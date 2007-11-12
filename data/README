@@ -1,0 +1,75 @@
+
+
+********************************************************************************
+*                        Data files license notes                              *
+********************************************************************************
+
+
+== LICENSE =====================================================================
+
+All data files included in this directory or any of its subdirectories, with
+some exceptions that are explained later in this file, are distributed under the
+terms of the GNU General Public License version 3 or, at your option, any later
+version.
+
+A full description of this license can be found in the COPYING file in the
+parent directory.
+
+(c) Juan Pedro Bolívar Puente, 2007
+
+
+== EXCEPTIONS ==================================================================
+
+Some of the files under this directory hierarchy are taken from other free
+software. In this section we will explain which are those files and the legal
+notice from its original author.
+
+==
+CEGUI Skin XML template files -every .xsd file- and the TaharezLooks skin
+-every containing the string TaharezLooks in its name- are taken from the CEGUI
+library.
+
+
+>> Original Note
+
+The MIT License
+
+Copyright (c) 2004 - 2006 Paul D Turner & The CEGUI Development Team
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software is furnished to do so,
+subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+
+==
+DejaVu font -file DejaVuSans.ttf- was taken from the DejaVu project.
+
+
+>> Original Note
+
+DejaVuSans.ttf is a international TrueType font from the excellent DejaVu font
+package, which is distributed under the conditions of the Bitstream Vera Fonts
+Copyright, which can be found in the DejaVu package.
+
+DejaVu fonts 2.2 (c)2004-2006 Stepan Roh and DejaVu fonts team
+
+The DejaVu fonts are a font family based on the Bitstream Vera Fonts
+(http://gnome.org/fonts/). Its purpose is to provide a wider range of
+characters (see status.txt for more information) while maintaining the
+original look and feel.
+
+DejaVu fonts are based on Bitstream Vera fonts version 1.10.
+
