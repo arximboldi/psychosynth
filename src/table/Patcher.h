@@ -69,6 +69,17 @@ const PatcherData PATCHER_TABLE[N_OBJECTS][N_OBJECTS] =
     }
 };
 
+class PatcherListener {
+public:
+    virtual void handleLinkAdded() = 0;
+    virtual void handleLinkDeleted() = 0;
+};
+
+class PatcherSubject {
+public:
+    
+};
+
 class Patcher
 {
     struct Link {
@@ -120,6 +131,7 @@ class Patcher
     inline void undoLink(Link& l);
     inline void makeLink(Link& l);
     inline void findInSock(Link& l);
+    inline bool isLinked(Link& l);
     
 public:
     Patcher();

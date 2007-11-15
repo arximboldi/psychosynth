@@ -43,19 +43,19 @@ void showVersion() {
 
 int main(int argc, const char *argv[])
 {	
-#if 0
+#if 1
     PsychoSynth3D mainApp;
 
     mainApp.run(argc, argv);
 #endif
 
-#if 1
+#if 0
     AudioInfo info(DEFAULT_SAMPLE_RATE, DEFAULT_BUFFER_SIZE, DEFAULT_NUM_CHANNEL);
     Table table(info);
     Output* output(new OutputAlsa(info, "default"));
 
     table.attachOutput(output);
-    TableObject obj = table.addObject(OBJ_OSCILLATOR, 1024);
+    TableObject obj = table.addObject(OBJ_OSCILLATOR);
     table.activateObject(obj);
     table.update();
     cout << "Opening...\n";
@@ -83,6 +83,8 @@ int main(int argc, const char *argv[])
 	    usleep(delta * 1000);
 	} while ((n -= delta) > 0);
     } while (++type < ObjectOscillator::N_OSC_TYPES);
+    obj.deleteMe();
+    sleep(1);
 #endif
 	
     return 0;

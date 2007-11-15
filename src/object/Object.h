@@ -137,7 +137,7 @@ private:
 	
 	void configure(int type, void* dest);
 
-	int type() {
+	int type() const {
 	    return m_type;
 	};
 	
@@ -148,7 +148,7 @@ private:
 	}
 
 	template <typename T>
-	void get(T& d) {
+	void get(T& d) const {
 	    d = *static_cast<T*>(m_src);
 	}
 	

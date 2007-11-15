@@ -25,21 +25,23 @@
 using namespace CEGUI;
 
 WindowList::Button::Button(std::string imageset, std::string layout,
-						   ToggableWindow* window, OIS::KeyCode key, int i) :
-	m_toggable(window),
-	m_key(key)
+			   ToggableWindow* window, OIS::KeyCode key, int i) :
+    m_toggable(window),
+    m_key(key)
 {
-	ImagesetManager::getSingleton().createImageset(imageset);
+    ImagesetManager::getSingleton().createImageset(imageset);
 	 
-	m_window = WindowManager::getSingleton().loadWindowLayout(layout);
+    m_window = WindowManager::getSingleton().loadWindowLayout(layout);
+
+    m_window->setPosition(UVector2(UDim(0.0, WL_GAP*(i+1) + WL_BUTTON_SIZE*i), 
+    				   UDim(1.0, -WL_BUTTON_SIZE-WL_GAP)));
+    m_window->setWantsMultiClickEvents(false);
+    m_window->subscribeEvent(PushButton::EventClicked, 
+			     Event::Subscriber(&WindowList::Button::onClick,
+					       this));
+  
+    Window* root_win = System::getSingleton().getGUISheet();
+    root_win->addChildWindow(m_window);
 	
-	m_window->setPosition(UVector2(UDim(0.0, WL_GAP*(i+1) + WL_BUTTON_SIZE*i), 
-								   UDim(1.0, -WL_BUTTON_SIZE-WL_GAP)));
-	m_window->subscribeEvent(PushButton::EventClicked, 
-							 Event::Subscriber(&WindowList::Button::onClick, this));
-						 
-	Window* root_win = System::getSingleton().getGUISheet();
-	root_win->addChildWindow(m_window);
-	
-	m_toggable->setActive(false);
+    m_toggable->setActive(false);
 }

@@ -7,6 +7,7 @@ psychosynth_SOURCES = \
 	common/AudioBuffer.cpp \
 	common/RingAudioBuffer.cpp \
 	common/Mutex.cpp \
+	common/Misc.cpp \
 	table/Table.cpp \
 	table/Patcher.cpp \
 	gui3d/CameraControllerRasko.cpp \
@@ -53,6 +54,7 @@ noinst_HEADERS = \
 	common/RingAudioBuffer.h \
 	common/AudioInfo.h \
         common/MapIterator.h \
+	common/Misc.h \
 	table/Table.h \
 	table/Patcher.h\
 	gui3d/CameraController.h \

@@ -35,45 +35,56 @@
 #include "gui3d/ElementManager.h"
 #include "gui3d/WindowList.h"
 #include "gui3d/CameraControllerRasko.h"
+#include "table/Table.h"
+#include "output/Output.h"
 
+class PsychoSynth3D : public Ogre::FrameListener
+{
+    Ogre::Root*          m_ogre;
+    Ogre::RenderWindow*  m_window;
+    Ogre::SceneManager*  m_scene;
+    Ogre::Camera*        m_camera;
+    Ogre::Viewport*      m_viewport;
+	
+    CEGUI::System*            m_gui;
+    CEGUI::OgreCEGUIRenderer* m_ceguirender;
+	
+    InputManager*     m_inputmgr;
+    CeguiInjecter*    m_guiinput;
+    TaskManager*      m_taskmgr;
+    ElementManager*   m_elemmgr;
+    WindowList*       m_windowlist;
+    CameraController* m_camctrl;
+    Timer m_timer;
 
-class PsychoSynth3D : public Ogre::FrameListener {
-	Ogre::Root          *m_ogre;
-	Ogre::RenderWindow  *m_window;
-	Ogre::SceneManager  *m_scene;
-	Ogre::Camera        *m_camera;
-	Ogre::Viewport      *m_viewport;
-	
-	CEGUI::System*            m_gui;
-	CEGUI::OgreCEGUIRenderer *m_ceguirender;
-	
-	InputManager     *m_inputmgr;
-	CeguiInjecter    *m_guiinput;
-	TaskManager      *m_taskmgr;
-	ElementManager   *m_elemmgr;
-	WindowList       *m_windowlist;
-	CameraController *m_camctrl;
-	
-	Timer m_timer;
-	
-	bool must_quit;
+    AudioInfo m_audio_info;
+    Table*    m_table;
+    Output*   m_output;
+    
+    bool must_quit;
+
+    void setupOgre();
+    void setupInput();
+    void setupGui();
+    void setupSynth();
+    void setupMenus();
+    void setupTable();
+
+    void closeTable();
+    void closeMenus();
+    void closeSynth();
+    void closeGui();
+    void closeInput();
+    void closeOgre();
+   
+
 public:
-	PsychoSynth3D() {
-	}
-	
-	~PsychoSynth3D() {
-	}
+    PsychoSynth3D();
+    ~PsychoSynth3D();
 		
-	int run(int argc, const char* argv[]);
-	
-	void setupOgre();
-	void setupInput();
-	void setupGui();
-	void closeOgre();
-	void closeInput();
-	void closeGui();
-	
-	bool frameStarted(const Ogre::FrameEvent& evt);
+    int run(int argc, const char* argv[]);
+       	
+    bool frameStarted(const Ogre::FrameEvent& evt);
 };
 
 #endif /* PSYCHOSYNTH3D_H */

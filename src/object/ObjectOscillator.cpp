@@ -65,7 +65,7 @@ ObjectOscillator::ObjectOscillator(const AudioInfo& prop, int mode) :
     Object(prop,
 	   OBJ_OSCILLATOR,
 	   N_PARAM,
-	   N_IN_A_SOCKETS, 
+	   N_IN_A_SOCKETS,
 	   N_IN_C_SOCKETS,
 	   N_OUT_A_SOCKETS,
 	   N_OUT_C_SOCKETS),
@@ -123,6 +123,6 @@ void ObjectOscillator::doUpdate()
 	m_time += speed;
     }
 
-    for (i = 1; i < getAudioInfo().num_channels; i++)
+    for (i = 1; i < (size_t)getAudioInfo().num_channels; i++)
 	memcpy((*buf)[i], (*buf)[0], sizeof(Sample) * getAudioInfo().block_size);
 }

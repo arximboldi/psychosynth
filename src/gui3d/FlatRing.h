@@ -25,77 +25,79 @@
 
 #include <OGRE/Ogre.h>
 
-class FlatRing : public Ogre::ManualObject {
-	Ogre::Degree m_startangle;
-	Ogre::Degree m_endangle;
-	Ogre::Real m_innerrad;
-	Ogre::Real m_outerrad;
-	Ogre::ColourValue m_colour;
-	int m_numtrig;
+class FlatRing : public Ogre::ManualObject
+{
+    Ogre::Degree m_startangle;
+    Ogre::Degree m_endangle;
+    Ogre::Real m_innerrad;
+    Ogre::Real m_outerrad;
+    Ogre::ColourValue m_colour;
+    int m_numtrig;
 	
-	void build();
-	void createMaterial();
+    void build();
+    void createMaterial();
 
 public:
-	FlatRing(const Ogre::String& id,
-			 Ogre::Degree start_angle = Ogre::Degree(0.0), 
-			 Ogre::Degree end_angle = Ogre::Degree(360.0),
-			 Ogre::Real inner_radious = 0.5,
-			 Ogre::Real outer_radious = 1,
-			 Ogre::ColourValue colour = Ogre::ColourValue(),
-			 int num_triangles = 40);
+    FlatRing(const Ogre::String& id,
+	     Ogre::Degree start_angle = Ogre::Degree(0.0), 
+	     Ogre::Degree end_angle = Ogre::Degree(360.0),
+	     Ogre::Real inner_radious = 0.5,
+	     Ogre::Real outer_radious = 1,
+	     Ogre::ColourValue colour = Ogre::ColourValue(),
+	     int num_triangles = 40);
 	
-	~FlatRing();
+    ~FlatRing();
 	
-	void setStartAngle(Ogre::Degree start_angle) {
-		m_startangle = start_angle;
-	};
+    void setStartAngle(Ogre::Degree start_angle) {
+	m_startangle = start_angle;
+    };
 	
-	void setEndAngle(Ogre::Degree end_angle) {
-		m_endangle = end_angle;
-	};
+    void setEndAngle(Ogre::Degree end_angle) {
+	m_endangle = end_angle;
+    };
 	
-	void setInnerRadious(Ogre::Real inner_radious) {
-		m_innerrad = inner_radious;
-	};
+    void setInnerRadious(Ogre::Real inner_radious) {
+	m_innerrad = inner_radious;
+    };
 	
-	void setOuterRadious(Ogre::Real outer_radious) {
-		m_outerrad = outer_radious;
-	};
+    void setOuterRadious(Ogre::Real outer_radious) {
+	m_outerrad = outer_radious;
+    };
 	
-	void setColour(Ogre::ColourValue colour) {
-		m_colour = colour;
-	};
+    void setColour(Ogre::ColourValue colour) {
+	m_colour = colour;
+	createMaterial();
+    };
 	
-	void setTriangles(int numtrig) {
-		m_numtrig = numtrig;
-	};
+    void setTriangles(int numtrig) {
+	m_numtrig = numtrig;
+    };
 	
-	Ogre::Degree getStartAngle() const {
-		return m_startangle;
-	};
+    Ogre::Degree getStartAngle() const {
+	return m_startangle;
+    };
 	
-	Ogre::Degree getEndAngle() const {
-		return m_endangle;
-	};
+    Ogre::Degree getEndAngle() const {
+	return m_endangle;
+    };
 	
-	Ogre::Real getInnerRadious() const {
-		return m_outerrad;
-	};
+    Ogre::Real getInnerRadious() const {
+	return m_outerrad;
+    };
 	
-	Ogre::Real getOuterRadious() const {
-		return m_outerrad;
-	};
+    Ogre::Real getOuterRadious() const {
+	return m_outerrad;
+    };
 	
-	Ogre::ColourValue getColour() const {
-		return m_colour;
-	};
+    Ogre::ColourValue getColour() const {
+	return m_colour;
+    };
 	
-	int getTriangles() const {
-		return m_numtrig;
-	}
+    int getTriangles() const {
+	return m_numtrig;
+    }
 	
-	void update();
+    void update();
 };
 
 #endif /* FLATRING_H */

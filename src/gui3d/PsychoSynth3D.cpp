@@ -25,12 +25,23 @@
 #include "gui3d/ElementSelector.h"
 #include "gui3d/CameraControllerRasko.h"
 #include "gui3d/Element.h"
+#include "gui3d/ElementTypes.h"
 #include "gui3d/QueryFlags.h"
 #include "gui3d/FlatRing.h"
 
+#include "output/OutputAlsa.h"
 
 using namespace Ogre;
 using namespace std;
+
+PsychoSynth3D::PsychoSynth3D() :
+    m_audio_info(DEFAULT_SAMPLE_RATE, DEFAULT_BUFFER_SIZE, DEFAULT_NUM_CHANNEL)
+{
+}
+
+PsychoSynth3D::~PsychoSynth3D()
+{
+}
 
 void PsychoSynth3D::setupOgre()
 {
@@ -56,9 +67,51 @@ void PsychoSynth3D::setupOgre()
 	
     m_ogre->addFrameListener(this);
 	
-    /*** TODO: This scene creation code must be separated *********************/
     m_scene = m_ogre->createSceneManager(Ogre::ST_GENERIC, "main");
+
+    /* TODO: This scene creation code must be separated? */
+}
+
+void PsychoSynth3D::setupInput()
+{
+    size_t window_hnd = 0;
+    m_window->getCustomAttribute("WINDOW", &window_hnd);
+    m_inputmgr = new InputManager(window_hnd);
+}
+
+void PsychoSynth3D::setupGui()
+{
+    m_ceguirender = new CEGUI::OgreCEGUIRenderer(m_window,
+						 Ogre::RENDER_QUEUE_OVERLAY, false,
+						 3000, m_scene);
+    m_gui = new CEGUI::System(m_ceguirender);
 	
+    CEGUI::SchemeManager::getSingleton().loadScheme("TaharezLook.scheme");
+    m_gui->setDefaultMouseCursor("TaharezLook", "MouseArrow");
+    m_gui->setDefaultFont(CEGUI::FontManager::getSingleton().
+			  createFont("DejaVuSans-10.font"));
+	
+    CEGUI::WindowManager *win = CEGUI::WindowManager::getSingletonPtr();
+    CEGUI::Window *sheet = win->createWindow("DefaultGUISheet", "root"); // TODO: root?
+    m_gui->setGUISheet(sheet);
+
+    m_guiinput   = new CeguiInjecter(); 
+    m_inputmgr->addMouseListener(m_guiinput);
+    m_inputmgr->addKeyListener(m_guiinput);
+}
+
+void PsychoSynth3D::setupSynth()
+{
+    m_table = new Table(m_audio_info);
+    m_output = new OutputAlsa(m_audio_info, "default");
+    m_table->attachOutput(m_output);
+    m_table->update();
+    m_output->open();
+    m_output->start();
+}
+
+void PsychoSynth3D::setupTable()
+{
     m_camera = m_scene->createCamera("camera");
     m_camera->setNearClipDistance(5);
     m_viewport = m_window->addViewport(m_camera);
@@ -92,36 +145,68 @@ void PsychoSynth3D::setupOgre()
     node->attachObject(ring);
     node->setPosition(Vector3(0,0.001,0));
 
+    m_taskmgr = new TaskManager();
+    m_elemmgr = new ElementManager(m_table, m_scene, m_camera);
+    m_camctrl = new CameraControllerRasko(m_camera, m_taskmgr);
+
+    m_inputmgr->addMouseListener(m_camctrl);
+    m_inputmgr->addMouseListener(m_elemmgr);
+    m_inputmgr->addKeyListener(m_camctrl);
+    m_inputmgr->addKeyListener(m_elemmgr);
+
+    m_table->addTableListener(m_elemmgr);
 }
 
-void PsychoSynth3D::setupInput()
+void PsychoSynth3D::setupMenus()
 {
-    size_t window_hnd = 0;
-    m_window->getCustomAttribute("WINDOW", &window_hnd);
-    m_inputmgr = new InputManager(window_hnd);
+    m_windowlist = new WindowList();
+	
+    ElementSelector* selector = new ElementSelector(m_elemmgr);
+    ElementSelector::Category* cat = NULL;
+
+    cat = selector->addCategory("Wave");
+    cat->addButton("Sine", ELEM_OSC_SINE);
+    cat->addButton("Square", ELEM_OSC_SQUARE);
+    cat->addButton("Sawtooth", ELEM_OSC_SAWTOOTH);
+    cat->addButton("Triangle", ELEM_OSC_TRIANGLE);
+
+    cat = selector->addCategory("Mix");
+    cat->addButton("Mixer", ELEM_MIXER);
+	
+    m_windowlist->addWindow("ElementSelectorButton.imageset",
+			    "ElementSelectorButton.layout",
+			    selector,
+			    OIS::KC_UNASSIGNED);
+    
+    m_windowlist->addWindow("QuitWindowButton.imageset",
+			    "QuitWindowButton.layout",
+			    new QuitWindow(),
+			    OIS::KC_ESCAPE);
+
+    m_inputmgr->addKeyListener(m_windowlist);
 }
 
-void PsychoSynth3D::setupGui()
+void PsychoSynth3D::closeTable()
 {
-    m_ceguirender = new CEGUI::OgreCEGUIRenderer(m_window,
-						 Ogre::RENDER_QUEUE_OVERLAY, false,
-						 3000, m_scene);
-    m_gui = new CEGUI::System(m_ceguirender);
-	
-    CEGUI::SchemeManager::getSingleton().loadScheme("TaharezLook.scheme");
-    m_gui->setDefaultMouseCursor("TaharezLook", "MouseArrow");
-    m_gui->setDefaultFont(CEGUI::FontManager::getSingleton().
-			  createFont("DejaVuSans-10.font"));
-	
-    /* TODO */
-    CEGUI::WindowManager *win = CEGUI::WindowManager::getSingletonPtr();
-    CEGUI::Window *sheet = win->createWindow("DefaultGUISheet", "root");
-    m_gui->setGUISheet(sheet);
+    delete m_taskmgr;
+    delete m_camctrl;
+    delete m_elemmgr;
+}
+
+void PsychoSynth3D::closeMenus()
+{
+    delete m_windowlist;
+}
+
+void PsychoSynth3D::closeSynth()
+{
+    delete m_table;
 }
 
 void PsychoSynth3D::closeGui()
 {
-//  TODO
+    delete m_guiinput;
+// TODO
 //	delete m_ceguirender;
 //	delete m_gui; /
 }
@@ -140,53 +225,19 @@ int PsychoSynth3D::run(int argc, const char* argv[])
 {
     setupOgre();
     setupInput();
+    setupSynth();
+    setupTable();
     setupGui();
-
-    m_guiinput   = new CeguiInjecter();
-    m_taskmgr    = new TaskManager();
-    m_elemmgr    = new ElementManager(NULL, m_scene, m_camera);
-    m_camctrl    = new CameraControllerRasko(m_camera, m_taskmgr);
-    m_windowlist = new WindowList();
-	
-    ElementSelector* selector = new ElementSelector(m_elemmgr);
-    ElementSelector::Category* cat = NULL;
-    cat = selector->addCategory("Wave");
-    cat->addButton("Sine", 0);
-    cat->addButton("Square", 0);
-    cat->addButton("Sawtooth", 0);
-    cat->addButton("Triangle", 0);
-    cat = selector->addCategory("Sample");
-    cat->addButton("Bass.wav", 0);
-    cat = selector->addCategory("Control");
-	
-    m_windowlist->addWindow("ElementSelectorButton.imageset",
-			    "ElementSelectorButton.layout",
-			    selector,
-			    OIS::KC_UNASSIGNED);
-    m_windowlist->addWindow("QuitWindowButton.imageset",
-			    "QuitWindowButton.layout",
-			    new QuitWindow(),
-			    OIS::KC_ESCAPE);
-	
-    m_inputmgr->addMouseListener(m_guiinput);
-    m_inputmgr->addMouseListener(m_elemmgr);
-    m_inputmgr->addMouseListener(m_camctrl);
-	
-    m_inputmgr->addKeyListener(m_guiinput);
-    m_inputmgr->addKeyListener(m_elemmgr);
-    m_inputmgr->addKeyListener(m_camctrl);
-    m_inputmgr->addKeyListener(m_windowlist);
+    setupMenus();
 		
     m_timer.forceFps(120);
 		
     m_ogre->startRendering();
-	
-    delete m_taskmgr;
-    delete m_camctrl;
-    delete m_windowlist;
-    delete m_elemmgr;
-	
+    
+    closeMenus();
     closeGui();
+    closeTable();
+    closeSynth();
     closeInput();
     closeOgre();
        
@@ -197,7 +248,9 @@ bool PsychoSynth3D::frameStarted(const Ogre::FrameEvent& evt)
 {
     m_timer.update();
     m_inputmgr->capture();
-
     m_taskmgr->update(m_timer.deltaticks());
+    m_table->update();
+    m_elemmgr->update();
+	
     return !must_quit;
 }

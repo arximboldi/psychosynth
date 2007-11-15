@@ -46,7 +46,7 @@ void FlatRing::build()
 void FlatRing::createMaterial()
 {
     MaterialPtr matptr = 
-	MaterialManager::getSingleton().create(getName(), "General"); 
+	MaterialManager::getSingleton().createOrRetrieve(getName(), "General").first; 
 	
     matptr->setReceiveShadows(true);
     Pass* pass = matptr->getTechnique(0)->getPass(0);

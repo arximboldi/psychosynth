@@ -31,43 +31,44 @@
 
 const int N_MB = OIS::MB_Button7+1;
 
-class ElementManager : public OIS::MouseListener, public OIS::KeyListener
+class ElementManager : public OIS::MouseListener,
+		       public OIS::KeyListener,
+		       public TableListener
 {
-	typedef std::map<std::string,Element*> ElemMap;
-	typedef ElemMap::iterator  ElemIter;
+    typedef std::list<Element*> ElemList;
+    typedef ElemList::iterator ElemIter;
 	
-	Table* m_table;
-	ElemMap m_elems;
-	ElemIter m_addelem;
-	ElemIter m_selected;
+    Table* m_table;
+    ElemList m_elems;
+    ElemList m_clear_elems;
+    	
+    int m_elemcount;
 	
-	int m_elemcount;
+    Ogre::Camera* m_camera;
+    Ogre::SceneManager* m_scene;
+    Ogre::RaySceneQuery* m_rayquery;
 	
-	Ogre::Camera* m_camera;
-	
-	Ogre::SceneManager* m_scene;
-	Ogre::RaySceneQuery* m_rayquery;
-	
-	bool m_pressed[N_MB];
-	
-	void stopAdding();
-	void add();
-	void select(const std::string& name);
-	void unselect();
-	bool isAdding() { return m_addelem != m_elems.end(); }
-	bool isSelected() { return m_selected != m_elems.end(); }
-	void move(Element* elem);
 
+    bool getTablePointer(Ogre::Vector2& res);
+    Element* createElement(TableObject& obj);
+    
 public:
-	ElementManager(Table* table, Ogre::SceneManager* scene, Ogre::Camera* camera);
+    ElementManager(Table* table, Ogre::SceneManager* scene,
+		   Ogre::Camera* camera);
+
+    void update();
+    
+    void addElement(int e_type);
 	
-	void addElement(int e_type);
-	
-	bool mouseMoved(const OIS::MouseEvent& e);
-	bool mousePressed(const OIS::MouseEvent &e, OIS::MouseButtonID id);
-	bool mouseReleased(const OIS::MouseEvent &e, OIS::MouseButtonID id);
-	bool keyPressed(const OIS::KeyEvent &e);
-	bool keyReleased(const OIS::KeyEvent &e);
+    bool mouseMoved(const OIS::MouseEvent& e);
+    bool mousePressed(const OIS::MouseEvent &e, OIS::MouseButtonID id);
+    bool mouseReleased(const OIS::MouseEvent &e, OIS::MouseButtonID id);
+    
+    bool keyPressed(const OIS::KeyEvent &e);
+    bool keyReleased(const OIS::KeyEvent &e);
+
+    void handleAddObject(TableObject& obj);
+    void handleDeleteObject(TableObject& obj);
 };
 
 #endif /* ELEMENTMANAGER_H */

@@ -31,125 +31,125 @@ const float BUT_WIDTH = 100;
 const float BUT_HEIGHT = 20;
 
 ElementSelector::Category::Button::Button(const std::string& name, 
-								   ElementManager* mgr, int elem_type,
-								   int index) :
-	m_elem_type(elem_type),
-	m_mgr(mgr),
-	m_index(index)
+					  ElementManager* mgr, int elem_type,
+					  int index) :
+    m_elem_type(elem_type),
+    m_mgr(mgr),
+    m_index(index)
 {
-	WindowManager& wmgr = WindowManager::getSingleton();
+    WindowManager& wmgr = WindowManager::getSingleton();
 	
-	m_window = wmgr.createWindow("TaharezLook/Button", name);
-	m_window->setText    (name);
-	m_window->setSize    ( UVector2(CEGUI::UDim(0, BUT_WIDTH), CEGUI::UDim(0, BUT_HEIGHT)));
-	
-	m_window->subscribeEvent(PushButton::EventClicked,
-			Event::Subscriber(&ElementSelector::Category::Button::onClick, this));
-	m_window->subscribeEvent(Window::EventParentSized,
-			Event::Subscriber(&ElementSelector::Category::Button::onParentResize, this));
+    m_window = wmgr.createWindow("TaharezLook/Button", name);
+    m_window->setText    (name);
+    m_window->setSize    ( UVector2(CEGUI::UDim(0, BUT_WIDTH), CEGUI::UDim(0, BUT_HEIGHT)));
+    m_window->setWantsMultiClickEvents(false);
+    m_window->subscribeEvent(PushButton::EventClicked,
+			     Event::Subscriber(&ElementSelector::Category::Button::onClick, this));
+    m_window->subscribeEvent(Window::EventParentSized,
+			     Event::Subscriber(&ElementSelector::Category::Button::onParentResize, this));
 }
 
 void ElementSelector::Category::Button::setPosition()
 {
-	float x, y;
-	int xindex, yindex, butsinrow;
-	float maxw = m_window->getParentPixelWidth();
+    float x, y;
+    int xindex, yindex, butsinrow;
+    float maxw = m_window->getParentPixelWidth();
 	
-	butsinrow = int(maxw) / int(BUT_WIDTH + BUT_XGAP);
-	if (butsinrow < 1)
-		butsinrow = 1;
+    butsinrow = int(maxw) / int(BUT_WIDTH + BUT_XGAP);
+    if (butsinrow < 1)
+	butsinrow = 1;
 		
-	yindex = m_index / butsinrow;
-	xindex = m_index % butsinrow;
+    yindex = m_index / butsinrow;
+    xindex = m_index % butsinrow;
 	
-	y = (yindex) * BUT_YGAP + yindex * BUT_HEIGHT;
-	x = (xindex) * BUT_XGAP + xindex * BUT_WIDTH;
+    y = (yindex) * BUT_YGAP + yindex * BUT_HEIGHT;
+    x = (xindex) * BUT_XGAP + xindex * BUT_WIDTH;
 
-	m_window->setPosition(UVector2(UDim(0, x), UDim(0, y)));
+    m_window->setPosition(UVector2(UDim(0, x), UDim(0, y)));
 }
 
 ElementSelector::Category::Category(const std::string& name, ElementManager* mgr) :
-	m_mgr(mgr),
-	m_nbut(0)
+    m_mgr(mgr),
+    m_nbut(0)
 {
-	WindowManager& wmgr = WindowManager::getSingleton();
+    WindowManager& wmgr = WindowManager::getSingleton();
 	
-	m_window = wmgr.createWindow("TaharezLook/ScrollablePane", name);
-	m_window->setPosition( UVector2(UDim(0, BUT_XGAP),    UDim(0, BUT_YGAP)) );
-	m_window->setSize    ( UVector2(UDim(1, -2*BUT_XGAP), UDim(1, -2*BUT_YGAP)) );
-	m_window->setText    (name);
+    m_window = wmgr.createWindow("TaharezLook/ScrollablePane", name);
+    m_window->setPosition( UVector2(UDim(0, BUT_XGAP),    UDim(0, BUT_YGAP)) );
+    m_window->setSize    ( UVector2(UDim(1, -2*BUT_XGAP), UDim(1, -2*BUT_YGAP)) );
+    m_window->setText    (name);
 }
 
 ElementSelector::Category::~Category()
 {
-	list<Button*>::iterator i;
-	for (i = m_buts.begin(); i != m_buts.end(); i++);
-		delete *i;
+    list<Button*>::iterator i;
+    for (i = m_buts.begin(); i != m_buts.end(); i++);
+    delete *i;
 	
-	//delete m_window;
+    //delete m_window;
 }
 
 void ElementSelector::Category::addButton(const std::string& name, int elem_id)
 {
-	Button* but = new Button(name, m_mgr, elem_id, m_nbut++);
-	m_buts.push_back(but);
+    Button* but = new Button(name, m_mgr, elem_id, m_nbut++);
+    m_buts.push_back(but);
 
-	m_window->addChildWindow( but->getWindow() );
+    m_window->addChildWindow( but->getWindow() );
 	
-	but->setPosition();
+    but->setPosition();
 }
 
 CEGUI::FrameWindow* ElementSelector::createWindow()
 {
-	WindowManager& wmgr = WindowManager::getSingleton();
+    WindowManager& wmgr = WindowManager::getSingleton();
 	
-	FrameWindow* window = dynamic_cast<FrameWindow*>(
-					wmgr.createWindow("TaharezLook/FrameWindow", "window_selector"));
+    FrameWindow* window = dynamic_cast<FrameWindow*>(
+	wmgr.createWindow("TaharezLook/FrameWindow", "window_selector"));
 	
-	window->setPosition( UVector2(UDim(0, 10), UDim(0, 10)) );
-	window->setSize    ( UVector2(UDim(1, -20),UDim(0, 100)) );
-	window->setText("Object Selector");
+    window->setPosition( UVector2(UDim(0, 10), UDim(0, 10)) );
+    window->setSize    ( UVector2(UDim(1, -20),UDim(0, 100)) );
+    window->setText("Object Selector");
 	
-	m_container = wmgr.createWindow("TaharezLook/TabControl", "container_selector");
-	m_container->setPosition( UVector2(UDim(0, 10), UDim(0, 30)) );
-	m_container->setSize    ( UVector2(UDim(1, -20),     UDim(1, -40)) );
+    m_container = wmgr.createWindow("TaharezLook/TabControl", "container_selector");
+    m_container->setPosition( UVector2(UDim(0, 10), UDim(0, 30)) );
+    m_container->setSize    ( UVector2(UDim(1, -20),     UDim(1, -40)) );
 	
-	window->addChildWindow(m_container);
+    window->addChildWindow(m_container);
 	
-	return window;
+    return window;
 }
 
 ElementSelector::Category* ElementSelector::addCategory(const std::string& name)
 {
-	if (m_cat[name] != NULL)
-		return NULL;
+    if (m_cat[name] != NULL)
+	return NULL;
 
-	Category* newcat = new Category(name, m_mgr);
-	m_container->addChildWindow(newcat->getWindow());
-	m_cat[name] = newcat;
+    Category* newcat = new Category(name, m_mgr);
+    m_container->addChildWindow(newcat->getWindow());
+    m_cat[name] = newcat;
 	
-	return newcat;
+    return newcat;
 }
 
 ElementSelector::Category* ElementSelector::findCategory(const std::string& name)
 {
-	map<string,Category*>::iterator i = m_cat.find(name);
+    map<string,Category*>::iterator i = m_cat.find(name);
 	
-	if (i == m_cat.end())
-		return NULL;
+    if (i == m_cat.end())
+	return NULL;
 	
-	return (*i).second;
+    return (*i).second;
 }
 
 ElementSelector::ElementSelector(ElementManager* emgr) :
-	m_mgr(emgr)
+    m_mgr(emgr)
 {
-	setActive(false); // Force creation of the window;
+    setActive(false); // Force creation of the window;
 }
 
 ElementSelector::~ElementSelector()
 {
-	map<string,Category*>::iterator i;
-	for (i = m_cat.begin(); i != m_cat.end(); i++)
-		delete (*i).second;
+    map<string,Category*>::iterator i;
+    for (i = m_cat.begin(); i != m_cat.end(); i++)
+	delete (*i).second;
 }

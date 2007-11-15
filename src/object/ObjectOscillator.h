@@ -68,7 +68,7 @@ public:
 
 private:
     const static int DEFAULT_FREQ = 110;
-    const static float  DEFAULT_AMPL = 1;
+    const static float  DEFAULT_AMPL = 0.5;
     const static int TABLE_SIZE = 1<<12;
 
     static Sample m_table[N_OSC_TYPES][TABLE_SIZE];

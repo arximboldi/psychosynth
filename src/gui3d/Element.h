@@ -24,47 +24,154 @@
 #define ELEMENT_H
 
 #include <OGRE/Ogre.h>
+#include <OIS/OIS.h>
 
-class Element {
-	std::string m_id;
-	
-	Ogre::Entity* m_entity;
-	Ogre::SceneNode* m_node;
-	
-	Ogre::Vector2 m_pos;
-	Ogre::Degree m_angle;
-	
-	bool m_ghost;
-	bool m_selected;
+#include "gui3d/FlatRing.h"
+#include "table/Table.h"
+
+class Element;
+
+class ElemComponent
+{
+    Element* m_parent;
+    Ogre::SceneNode* m_node;
+    
+public:    
+    virtual ~ElemComponent() {};
+    virtual void init() = 0;
+    virtual void handleParamChange(TableObject& obj, int param_id) = 0;
+    virtual bool handlePointerMove(Ogre::Vector2 pos) = 0;
+    virtual bool handlePointerClick(Ogre::Vector2 pos, OIS::MouseButtonID id) = 0;
+    virtual bool handlePointerRelease(Ogre::Vector2 pos, OIS::MouseButtonID id) = 0;
+    
+    void setSceneNode(Ogre::SceneNode* node) {
+	m_node = node;
+    }
+    
+    Ogre::SceneNode* getSceneNode() {
+	return m_node;
+    }
+
+    void setParent(Element* parent) {
+	m_parent = parent;
+    }
+    
+    Element* getParent() {
+	return m_parent;
+    };
+};
+
+class ElemMainComponent : public ElemComponent
+{
+    std::string m_mesh;
+    Ogre::Entity* m_mesh_ent;
+    Ogre::Vector2 m_last_mouse_pos;
+    int m_param;
+    float m_min_val;
+    float m_max_val;
+    float m_old_value;
+    bool m_rotating;
+    
 public:
-	Element(Ogre::SceneManager* scene, std::string id, std::string mesh, Ogre::Vector2 pos,
-			Ogre::Degree angle, bool phantom);
-	virtual ~Element();
+    ElemMainComponent(const std::string& mesh,
+		      int param, float min_val, float max_val);
+    void setMesh(const std::string& mesh);
+
+    bool handlePointerMove(Ogre::Vector2 pos);
+    bool handlePointerClick(Ogre::Vector2 pos, OIS::MouseButtonID id);
+    bool handlePointerRelease(Ogre::Vector2 pos, OIS::MouseButtonID id);
+    void init();
+    virtual void handleParamChange(TableObject& obj, int param_id);
+};
+
+class ElemMultiMainComponent : public ElemMainComponent
+{
+    int m_param;
+    const char** m_names;
+public:
+    ElemMultiMainComponent(int param_1, float min_val, float max_val,
+			   int param_2, const char** names);
+    
+    void handleParamChange(TableObject& obj, int param_id);
+};
+
+class Element : public TableObjectListener
+{
+    typedef std::list<ElemComponent*>::iterator ElemComponentIter;
+    std::list<ElemComponent*> m_comp;
+        
+    TableObject m_obj;
+
+    Ogre::ColourValue   m_col_ghost;
+    Ogre::ColourValue   m_col_selected;
+    Ogre::ColourValue   m_col_normal;
+    Ogre::SceneManager* m_scene;
+    FlatRing*           m_base;
+    Ogre::SceneNode*    m_node;
+
+    Ogre::Vector2 m_click_diff;
+    Ogre::Vector2 m_pos;
+    Ogre::Degree m_angle;
 	
-	bool isGhost() {
-		return m_ghost;
-	};
+    bool m_ghost;
+    bool m_selected;
+    bool m_moving;
+    
+public:
+    static const Real RADIOUS = 1.0f;
+
+    Element(const TableObject& obj, Ogre::SceneManager* scene);
+    
+    virtual ~Element();
+
+    void addComponent(ElemComponent* comp);
+    
+    void setGhost(bool ghost);
+    void setSelected(bool selected);
+    void setPosition(const Ogre::Vector2& pos);
+    
+    bool pointerClicked(const Ogre::Vector2& pos, OIS::MouseButtonID id);
+    bool pointerReleased(const Ogre::Vector2& pos, OIS::MouseButtonID id);
+    bool pointerMoved(const Ogre::Vector2& pos);
+    bool keyPressed(const OIS::KeyEvent& e);
+    bool keyReleased(const OIS::KeyEvent& e);
+    
+    void handleMoveObject(TableObject& obj);
+    void handleActivateObject(TableObject& obj);
+    void handleDeactivateObject(TableObject& obj);
+    void handleSetParamObject(TableObject& ob, int param_id);
+    
+    bool isGhost() const {
+	return m_ghost;
+    };
 	
-	bool isSelected() {
-		return m_selected;
-	};
+    bool isSelected() const {
+	return m_selected;
+    };
 	
-	void setGhost(bool ghost);
-	void setSelected(bool selected);
-	
-	Ogre::Vector2 getPosition() {
-		return m_pos;
-	}
-	
-	void setPosition(const Ogre::Vector2& pos) {
-		m_pos = pos;
-		m_node->setPosition(Ogre::Vector3(pos.x, 0, pos.y));
-	};
-	
-	void rotate(Ogre::Degree angle) {
-		m_angle += angle;
-		m_node->yaw(angle);
-	};
+    Ogre::Vector2 getPosition() {
+	return m_pos;
+    }
+
+    Ogre::SceneManager* getScene() {
+	return m_scene;
+    }
+
+    TableObject& getObject() {
+	return m_obj;
+    }
+};
+
+class ElementOscillator : public Element
+{
+public:
+    ElementOscillator(const TableObject& obj, Ogre::SceneManager* m_scene);
+};
+
+class ElementMixer : public Element
+{
+public:
+    ElementMixer(const TableObject& obj, Ogre::SceneManager* m_scene);
 };
 
 #endif /* ELEMENT_H */

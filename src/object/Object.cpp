@@ -29,6 +29,8 @@ using namespace std;
 
 void Object::Param::configure(int type, void* dest)
 {
+    m_dest = dest;
+    
     if (type != m_type) {
 	switch(m_type) {
 	case PARAM_INT:
@@ -51,17 +53,20 @@ void Object::Param::configure(int type, void* dest)
 	    break;
 	case PARAM_INT:
 	    m_src = new int;
+	    *static_cast<int*>(m_src) = *static_cast<int*>(m_dest);
 	    break;
 	case PARAM_FLOAT:
 	    m_src = new float;
+	    *static_cast<float*>(m_src) = *static_cast<float*>(m_dest);
 	    break;
 	case PARAM_STRING:
 	    m_src = new string;
+	    *static_cast<string*>(m_src) = *static_cast<string*>(m_dest);
 	    break;
 	default: break;
 	}
     }
-    m_dest = dest;
+    
 }
 
 
@@ -85,6 +90,7 @@ Object::Object(const AudioInfo& info, int type, int params,
 
 Object::~Object()
 {
+    
 }
 
 void Object::connectIn(int type, int in_socket, Object* src, int out_socket)

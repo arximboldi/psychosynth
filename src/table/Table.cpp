@@ -28,7 +28,8 @@
 using namespace std;
 
 Table::Table(const AudioInfo& info) :
-    m_info(info)
+    m_info(info),
+    m_last_id(MIN_USER_ID)
 {
     m_output = new ObjectOutput(m_info);
     m_mixer = new ObjectMixer(m_info, MIXER_CHANNELS);
@@ -51,7 +52,7 @@ TableObject Table::findObject(int id)
 	return TableObject(*i, this);
 }
 
-TableObject Table::addObject(int type, int id)
+TableObject Table::addObject(int type)
 {
     Object* obj;
 
@@ -66,8 +67,8 @@ TableObject Table::addObject(int type, int id)
 	obj = NULL;
 	return TableObject(NULL, NULL);
     }
-
-    if (!m_objmgr.attachObject(obj, id))
+    
+    if (!m_objmgr.attachObject(obj, m_last_id++))
 	return TableObject(NULL, NULL);
 
     TableObject tobj(obj, this);

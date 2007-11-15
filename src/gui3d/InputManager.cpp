@@ -43,7 +43,7 @@ InputManager::~InputManager()
 bool InputManager::mouseMoved(const OIS::MouseEvent& e)
 {
 	bool finished = false;
-	for (MouseIter i = m_mlist.begin(); i != m_mlist.end() && !finished; i++)
+	for (MouseRIter i = m_mlist.rbegin(); i != m_mlist.rend() && !finished; i++)
 		finished = (*i)->mouseMoved(e);
 	return true;
 }
@@ -51,7 +51,7 @@ bool InputManager::mouseMoved(const OIS::MouseEvent& e)
 bool InputManager::mousePressed(const OIS::MouseEvent &e, OIS::MouseButtonID id)
 {
 	bool finished = false;
-	for (MouseIter i = m_mlist.begin(); i != m_mlist.end() && !finished; i++)
+	for (MouseRIter i = m_mlist.rbegin(); i != m_mlist.rend() && !finished; i++)
 		finished = (*i)->mousePressed(e, id);
 	return true;
 }
@@ -59,7 +59,7 @@ bool InputManager::mousePressed(const OIS::MouseEvent &e, OIS::MouseButtonID id)
 bool InputManager::mouseReleased(const OIS::MouseEvent &e, OIS::MouseButtonID id)
 {
 	bool finished = false;
-	for (MouseIter i = m_mlist.begin(); i != m_mlist.end() && !finished; i++)
+	for (MouseRIter i = m_mlist.rbegin(); i != m_mlist.rend() && !finished; i++)
 		finished = (*i)->mouseReleased(e, id);
 	return true;
 }
@@ -67,7 +67,7 @@ bool InputManager::mouseReleased(const OIS::MouseEvent &e, OIS::MouseButtonID id
 bool InputManager::keyPressed(const OIS::KeyEvent &e)
 {
 	bool finished = false;
-	for (KeyIter i = m_klist.begin(); i != m_klist.end() && !finished; i++)
+	for (KeyRIter i = m_klist.rbegin(); i != m_klist.rend() && !finished; i++)
 		finished = (*i)->keyPressed(e);
 	return true;
 }
@@ -75,7 +75,7 @@ bool InputManager::keyPressed(const OIS::KeyEvent &e)
 bool InputManager::keyReleased(const OIS::KeyEvent &e)
 {
 	bool finished = false;
-	for (KeyIter i = m_klist.begin(); i != m_klist.end() && !finished; i++)
+	for (KeyRIter i = m_klist.rbegin(); i != m_klist.rend() && !finished; i++)
 		finished = (*i)->keyReleased(e);
 	return true;
 }
