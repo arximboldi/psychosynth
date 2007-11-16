@@ -30,117 +30,61 @@
 #include "object/ObjectOutput.h"
 #include "object/ObjectMixer.h"
 #include "object/ObjectOscillator.h"
-    
-const int PATCHER_ANY  = -1;
 
-struct PatcherData {
-    int socket_type;
+struct PatcherEvent {
+    Object* src;
+    Object* dest;
     int src_socket;
     int dest_socket;
-};
+    int socket_type;
 
-/*
- * Each object has several inputs and output sockets. On a dinamically patched synth we only
- * want one output connected with one input. This table tells the dinamic patcher which
- * output should be connected with which inpunt on each object.
- * The first dimension is the source object type and the second is the destiny object type.
- */
-const PatcherData PATCHER_TABLE[N_OBJECTS][N_OBJECTS] =
-{
-    /* ObjectOutput */
-    {
-	{Object::LINK_NONE, 0, 0}, /* ObjectOutput */
-	{Object::LINK_NONE, 0, 0}, /* ObjectMixer */
-	{Object::LINK_NONE, 0, 0}  /* ObjectOscillator */
-    },
-
-    /* ObjectMixer */
-    {
-	{Object::LINK_AUDIO, ObjectMixer::OUT_A_OUTPUT, ObjectOutput::IN_A_INPUT},  /* ObjectOutput */
-	{Object::LINK_AUDIO, ObjectMixer::OUT_A_OUTPUT, PATCHER_ANY}, /* ObjectMixer */
-	{Object::LINK_NONE, 0, 0} /* ObjectOscillator */
-    },
-
-    /* ObjectOscillator */
-    {
-	{Object::LINK_NONE, 0, 0}, /* ObjectOutput */
-	{Object::LINK_AUDIO, ObjectMixer::OUT_A_OUTPUT, PATCHER_ANY}, /* ObjectMixer */
-	{Object::LINK_NONE, 0, 0} /* ObjectOscillator */
-    }
+    PatcherEvent(Object* s, Object* d, int ss, int ds, int st):
+	src(s), dest(d), src_socket(ss), dest_socket(ds), socket_type(st) {};
 };
 
 class PatcherListener {
 public:
-    virtual void handleLinkAdded() = 0;
-    virtual void handleLinkDeleted() = 0;
+    virtual ~PatcherListener() {};
+    virtual void handleLinkAdded(const PatcherEvent& ev) = 0;
+    virtual void handleLinkDeleted(const PatcherEvent& ev) = 0;
 };
 
 class PatcherSubject {
-public:
+    std::list<PatcherListener*> m_list;
+
+protected:
+    void notifyLinkAdded(const PatcherEvent& ev) {
+	for (std::list<PatcherListener*>::iterator it = m_list.begin();
+	     it != m_list.end(); )
+	    (*it++)->handleLinkAdded(ev);
+    };
     
+    void notifyLinkDeleted(const PatcherEvent& ev) {
+	for (std::list<PatcherListener*>::iterator it = m_list.begin();
+	     it != m_list.end(); )
+	    (*it++)->handleLinkDeleted(ev);
+    };
+    
+public:
+    void addListener(PatcherListener* l) {
+	m_list.push_back(l);
+    };
+    
+    void deleteListener(PatcherListener* l) {
+	m_list.remove(l);
+    };
 };
 
-class Patcher
+class Patcher : public PatcherSubject
 {
-    struct Link {
-	Object* src;
-	Object* dest;
-	float dist;
-	int sock_type;
-	int out_sock;
-	int in_sock;
-	int actual_in_sock;
-	
-	Link(Object* s, Object* d, float ds, int t, int os, int is) :
-	    src(s), dest(d), dist(ds),
-	    sock_type(t), out_sock(os), in_sock(is), actual_in_sock(-1)
-	    {}
-	
-	bool operator< (const Link& l) const {
-	    return dist < l.dist;
-	}
-    };
-    
-    struct Node {
-	Object* obj;
-	Object* dest;
-	bool out_used; /* We output to one object only */
-	int actual_sock_type;
-	int actual_in_sock; 
-
-	Node(Object* o) :
-	    obj(o),
-	    dest(NULL),
-	    out_used(false),
-	    actual_sock_type(-1),
-	    actual_in_sock(-1) {}
-    };
-
-    class LinkPtrCmp {
-    public:
-	bool operator() (const Link* a, const Link* b) {
-	  return *a < *b;
-	}
-    };
-
-    bool m_changed;
-    
-    std::map<int, Node> m_nodes;
-    std::multiset<Link*, LinkPtrCmp> m_links;
-
-    inline void undoLink(Link& l);
-    inline void makeLink(Link& l);
-    inline void findInSock(Link& l);
-    inline bool isLinked(Link& l);
-    
 public:
-    Patcher();
-    ~Patcher();
+    virtual ~Patcher() {};
     
-    bool addObject(Object* obj);
-    bool deleteObject(Object* obj);
-    void moveObject(Object* obj);
-    void update();
+    virtual bool addObject(Object* obj) = 0;
+    virtual bool deleteObject(Object* obj) = 0;
+    virtual void moveObject(Object* obj) = 0;
+    virtual void update() = 0;
+    virtual void clear() = 0;
 };
 
 #endif /* PATCHER_H */

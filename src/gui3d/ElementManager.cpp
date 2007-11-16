@@ -208,4 +208,12 @@ void ElementManager::update()
     m_clear_elems.clear();
 }
 
+void ElementManager::handleLinkAdded(const TablePatcherEvent& ev)
+{
+    cout << "awiniwaun\n";
+}
 
+void ElementManager::handleLinkDeleted(const TablePatcherEvent& ev)
+{
+    cout << "awinipeich\n";
+}

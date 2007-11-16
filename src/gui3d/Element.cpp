@@ -32,6 +32,11 @@
 using namespace std;
 using namespace Ogre;
 
+inline void ElemComponent::updateVisibility()
+{
+    m_node->setVisible(!m_parent->isGhost());
+}
+
 ElemMainComponent::ElemMainComponent(const std::string& mesh,
 				     int param, float min_val, float max_val) :
     m_mesh(mesh),
@@ -54,6 +59,7 @@ void ElemMainComponent::setMesh(const std::string& mesh)
 						       itoa(getParent()->getObject().getID(),10),
 						       mesh);
     getSceneNode()->attachObject(m_mesh_ent);
+    updateVisibility();
 }
 
 bool ElemMainComponent::handlePointerMove(Ogre::Vector2 pos)

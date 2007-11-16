@@ -30,6 +30,7 @@
 #include "gui3d/FlatRing.h"
 
 #include "output/OutputAlsa.h"
+#include "table/PatcherDynamic.h"
 
 using namespace Ogre;
 using namespace std;
@@ -105,6 +106,7 @@ void PsychoSynth3D::setupSynth()
     m_table = new Table(m_audio_info);
     m_output = new OutputAlsa(m_audio_info, "default");
     m_table->attachOutput(m_output);
+    m_table->attachPatcher(new PatcherDynamic());
     m_table->update();
     m_output->open();
     m_output->start();
@@ -155,6 +157,7 @@ void PsychoSynth3D::setupTable()
     m_inputmgr->addKeyListener(m_elemmgr);
 
     m_table->addTableListener(m_elemmgr);
+    m_table->addTablePatcherListener(m_elemmgr);
 }
 
 void PsychoSynth3D::setupMenus()

@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) 2007 Juan Pedro Bolivar Puente                          *
+ *   Copyright (C) 2007 by Juan Pedro Bolivar Puente                       *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -20,59 +20,76 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef ELEMENTMANAGER_H
-#define ELEMENTMANAGER_H
+#ifndef PATCHERDYNAMIC_H
+#define PATCHERDYNAMIC_H
 
 #include <map>
-#include <OIS/OIS.h>
-#include "gui3d/Element.h"
-#include "gui3d/QueryFlags.h"
-#include "table/Table.h"
+#include <set>
 
-const int N_MB = OIS::MB_Button7+1;
+#include "table/Patcher.h"
 
-class ElementManager : public OIS::MouseListener,
-		       public OIS::KeyListener,
-		       public TableListener,
-		       public TablePatcherListener
-{
-    typedef std::list<Element*> ElemList;
-    typedef ElemList::iterator ElemIter;
+class PatcherDynamic : public Patcher
+{    
+    struct Link {
+	Object* src;
+	Object* dest;
+	float dist;
+	int sock_type;
+	int out_sock;
+	int in_sock;
+	int actual_in_sock;
 	
-    Table* m_table;
-    ElemList m_elems;
-    ElemList m_clear_elems;
-    	
-    int m_elemcount;
+	Link(Object* s, Object* d, float ds, int t, int os, int is) :
+	    src(s), dest(d), dist(ds),
+	    sock_type(t), out_sock(os), in_sock(is), actual_in_sock(-1)
+	    {}
 	
-    Ogre::Camera* m_camera;
-    Ogre::SceneManager* m_scene;
-    Ogre::RaySceneQuery* m_rayquery;
+	bool operator< (const Link& l) const {
+	    return dist < l.dist;
+	}
+    };
 
+    struct Node {
+	Object* obj;
+	Object* dest;
+	bool out_used; /* We output to one object only */
+	int actual_sock_type;
+	int actual_in_sock; 
+
+	Node(Object* o) :
+	    obj(o),
+	    dest(NULL),
+	    out_used(false),
+	    actual_sock_type(-1),
+	    actual_in_sock(-1) {}
+    };
+
+    class LinkPtrCmp {
+    public:
+	bool operator() (const Link* a, const Link* b) {
+	  return *a < *b;
+	}
+    };
+
+    bool m_changed;
     
-    bool getTablePointer(Ogre::Vector2& res);
-    Element* createElement(TableObject& obj);
+    std::map<int, Node> m_nodes;
+    std::multiset<Link*, LinkPtrCmp> m_links;
+
+    inline void undoLink(Link& l);
+    inline void makeLink(Link& l);
+    inline void findInSock(Link& l);
+    inline bool isLinked(Link& l);
     
 public:
-    ElementManager(Table* table, Ogre::SceneManager* scene,
-		   Ogre::Camera* camera);
-
+    PatcherDynamic();
+    ~PatcherDynamic();
+    
+    bool addObject(Object* obj);
+    bool deleteObject(Object* obj);
+    void moveObject(Object* obj);
     void update();
-    
-    void addElement(int e_type);
-	
-    bool mouseMoved(const OIS::MouseEvent& e);
-    bool mousePressed(const OIS::MouseEvent &e, OIS::MouseButtonID id);
-    bool mouseReleased(const OIS::MouseEvent &e, OIS::MouseButtonID id);
-    
-    bool keyPressed(const OIS::KeyEvent &e);
-    bool keyReleased(const OIS::KeyEvent &e);
-
-    void handleAddObject(TableObject& obj);
-    void handleDeleteObject(TableObject& obj);
-
-    void handleLinkAdded(const TablePatcherEvent& ev);
-    void handleLinkDeleted(const TablePatcherEvent& ev);
+    void clear();
 };
 
-#endif /* ELEMENTMANAGER_H */
+#endif /* PATCHERDYNAMIC_H */

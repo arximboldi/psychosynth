@@ -27,7 +27,7 @@
 #include <config.h>
 #endif
 
-#define DEFAULT_BUFFER_SIZE  512
+#define DEFAULT_BUFFER_SIZE  128
 #define DEFAULT_SAMPLE_RATE  44100
 #define DEFAULT_NUM_CHANNEL  2
 #define DEFAULT_PORT         1234

@@ -27,20 +27,83 @@
 
 using namespace std;
 
+void TableSubject::notifyAddObject(TableObject& obj)
+{
+    m_obj_listeners[obj.getID()];
+    for (ListenerIter i = m_listeners.begin(); i != m_listeners.end(); i++)
+	(*i)->handleAddObject(obj);
+}
+
+void TableSubject::notifyDeleteObject(TableObject& obj)
+{
+    m_obj_listeners.erase(obj.getID());
+    for (ListenerIter i = m_listeners.begin(); i != m_listeners.end(); i++)
+	(*i)->handleDeleteObject(obj);
+}
+    
+void TableSubject::notifyMoveObject(TableObject& obj)
+{
+    std::map<int, std::list<TableObjectListener*> >::iterator it;
+    if ((it = m_obj_listeners.find(obj.getID())) != m_obj_listeners.end()) {
+	for (ObjectListenerIter i = it->second.begin(); i != it->second.end(); i++)
+	    (*i)->handleMoveObject(obj);
+    }
+}
+
+void TableSubject::notifyActivateObject(TableObject& obj)
+{
+    std::map<int, std::list<TableObjectListener*> >::iterator it;
+    if ((it = m_obj_listeners.find(obj.getID())) != m_obj_listeners.end()) {
+	for (ObjectListenerIter i = it->second.begin(); i != it->second.end(); i++)
+	    (*i)->handleActivateObject(obj);
+    }
+}
+    
+void TableSubject::notifyDeactivateObject(TableObject& obj)
+{
+    std::map<int, std::list<TableObjectListener*> >::iterator it;
+    if ((it = m_obj_listeners.find(obj.getID())) != m_obj_listeners.end()) {
+	for (ObjectListenerIter i = it->second.begin(); i != it->second.end(); i++)
+	    (*i)->handleDeactivateObject(obj);
+    }
+}
+
+void TableSubject::notifySetParamObject(TableObject& obj, int param_id) {
+    std::map<int, std::list<TableObjectListener*> >::iterator it;
+    if ((it = m_obj_listeners.find(obj.getID())) != m_obj_listeners.end()) {
+	for (ObjectListenerIter i = it->second.begin(); i != it->second.end(); i++)
+	    (*i)->handleSetParamObject(obj, param_id);	
+    }
+}
+
+void TableSubject::notifyLinkAdded(const TablePatcherEvent& ev)
+{
+    for (list<TablePatcherListener*>::iterator i = m_patch_list.begin();
+	 i != m_patch_list.end();)
+	(*i++)->handleLinkAdded(ev);
+}
+
+void TableSubject::notifyLinkDeleted(const TablePatcherEvent& ev)
+{
+    for (list<TablePatcherListener*>::iterator i = m_patch_list.begin();
+	 i != m_patch_list.end();)
+	(*i++)->handleLinkDeleted(ev);
+}
+
 Table::Table(const AudioInfo& info) :
     m_info(info),
+    m_patcher(NULL),
     m_last_id(MIN_USER_ID)
 {
     m_output = new ObjectOutput(m_info);
     m_mixer = new ObjectMixer(m_info, MIXER_CHANNELS);
     m_objmgr.attachObject(m_output, OUTPUT_ID);
     m_objmgr.attachObject(m_mixer, MIXER_ID);
-    m_patcher.addObject(m_output);
-    m_patcher.addObject(m_mixer);
 }
 
 Table::~Table()
 {
+    delete m_patcher;
 }
 
 TableObject Table::findObject(int id)
@@ -79,13 +142,15 @@ TableObject Table::addObject(int type)
 void Table::moveObject(TableObject& obj, Real x, Real y)
 {
     obj.m_obj->setXY(x, y);
-    m_patcher.moveObject(obj.m_obj);
+    if (m_patcher)
+	m_patcher->moveObject(obj.m_obj);
     notifyMoveObject(obj);
 }
 
 void Table::deleteObject(TableObject& obj)
 {
-    m_patcher.deleteObject(obj.m_obj);
+    if (m_patcher)
+	m_patcher->deleteObject(obj.m_obj);
     notifyDeleteObject(obj);
     m_objmgr.detachObject(obj.m_obj->getID());
     delete obj.m_obj;
@@ -93,12 +158,33 @@ void Table::deleteObject(TableObject& obj)
 
 void Table::activateObject(TableObject& obj)
 {
-    m_patcher.addObject(obj.m_obj);
+    if (m_patcher)
+	m_patcher->addObject(obj.m_obj);
     notifyActivateObject(obj);
 }
 
 void Table::deactivateObject(TableObject& obj)
 {
-    m_patcher.deleteObject(obj.m_obj);
+    if (m_patcher)
+	m_patcher->deleteObject(obj.m_obj);
     notifyDeactivateObject(obj);
 }
+
+void Table::attachPatcher(Patcher* pat)
+{
+    dattachPatcher();
+    m_patcher = pat;
+    pat->addListener(this);
+    for (ObjectManager::Iterator it = m_objmgr.begin(); it != m_objmgr.end(); ++it)
+	m_patcher->addObject(*it);
+}
+
+void Table::dattachPatcher()
+{
+    if (m_patcher) {
+	m_patcher->deleteListener(this);
+	m_patcher->clear();
+	m_patcher = NULL;
+    }
+}
+

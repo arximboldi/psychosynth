@@ -47,6 +47,8 @@ public:
     void setSceneNode(Ogre::SceneNode* node) {
 	m_node = node;
     }
+
+    inline void updateVisibility();
     
     Ogre::SceneNode* getSceneNode() {
 	return m_node;

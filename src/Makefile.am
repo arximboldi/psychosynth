@@ -2,7 +2,7 @@
 bin_PROGRAMS = psychosynth
 
 psychosynth_SOURCES = \
-	common/CmdLineOpts.cpp \
+	common/ArgParser.cpp \
 	common/Error.cpp \
 	common/AudioBuffer.cpp \
 	common/RingAudioBuffer.cpp \
@@ -10,6 +10,7 @@ psychosynth_SOURCES = \
 	common/Misc.cpp \
 	table/Table.cpp \
 	table/Patcher.cpp \
+	table/PatcherDynamic.cpp \
 	gui3d/CameraControllerRasko.cpp \
 	gui3d/QuitWindow.cpp \
 	gui3d/InputManager.cpp \
@@ -44,7 +45,7 @@ psychosynth_LDFLAGS = $(all_libraries)
 psychosynth_LDADD = $(OGRE_LIBS) $(CEGUI_LIBS) $(OIS_LIBS) -lCEGUIOgreRenderer
 
 noinst_HEADERS = \
-	common/CmdLineOpts.h \
+	common/ArgParser.h \
 	common/Error.h \
 	common/Packets.h \
 	common/Singleton.h \
@@ -57,6 +58,7 @@ noinst_HEADERS = \
 	common/Misc.h \
 	table/Table.h \
 	table/Patcher.h\
+	table/PatcherDynamic.h \
 	gui3d/CameraController.h \
 	gui3d/CameraControllerRasko.h \
 	gui3d/CeguiInjecter.h \

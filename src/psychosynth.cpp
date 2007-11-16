@@ -25,8 +25,8 @@
 #include "psychosynth.h"
 
 #include "table/Table.h"
-#include "table/Patcher.h"
-#include "common/CmdLineOpts.h"
+#include "table/PatcherDynamic.h"
+#include "common/ArgParser.h"
 #include "gui3d/PsychoSynth3D.h"
 #include "output/OutputAlsa.h"
 #include "output/OutputOss.h"
@@ -37,55 +37,11 @@
 
 using namespace std;
 
-void showVersion() {
-    
-};
-
 int main(int argc, const char *argv[])
-{	
-#if 1
-    PsychoSynth3D mainApp;
+{
+    PsychoSynth3D main_app;
 
-    mainApp.run(argc, argv);
-#endif
-
-#if 0
-    AudioInfo info(DEFAULT_SAMPLE_RATE, DEFAULT_BUFFER_SIZE, DEFAULT_NUM_CHANNEL);
-    Table table(info);
-    Output* output(new OutputAlsa(info, "default"));
-
-    table.attachOutput(output);
-    TableObject obj = table.addObject(OBJ_OSCILLATOR);
-    table.activateObject(obj);
-    table.update();
-    cout << "Opening...\n";
-    output->open();
-    cout << "Starting...\n";
-    output->start();
-    cout << "Waiting... \n";
-
-    int delta = 20;
-    int total = 1000;
-    int type = ObjectOscillator::OSC_SINE;	
-    do {
-	obj.setParam(ObjectOscillator::PARAM_WAVE, type);
-	int n = total;
-	float freq = 30;
-	do {
-	    obj.setParam(ObjectOscillator::PARAM_FREQUENCY, freq);
-	    freq += delta;
-	    usleep(delta * 1000);
-	} while ((n -= delta) > 0);
-	n = 1000;
-	do {
-	    obj.setParam(ObjectOscillator::PARAM_FREQUENCY, freq);
-	    freq -= delta;
-	    usleep(delta * 1000);
-	} while ((n -= delta) > 0);
-    } while (++type < ObjectOscillator::N_OSC_TYPES);
-    obj.deleteMe();
-    sleep(1);
-#endif
+    main_app.run(argc, argv);
 	
     return 0;
 }

@@ -131,27 +131,65 @@ public:
     virtual void handleSetParamObject(TableObject& ob, int param_id) = 0;
 };
 
+struct TablePatcherEvent {
+    TableObject src;
+    TableObject dest;
+    int src_socket;
+    int dest_socket;
+    int socket_type;
+    
+    TablePatcherEvent(const TableObject& s, const TableObject& d,
+		      int ss, int ds, int st) :
+	src(s), dest(d), src_socket(ss), dest_socket(ds), socket_type(st) {}
+};
+
+class TablePatcherListener {
+public:
+    virtual ~TablePatcherListener() {};
+    virtual void handleLinkAdded(const TablePatcherEvent& ev) = 0;
+    virtual void handleLinkDeleted(const TablePatcherEvent& ev) = 0;
+};
+
 class TableSubject {
     typedef std::list<TableListener*>::iterator ListenerIter;
     typedef std::list<TableObjectListener*>::iterator ObjectListenerIter;
     
     std::list<TableListener*> m_listeners;
+    std::list<TablePatcherListener*> m_patch_list;
     std::map<int, std::list<TableObjectListener*> > m_obj_listeners; 
-	
+
+protected:
+    void notifyAddObject(TableObject& obj);
+    void notifyDeleteObject(TableObject& obj);
+    void notifyMoveObject(TableObject& obj);
+    void notifyActivateObject(TableObject& obj);
+    void notifyDeactivateObject(TableObject& obj);
+    void notifySetParamObject(TableObject& obj, int param_id);
+    void notifyLinkAdded(const TablePatcherEvent& ev);
+    void notifyLinkDeleted(const TablePatcherEvent& ev);
+    
 public:
     void addTableListener(TableListener* cl) {
 	m_listeners.push_back(cl);
     };
 
+    void addTablePatcherListener(TablePatcherListener* cl) {
+	m_patch_list.push_back(cl);
+    };
+    
     void addTableObjectListener(TableObject& obj, TableObjectListener* cl) {
 	std::map<int, std::list<TableObjectListener*> >::iterator it;
 	
 	if ((it = m_obj_listeners.find(obj.getID())) != m_obj_listeners.end())
 	    it->second.push_back(cl);
     };
-
+    
     void deleteTableListener(TableListener* cl) {
 	m_listeners.remove(cl);
+    };
+
+    void deleteTablePatcherListener(TablePatcherListener* cl) {
+	m_patch_list.remove(cl);
     };
     
     void deleteTableObjectListener(TableObject& obj, TableObjectListener* cl) {
@@ -160,61 +198,18 @@ public:
 	if ((it = m_obj_listeners.find(obj.getID())) != m_obj_listeners.end())
 	    it->second.remove(cl);
     };
-	
-    void notifyAddObject(TableObject& obj) {
-	m_obj_listeners[obj.getID()];
-	for (ListenerIter i = m_listeners.begin(); i != m_listeners.end(); i++)
-	    (*i)->handleAddObject(obj);
-    }
-
-    void notifyDeleteObject(TableObject& obj) {
-	m_obj_listeners.erase(obj.getID());
-	for (ListenerIter i = m_listeners.begin(); i != m_listeners.end(); i++)
-	    (*i)->handleDeleteObject(obj);
-    }
-    
-    void notifyMoveObject(TableObject& obj) {
-	std::map<int, std::list<TableObjectListener*> >::iterator it;
-	if ((it = m_obj_listeners.find(obj.getID())) != m_obj_listeners.end()) {
-	    for (ObjectListenerIter i = it->second.begin(); i != it->second.end(); i++)
-		(*i)->handleMoveObject(obj);
-	}
-    }
-
-    void notifyActivateObject(TableObject& obj) {
-	std::map<int, std::list<TableObjectListener*> >::iterator it;
-	if ((it = m_obj_listeners.find(obj.getID())) != m_obj_listeners.end()) {
-	    for (ObjectListenerIter i = it->second.begin(); i != it->second.end(); i++)
-		(*i)->handleActivateObject(obj);
-	}
-    }
-    void notifyDeactivateObject(TableObject& obj) {
-	std::map<int, std::list<TableObjectListener*> >::iterator it;
-	if ((it = m_obj_listeners.find(obj.getID())) != m_obj_listeners.end()) {
-	    for (ObjectListenerIter i = it->second.begin(); i != it->second.end(); i++)
-		(*i)->handleDeactivateObject(obj);
-	}
-    }
-
-    void notifySetParamObject(TableObject& obj, int param_id) {
-	std::map<int, std::list<TableObjectListener*> >::iterator it;
-	if ((it = m_obj_listeners.find(obj.getID())) != m_obj_listeners.end()) {
-	    for (ObjectListenerIter i = it->second.begin(); i != it->second.end(); i++)
-		(*i)->handleSetParamObject(obj, param_id);	
-	}
-    }
 };
 
-class Table: public TableSubject {
+class Table: public TableSubject, public PatcherListener {
     AudioInfo m_info;
     ObjectManager m_objmgr;
-    Patcher m_patcher;
+    Patcher* m_patcher;
     ObjectOutput* m_output;
     ObjectMixer* m_mixer;
     int m_last_id;
     
     static const int MIXER_CHANNELS = 16;
-    
+
 public:
     enum {
 	OUTPUT_ID = 0,
@@ -252,9 +247,30 @@ public:
     void dattachOutput(Output* out) {
 	m_output->detachOutput(out);
     };
+
+    void attachPatcher(Patcher* pat);
+    
+    void dattachPatcher();
     
     void update() {
-	m_patcher.update();
+	if (m_patcher)
+	    m_patcher->update();
+    }
+
+    void handleLinkAdded(const PatcherEvent& ev) {
+	notifyLinkAdded(TablePatcherEvent(TableObject(ev.src,this),
+					  TableObject(ev.dest,this),
+					  ev.src_socket,
+					  ev.dest_socket,
+					  ev.socket_type));
+    };
+    
+    void handleLinkDeleted(const PatcherEvent& ev) {
+	notifyLinkDeleted(TablePatcherEvent(TableObject(ev.src,this),
+					  TableObject(ev.dest,this),
+					  ev.src_socket,
+					  ev.dest_socket,
+					  ev.socket_type));
     }
 };
 
