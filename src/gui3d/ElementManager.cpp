@@ -121,8 +121,8 @@ bool ElementManager::mouseMoved(const OIS::MouseEvent& e)
     bool ret = false;
     
     if (getTablePointer(pos)) {
-	for (ElemIter it = m_elems.begin(); it != m_elems.end();)
-	    if ((*it++)->pointerMoved(pos))
+	for (ElemMapIter it = m_elems.begin(); it != m_elems.end();)
+	    if ((*it++).second->pointerMoved(pos))
 		ret = true;
     }
 
@@ -135,8 +135,8 @@ bool ElementManager::mousePressed(const OIS::MouseEvent &e, OIS::MouseButtonID i
     bool ret = false;
     
     if (getTablePointer(pos)) {
-	for (ElemIter it = m_elems.begin(); it != m_elems.end();)
-	    if ((*it++)->pointerClicked(pos, id))
+	for (ElemMapIter it = m_elems.begin(); it != m_elems.end();)
+	    if ((*it++).second->pointerClicked(pos, id))
 		ret = true;
     }
 	
@@ -149,8 +149,8 @@ bool ElementManager::mouseReleased(const OIS::MouseEvent &e, OIS::MouseButtonID 
     bool ret = false;
     
     if (getTablePointer(pos)) {
-	for (ElemIter it = m_elems.begin(); it != m_elems.end();)
-	    if((*it++)->pointerReleased(pos, id))
+	for (ElemMapIter it = m_elems.begin(); it != m_elems.end();)
+	    if((*it++).second->pointerReleased(pos, id))
 		ret = true;
     }
     
@@ -161,8 +161,8 @@ bool ElementManager::keyPressed(const OIS::KeyEvent &e)
 {
     bool ret = false;
     
-    for (ElemIter it = m_elems.begin(); it != m_elems.end();)
-	if((*it++)->keyPressed(e))
+    for (ElemMapIter it = m_elems.begin(); it != m_elems.end();)
+	if((*it++).second->keyPressed(e))
 		ret = true;    
 
     return ret;
@@ -172,8 +172,8 @@ bool ElementManager::keyReleased(const OIS::KeyEvent &e)
 {
     bool ret = false;
     
-    for (ElemIter it = m_elems.begin(); it != m_elems.end();)
-	if((*it++)->keyReleased(e))
+    for (ElemMapIter it = m_elems.begin(); it != m_elems.end();)
+	if((*it++).second->keyReleased(e))
 		ret = true;    
     
     return ret;
@@ -184,7 +184,7 @@ void ElementManager::handleAddObject(TableObject& obj)
     Element* elem = createElement(obj);
 
     if (elem != NULL) {
-	m_elems.push_back(elem);
+	m_elems.insert(pair<int,Element*>(obj.getID(), elem));
 	obj.addListener(elem);
     }
     else
@@ -193,9 +193,9 @@ void ElementManager::handleAddObject(TableObject& obj)
 
 void ElementManager::handleDeleteObject(TableObject& obj)
 {
-    for (ElemIter it = m_elems.begin(); it != m_elems.end(); )
-	if ((*it)->getObject() == obj) {
-	    m_clear_elems.push_back(*it);
+    for (ElemMapIter it = m_elems.begin(); it != m_elems.end(); )
+	if ((*it).second->getObject() == obj) {
+	    m_clear_elems.push_back((*it).second);
 	    m_elems.erase(it++);
 	} else
 	    ++it;
@@ -211,9 +211,18 @@ void ElementManager::update()
 void ElementManager::handleLinkAdded(const TablePatcherEvent& ev)
 {
     cout << "awiniwaun\n";
+    m_cons.push_back(new Connection(m_scene, ev.src, ev.dest));
 }
 
 void ElementManager::handleLinkDeleted(const TablePatcherEvent& ev)
 {
     cout << "awinipeich\n";
+    
+    /* TODO */
+    for (list<Connection*>::iterator it = m_cons.begin(); it != m_cons.end();)
+	if ((*it)->getSource() == ev.src && (*it)->getDestiny() == ev.dest) {
+	    delete *it;
+	    m_cons.erase(it++);
+	} else
+	    ++it;
 }

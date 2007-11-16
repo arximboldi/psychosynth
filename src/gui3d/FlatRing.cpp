@@ -21,6 +21,7 @@
  ***************************************************************************/
 
 #include "gui3d/FlatRing.h"
+#include "gui3d/OgreMisc.h"
 
 using namespace std;
 using namespace Ogre;
@@ -43,20 +44,6 @@ void FlatRing::build()
     }
 }
 
-void FlatRing::createMaterial()
-{
-    MaterialPtr matptr = 
-	MaterialManager::getSingleton().createOrRetrieve(getName(), "General").first; 
-	
-    matptr->setReceiveShadows(true);
-    Pass* pass = matptr->getTechnique(0)->getPass(0);
-    pass->setDiffuse(m_colour);
-    //matptr->getTechnique(0)->getPass(0)->setAmbient(clr); 
-    //matptr->getTechnique(0)->getPass(0)->setEmissive(ColourValue(0,0,0,clr.a)); 
-    pass->setSceneBlending(SBT_TRANSPARENT_ALPHA);
-    pass->setDepthWriteEnabled(false);
-}
-
 FlatRing::~FlatRing()
 {
     //clear();
@@ -76,7 +63,7 @@ FlatRing::FlatRing(const Ogre::String& id,
     m_numtrig(num_triangles)
 {
     setDynamic(true);
-    createMaterial();
+    createColourMaterial(getName(), m_colour);
     begin(id, RenderOperation::OT_TRIANGLE_STRIP);
     build();
     end();

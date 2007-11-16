@@ -20,85 +20,63 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef FLATRING_H
-#define FLATRING_H
+#ifndef CONNECTION_H
+#define CONNECTION_H
 
 #include <OGRE/Ogre.h>
-#include "gui3d/OgreMisc.h"
+
+#include <table/Table.h>
 
 
-class FlatRing : public Ogre::ManualObject
-{
-    Ogre::Degree m_startangle;
-    Ogre::Degree m_endangle;
-    Ogre::Real m_innerrad;
-    Ogre::Real m_outerrad;
-    Ogre::ColourValue m_colour;
-    int m_numtrig;
-	
-    void build();
+class ConnectionObject : public Ogre::ManualObject {
 
+    void build(const Ogre::Vector2& src,
+	       const Ogre::Vector2& dest);
 public:
-    FlatRing(const Ogre::String& id,
-	     Ogre::Degree start_angle = Ogre::Degree(0.0), 
-	     Ogre::Degree end_angle = Ogre::Degree(360.0),
-	     Ogre::Real inner_radious = 0.5,
-	     Ogre::Real outer_radious = 1,
-	     Ogre::ColourValue colour = Ogre::ColourValue(),
-	     int num_triangles = 40);
-	
-    ~FlatRing();
-	
-    void setStartAngle(Ogre::Degree start_angle) {
-	m_startangle = start_angle;
-    };
-	
-    void setEndAngle(Ogre::Degree end_angle) {
-	m_endangle = end_angle;
-    };
-	
-    void setInnerRadious(Ogre::Real inner_radious) {
-	m_innerrad = inner_radious;
-    };
-	
-    void setOuterRadious(Ogre::Real outer_radious) {
-	m_outerrad = outer_radious;
-    };
-	
-    void setColour(Ogre::ColourValue colour) {
-	m_colour = colour;
-	createColourMaterial(getName(), m_colour);
-    };
-	
-    void setTriangles(int numtrig) {
-	m_numtrig = numtrig;
-    };
-	
-    Ogre::Degree getStartAngle() const {
-	return m_startangle;
-    };
-	
-    Ogre::Degree getEndAngle() const {
-	return m_endangle;
-    };
-	
-    Ogre::Real getInnerRadious() const {
-	return m_outerrad;
-    };
-	
-    Ogre::Real getOuterRadious() const {
-	return m_outerrad;
-    };
-	
-    Ogre::ColourValue getColour() const {
-	return m_colour;
-    };
-	
-    int getTriangles() const {
-	return m_numtrig;
-    }
-	
-    void update();
+    ConnectionObject(const std::string &id,
+		     const Ogre::ColourValue& colour,
+		     const Ogre::Vector2& src,
+		     const Ogre::Vector2& dest);
+    
+    void update(const Ogre::Vector2& src,
+		const Ogre::Vector2& dest);
+
+    ~ConnectionObject();
 };
 
-#endif /* FLATRING_H */
+class Connection : public TableObjectListener
+{
+    Ogre::SceneManager* m_scene;
+    Ogre::SceneNode* m_node;
+    
+    ConnectionObject* m_line;
+
+    TableObject m_s_obj;
+    TableObject m_d_obj;
+
+    Ogre::Vector2 m_src;
+    Ogre::Vector2 m_dest;
+    
+public:
+
+    Connection(Ogre::SceneManager* scene,
+	       const TableObject& src,
+	       const TableObject& dest);
+
+    ~Connection();
+    
+    void handleMoveObject(TableObject& obj);
+    void handleActivateObject(TableObject& obj) {};
+    void handleDeactivateObject(TableObject& obj) {};
+    void handleSetParamObject(TableObject& ob, int param_id) {};
+
+    const TableObject& getSource() {
+	return m_s_obj;
+    }
+
+    const TableObject& getDestiny() {
+	return m_d_obj;
+    }
+};
+
+#endif /* CONNECTION_H */

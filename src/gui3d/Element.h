@@ -101,7 +101,12 @@ class Element : public TableObjectListener
 {
     typedef std::list<ElemComponent*>::iterator ElemComponentIter;
     std::list<ElemComponent*> m_comp;
-        
+
+    /*
+    std::list<Connection*> m_src_con;
+    std::list<Connection*> m_dest_con;
+    */
+    
     TableObject m_obj;
 
     Ogre::ColourValue   m_col_ghost;
@@ -162,6 +167,24 @@ public:
     TableObject& getObject() {
 	return m_obj;
     }
+
+    /*
+    void addSourceConnection(Connection* con) {
+	m_src_con.push_back(con);
+    };
+
+    void addDestinyConnection(Connection* con) {
+	m_dest_con.push_back(con);
+    };
+
+    void removeSourceConnection(Connection* con) {
+	m_src_con.remove(con);
+    }
+
+    void removeDestinyConnection(Connection* con) {
+	m_dest_con.remove(con);
+    }
+    */
 };
 
 class ElementOscillator : public Element

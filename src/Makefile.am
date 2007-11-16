@@ -23,6 +23,8 @@ psychosynth_SOURCES = \
 	gui3d/ElementManager.cpp \
 	gui3d/WindowList.cpp \
 	gui3d/FlatRing.cpp \
+	gui3d/Connection.cpp \
+	gui3d/OgreMisc.cpp \
 	net/NetBuffer.cpp \
 	net/NetChannel.cpp \
 	net/NetChannelManager.cpp \
@@ -74,6 +76,8 @@ noinst_HEADERS = \
 	gui3d/QueryFlags.h\
 	gui3d/WindowList.h\
 	gui3d/FlatRing.h\
+	gui3d/Connection.h\
+	gui3d/OgreMisc.h \
 	net/NetBuffer.h \
 	net/NetChannel.h \
 	net/NetChannelManager.h \

@@ -275,6 +275,16 @@ void Element::handleMoveObject(TableObject& obj)
     m_pos.x = obj.getX();
     m_pos.y = obj.getY();
     m_node->setPosition(m_pos.x, ELEMENT_Z_POS, m_pos.y);
+
+    /*
+    for (std::list<Connection*>::iterator it = m_src_con.begin();
+	 it != m_src_con.end(); ++it)
+	(*it)->updateSource(m_pos);
+
+    for (std::list<Connection*>::iterator it = m_dest_con.begin();
+	 it != m_dest_con.end(); ++it)
+	(*it)->updateDestiny(m_pos);
+    */
 }
 
 void Element::handleActivateObject(TableObject& obj)

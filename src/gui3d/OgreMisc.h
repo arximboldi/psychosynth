@@ -20,63 +20,12 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef ELEMENTMANAGER_H
-#define ELEMENTMANAGER_H
+#ifndef OGREMISC_H
+#define OGREMISC_H
 
-#include <map>
-#include <OIS/OIS.h>
-#include "gui3d/Element.h"
-#include "gui3d/QueryFlags.h"
-#include "gui3d/Connection.h"
-#include "table/Table.h"
+#include <string>
 
+Ogre::MaterialPtr createColourMaterial(const std::string& name,
+				       const Ogre::ColourValue& colour);
 
-const int N_MB = OIS::MB_Button7+1;
-
-class ElementManager : public OIS::MouseListener,
-		       public OIS::KeyListener,
-		       public TableListener,
-		       public TablePatcherListener
-{
-    typedef std::list<Element*> ElemList;
-    typedef std::map<int, Element*> ElemMap; /* TODO: turn back into a list? */
-    typedef ElemList::iterator ElemIter;
-    typedef ElemMap::iterator ElemMapIter;
-    
-    Table* m_table;
-    ElemList m_clear_elems;
-    ElemMap m_elems;
-    std::list<Connection*> m_cons;
-    int m_elemcount;
-	
-    Ogre::Camera* m_camera;
-    Ogre::SceneManager* m_scene;
-    Ogre::RaySceneQuery* m_rayquery;
-
-    
-    bool getTablePointer(Ogre::Vector2& res);
-    Element* createElement(TableObject& obj);
-    
-public:
-    ElementManager(Table* table, Ogre::SceneManager* scene,
-		   Ogre::Camera* camera);
-
-    void update();
-    
-    void addElement(int e_type);
-	
-    bool mouseMoved(const OIS::MouseEvent& e);
-    bool mousePressed(const OIS::MouseEvent &e, OIS::MouseButtonID id);
-    bool mouseReleased(const OIS::MouseEvent &e, OIS::MouseButtonID id);
-    
-    bool keyPressed(const OIS::KeyEvent &e);
-    bool keyReleased(const OIS::KeyEvent &e);
-
-    void handleAddObject(TableObject& obj);
-    void handleDeleteObject(TableObject& obj);
-
-    void handleLinkAdded(const TablePatcherEvent& ev);
-    void handleLinkDeleted(const TablePatcherEvent& ev);
-};
-
-#endif /* ELEMENTMANAGER_H */
+#endif /* OGREMISC_H */

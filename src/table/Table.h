@@ -106,11 +106,11 @@ public:
 	m_obj->getParam(id, data);
     };
 
-    bool operator==(const TableObject& o) {
+    bool operator==(const TableObject& o) const {
 	return m_obj == o.m_obj;
     }
 
-    bool operator!=(const TableObject& o) {
+    bool operator!=(const TableObject& o) const {
 	return m_obj != o.m_obj;
     }
 };
