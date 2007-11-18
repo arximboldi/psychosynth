@@ -26,8 +26,10 @@
 #include "gui3d/QueryFlags.h"
 #include "common/Misc.h"
 
-#define ELEMENT_Z_POS     0.001f
-#define ROTATION_FACTOR  100.0f
+#define ELEMENT_Z_POS       0.001f
+#define ROTATION_FACTOR     100.0f
+#define INDICATOR_MIN_ANGLE 260
+#define INDICATOR_RANGE_ANGLE 340
 
 using namespace std;
 using namespace Ogre;
@@ -51,14 +53,14 @@ ElemMainComponent::ElemMainComponent(const std::string& mesh,
 void ElemMainComponent::setMesh(const std::string& mesh)
 {
     if (m_mesh_ent) {
-	getSceneNode()->detachObject(m_mesh_ent);
+	m_ent_node->detachObject(m_mesh_ent);
 	getParent()->getScene()->destroyEntity(m_mesh_ent);
     }
 
     m_mesh_ent = getParent()->getScene()->createEntity(string("EE") +
 						       itoa(getParent()->getObject().getID(),10),
 						       mesh);
-    getSceneNode()->attachObject(m_mesh_ent);
+    m_ent_node->attachObject(m_mesh_ent);
     updateVisibility();
 }
 
@@ -104,7 +106,27 @@ bool ElemMainComponent::handlePointerRelease(Ogre::Vector2 pos, OIS::MouseButton
 void ElemMainComponent::init()
 {
     getParent()->getObject().getParam(m_param, m_old_value);
+
+    m_ent_node = getSceneNode()->createChildSceneNode();
+
     setMesh(m_mesh);
+
+    m_indicator = new FlatRing(string("IND1")+getSceneNode()->getName(),
+			       Degree(INDICATOR_MIN_ANGLE), Degree(INDICATOR_MIN_ANGLE +
+				   INDICATOR_RANGE_ANGLE),
+			       Element::RADIOUS + 0.1, Element::RADIOUS + 0.3,
+			       ColourValue(1,1,1,0.5));
+
+    m_indicator_fill = new FlatRing(string("IND2")+getSceneNode()->getName(),
+				    Degree(INDICATOR_MIN_ANGLE),
+				    Degree(INDICATOR_MIN_ANGLE +
+					   m_old_value / (m_max_val-m_min_val) *
+					   INDICATOR_RANGE_ANGLE),
+				    Element::RADIOUS + 0.1, Element::RADIOUS + 0.3,
+				    ColourValue(1,1,1,0.6));
+
+    getSceneNode()->attachObject(m_indicator);
+    getSceneNode()->attachObject(m_indicator_fill);
 }
 
 void ElemMainComponent::handleParamChange(TableObject& obj, int param_id)
@@ -112,7 +134,11 @@ void ElemMainComponent::handleParamChange(TableObject& obj, int param_id)
     if (param_id == m_param) {
 	float new_val;
 	obj.getParam(m_param, new_val);
-	getSceneNode()->yaw(Radian((new_val - m_old_value)/(m_max_val-m_min_val) * 2 * Math::PI));
+	m_ent_node->yaw(Radian((new_val - m_old_value)/(m_max_val-m_min_val) * 2 * Math::PI));
+	m_indicator_fill->setEndAngle(Degree(INDICATOR_MIN_ANGLE +
+					     new_val/(m_max_val-m_min_val)
+					     * INDICATOR_RANGE_ANGLE));
+	m_indicator_fill->update();
 	m_old_value = new_val;
     }
 }
@@ -137,9 +163,9 @@ void ElemMultiMainComponent::handleParamChange(TableObject& obj, int param_id)
 
 Element::Element(const TableObject& obj, Ogre::SceneManager* scene) :
     m_obj(obj),
-    m_col_ghost(1,1,1,0.5),
-    m_col_selected(1,0.5,0.5,0.5),
-    m_col_normal(0.5,1,0.5,0.5),
+    m_col_ghost(0.8, 0.8, 0.1, 0.4),
+    m_col_selected(0.8, 0.1, 0.1, 0.7),
+    m_col_normal(0.5, 0.8, 0.5, 0.5),
     m_scene(scene),
     m_selected(false),
     m_moving(false)
@@ -147,7 +173,7 @@ Element::Element(const TableObject& obj, Ogre::SceneManager* scene) :
     m_base = new FlatRing(string("EB") + itoa(m_obj.getID(),10),
 			  Degree(0), Degree(360),
 			  0, 1,
-			  m_col_ghost, 40);
+			  m_col_ghost);
 
     m_node = scene->getRootSceneNode()->createChildSceneNode();
     
@@ -275,7 +301,9 @@ void Element::handleMoveObject(TableObject& obj)
     m_pos.x = obj.getX();
     m_pos.y = obj.getY();
     m_node->setPosition(m_pos.x, ELEMENT_Z_POS, m_pos.y);
-
+    //m_node->yaw(Math::ATan2(m_pos.x, m_pos.y));
+    m_node->lookAt(Vector3(0, ELEMENT_Z_POS, 0), Node::TS_PARENT);
+    
     /*
     for (std::list<Connection*>::iterator it = m_src_con.begin();
 	 it != m_src_con.end(); ++it)

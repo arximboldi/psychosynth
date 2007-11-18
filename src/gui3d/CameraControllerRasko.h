@@ -29,38 +29,45 @@
 class CameraControllerRasko;
 
 class CameraMove : public Task {
-	CameraControllerRasko* m_ctrl;
-	Ogre::Vector3 m_dest;
-	Ogre::Vector3 m_speed;
-	int m_duration;
+    CameraControllerRasko* m_ctrl;
+    Ogre::Vector3 m_dest;
+    Ogre::Vector3 m_speed;
+    int m_duration;
 
 public:
-	CameraMove(CameraControllerRasko* ctrl, Ogre::Vector3 dest, int duration);
+    CameraMove(CameraControllerRasko* ctrl, Ogre::Vector3 dest, int duration);
 
-	void update(int ms);
+    void update(int ms);
 };
 
 class CameraControllerRasko : public CameraController {
-	friend class CameraMove;
+    friend class CameraMove;
 	
-	TaskManager* m_taskmgr;
-	CameraMove* m_move;
-	bool m_mouseleft;
-	bool m_mouseright;
-	bool m_mousecenter;
-	Ogre::Vector3 m_aimpoint;
-	Ogre::Radian m_xangle;
-	Ogre::Radian m_yangle;
-	Ogre::Real m_dist;
-	Ogre::Real m_zxdist;
+    TaskManager* m_taskmgr;
+    CameraMove* m_move;
+    bool m_mouseleft;
+    bool m_mouseright;
+    bool m_mousecenter;
+    bool m_moving;
+    bool m_modifier;
+    Ogre::Vector3 m_aimpoint;
+    Ogre::Vector3 m_last_tpos;
+    Ogre::Radian m_xangle;
+    Ogre::Radian m_yangle;
+    Ogre::Real m_dist;
+    Ogre::Real m_zxdist;
 	
-	void recalculate();
+    void recalculate();
+    bool getTableIntersection(Ogre::Vector3& dest);
 public:
-	CameraControllerRasko(Ogre::Camera* camera, TaskManager* taskmgr);
+    CameraControllerRasko(Ogre::Camera* camera, TaskManager* taskmgr);
 	
-	virtual bool mouseMoved(const OIS::MouseEvent& e);
-	virtual bool mousePressed(const OIS::MouseEvent &e, OIS::MouseButtonID id);
-	virtual bool mouseReleased(const OIS::MouseEvent &e, OIS::MouseButtonID id);
+    virtual bool mouseMoved(const OIS::MouseEvent& e);
+    virtual bool mousePressed(const OIS::MouseEvent &e, OIS::MouseButtonID id);
+    virtual bool mouseReleased(const OIS::MouseEvent &e, OIS::MouseButtonID id);
+    
+    virtual bool keyPressed(const OIS::KeyEvent &e);
+    virtual bool keyReleased(const OIS::KeyEvent &e);
 };
 
 #endif /* CAMERACONTROLLERRASKO_H */

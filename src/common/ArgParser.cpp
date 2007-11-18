@@ -65,7 +65,8 @@ void ArgParser::parseArgs(int argc, const char* argv[])
 		    else
 			skip = true;		    
 		}
-	    }		
+	    }
+	    break;
 		
 	case ARG_LONG:
 	    map<const char*, list<Option*> >::iterator l = m_long.find(argv[i]+2);

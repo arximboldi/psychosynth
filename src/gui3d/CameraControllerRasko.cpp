@@ -24,183 +24,225 @@
 
 #include "gui3d/CameraControllerRasko.h"
 
+#define CAMERA_MOVE_DELAY 400
+
 using namespace Ogre;
 using namespace std;
 
 CameraMove::CameraMove(CameraControllerRasko* ctrl, Ogre::Vector3 dest, int duration) :
-	m_ctrl(ctrl),
-	m_dest(dest),
-	m_duration(duration)
+    m_ctrl(ctrl),
+    m_dest(dest),
+    m_duration(duration)
 {	
-	const Vector3& src = ctrl->m_camera->getPosition();
-	m_speed.x = (dest.x - src.x)/duration;
-	m_speed.y = (dest.y - src.y)/duration;
-	m_speed.z = (dest.z - src.z)/duration;
+    const Vector3& src = ctrl->m_camera->getPosition();
+    m_speed.x = (dest.x - src.x)/duration;
+    m_speed.y = (dest.y - src.y)/duration;
+    m_speed.z = (dest.z - src.z)/duration;
 	
-	if (m_ctrl->m_move) m_ctrl->m_move->finish();
-	m_ctrl->m_move = this;
+    if (m_ctrl->m_move) m_ctrl->m_move->finish();
+    m_ctrl->m_move = this;
 }
 
 void CameraMove::update(int ms)
 {
-	Ogre::Vector3 pos = m_ctrl->m_camera->getPosition();
+    Ogre::Vector3 pos = m_ctrl->m_camera->getPosition();
 	
-	m_duration -= ms;
-	if (m_duration < 0) {
-		ms += m_duration;
-		m_ctrl->m_move = NULL;
-		finish();
-	}
+    m_duration -= ms;
+    if (m_duration < 0) {
+	ms += m_duration;
+	m_ctrl->m_move = NULL;
+	finish();
+    }
 	
-	pos.x += m_speed.x * ms;
-	pos.y += m_speed.y * ms;
-	pos.z += m_speed.z * ms;
-	m_ctrl->m_camera->setPosition(pos);
+    pos.x += m_speed.x * ms;
+    pos.y += m_speed.y * ms;
+    pos.z += m_speed.z * ms;
+    m_ctrl->m_camera->setPosition(pos);
 	
-	m_ctrl->m_aimpoint.x += m_speed.x * ms;
-	m_ctrl->m_aimpoint.y += m_speed.y * ms;
-	m_ctrl->m_aimpoint.z += m_speed.z * ms;
+    m_ctrl->m_aimpoint.x += m_speed.x * ms;
+    m_ctrl->m_aimpoint.y += m_speed.y * ms;
+    m_ctrl->m_aimpoint.z += m_speed.z * ms;
 }
 
 CameraControllerRasko::CameraControllerRasko(Ogre::Camera* camera, TaskManager* taskmgr) :
-	CameraController(camera),
-	m_taskmgr(taskmgr),
-	m_move(NULL),	
-	m_mouseleft(false),
-	m_mouseright(false),
-	m_mousecenter(false),
-	m_aimpoint(0.0,0.0,0.0),
-	m_xangle(0.0),
-	m_yangle(Math::PI/4),
-	m_dist(15.0),
-	m_zxdist(m_dist * Math::Cos(m_yangle))
+    CameraController(camera),
+    m_taskmgr(taskmgr),
+    m_move(NULL),	
+    m_mouseleft(false),
+    m_mouseright(false),
+    m_mousecenter(false),
+    m_moving(false),
+    m_modifier(false),
+    m_aimpoint(0.0,0.0,0.0),
+    m_xangle(0.0),
+    m_yangle(Math::PI/4),
+    m_dist(15.0),
+    m_zxdist(m_dist * Math::Cos(m_yangle))
 {
-	m_camera->setPosition(Ogre::Vector3(0.0,
-										m_dist * Math::Sin(m_yangle),
-										m_dist * Math::Cos(m_yangle)));
-	m_camera->lookAt(Ogre::Vector3(0,0,0));
+    m_camera->setPosition(Ogre::Vector3(0.0,
+					m_dist * Math::Sin(m_yangle),
+					m_dist * Math::Cos(m_yangle)));
+    m_camera->lookAt(Ogre::Vector3(0,0,0));
 }
 
 void CameraControllerRasko::recalculate()
 {
-	Vector3 pos = m_camera->getPosition();
+    Vector3 pos = m_camera->getPosition();
 	
-	m_zxdist = m_dist * Math::Cos(m_yangle);
-	pos.x = m_aimpoint.x + m_zxdist * Math::Sin(m_xangle);
-	pos.y = m_aimpoint.y + m_dist   * Math::Sin(m_yangle);
-	pos.z = m_aimpoint.z + m_zxdist * Math::Cos(m_xangle);
+    m_zxdist = m_dist * Math::Cos(m_yangle);
+    pos.x = m_aimpoint.x + m_zxdist * Math::Sin(m_xangle);
+    pos.y = m_aimpoint.y + m_dist   * Math::Sin(m_yangle);
+    pos.z = m_aimpoint.z + m_zxdist * Math::Cos(m_xangle);
 	
-	m_camera->setPosition(pos);
-	m_camera->lookAt(m_aimpoint);
+    m_camera->setPosition(pos);
+    m_camera->lookAt(m_aimpoint);
+}
+
+bool CameraControllerRasko::getTableIntersection(Ogre::Vector3& dest)
+{
+    CEGUI::Point mousepos = CEGUI::MouseCursor::getSingleton().getPosition();	
+    Ray ray =  Ray(m_camera->getCameraToViewportRay(
+		       mousepos.d_x/m_camera->getViewport()->getActualWidth(),
+		       mousepos.d_y/m_camera->getViewport()->getActualHeight()));
+    pair<bool, Ogre::Real>  inter = ray.intersects(Plane(Vector3(0.0,1.0,0.0),
+							 Ogre::Real(0.0)));
+			
+    if (inter.first) {
+	dest = ray.getPoint(inter.second);
+	return true;
+    }
+
+    return false;
 }
 
 bool CameraControllerRasko::mouseMoved(const OIS::MouseEvent& e)
 {
-	if (m_mouseright) {		
-		m_xangle += Degree(e.state.X.rel * 0.5);
-		m_yangle += Degree(e.state.Y.rel * 0.5);
-		
-		if (m_yangle >= Degree(89.0)) m_yangle = Degree(89.0);
-		else if (m_yangle < Degree(0.0)) m_yangle = 0.0;
-		
-		m_zxdist = m_dist * cos(m_yangle.valueRadians());
-		
-		recalculate();
+    if (m_moving) {
+	Vector3 table_pos;
+	if (getTableIntersection(table_pos)) {
+	    m_camera->setPosition(m_camera->getPosition() + (m_last_tpos - table_pos));
+	    m_aimpoint += m_last_tpos - table_pos;
 	}
+    }
+    
+    if (m_mouseright) {		
+	m_xangle += Degree(e.state.X.rel * 0.5);
+	m_yangle += Degree(e.state.Y.rel * 0.5);
+		
+	if (m_yangle >= Degree(89.0)) m_yangle = Degree(89.0);
+	else if (m_yangle < Degree(0.0)) m_yangle = 0.0;
+		
+	m_zxdist = m_dist * cos(m_yangle.valueRadians());
+		
+	recalculate();
+    }
 	
-	if (m_mousecenter) {
-		const Vector3* corners = m_camera->getWorldSpaceCorners();
-		Real h = (corners[0] - corners[3]).length();
-		Real min_dist = h/Math::Tan(m_yangle);
-		m_dist += 25.0 * Real(e.state.Y.rel) / m_camera->getViewport()->getActualHeight();
-		if (m_dist < min_dist)
-			m_dist = min_dist;
-		recalculate();
-	}
+    if (m_mousecenter) {
+	const Vector3* corners = m_camera->getWorldSpaceCorners();
+	Real h = (corners[0] - corners[3]).length();
+	Real min_dist = h/Math::Tan(m_yangle);
+	m_dist += 25.0 * Real(e.state.Y.rel) / m_camera->getViewport()->getActualHeight();
+	if (m_dist < min_dist)
+	    m_dist = min_dist;
+	recalculate();
+    }
 	
-	if (e.state.Z.rel != 0) {
-		const Vector3* corners = m_camera->getWorldSpaceCorners();
-		Real h = (corners[0] - corners[3]).length();
-		Real min_dist = h/Math::Tan(m_yangle);
-		m_dist += e.state.Z.rel * 0.01;
-		if (m_dist < min_dist)
-			m_dist = min_dist;
-		recalculate();
-	}
+    if (e.state.Z.rel != 0) {
+	const Vector3* corners = m_camera->getWorldSpaceCorners();
+	Real h = (corners[0] - corners[3]).length();
+	Real min_dist = h/Math::Tan(m_yangle);
+	m_dist += e.state.Z.rel * 0.01;
+	if (m_dist < min_dist)
+	    m_dist = min_dist;
+	recalculate();
+    }
 	
-	return false;
+    return false;
 }
 
 bool CameraControllerRasko::mousePressed(const OIS::MouseEvent &e, OIS::MouseButtonID id)
 {
-	Ray ray;
-	pair<bool, Real> inter;
-	Vector3 interpt;
-	CEGUI::Point mousepos = CEGUI::MouseCursor::getSingleton().getPosition();
-	const Vector3* corners;
-	Real h, min_dist;
+    Vector3 table_pos;
+    const Vector3* corners;
+    Real h, min_dist;
 	
-	switch(id) {
-		case OIS::MB_Left:
-			m_mouseleft = true;
-			
-			
-			ray =  Ray( m_camera->getCameraToViewportRay(
-					mousepos.d_x/m_camera->getViewport()->getActualWidth(),
-					mousepos.d_y/m_camera->getViewport()->getActualHeight() ) );
-			inter = ray.intersects(Plane(Vector3(0.0,1.0,0.0), Real(0.0)));
-			
-			if (inter.first) {
-				interpt = ray.getPoint(inter.second);
-				m_taskmgr->attach(new CameraMove(this, m_camera->getPosition() +
-													   (interpt - m_aimpoint),
-													   500)); 
-			}
-			
-			break;
-		case OIS::MB_Right:
-			m_mouseright = true;
-			break;
-		case OIS::MB_Middle:
-			m_mousecenter = true;
-			break;
-		case OIS::MB_Button3: /* OIS is buggy, this does not work! */
-			m_dist += 1.0;
-			recalculate();
-			break; 
-		case OIS::MB_Button4:
-			corners = m_camera->getWorldSpaceCorners();
-			h = (corners[1] - corners[2]).length();
-			min_dist = h/Math::Tan(m_yangle);
-			m_dist -= 1.0;
-			if (m_dist < min_dist)
-				m_dist = min_dist;
-			recalculate();
-			break;
-		default: break;
-	}
+    switch(id) {
+    case OIS::MB_Left:
+	m_mouseleft = true;
+
+	if (getTableIntersection(table_pos)) {
+	    if (m_modifier) {
+		m_taskmgr->attach(new CameraMove(this, m_camera->getPosition() +
+						 (table_pos - m_aimpoint),
+						 CAMERA_MOVE_DELAY)); 
+	    } else {
+		m_moving = true;
+		m_last_tpos = table_pos;
+	    }
+	}		
+	break;
+    case OIS::MB_Right:
+	m_mouseright = true;
+	break;
+    case OIS::MB_Middle:
+	m_mousecenter = true;
+	break;
+    case OIS::MB_Button3: /* OIS is buggy, this does not work! */
+	m_dist += 1.0;
+	recalculate();
+	break; 
+    case OIS::MB_Button4:
+	corners = m_camera->getWorldSpaceCorners();
+	h = (corners[1] - corners[2]).length();
+	min_dist = h/Math::Tan(m_yangle);
+	m_dist -= 1.0;
+	if (m_dist < min_dist)
+	    m_dist = min_dist;
+	recalculate();
+	break;
+    default:
+	break;
+    }
 	
-	return false;
+    return false;
 }
 
 bool CameraControllerRasko::mouseReleased(const OIS::MouseEvent &e, OIS::MouseButtonID id)
 {
-	switch(id) {
-		case OIS::MB_Left:
-			m_mouseleft = false;
-			break;
-		case OIS::MB_Right:
-			m_mouseright = false;
-			break;
-		case OIS::MB_Middle:
-			m_mousecenter = false;
-			break;
-		case OIS::MB_Button3: 
-			break; 
-		case OIS::MB_Button4:
-			break;
-		default: break;
-	}
+    switch(id) {
+    case OIS::MB_Left:
+	m_mouseleft = false;
+	m_moving = false;
+	break;
+    case OIS::MB_Right:
+	m_mouseright = false;
+	break;
+    case OIS::MB_Middle:
+	m_mousecenter = false;
+	break;
+    case OIS::MB_Button3: 
+	break; 
+    case OIS::MB_Button4:
+	break;
+    default: break;
+    }
 	
-	return false;
+    return false;
 }
+
+bool CameraControllerRasko::keyPressed(const OIS::KeyEvent &e)
+{
+    if (e.key == OIS::KC_LCONTROL)
+	m_modifier = true;
+    
+    return false;
+}
+
+bool CameraControllerRasko::keyReleased(const OIS::KeyEvent &e)
+{
+    if (e.key == OIS::KC_LCONTROL)
+	m_modifier = false;
+
+    return false;
+}
+

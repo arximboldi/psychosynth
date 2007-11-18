@@ -32,10 +32,11 @@ using namespace std;
 void ConnectionObject::build(const Ogre::Vector2& src,
 			     const Ogre::Vector2& dst)
 {
-    Vector2 top_left  = src + src.perpendicular().normalisedCopy() * CON_WIDTH;
-    Vector2 top_right = src - src.perpendicular().normalisedCopy() * CON_WIDTH;
-    Vector2 bot_left  = dst + dst.perpendicular().normalisedCopy() * CON_WIDTH;
-    Vector2 bot_right = dst - dst.perpendicular().normalisedCopy() * CON_WIDTH;
+    Vector2 side =  (src - dst).perpendicular().normalisedCopy() * CON_WIDTH;
+    Vector2 top_left  = src + side;
+    Vector2 top_right = src - side;
+    Vector2 bot_left  = dst + side;
+    Vector2 bot_right = dst - side;
 
     position(top_left.x, CON_Y, top_left.y);
     position(top_right.x, CON_Y, top_right.y);
@@ -79,7 +80,7 @@ Connection::Connection(Ogre::SceneManager* scene,
     m_dest(dest.getX(), dest.getY())
 {
     m_node = m_scene->getRootSceneNode()->createChildSceneNode();
-    m_line = new ConnectionObject(m_node->getName(), ColourValue(1,1,1,0.5),
+    m_line = new ConnectionObject(m_node->getName(), ColourValue(0.7, 0.7, 0, 0.5),
 				  m_src, m_dest);
     m_node->attachObject(m_line);
 

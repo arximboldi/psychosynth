@@ -38,8 +38,10 @@ MaterialPtr createColourMaterial(const std::string& name,
     matptr->setReceiveShadows(true);
     Pass* pass = matptr->getTechnique(0)->getPass(0);
     pass->setDiffuse(colour);
-    //matptr->getTechnique(0)->getPass(0)->setAmbient(clr); 
-    //matptr->getTechnique(0)->getPass(0)->setEmissive(ColourValue(0,0,0,clr.a)); 
+    pass->setAmbient(colour);
+    pass->setSpecular(colour);
+    pass->setSelfIllumination(colour);
+    //pass->setEmissive(ColourValue(0,0,0,colour.a)); 
     pass->setSceneBlending(SBT_TRANSPARENT_ALPHA);
     pass->setDepthWriteEnabled(false);
 

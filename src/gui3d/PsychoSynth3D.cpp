@@ -121,18 +121,42 @@ void PsychoSynth3D::setupTable()
     m_scene->setAmbientLight(ColourValue(0, 0, 0));
     m_scene->setShadowTechnique(SHADOWTYPE_STENCIL_ADDITIVE);
 
-    Light* light1 = m_scene->createLight("light1");
-    light1->setType(Light::LT_POINT);
-    light1->setPosition(Vector3(-10, 20, -5));
-    light1->setDiffuseColour(1.0, 1.0, 1.0);
-    light1->setSpecularColour(1.0, 1.0, 1.0);
+    Light* light;
+    light = m_scene->createLight("light1");
+    light->setType(Light::LT_POINT);
+    light->setPosition(Vector3(-30, 30, -30));
+    light->setDiffuseColour(1.0, 1.0, 1.0);
+    light->setSpecularColour(1.0, 1.0, 1.0);
+    light->setAttenuation(100, 3, 0, 0);
 
-    Light* light2 = m_scene->createLight("light2");
-    light2->setType(Light::LT_POINT);
-    light2->setPosition(Vector3(30, 30, 30));
-    light2->setDiffuseColour(0.7, 0.4, 0.3);
-    light2->setSpecularColour(0.7, 0.4, 0.3);
+    light = m_scene->createLight("light2");
+    light->setType(Light::LT_POINT);
+    light->setPosition(Vector3(30, 30, 30));
+    light->setDiffuseColour(1.0, 1.0, 1.0);
+    light->setSpecularColour(1.0, 1.0, 1.0);
+    light->setAttenuation(100, 3, 0, 0);
 
+    light = m_scene->createLight("light3");
+    light->setType(Light::LT_POINT);
+    light->setPosition(Vector3(30, 30, -30));
+    light->setDiffuseColour(1.0, 1.0, 1.0);
+    light->setSpecularColour(1.0, 1.0, 1.0);
+    light->setAttenuation(100, 3, 0, 0);
+    
+    light = m_scene->createLight("light4");
+    light->setType(Light::LT_POINT);
+    light->setPosition(Vector3(-30, 30, 30));
+    light->setDiffuseColour(1.0, 1.0, 1.0);
+    light->setSpecularColour(1.0, 1.0, 1.0);
+    light->setAttenuation(100, 3, 0, 0);
+    
+    /*
+    light = m_scene->createLight("light2");
+    light->setType(Light::LT_POINT);
+    light->setPosition(Vector3(30, 30, 30));
+    light->setDiffuseColour(0.7, 0.4, 0.3);
+    light->setSpecularColour(0.7, 0.4, 0.3);
+    */
     m_viewport->setBackgroundColour(Ogre::ColourValue(0,0,0));
     m_camera->setAspectRatio(Ogre::Real(m_window->getWidth())/m_window->getHeight());
 	

@@ -66,7 +66,10 @@ public:
 class ElemMainComponent : public ElemComponent
 {
     std::string m_mesh;
-    Ogre::Entity* m_mesh_ent;
+    Ogre::SceneNode* m_ent_node;
+    Ogre::Entity*   m_mesh_ent;
+    FlatRing* m_indicator;
+    FlatRing* m_indicator_fill;
     Ogre::Vector2 m_last_mouse_pos;
     int m_param;
     float m_min_val;
