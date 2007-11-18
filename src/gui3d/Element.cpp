@@ -28,8 +28,8 @@
 
 #define ELEMENT_Z_POS       0.001f
 #define ROTATION_FACTOR     100.0f
-#define INDICATOR_MIN_ANGLE 260
-#define INDICATOR_RANGE_ANGLE 340
+#define INDICATOR_MIN_ANGLE 265
+#define INDICATOR_RANGE_ANGLE 170
 
 using namespace std;
 using namespace Ogre;

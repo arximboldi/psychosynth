@@ -141,14 +141,14 @@ void PsychoSynth3D::setupTable()
     light->setPosition(Vector3(30, 30, -30));
     light->setDiffuseColour(1.0, 1.0, 1.0);
     light->setSpecularColour(1.0, 1.0, 1.0);
-    light->setAttenuation(100, 3, 0, 0);
+    light->setAttenuation(100, 2, 0, 0);
     
     light = m_scene->createLight("light4");
     light->setType(Light::LT_POINT);
     light->setPosition(Vector3(-30, 30, 30));
     light->setDiffuseColour(1.0, 1.0, 1.0);
     light->setSpecularColour(1.0, 1.0, 1.0);
-    light->setAttenuation(100, 3, 0, 0);
+    light->setAttenuation(100, 2.5, 0, 0);
     
     /*
     light = m_scene->createLight("light2");
