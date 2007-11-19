@@ -26,140 +26,10 @@
 #include "gui3d/QueryFlags.h"
 #include "common/Misc.h"
 
-#define ELEMENT_Z_POS       0.001f
 #define ROTATION_FACTOR     100.0f
-#define INDICATOR_MIN_ANGLE 265
-#define INDICATOR_RANGE_ANGLE 170
 
 using namespace std;
 using namespace Ogre;
-
-inline void ElemComponent::updateVisibility()
-{
-    m_node->setVisible(!m_parent->isGhost());
-}
-
-ElemMainComponent::ElemMainComponent(const std::string& mesh,
-				     int param, float min_val, float max_val) :
-    m_mesh(mesh),
-    m_mesh_ent(NULL),
-    m_param(param),
-    m_min_val(min_val),
-    m_max_val(max_val),
-    m_rotating(false)
-{
-}
-
-void ElemMainComponent::setMesh(const std::string& mesh)
-{
-    if (m_mesh_ent) {
-	m_ent_node->detachObject(m_mesh_ent);
-	getParent()->getScene()->destroyEntity(m_mesh_ent);
-    }
-
-    m_mesh_ent = getParent()->getScene()->createEntity(string("EE") +
-						       itoa(getParent()->getObject().getID(),10),
-						       mesh);
-    m_ent_node->attachObject(m_mesh_ent);
-    updateVisibility();
-}
-
-bool ElemMainComponent::handlePointerMove(Ogre::Vector2 pos)
-{
-    if (m_rotating) {
-	Vector2 rad   = m_last_mouse_pos - getParent()->getPosition();
-	Vector2 delta = pos - m_last_mouse_pos;
-	float value = m_old_value  + (rad.perpendicular().normalisedCopy() * delta).length()
-	    * (rad.crossProduct(delta) < 0.0 ? 1 : -1) * (m_max_val - m_min_val) / (4 * Math::PI);
-
-	if (value > m_max_val)
-	    value = m_max_val;
-	if (value < m_min_val)
-	    value = m_min_val;
-
-	getParent()->getObject().setParam(m_param, value);
-    }
-
-    m_last_mouse_pos = pos;
-
-    return false;
-}
-
-bool ElemMainComponent::handlePointerClick(Ogre::Vector2 pos, OIS::MouseButtonID id)
-{
-    if (getParent()->isSelected() && id == OIS::MB_Right) {
-	m_rotating = true;
-	return true;
-    }
-
-    return false;
-}
-
-bool ElemMainComponent::handlePointerRelease(Ogre::Vector2 pos, OIS::MouseButtonID id)
-{
-    if (id == OIS::MB_Right)
-	m_rotating = false;
-
-    return false;
-}
-
-void ElemMainComponent::init()
-{
-    getParent()->getObject().getParam(m_param, m_old_value);
-
-    m_ent_node = getSceneNode()->createChildSceneNode();
-
-    setMesh(m_mesh);
-
-    m_indicator = new FlatRing(string("IND1")+getSceneNode()->getName(),
-			       Degree(INDICATOR_MIN_ANGLE), Degree(INDICATOR_MIN_ANGLE +
-				   INDICATOR_RANGE_ANGLE),
-			       Element::RADIOUS + 0.1, Element::RADIOUS + 0.3,
-			       ColourValue(1,1,1,0.5));
-
-    m_indicator_fill = new FlatRing(string("IND2")+getSceneNode()->getName(),
-				    Degree(INDICATOR_MIN_ANGLE),
-				    Degree(INDICATOR_MIN_ANGLE +
-					   m_old_value / (m_max_val-m_min_val) *
-					   INDICATOR_RANGE_ANGLE),
-				    Element::RADIOUS + 0.1, Element::RADIOUS + 0.3,
-				    ColourValue(1,1,1,0.6));
-
-    getSceneNode()->attachObject(m_indicator);
-    getSceneNode()->attachObject(m_indicator_fill);
-}
-
-void ElemMainComponent::handleParamChange(TableObject& obj, int param_id)
-{
-    if (param_id == m_param) {
-	float new_val;
-	obj.getParam(m_param, new_val);
-	m_ent_node->yaw(Radian((new_val - m_old_value)/(m_max_val-m_min_val) * 2 * Math::PI));
-	m_indicator_fill->setEndAngle(Degree(INDICATOR_MIN_ANGLE +
-					     new_val/(m_max_val-m_min_val)
-					     * INDICATOR_RANGE_ANGLE));
-	m_indicator_fill->update();
-	m_old_value = new_val;
-    }
-}
-
-ElemMultiMainComponent::ElemMultiMainComponent(int param_1, float min_val, float max_val,
-					       int param_2, const char** names) :
-    ElemMainComponent(names[0], param_1, min_val, max_val),
-    m_param(param_2),
-    m_names(names)
-{
-}
-    
-void ElemMultiMainComponent::handleParamChange(TableObject& obj, int param_id)
-{
-    if (param_id == m_param) {
-	int val;
-	obj.getParam(param_id, val);
-	setMesh(m_names[val]);
-    } else
-	ElemMainComponent::handleParamChange(obj, param_id);
-}
 
 Element::Element(const TableObject& obj, Ogre::SceneManager* scene) :
     m_obj(obj),
@@ -167,6 +37,9 @@ Element::Element(const TableObject& obj, Ogre::SceneManager* scene) :
     m_col_selected(0.8, 0.1, 0.1, 0.7),
     m_col_normal(0.5, 0.8, 0.5, 0.5),
     m_scene(scene),
+    m_aimpoint(0,0,0),
+    m_click_diff(0,0),
+    m_pos(0,0),
     m_selected(false),
     m_moving(false)
 {
@@ -180,7 +53,7 @@ Element::Element(const TableObject& obj, Ogre::SceneManager* scene) :
     m_node->attachObject(m_base);
     m_pos.x = obj.getX();
     m_pos.y = obj.getY();
-    m_node->setPosition(Vector3(m_pos.x, ELEMENT_Z_POS, m_pos.y));
+    m_node->setPosition(Vector3(m_pos.x, Z_POS, m_pos.y));
 
     m_selected = false;
     setGhost(true);
@@ -204,6 +77,32 @@ void Element::addComponent(ElemComponent* comp)
     comp->init();
     /* TODO */
     node->setVisible(!m_ghost);
+}
+
+void Element::setTarget(const TableObject& obj)
+{
+    if (!m_target.isNull()) {
+	m_target.deleteListener(this);
+	m_aimpoint = Vector3(0, Z_POS, 0);
+    }
+    
+    m_target = obj;
+
+    if (!m_target.isNull()) {
+	m_target.addListener(this);
+	m_aimpoint = Vector3(obj.getX(), Z_POS, obj.getY());
+    }
+
+    m_node->lookAt(m_aimpoint, Node::TS_PARENT);
+}
+
+void Element::clearTarget(const TableObject& obj)
+{
+    if (m_target == obj) {
+	m_target.deleteListener(this);
+	m_target = TableObject();
+	m_aimpoint = Vector3(0, Z_POS, 0);
+    }
 }
 
 void Element::setPosition(const Ogre::Vector2& pos)
@@ -232,9 +131,11 @@ void Element::setSelected(bool selected)
 
 bool Element::pointerClicked(const Ogre::Vector2& pos, OIS::MouseButtonID id)
 {
+    bool ret;
+    
     for (ElemComponentIter it = m_comp.begin(); it != m_comp.end(); ++it)
 	if ((*it)->handlePointerClick(pos, id))
-	    return true;
+	    ret = true;
     
     switch (id) {
     case OIS::MB_Left:
@@ -253,7 +154,7 @@ bool Element::pointerClicked(const Ogre::Vector2& pos, OIS::MouseButtonID id)
 	break;
     }
 
-    return false;
+    return ret;
 }
 
 bool Element::pointerMoved(const Ogre::Vector2& pos)
@@ -298,11 +199,16 @@ bool Element::keyReleased(const OIS::KeyEvent& e)
 
 void Element::handleMoveObject(TableObject& obj)
 {
-    m_pos.x = obj.getX();
-    m_pos.y = obj.getY();
-    m_node->setPosition(m_pos.x, ELEMENT_Z_POS, m_pos.y);
-    //m_node->yaw(Math::ATan2(m_pos.x, m_pos.y));
-    m_node->lookAt(Vector3(0, ELEMENT_Z_POS, 0), Node::TS_PARENT);
+    if (obj == m_obj) {
+	m_pos.x = obj.getX();
+	m_pos.y = obj.getY();
+	m_node->setPosition(m_pos.x, Z_POS, m_pos.y);
+    } else if (obj == m_target) {
+	m_aimpoint.x = obj.getX();
+	m_aimpoint.z = obj.getY();
+    }
+    
+    m_node->lookAt(m_aimpoint, Node::TS_PARENT);
     
     /*
     for (std::list<Connection*>::iterator it = m_src_con.begin();
@@ -317,40 +223,19 @@ void Element::handleMoveObject(TableObject& obj)
 
 void Element::handleActivateObject(TableObject& obj)
 {
-    setGhost(false);
+    if (obj == m_obj)
+	setGhost(false);
 }
 
 void Element::handleDeactivateObject(TableObject& obj)
 {
-    setGhost(true);
+    if (obj == m_obj)
+	setGhost(true);
 }
 
-void Element::handleSetParamObject(TableObject& ob, int param_id)
+void Element::handleSetParamObject(TableObject& obj, int param_id)
 {
-    for (ElemComponentIter it = m_comp.begin(); it != m_comp.end(); ++it)
-	(*it)->handleParamChange(ob, param_id);
-}
-
-#include "object/ObjectOscillator.h"
-
-ElementOscillator::ElementOscillator(const TableObject& obj,
-				     Ogre::SceneManager* m_scene) :
-    Element(obj, m_scene)
-{
-    static const char* names[ObjectOscillator::N_OSC_TYPES] =
-	{"oscsine.mesh", "oscsine.mesh", "oscsine.mesh", "oscsine.mesh"};
-    
-    addComponent(new ElemMultiMainComponent(
-		     ObjectOscillator::PARAM_FREQUENCY, 20.0f, 5000.0f,
-		     ObjectOscillator::PARAM_WAVE, names));
-}
-
-#include "object/ObjectMixer.h"
-
-ElementMixer::ElementMixer(const TableObject& obj,
-			   Ogre::SceneManager* m_scene) :
-    Element(obj, m_scene)
-{ 
-    addComponent(new ElemMainComponent("oscsine.mesh",
-				       ObjectMixer::PARAM_AMPLITUDE, 0.0f, 1.0f));   
+    if (obj == m_obj)
+	for (ElemComponentIter it = m_comp.begin(); it != m_comp.end(); ++it)
+	    (*it)->handleParamChange(obj, param_id);
 }

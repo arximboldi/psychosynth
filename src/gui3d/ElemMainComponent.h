@@ -1,3 +1,4 @@
+
 /***************************************************************************
  *                                                                         *
  *   PSYCHOSYNTH                                                           *
@@ -20,32 +21,48 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef OGREMISC_H
-#define OGREMISC_H
+#ifndef ELEMMAINCOMPONENT_H
+#define ELEMMAINCOMPONENT_H
 
-#include <string>
+#include "gui3d/Element.h"
 
-
-inline Ogre::Vector3 yawVector3(const Ogre::Vector3& v, Ogre::Real angle)
+class ElemMainComponent : public ElemComponent
 {
-    Ogre::Real cosa = cos(angle);
-    Ogre::Real sina = sin(angle);
+    std::string m_mesh;
+    Ogre::SceneNode* m_ent_node;
+    Ogre::Entity*   m_mesh_ent;
+    FlatRing* m_indicator;
+    FlatRing* m_indicator_fill;
+    Ogre::Vector2 m_last_mouse_pos;
+    int m_param;
+    float m_min_val;
+    float m_max_val;
+    float m_old_value;
+    bool m_rotating;
     
-    return Ogre::Vector3(cosa * v.x - sina * v.z,
-		    v.y,
-		    sina * v.x + cosa * v.z);    
-}
+public:
+    ElemMainComponent(const std::string& mesh,
+		      int param, float min_val, float max_val);
 
-inline Ogre::Vector2 yawVector2(const Ogre::Vector2& v, Ogre::Real angle)
+    void setMesh(const std::string& mesh);
+
+    void init();
+    bool handlePointerMove(Ogre::Vector2 pos);
+    bool handlePointerClick(Ogre::Vector2 pos, OIS::MouseButtonID id);
+    bool handlePointerRelease(Ogre::Vector2 pos, OIS::MouseButtonID id);
+    virtual void handleParamChange(TableObject& obj, int param_id);
+};
+
+class ElemMultiMainComponent : public ElemMainComponent
 {
-    Ogre::Real cosa = cos(angle);
-    Ogre::Real sina = sin(angle);
+    int m_param;
+    const char** m_names;
+public:
+    ElemMultiMainComponent(int param_1, float min_val, float max_val,
+			   int param_2, const char** names);
     
-    return Ogre::Vector2(cosa * v.x - sina * v.y,
-			 sina * v.x + cosa * v.y);    
-}
+    void handleParamChange(TableObject& obj, int param_id);
+};
 
-Ogre::MaterialPtr createColourMaterial(const std::string& name,
-				       const Ogre::ColourValue& colour);
+#endif /* ELEMMAIMCOMPONENT */
 
-#endif /* OGREMISC_H */

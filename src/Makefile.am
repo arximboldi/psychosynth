@@ -20,6 +20,10 @@ psychosynth_SOURCES = \
 	gui3d/Timer.cpp \
 	gui3d/ToggableWindow.cpp \
 	gui3d/Element.cpp \
+	gui3d/ElemMainComponent.cpp \
+	gui3d/ElemSecondComponent.cpp \
+	gui3d/ElementOscillator.cpp \
+	gui3d/ElementMixer.cpp \
 	gui3d/ElementManager.cpp \
 	gui3d/WindowList.cpp \
 	gui3d/FlatRing.cpp \
@@ -72,6 +76,10 @@ noinst_HEADERS = \
 	gui3d/Timer.h\
 	gui3d/ToggableWindow.h\
 	gui3d/Element.h\
+	gui3d/ElemMainComponent.h \
+	gui3d/ElemSecondComponent.h \
+	gui3d/ElementOscillator.h \
+	gui3d/ElementMixer.h \
 	gui3d/ElementManager.h\
 	gui3d/QueryFlags.h\
 	gui3d/WindowList.h\

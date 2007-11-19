@@ -26,7 +26,7 @@
 using namespace Ogre;
 using namespace std;
 
-#define CON_WIDTH 0.1f
+#define CON_WIDTH 0.05f
 #define CON_Y     0.001f
 
 void ConnectionObject::build(const Ogre::Vector2& src,

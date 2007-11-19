@@ -20,32 +20,17 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef OGREMISC_H
-#define OGREMISC_H
+#include "gui3d/ElementMixer.h"
+#include "gui3d/ElemMainComponent.h"
+#include "object/ObjectMixer.h"
 
-#include <string>
+using namespace std;
+using namespace Ogre;
 
-
-inline Ogre::Vector3 yawVector3(const Ogre::Vector3& v, Ogre::Real angle)
-{
-    Ogre::Real cosa = cos(angle);
-    Ogre::Real sina = sin(angle);
-    
-    return Ogre::Vector3(cosa * v.x - sina * v.z,
-		    v.y,
-		    sina * v.x + cosa * v.z);    
+ElementMixer::ElementMixer(const TableObject& obj,
+			   Ogre::SceneManager* m_scene) :
+    Element(obj, m_scene)
+{ 
+    addComponent(new ElemMainComponent("oscsine.mesh",
+				       ObjectMixer::PARAM_AMPLITUDE, 0.0f, 1.0f));   
 }
-
-inline Ogre::Vector2 yawVector2(const Ogre::Vector2& v, Ogre::Real angle)
-{
-    Ogre::Real cosa = cos(angle);
-    Ogre::Real sina = sin(angle);
-    
-    return Ogre::Vector2(cosa * v.x - sina * v.y,
-			 sina * v.x + cosa * v.y);    
-}
-
-Ogre::MaterialPtr createColourMaterial(const std::string& name,
-				       const Ogre::ColourValue& colour);
-
-#endif /* OGREMISC_H */

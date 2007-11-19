@@ -20,32 +20,34 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef OGREMISC_H
-#define OGREMISC_H
+#ifndef ELEMSECONDCOMPONENT_H
+#define ELEMSECONDCOMPONENT_H
 
-#include <string>
+#include "gui3d/Element.h"
 
-
-inline Ogre::Vector3 yawVector3(const Ogre::Vector3& v, Ogre::Real angle)
+class ElemSecondComponent : public ElemComponent
 {
-    Ogre::Real cosa = cos(angle);
-    Ogre::Real sina = sin(angle);
+    FlatRing* m_indicator;
+    FlatRing* m_indicator_point;   
+    Ogre::SceneNode* m_point_node;
+    Ogre::SceneNode* m_point_yaw;
+    Ogre::Degree m_angle;
     
-    return Ogre::Vector3(cosa * v.x - sina * v.z,
-		    v.y,
-		    sina * v.x + cosa * v.z);    
-}
-
-inline Ogre::Vector2 yawVector2(const Ogre::Vector2& v, Ogre::Real angle)
-{
-    Ogre::Real cosa = cos(angle);
-    Ogre::Real sina = sin(angle);
+    int m_param;
+    float m_min_val;
+    float m_max_val;
+    float m_old_value;
+    bool m_changing;
     
-    return Ogre::Vector2(cosa * v.x - sina * v.y,
-			 sina * v.x + cosa * v.y);    
-}
+public:
+    ElemSecondComponent(int param, float min_val, float max_val);
 
-Ogre::MaterialPtr createColourMaterial(const std::string& name,
-				       const Ogre::ColourValue& colour);
+    void init();
+    bool handlePointerMove(Ogre::Vector2 pos);
+    bool handlePointerClick(Ogre::Vector2 pos, OIS::MouseButtonID id);
+    bool handlePointerRelease(Ogre::Vector2 pos, OIS::MouseButtonID id);
+    void handleParamChange(TableObject& obj, int param_id);   
+};
 
-#endif /* OGREMISC_H */
+#endif /* ELEMSECONDCOMPONENT_H */
+

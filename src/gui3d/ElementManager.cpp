@@ -24,6 +24,8 @@
 
 #include "gui3d/ElementManager.h"
 #include "gui3d/ElementTypes.h"
+#include "gui3d/ElementOscillator.h"
+#include "gui3d/ElementMixer.h"
 #include "gui3d/QueryFlags.h"
 #include "common/Error.h"
 #include "object/KnownObjects.h"
@@ -210,19 +212,19 @@ void ElementManager::update()
 
 void ElementManager::handleLinkAdded(const TablePatcherEvent& ev)
 {
-    cout << "awiniwaun\n";
     m_cons.push_back(new Connection(m_scene, ev.src, ev.dest));
+    m_elems[ev.src.getID()]->setTarget(ev.dest);
 }
 
 void ElementManager::handleLinkDeleted(const TablePatcherEvent& ev)
 {
-    cout << "awinipeich\n";
-    
-    /* TODO */
+     /* TODO */
     for (list<Connection*>::iterator it = m_cons.begin(); it != m_cons.end();)
 	if ((*it)->getSource() == ev.src && (*it)->getDestiny() == ev.dest) {
 	    delete *it;
 	    m_cons.erase(it++);
 	} else
 	    ++it;
+
+    m_elems[ev.src.getID()]->clearTarget(ev.dest);
 }

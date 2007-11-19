@@ -63,43 +63,6 @@ public:
     };
 };
 
-class ElemMainComponent : public ElemComponent
-{
-    std::string m_mesh;
-    Ogre::SceneNode* m_ent_node;
-    Ogre::Entity*   m_mesh_ent;
-    FlatRing* m_indicator;
-    FlatRing* m_indicator_fill;
-    Ogre::Vector2 m_last_mouse_pos;
-    int m_param;
-    float m_min_val;
-    float m_max_val;
-    float m_old_value;
-    bool m_rotating;
-    
-public:
-    ElemMainComponent(const std::string& mesh,
-		      int param, float min_val, float max_val);
-    void setMesh(const std::string& mesh);
-
-    bool handlePointerMove(Ogre::Vector2 pos);
-    bool handlePointerClick(Ogre::Vector2 pos, OIS::MouseButtonID id);
-    bool handlePointerRelease(Ogre::Vector2 pos, OIS::MouseButtonID id);
-    void init();
-    virtual void handleParamChange(TableObject& obj, int param_id);
-};
-
-class ElemMultiMainComponent : public ElemMainComponent
-{
-    int m_param;
-    const char** m_names;
-public:
-    ElemMultiMainComponent(int param_1, float min_val, float max_val,
-			   int param_2, const char** names);
-    
-    void handleParamChange(TableObject& obj, int param_id);
-};
-
 class Element : public TableObjectListener
 {
     typedef std::list<ElemComponent*>::iterator ElemComponentIter;
@@ -111,7 +74,8 @@ class Element : public TableObjectListener
     */
     
     TableObject m_obj;
-
+    TableObject m_target;
+    
     Ogre::ColourValue   m_col_ghost;
     Ogre::ColourValue   m_col_selected;
     Ogre::ColourValue   m_col_normal;
@@ -119,9 +83,9 @@ class Element : public TableObjectListener
     FlatRing*           m_base;
     Ogre::SceneNode*    m_node;
 
+    Ogre::Vector3 m_aimpoint;
     Ogre::Vector2 m_click_diff;
     Ogre::Vector2 m_pos;
-    Ogre::Degree m_angle;
 	
     bool m_ghost;
     bool m_selected;
@@ -129,13 +93,16 @@ class Element : public TableObjectListener
     
 public:
     static const Real RADIOUS = 1.0f;
-
+    static const Real Z_POS = 0.001f;
+    
     Element(const TableObject& obj, Ogre::SceneManager* scene);
     
     virtual ~Element();
 
     void addComponent(ElemComponent* comp);
-    
+
+    void setTarget(const TableObject& obj);
+    void clearTarget(const TableObject& obj);
     void setGhost(bool ghost);
     void setSelected(bool selected);
     void setPosition(const Ogre::Vector2& pos);
@@ -190,16 +157,9 @@ public:
     */
 };
 
-class ElementOscillator : public Element
+inline void ElemComponent::updateVisibility()
 {
-public:
-    ElementOscillator(const TableObject& obj, Ogre::SceneManager* m_scene);
-};
-
-class ElementMixer : public Element
-{
-public:
-    ElementMixer(const TableObject& obj, Ogre::SceneManager* m_scene);
-};
+    m_node->setVisible(!m_parent->isGhost());
+}
 
 #endif /* ELEMENT_H */
