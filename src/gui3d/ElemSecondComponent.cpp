@@ -100,6 +100,7 @@ bool ElemSecondComponent::handlePointerClick(Ogre::Vector2 pos, OIS::MouseButton
 
     if ((pos - real_pos).length() < SECOND_POINT_RAD) {
 	m_changing = true;
+	return true;
     }
 	
     return false;
