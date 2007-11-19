@@ -37,7 +37,7 @@ Element::Element(const TableObject& obj, Ogre::SceneManager* scene) :
     m_col_selected(0.8, 0.1, 0.1, 0.7),
     m_col_normal(0.5, 0.8, 0.5, 0.5),
     m_scene(scene),
-    m_aimpoint(0,0,0),
+    m_aimpoint(0, Z_POS, 0),
     m_click_diff(0,0),
     m_pos(0,0),
     m_selected(false),
@@ -131,7 +131,7 @@ void Element::setSelected(bool selected)
 
 bool Element::pointerClicked(const Ogre::Vector2& pos, OIS::MouseButtonID id)
 {
-    bool ret;
+    bool ret = false;
     
     for (ElemComponentIter it = m_comp.begin(); it != m_comp.end(); ++it)
 	if ((*it)->handlePointerClick(pos, id))
@@ -159,16 +159,18 @@ bool Element::pointerClicked(const Ogre::Vector2& pos, OIS::MouseButtonID id)
 
 bool Element::pointerMoved(const Ogre::Vector2& pos)
 {
+    bool ret = false;
+    
     for (ElemComponentIter it = m_comp.begin(); it != m_comp.end();)
 	if ((*it++)->handlePointerMove(pos))
-	    return true;
+	    ret = true;
     
     if (m_ghost)
 	setPosition(pos);
     else if (m_moving)
 	setPosition(pos - m_click_diff);
 
-    return false;
+    return ret;
 }
 
 bool Element::pointerReleased(const Ogre::Vector2& pos, OIS::MouseButtonID id)
