@@ -31,6 +31,10 @@ ElementMixer::ElementMixer(const TableObject& obj,
 			   Ogre::SceneManager* m_scene) :
     Element(obj, m_scene)
 { 
-    addComponent(new ElemMainComponent("oscsine.mesh",
-				       ObjectMixer::PARAM_AMPLITUDE, 0.0f, 1.0f));   
+    addComponent(new ElemMainComponent("mixer.mesh",
+				       ObjectMixer::PARAM_AMPLITUDE, 0.0f, 1.0f));
+
+    getGUIProperties().addParameter(new ElemGuiParamFloat(
+					ObjectMixer::PARAM_AMPLITUDE, 0.0f, 1.0f,
+					"Amplitude"));
 }

@@ -25,37 +25,37 @@
 using namespace CEGUI;
 
 ToggableWindow::ToggableWindow() :
-	m_window(NULL),
-	m_active(false)
+    m_window(NULL),
+    m_active(false)
 {
 }
 
 ToggableWindow::~ToggableWindow()
 {
-	if (m_active) {
-		Window* root_win = System::getSingleton().getGUISheet();
-		root_win->removeChildWindow(m_window);
-	}
-	delete m_window;
+    if (m_active) {
+	Window* root_win = System::getSingleton().getGUISheet();
+	root_win->removeChildWindow(m_window);
+    }
+    delete m_window;
 }
 
 void ToggableWindow::buildWindow()
 {
-	m_window = createWindow();
-	m_window->subscribeEvent(FrameWindow::EventCloseClicked, 
-		Event::Subscriber(&ToggableWindow::onClose, this));
+    m_window = createWindow();
+    m_window->subscribeEvent(FrameWindow::EventCloseClicked, 
+			     Event::Subscriber(&ToggableWindow::onClose, this));
 }
 
 void ToggableWindow::setActive(bool active)
 {
-	if (m_window == NULL)
-		buildWindow();
+    if (m_window == NULL)
+	buildWindow();
 		
-	if (active != m_active) {
-		m_active = active;
-		Window* root_win = System::getSingleton().getGUISheet();
-		if (m_active)  root_win->addChildWindow(m_window);
-		if (!m_active) root_win->removeChildWindow(m_window);
+    if (active != m_active) {
+	m_active = active;
+	Window* root_win = System::getSingleton().getGUISheet();
+	if (m_active)  root_win->addChildWindow(m_window);
+	if (!m_active) root_win->removeChildWindow(m_window);
     }
 }
 

@@ -41,13 +41,16 @@ Element::Element(const TableObject& obj, Ogre::SceneManager* scene) :
     m_click_diff(0,0),
     m_pos(0,0),
     m_selected(false),
-    m_moving(false)
+    m_moving(false),
+    m_gui_prop(obj)
 {
     m_base = new FlatRing(string("EB") + itoa(m_obj.getID(),10),
 			  Degree(0), Degree(360),
 			  0, 1,
 			  m_col_ghost);
 
+    m_gui_prop.setActive(false);
+    
     m_node = scene->getRootSceneNode()->createChildSceneNode();
     
     m_node->attachObject(m_base);
@@ -186,11 +189,21 @@ bool Element::pointerReleased(const Ogre::Vector2& pos, OIS::MouseButtonID id)
 
 bool Element::keyPressed(const OIS::KeyEvent& e)
 {
-    if (m_selected && e.key == OIS::KC_DELETE) {
-	m_obj.deleteMe();
-	return true;
+    switch(e.key) {
+    case OIS::KC_DELETE:
+	if (m_selected)
+	    m_obj.deleteMe();
+	break;
+
+    case OIS::KC_E:
+	if (m_selected)
+	    m_gui_prop.toggle();
+	break;
+	
+    default:
+	break;
     }
-    
+       
     return false;
 }
 

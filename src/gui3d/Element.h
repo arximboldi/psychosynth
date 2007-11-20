@@ -27,6 +27,7 @@
 #include <OIS/OIS.h>
 
 #include "gui3d/FlatRing.h"
+#include "gui3d/ElementProperties.h"
 #include "table/Table.h"
 
 class Element;
@@ -82,7 +83,7 @@ class Element : public TableObjectListener
     Ogre::SceneManager* m_scene;
     FlatRing*           m_base;
     Ogre::SceneNode*    m_node;
-
+    
     Ogre::Vector3 m_aimpoint;
     Ogre::Vector2 m_click_diff;
     Ogre::Vector2 m_pos;
@@ -90,7 +91,8 @@ class Element : public TableObjectListener
     bool m_ghost;
     bool m_selected;
     bool m_moving;
-    
+
+    ElementProperties m_gui_prop;
 public:
     static const Real RADIOUS = 1.0f;
     static const Real Z_POS = 0.001f;
@@ -138,6 +140,9 @@ public:
 	return m_obj;
     }
 
+    ElementProperties& getGUIProperties() {
+	return m_gui_prop;
+    }
     /*
     void addSourceConnection(Connection* con) {
 	m_src_con.push_back(con);

@@ -90,7 +90,7 @@ void PsychoSynth3D::setupGui()
     CEGUI::SchemeManager::getSingleton().loadScheme("TaharezLook.scheme");
     m_gui->setDefaultMouseCursor("TaharezLook", "MouseArrow");
     m_gui->setDefaultFont(CEGUI::FontManager::getSingleton().
-			  createFont("DejaVuSans-10.font"));
+			  createFont("DejaVuSans-9.font"));
 	
     CEGUI::WindowManager *win = CEGUI::WindowManager::getSingletonPtr();
     CEGUI::Window *sheet = win->createWindow("DefaultGUISheet", "root"); // TODO: root?
@@ -162,12 +162,14 @@ void PsychoSynth3D::setupTable()
 	
     Entity *ent1 = m_scene->createEntity( "object1", "table.mesh" );
     ent1->setQueryFlags(QFLAG_TABLE);
-    SceneNode *node1 = m_scene->getRootSceneNode()->createChildSceneNode("nodo1");
-    node1->attachObject( ent1 );
-
-    SceneNode *node = m_scene->getRootSceneNode()->createChildSceneNode("myring");
+    SceneNode *node1 = m_scene->getRootSceneNode()->createChildSceneNode();
+    //node1->setScale(Vector3(1.5, 1.5, 1.5));
+    node1->attachObject(ent1);
+    
+    
+    SceneNode *node = m_scene->getRootSceneNode()->createChildSceneNode();
     FlatRing* ring = new FlatRing("ringy", Degree(0), Degree(360), 0, 0.4,
-				  ColourValue(0, 0, 0, 0.7));
+				  ColourValue(0, 0, 0, 0.8));
     node->attachObject(ring);
     node->setPosition(Vector3(0,0.001,0));
 

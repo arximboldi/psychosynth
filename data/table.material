@@ -1,4 +1,4 @@
-material Top
+material Top.003
 {
 	receive_shadows on
 	technique
@@ -12,7 +12,7 @@ material Top
 		}
 	}
 }
-material Base
+material Base.003
 {
 	receive_shadows on
 	technique

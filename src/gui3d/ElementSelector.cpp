@@ -103,8 +103,8 @@ CEGUI::FrameWindow* ElementSelector::createWindow()
 {
     WindowManager& wmgr = WindowManager::getSingleton();
 	
-    FrameWindow* window = dynamic_cast<FrameWindow*>(
-	wmgr.createWindow("TaharezLook/FrameWindow", "window_selector"));
+    FrameWindow* window = dynamic_cast<FrameWindow*>
+	(wmgr.createWindow("TaharezLook/FrameWindow", "window_selector"));
 	
     window->setPosition( UVector2(UDim(0, 10), UDim(0, 10)) );
     window->setSize    ( UVector2(UDim(1, -20),UDim(0, 100)) );

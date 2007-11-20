@@ -25,29 +25,35 @@
 
 #include <CEGUI/CEGUI.h>
 
-class ToggableWindow {
-	CEGUI::FrameWindow* m_window;
-	bool m_active;
+class ToggableWindow
+{
+    CEGUI::FrameWindow* m_window;
+    bool m_active;
 	
-	virtual CEGUI::FrameWindow* createWindow() = 0;
+    virtual CEGUI::FrameWindow* createWindow() = 0;
+    void buildWindow();
 
-	void buildWindow();
+protected:
+    CEGUI::FrameWindow* getWindow() {
+	return m_window;
+    }
+    
 public:
-	ToggableWindow();
-	virtual ~ToggableWindow();
+    ToggableWindow();
+    virtual ~ToggableWindow();
 	
-	bool isActive() {return m_active;}
-	void setActive(bool active);
+    bool isActive() {return m_active;}
+    void setActive(bool active);
 	
-	bool toggle() {
-		setActive(!m_active);
-		return m_active;
-	};
+    bool toggle() {
+	setActive(!m_active);
+	return m_active;
+    };
 	
-	bool onClose(const CEGUI::EventArgs &e) {
-		setActive(false);
-		return true;
-	};
+    bool onClose(const CEGUI::EventArgs &e) {
+	setActive(false);
+	return true;
+    };
 
 };
 

@@ -1,0 +1,34 @@
+material mixer
+{
+	receive_shadows on
+	technique
+	{
+		pass
+		{
+			ambient 0.500000 0.500000 0.500000 1.000000
+			diffuse 0.923137 0.600000 0.000000 1.000000
+			specular 0.500000 0.500000 0.500000 1.000000 12.500000
+			emissive 0.000000 0.000000 0.000000 1.000000
+		}
+	}
+}
+material mixer_image
+{
+	receive_shadows on
+	technique
+	{
+		pass
+		{
+		    scene_blend alpha_blend
+            depth_write off
+
+			texture_unit
+			{
+				texture tex-mixer.tga
+				filtering trilinear
+				tex_address_mode wrap
+				
+			}
+		}
+	}
+}

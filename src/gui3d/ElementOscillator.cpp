@@ -32,13 +32,30 @@ ElementOscillator::ElementOscillator(const TableObject& obj,
 				     Ogre::SceneManager* m_scene) :
     Element(obj, m_scene)
 {
-    static const char* names[ObjectOscillator::N_OSC_TYPES] =
-	{"oscsine.mesh", "oscsine.mesh", "oscsine.mesh", "oscsine.mesh"};
+    static const char* mesh_names[ObjectOscillator::N_OSC_TYPES] =
+	{"osc_sine.mesh", "osc_square.mesh", "osc_triangle.mesh", "osc_sawtooth.mesh"};
+
+    static const char* wave_names[ObjectOscillator::N_OSC_TYPES] =
+	{"Sine", "Square", "Triangle", "Sawtooth"};
     
     addComponent(new ElemMultiMainComponent(
 		     ObjectOscillator::PARAM_FREQUENCY, 20.0f, 5000.0f,
-		     ObjectOscillator::PARAM_WAVE, names));
+		     ObjectOscillator::PARAM_WAVE, mesh_names));
     
     addComponent(new ElemSecondComponent(
 		     ObjectOscillator::PARAM_AMPLITUDE, 0.0f, 1.0f));
+
+    getGUIProperties().addParameter(new ElemGuiParamMulti(
+					ObjectOscillator::PARAM_WAVE,
+					ObjectOscillator::N_OSC_TYPES,
+					wave_names,
+					"Wave"));
+    
+    getGUIProperties().addParameter(new ElemGuiParamFloat(
+					ObjectOscillator::PARAM_FREQUENCY, 20.0f, 5000.0f,
+					"Frequency"));
+    
+    getGUIProperties().addParameter(new ElemGuiParamFloat(
+					ObjectOscillator::PARAM_AMPLITUDE, 0.0f, 1.0f,
+					"Amplitude"));
 }

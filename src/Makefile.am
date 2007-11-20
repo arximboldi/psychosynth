@@ -25,6 +25,7 @@ psychosynth_SOURCES = \
 	gui3d/ElementOscillator.cpp \
 	gui3d/ElementMixer.cpp \
 	gui3d/ElementManager.cpp \
+	gui3d/ElementProperties.cpp \
 	gui3d/WindowList.cpp \
 	gui3d/FlatRing.cpp \
 	gui3d/Connection.cpp \
@@ -81,6 +82,7 @@ noinst_HEADERS = \
 	gui3d/ElementOscillator.h \
 	gui3d/ElementMixer.h \
 	gui3d/ElementManager.h\
+	gui3d/ElementProperties.h \
 	gui3d/QueryFlags.h\
 	gui3d/WindowList.h\
 	gui3d/FlatRing.h\
