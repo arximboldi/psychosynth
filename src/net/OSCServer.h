@@ -23,8 +23,60 @@
 #ifndef OSCSERVER_H
 #define OSCSERVER_H
 
-class OSCServer
+#include <list>
+
+#include "net/OSCMisc.h"
+#include "net/OSCController.h"
+
+class OSCServer;
+
+class OSCServerListener
 {
+public:
+    virtual bool handleClientConnect(OSCServer* server, int client_id) = 0;
+    virtual bool handleClientDisconnect(OSCServer* server, int client_id) = 0;
+    virtual bool handleClientTimeout(OSCServer* server, int client_id) = 0;
+};
+
+class OSCServerSubject
+{
+    std::list<OSCServerListener*> m_list;
+public:
+    void addListener(OSCServerListener* l) {
+	m_list.push_back(l);
+    }
+
+    void deleteListener(OSCServerListener* l) {
+	m_list.remove(l);
+    }
+    
+    void notifyClientDisconnect(OSCServer* server, int client_id);
+    void notifyClientConnect(OSCServer* server, int client_id);
+    void notifyClientTimeout(OSCServer* server, int client_id);
+};
+
+class OSCServer : public OSCController,
+		  public OSCServerSubject
+{
+    lo_server m_server;
+    bool m_listening;
+    
+    LO_HANDLER(OSCServer, alive);
+    LO_HANDLER(OSCServer, connect);
+    LO_HANDLER(OSCServer, get_state);
+    LO_HANDLER(OSCServer, disconnect);
+
+public:
+    OSCServer();
+    ~OSCServer();
+
+    bool isListening() {
+	return m_listening;
+    };
+
+    bool listen(const char* port);
+    void stop();
+    int update(int msec);
 };
 
 #endif

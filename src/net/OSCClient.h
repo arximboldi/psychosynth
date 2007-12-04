@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) 2007 by Juan Pedro Bolivar Puente                       *
+ *   Copyright (C) 2007 Juan Pedro Bolivar Puente                          *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -20,32 +20,56 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <iostream>
+#ifndef OSCCLIENT_H
+#define OSCCLIENT_H
 
-#include "psychosynth.h"
+#include "net/OSCController.h"
 
-#include "table/Table.h"
-#include "table/PatcherDynamic.h"
-#include "common/ArgParser.h"
-#include "common/Logger.h"
-#include "gui3d/PsychoSynth3D.h"
-#include "output/OutputAlsa.h"
-#include "output/OutputOss.h"
-#include "object/ObjectOscillator.h"
-#include "object/ObjectMixer.h"
-#include "object/ObjectOutput.h"
-#include "object/ObjectManager.h"
+class OSCClient;
 
-using namespace std;
-
-int main(int argc, const char *argv[])
+class OSCClientListener
 {
-    PsychoSynth3D main_app;
+public:
+    virtual bool handleClientAccept(OSCClient*) = 0;
+    virtual bool handleClientTimeout(OSCClient*) = 0;
+    virtual bool handleClientDrop(OSCClient*) = 0;
+};
 
-    Logger::instance().addDumper(new LogDefaultDumper);
-    Logger::instance().log(Log::WARNING, "Hola amigo!");
+class OSCClientSubject
+{
+    std::list<OSCClientListener*> m_list;
     
-    main_app.run(argc, argv);
-	
-    return 0;
-}
+public:
+    void addListener(OSCClientListener* l) {
+	m_list.push_back(l);
+    };
+    
+    void deleteListener(OSCClientListener* l) {
+	m_list.remove(l);
+    };
+    
+    void notifyClientAccept(OSCClient* param);
+    void notifyClientTimeout(OSCClient* param);
+    void notifyClientDrop(OSCClient* param);
+};
+
+class OSCClient : public OSCController,
+		  private OSCClientSubject
+{
+    lo_server m_server;
+
+    LO_HANDLER(OSCClient, alive);
+    LO_HANDLER(OSCClient, drop);
+    LO_HANDLER(OSCClient, accepted);
+
+public:
+    OSCClient();
+    ~OSCClient();
+    
+    void connect(lo_address);
+    void disconnect();
+    bool isConnected();
+    int update(int msec);
+};
+
+#endif /* OSCCLIENT_H */

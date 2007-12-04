@@ -115,14 +115,16 @@ public:
     }
 };
 
-class TableListener {
+class TableListener
+{
 public:
     virtual ~TableListener() {};
     virtual void handleAddObject(TableObject& obj) = 0;
     virtual void handleDeleteObject(TableObject& obj) = 0;
 };
 
-class TableObjectListener {
+class TableObjectListener
+{
 public:
     virtual ~TableObjectListener() {};
     virtual void handleMoveObject(TableObject& obj) = 0;
@@ -131,7 +133,8 @@ public:
     virtual void handleSetParamObject(TableObject& ob, int param_id) = 0;
 };
 
-struct TablePatcherEvent {
+struct TablePatcherEvent
+{
     TableObject src;
     TableObject dest;
     int src_socket;
@@ -143,21 +146,24 @@ struct TablePatcherEvent {
 	src(s), dest(d), src_socket(ss), dest_socket(ds), socket_type(st) {}
 };
 
-class TablePatcherListener {
+class TablePatcherListener
+{
 public:
     virtual ~TablePatcherListener() {};
     virtual void handleLinkAdded(const TablePatcherEvent& ev) = 0;
     virtual void handleLinkDeleted(const TablePatcherEvent& ev) = 0;
 };
 
-class TableSubject {
-    typedef std::list<TableListener*>::iterator ListenerIter;
+class TableSubject
+{
     typedef std::list<TableObjectListener*>::iterator ObjectListenerIter;
+    typedef std::list<TableListener*>::iterator ListenerIter;
     
     std::list<TableListener*> m_listeners;
     std::list<TablePatcherListener*> m_patch_list;
     std::map<int, std::list<TableObjectListener*> > m_obj_listeners; 
-
+    std::list<TableObjectListener*> m_all_obj_list;
+    
 protected:
     void notifyAddObject(TableObject& obj);
     void notifyDeleteObject(TableObject& obj);
@@ -176,6 +182,10 @@ public:
     void addTablePatcherListener(TablePatcherListener* cl) {
 	m_patch_list.push_back(cl);
     };
+
+    void addTableObjectListener(TableObjectListener* cl) {
+	m_all_obj_list.push_back(cl);
+    };
     
     void addTableObjectListener(TableObject& obj, TableObjectListener* cl) {
 	std::map<int, std::list<TableObjectListener*> >::iterator it;
@@ -191,6 +201,10 @@ public:
     void deleteTablePatcherListener(TablePatcherListener* cl) {
 	m_patch_list.remove(cl);
     };
+
+    void deleteTableObjectListener(TableObjectListener* cl) {
+	m_all_obj_list.remove(cl);
+    };
     
     void deleteTableObjectListener(TableObject& obj, TableObjectListener* cl) {
 	std::map<int, std::list<TableObjectListener*> >::iterator it;
@@ -200,7 +214,9 @@ public:
     };
 };
 
-class Table: public TableSubject, public PatcherListener {
+class Table : public TableSubject,
+	      public PatcherListener
+{
     AudioInfo m_info;
     ObjectManager m_objmgr;
     Patcher* m_patcher;

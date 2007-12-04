@@ -20,80 +20,71 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <iostream>
-#include <cmath>
-
-#include "client/Client.h"
-#include "output/OutputAlsa.h"
-#include "output/OutputOss.h"
-#include "object/ObjectOscillator.h"
-#include "net/NetChannelManager.h"
+#include "net/OSCClient.h"
 
 using namespace std;
 
-void Client::handleMessage(const NetMessage &msg)
+void OSCClientSubject::notifyClientAccept(OSCClient* param)
 {
-	if ((unsigned)msg.getLength() < sizeof(unsigned short)) {
-		WARNING("Message too short!");
-		return;
-	}
-	
-	DEBUG("NEW MESSAGE");
-	msg.print();
-	
-	unsigned short packet_type = msg.getw();
-	switch (packet_type) {
-		case PACKET_CONFIG:
-			processConfig(msg); 
-			break;
-		default: 
-			m_next_is_mine++;
-			if (!m_updater.processMessage(msg)) 
-				m_next_is_mine--;
-			break;
-	}
+    for (list<OSCClientListener*>::iterator it = m_list.begin();
+	 it != m_list.end(); ++it)
+	(*it)->handleClientAccept(param);
 }
 
-void Client::processConfig(const NetMessage& msg)
+void OSCClientSubject::notifyClientTimeout(OSCClient* param)
 {
-	PacketConfig packet;
-	msg.geta(&packet, sizeof(packet));
-	/* TODO */
+    for (list<OSCClientListener*>::iterator it = m_list.begin();
+	 it != m_list.end(); ++it)
+	(*it)->handleClientTimeout(param);
 }
 
-void Client::run()
+void OSCClientSubject::notifyClientDrop(OSCClient* param)
 {
-	open();
-	connect(m_host.c_str(), m_port);
-	m_manager.manage(this);
-	
-	m_manager.setTimeout(1000);
-
-	while(m_manager.poll());
-
-	close();
+    for (list<OSCClientListener*>::iterator it = m_list.begin();
+	 it != m_list.end(); ++it)
+	(*it)->handleClientDrop(param);
 }
 
-void Client::handleAddObject(Object* obj)
+OSCClient::OSCClient() :
+    OSCController(false),
+    m_server(NULL)
 {
-	if (!m_next_is_mine) {
-		PacketAddObject packet(obj->getType(), obj->getId(), obj->getX(), obj->getY());
-		sendMessage(makePacketMessage(packet));
-	} else m_next_is_mine--;
 }
 
-void Client::handleMoveObject(Object* obj)
+OSCClient::~OSCClient()
 {
-	if (!m_next_is_mine) {
-		PacketMoveObject packet(obj->getId(), obj->getX(), obj->getY());
-		sendMessage(makePacketMessage(packet));
-	} else m_next_is_mine--;
 }
 
-void Client::handleDeleteObject(Object* obj)
+void OSCClient::connect(lo_address target)
 {
-	if (!m_next_is_mine) {
-		PacketDeleteObject packet(obj->getId());
-		sendMessage(makePacketMessage(packet));
-	} else m_next_is_mine--;
+}
+
+void OSCClient::disconnect()
+{
+}
+
+bool OSCClient::isConnected()
+{
+}
+
+int OSCClient::update(int msec)
+{
+}
+
+int OSCClient::_drop_cb(const char* path, const char* types,
+			lo_arg** argv, int argc, lo_message msg)
+{
+    return 0;
+}
+
+int OSCClient::_accepted_cb(const char* path, const char* types,
+			    lo_arg** argv, int argc, lo_message msg)
+{
+    return 0;
+}
+
+int OSCClient::_alive_cb(const char* path, const char* types,
+			 lo_arg** argv, int argc, lo_message msg)
+{
+    return 0;
 }

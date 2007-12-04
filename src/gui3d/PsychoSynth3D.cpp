@@ -20,6 +20,8 @@
  *                                                                         *
  ***************************************************************************/
 
+#include "common/Logger.h"
+
 #include "gui3d/PsychoSynth3D.h"
 #include "gui3d/QuitWindow.h"
 #include "gui3d/ElementSelector.h"
@@ -46,7 +48,10 @@ PsychoSynth3D::~PsychoSynth3D()
 
 void PsychoSynth3D::setupOgre()
 {
-    m_ogre = new Root("data/plugins.cfg", "data/ogre.cfg");
+
+    Logger::instance().log(::Log::INFO, "Initializing Ogre.");
+    
+    m_ogre = new Root("data/plugins.cfg", "data/ogre.cfg", "Ogre.log");
 
     ResourceGroupManager& resource_manager = ResourceGroupManager::getSingleton();
     resource_manager.addResourceLocation("data", "FileSystem", "General");
@@ -248,6 +253,7 @@ void PsychoSynth3D::closeInput()
 void PsychoSynth3D::closeOgre()
 {
     delete m_ogre;
+    Logger::instance().log(::Log::INFO, "Ogre closed.");
 }
 
 int PsychoSynth3D::run(int argc, const char* argv[])

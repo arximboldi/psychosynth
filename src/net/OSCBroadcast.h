@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) 2007 by Juan Pedro Bolivar Puente                       *
+ *   Copyright (C) 2007 Juan Pedro Bolivar Puente                          *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -20,51 +20,61 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "core/CoreNetUpdater.h"
-#include "common/Error.h"
-#include "object/Object.h"
-#include "object/ObjectOscillator.h"
+#ifndef OSCBROADCAST_H
+#define OSCBROADCAST_H
 
-static Object* createObject(int type)
+#include <list>
+#include <lo/lo.h>
+
+#include "net/OSCMisc.h"
+
+/*
+template<class T>
+class first_equals
 {
-    switch (type) {
-    case OBJ_OSCILLATOR:  return new ObjectOscillator(AudioInfo()); /* TODO!! */
-    default:              return NULL;
+    T m_ref;
+public:
+    first_equals(const T& r) : m_ref(r) {};
+
+    template<class U>
+    bool operator() (const std::pair<T,U>& p) {
+	return p.first == m_ref;
     }
-}
+};
+*/
 
-bool CoreNetUpdater::processMessage(const NetMessage& msg)
+class lo_address_equals_func
 {
-    msg.seek(0);
-	
-    unsigned short packet_type = msg.getw();
-    switch (packet_type) {
-    case PACKET_ADDOBJECT:    return processAddObject(msg);
-    case PACKET_MOVEOBJECT:   return processMoveObject(msg);
-    case PACKET_DELETEOBJECT: return processDeleteObject(msg);
-    default:                  WARNING("Unknwon message"); return false;
+    lo_address m_ref;
+    
+public:
+    lo_address_equals_func(lo_address ref) : m_ref(ref) {}
+
+    bool operator() (lo_address param) {
+	return lo_address_equals(m_ref, param);
     }
-}
+};
 
-bool CoreNetUpdater::processAddObject(const NetMessage& msg)
+class OSCBroadcast
 {
-    PacketAddObject packet;
-    msg.geta(&packet, sizeof(packet));
-    return m_core->addObject(createObject(packet.type), packet.id, packet.x, packet.y);
-}
+    std::list<lo_address> m_dest;
+    
+public:
+    void addDestiny(lo_address dest) {
+	m_dest.push_back(dest);
+    }
+    
+    void deleteDestiny(lo_address dest) {
+	m_dest.remove_if(lo_address_equals_func(dest));
+    }
 
-bool CoreNetUpdater::processMoveObject(const NetMessage& msg)
-{
-    PacketMoveObject packet;
-    msg.geta(&packet, sizeof(packet));
-    m_core->moveObject(m_core->findObject(packet.id), packet.x, packet.y);
-    return true;
-}
+    void clear() {
+	m_dest.clear();
+    }
+    
+    void broadcastMessage(const char* path, lo_message msg);
 
-bool CoreNetUpdater::processDeleteObject(const NetMessage& msg)
-{
-    PacketDeleteObject packet;
-    msg.geta(&packet, sizeof(packet));
-    m_core->deleteObject(m_core->findObject(packet.id));
-    return true;
-}
+    void broadcastMessageFrom(const char* path, lo_message msg, lo_address from);
+};
+
+#endif /* OSCBROADCAST_H */

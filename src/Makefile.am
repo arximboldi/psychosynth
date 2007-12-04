@@ -8,6 +8,7 @@ psychosynth_SOURCES = \
 	common/RingAudioBuffer.cpp \
 	common/Mutex.cpp \
 	common/Misc.cpp \
+	common/Logger.cpp \
 	table/Table.cpp \
 	table/Patcher.cpp \
 	table/PatcherDynamic.cpp \
@@ -30,26 +31,39 @@ psychosynth_SOURCES = \
 	gui3d/FlatRing.cpp \
 	gui3d/Connection.cpp \
 	gui3d/OgreMisc.cpp \
-	net/NetBuffer.cpp \
-	net/NetChannel.cpp \
-	net/NetChannelManager.cpp \
-	net/NetMessage.cpp \
-	net/NetSocket.cpp \
 	object/Object.cpp \
 	object/ObjectOscillator.cpp \
 	object/ObjectMixer.cpp \
 	object/ObjectManager.cpp \
 	object/ObjectOutput.cpp \
-	object/KnownObjects.h \
+	net/OSCBroadcast.cpp \
+	net/OSCController.cpp \
+	net/OSCServer.cpp \
+	net/OSCClient.cpp \
 	output/OutputAlsa.cpp \
 	output/OutputOss.cpp \
 	psychosynth.cpp
 
 AM_CPPFLAGS = $(all_includes)
 
-psychosynth_CXXFLAGS = $(OGRE_CFLAGS) $(CEGUI_CFLAGS) $(OIS_CFLAGS)
+psychosynth_CXXFLAGS = \
+	$(OGRE_CFLAGS) \
+	$(CEGUI_CFLAGS) \
+	$(OIS_CFLAGS) \
+	$(CEGUIOGRE_CFLAGS) \
+	$(ALSA_CFLAGS) \
+	$(JACK_CFLAGS) \
+	$(LIBLO_CFLAGS)
+
 psychosynth_LDFLAGS = $(all_libraries)
-psychosynth_LDADD = $(OGRE_LIBS) $(CEGUI_LIBS) $(OIS_LIBS) -lCEGUIOgreRenderer
+psychosynth_LDADD = \
+	$(OGRE_LIBS) \
+	$(CEGUI_LIBS) \
+	$(OIS_LIBS) \
+	$(CEGUIOGRE_LIBS)\
+	$(ALSA_LIBS) \
+	$(JACK_LIBS) \
+	$(LIBLO_LIBS)
 
 noinst_HEADERS = \
 	common/ArgParser.h \
@@ -63,6 +77,7 @@ noinst_HEADERS = \
 	common/AudioInfo.h \
         common/MapIterator.h \
 	common/Misc.h \
+	common/Logger.h \
 	table/Table.h \
 	table/Patcher.h\
 	table/PatcherDynamic.h \
@@ -88,16 +103,17 @@ noinst_HEADERS = \
 	gui3d/FlatRing.h\
 	gui3d/Connection.h\
 	gui3d/OgreMisc.h \
-	net/NetBuffer.h \
-	net/NetChannel.h \
-	net/NetChannelManager.h \
-	net/NetMessage.h \
-	net/NetSocket.h \
 	object/Object.h \
 	object/ObjectOscillator.h \
 	object/ObjectManager.h \
 	object/ObjectOutput.h \
 	object/ObjectMixer.h \
+	object/KnownObjects.h \
+	net/OSCBroadcast.h \
+	net/OSCServer.h \
+	net/OSCClient.h \
+	net/OSCController.h \
+	net/OSCMisc.h \
 	output/Output.h \
 	output/OutputAlsa.h \
 	output/OutputOss.h \

@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) 2007 by Juan Pedro Bolivar Puente                       *
+ *   Copyright (C) 2007 Juan Pedro Bolivar Puente                          *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -20,20 +20,25 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef SCONNECTION_H
-#define SCONNECTION_H
+#ifndef OSCMISC_H
+#define OSCMISC_H
 
-#include "net/NetMessage.h"
+#include <lo/lo.h>
 
-class Server;
+#define LO_HANDLER_ARGS const char* path, const char* types,\
+	lo_arg** argv, int argc, lo_message msg
 
-class SConnection : public NetMessageChannel {
-		Server* m_server;
-	public:
-		SConnection(Server* s = NULL)
-			: m_server(s) {}
-				
-		virtual void handleMessage(const NetMessage& msg);
-};
+#define LO_HANDLER(clax,name)			\
+int _##name##_cb (LO_HANDLER_ARGS);\
+inline static int name##_cb(LO_HANDLER_ARGS, void* osc_listener)\
+{ return ((clax*)osc_listener)->_##name##_cb(path, types, argv, argc, msg); }
 
-#endif /* SCONNECTION_H */
+
+inline bool lo_address_equals(lo_address a, lo_address b)
+{
+    return strcmp(lo_address_get_hostname(a), lo_address_get_hostname(b)) == 0
+	&& strcmp(lo_address_get_port(a), lo_address_get_port(b)) == 0
+	;// FIXME: && lo_address_get_protocol(a) == lo_address_get_protocol(b);
+}
+
+#endif /* OSCMISC_H */

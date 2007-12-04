@@ -22,4 +22,71 @@
 
 #include "OSCServer.h"
 
+using namespace std;
 
+void OSCServerSubject::notifyClientDisconnect(OSCServer* server, int c_id)
+{
+    for (list<OSCServerListener*>::iterator it = m_list.begin();
+	 it != m_list.end(); ++it)
+	(*it)->handleClientDisconnect(server, c_id);
+}
+
+void OSCServerSubject::notifyClientConnect(OSCServer* server, int c_id)
+{
+    for (list<OSCServerListener*>::iterator it = m_list.begin();
+	 it != m_list.end(); ++it)
+	(*it)->handleClientConnect(server, c_id);
+}
+
+void OSCServerSubject::notifyClientTimeout(OSCServer* server, int c_id)
+{
+    for (list<OSCServerListener*>::iterator it = m_list.begin();
+	 it != m_list.end(); ++it)
+	(*it)->handleClientTimeout(server, c_id);
+}
+
+OSCServer::OSCServer()
+{
+}
+
+OSCServer::~OSCServer()
+{
+}
+    
+bool OSCServer::listen(const char* port)
+{
+    return true;
+}
+
+void OSCServer::stop()
+{
+}
+
+int OSCServer::update(int msec)
+{
+    return 0;
+}
+
+int OSCServer::_alive_cb(const char* path, const char* types,
+			  lo_arg** argv, int argc, lo_message msg)
+{
+    return 0;
+}
+
+int OSCServer::_connect_cb(const char* path, const char* types,
+			    lo_arg** argv, int argc, lo_message msg)
+{
+    return 0;
+}
+
+int OSCServer::_get_state_cb(const char* path, const char* types,
+			      lo_arg** argv, int argc, lo_message msg)
+{
+    return 0;
+}
+
+int OSCServer::_disconnect_cb(const char* path, const char* types,
+			       lo_arg** argv, int argc, lo_message msg)
+{
+    return 0;
+}

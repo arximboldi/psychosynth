@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) 2007 by Juan Pedro Bolivar Puente                       *
+ *   Copyright (C) 2007 Juan Pedro Bolivar Puente                          *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -20,56 +20,43 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef __SERVER_H__
-#define __SERVER_H__
+#include "common/Logger.h"
 
-#include <list>
+using namespace std;
 
-#include "net/NetMessage.h"
-#include "net/NetChannelManager.h"
-#include "common/Thread.h"
-#include "core/Core.h"
-#include "core/CoreNetUpdater.h"
-#include "server/SConnection.h"
+Log::~Log()
+{
+    for (list<LogDumper*>::iterator it = m_dumpers.begin();
+	 it != m_dumpers.end(); ++it) {
+	delete *it;
+    }
+}
 
-class Server : private NetMessageChannel, public CoreListener, public SelfThread {
-	friend class SConnection;
+Log& Log::getPath(std::string path)
+{
+    string base;
+    for (size_t i = 0; i != path.size(); ++i)
+	if (path[i] == '/') {
+	    base.assign(path, 0, i);
+	    path.erase(0, i);
+	    break;
+	}
 
-	typedef std::list<SConnection*> SConList;
-	typedef std::list<SConnection*>::iterator SConIter;
-	
-	CoreNetUpdater m_updater;
-	
-	int m_port;
-	NetChannelManager m_manager;
-	SConList m_connections;
-	
-	int m_next_is_mine;
-	
-	void sendWelcome(SConnection* con);
+    if (base.empty()) {
+	return getChild(path);
+    }
 
-	void broadcastMessage(SConnection* reciver, const NetMessage& msg);
-	void processMessage(SConnection* reciver, const NetMessage& msg);
+    return getChild(base).getPath(path);
+}
 
-public:
-	Server(int port = DEFAULT_PORT) :
-		m_port(port),
-		m_next_is_mine(0) {};
-	
-	~Server();
+void Log::log(int level, const string& msg)
+{
+    for (list<LogDumper*>::iterator it = m_dumpers.begin();
+	 it != m_dumpers.end(); ++it) {
+	(*it)->dump(*this, level, msg);
+    }
 
-	void setCore(Core* core) { m_updater.setCore(core); }
-	Core* getCore() const { return m_updater.getCore(); }
-	
-	virtual void run();
-	
-	/* NetMessageChannel events */
-	virtual void handleAccept();
+    if (m_parent)
+	m_parent->log(level, msg);
+}
 
-	/* Core events */
-	virtual void handleAddObject(Object* obj);
-	virtual void handleMoveObject(Object* obj);
-	virtual void handleDeleteObject(Object* obj);
-};
-
-#endif

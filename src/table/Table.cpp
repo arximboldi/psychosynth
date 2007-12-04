@@ -43,6 +43,9 @@ void TableSubject::notifyDeleteObject(TableObject& obj)
     
 void TableSubject::notifyMoveObject(TableObject& obj)
 {
+    for (ObjectListenerIter i = m_all_obj_list.begin(); i != m_all_obj_list.end(); i++)
+	(*i)->handleMoveObject(obj);
+    
     std::map<int, std::list<TableObjectListener*> >::iterator it;
     if ((it = m_obj_listeners.find(obj.getID())) != m_obj_listeners.end()) {
 	for (ObjectListenerIter i = it->second.begin(); i != it->second.end(); i++)
@@ -52,6 +55,9 @@ void TableSubject::notifyMoveObject(TableObject& obj)
 
 void TableSubject::notifyActivateObject(TableObject& obj)
 {
+    for (ObjectListenerIter i = m_all_obj_list.begin(); i != m_all_obj_list.end(); i++)
+	(*i)->handleActivateObject(obj);
+    
     std::map<int, std::list<TableObjectListener*> >::iterator it;
     if ((it = m_obj_listeners.find(obj.getID())) != m_obj_listeners.end()) {
 	for (ObjectListenerIter i = it->second.begin(); i != it->second.end(); i++)
@@ -61,6 +67,9 @@ void TableSubject::notifyActivateObject(TableObject& obj)
     
 void TableSubject::notifyDeactivateObject(TableObject& obj)
 {
+    for (ObjectListenerIter i = m_all_obj_list.begin(); i != m_all_obj_list.end(); i++)
+	(*i)->handleDeactivateObject(obj);
+    
     std::map<int, std::list<TableObjectListener*> >::iterator it;
     if ((it = m_obj_listeners.find(obj.getID())) != m_obj_listeners.end()) {
 	for (ObjectListenerIter i = it->second.begin(); i != it->second.end(); i++)
@@ -68,7 +77,11 @@ void TableSubject::notifyDeactivateObject(TableObject& obj)
     }
 }
 
-void TableSubject::notifySetParamObject(TableObject& obj, int param_id) {
+void TableSubject::notifySetParamObject(TableObject& obj, int param_id)
+{
+    for (ObjectListenerIter i = m_all_obj_list.begin(); i != m_all_obj_list.end(); i++)
+	(*i)->handleSetParamObject(obj, param_id);
+    
     std::map<int, std::list<TableObjectListener*> >::iterator it;
     if ((it = m_obj_listeners.find(obj.getID())) != m_obj_listeners.end()) {
 	for (ObjectListenerIter i = it->second.begin(); i != it->second.end(); i++)

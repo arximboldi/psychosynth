@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) 2007 by Juan Pedro Bolivar Puente                       *
+ *   Copyright (C) 2007 Juan Pedro Bolivar Puente                          *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -20,10 +20,23 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "server/SConnection.h"
-#include "server/Server.h"
+#include "net/OSCBroadcast.h"
+#include "net/OSCMisc.h"
 
-void SConnection::handleMessage(const NetMessage &msg)
+using namespace std;
+
+void OSCBroadcast::broadcastMessage(const char* path, lo_message msg)
 {
-	m_server->processMessage(this, msg);
+    for (list<lo_address>::iterator it = m_dest.begin();
+	 it != m_dest.end(); ++it)
+	lo_send_message(*it, path, msg);
 }
+
+void OSCBroadcast::broadcastMessageFrom(const char* path, lo_message msg, lo_address source)
+{    
+    for (list<lo_address>::iterator it = m_dest.begin();
+	 it != m_dest.end(); ++it)
+	if (!lo_address_equals(*it, source))
+	    lo_send_message(*it, path, msg);
+}
+
