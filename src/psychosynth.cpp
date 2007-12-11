@@ -22,19 +22,8 @@
 
 #include <iostream>
 
-#include "psychosynth.h"
-
-#include "table/Table.h"
-#include "table/PatcherDynamic.h"
-#include "common/ArgParser.h"
 #include "common/Logger.h"
 #include "gui3d/PsychoSynth3D.h"
-#include "output/OutputAlsa.h"
-#include "output/OutputOss.h"
-#include "object/ObjectOscillator.h"
-#include "object/ObjectMixer.h"
-#include "object/ObjectOutput.h"
-#include "object/ObjectManager.h"
 
 using namespace std;
 
@@ -42,8 +31,7 @@ int main(int argc, const char *argv[])
 {
     PsychoSynth3D main_app;
 
-    Logger::instance().addDumper(new LogDefaultDumper);
-    Logger::instance().log(Log::WARNING, "Hola amigo!");
+    Logger::instance().attachDumper(new LogDefaultDumper);
     
     main_app.run(argc, argv);
 	

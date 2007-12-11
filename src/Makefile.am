@@ -40,6 +40,7 @@ psychosynth_SOURCES = \
 	net/OSCController.cpp \
 	net/OSCServer.cpp \
 	net/OSCClient.cpp \
+	output/OutputJack.cpp \
 	output/OutputAlsa.cpp \
 	output/OutputOss.cpp \
 	psychosynth.cpp
@@ -115,6 +116,7 @@ noinst_HEADERS = \
 	net/OSCController.h \
 	net/OSCMisc.h \
 	output/Output.h \
+	output/OutputJack.h \
 	output/OutputAlsa.h \
 	output/OutputOss.h \
 	psychosynth.h

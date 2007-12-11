@@ -29,66 +29,76 @@
 #include "psychosynth.h"
 
 class AudioBuffer {
-	AudioInfo m_info;
-	Sample** m_data;
+    AudioInfo m_info;
+    Sample** m_data;
 
-	void allocate();
+    void allocate();
 	
-	void liberate();
+    void liberate();
 
 public:
-	AudioBuffer() :
-		m_info(0,0,0),
-		m_data(NULL) {}
+    AudioBuffer() :
+	m_info(0,0,0),
+	m_data(NULL) {}
 	
-	AudioBuffer(const AudioInfo& info) : 
-		m_info(info) {
-		allocate();
-	}
+    AudioBuffer(const AudioInfo& info) : 
+	m_info(info) {
+	allocate();
+    }
 	
-	AudioBuffer(const AudioBuffer& buf) :
-		m_info(buf.m_info) {
-		allocate();
-		memcpy(*m_data, *buf.m_data, sizeof(Sample) * m_info.num_channels * m_info.block_size);
-	}
+    AudioBuffer(const AudioBuffer& buf) :
+	m_info(buf.m_info) {
+	allocate();
+	memcpy(*m_data, *buf.m_data, sizeof(Sample) * m_info.num_channels * m_info.block_size);
+    }
 	
-	~AudioBuffer() {
-		liberate();
-	}
+    ~AudioBuffer() {
+	liberate();
+    }
 	
-	AudioBuffer& operator= (const AudioBuffer& buf);
+    AudioBuffer& operator= (const AudioBuffer& buf);
 	
-	const AudioInfo& getInfo() const {
-		return m_info;
-	}
+    const AudioInfo& getInfo() const {
+	return m_info;
+    }
 	
-	Sample* getChanel(int n) {
-		return m_data[n];
-	}
+    Sample* getChanel(int n) {
+	return m_data[n];
+    }
 	
-	const Sample* getChanel(int n) const {
-		return m_data[n];
-	}
+    const Sample* getChanel(int n) const {
+	return m_data[n];
+    }
 	
-	Sample** getData() {
-		return m_data;
-	}
+    Sample** getData() {
+	return m_data;
+    }
 	
-	Sample** const getData() const {
-		return m_data;
-	}
+    Sample** const getData() const {
+	return m_data;
+    }
 	
-	Sample* operator[] (int n) {
-		return m_data[n];
-	}
+    Sample* operator[] (int n) {
+	return m_data[n];
+    }
 	
-	const Sample* operator[] (int n) const {
-		return m_data[n];
-	}
-	
-	void clear() {
-		memset(*m_data, 0, sizeof(Sample) * m_info.block_size * m_info.num_channels);
-	}
+    const Sample* operator[] (int n) const {
+	return m_data[n];
+    }
+
+    size_t size() const {
+	return m_info.block_size;
+    }
+    
+    void resize(size_t new_size) {
+	liberate();
+	m_info.block_size = new_size;
+	allocate();
+    }
+    
+    void clear() {
+	memset(*m_data, 0, sizeof(Sample) * m_info.block_size * m_info.num_channels);
+    }
 };
 
 #endif /* AUDIOBUFFER_H */

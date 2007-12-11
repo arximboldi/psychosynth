@@ -32,92 +32,97 @@
 
 class RingAudioBuffer {
 public:
-	class ReadPtr {
-		friend class RingAudioBuffer;
+    class ReadPtr {
+	friend class RingAudioBuffer;
 		
-		int m_pos;
-		int m_count;
-	public:
-		ReadPtr(int pos = 0, int count = 0) :
-			m_pos(pos),
-			m_count(count) {}
-	};
+	int m_pos;
+	int m_count;
+    public:
+	ReadPtr(int pos = 0, int count = 0) :
+	    m_pos(pos),
+	    m_count(count) {}
+    };
 
-	enum {
-		ERR_NONE,
-		ERR_UNDERRUN,
-		ERR_OVERRUN,
-		ERR_CODES
-	};
+    enum {
+	ERR_NONE,
+	ERR_UNDERRUN,
+	ERR_OVERRUN,
+	ERR_CODES
+    };
 	
 private:
-	AudioInfo m_info;
-	Sample** m_data;
-	int m_size;
-	int m_writepos;
-	int m_writecount;
+    AudioInfo m_info;
+    Sample** m_data;
+    int m_size;
+    int m_writepos;
+    int m_writecount;
 	
-	void allocate();
+    void allocate();
 	
-	void liberate() {
-		delete [] *m_data;
-		delete [] m_data;
-	}
+    void liberate() {
+	delete [] *m_data;
+	delete [] m_data;
+    }
 
 public:
-	RingAudioBuffer();
+    RingAudioBuffer();
 	
-	RingAudioBuffer(const AudioInfo& info);
+    RingAudioBuffer(const AudioInfo& info);
 	
-	RingAudioBuffer(const AudioInfo& info, int size);
+    RingAudioBuffer(const AudioInfo& info, int size);
 	
-	RingAudioBuffer(const RingAudioBuffer& buf);
+    RingAudioBuffer(const RingAudioBuffer& buf);
 	
-	~RingAudioBuffer() {
-		liberate();
-	}
+    ~RingAudioBuffer() {
+	liberate();
+    }
 	
-	RingAudioBuffer& operator= (RingAudioBuffer& buf);
+    RingAudioBuffer& operator= (RingAudioBuffer& buf);
 	
-	const AudioInfo& getAudioInfo() const {
-		return m_info;
-	}
+    const AudioInfo& getAudioInfo() const {
+	return m_info;
+    }
+    
+    int size() const {
+	return m_size;
+    }
+
+    void resize(int new_size) {
+	liberate();
+	m_size = new_size;
+	allocate();
+    }
+    
+    ReadPtr begin() const {
+	return ReadPtr(m_writepos, m_writecount - m_size < 0 ?
+		       m_writecount - m_size : 0);
+    };
 	
-	int size() const {
-		return m_size;
-	}
+    ReadPtr end() const {
+	return ReadPtr(m_writepos, m_writecount);
+    };
 	
-	ReadPtr begin() const {
-		return ReadPtr(m_writepos, m_writecount - m_size < 0 ?
-			m_writecount - m_size : 0);
-	};
+    int availible(const ReadPtr& r) const {
+	return m_writecount - r.m_count;
+    }
 	
-	ReadPtr end() const {
-		return ReadPtr(m_writepos, m_writecount);
-	};
+    int error(const ReadPtr& reader) const {
+	if (reader.m_pos + m_size < m_writepos) return ERR_UNDERRUN;
+	if (reader.m_count > m_writecount) return ERR_OVERRUN;
+	return ERR_NONE;
+    }
 	
-	int availible(const ReadPtr& r) const {
-		return m_writecount - r.m_count;
-	}
+    int read(ReadPtr& r, AudioBuffer& buf) const {
+	return read(r, buf, buf.getInfo().block_size);
+    };
 	
-	int error(const ReadPtr& reader) const {
-		if (reader.m_pos + m_size < m_writepos) return ERR_UNDERRUN;
-		if (reader.m_count > m_writecount) return ERR_OVERRUN;
-		return ERR_NONE;
-	}
+    int read(ReadPtr& r, AudioBuffer& buf, int samples) const;
 	
-	/* No n_channels, etc test! */
-	int read(ReadPtr& r, AudioBuffer& buf) const {
-		return read(r, buf, buf.getInfo().block_size);
-	};
+    void write(const AudioBuffer& buf) {
+	write(buf, buf.getInfo().block_size);
+    }
 	
-	int read(ReadPtr& r, AudioBuffer& buf, int samples) const;
-	
-	void write(const AudioBuffer& buf) {
-		write(buf, buf.getInfo().block_size);
-	}
-	
-	void write(const AudioBuffer& buf, int samples);
+    void write(const AudioBuffer& buf, int samples);
 };
 
 #endif /* RINGAUDIOBUFFER_H */

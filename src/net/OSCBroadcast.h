@@ -60,6 +60,10 @@ class OSCBroadcast
     std::list<lo_address> m_dest;
     
 public:
+    ~OSCBroadcast() {
+	clear();
+    }
+    
     void addDestiny(lo_address dest) {
 	m_dest.push_back(dest);
     }
@@ -68,9 +72,9 @@ public:
 	m_dest.remove_if(lo_address_equals_func(dest));
     }
 
-    void clear() {
-	m_dest.clear();
-    }
+    void clear();
+    
+    bool isDestiny(lo_address dest);
     
     void broadcastMessage(const char* path, lo_message msg);
 

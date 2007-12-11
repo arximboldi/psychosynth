@@ -25,6 +25,25 @@
 
 using namespace std;
 
+void OSCBroadcast::clear()
+{
+    for (list<lo_address>::iterator it = m_dest.begin();
+	 it != m_dest.end(); ++it)
+	lo_address_free(*it);
+    
+    m_dest.clear();
+}
+
+bool OSCBroadcast::isDestiny(lo_address adr)
+{
+    for (list<lo_address>::iterator it = m_dest.begin();
+	 it != m_dest.end(); ++it)
+	if (lo_address_equals(*it, adr))
+	    return true;
+	    
+    return false;
+}
+
 void OSCBroadcast::broadcastMessage(const char* path, lo_message msg)
 {
     for (list<lo_address>::iterator it = m_dest.begin();

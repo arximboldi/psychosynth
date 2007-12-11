@@ -32,12 +32,11 @@ OutputAlsa::OutputAlsa(const AudioInfo& info, const std::string& device) :
     alsa_device(device),
     alsa_thread(this)
 {
-    out_state = OUT_NOTINIT;
 }
 
 OutputAlsa::~OutputAlsa()
 {
-    if (out_state != OUT_NOTINIT)
+    if (getState() != NOTINIT)
 	close();
 }
 
@@ -45,7 +44,7 @@ void OutputAlsa::run()
 {
     snd_pcm_sframes_t nframes;
 	
-    while (out_state == OUT_RUNNING) {
+    while (getState() == RUNNING) {
 	//ut << "out_state " << out_state << '\n';
 	snd_pcm_wait (alsa_pcm, 1000);  
 
@@ -55,16 +54,15 @@ void OutputAlsa::run()
 	    else
 		cout << _("ERROR: Unknown Alsa avail update return value.") << endl;
 	}
-	
-	if (out_callback)
-	    out_callback (nframes, out_cbdata);
+
+	process(getInfo().block_size);
     }
 }
 
 void OutputAlsa::start()
 {
-    if (out_state == OUT_IDLE) {
-	out_state = OUT_RUNNING;
+    if (getState() == IDLE) {
+	setState(RUNNING);
 	alsa_thread.start();
     } else {
 	cout << _("ERROR: Alsa output thread already started or Alsa subsystem not initialized.") << endl;
@@ -73,8 +71,8 @@ void OutputAlsa::start()
 
 void OutputAlsa::stop()
 {
-    if (out_state == OUT_RUNNING) {
-	out_state = OUT_IDLE;
+    if (getState() == RUNNING) {
+	setState(IDLE);
 	alsa_thread.join();
     } else {
 	cout << _("ERROR: Alsa output thread not running.") << endl;
@@ -85,9 +83,9 @@ bool OutputAlsa::open()
 {
     int err;
     int dir = 0;
-    unsigned int uirate = out_info.sample_rate;
+    unsigned int uirate = getInfo().sample_rate;
 	
-    if (out_state == OUT_NOTINIT) {
+    if (getState() == NOTINIT) {
 	if ((err = snd_pcm_open (&alsa_pcm, alsa_device.c_str(), SND_PCM_STREAM_PLAYBACK, 0)) < 0) {
 	    cerr << _("ERROR: Cannot open ALSA device: ") << alsa_device 
 		 << " (" << snd_strerror(err) << ")." << endl;
@@ -102,18 +100,18 @@ bool OutputAlsa::open()
 		
 	snd_pcm_hw_params_set_format (alsa_pcm, alsa_hwparams, alsa_format);
 	snd_pcm_hw_params_set_rate_near (alsa_pcm, alsa_hwparams, &uirate, &dir);
-	snd_pcm_hw_params_set_channels (alsa_pcm, alsa_hwparams, out_info.num_channels);
+	snd_pcm_hw_params_set_channels (alsa_pcm, alsa_hwparams, getInfo().num_channels);
 	snd_pcm_hw_params (alsa_pcm, alsa_hwparams);
 	snd_pcm_prepare (alsa_pcm);
 		
 	snd_pcm_sw_params_malloc (&alsa_swparams);
-	snd_pcm_sw_params_set_avail_min(alsa_pcm, alsa_swparams, out_info.block_size);
+	snd_pcm_sw_params_set_avail_min(alsa_pcm, alsa_swparams, getInfo().block_size);
 	snd_pcm_sw_params_set_start_threshold (alsa_pcm, alsa_swparams, 0U);
 	snd_pcm_sw_params (alsa_pcm, alsa_swparams);
 		
-	buf = new short int[out_info.block_size * out_info.num_channels * sizeof(short int)];
+	m_buf = new short int[getInfo().block_size * getInfo().num_channels * sizeof(short int)];
 		
-	out_state = OUT_IDLE;
+	setState(IDLE);
 		
 	return true;
     } else {
@@ -122,76 +120,45 @@ bool OutputAlsa::open()
     }
 }
 
-bool OutputAlsa::put(const Real* rbuf, int nframes)
+bool OutputAlsa::put(const AudioBuffer& in_buf, size_t nframes)
 {
-    int err, i;
+    int err, j;
+    size_t i;
     short int* bufp;
     bool ret = true;
     Real r;
 	
-    if (out_state != OUT_NOTINIT) {
-	int copyframes = out_info.block_size;
-	while (nframes > 0) {
-	    if (nframes < copyframes)
-		copyframes = nframes;
-			
-	    bufp = buf;
-	    for (i = 0; i < copyframes*out_info.num_channels; i++) {
-		r = *(rbuf++);
-		if (r < -1) r = -1; 
-		else if (r > 1) r = 1;	
-		*(bufp++) = (short int)(r*32766.0);
-	    }
-	    if ((err = snd_pcm_writei (alsa_pcm, buf, copyframes)) != copyframes) {
-		cerr << _("ERROR: Write to ALSA audio interface failed.")
-		     << " (" << snd_strerror (err) << ")." << endl;
-		ret = false;
-	    }
-	    nframes -= copyframes;
-	}
-		
-    } else {
-	cerr << _("ERROR: OSS output device not initialized. Cannot write.") << endl;
-    }
-	
-    return ret;
-}
-
-bool OutputAlsa::put(const AudioBuffer& in_buf)
-{
-    int err, i, j;
-    int nframes = in_buf.getInfo().block_size;
-    short int* bufp;
-    bool ret = true;
-    Real r;
-	
-    if (in_buf.getInfo().num_channels != out_info.num_channels 
-	|| in_buf.getInfo().sample_rate != out_info.sample_rate) {
+    if (in_buf.getInfo().num_channels != getInfo().num_channels 
+	|| in_buf.getInfo().sample_rate != getInfo().sample_rate) {
 	/* TODO: Adapt the audio signal to fit our requeriments. */
 	WARNING("Cant send data to the device: data and output system properties missmatch.");
 	return false;
     }
 
-    if (out_state != OUT_NOTINIT) {
-	int copyframes = out_info.block_size;
+    if (getState() != NOTINIT) {
+	size_t copyframes = getInfo().block_size;
+	size_t index = 0;
+	
 	while (nframes > 0) {
 	    if (nframes < copyframes)
 		copyframes = nframes;
 			
-	    bufp = buf;
-	    for (i = 0; i < copyframes; i++) {
-		for (j = 0; j < out_info.num_channels; j++) {
-		    r = in_buf[j][i]; /* TODO: Optimize interleaving */
+	    bufp = m_buf;
+	    for (i = 0; i < copyframes; i++, index++) {
+		for (j = 0; j < getInfo().num_channels; j++) {
+		    r = in_buf[j][index]; /* TODO: Optimize interleaving */
 		    if (r < -1) r = -1; 
 		    else if (r > 1) r = 1;	
 		    *(bufp++) = (short int)(r*32766.0);
 		}
 	    }
-	    if ((err = snd_pcm_writei (alsa_pcm, buf, copyframes)) != copyframes) {
+
+	    if ((err = snd_pcm_writei (alsa_pcm, m_buf, copyframes)) != (int)copyframes) {
 		WARNING( _("Write to ALSA audio interface failed.")
 			 << " (" << snd_strerror (err) << ").");
 		ret = false;
 	    }
+	    
 	    nframes -= copyframes;
 	}
 		
@@ -205,14 +172,14 @@ bool OutputAlsa::put(const AudioBuffer& in_buf)
 
 bool OutputAlsa::close()
 {
-    if (out_state != OUT_NOTINIT) {
-	if (out_state == OUT_RUNNING)
+    if (getState() != NOTINIT) {
+	if (getState() == RUNNING)
 	    stop();
 	
 	snd_pcm_close(alsa_pcm);
 	snd_pcm_hw_params_free(alsa_hwparams);
 	snd_pcm_sw_params_free(alsa_swparams);
-	out_state = OUT_NOTINIT;
+	setState(NOTINIT);
 	return true;
 		
     } else {

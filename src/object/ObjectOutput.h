@@ -32,7 +32,8 @@
 
 class ObjectManager;
 
-class ObjectOutput : public Object {
+class ObjectOutput : public Object
+{
     struct Slot {
 	RingAudioBuffer::ReadPtr m_ptr;
 	Output* m_out;
@@ -61,7 +62,7 @@ class ObjectOutput : public Object {
         
     static void outputCallback(int nframes, void* arg);
     
-    void output(Slot& slot, int nframes);
+    void output(Slot& slot, size_t nframes);
 	
     void doUpdate();
 

@@ -60,9 +60,20 @@ void ObjectOutput::outputCallback(int nframes, void* arg)
     slot->m_parent->output(*slot, nframes);
 }
 	
-void ObjectOutput::output(Slot& slot, int nframes)
-{
-    /* TODO: Controlar mejor el tema de los nframes */
+void ObjectOutput::output(Slot& slot, size_t nframes)
+{    
+    if (nframes > m_buffer.size()) {
+	cout << "nframes: " << nframes << endl;
+	m_buflock.writeLock();
+	m_buffer.resize(nframes * SAFETY_FACTOR);
+	m_buflock.unlock();
+    }
+
+    if (nframes > slot.m_buf.size()) {
+	cout << "nframiss: " << nframes << endl;
+	slot.m_buf.resize(nframes);
+    }
+
     if (m_manager) {
 	int avail;
 
@@ -70,8 +81,9 @@ void ObjectOutput::output(Slot& slot, int nframes)
 	avail = m_buffer.availible(slot.m_ptr);
 	m_buflock.unlock();
 
-	while(avail < getAudioInfo().block_size) {
+	while(avail < nframes) {
 	    m_manager->update();
+
 	    m_buflock.readLock();
 	    avail = m_buffer.availible(slot.m_ptr);
 	    m_buflock.unlock();
@@ -79,9 +91,9 @@ void ObjectOutput::output(Slot& slot, int nframes)
     }
 
     m_buflock.readLock();
-    m_buffer.read(slot.m_ptr, slot.m_buf);
+    m_buffer.read(slot.m_ptr, slot.m_buf, nframes);
     m_buflock.unlock();
     
-    slot.m_out->put(slot.m_buf);
+    slot.m_out->put(slot.m_buf, nframes);
 }
 

@@ -20,33 +20,56 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef OUTPUTOSS_H
-#define OUTPUTOSS_H
+#ifndef OUTPUTJACK_H
+#define OUTPUTJACK_H
 
-#include <pthread.h>
-
-#include "psychosynth.h"
 #include "output/Output.h"
-#include "common/Thread.h"
 
-class OutputOss : public Output, Runnable {
-    int oss_fd;
-    int oss_format;
-    int oss_stereo;
-    short int* buf;
-    std::string oss_device;
-	
-    Thread oss_thread;
+#if 0
+
+class OutputJack : public Output
+{
+    class JackPort {
+	jack_port_t* m_port;
+    public:
+	void reg(int i);
+	void connect();
+    };
+    
+    static int jack_process_cb(jack_nframes_t nframes, void *jack_client) {
+	static_cast<OutputJack*>(jack_client)->jackProcess(nframes);
+	return 0;
+    }
+
+    static int jack_sample_rate_cb(jack_nframes_t nframes, void *jack_client) {
+	static_cast<OutputJack*>(jack_client)->jackSampleRate(nframes);
+	return 0;
+    }
+
+    static int jack_shutdown_cb(void *jack_client) {
+	static_cast<OutputJack*>(jack_client)->jackShutDown(nframes);
+	return 0;
+    }
+
+    void jackProcess(jack_nframes_t nframes);
+    void jackSampleRate(jack_nframes_t nframes);
+    void jackShutDown(jack_nframes_t nframes);
+
+    std::vector<JackPort> m_ports;
+    jack_client_t* m_client;
+    std::string m_serv_name;
+    
 public:
-    OutputOss(const AudioInfo& info, const std::string& device);
-    ~OutputOss();
-
+    OutputJack(const AudioInfo& info);
+    OutputJack(const AudioInfo& info, const std::string& server_name);
+    ~OutputJack();
     bool open();
     bool close();
-    bool put(const AudioBuffer& buf, size_t nframes);
-    void run();
+    bool put(const AudioBuffer& buf);
     void start();
     void stop();
 };
 
-#endif /* OUTPUTOSS_H */
+#endif
+
+#endif /* OUTPUTJACK_H */

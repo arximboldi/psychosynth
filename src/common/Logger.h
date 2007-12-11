@@ -82,11 +82,11 @@ public:
 	return m_name;
     }
 
-    void addDumper(LogDumper* d) {
+    void attachDumper(LogDumper* d) {
 	m_dumpers.push_back(d);
     }
 
-    void deleteDumper(LogDumper* d) {
+    void dattachDumper(LogDumper* d) {
 	m_dumpers.remove(d);
     }
        

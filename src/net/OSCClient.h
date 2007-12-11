@@ -48,27 +48,45 @@ public:
 	m_list.remove(l);
     };
     
-    void notifyClientAccept(OSCClient* param);
-    void notifyClientTimeout(OSCClient* param);
-    void notifyClientDrop(OSCClient* param);
+    void notifyServerAccept(OSCClient* param);
+    void notifyServerTimeout(OSCClient* param);
+    void notifyServerDrop(OSCClient* param);
 };
 
 class OSCClient : public OSCController,
 		  private OSCClientSubject
 {
+    lo_address m_target;
     lo_server m_server;
-
+    int m_id;
+    int m_state;
+    int m_last_alive_recv;
+    int m_last_alive_sent;
+    
     LO_HANDLER(OSCClient, alive);
     LO_HANDLER(OSCClient, drop);
-    LO_HANDLER(OSCClient, accepted);
+    LO_HANDLER(OSCClient, accept);
 
+    void addMethods();
+    void close();
+    
 public:
+    enum State {
+	IDLE,
+	PENDING,
+	CONNECTED,
+	CLOSING
+    };
+    
     OSCClient();
     ~OSCClient();
+
+    int getState() {
+	return m_state;
+    }
     
-    void connect(lo_address);
+    void connect(lo_address target, const char* src_port);
     void disconnect();
-    bool isConnected();
     int update(int msec);
 };
 

@@ -20,33 +20,67 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef OUTPUTOSS_H
-#define OUTPUTOSS_H
+#include "output/OutputJack.h"
 
-#include <pthread.h>
+using namespace std;
 
-#include "psychosynth.h"
-#include "output/Output.h"
-#include "common/Thread.h"
+#if 0
 
-class OutputOss : public Output, Runnable {
-    int oss_fd;
-    int oss_format;
-    int oss_stereo;
-    short int* buf;
-    std::string oss_device;
-	
-    Thread oss_thread;
-public:
-    OutputOss(const AudioInfo& info, const std::string& device);
-    ~OutputOss();
+OutputJack(const AudioInfo& info) :
+    Output(info)
+{
+}
 
-    bool open();
-    bool close();
-    bool put(const AudioBuffer& buf, size_t nframes);
-    void run();
-    void start();
-    void stop();
-};
+OutputJack(const AudioInfo& info, const std::string& server_name) :
+    Output(info),
+    
+{
+}
 
-#endif /* OUTPUTOSS_H */
+~OutputJack()
+{
+    
+}
+
+bool open()
+{
+    
+}
+
+bool close()
+{
+    
+}
+
+bool put(const AudioBuffer& buf)
+{
+    
+}
+
+void start()
+{
+    
+}
+
+void stop()
+{
+    
+}
+
+void jackProcess(jack_nframes_t nframes)
+{
+    
+}
+
+void jackSampleRate(jack_nframes_t nframes)
+{
+    
+}
+
+void jackShutDown(jack_nframes_t nframes)
+{
+    
+}
+
+#endif
+

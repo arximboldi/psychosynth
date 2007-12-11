@@ -58,6 +58,12 @@ public:
 class OSCServer : public OSCController,
 		  public OSCServerSubject
 {
+    struct Slot {
+	int id;
+	int last_alive_recv;
+	int last_alive_sent;
+    };
+    
     lo_server m_server;
     bool m_listening;
     
@@ -66,6 +72,7 @@ class OSCServer : public OSCController,
     LO_HANDLER(OSCServer, get_state);
     LO_HANDLER(OSCServer, disconnect);
 
+    void addMethods();
 public:
     OSCServer();
     ~OSCServer();

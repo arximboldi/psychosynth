@@ -177,7 +177,7 @@ void OSCController::handleSetParamObject(TableObject& obj, int param_id)
 	m_skip--;
 }
 
-void OSCController::addToServer(lo_server s)
+void OSCController::addMethods(lo_server s)
 {
     lo_server_add_method (s, "/ps/add", "iii", &add_cb, this);
     lo_server_add_method (s, "/ps/delete", "ii", &delete_cb, this);
@@ -192,144 +192,145 @@ void OSCController::addToServer(lo_server s)
 int OSCController::_add_cb(const char* path, const char* types,
 			   lo_arg** argv, int argc, lo_message msg)
 {
-    m_skip++;
-    
-    pair<int,int> net_id(argv[0]->i, argv[1]->i);
+    if (isDestiny(lo_message_get_source(msg))) {
+	pair<int,int> net_id(argv[0]->i, argv[1]->i);
 
-    TableObject obj = m_table->addObject(argv[2]->i);
+	m_skip++;
+	TableObject obj = m_table->addObject(argv[2]->i);
 
-    if (!obj.isNull()) {
-	int local_id = obj.getID();
-	m_net_id[local_id] = net_id;
-	m_local_id[net_id] = local_id;
+	if (!obj.isNull()) {
+	    int local_id = obj.getID();
+	    m_net_id[local_id] = net_id;
+	    m_local_id[net_id] = local_id;
 
-	if (m_is_server)
 	    broadcastMessageFrom("/ps/add", msg, lo_message_get_source(msg));
+	}
     }
-
+    
     return 0;
 }
 
 int OSCController::_delete_cb(const char* path, const char* types,
 			      lo_arg** argv, int argc, lo_message msg)
 {
-    m_skip++;
+    if (isDestiny(lo_message_get_source(msg))) {
+	pair<int,int> net_id(argv[0]->i, argv[1]->i);
 
-    pair<int,int> net_id(argv[0]->i, argv[1]->i);
-
-    map<pair<int,int>, int>::iterator it = m_local_id.find(net_id);
-    TableObject obj;
+	map<pair<int,int>, int>::iterator it = m_local_id.find(net_id);
+	TableObject obj;
     
-    if (it != m_local_id.end() &&
-	!(obj = m_table->findObject(it->second)).isNull()) {
-	
-	m_table->deleteObject(obj);
+	if (it != m_local_id.end() &&
+	    !(obj = m_table->findObject(it->second)).isNull()) {
 
-	m_local_id.erase(net_id);
-	m_net_id.erase(it->second);
+	    m_skip++;
+	    m_table->deleteObject(obj);
 
-	if (m_is_server)
-	    broadcastMessageFrom("/ps/delete", msg, lo_message_get_source(msg));
+	    m_local_id.erase(net_id);
+	    m_net_id.erase(it->second);
+
+	    if (m_is_server)
+		broadcastMessageFrom("/ps/delete", msg, lo_message_get_source(msg));
+	}
     }
-
+    
     return 0;
 }
 
 int OSCController::_move_cb(const char* path, const char* types,
 			    lo_arg** argv, int argc, lo_message msg)
 {
-    m_skip++;
+    if (isDestiny(lo_message_get_source(msg))) {
+	pair<int,int> net_id(argv[0]->i, argv[1]->i);
 
-    pair<int,int> net_id(argv[0]->i, argv[1]->i);
-
-    map<pair<int,int>, int>::iterator it = m_local_id.find(net_id);
-    TableObject obj;
+	map<pair<int,int>, int>::iterator it = m_local_id.find(net_id);
+	TableObject obj;
     
-    if (it != m_local_id.end() &&
-	!(obj = m_table->findObject(it->second)).isNull()) {
+	if (it != m_local_id.end() &&
+	    !(obj = m_table->findObject(it->second)).isNull()) {
 
-	m_table->moveObject(obj, argv[2]->f, argv[3]->f);
+	    m_skip++;
+	    m_table->moveObject(obj, argv[2]->f, argv[3]->f);
 
-	if (m_is_server)
 	    broadcastMessageFrom("/ps/move", msg, lo_message_get_source(msg));
+	}
     }
-
+    
     return 0;
 }
 
 int OSCController::_param_cb(const char* path, const char* types,
 			     lo_arg** argv, int argc, lo_message msg)
 {
-    m_skip++;
+    if (isDestiny(lo_message_get_source(msg))) {
+	pair<int,int> net_id(argv[0]->i, argv[1]->i);
 
-    pair<int,int> net_id(argv[0]->i, argv[1]->i);
-
-    map<pair<int,int>, int>::iterator it = m_local_id.find(net_id);
-    TableObject obj;
+	map<pair<int,int>, int>::iterator it = m_local_id.find(net_id);
+	TableObject obj;
     
-    if (it != m_local_id.end() &&
-	!(obj = m_table->findObject(it->second)).isNull()) {
-	
-	switch(types[2]) {
-	case LO_FLOAT:
-	    m_table->setParamObject(obj, argv[2]->i, argv[3]->f);
-	    break;
-	case LO_INT32:
-	    m_table->setParamObject(obj, argv[2]->i, argv[3]->i);
-	    break;
-	case LO_STRING:
-	    m_table->setParamObject(obj, argv[2]->i, string(&argv[3]->s));
-	    break;
-	default:
-	    break;
-	}
-	
-	if (m_is_server)
-	    broadcastMessageFrom("/ps/param", msg, lo_message_get_source(msg));
-    }
+	if (it != m_local_id.end() &&
+	    !(obj = m_table->findObject(it->second)).isNull()) {
 
+	    m_skip++;
+	    switch(types[2]) {
+	    case LO_FLOAT:
+		m_table->setParamObject(obj, argv[2]->i, argv[3]->f);
+		break;
+	    case LO_INT32:
+		m_table->setParamObject(obj, argv[2]->i, argv[3]->i);
+		break;
+	    case LO_STRING:
+		m_table->setParamObject(obj, argv[2]->i, string(&argv[3]->s));
+		break;
+	    default:
+		break;
+	    }
+	
+	    broadcastMessageFrom("/ps/param", msg, lo_message_get_source(msg));
+	}
+    }
+    
     return 0;
 }
 
 int OSCController::_activate_cb(const char* path, const char* types,
 				lo_arg** argv, int argc, lo_message msg)
 {
-    m_skip++;
+    if (isDestiny(lo_message_get_source(msg))) {
+	pair<int,int> net_id(argv[0]->i, argv[1]->i);
 
-    pair<int,int> net_id(argv[0]->i, argv[1]->i);
-
-    map<pair<int,int>, int>::iterator it = m_local_id.find(net_id);
-    TableObject obj;
+	map<pair<int,int>, int>::iterator it = m_local_id.find(net_id);
+	TableObject obj;
     
-    if (it != m_local_id.end() &&
-	!(obj = m_table->findObject(it->second)).isNull()) {
+	if (it != m_local_id.end() &&
+	    !(obj = m_table->findObject(it->second)).isNull()) {
 
-	m_table->activateObject(obj);
+	    m_skip++;
+	    m_table->activateObject(obj);
 
-	if (m_is_server)
 	    broadcastMessageFrom("/ps/activate", msg, lo_message_get_source(msg));
+	}
     }
-
+    
     return 0;
 }
 
 int OSCController::_deactivate_cb(const char* path, const char* types,
 				  lo_arg** argv, int argc, lo_message msg)
 {
-    m_skip++;
+    if (isDestiny(lo_message_get_source(msg))) {
+	pair<int,int> net_id(argv[0]->i, argv[1]->i);
 
-    pair<int,int> net_id(argv[0]->i, argv[1]->i);
-
-    map<pair<int,int>, int>::iterator it = m_local_id.find(net_id);
-    TableObject obj;
+	map<pair<int,int>, int>::iterator it = m_local_id.find(net_id);
+	TableObject obj;
     
-    if (it != m_local_id.end() &&
-	!(obj = m_table->findObject(it->second)).isNull()) {
+	if (it != m_local_id.end() &&
+	    !(obj = m_table->findObject(it->second)).isNull()) {
 	
-	m_table->deactivateObject(obj);
+	    m_skip++;
+	    m_table->deactivateObject(obj);
 
-	if (m_is_server)
 	    broadcastMessageFrom("/ps/deactivate", msg, lo_message_get_source(msg));
+	}
     }
     
     return 0;

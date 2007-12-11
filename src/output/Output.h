@@ -33,40 +33,77 @@ enum {
     OUT_TYPES,
 };
 
-enum {
-    OUT_NOTINIT,
-    OUT_IDLE,
-    OUT_RUNNING,
-    OUT_STATES
+class OutputProcessor
+{
+public:
+    virtual void processOutput(int n_frames) = 0;
 };
 
-class Output {
-protected:
-    int out_state;
-    AudioInfo out_info;
-	
-    void *out_cbdata;
-    void (*out_callback) (int,void*);
-
+class Output
+{
 public:
+    enum State {
+	NOTINIT,
+	IDLE,
+	RUNNING,
+	N_STATES
+    };
+    
+    typedef void(*callback_t)(int,void*);
+
+private:
+    AudioInfo m_info;
+    State m_state;
+	
+    void* m_cbdata;
+    callback_t m_callback;
+
+protected:
+    void process(int n_frames) {
+	if (m_callback)
+	    m_callback(n_frames, m_cbdata);
+    }
+    
+    State getState() const {
+	return m_state;
+    }
+
+    void setState(State state) {
+	m_state = state;
+    }
+    
+    callback_t getCallback() {
+	return m_callback;
+    }
+
+    void* getCallbackData() {
+	return m_cbdata;
+    }
+    
+public:
+    
     Output(AudioInfo info = AudioInfo(), void (*callback)(int,void*) = NULL, void* data = NULL) :
-	out_info(info),
-	out_cbdata(data),
-	out_callback(callback)
+	m_info(info),
+	m_state(NOTINIT),
+	m_cbdata(data),
+	m_callback(callback)
 	{}
 
     virtual ~Output() {};
 	
     virtual bool open() = 0;
     virtual bool close()  = 0;
-    virtual bool put(const Real* rbuf, int nframes) = 0;
-    virtual bool put(const AudioBuffer& buf) = 0;
+    virtual bool put(const AudioBuffer& buf, size_t nframes) = 0;
     virtual void start() = 0;
     virtual void stop() = 0;
-	
+
+    bool put(const AudioBuffer& buf) {
+	return put(buf, buf.size());
+    }
+    
     bool setInfo(const AudioInfo& info) {
-	if (out_state == OUT_NOTINIT) {
-	    out_info = info;
+	if (m_state == NOTINIT) {
+	    m_info = info;
 	    return true;
 	} else {
 	    WARNING("Cannot change parameters of output device once initialized.");
@@ -74,10 +111,10 @@ public:
 	}
     }
 	
-    bool setCallback(void(*callback)(int,void*), void* data) {
-	if (out_state == OUT_NOTINIT) {
-	    out_cbdata = data;
-	    out_callback = callback;
+    bool setCallback(callback_t callback, void* data) {
+	if (m_state == NOTINIT) {
+	    m_cbdata = data;
+	    m_callback = callback;
 	    return true;
 	} else {
 	    WARNING("Cannot change parameters of output device once initialized.");
@@ -86,7 +123,7 @@ public:
     }
 	
     const AudioInfo& getInfo() const {
-	return out_info;
+	return m_info;
     }
 };
 

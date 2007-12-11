@@ -91,7 +91,7 @@ public:
 	OSCBroadcast::clear();
     }
 
-    void addToServer(lo_server s);
+    void addMethods(lo_server s);
     
     void handleAddObject(TableObject& obj);
     void handleDeleteObject(TableObject& obj);
