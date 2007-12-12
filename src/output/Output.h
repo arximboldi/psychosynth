@@ -89,14 +89,15 @@ public:
 	m_callback(callback)
 	{}
 
-    virtual ~Output() {};
-	
     virtual bool open() = 0;
     virtual bool close()  = 0;
     virtual bool put(const AudioBuffer& buf, size_t nframes) = 0;
     virtual void start() = 0;
     virtual void stop() = 0;
 
+    virtual ~Output() {};
+
+    
     bool put(const AudioBuffer& buf) {
 	return put(buf, buf.size());
     }

@@ -48,6 +48,7 @@ public:
     enum Level {
 	INFO,
 	WARNING,
+	ERROR,
 	FATAL
     };
 
@@ -57,6 +58,8 @@ public:
 	    return "INFO";
 	case WARNING:
 	    return "WARNING";
+	case ERROR:
+	    return "ERROR";
 	case FATAL:
 	    return "FATAL";
 	default:
@@ -104,7 +107,7 @@ public:
 	return m_parent;
     }
         
-    void log(std::string& child, int level, const std::string& msg) {
+    void log(const std::string& child, int level, const std::string& msg) {
 	getChild(child).log(level, msg);
     }
 

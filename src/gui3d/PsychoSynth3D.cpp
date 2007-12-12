@@ -31,7 +31,9 @@
 #include "gui3d/QueryFlags.h"
 #include "gui3d/FlatRing.h"
 
+#include "output/OutputOss.h"
 #include "output/OutputAlsa.h"
+#include "output/OutputJack.h"
 #include "table/PatcherDynamic.h"
 
 using namespace Ogre;
@@ -109,7 +111,11 @@ void PsychoSynth3D::setupGui()
 void PsychoSynth3D::setupSynth()
 {
     m_table = new Table(m_audio_info);
-    m_output = new OutputAlsa(m_audio_info, "default");
+
+    //m_output = new OutputAlsa(m_audio_info, "default");
+    //m_output = new OutputOss(m_audio_info, "/dev/dsp");
+    m_output = new OutputJack(m_audio_info);
+
     m_table->attachOutput(m_output);
     m_table->attachPatcher(new PatcherDynamic());
     m_table->update();

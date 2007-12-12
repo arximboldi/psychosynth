@@ -23,41 +23,37 @@
 #ifndef OUTPUTJACK_H
 #define OUTPUTJACK_H
 
+#include <vector>
+#include <jack/jack.h>
+
 #include "output/Output.h"
 
-#if 0
-
 class OutputJack : public Output
-{
-    class JackPort {
-	jack_port_t* m_port;
-    public:
-	void reg(int i);
-	void connect();
-    };
-    
-    static int jack_process_cb(jack_nframes_t nframes, void *jack_client) {
+{   
+    static int jack_process_cb(jack_nframes_t nframes, void* jack_client) {
 	static_cast<OutputJack*>(jack_client)->jackProcess(nframes);
 	return 0;
     }
 
-    static int jack_sample_rate_cb(jack_nframes_t nframes, void *jack_client) {
+    static int jack_sample_rate_cb(jack_nframes_t nframes, void* jack_client) {
 	static_cast<OutputJack*>(jack_client)->jackSampleRate(nframes);
 	return 0;
     }
 
-    static int jack_shutdown_cb(void *jack_client) {
-	static_cast<OutputJack*>(jack_client)->jackShutDown(nframes);
-	return 0;
+    static void jack_shutdown_cb(void* jack_client) {
+	static_cast<OutputJack*>(jack_client)->jackShutDown();
     }
 
     void jackProcess(jack_nframes_t nframes);
     void jackSampleRate(jack_nframes_t nframes);
-    void jackShutDown(jack_nframes_t nframes);
+    void jackShutDown();
 
-    std::vector<JackPort> m_ports;
+    void connectPorts();
+    
+    std::vector<jack_port_t*> m_out_ports;
     jack_client_t* m_client;
     std::string m_serv_name;
+    size_t m_actual_rate;
     
 public:
     OutputJack(const AudioInfo& info);
@@ -65,11 +61,9 @@ public:
     ~OutputJack();
     bool open();
     bool close();
-    bool put(const AudioBuffer& buf);
+    bool put(const AudioBuffer& buf, size_t nframes);
     void start();
     void stop();
 };
-
-#endif
 
 #endif /* OUTPUTJACK_H */
