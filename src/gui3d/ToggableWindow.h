@@ -42,9 +42,12 @@ public:
     ToggableWindow();
     virtual ~ToggableWindow();
 	
-    bool isActive() {return m_active;}
     void setActive(bool active);
-	
+
+    bool isActive() {
+	return m_active;
+    }
+    
     bool toggle() {
 	setActive(!m_active);
 	return m_active;
@@ -54,7 +57,6 @@ public:
 	setActive(false);
 	return true;
     };
-
 };
 
 #endif /* TOGGABLEWINDOW_H */

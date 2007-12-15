@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) 2007 Juan Pedro Bolivar Puente                          *
+ *   Copyright (C) Juan Pedro Bolivar Puente 2007                          *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -20,43 +20,26 @@
  *                                                                         *
  ***************************************************************************/
 
+#ifndef GUILOGSINK_H
+#define GUILOGSINK_H
+
 #include "common/Logger.h"
+#include "CEGUI/CEGUI.h"
 
-using namespace std;
-
-Log::~Log()
+class GuiLogSink : public LogSink
 {
-    for (list<LogSink*>::iterator it = m_dumpers.begin();
-	 it != m_dumpers.end(); ++it) {
-	delete *it;
-    }
-}
+    CEGUI::Window* m_window;
+    std::string m_buffer;
 
-Log& Log::getPath(std::string path)
-{
-    string base;
-    for (size_t i = 0; i != path.size(); ++i)
-	if (path[i] == '/') {
-	    base.assign(path, 0, i);
-	    path.erase(0, i);
-	    break;
-	}
+    void dump(Log& log, int level, const std::string& msg);
+    
+public:
+    GuiLogSink(CEGUI::Window* win = NULL) :
+	m_window(win) {}
 
-    if (base.empty()) {
-	return getChild(path);
-    }
+    void setWindow(CEGUI::Window* win) {
+	m_window = win;
+    };
+};
 
-    return getChild(base).getPath(path);
-}
-
-void Log::log(Log& log, int level, const string& msg)
-{
-    for (list<LogSink*>::iterator it = m_dumpers.begin();
-	 it != m_dumpers.end(); ++it) {
-	(*it)->dump(log, level, msg);
-    }
-
-    if (m_parent)
-	m_parent->log(log, level, msg);
-}
-
+#endif /* GUILOGSINK_H */

@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) 2007 Juan Pedro Bolivar Puente                          *
+ *   Copyright (C) Juan Pedro Bolivar Puente 2007                          *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -23,6 +23,7 @@
 #ifndef OSCCLIENT_H
 #define OSCCLIENT_H
 
+#include "common/Logger.h"
 #include "net/OSCController.h"
 
 class OSCClient;
@@ -30,14 +31,23 @@ class OSCClient;
 class OSCClientListener
 {
 public:
-    virtual bool handleClientAccept(OSCClient*) = 0;
-    virtual bool handleClientTimeout(OSCClient*) = 0;
-    virtual bool handleClientDrop(OSCClient*) = 0;
+    virtual ~OSCClientListener() {}
+    
+    virtual bool handleClientConnect(OSCClient* client) = 0;
+    virtual bool handleClientDisconnect(OSCClient* client) = 0;
+    virtual bool handleClientAccept(OSCClient* client) = 0;
+    virtual bool handleClientTimeout(OSCClient* client) = 0;
+    virtual bool handleClientDrop(OSCClient* client) = 0;
 };
 
 class OSCClientSubject
 {
     std::list<OSCClientListener*> m_list;
+
+protected:
+    void notifyServerAccept(OSCClient* param);
+    void notifyServerTimeout(OSCClient* param);
+    void notifyServerDrop(OSCClient* param);
     
 public:
     void addListener(OSCClientListener* l) {
@@ -47,14 +57,10 @@ public:
     void deleteListener(OSCClientListener* l) {
 	m_list.remove(l);
     };
-    
-    void notifyServerAccept(OSCClient* param);
-    void notifyServerTimeout(OSCClient* param);
-    void notifyServerDrop(OSCClient* param);
 };
 
 class OSCClient : public OSCController,
-		  private OSCClientSubject
+		  public OSCClientSubject
 {
     lo_address m_target;
     lo_server m_server;

@@ -31,7 +31,7 @@ int main(int argc, const char *argv[])
 {
     PsychoSynth3D main_app;
 
-    Logger::instance().attachDumper(new LogDefaultDumper);
+    Logger::instance().attachSink(new LogDefaultSink);
     
     main_app.run(argc, argv);
 	

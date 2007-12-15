@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<GUILayout>
+<Window Type="TaharezLook/ImageButton" Name="btnNetworkWindow">
+	<Property Name="UnifiedPosition" Value="{{1,-32},{1,-32}}" />
+	<Property Name="UnifiedSize" Value="{{0,32},{0,32}}" />
+	<Property Name="NormalImage"     Value="set:NetworkWindowButton image:btnNormal" />
+	<Property Name="HoverImage"      Value="set:NetworkWindowButton image:btnHover"  />
+	<Property Name="PushedImage"     Value="set:NetworkWindowButton image:btnPushed" />
+	<Property Name="DisabledImage"   Value="set:NetworkWindowButton image:btnDisabl" />
+</Window>
+</GUILayout>
+

@@ -27,26 +27,26 @@ using namespace std;
 
 FrameWindow* QuitWindow::createWindow()
 {
-	WindowManager& wmgr = WindowManager::getSingleton();
+    WindowManager& wmgr = WindowManager::getSingleton();
 	
-	FrameWindow* window = dynamic_cast<FrameWindow*>(
-					wmgr.createWindow("TaharezLook/FrameWindow", "window_menu"));
+    FrameWindow* window = dynamic_cast<FrameWindow*>(
+	wmgr.createWindow("TaharezLook/FrameWindow", "window_menu"));
 	
-	window->setPosition( UVector2(UDim(0.5, -100), UDim(0.5, -50)) );
-	window->setSize    ( UVector2(UDim(0, 200),     UDim(0, 80)) );
-	window->setText("Quit Window");
+    window->setPosition( UVector2(UDim(0.5, -100), UDim(0.5, -50)) );
+    window->setSize    ( UVector2(UDim(0, 200),     UDim(0, 80)) );
+    window->setText("Quit Window");
 	
-	Window *button_quit = wmgr.createWindow("TaharezLook/Button", "button_quit");
-	button_quit->setText("Quit");
-	button_quit->setPosition( UVector2(UDim(0.10, 0), UDim(0, 40)) );
-	button_quit->setSize    ( UVector2(UDim(0.80, 0), UDim(0, 20)) );
+    Window *button_quit = wmgr.createWindow("TaharezLook/Button", "button_quit");
+    button_quit->setText("Quit");
+    button_quit->setPosition( UVector2(UDim(0.10, 0), UDim(0, 40)) );
+    button_quit->setSize    ( UVector2(UDim(0.80, 0), UDim(0, 20)) );
 	
-	window->addChildWindow(button_quit);
+    window->addChildWindow(button_quit);
 	
-	button_quit->subscribeEvent(PushButton::EventClicked, 
-						 Event::Subscriber(&QuitWindow::onQuit, this));
+    button_quit->subscribeEvent(PushButton::EventClicked, 
+				Event::Subscriber(&QuitWindow::onQuit, this));
            
-	return window;
+    return window;
 }
 
 QuitWindow::QuitWindow()

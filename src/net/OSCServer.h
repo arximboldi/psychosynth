@@ -32,7 +32,11 @@ class OSCServer;
 
 class OSCServerListener
 {
+    
 public:
+    virtual ~OSCServerListener() {}
+    virtual bool handleStartListening(OSCServer* server) = 0;
+    virtual bool handleStopListening(OSCServer* server) = 0;
     virtual bool handleClientConnect(OSCServer* server, int client_id) = 0;
     virtual bool handleClientDisconnect(OSCServer* server, int client_id) = 0;
     virtual bool handleClientTimeout(OSCServer* server, int client_id) = 0;
@@ -41,6 +45,12 @@ public:
 class OSCServerSubject
 {
     std::list<OSCServerListener*> m_list;
+
+protected:    
+    void notifyClientDisconnect(OSCServer* server, int client_id);
+    void notifyClientConnect(OSCServer* server, int client_id);
+    void notifyClientTimeout(OSCServer* server, int client_id);
+    
 public:
     void addListener(OSCServerListener* l) {
 	m_list.push_back(l);
@@ -49,10 +59,6 @@ public:
     void deleteListener(OSCServerListener* l) {
 	m_list.remove(l);
     }
-    
-    void notifyClientDisconnect(OSCServer* server, int client_id);
-    void notifyClientConnect(OSCServer* server, int client_id);
-    void notifyClientTimeout(OSCServer* server, int client_id);
 };
 
 class OSCServer : public OSCController,

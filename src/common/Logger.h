@@ -30,7 +30,7 @@
 
 class Log;
 
-class LogDumper
+class LogSink
 {
 public:
     virtual void dump(Log& log, int level, const std::string& msg) = 0;
@@ -39,7 +39,7 @@ public:
 class Log
 {
     std::map<std::string, Log> m_childs;
-    std::list<LogDumper*> m_dumpers;
+    std::list<LogSink*> m_dumpers;
     Log* m_parent;
     std::string m_name;
     bool m_isinit;
@@ -85,11 +85,11 @@ public:
 	return m_name;
     }
 
-    void attachDumper(LogDumper* d) {
+    void attachSink(LogSink* d) {
 	m_dumpers.push_back(d);
     }
 
-    void dattachDumper(LogDumper* d) {
+    void dattachSink(LogSink* d) {
 	m_dumpers.remove(d);
     }
        
@@ -115,10 +115,14 @@ public:
 	if (m_parent)
 	    return m_parent->getPathName() + "/" + m_name; 
 	else
-	    return "/" + m_name;
+	    return m_name;
     }
+
+    void log(int level, const std::string& msg) {
+	log(*this, level, msg);
+    };
     
-    void log(int level, const std::string& msg);
+    void log(Log& log, int level, const std::string& msg);
     
     Log& getPath(std::string path);
 };
@@ -129,7 +133,8 @@ class Logger : public Singleton<Logger>,
 public:
 };
 
-class LogDefaultDumper : public LogDumper {
+class LogDefaultSink : public LogSink
+{
 public:
     void dump(Log& log, int level, const std::string& msg) {
 	if (level > Log::INFO)
@@ -142,6 +147,7 @@ public:
 		      << ": " << msg << std::endl;
     }
 };
+
 
 #endif
 

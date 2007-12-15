@@ -26,18 +26,19 @@
 #include <OGRE/Ogre.h>
 #include "gui3d/ToggableWindow.h"
 
-class QuitWindow : public ToggableWindow {
-	
-	CEGUI::FrameWindow* createWindow();
+class QuitWindow : public ToggableWindow
+{	
+    CEGUI::FrameWindow* createWindow();
+
 public:
-	QuitWindow();
-	~QuitWindow();
+    QuitWindow();
+    ~QuitWindow();
 	
-	bool onQuit(const CEGUI::EventArgs &e) {
-		/* TODO */
-		Ogre::Root::getSingleton().queueEndRendering();
-		return true;
-	};
+    bool onQuit(const CEGUI::EventArgs &e) {
+	/* TODO */
+	Ogre::Root::getSingleton().queueEndRendering();
+	return true;
+    };
 };
 
 #endif /* QUITWINDOW_H */

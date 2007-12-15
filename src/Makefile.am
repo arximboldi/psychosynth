@@ -15,7 +15,7 @@ psychosynth_SOURCES = \
 	gui3d/CameraControllerRasko.cpp \
 	gui3d/QuitWindow.cpp \
 	gui3d/InputManager.cpp \
-	gui3d/ElementSelector.cpp \
+	gui3d/SelectorWindow.cpp \
 	gui3d/PsychoSynth3D.cpp \
 	gui3d/TaskManager.cpp \
 	gui3d/Timer.cpp \
@@ -31,6 +31,8 @@ psychosynth_SOURCES = \
 	gui3d/FlatRing.cpp \
 	gui3d/Connection.cpp \
 	gui3d/OgreMisc.cpp \
+	gui3d/NetworkWindow.cpp \
+	gui3d/GuiLogSink.cpp \
 	object/Object.cpp \
 	object/ObjectOscillator.cpp \
 	object/ObjectMixer.cpp \
@@ -88,7 +90,7 @@ noinst_HEADERS = \
 	gui3d/QuitWindow.h \
 	gui3d/InputManager.h \
 	gui3d/PsychoSynth3D.h \
-	gui3d/ElementSelector.h\
+	gui3d/SelectorWindow.h\
 	gui3d/TaskManager.h\
 	gui3d/Timer.h\
 	gui3d/ToggableWindow.h\
@@ -104,6 +106,8 @@ noinst_HEADERS = \
 	gui3d/FlatRing.h\
 	gui3d/Connection.h\
 	gui3d/OgreMisc.h \
+	gui3d/NetworkWindow.h \
+	gui3d/GuiLogSink.h \
 	object/Object.h \
 	object/ObjectOscillator.h \
 	object/ObjectManager.h \
@@ -113,6 +117,8 @@ noinst_HEADERS = \
 	net/OSCBroadcast.h \
 	net/OSCServer.h \
 	net/OSCClient.h \
+	net/OSCServerLogger.h \
+	net/OSCClientLogger.h \
 	net/OSCController.h \
 	net/OSCMisc.h \
 	output/Output.h \

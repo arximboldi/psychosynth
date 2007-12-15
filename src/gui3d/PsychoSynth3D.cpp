@@ -23,8 +23,11 @@
 #include "common/Logger.h"
 
 #include "gui3d/PsychoSynth3D.h"
+
 #include "gui3d/QuitWindow.h"
-#include "gui3d/ElementSelector.h"
+#include "gui3d/SelectorWindow.h"
+#include "gui3d/NetworkWindow.h"
+
 #include "gui3d/CameraControllerRasko.h"
 #include "gui3d/Element.h"
 #include "gui3d/ElementTypes.h"
@@ -50,10 +53,9 @@ PsychoSynth3D::~PsychoSynth3D()
 
 void PsychoSynth3D::setupOgre()
 {
-
-    Logger::instance().log(::Log::INFO, "Initializing Ogre.");
-    
-    m_ogre = new Root("data/plugins.cfg", "data/ogre.cfg", "Ogre.log");
+    new LogManager;
+    LogManager::getSingleton().createLog("Ogre.log", false, false, false);  
+    m_ogre = new Root("data/plugins.cfg", "data/ogre.cfg");
 
     ResourceGroupManager& resource_manager = ResourceGroupManager::getSingleton();
     resource_manager.addResourceLocation("data", "FileSystem", "General");
@@ -112,9 +114,9 @@ void PsychoSynth3D::setupSynth()
 {
     m_table = new Table(m_audio_info);
 
-    //m_output = new OutputAlsa(m_audio_info, "default");
+    m_output = new OutputAlsa(m_audio_info, "default");
     //m_output = new OutputOss(m_audio_info, "/dev/dsp");
-    m_output = new OutputJack(m_audio_info);
+    //m_output = new OutputJack(m_audio_info);
 
     m_table->attachOutput(m_output);
     m_table->attachPatcher(new PatcherDynamic());
@@ -199,11 +201,9 @@ void PsychoSynth3D::setupTable()
 
 void PsychoSynth3D::setupMenus()
 {
-    m_windowlist = new WindowList();
-	
-    ElementSelector* selector = new ElementSelector(m_elemmgr);
-    ElementSelector::Category* cat = NULL;
-
+    SelectorWindow* selector = new SelectorWindow(m_elemmgr);
+    SelectorWindow::Category* cat = NULL;
+    
     cat = selector->addCategory("Wave");
     cat->addButton("Sine", ELEM_OSC_SINE);
     cat->addButton("Square", ELEM_OSC_SQUARE);
@@ -212,12 +212,17 @@ void PsychoSynth3D::setupMenus()
 
     cat = selector->addCategory("Mix");
     cat->addButton("Mixer", ELEM_MIXER);
-	
-    m_windowlist->addWindow("ElementSelectorButton.imageset",
-			    "ElementSelectorButton.layout",
+
+    m_windowlist = new WindowList();
+    
+    m_windowlist->addWindow("SelectorWindowButton.imageset",
+			    "SelectorWindowButton.layout",
 			    selector,
 			    OIS::KC_UNASSIGNED);
-    
+    m_windowlist->addWindow("NetworkWindowButton.imageset",
+			    "NetworkWindowButton.layout",
+			    new NetworkWindow(NULL, NULL),
+			    OIS::KC_UNASSIGNED);
     m_windowlist->addWindow("QuitWindowButton.imageset",
 			    "QuitWindowButton.layout",
 			    new QuitWindow(),
@@ -259,27 +264,38 @@ void PsychoSynth3D::closeInput()
 void PsychoSynth3D::closeOgre()
 {
     delete m_ogre;
-    Logger::instance().log(::Log::INFO, "Ogre closed.");
 }
 
 int PsychoSynth3D::run(int argc, const char* argv[])
 {
+    Logger::instance().log("gui", ::Log::INFO, "Initializing Ogre.");
     setupOgre();
+    Logger::instance().log("gui", ::Log::INFO, "Initializing OIS.");
     setupInput();
+    Logger::instance().log("gui", ::Log::INFO, "Initializing synthetizer.");
     setupSynth();
+    Logger::instance().log("gui", ::Log::INFO, "Initializing scene.");
     setupTable();
+    Logger::instance().log("gui", ::Log::INFO, "Initializing CEGUI.");
     setupGui();
+    Logger::instance().log("gui", ::Log::INFO, "Initializing GUI elements.");
     setupMenus();
 		
     m_timer.forceFps(120);
 		
     m_ogre->startRendering();
-    
+
+    Logger::instance().log("gui", ::Log::INFO, "Closing GUI elements.");
     closeMenus();
+    Logger::instance().log("gui", ::Log::INFO, "Closing CEGUI.");
     closeGui();
+    Logger::instance().log("gui", ::Log::INFO, "Closing scene.");
     closeTable();
+    Logger::instance().log("gui", ::Log::INFO, "Closing synthetizer.");
     closeSynth();
+    Logger::instance().log("gui", ::Log::INFO, "Closing OIS.");
     closeInput();
+    Logger::instance().log("gui", ::Log::INFO, "Closing Ogre.");
     closeOgre();
        
     return 0;

@@ -20,43 +20,80 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "common/Logger.h"
+#ifndef SELECTORWINDOW_H
+#define SELECTORWINDOW_H
 
-using namespace std;
+#include <map>
+#include <list>
 
-Log::~Log()
-{
-    for (list<LogSink*>::iterator it = m_dumpers.begin();
-	 it != m_dumpers.end(); ++it) {
-	delete *it;
-    }
-}
+#include "gui3d/ToggableWindow.h"
+#include "gui3d/ElementManager.h"
 
-Log& Log::getPath(std::string path)
-{
-    string base;
-    for (size_t i = 0; i != path.size(); ++i)
-	if (path[i] == '/') {
-	    base.assign(path, 0, i);
-	    path.erase(0, i);
-	    break;
-	}
+class SelectorWindow : public ToggableWindow
+{	
+public:
+    class Category {
+	class Button {
+	    int m_elem_type;
+	    ElementManager* m_mgr;
+	    CEGUI::Window* m_window;
+	    int m_index;
+			
+	public:
+	    Button(const std::string& name, ElementManager* m_mgr,
+		   int elem_type, int index);
+			
+	    ~Button() {
+		//delete m_window;
+	    }
+			
+	    CEGUI::Window* getWindow() {
+		return m_window;
+	    };
+			
+	    void setPosition();
+			
+	    bool onClick(const CEGUI::EventArgs &e) {
+		m_mgr->addElement(m_elem_type);
+		return true;
+	    }
+			
+	    bool onParentResize(const CEGUI::EventArgs &e) {
+		setPosition();
+		return true;
+	    }
+	};
+		
+	std::list<Button*> m_buts;
+	CEGUI::Window* m_window;
+	ElementManager* m_mgr;
+	int m_nbut;
+		
+    public:
+	Category(const std::string& name, ElementManager* mgr);
+		
+	~Category();
+		
+	CEGUI::Window* getWindow() {
+	    return m_window;
+	};
+		
+	void addButton(const std::string& name, int elem_id);
+    };
+	
+private:	
+    std::map<std::string, Category*> m_cat;
+    CEGUI::Window* m_window;
+    CEGUI::Window* m_container;
+    ElementManager* m_mgr;
+	
+    CEGUI::FrameWindow* createWindow();
 
-    if (base.empty()) {
-	return getChild(path);
-    }
+public:	
+    SelectorWindow(ElementManager* emgr);
+    Category* addCategory(const std::string& name);
+    Category* findCategory(const std::string& name);
+    virtual ~SelectorWindow();
+};
 
-    return getChild(base).getPath(path);
-}
-
-void Log::log(Log& log, int level, const string& msg)
-{
-    for (list<LogSink*>::iterator it = m_dumpers.begin();
-	 it != m_dumpers.end(); ++it) {
-	(*it)->dump(log, level, msg);
-    }
-
-    if (m_parent)
-	m_parent->log(log, level, msg);
-}
-
+#endif /* SELECTORWINDOW_H */

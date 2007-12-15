@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) 2007 Juan Pedro Bolivar Puente                          *
+ *   Copyright (C) Juan Pedro Bolivar Puente 2007                          *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -20,43 +20,16 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "common/Logger.h"
+#include "GuiLogSink.h"
 
 using namespace std;
+using namespace CEGUI;
 
-Log::~Log()
+void GuiLogSink::dump(Log& log, int level, const string& msg)
 {
-    for (list<LogSink*>::iterator it = m_dumpers.begin();
-	 it != m_dumpers.end(); ++it) {
-	delete *it;
-    }
-}
-
-Log& Log::getPath(std::string path)
-{
-    string base;
-    for (size_t i = 0; i != path.size(); ++i)
-	if (path[i] == '/') {
-	    base.assign(path, 0, i);
-	    path.erase(0, i);
-	    break;
-	}
-
-    if (base.empty()) {
-	return getChild(path);
-    }
-
-    return getChild(base).getPath(path);
-}
-
-void Log::log(Log& log, int level, const string& msg)
-{
-    for (list<LogSink*>::iterator it = m_dumpers.begin();
-	 it != m_dumpers.end(); ++it) {
-	(*it)->dump(log, level, msg);
-    }
-
-    if (m_parent)
-	m_parent->log(log, level, msg);
+    m_buffer += "\n";
+    m_buffer += msg;
+    if (m_window)
+	m_window->setText(m_buffer);
 }
 

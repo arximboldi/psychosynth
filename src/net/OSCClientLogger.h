@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) 2007 Juan Pedro Bolivar Puente                          *
+ *   Copyright (C) Juan Pedro Bolivar Puente 2007                          *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -20,43 +20,38 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "common/Logger.h"
+#ifndef OSCCLIENTLOGGER_H
+#define OSCCLIENTLOGGER_H
 
-using namespace std;
+#include "net/OSCClient.h"
 
-Log::~Log()
+class OSCClientLogger : public OSCClientListener
 {
-    for (list<LogSink*>::iterator it = m_dumpers.begin();
-	 it != m_dumpers.end(); ++it) {
-	delete *it;
+public:
+    virtual bool handleClientConnect(OSCClient* client) {
+	Logger::instance().log("oscclient", Log::INFO, "Connecting...");
+	return false;
     }
-}
-
-Log& Log::getPath(std::string path)
-{
-    string base;
-    for (size_t i = 0; i != path.size(); ++i)
-	if (path[i] == '/') {
-	    base.assign(path, 0, i);
-	    path.erase(0, i);
-	    break;
-	}
-
-    if (base.empty()) {
-	return getChild(path);
+    
+    virtual bool handleClientDisconnect(OSCClient* client) {
+	Logger::instance().log("oscclient", Log::INFO, "Disconnected.");
+	return false;
     }
-
-    return getChild(base).getPath(path);
-}
-
-void Log::log(Log& log, int level, const string& msg)
-{
-    for (list<LogSink*>::iterator it = m_dumpers.begin();
-	 it != m_dumpers.end(); ++it) {
-	(*it)->dump(log, level, msg);
+    
+    virtual bool handleClientAccept(OSCClient* client) {
+	Logger::instance().log("oscclient", Log::INFO, "Accepted.");
+	return false;
     }
+    
+    virtual bool handleClientTimeout(OSCClient* client) {
+	Logger::instance().log("oscclient", Log::INFO, "Connection timeout.");
+	return false;
+    }
+    
+    virtual bool handleClientDrop(OSCClient* client) {
+	Logger::instance().log("oscclient", Log::INFO, "Client dropped by server.");
+	return false;
+    }
+};
 
-    if (m_parent)
-	m_parent->log(log, level, msg);
-}
-
+#endif /* OSCCLIENTLOGGER_H */

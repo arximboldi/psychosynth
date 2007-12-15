@@ -56,6 +56,8 @@ OSCClient::OSCClient() :
 
 OSCClient::~OSCClient()
 {
+    if (m_state != IDLE)
+	disconnect();
 }
 
 void OSCClient::connect(lo_address target, const char* local_port)
@@ -80,11 +82,13 @@ void OSCClient::close()
 
 void OSCClient::disconnect()
 {
-    lo_message msg = lo_message_new();
-    broadcastMessage("/ps/disconnect", msg);
-    lo_message_free(msg);
-    
-    close();
+    if (m_state != IDLE) {
+	lo_message msg = lo_message_new();
+	broadcastMessage("/ps/disconnect", msg);
+	lo_message_free(msg);
+	
+	close();
+    }
 }
 
 int OSCClient::update(int msec)
