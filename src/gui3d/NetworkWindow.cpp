@@ -20,7 +20,8 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "NetworkWindow.h"
+#include "gui3d/NetworkWindow.h"
+#include "common/Misc.h"
 
 using namespace std;
 using namespace CEGUI;
@@ -35,19 +36,17 @@ ClientTab::ClientTab(OSCClient* client) :
     m_client(client),
     m_connected(false)
 {
-    /*
-      m_client->addListener(this);
-      m_client->addListener(&m_logger);
-    */
+    m_client->addListener(this);
+    m_client->addListener(&m_logger);
+    
     ::Logger::instance().getChild("oscclient").attachSink(&m_logsink);
 }
 
 ClientTab::~ClientTab()
 {
-    /*
-      m_client->deleteListener(this);
-      m_client->deleteListener(&m_logger);
-    */
+    m_client->deleteListener(this);
+    m_client->deleteListener(&m_logger);
+ 
     ::Logger::instance().getChild("oscclient").dattachSink(&m_logsink);
     m_logsink.setWindow(NULL);
 }
@@ -63,7 +62,7 @@ Window* ClientTab::createWindow()
 
     m_disable = wmgr.createWindow("DefaultGUISheet");
     m_disable->setPosition( UVector2(UDim(0, 0), UDim(0, 1)) );
-    m_disable->setSize    ( UVector2(UDim(1, 0),     UDim(1, 0)) );
+    m_disable->setSize    ( UVector2(UDim(1, 0),     UDim(0, 75)) );
 
     Window* host_label = wmgr.createWindow("TaharezLook/StaticText");
     host_label->setText("Remote host");
@@ -140,23 +139,16 @@ void ClientTab::setConnected(bool con)
 bool ClientTab::onButtonClick(const CEGUI::EventArgs &e)
 {
     if (!m_connected) {
-	
+	lo_address add;
+	add = lo_address_new(m_host->getText().c_str(),
+			     itoa(m_rport->getCurrentValue(), 10));
+
+	m_client->connect(add, itoa(m_lport->getCurrentValue(), 10));
     } else {
-	
+	m_client->disconnect();
     }
+    
     return true;
-}
-
-bool ClientTab::handleClientTimeout(OSCClient* client)
-{
-    setConnected(false);
-    return false;
-}
-
-bool ClientTab::handleClientDrop(OSCClient* client)
-{
-    setConnected(false);
-    return false;
 }
 
 bool ClientTab::handleClientConnect(OSCClient* client)
@@ -165,7 +157,7 @@ bool ClientTab::handleClientConnect(OSCClient* client)
     return false;
 }
 
-bool ClientTab::handleClientDisconnect(OSCClient* client)
+bool ClientTab::handleClientDisconnect(OSCClient* client, OSCClientError err)
 {
     setConnected(false);
     return false;
@@ -175,19 +167,18 @@ ServerTab::ServerTab(OSCServer* server) :
     m_server(server),
     m_listening(false)
 {
-    /*
-      m_server->addListener(this);
-      m_server->addListener(&m_logger);
-    */
+    m_server->addListener(this);
+    m_server->addListener(&m_logger);
+ 
     ::Logger::instance().getChild("oscserver").attachSink(&m_logsink);
 }
 
 ServerTab::~ServerTab()
 {
-    /*
-      m_client->deleteListener(this);
-      m_client->deleteListener(&m_logger);
-    */
+    
+    m_server->deleteListener(this);
+    m_server->deleteListener(&m_logger);
+    
     ::Logger::instance().getChild("oscserver").dattachSink(&m_logsink);
     m_logsink.setWindow(NULL);
 }
@@ -203,7 +194,7 @@ Window* ServerTab::createWindow()
 
     m_disable = wmgr.createWindow("DefaultGUISheet");
     m_disable->setPosition( UVector2(UDim(0, 0), UDim(0, 1)) );
-    m_disable->setSize    ( UVector2(UDim(1, 0),     UDim(1, 0)) );
+    m_disable->setSize    ( UVector2(UDim(1, 0),     UDim(0, 25)) );
     
     Window* lport_label = wmgr.createWindow("TaharezLook/StaticText");
     lport_label->setText("Port");
@@ -253,13 +244,13 @@ void ServerTab::setListening(bool lis)
     }
 }
 
-bool ServerTab::handleStartListening(OSCServer* server)
+bool ServerTab::handleServerStartListening(OSCServer* server)
 {
     setListening(true);
     return false;
 }
 
-bool ServerTab::handleStopListening(OSCServer* server)
+bool ServerTab::handleServerStopListening(OSCServer* server, OSCServerError err)
 {
     setListening(false);
     return false;
@@ -268,9 +259,9 @@ bool ServerTab::handleStopListening(OSCServer* server)
 bool ServerTab::onButtonClick(const CEGUI::EventArgs &e)
 {
     if (!m_listening) {
-	
+	m_server->listen(itoa(m_lport->getCurrentValue(), 10));
     } else {
-	
+	m_server->stop();
     }
     return true;
 }

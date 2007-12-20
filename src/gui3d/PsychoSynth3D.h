@@ -37,6 +37,8 @@
 #include "gui3d/CameraControllerRasko.h"
 #include "table/Table.h"
 #include "output/Output.h"
+#include "net/OSCClient.h"
+#include "net/OSCServer.h"
 
 class PsychoSynth3D : public Ogre::FrameListener
 {
@@ -60,6 +62,8 @@ class PsychoSynth3D : public Ogre::FrameListener
     AudioInfo m_audio_info;
     Table*    m_table;
     Output*   m_output;
+    OSCClient m_oscclient;
+    OSCServer m_oscserver;
     
     bool must_quit;
   

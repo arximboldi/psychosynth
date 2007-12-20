@@ -28,16 +28,21 @@
 
 class OSCClient;
 
+enum OSCClientError {
+    CE_NONE = 0,
+    CE_PORT_BINDING,
+    CE_SERVER_TIMEOUT,
+    CE_SERVER_DROP
+};
+
 class OSCClientListener
 {
 public:
     virtual ~OSCClientListener() {}
     
     virtual bool handleClientConnect(OSCClient* client) = 0;
-    virtual bool handleClientDisconnect(OSCClient* client) = 0;
+    virtual bool handleClientDisconnect(OSCClient* client, OSCClientError err) = 0;
     virtual bool handleClientAccept(OSCClient* client) = 0;
-    virtual bool handleClientTimeout(OSCClient* client) = 0;
-    virtual bool handleClientDrop(OSCClient* client) = 0;
 };
 
 class OSCClientSubject
@@ -45,9 +50,9 @@ class OSCClientSubject
     std::list<OSCClientListener*> m_list;
 
 protected:
-    void notifyServerAccept(OSCClient* param);
-    void notifyServerTimeout(OSCClient* param);
-    void notifyServerDrop(OSCClient* param);
+    void notifyClientConnect(OSCClient* param);
+    void notifyClientDisconnect(OSCClient* param, OSCClientError err);
+    void notifyClientAccept(OSCClient* param);
     
 public:
     void addListener(OSCClientListener* l) {

@@ -27,8 +27,8 @@ using namespace CEGUI;
 
 void GuiLogSink::dump(Log& log, int level, const string& msg)
 {
-    m_buffer += "\n";
     m_buffer += msg;
+    m_buffer += "\n";
     if (m_window)
 	m_window->setText(m_buffer);
 }

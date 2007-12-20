@@ -46,10 +46,8 @@ class ClientTab : public OSCClientListener
     CEGUI::Editbox* m_host;
     
     bool handleClientAccept(OSCClient* client) { return false; }
-    bool handleClientTimeout(OSCClient* client);
-    bool handleClientDrop(OSCClient* client);
     bool handleClientConnect(OSCClient* client);
-    bool handleClientDisconnect(OSCClient* client);
+    bool handleClientDisconnect(OSCClient* client, OSCClientError err);
 
     void setConnected(bool con);
 
@@ -74,11 +72,11 @@ class ServerTab : public OSCServerListener
     CEGUI::Window* m_disable;
     CEGUI::Spinner* m_lport;
 
-    bool handleStartListening(OSCServer* server);
-    bool handleStopListening(OSCServer* server);
-    bool handleClientConnect(OSCServer* server, int client_id) { return false; };
-    bool handleClientDisconnect(OSCServer* server, int client_id) { return false; };
-    bool handleClientTimeout(OSCServer* server, int client_id) { return false; };
+    bool handleServerStartListening(OSCServer* server);
+    bool handleServerStopListening(OSCServer* server, OSCServerError err);
+    bool handleServerClientConnect(OSCServer* server, int client_id) { return false; };
+    bool handleServerClientDisconnect(OSCServer* server, int client_id, OSCServerClientError) { return false; };
+    bool handleServerClientTimeout(OSCServer* server, int client_id) { return false; };
 
     void setListening(bool listening);
     

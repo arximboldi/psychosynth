@@ -22,35 +22,36 @@
 
 #include "net/OSCClient.h"
 
-const int MAX_ALIVE_DELAY = 10000;
+const int MAX_ALIVE_DELAY = 20000;
 const int MIN_ALIVE_DELAY = 1000;
 
 using namespace std;
 
-void OSCClientSubject::notifyServerAccept(OSCClient* param)
+void OSCClientSubject::notifyClientConnect(OSCClient* param)
+{
+    for (list<OSCClientListener*>::iterator it = m_list.begin();
+	 it != m_list.end(); ++it)
+	(*it)->handleClientConnect(param);
+}
+
+void OSCClientSubject::notifyClientAccept(OSCClient* param)
 {
     for (list<OSCClientListener*>::iterator it = m_list.begin();
 	 it != m_list.end(); ++it)
 	(*it)->handleClientAccept(param);
 }
 
-void OSCClientSubject::notifyServerTimeout(OSCClient* param)
+void OSCClientSubject::notifyClientDisconnect(OSCClient* param, OSCClientError err)
 {
     for (list<OSCClientListener*>::iterator it = m_list.begin();
 	 it != m_list.end(); ++it)
-	(*it)->handleClientTimeout(param);
-}
-
-void OSCClientSubject::notifyServerDrop(OSCClient* param)
-{
-    for (list<OSCClientListener*>::iterator it = m_list.begin();
-	 it != m_list.end(); ++it)
-	(*it)->handleClientDrop(param);
+	(*it)->handleClientDisconnect(param, err);
 }
 
 OSCClient::OSCClient() :
     OSCController(false),
-    m_server(NULL)
+    m_server(NULL),
+    m_state(IDLE)
 {
 }
 
@@ -63,13 +64,26 @@ OSCClient::~OSCClient()
 void OSCClient::connect(lo_address target, const char* local_port)
 {
     if (m_state == IDLE) {
-	m_server = lo_server_new(local_port, NULL);
+	notifyClientConnect(this);
+	
+	m_server = lo_server_new_with_proto(local_port, LO_UDP, NULL);
+
+	if (!m_server) {
+	    notifyClientDisconnect(this, CE_PORT_BINDING);
+	    return;
+	}
+	
+	m_last_alive_recv = 0;
+	m_last_alive_sent = 0;
+	
 	addMethods();
 	addDestiny(target);
-
+	setSender(m_server);
+	
 	lo_message msg = lo_message_new();
 	broadcastMessage("/ps/connect", msg);
 	lo_message_free(msg);
+	m_state = PENDING;
     }
 }
 
@@ -88,6 +102,7 @@ void OSCClient::disconnect()
 	lo_message_free(msg);
 	
 	close();
+	notifyClientDisconnect(this, CE_NONE);
     }
 }
 
@@ -100,7 +115,7 @@ int OSCClient::update(int msec)
 	m_last_alive_sent += msec;
 	
 	if (m_last_alive_recv > MAX_ALIVE_DELAY) {
-	    notifyServerTimeout(this);
+	    notifyClientDisconnect(this, CE_SERVER_TIMEOUT);
 	    m_state = CLOSING;
 	}
 
@@ -120,6 +135,9 @@ int OSCClient::update(int msec)
 
 void OSCClient::addMethods()
 {
+    /* DEBUG */
+    lo_server_add_method(m_server, NULL, NULL, &lo_generic_handler, NULL);
+
     lo_server_add_method(m_server, "/ps/drop", "", &drop_cb, this);
     lo_server_add_method(m_server, "/ps/accept", "i", &accept_cb, this);
     lo_server_add_method(m_server, "/ps/alive", "", &alive_cb, this);
@@ -130,7 +148,7 @@ int OSCClient::_drop_cb(const char* path, const char* types,
 {
     m_state = CLOSING;
 
-    notifyServerDrop(this);
+    notifyClientDisconnect(this, CE_SERVER_DROP);
     return 0;
 }
 
@@ -139,17 +157,18 @@ int OSCClient::_accept_cb(const char* path, const char* types,
 {
     m_id = argv[0]->i;
     setID(m_id);
+
     OSCController::addMethods(m_server);
     activate();
-    notifyServerAccept(this);
 
+    m_state = CONNECTED;
+    notifyClientAccept(this);
     return 0;
 }
 
 int OSCClient::_alive_cb(const char* path, const char* types,
 			 lo_arg** argv, int argc, lo_message msg)
 {
-    m_last_alive_recv = 0;
-    
+    m_last_alive_recv = 0;    
     return 0;
 }

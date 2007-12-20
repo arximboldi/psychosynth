@@ -32,6 +32,19 @@ void OSCBroadcast::clear()
 	lo_address_free(*it);
     
     m_dest.clear();
+    m_sender = NULL;
+}
+
+void OSCBroadcast::deleteDestiny(lo_address add)
+{
+   for (list<lo_address>::iterator it = m_dest.begin();
+	 it != m_dest.end();)
+       if (lo_address_equals(*it, add)) {
+	   lo_address_free(*it);
+	   m_dest.erase(it++);
+       }
+       else
+	   ++it;
 }
 
 bool OSCBroadcast::isDestiny(lo_address adr)
@@ -46,16 +59,28 @@ bool OSCBroadcast::isDestiny(lo_address adr)
 
 void OSCBroadcast::broadcastMessage(const char* path, lo_message msg)
 {
-    for (list<lo_address>::iterator it = m_dest.begin();
-	 it != m_dest.end(); ++it)
-	lo_send_message(*it, path, msg);
+    if (m_sender)
+	for (list<lo_address>::iterator it = m_dest.begin();
+	     it != m_dest.end(); ++it)
+	    lo_send_message_from(*it, m_sender, path, msg);
+    else
+	for (list<lo_address>::iterator it = m_dest.begin();
+	     it != m_dest.end(); ++it)
+	    lo_send_message(*it, path, msg);
 }
 
 void OSCBroadcast::broadcastMessageFrom(const char* path, lo_message msg, lo_address source)
-{    
-    for (list<lo_address>::iterator it = m_dest.begin();
-	 it != m_dest.end(); ++it)
-	if (!lo_address_equals(*it, source))
-	    lo_send_message(*it, path, msg);
+{
+    if (m_sender) {
+	for (list<lo_address>::iterator it = m_dest.begin();
+	     it != m_dest.end(); ++it)
+	    if (!lo_address_equals(*it, source))
+		lo_send_message_from(*it, m_sender, path, msg);
+    } else {
+	for (list<lo_address>::iterator it = m_dest.begin();
+	     it != m_dest.end(); ++it)
+	    if (!lo_address_equals(*it, source))
+		lo_send_message(*it, path, msg);
+    }
 }
 

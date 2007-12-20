@@ -58,19 +58,27 @@ public:
 class OSCBroadcast
 {
     std::list<lo_address> m_dest;
+    lo_server m_sender;
     
 public:
+    OSCBroadcast() :
+	m_sender(NULL) {}
+    
     ~OSCBroadcast() {
 	clear();
+    }
+
+    void setSender(lo_server s) {
+	m_sender = s;
     }
     
     void addDestiny(lo_address dest) {
 	m_dest.push_back(dest);
     }
     
-    void deleteDestiny(lo_address dest) {
-	m_dest.remove_if(lo_address_equals_func(dest));
-    }
+    void deleteDestiny(lo_address dest); /*{
+	//m_dest.remove_if(lo_address_equals_func(dest));
+	}*/
 
     void clear();
     

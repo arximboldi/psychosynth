@@ -30,26 +30,38 @@
 
 class OSCServer;
 
+enum OSCServerClientError {
+    SCE_NONE = 0,
+    SCE_CLIENT_TIMEOUT
+};
+
+enum OSCServerError {
+    SE_NONE = 0,
+    SE_PORT_BINDING
+};
+
 class OSCServerListener
 {
     
 public:
     virtual ~OSCServerListener() {}
-    virtual bool handleStartListening(OSCServer* server) = 0;
-    virtual bool handleStopListening(OSCServer* server) = 0;
-    virtual bool handleClientConnect(OSCServer* server, int client_id) = 0;
-    virtual bool handleClientDisconnect(OSCServer* server, int client_id) = 0;
-    virtual bool handleClientTimeout(OSCServer* server, int client_id) = 0;
+    virtual bool handleServerStartListening(OSCServer* server) = 0;
+    virtual bool handleServerStopListening(OSCServer* server, OSCServerError err) = 0;
+    virtual bool handleServerClientConnect(OSCServer* server, int client_id) = 0;
+    virtual bool handleServerClientDisconnect(OSCServer* server, int client_id,
+					OSCServerClientError cause) = 0;
 };
 
 class OSCServerSubject
 {
     std::list<OSCServerListener*> m_list;
 
-protected:    
-    void notifyClientDisconnect(OSCServer* server, int client_id);
-    void notifyClientConnect(OSCServer* server, int client_id);
-    void notifyClientTimeout(OSCServer* server, int client_id);
+protected:
+    void notifyServerStartListening(OSCServer* server);
+    void notifyServerStopListening(OSCServer* server, OSCServerError err);
+    void notifyServerClientDisconnect(OSCServer* server, int client_id,
+				OSCServerClientError cause);
+    void notifyServerClientConnect(OSCServer* server, int client_id);
     
 public:
     void addListener(OSCServerListener* l) {
@@ -64,14 +76,37 @@ public:
 class OSCServer : public OSCController,
 		  public OSCServerSubject
 {
+public:
+    enum State {
+	IDLE,
+	LISTENING
+    };
+    
+private:
+    const static int SERVER_ID = 0;
+
     struct Slot {
 	int id;
 	int last_alive_recv;
 	int last_alive_sent;
+	
+	Slot(int id = 0) :
+	    id(id), last_alive_recv(0), last_alive_sent(0) {};
     };
+
+    struct lo_address_lt_func {
+	bool operator() (lo_address a, lo_address b) {
+	    return lo_address_cmp(a, b) < 0;
+	}
+    };
+
+    typedef std::map<lo_address, Slot, lo_address_lt_func> SlotMap; 
+    SlotMap m_slots;
     
     lo_server m_server;
     bool m_listening;
+    int m_nextid;
+    State m_state;
     
     LO_HANDLER(OSCServer, alive);
     LO_HANDLER(OSCServer, connect);
@@ -80,6 +115,7 @@ class OSCServer : public OSCController,
 
     void addMethods();
 public:
+    
     OSCServer();
     ~OSCServer();
 
@@ -87,10 +123,12 @@ public:
 	return m_listening;
     };
 
-    bool listen(const char* port);
+    void listen(const char* port);
     void stop();
+    void close();
+
     int update(int msec);
 };
 
-#endif
+#endif /* OSCSERVER_H */
 

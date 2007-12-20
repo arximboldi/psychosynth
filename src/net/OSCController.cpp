@@ -51,7 +51,7 @@ void OSCController::handleAddObject(TableObject& obj)
 	lo_message_add_int32(msg, net_id.second);
 	lo_message_add_int32(msg, obj.getType());
 
-	broadcastMessage("ps/add", msg);
+	broadcastMessage("/ps/add", msg);
 
 	lo_message_free(msg);
     } else
@@ -69,7 +69,7 @@ void OSCController::handleDeleteObject(TableObject& obj)
 	lo_message_add_int32(msg, net_id.first);
 	lo_message_add_int32(msg, net_id.second);
 
-	broadcastMessage("ps/delete", msg);
+	broadcastMessage("/ps/delete", msg);
 
 	lo_message_free(msg);
 
@@ -92,7 +92,7 @@ void OSCController::handleMoveObject(TableObject& obj)
 	lo_message_add_float(msg, obj.getX());
 	lo_message_add_float(msg, obj.getY());
 	    
-	broadcastMessage("ps/move", msg);
+	broadcastMessage("/ps/move", msg);
 
 	lo_message_free(msg);		
     } else
@@ -110,7 +110,7 @@ void OSCController::handleActivateObject(TableObject& obj)
 	lo_message_add_int32(msg, net_id.first);
 	lo_message_add_int32(msg, net_id.second);
 
-	broadcastMessage("ps/activate", msg);
+	broadcastMessage("/ps/activate", msg);
 
 	lo_message_free(msg);
     } else
@@ -128,7 +128,7 @@ void OSCController::handleDeactivateObject(TableObject& obj)
 	lo_message_add_int32(msg, net_id.first);
 	lo_message_add_int32(msg, net_id.second);
 
-	broadcastMessage("ps/deactivate", msg);
+	broadcastMessage("/ps/deactivate", msg);
 
 	lo_message_free(msg);
     } else
@@ -170,7 +170,7 @@ void OSCController::handleSetParamObject(TableObject& obj, int param_id)
 	    break;
 	}
 	
-	broadcastMessage("ps/param", msg);
+	broadcastMessage("/ps/param", msg);
 
 	lo_message_free(msg);	
     } else

@@ -41,4 +41,33 @@ inline bool lo_address_equals(lo_address a, lo_address b)
 	;// FIXME: && lo_address_get_protocol(a) == lo_address_get_protocol(b);
 }
 
+inline int lo_address_cmp(lo_address a, lo_address b)
+{
+    int res;
+
+    res = strcmp(lo_address_get_hostname(a), lo_address_get_hostname(b));
+    if (!res) {
+	res = strcmp(lo_address_get_port(a), lo_address_get_port(b));
+    }
+
+    return res;
+}
+
+inline int lo_generic_handler(const char *path, const char *types, lo_arg **argv,
+			   int argc, void *data, void *user_data)
+{
+    int i;
+
+    printf("path: <%s>\n", path);
+    for (i=0; i<argc; i++) {
+	printf("arg %d '%c' ", i, types[i]);
+	lo_arg_pp((lo_type)types[i], argv[i]);
+	printf("\n");
+    }
+    printf("\n");
+    fflush(stdout);
+
+    return 1;
+}
+
 #endif /* OSCMISC_H */

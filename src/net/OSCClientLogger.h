@@ -33,23 +33,32 @@ public:
 	return false;
     }
     
-    virtual bool handleClientDisconnect(OSCClient* client) {
-	Logger::instance().log("oscclient", Log::INFO, "Disconnected.");
+    virtual bool handleClientDisconnect(OSCClient* client, OSCClientError err) {
+	switch(err) {
+	case CE_NONE:
+	    Logger::instance().log("oscclient", Log::INFO, "Disconnected.");
+	    break;
+
+	case CE_PORT_BINDING:
+	    Logger::instance().log("oscclient", Log::ERROR, "Could not bind port.");
+	    break;
+
+	case CE_SERVER_DROP:
+	    Logger::instance().log("oscclient", Log::ERROR, "Connection dropped by server.");
+	    break;
+
+	case CE_SERVER_TIMEOUT:
+	    Logger::instance().log("oscclient", Log::ERROR, "Connection timeout");
+	    break;
+
+	default:
+	    break;
+	}
 	return false;
     }
     
     virtual bool handleClientAccept(OSCClient* client) {
 	Logger::instance().log("oscclient", Log::INFO, "Accepted.");
-	return false;
-    }
-    
-    virtual bool handleClientTimeout(OSCClient* client) {
-	Logger::instance().log("oscclient", Log::INFO, "Connection timeout.");
-	return false;
-    }
-    
-    virtual bool handleClientDrop(OSCClient* client) {
-	Logger::instance().log("oscclient", Log::INFO, "Client dropped by server.");
 	return false;
     }
 };
