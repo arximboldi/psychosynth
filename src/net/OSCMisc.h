@@ -37,8 +37,8 @@ inline static int name##_cb(LO_HANDLER_ARGS, void* osc_listener)\
 inline bool lo_address_equals(lo_address a, lo_address b)
 {
     return strcmp(lo_address_get_hostname(a), lo_address_get_hostname(b)) == 0
-	&& strcmp(lo_address_get_port(a), lo_address_get_port(b)) == 0
-	;// FIXME: && lo_address_get_protocol(a) == lo_address_get_protocol(b);
+	&& strcmp(lo_address_get_port(a), lo_address_get_port(b)) == 0;
+    // FIXME: && lo_address_get_protocol(a) == lo_address_get_protocol(b);
 }
 
 inline int lo_address_cmp(lo_address a, lo_address b)

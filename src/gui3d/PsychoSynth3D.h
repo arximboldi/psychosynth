@@ -59,11 +59,11 @@ class PsychoSynth3D : public Ogre::FrameListener
     CameraController* m_camctrl;
     Timer m_timer;
 
-    AudioInfo m_audio_info;
-    Table*    m_table;
-    Output*   m_output;
-    OSCClient m_oscclient;
-    OSCServer m_oscserver;
+    AudioInfo  m_audio_info;
+    Table*     m_table;
+    Output*    m_output;
+    OSCClient* m_oscclient;
+    OSCServer* m_oscserver;
     
     bool must_quit;
   
@@ -71,11 +71,13 @@ class PsychoSynth3D : public Ogre::FrameListener
     void setupInput();
     void setupGui();
     void setupSynth();
+    void setupNet();
     void setupMenus();
     void setupTable();
 
     void closeTable();
     void closeMenus();
+    void closeNet();
     void closeSynth();
     void closeGui();
     void closeInput();

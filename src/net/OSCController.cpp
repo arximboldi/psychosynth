@@ -24,11 +24,11 @@
 
 using namespace std;
 
-OSCController::OSCController(bool is_server) :
+OSCController::OSCController() :
     m_table(NULL),
     m_skip(0),
     m_id(0),
-    m_is_server(is_server)
+    m_activated(false)
 {
 }
 
@@ -54,8 +54,7 @@ void OSCController::handleAddObject(TableObject& obj)
 	broadcastMessage("/ps/add", msg);
 
 	lo_message_free(msg);
-    } else
-	m_skip--;
+    }
 }
 
 void OSCController::handleDeleteObject(TableObject& obj)
@@ -75,13 +74,13 @@ void OSCController::handleDeleteObject(TableObject& obj)
 
 	m_local_id.erase(net_id);
 	m_net_id.erase(local_id);
-    } else
-	m_skip--;
+    }
 }
 
 void OSCController::handleMoveObject(TableObject& obj)
 {
     if (!m_skip) {
+	cout << "COMOOOOOOO " << m_skip << endl;
 	int local_id(obj.getID());
 	pair<int,int> net_id = m_net_id[local_id];
 
@@ -95,8 +94,7 @@ void OSCController::handleMoveObject(TableObject& obj)
 	broadcastMessage("/ps/move", msg);
 
 	lo_message_free(msg);		
-    } else
-	m_skip--;
+    }
 }
 
 void OSCController::handleActivateObject(TableObject& obj)
@@ -113,8 +111,7 @@ void OSCController::handleActivateObject(TableObject& obj)
 	broadcastMessage("/ps/activate", msg);
 
 	lo_message_free(msg);
-    } else
-	m_skip--;
+    }
 }
 
 void OSCController::handleDeactivateObject(TableObject& obj)
@@ -131,13 +128,13 @@ void OSCController::handleDeactivateObject(TableObject& obj)
 	broadcastMessage("/ps/deactivate", msg);
 
 	lo_message_free(msg);
-    } else
-	m_skip--;
+    }
 }
 
 void OSCController::handleSetParamObject(TableObject& obj, int param_id)
 {
     if (!m_skip) {
+	cout << "POR QUEEEE " << m_skip << endl;
 	int local_id(obj.getID());
 	pair<int,int> net_id = m_net_id[local_id];
 
@@ -150,11 +147,13 @@ void OSCController::handleSetParamObject(TableObject& obj, int param_id)
 	switch(obj.getParamType(param_id)) {
 	case Object::PARAM_INT: {
 	    int val;
+	    cout << "Jooooooo\n";
 	    obj.getParam(param_id, val);
 	    lo_message_add_int32(msg, val);
 	    break;
 	}    
 	case Object::PARAM_FLOAT: {
+	    cout << "JAJAJAJA\n";
 	    float val;
 	    obj.getParam(param_id, val);
 	    lo_message_add_float(msg, val);
@@ -173,8 +172,9 @@ void OSCController::handleSetParamObject(TableObject& obj, int param_id)
 	broadcastMessage("/ps/param", msg);
 
 	lo_message_free(msg);	
-    } else
-	m_skip--;
+    } else {
+	cout << "WTF!!!" << endl;
+    }
 }
 
 void OSCController::addMethods(lo_server s)
@@ -182,9 +182,8 @@ void OSCController::addMethods(lo_server s)
     lo_server_add_method (s, "/ps/add", "iii", &add_cb, this);
     lo_server_add_method (s, "/ps/delete", "ii", &delete_cb, this);
     lo_server_add_method (s, "/ps/move", "iiff", &move_cb, this);
-    lo_server_add_method (s, "/ps/param", "iiif", &param_cb, this);
-    lo_server_add_method (s, "/ps/param", "iiii", &param_cb, this);
-    lo_server_add_method (s, "/ps/param", "iiis", &param_cb, this);
+    /* FIXME: Notify bug to liblo */
+    lo_server_add_method (s, "/ps/param", NULL, &param_cb, this);
     lo_server_add_method (s, "/ps/activate", "ii", &activate_cb, this);
     lo_server_add_method (s, "/ps/deactivate", "ii", &deactivate_cb, this);
 }
@@ -197,7 +196,8 @@ int OSCController::_add_cb(const char* path, const char* types,
 
 	m_skip++;
 	TableObject obj = m_table->addObject(argv[2]->i);
-
+	m_skip--;
+	
 	if (!obj.isNull()) {
 	    int local_id = obj.getID();
 	    m_net_id[local_id] = net_id;
@@ -224,12 +224,12 @@ int OSCController::_delete_cb(const char* path, const char* types,
 
 	    m_skip++;
 	    m_table->deleteObject(obj);
-
+	    m_skip--;
+	    
 	    m_local_id.erase(net_id);
 	    m_net_id.erase(it->second);
 
-	    if (m_is_server)
-		broadcastMessageFrom("/ps/delete", msg, lo_message_get_source(msg));
+	    broadcastMessageFrom("/ps/delete", msg, lo_message_get_source(msg));
 	}
     }
     
@@ -249,8 +249,10 @@ int OSCController::_move_cb(const char* path, const char* types,
 	    !(obj = m_table->findObject(it->second)).isNull()) {
 
 	    m_skip++;
+	    cout << "moviendooo " << m_skip << endl;
 	    m_table->moveObject(obj, argv[2]->f, argv[3]->f);
-
+	    m_skip--;
+	    
 	    broadcastMessageFrom("/ps/move", msg, lo_message_get_source(msg));
 	}
     }
@@ -271,20 +273,25 @@ int OSCController::_param_cb(const char* path, const char* types,
 	    !(obj = m_table->findObject(it->second)).isNull()) {
 
 	    m_skip++;
-	    switch(types[2]) {
-	    case LO_FLOAT:
+	    cout << "LANZANDOOOO " << m_skip << endl;
+	    
+	    switch(obj.getParamType(argv[2]->i)) {
+	    case Object::PARAM_FLOAT:
+		cout << "noooooo" << endl;
 		m_table->setParamObject(obj, argv[2]->i, argv[3]->f);
 		break;
-	    case LO_INT32:
+	    case Object::PARAM_INT:
+		cout << "SIIIII" << endl;
 		m_table->setParamObject(obj, argv[2]->i, argv[3]->i);
 		break;
-	    case LO_STRING:
+	    case Object::PARAM_STRING:
 		m_table->setParamObject(obj, argv[2]->i, string(&argv[3]->s));
 		break;
 	    default:
-		break;
+		return 0;
 	    }
-	
+	    m_skip--;
+	    
 	    broadcastMessageFrom("/ps/param", msg, lo_message_get_source(msg));
 	}
     }
@@ -306,7 +313,8 @@ int OSCController::_activate_cb(const char* path, const char* types,
 
 	    m_skip++;
 	    m_table->activateObject(obj);
-
+	    m_skip--;
+	    
 	    broadcastMessageFrom("/ps/activate", msg, lo_message_get_source(msg));
 	}
     }
@@ -328,7 +336,8 @@ int OSCController::_deactivate_cb(const char* path, const char* types,
 	
 	    m_skip++;
 	    m_table->deactivateObject(obj);
-
+	    m_skip--;
+	    
 	    broadcastMessageFrom("/ps/deactivate", msg, lo_message_get_source(msg));
 	}
     }

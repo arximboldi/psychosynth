@@ -38,7 +38,7 @@ class OSCController : public TableListener,
     Table* m_table;
     int m_skip;
     int m_id;
-    bool m_is_server;
+    bool m_activated;
     
     LO_HANDLER(OSCController, add);
     LO_HANDLER(OSCController, delete);
@@ -58,7 +58,7 @@ class OSCController : public TableListener,
     }
     
 public:
-    OSCController(bool m_is_server = false);
+    OSCController();
     ~OSCController();
 
     void setID(int id) {
@@ -66,20 +66,17 @@ public:
     }
 
     void setTable(Table* table) {
-	if (m_table)
-	    deleteFromTable(m_table);
-	if (table)
-	    addToTable(table);
+	deactivate();
 	m_table = table;
     }
 
     void activate() {
-	if (m_table)
+	if (!m_activated && m_table)
 	    addToTable(m_table);
     }
 
     void deactivate() {
-	if (m_table)
+	if (m_activated && m_table)
 	    deleteFromTable(m_table);
     }
 

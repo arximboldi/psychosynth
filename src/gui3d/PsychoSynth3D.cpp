@@ -123,9 +123,15 @@ void PsychoSynth3D::setupSynth()
     m_table->update();
     m_output->open();
     m_output->start();
+}
 
-    m_oscclient.setTable(m_table);
-    m_oscserver.setTable(m_table);
+void PsychoSynth3D::setupNet()
+{
+    m_oscclient = new OSCClient();
+    m_oscserver = new OSCServer();
+
+    m_oscclient->setTable(m_table);
+    m_oscserver->setTable(m_table);
 }
 
 void PsychoSynth3D::setupTable()
@@ -224,8 +230,8 @@ void PsychoSynth3D::setupMenus()
 			    OIS::KC_UNASSIGNED);
     m_windowlist->addWindow("NetworkWindowButton.imageset",
 			    "NetworkWindowButton.layout",
-			    new NetworkWindow(&m_oscclient,
-					      &m_oscserver),
+			    new NetworkWindow(m_oscclient,
+					      m_oscserver),
 			    OIS::KC_UNASSIGNED);
     m_windowlist->addWindow("QuitWindowButton.imageset",
 			    "QuitWindowButton.layout",
@@ -245,6 +251,12 @@ void PsychoSynth3D::closeTable()
 void PsychoSynth3D::closeMenus()
 {
     delete m_windowlist;
+}
+
+void PsychoSynth3D::closeNet()
+{
+    delete m_oscclient;
+    delete m_oscserver;
 }
 
 void PsychoSynth3D::closeSynth()
@@ -278,6 +290,8 @@ int PsychoSynth3D::run(int argc, const char* argv[])
     setupInput();
     Logger::instance().log("gui", ::Log::INFO, "Initializing synthetizer.");
     setupSynth();
+    Logger::instance().log("gui", ::Log::INFO, "Initializing networking.");
+    setupNet();
     Logger::instance().log("gui", ::Log::INFO, "Initializing scene.");
     setupTable();
     Logger::instance().log("gui", ::Log::INFO, "Initializing CEGUI.");
@@ -293,6 +307,8 @@ int PsychoSynth3D::run(int argc, const char* argv[])
     closeMenus();
     Logger::instance().log("gui", ::Log::INFO, "Closing CEGUI.");
     closeGui();
+    Logger::instance().log("gui", ::Log::INFO, "Closing networking.");
+    closeNet();
     Logger::instance().log("gui", ::Log::INFO, "Closing scene.");
     closeTable();
     Logger::instance().log("gui", ::Log::INFO, "Closing synthetizer.");
@@ -312,8 +328,8 @@ bool PsychoSynth3D::frameStarted(const Ogre::FrameEvent& evt)
     m_taskmgr->update(m_timer.deltaticks());
     m_table->update();
     m_elemmgr->update();
-    m_oscclient.update(m_timer.deltaticks());
-    m_oscserver.update(m_timer.deltaticks());
+    m_oscclient->update(m_timer.deltaticks());
+    m_oscserver->update(m_timer.deltaticks());
     
     return !must_quit;
 }

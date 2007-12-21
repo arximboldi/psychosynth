@@ -26,7 +26,8 @@
 using namespace std;
 using namespace CEGUI;
 
-const int DEFAULT_PORT = 8191;
+const int DEFAULT_CLIENT_PORT = 8192;
+const int DEFAULT_SERVER_PORT = 8191;
 const char* DEFAULT_HOST = "localhost";
 
 const int NW_HEIGHT = 300;
@@ -82,7 +83,7 @@ Window* ClientTab::createWindow()
     m_rport = dynamic_cast<Spinner*>(wmgr.createWindow("TaharezLook/Spinner"));
     m_rport->setPosition(UVector2(UDim(0.5, 0), UDim(0, 25)));
     m_rport->setSize    (UVector2(UDim(0.5, 0), UDim(0, 20)));
-    m_rport->setCurrentValue(DEFAULT_PORT);
+    m_rport->setCurrentValue(DEFAULT_SERVER_PORT);
     
     Window* lport_label = wmgr.createWindow("TaharezLook/StaticText");
     lport_label->setText("Local port");
@@ -92,7 +93,7 @@ Window* ClientTab::createWindow()
     m_lport = dynamic_cast<Spinner*>(wmgr.createWindow("TaharezLook/Spinner"));
     m_lport->setPosition(UVector2(UDim(0.5, 0), UDim(0, 50)));
     m_lport->setSize    (UVector2(UDim(0.5, 0), UDim(0, 20)));
-    m_lport->setCurrentValue(DEFAULT_PORT);
+    m_lport->setCurrentValue(DEFAULT_CLIENT_PORT);
 
     m_button = wmgr.createWindow("TaharezLook/Button");
     m_button->setText("Connect");
@@ -204,7 +205,7 @@ Window* ServerTab::createWindow()
     m_lport = dynamic_cast<Spinner*>(wmgr.createWindow("TaharezLook/Spinner"));
     m_lport->setPosition(UVector2(UDim(0.5, 0), UDim(0, 0)));
     m_lport->setSize    (UVector2(UDim(0.5, 0), UDim(0, 20)));
-    m_lport->setCurrentValue(DEFAULT_PORT);
+    m_lport->setCurrentValue(DEFAULT_SERVER_PORT);
 
     m_button = wmgr.createWindow("TaharezLook/Button");
     m_button->setText("Start");

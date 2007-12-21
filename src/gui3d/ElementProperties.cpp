@@ -34,7 +34,8 @@ ElemGuiParamMulti::ElemGuiParamMulti(int param, int nval, const char** names,
     ElemGuiParam(param),
     m_op_names(names),
     m_nval(nval),
-    m_name(name)
+    m_name(name),
+    m_skip(0)
 {
 }
 
@@ -63,7 +64,9 @@ void ElemGuiParamMulti::createGUI()
     
     int value;
     getParent()->getObject().getParam(getParam(), value);
+    m_skip++;
     m_selector->setText(m_op_names[value]);
+    m_skip--;
     
     getParentWindow()->addChildWindow(m_label);
     getParentWindow()->addChildWindow(m_selector);
@@ -74,13 +77,23 @@ void ElemGuiParamMulti::handleParamChange(TableObject& obj, int param)
     int new_val;
 
     obj.getParam(param, new_val);
+    cout << "VALOOOORCITOO " << new_val << endl;
+    m_skip++;
     m_selector->setText(m_op_names[new_val]);
+    m_skip--;
 }
 
 bool ElemGuiParamMulti::onComboboxChange(const CEGUI::EventArgs &e)
 {
-    int new_val = m_selector->getSelectedItem()->getID();
-    getParent()->getObject().setParam(getParam(), new_val);
+    if (!m_skip) {
+	String new_val = m_selector->getText();
+	
+	for (int i = 0; i < m_nval; ++i)
+	    if (new_val == m_op_names[i]) {
+		getParent()->getObject().setParam(getParam(), i);
+		break;
+	    }
+    }
     
     return true;
 }
@@ -90,7 +103,8 @@ ElemGuiParamFloat::ElemGuiParamFloat(int param, float min_val, float max_val,
     ElemGuiParam(param),
     m_min_val(min_val),
     m_max_val(max_val),
-    m_name(name)
+    m_name(name),
+    m_skip(0)
 {
 }
 
@@ -115,7 +129,9 @@ void ElemGuiParamFloat::createGUI()
 
     float value;
     getParent()->getObject().getParam(getParam(), value);
+    m_skip++;
     m_spinner->setCurrentValue(value);
+    m_skip--;
     
     getParentWindow()->addChildWindow(m_label);
     getParentWindow()->addChildWindow(m_spinner);
@@ -126,15 +142,18 @@ void ElemGuiParamFloat::handleParamChange(TableObject& obj, int param)
     float new_val;
 
     obj.getParam(param, new_val);
+    m_skip++;
     m_spinner->setCurrentValue(new_val);
-    
+    m_skip--;
 }
 
 bool ElemGuiParamFloat::onSpinnerChange(const CEGUI::EventArgs &e)
 {
-    float new_val = m_spinner->getCurrentValue();
-    getParent()->getObject().setParam(getParam(), new_val);
-
+    if (!m_skip) {
+	float new_val = m_spinner->getCurrentValue();
+	getParent()->getObject().setParam(getParam(), new_val);
+    }
+    
     return true;
 }
 

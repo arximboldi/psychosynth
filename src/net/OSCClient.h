@@ -73,6 +73,7 @@ class OSCClient : public OSCController,
     int m_state;
     int m_last_alive_recv;
     int m_last_alive_sent;
+    int m_count_next;
     
     LO_HANDLER(OSCClient, alive);
     LO_HANDLER(OSCClient, drop);

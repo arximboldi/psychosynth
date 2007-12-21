@@ -45,6 +45,7 @@ ElementOscillator::ElementOscillator(const TableObject& obj,
     addComponent(new ElemSecondComponent(
 		     ObjectOscillator::PARAM_AMPLITUDE, 0.0f, 1.0f));
 
+    
     getGUIProperties().addParameter(new ElemGuiParamMulti(
 					ObjectOscillator::PARAM_WAVE,
 					ObjectOscillator::N_OSC_TYPES,

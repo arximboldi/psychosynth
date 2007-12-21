@@ -37,7 +37,7 @@ class ElemGuiParam {
     ElementProperties* m_parent;
     int m_param;
     bool changed;
-
+    
 public:
     ElemGuiParam(int param) :
 	m_param(param) {};
@@ -72,6 +72,7 @@ class ElemGuiParamFloat : public ElemGuiParam {
     float m_min_val;
     float m_max_val;
     std::string m_name;
+    int m_skip;
     
 public:
     ElemGuiParamFloat(int param, float min_val, float max_val, const std::string& name);
@@ -88,6 +89,7 @@ class ElemGuiParamMulti : public ElemGuiParam {
     
     int m_nval;
     std::string m_name;
+    int m_skip;
     
 public:
     ElemGuiParamMulti(int param, int nval, const char** names,

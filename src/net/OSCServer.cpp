@@ -57,7 +57,6 @@ void OSCServerSubject::notifyServerStopListening(OSCServer* server, OSCServerErr
 }
 
 OSCServer::OSCServer() :
-    OSCController(false),
     m_server(NULL),
     m_state(IDLE)
 {
@@ -141,20 +140,22 @@ int OSCServer::update(int msec)
 		lo_send_message_from(it->first, m_server,
 				     "/ps/drop", msg);
 		lo_message_free(msg);
-		
+	       
 		notifyServerClientDisconnect(this, cl.id, SCE_CLIENT_TIMEOUT);
+		
 		m_slots.erase(it++);
 		deleteDestiny(addr);
-	    } else if (cl.last_alive_sent > MIN_ALIVE_DELAY) {
-		lo_message msg = lo_message_new();
-		lo_send_message_from(it->first, m_server,
-				     "/ps/alive", msg);
-		lo_message_free(msg);
+	    } else {
+		if (cl.last_alive_sent > MIN_ALIVE_DELAY) {
+		    lo_message msg = lo_message_new();
+		    lo_send_message_from(it->first, m_server,
+					 "/ps/alive", msg);
+		    lo_message_free(msg);
 		
-		cl.last_alive_sent = 0;
+		    cl.last_alive_sent = 0;
+		}
+		++it;
 	    }
-	    
-	    ++it;
 	}
     }
     
@@ -186,7 +187,7 @@ int OSCServer::_connect_cb(const char* path, const char* types,
 	
 	lo_message resp = lo_message_new();
 	lo_message_add_int32(resp, id);
-	lo_send_message_from(add, m_server, "/ps/accept", resp);
+	lo_send_message_from(addcpy, m_server, "/ps/accept", resp);
 
 	addDestiny(addcpy);
 	m_slots[addcpy] = Slot(id);

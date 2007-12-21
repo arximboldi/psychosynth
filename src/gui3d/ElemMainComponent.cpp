@@ -147,6 +147,7 @@ void ElemMultiMainComponent::handleParamChange(TableObject& obj, int param_id)
     if (param_id == m_param) {
 	int val;
 	obj.getParam(param_id, val);
+	cout << "VALOOOOR " << val << endl;
 	setMesh(m_names[val]);
     } else
 	ElemMainComponent::handleParamChange(obj, param_id);

@@ -49,9 +49,9 @@ void OSCClientSubject::notifyClientDisconnect(OSCClient* param, OSCClientError e
 }
 
 OSCClient::OSCClient() :
-    OSCController(false),
     m_server(NULL),
-    m_state(IDLE)
+    m_state(IDLE),
+    m_count_next(0)
 {
 }
 
@@ -75,6 +75,7 @@ void OSCClient::connect(lo_address target, const char* local_port)
 	
 	m_last_alive_recv = 0;
 	m_last_alive_sent = 0;
+	m_count_next = 1;
 	
 	addMethods();
 	addDestiny(target);
@@ -111,8 +112,11 @@ int OSCClient::update(int msec)
     if (m_state != IDLE) {
 	lo_server_recv_noblock(m_server, 0);
 
-	m_last_alive_recv += msec;
-	m_last_alive_sent += msec;
+	if (!m_count_next) {
+	    m_last_alive_recv += msec;
+	    m_last_alive_sent += msec;
+	} else
+	    m_count_next = 0;
 	
 	if (m_last_alive_recv > MAX_ALIVE_DELAY) {
 	    notifyClientDisconnect(this, CE_SERVER_TIMEOUT);
