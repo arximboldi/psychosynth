@@ -20,7 +20,8 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "OSCServer.h"
+#include "net/OSCServer.h"
+#include "net/OSCProtocol.h"
 
 const int MAX_ALIVE_DELAY = 10000;
 const int MIN_ALIVE_DELAY = 1000;
@@ -73,17 +74,19 @@ void OSCServer::addMethods()
     /* DEBUG */
     lo_server_add_method(m_server, NULL, NULL, &lo_generic_handler, NULL);
 
-    lo_server_add_method(m_server, "/ps/alive", "", &alive_cb, this);
-    lo_server_add_method(m_server, "/ps/connect", "", &connect_cb, this);
-    lo_server_add_method(m_server, "/ps/get_state", "", &get_state_cb, this);
+    lo_server_add_method(m_server, MSG_ALIVE, "", &alive_cb, this);
+    lo_server_add_method(m_server, MSG_CONNECT, "", &connect_cb, this);
+    lo_server_add_method(m_server, MSG_GET_STATE, "", &get_state_cb, this);
+    lo_server_add_method(m_server, MSG_DISCONNECT, "", &disconnect_cb, this);
 }
 
 void OSCServer::listen(const char* port)
 {
     if (m_state == IDLE) {
 	notifyServerStartListening(this);
-	m_server = lo_server_new_with_proto(port, LO_UDP, NULL);
 
+	m_server = lo_server_new_with_proto(port, LO_UDP, NULL);
+	
 	if (!m_server) {
 	    notifyServerStopListening(this, SE_PORT_BINDING);
 	    return;
@@ -106,7 +109,7 @@ void OSCServer::stop()
 {
     if (m_state != IDLE) {
 	lo_message msg = lo_message_new();
-	broadcastMessage("/ps/drop", msg);
+	broadcastMessage(MSG_DROP, msg);
 	lo_message_free(msg);
 
 	close();
@@ -138,7 +141,7 @@ int OSCServer::update(int msec)
 	    if (cl.last_alive_recv > MAX_ALIVE_DELAY) {
 		lo_message msg = lo_message_new();
 		lo_send_message_from(it->first, m_server,
-				     "/ps/drop", msg);
+				     MSG_DROP, msg);
 		lo_message_free(msg);
 	       
 		notifyServerClientDisconnect(this, cl.id, SCE_CLIENT_TIMEOUT);
@@ -149,7 +152,7 @@ int OSCServer::update(int msec)
 		if (cl.last_alive_sent > MIN_ALIVE_DELAY) {
 		    lo_message msg = lo_message_new();
 		    lo_send_message_from(it->first, m_server,
-					 "/ps/alive", msg);
+					 MSG_ALIVE, msg);
 		    lo_message_free(msg);
 		
 		    cl.last_alive_sent = 0;
@@ -178,20 +181,25 @@ int OSCServer::_connect_cb(const char* path, const char* types,
 			   lo_arg** argv, int argc, lo_message msg)
 {
     lo_address add = lo_message_get_source(msg);
-
+    int id;
+    
     if (!isDestiny(add)) {
-	int id = m_nextid++;
+	id = m_nextid++;
 	
 	lo_address addcpy = lo_address_new(lo_address_get_hostname(add),
 					   lo_address_get_port(add));
 	
-	lo_message resp = lo_message_new();
-	lo_message_add_int32(resp, id);
-	lo_send_message_from(addcpy, m_server, "/ps/accept", resp);
-
 	addDestiny(addcpy);
 	m_slots[addcpy] = Slot(id);
+    } else {
+	id = m_slots[add].id;
+	m_slots[add].last_alive_recv = 0;
+	m_slots[add].last_alive_sent = 0;
     }
+    
+    lo_message resp = lo_message_new();
+    lo_message_add_int32(resp, id);
+    lo_send_message_from(add, m_server, MSG_ACCEPT, resp);
     
     return 0;
 }
@@ -199,6 +207,10 @@ int OSCServer::_connect_cb(const char* path, const char* types,
 int OSCServer::_get_state_cb(const char* path, const char* types,
 			     lo_arg** argv, int argc, lo_message msg)
 {
+    if (isDestiny(add)) {
+	/* TODO */
+    }
+    
     return 0;
 }
 

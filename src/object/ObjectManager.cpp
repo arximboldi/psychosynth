@@ -66,6 +66,15 @@ bool ObjectManager::detachObject(int id)
     if (iter == m_objmap.end())
 	return false;
 
+    detachObject(iter);
+    
+    return true;
+}
+
+void ObjectManager::detachObject(Iterator it)
+{
+    map<int, Object*>::iterator& iter = it;
+    
     ObjectOutput* out = dynamic_cast<ObjectOutput*>((*iter).second);
     if (out != NULL) {
 	m_outputs.remove(out);
@@ -74,8 +83,13 @@ bool ObjectManager::detachObject(int id)
 
     (*iter).second->setID(OBJ_NULL_ID);
     m_objmap.erase(iter);
-    
-    return true;
+}
+
+void ObjectManager::remove(Iterator it)
+{
+    Object* obj = it->second;
+    detachObject(it);
+    delete obj;
 }
 
 void ObjectManager::update()

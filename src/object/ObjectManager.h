@@ -42,6 +42,8 @@ public:
 	
     bool attachObject(Object* obj, int id);
     bool detachObject(int id);
+    void detachObject(Iterator it);
+    void remove(Iterator it);
 
     ConstIterator begin() const {
 	return m_objmap.begin();
@@ -58,7 +60,7 @@ public:
     Iterator end() {
 	return m_objmap.end();
     }
-
+    
     Iterator find(int id) {
 	return m_objmap.find(id);
     }

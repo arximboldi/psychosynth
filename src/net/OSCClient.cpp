@@ -21,6 +21,7 @@
  ***************************************************************************/
 
 #include "net/OSCClient.h"
+#include "net/OSCProtocol.h"
 
 const int MAX_ALIVE_DELAY = 20000;
 const int MIN_ALIVE_DELAY = 1000;
@@ -78,12 +79,14 @@ void OSCClient::connect(lo_address target, const char* local_port)
 	m_count_next = 1;
 	
 	addMethods();
-	addDestiny(target);
 	setSender(m_server);
 	
 	lo_message msg = lo_message_new();
-	broadcastMessage("/ps/connect", msg);
+	lo_send_message_from(target, m_server, MSG_CONNECT, msg);
 	lo_message_free(msg);
+
+	lo_address_free(target);
+	
 	m_state = PENDING;
     }
 }
@@ -99,7 +102,7 @@ void OSCClient::disconnect()
 {
     if (m_state != IDLE) {
 	lo_message msg = lo_message_new();
-	broadcastMessage("/ps/disconnect", msg);
+	broadcastMessage(MSG_DISCONNECT, msg);
 	lo_message_free(msg);
 	
 	close();
@@ -125,13 +128,15 @@ int OSCClient::update(int msec)
 
 	if (m_last_alive_sent > MIN_ALIVE_DELAY) {
 	    lo_message msg = lo_message_new();
-	    broadcastMessage("/ps/alive", msg);
+	    broadcastMessage(MSG_ALIVE, msg);
 	    lo_message_free(msg);
 	    m_last_alive_sent = 0;
 	}
 	
-	if (m_state == CLOSING)
+	if (m_state == CLOSING) {
 	    close();
+	    notifyClientDisconnect(this, CE_SERVER_DROP);
+	}
     }
 
     return m_state;
@@ -142,9 +147,9 @@ void OSCClient::addMethods()
     /* DEBUG */
     lo_server_add_method(m_server, NULL, NULL, &lo_generic_handler, NULL);
 
-    lo_server_add_method(m_server, "/ps/drop", "", &drop_cb, this);
-    lo_server_add_method(m_server, "/ps/accept", "i", &accept_cb, this);
-    lo_server_add_method(m_server, "/ps/alive", "", &alive_cb, this);
+    lo_server_add_method(m_server, MSG_DROP, "", &drop_cb, this);
+    lo_server_add_method(m_server, MSG_ACCEPT, "i", &accept_cb, this);
+    lo_server_add_method(m_server, MSG_ALIVE, "", &alive_cb, this);
 }
 
 int OSCClient::_drop_cb(const char* path, const char* types,
@@ -152,21 +157,36 @@ int OSCClient::_drop_cb(const char* path, const char* types,
 {
     m_state = CLOSING;
 
-    notifyClientDisconnect(this, CE_SERVER_DROP);
     return 0;
 }
 
 int OSCClient::_accept_cb(const char* path, const char* types,
 			  lo_arg** argv, int argc, lo_message msg)
 {
-    m_id = argv[0]->i;
-    setID(m_id);
+    if (m_state == PENDING) {
+	m_id = argv[0]->i;
+	setID(m_id);
 
-    OSCController::addMethods(m_server);
-    activate();
+	getTable()->clear();
+	
+	OSCController::addMethods(m_server);
+	activate();
 
-    m_state = CONNECTED;
-    notifyClientAccept(this);
+	/* FIXME: Make sure that the accept message came from our desired target. */
+	lo_address add = lo_message_get_source(msg);
+	lo_address addcpy = lo_address_new(lo_address_get_hostname(add),
+					   lo_address_get_port(add));
+    
+	addDestiny(addcpy);
+
+	lo_message msg = lo_message_new();
+	broadcastMessage(MSG_GET_STATE, msg);
+	lo_message_free(msg);
+	
+	m_state = CONNECTED;
+	notifyClientAccept(this);
+    }
+    
     return 0;
 }
 

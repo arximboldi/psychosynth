@@ -21,6 +21,7 @@
  ***************************************************************************/
 
 #include "common/Logger.h"
+#include "common/Misc.h"
 
 #include "gui3d/PsychoSynth3D.h"
 
@@ -84,9 +85,26 @@ void PsychoSynth3D::setupOgre()
 
 void PsychoSynth3D::setupInput()
 {
+    OIS::ParamList pl;
     size_t window_hnd = 0;
+
     m_window->getCustomAttribute("WINDOW", &window_hnd);
-    m_inputmgr = new InputManager(window_hnd);
+    
+    pl.insert(std::make_pair(std::string("WINDOW"), std::string(itoa(window_hnd, 10))));
+
+#if defined OIS_WIN32_PLATFORM 
+    pl.insert(std::make_pair(std::string("w32_mouse"), std::string("DISCL_FOREGROUND" ))); 
+    pl.insert(std::make_pair(std::string("w32_mouse"), std::string("DISCL_NONEXCLUSIVE"))); 
+    pl.insert(std::make_pair(std::string("w32_keyboard"), std::string("DISCL_FOREGROUND"))); 
+    pl.insert(std::make_pair(std::string("w32_keyboard"), std::string("DISCL_NONEXCLUSIVE"))); 
+#elif defined OIS_LINUX_PLATFORM 
+    pl.insert(std::make_pair(std::string("x11_mouse_grab"), std::string("false"))); 
+    pl.insert(std::make_pair(std::string("x11_mouse_hide"), std::string("true"))); 
+    pl.insert(std::make_pair(std::string("x11_keyboard_grab"), std::string("false"))); 
+    pl.insert(std::make_pair(std::string("XAutoRepeatOn"), std::string("true"))); 
+#endif
+
+    m_inputmgr = new InputManager(pl);
 }
 
 void PsychoSynth3D::setupGui()

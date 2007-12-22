@@ -54,10 +54,13 @@ inline int lo_address_cmp(lo_address a, lo_address b)
 }
 
 inline int lo_generic_handler(const char *path, const char *types, lo_arg **argv,
-			   int argc, void *data, void *user_data)
+			      int argc, lo_message msg, void *user_data)
 {
     int i;
 
+    printf("--- OSC Message ---\n");
+    printf("from host: %s\n", lo_address_get_hostname(lo_message_get_source(msg)));
+    printf("from port: %s\n", lo_address_get_port(lo_message_get_source(msg)));
     printf("path: <%s>\n", path);
     for (i=0; i<argc; i++) {
 	printf("arg %d '%c' ", i, types[i]);

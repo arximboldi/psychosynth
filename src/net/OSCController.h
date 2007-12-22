@@ -70,14 +70,22 @@ public:
 	m_table = table;
     }
 
+    Table* getTable() {
+	return m_table;
+    }
+
     void activate() {
-	if (!m_activated && m_table)
+	if (!m_activated && m_table) {
+	    m_activated = true;
 	    addToTable(m_table);
+	}
     }
 
     void deactivate() {
-	if (m_activated && m_table)
+	if (m_activated && m_table) {
+	    m_activated = false;
 	    deleteFromTable(m_table);
+	}
     }
 
     void clear() {

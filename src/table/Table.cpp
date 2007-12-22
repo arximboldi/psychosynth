@@ -119,6 +119,21 @@ Table::~Table()
     delete m_patcher;
 }
 
+void
+Table::clear()
+{
+    for (ObjectManager::Iterator it = m_objmgr.begin();
+	 it != m_objmgr.end();)
+	if ((*it)->getID() >= MIN_USER_ID) {
+	    if (m_patcher)
+		m_patcher->deleteObject(*it);
+	    TableObject obj(*it, this);
+	    notifyDeleteObject(obj);
+	    m_objmgr.remove(it++);
+	} else
+	    ++it;
+}
+
 TableObject Table::findObject(int id)
 {
     ObjectManager::Iterator i = m_objmgr.find(id);

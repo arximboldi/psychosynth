@@ -20,6 +20,8 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <iostream>
+
 #include "net/OSCBroadcast.h"
 #include "net/OSCMisc.h"
 

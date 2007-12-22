@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) 2007 Juan Pedro Bolivar Puente                          *
+ *   Copyright (C) Juan Pedro Bolivar Puente 2007                          *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -20,61 +20,23 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef INPUTMANAGER_H
-#define INPUTMANAGER_H
+#ifndef OSCPROTOCOL_H
+#define OSCPROTOCOL_H
 
-#include <list>
-#include <OIS/OIS.h>
+/* Server-Client connection abstraction. */
+#define MSG_ACCEPT      "/ps/accept"
+#define MSG_CONNECT     "/ps/connect"
+#define MSG_ALIVE       "/ps/alive"
+#define MSG_DISCONNECT  "/ps/disconnect"
+#define MSG_DROP        "/ps/drop"
+#define MSG_GET_STATE   "/ps/get_state"
 
-class InputManager: public OIS::MouseListener, public OIS::KeyListener {
-    typedef std::list<OIS::MouseListener*>::reverse_iterator MouseRIter;
-    typedef std::list<OIS::KeyListener*>::reverse_iterator KeyRIter;
-	
-    std::list<OIS::MouseListener*> m_mlist;
-    std::list<OIS::KeyListener*> m_klist;
-	
-    OIS::InputManager* m_inputmgr;
-    OIS::Keyboard* m_keyboard;
-    OIS::Mouse* m_mouse;
-	
-    int m_width;
-    int m_height;
+/* Table constrolling. */
+#define MSG_PARAM       "/ps/param"
+#define MSG_MOVE        "/ps/move"
+#define MSG_ACTIVATE    "/ps/activate"
+#define MSG_DEACTIVATE  "/ps/deactivate"
+#define MSG_ADD         "/ps/add"
+#define MSG_DELETE      "/ps/delete"
 
-public:
-    InputManager(OIS::ParamList& pl);
-    InputManager(size_t window_handle);
-    ~InputManager();
-
-    bool addMouseListener(OIS::MouseListener* listener) {
-	m_mlist.push_back(listener);
-	return true; /* TODO */
-    }
-	
-    bool addKeyListener(OIS::KeyListener* listener) {
-	m_klist.push_back(listener);
-	return true;
-    }
-	
-    bool removeMouseListener(OIS::MouseListener* listener) {
-	m_mlist.remove(listener);
-	return true;
-    }
-	
-    bool removeKeyboardListener(OIS::KeyListener* listener) {
-	m_klist.remove(listener);
-	return true;
-    }
-
-    void capture() {
-	m_mouse->capture();
-	m_keyboard->capture();
-    }
-	
-    bool mouseMoved(const OIS::MouseEvent& e);
-    bool mousePressed(const OIS::MouseEvent &e, OIS::MouseButtonID id);
-    bool mouseReleased(const OIS::MouseEvent &e, OIS::MouseButtonID id);
-    bool keyPressed(const OIS::KeyEvent &e);
-    bool keyReleased(const OIS::KeyEvent &e);
-};
-
-#endif /* INPUTMANAGER_H */
+#endif /* OSCPROTOCOL_H */

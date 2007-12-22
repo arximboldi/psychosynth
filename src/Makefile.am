@@ -121,6 +121,7 @@ noinst_HEADERS = \
 	net/OSCClientLogger.h \
 	net/OSCController.h \
 	net/OSCMisc.h \
+	net/OSCProtocol.h \
 	output/Output.h \
 	output/OutputJack.h \
 	output/OutputAlsa.h \

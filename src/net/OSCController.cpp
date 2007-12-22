@@ -21,6 +21,7 @@
  ***************************************************************************/
 
 #include "net/OSCController.h"
+#include "net/OSCProtocol.h"
 
 using namespace std;
 
@@ -51,7 +52,7 @@ void OSCController::handleAddObject(TableObject& obj)
 	lo_message_add_int32(msg, net_id.second);
 	lo_message_add_int32(msg, obj.getType());
 
-	broadcastMessage("/ps/add", msg);
+	broadcastMessage(MSG_ADD, msg);
 
 	lo_message_free(msg);
     }
@@ -68,7 +69,7 @@ void OSCController::handleDeleteObject(TableObject& obj)
 	lo_message_add_int32(msg, net_id.first);
 	lo_message_add_int32(msg, net_id.second);
 
-	broadcastMessage("/ps/delete", msg);
+	broadcastMessage(MSG_DELETE, msg);
 
 	lo_message_free(msg);
 
@@ -80,7 +81,6 @@ void OSCController::handleDeleteObject(TableObject& obj)
 void OSCController::handleMoveObject(TableObject& obj)
 {
     if (!m_skip) {
-	cout << "COMOOOOOOO " << m_skip << endl;
 	int local_id(obj.getID());
 	pair<int,int> net_id = m_net_id[local_id];
 
@@ -91,7 +91,7 @@ void OSCController::handleMoveObject(TableObject& obj)
 	lo_message_add_float(msg, obj.getX());
 	lo_message_add_float(msg, obj.getY());
 	    
-	broadcastMessage("/ps/move", msg);
+	broadcastMessage(MSG_MOVE, msg);
 
 	lo_message_free(msg);		
     }
@@ -108,7 +108,7 @@ void OSCController::handleActivateObject(TableObject& obj)
 	lo_message_add_int32(msg, net_id.first);
 	lo_message_add_int32(msg, net_id.second);
 
-	broadcastMessage("/ps/activate", msg);
+	broadcastMessage(MSG_ACTIVATE, msg);
 
 	lo_message_free(msg);
     }
@@ -125,7 +125,7 @@ void OSCController::handleDeactivateObject(TableObject& obj)
 	lo_message_add_int32(msg, net_id.first);
 	lo_message_add_int32(msg, net_id.second);
 
-	broadcastMessage("/ps/deactivate", msg);
+	broadcastMessage(MSG_DEACTIVATE, msg);
 
 	lo_message_free(msg);
     }
@@ -134,7 +134,6 @@ void OSCController::handleDeactivateObject(TableObject& obj)
 void OSCController::handleSetParamObject(TableObject& obj, int param_id)
 {
     if (!m_skip) {
-	cout << "POR QUEEEE " << m_skip << endl;
 	int local_id(obj.getID());
 	pair<int,int> net_id = m_net_id[local_id];
 
@@ -147,13 +146,11 @@ void OSCController::handleSetParamObject(TableObject& obj, int param_id)
 	switch(obj.getParamType(param_id)) {
 	case Object::PARAM_INT: {
 	    int val;
-	    cout << "Jooooooo\n";
 	    obj.getParam(param_id, val);
 	    lo_message_add_int32(msg, val);
 	    break;
 	}    
 	case Object::PARAM_FLOAT: {
-	    cout << "JAJAJAJA\n";
 	    float val;
 	    obj.getParam(param_id, val);
 	    lo_message_add_float(msg, val);
@@ -169,23 +166,21 @@ void OSCController::handleSetParamObject(TableObject& obj, int param_id)
 	    break;
 	}
 	
-	broadcastMessage("/ps/param", msg);
+	broadcastMessage(MSG_PARAM, msg);
 
 	lo_message_free(msg);	
-    } else {
-	cout << "WTF!!!" << endl;
     }
 }
 
 void OSCController::addMethods(lo_server s)
 {
-    lo_server_add_method (s, "/ps/add", "iii", &add_cb, this);
-    lo_server_add_method (s, "/ps/delete", "ii", &delete_cb, this);
-    lo_server_add_method (s, "/ps/move", "iiff", &move_cb, this);
+    lo_server_add_method (s, MSG_ADD, "iii", &add_cb, this);
+    lo_server_add_method (s, MSG_DELETE, "ii", &delete_cb, this);
+    lo_server_add_method (s, MSG_MOVE, "iiff", &move_cb, this);
     /* FIXME: Notify bug to liblo */
-    lo_server_add_method (s, "/ps/param", NULL, &param_cb, this);
-    lo_server_add_method (s, "/ps/activate", "ii", &activate_cb, this);
-    lo_server_add_method (s, "/ps/deactivate", "ii", &deactivate_cb, this);
+    lo_server_add_method (s, MSG_PARAM, NULL, &param_cb, this);
+    lo_server_add_method (s, MSG_ACTIVATE, "ii", &activate_cb, this);
+    lo_server_add_method (s, MSG_DEACTIVATE, "ii", &deactivate_cb, this);
 }
 
 int OSCController::_add_cb(const char* path, const char* types,
@@ -203,7 +198,7 @@ int OSCController::_add_cb(const char* path, const char* types,
 	    m_net_id[local_id] = net_id;
 	    m_local_id[net_id] = local_id;
 
-	    broadcastMessageFrom("/ps/add", msg, lo_message_get_source(msg));
+	    broadcastMessageFrom(MSG_ADD, msg, lo_message_get_source(msg));
 	}
     }
     
@@ -229,7 +224,7 @@ int OSCController::_delete_cb(const char* path, const char* types,
 	    m_local_id.erase(net_id);
 	    m_net_id.erase(it->second);
 
-	    broadcastMessageFrom("/ps/delete", msg, lo_message_get_source(msg));
+	    broadcastMessageFrom(MSG_DELETE, msg, lo_message_get_source(msg));
 	}
     }
     
@@ -249,11 +244,10 @@ int OSCController::_move_cb(const char* path, const char* types,
 	    !(obj = m_table->findObject(it->second)).isNull()) {
 
 	    m_skip++;
-	    cout << "moviendooo " << m_skip << endl;
 	    m_table->moveObject(obj, argv[2]->f, argv[3]->f);
 	    m_skip--;
 	    
-	    broadcastMessageFrom("/ps/move", msg, lo_message_get_source(msg));
+	    broadcastMessageFrom(MSG_MOVE, msg, lo_message_get_source(msg));
 	}
     }
     
@@ -273,15 +267,12 @@ int OSCController::_param_cb(const char* path, const char* types,
 	    !(obj = m_table->findObject(it->second)).isNull()) {
 
 	    m_skip++;
-	    cout << "LANZANDOOOO " << m_skip << endl;
 	    
 	    switch(obj.getParamType(argv[2]->i)) {
 	    case Object::PARAM_FLOAT:
-		cout << "noooooo" << endl;
 		m_table->setParamObject(obj, argv[2]->i, argv[3]->f);
 		break;
 	    case Object::PARAM_INT:
-		cout << "SIIIII" << endl;
 		m_table->setParamObject(obj, argv[2]->i, argv[3]->i);
 		break;
 	    case Object::PARAM_STRING:
@@ -292,7 +283,7 @@ int OSCController::_param_cb(const char* path, const char* types,
 	    }
 	    m_skip--;
 	    
-	    broadcastMessageFrom("/ps/param", msg, lo_message_get_source(msg));
+	    broadcastMessageFrom(MSG_PARAM, msg, lo_message_get_source(msg));
 	}
     }
     
@@ -315,7 +306,7 @@ int OSCController::_activate_cb(const char* path, const char* types,
 	    m_table->activateObject(obj);
 	    m_skip--;
 	    
-	    broadcastMessageFrom("/ps/activate", msg, lo_message_get_source(msg));
+	    broadcastMessageFrom(MSG_ACTIVATE, msg, lo_message_get_source(msg));
 	}
     }
     
@@ -338,7 +329,7 @@ int OSCController::_deactivate_cb(const char* path, const char* types,
 	    m_table->deactivateObject(obj);
 	    m_skip--;
 	    
-	    broadcastMessageFrom("/ps/deactivate", msg, lo_message_get_source(msg));
+	    broadcastMessageFrom(MSG_DEACTIVATE, msg, lo_message_get_source(msg));
 	}
     }
     

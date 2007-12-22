@@ -41,7 +41,7 @@ class TableObject
 {
     friend class Table;
     
-    Object* m_obj;
+    Object* m_obj; /* Use ObjectManager::Iterator instead? */
     Table* m_table;
 
     TableObject(Object* obj, Table* table) :
@@ -236,6 +236,8 @@ public:
     Table(const AudioInfo& info);
     ~Table();
 
+    void clear();
+    
     const AudioInfo& getInfo() const;
 
     TableObject findObject(int id);
