@@ -60,7 +60,8 @@ class ElementManager : public OIS::MouseListener,
 public:
     ElementManager(Table* table, Ogre::SceneManager* scene,
 		   Ogre::Camera* camera);
-
+    ~ElementManager();
+    
     void update();
     
     void addElement(int e_type);

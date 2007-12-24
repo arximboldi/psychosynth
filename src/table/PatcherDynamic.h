@@ -34,18 +34,19 @@ class PatcherDynamic : public Patcher
 	Object* src;
 	Object* dest;
 	float dist;
+	float dist_to_center;
 	int sock_type;
 	int out_sock;
 	int in_sock;
 	int actual_in_sock;
 	
-	Link(Object* s, Object* d, float ds, int t, int os, int is) :
-	    src(s), dest(d), dist(ds),
+	Link(Object* s, Object* d, float ds, float dc, int t, int os, int is) :
+	    src(s), dest(d), dist(ds), dist_to_center(dc),
 	    sock_type(t), out_sock(os), in_sock(is), actual_in_sock(-1)
 	    {}
 	
 	bool operator< (const Link& l) const {
-	    return dist < l.dist;
+	    return dist == l.dist ? dist_to_center < dist_to_center : dist < l.dist;
 	}
     };
 
@@ -56,7 +57,7 @@ class PatcherDynamic : public Patcher
 	int actual_sock_type;
 	int actual_in_sock; 
 
-	Node(Object* o) :
+	Node(Object* o = NULL) :
 	    obj(o),
 	    dest(NULL),
 	    out_used(false),

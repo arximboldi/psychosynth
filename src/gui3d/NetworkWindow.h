@@ -41,6 +41,7 @@ class ClientTab : public OSCClientListener
 
     CEGUI::Window* m_button;
     CEGUI::Window* m_disable;
+    CEGUI::Window* m_ext_disable;
     CEGUI::Spinner* m_lport;
     CEGUI::Spinner* m_rport;
     CEGUI::Editbox* m_host;
@@ -55,9 +56,12 @@ public:
     ClientTab(OSCClient* client);
     ~ClientTab();
     
-    CEGUI::Window* createWindow();
-
+    CEGUI::Window* createWindow();    
     bool onButtonClick(const CEGUI::EventArgs &e);
+
+    void externalDependant(CEGUI::Window* win) {
+	m_ext_disable = win;
+    }
 };
 
 class ServerTab : public OSCServerListener
@@ -70,6 +74,7 @@ class ServerTab : public OSCServerListener
 
     CEGUI::Window* m_button;
     CEGUI::Window* m_disable;
+    CEGUI::Window* m_ext_disable;
     CEGUI::Spinner* m_lport;
 
     bool handleServerStartListening(OSCServer* server);
@@ -86,6 +91,10 @@ public:
     CEGUI::Window* createWindow();
     
     bool onButtonClick(const CEGUI::EventArgs &e);
+
+    void externalDependant(CEGUI::Window* win) {
+	m_ext_disable = win;
+    }
 };
     
 class NetworkWindow : public ToggableWindow

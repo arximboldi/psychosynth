@@ -23,10 +23,9 @@ psychosynth_SOURCES = \
 	gui3d/Element.cpp \
 	gui3d/ElemMainComponent.cpp \
 	gui3d/ElemSecondComponent.cpp \
-	gui3d/ElementOscillator.cpp \
-	gui3d/ElementMixer.cpp \
 	gui3d/ElementManager.cpp \
 	gui3d/ElementProperties.cpp \
+	gui3d/TheElements.cpp \
 	gui3d/WindowList.cpp \
 	gui3d/FlatRing.cpp \
 	gui3d/Connection.cpp \
@@ -38,6 +37,10 @@ psychosynth_SOURCES = \
 	object/ObjectMixer.cpp \
 	object/ObjectManager.cpp \
 	object/ObjectOutput.cpp \
+	object/ObjectLFO.cpp \
+	object/ObjectFilter.cpp \
+	object/Filter.cpp \
+	object/WaveTable.cpp \
 	net/OSCBroadcast.cpp \
 	net/OSCController.cpp \
 	net/OSCServer.cpp \
@@ -97,10 +100,9 @@ noinst_HEADERS = \
 	gui3d/Element.h\
 	gui3d/ElemMainComponent.h \
 	gui3d/ElemSecondComponent.h \
-	gui3d/ElementOscillator.h \
-	gui3d/ElementMixer.h \
 	gui3d/ElementManager.h\
 	gui3d/ElementProperties.h \
+	gui3d/TheElements.h \
 	gui3d/QueryFlags.h\
 	gui3d/WindowList.h\
 	gui3d/FlatRing.h\
@@ -113,6 +115,10 @@ noinst_HEADERS = \
 	object/ObjectManager.h \
 	object/ObjectOutput.h \
 	object/ObjectMixer.h \
+	object/ObjectLFO.h \
+	object/ObjectFilter.h \
+	object/Filter.h \
+	object/WaveTable.h \
 	object/KnownObjects.h \
 	net/OSCBroadcast.h \
 	net/OSCServer.h \

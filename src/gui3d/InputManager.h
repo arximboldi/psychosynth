@@ -26,7 +26,8 @@
 #include <list>
 #include <OIS/OIS.h>
 
-class InputManager: public OIS::MouseListener, public OIS::KeyListener {
+class InputManager: public OIS::MouseListener, public OIS::KeyListener
+{
     typedef std::list<OIS::MouseListener*>::reverse_iterator MouseRIter;
     typedef std::list<OIS::KeyListener*>::reverse_iterator KeyRIter;
 	

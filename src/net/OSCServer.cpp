@@ -58,6 +58,7 @@ void OSCServerSubject::notifyServerStopListening(OSCServer* server, OSCServerErr
 }
 
 OSCServer::OSCServer() :
+    OSCController(true),
     m_server(NULL),
     m_state(IDLE)
 {
@@ -72,7 +73,7 @@ OSCServer::~OSCServer()
 void OSCServer::addMethods()
 {
     /* DEBUG */
-    lo_server_add_method(m_server, NULL, NULL, &lo_generic_handler, NULL);
+    //lo_server_add_method(m_server, NULL, NULL, &lo_generic_handler, NULL);
 
     lo_server_add_method(m_server, MSG_ALIVE, "", &alive_cb, this);
     lo_server_add_method(m_server, MSG_CONNECT, "", &connect_cb, this);
@@ -207,6 +208,7 @@ int OSCServer::_connect_cb(const char* path, const char* types,
 int OSCServer::_get_state_cb(const char* path, const char* types,
 			     lo_arg** argv, int argc, lo_message msg)
 {
+    lo_address add = lo_message_get_source(msg);
     if (isDestiny(add)) {
 	/* TODO */
     }

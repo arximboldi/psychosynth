@@ -129,9 +129,13 @@ void ClientTab::setConnected(bool con)
 	m_connected = con;
 	if (m_connected) {
 	    m_disable->disable();
+	    if (m_ext_disable)
+		m_ext_disable->disable();
 	    m_button->setText("Disconnect");
 	} else {
 	    m_disable->enable();
+	    if (m_ext_disable)
+		m_ext_disable->enable();
 	    m_button->setText("Connect");
 	}
     }
@@ -237,9 +241,13 @@ void ServerTab::setListening(bool lis)
 	m_listening = lis;
 	if (m_listening) {
 	    m_disable->disable();
+	    if (m_ext_disable)
+		m_ext_disable->disable();
 	    m_button->setText("Stop");
 	} else {
 	    m_disable->enable();
+	    if (m_ext_disable)
+		m_ext_disable->enable();
 	    m_button->setText("Start");
 	}
     }
@@ -293,10 +301,16 @@ FrameWindow* NetworkWindow::createWindow()
     Window* container = wmgr.createWindow("TaharezLook/TabControl", "network_mode_tab");
     container->setPosition( UVector2(UDim(0, 10), UDim(0, 30)) );
     container->setSize    ( UVector2(UDim(1, -20),     UDim(1, -40)) );
-	
+
+    Window* client_win = m_client_tab->createWindow();
+    Window* server_win = m_server_tab->createWindow();
+    
+    m_server_tab->externalDependant(client_win);
+    m_client_tab->externalDependant(server_win);
+    
     window->addChildWindow(container);
-    container->addChildWindow(m_client_tab->createWindow());
-    container->addChildWindow(m_server_tab->createWindow());
+    container->addChildWindow(client_win);
+    container->addChildWindow(server_win);
     
     return window;
 }

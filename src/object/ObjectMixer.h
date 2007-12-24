@@ -31,7 +31,8 @@ class ObjectMixer : public Object
     
     int m_numchan;
 	
-    void mix(AudioBuffer& dest, const AudioBuffer& src);
+    void mix(AudioBuffer* dest, const AudioBuffer* src,
+	     const ControlBuffer* ampl);
     void doUpdate();
 public:
     /*enum {
@@ -39,6 +40,7 @@ public:
       };*/
 	
     enum InControlSocketID {
+	IN_C_AMPLITUDE,
 	N_IN_C_SOCKETS
     };
 	
@@ -47,7 +49,7 @@ public:
 	N_OUT_A_SOCKETS
     };
 	
-    enum OutControlSocketID{
+    enum OutControlSocketID {
 	N_OUT_C_SOCKETS
     };
 
@@ -56,7 +58,7 @@ public:
 	N_PARAM
     };
     
-    ObjectMixer(const AudioInfo &info, int num_chan = 4);
+    ObjectMixer(const AudioInfo& info, int num_chan = 4);
 };
 
 #endif /* OBJECTMIXER_H */

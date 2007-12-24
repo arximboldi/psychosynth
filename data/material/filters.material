@@ -1,0 +1,119 @@
+material filter
+{
+	receive_shadows on
+	technique
+	{
+		pass
+		{
+			ambient 0.500000 0.500000 0.500000 1.000000
+			diffuse 1.000000 1.000000 1.000000 1.000000
+			specular 0.500000 0.500000 0.500000 1.000000 12.500000
+			emissive 0.000000 0.000000 0.000000 1.000000
+		}
+	}
+}
+
+material moog_image
+{
+	receive_shadows on
+	technique
+	{
+		pass
+		{
+		    scene_blend alpha_blend
+            depth_write off
+
+			texture_unit
+			{
+				texture moog.tga
+				filtering trilinear
+				tex_address_mode wrap
+				
+			}
+		}
+	}
+}
+
+material notch_image
+{
+	receive_shadows on
+	technique
+	{
+		pass
+		{
+		    scene_blend alpha_blend
+            depth_write off
+
+			texture_unit
+			{
+				texture notch.tga
+				filtering trilinear
+				tex_address_mode wrap
+				
+			}
+		}
+	}
+}
+
+material bandpass_image
+{
+	receive_shadows on
+	technique
+	{
+		pass
+		{
+		    scene_blend alpha_blend
+            depth_write off
+
+			texture_unit
+			{
+				texture bandpass.tga
+				filtering trilinear
+				tex_address_mode wrap
+				
+			}
+		}
+	}
+}
+
+material highpass_image
+{
+	receive_shadows on
+	technique
+	{
+		pass
+		{
+		    scene_blend alpha_blend
+            depth_write off
+
+			texture_unit
+			{
+				texture highpass.tga
+				filtering trilinear
+				tex_address_mode wrap
+				
+			}
+		}
+	}
+}
+
+material lowpass_image
+{
+	receive_shadows on
+	technique
+	{
+		pass
+		{
+		    scene_blend alpha_blend
+            depth_write off
+
+			texture_unit
+			{
+				texture lowpass.tga
+				filtering trilinear
+				tex_address_mode wrap
+				
+			}
+		}
+	}
+}

@@ -27,9 +27,6 @@
 #include <set>
 
 #include "object/Object.h"
-#include "object/ObjectOutput.h"
-#include "object/ObjectMixer.h"
-#include "object/ObjectOscillator.h"
 
 struct PatcherEvent {
     Object* src;

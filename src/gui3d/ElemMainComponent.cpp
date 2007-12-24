@@ -34,11 +34,19 @@ ElemMainComponent::ElemMainComponent(const std::string& mesh,
 				     int param, float min_val, float max_val) :
     m_mesh(mesh),
     m_mesh_ent(NULL),
+    m_indicator(NULL),
+    m_indicator_fill(NULL),
     m_param(param),
     m_min_val(min_val),
     m_max_val(max_val),
     m_rotating(false)
 {
+}
+
+ElemMainComponent::~ElemMainComponent()
+{
+    delete m_indicator;
+    delete m_indicator_fill;
 }
 
 void ElemMainComponent::setMesh(const std::string& mesh)
@@ -147,11 +155,8 @@ void ElemMultiMainComponent::handleParamChange(TableObject& obj, int param_id)
     if (param_id == m_param) {
 	int val;
 	obj.getParam(param_id, val);
-	cout << "VALOOOOR " << val << endl;
+
 	setMesh(m_names[val]);
     } else
 	ElemMainComponent::handleParamChange(obj, param_id);
 }
-
-
-

@@ -23,10 +23,84 @@
 #ifndef CONTROLBUFFER_H
 #define CONTROLBUFFER_H
 
-class ControlBuffer {
+#include "common/AudioInfo.h"
+
+class ControlBuffer
+{
+    Sample* m_data;
+    size_t m_size;
+
+    void allocate() {
+	m_data = new Sample[m_size];
+        /* FIXME: what is the effect of new Sample[0] ?*/
+    }
+    
+    void liberate() {
+	delete [] m_data;
+	m_data = NULL;
+    }
+    
 public:
-	ControlBuffer() {}
-	ControlBuffer(int size) {}
+    ControlBuffer() :
+	m_data(NULL),
+	m_size(0)
+	{}
+
+    ControlBuffer(size_t size) :
+	m_size(size) {
+	allocate();
+    }
+
+    ControlBuffer(const ControlBuffer& buf) :
+	m_size(buf.m_size) {
+	allocate();
+	memcpy(m_data, buf.m_data, sizeof(Sample) * m_size);
+    }
+
+    ~ControlBuffer() {
+	liberate();
+    }
+    
+    ControlBuffer& operator=(const ControlBuffer& buf) {
+	if (&buf != this) {
+	    liberate();
+	    m_size = buf.m_size;
+	    allocate();
+	    memcpy(m_data, buf.m_data, sizeof(Sample) * m_size);
+	}
+	return *this;
+    }
+    
+    Sample& operator[] (size_t i) {
+	return m_data[i];
+    }
+
+    const Sample& operator[] (size_t i) const {
+	return m_data[i];
+    }
+
+    Sample* getData() {
+	return m_data;
+    }
+
+    const Sample* getData() const {
+	return m_data;
+    }
+    
+    void clear() {
+	liberate();
+	m_size = 0;
+    }
+
+    size_t size() {
+	return m_size;
+    }
+
+    void resize(size_t newsize) {
+	liberate();
+	m_size = newsize;
+	allocate();
+    }
 };
 
 #endif /* CONTROLBUFER_H */

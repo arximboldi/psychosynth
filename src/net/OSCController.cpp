@@ -25,11 +25,12 @@
 
 using namespace std;
 
-OSCController::OSCController() :
+OSCController::OSCController(bool broadcast) :
     m_table(NULL),
     m_skip(0),
     m_id(0),
-    m_activated(false)
+    m_activated(false),
+    m_broadcast(broadcast)
 {
 }
 
@@ -198,7 +199,14 @@ int OSCController::_add_cb(const char* path, const char* types,
 	    m_net_id[local_id] = net_id;
 	    m_local_id[net_id] = local_id;
 
-	    broadcastMessageFrom(MSG_ADD, msg, lo_message_get_source(msg));
+	    if (m_broadcast) {
+	    lo_message newmsg = lo_message_new();
+	    lo_message_add_int32(newmsg, argv[0]->i);
+	    lo_message_add_int32(newmsg, argv[1]->i);
+	    lo_message_add_int32(newmsg, argv[2]->i);
+	    broadcastMessageFrom(MSG_ADD, newmsg, lo_message_get_source(msg));
+	    lo_message_free(newmsg);
+	    }
 	}
     }
     
@@ -224,7 +232,13 @@ int OSCController::_delete_cb(const char* path, const char* types,
 	    m_local_id.erase(net_id);
 	    m_net_id.erase(it->second);
 
-	    broadcastMessageFrom(MSG_DELETE, msg, lo_message_get_source(msg));
+	    if (m_broadcast) {
+	    lo_message newmsg = lo_message_new();
+	    lo_message_add_int32(newmsg, argv[0]->i);
+	    lo_message_add_int32(newmsg, argv[1]->i);
+	    broadcastMessageFrom(MSG_DELETE, newmsg, lo_message_get_source(msg));
+	    lo_message_free(msg);
+	    }
 	}
     }
     
@@ -246,9 +260,17 @@ int OSCController::_move_cb(const char* path, const char* types,
 	    m_skip++;
 	    m_table->moveObject(obj, argv[2]->f, argv[3]->f);
 	    m_skip--;
-	    
-	    broadcastMessageFrom(MSG_MOVE, msg, lo_message_get_source(msg));
-	}
+
+	    if (m_broadcast) {	    
+	    lo_message newmsg = lo_message_new();
+	    lo_message_add_int32(newmsg, argv[0]->i);
+	    lo_message_add_int32(newmsg, argv[1]->i);	    
+	    lo_message_add_float(newmsg, argv[2]->f);
+	    lo_message_add_float(newmsg, argv[3]->f);
+	    broadcastMessageFrom(MSG_MOVE, newmsg, lo_message_get_source(msg));
+	    lo_message_free(newmsg);
+	    }
+	    }
     }
     
     return 0;
@@ -267,23 +289,42 @@ int OSCController::_param_cb(const char* path, const char* types,
 	    !(obj = m_table->findObject(it->second)).isNull()) {
 
 	    m_skip++;
-	    
-	    switch(obj.getParamType(argv[2]->i)) {
-	    case Object::PARAM_FLOAT:
+	    switch(types[2]) {
+	    case LO_FLOAT:
 		m_table->setParamObject(obj, argv[2]->i, argv[3]->f);
 		break;
-	    case Object::PARAM_INT:
+	    case LO_INT32:
 		m_table->setParamObject(obj, argv[2]->i, argv[3]->i);
 		break;
-	    case Object::PARAM_STRING:
+	    case LO_STRING:
 		m_table->setParamObject(obj, argv[2]->i, string(&argv[3]->s));
 		break;
 	    default:
 		return 0;
 	    }
 	    m_skip--;
-	    
-	    broadcastMessageFrom(MSG_PARAM, msg, lo_message_get_source(msg));
+
+	    if (m_broadcast) {   
+	    lo_message newmsg = lo_message_new();
+	    lo_message_add_int32(newmsg, argv[0]->i);
+	    lo_message_add_int32(newmsg, argv[1]->i);	    
+	    lo_message_add_float(newmsg, argv[2]->f);
+	    switch(types[2]) {
+	    case LO_FLOAT:
+		lo_message_add_float(newmsg, argv[3]->f);
+		break;
+	    case LO_INT32:
+		lo_message_add_int32(newmsg, argv[3]->i);
+		break;
+	    case LO_STRING:
+		lo_message_add_string(newmsg, &argv[3]->s);
+		break;
+	    default:
+		return 0;
+	    }
+	    broadcastMessageFrom(MSG_PARAM, newmsg, lo_message_get_source(msg));
+	    lo_message_free(newmsg);
+	    }
 	}
     }
     
@@ -305,8 +346,14 @@ int OSCController::_activate_cb(const char* path, const char* types,
 	    m_skip++;
 	    m_table->activateObject(obj);
 	    m_skip--;
-	    
-	    broadcastMessageFrom(MSG_ACTIVATE, msg, lo_message_get_source(msg));
+
+	    if (m_broadcast) {
+	    lo_message newmsg = lo_message_new();
+	    lo_message_add_int32(newmsg, argv[0]->i);
+	    lo_message_add_int32(newmsg, argv[1]->i);
+	    broadcastMessageFrom(MSG_ACTIVATE, newmsg, lo_message_get_source(msg));
+	    lo_message_free(newmsg);
+	    }
 	}
     }
     
@@ -328,8 +375,14 @@ int OSCController::_deactivate_cb(const char* path, const char* types,
 	    m_skip++;
 	    m_table->deactivateObject(obj);
 	    m_skip--;
-	    
-	    broadcastMessageFrom(MSG_DEACTIVATE, msg, lo_message_get_source(msg));
+
+	    if (m_broadcast) {
+	    lo_message newmsg = lo_message_new();
+	    lo_message_add_int32(newmsg, argv[0]->i);
+	    lo_message_add_int32(newmsg, argv[1]->i);
+	    broadcastMessageFrom(MSG_DEACTIVATE, newmsg, lo_message_get_source(msg));
+	    lo_message_free(newmsg);
+	    }
 	}
     }
     

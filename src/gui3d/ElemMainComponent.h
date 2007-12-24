@@ -43,7 +43,8 @@ class ElemMainComponent : public ElemComponent
 public:
     ElemMainComponent(const std::string& mesh,
 		      int param, float min_val, float max_val);
-
+    ~ElemMainComponent();
+    
     void setMesh(const std::string& mesh);
 
     void init();

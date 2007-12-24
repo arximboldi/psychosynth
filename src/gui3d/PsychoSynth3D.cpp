@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) 2007 Juan Pedro Bolivar Puente                          *
+ *   Copyright (C) Juan Pedro Bolivar Puente 2007                          *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -59,13 +59,16 @@ void PsychoSynth3D::setupOgre()
     m_ogre = new Root("data/plugins.cfg", "data/ogre.cfg");
 
     ResourceGroupManager& resource_manager = ResourceGroupManager::getSingleton();
-    resource_manager.addResourceLocation("data", "FileSystem", "General");
-    resource_manager.addResourceLocation("data/gui/schemes", "FileSystem", "GUI");
-    resource_manager.addResourceLocation("data/gui/fonts", "FileSystem", "GUI");
-    resource_manager.addResourceLocation("data/gui/configs", "FileSystem", "GUI");
+    resource_manager.addResourceLocation("data",               "FileSystem", "General");
+    resource_manager.addResourceLocation("data/mesh",          "FileSystem", "General");
+    resource_manager.addResourceLocation("data/texture",       "FileSystem", "General");
+    resource_manager.addResourceLocation("data/material",      "FileSystem", "General");
+    resource_manager.addResourceLocation("data/gui/schemes",   "FileSystem", "GUI");
+    resource_manager.addResourceLocation("data/gui/fonts",     "FileSystem", "GUI");
+    resource_manager.addResourceLocation("data/gui/configs",   "FileSystem", "GUI");
     resource_manager.addResourceLocation("data/gui/imagesets", "FileSystem", "GUI");
     resource_manager.addResourceLocation("data/gui/looknfeel", "FileSystem", "GUI");
-    resource_manager.addResourceLocation("data/gui/layouts", "FileSystem", "GUI");
+    resource_manager.addResourceLocation("data/gui/layouts",   "FileSystem", "GUI");
 
     if (!m_ogre->restoreConfig() && !m_ogre->showConfigDialog())
 	m_ogre->setRenderSystem( *(m_ogre->getAvailableRenderers()->begin()) );
@@ -208,7 +211,8 @@ void PsychoSynth3D::setupTable()
     
     
     SceneNode *node = m_scene->getRootSceneNode()->createChildSceneNode();
-    FlatRing* ring = new FlatRing("ringy", Degree(0), Degree(360), 0, 0.4,
+    /* FIXME: Memory leak. */
+    FlatRing* ring = new FlatRing("the_point", Degree(0), Degree(360), 0, 0.4,
 				  ColourValue(0, 0, 0, 0.8));
     node->attachObject(ring);
     node->setPosition(Vector3(0,0.001,0));
@@ -237,6 +241,20 @@ void PsychoSynth3D::setupMenus()
     cat->addButton("Sawtooth", ELEM_OSC_SAWTOOTH);
     cat->addButton("Triangle", ELEM_OSC_TRIANGLE);
 
+    cat = selector->addCategory("LFO");
+    cat->addButton("Sine", ELEM_LFO_SINE);
+    cat->addButton("Square", ELEM_LFO_SQUARE);
+    cat->addButton("Sawtooth", ELEM_LFO_SAWTOOTH);
+    cat->addButton("Triangle", ELEM_LFO_TRIANGLE);
+
+    cat = selector->addCategory("Filter");
+    cat->addButton("Lowpass", ELEM_FILTER_LOWPASS);
+    cat->addButton("Highpass", ELEM_FILTER_HIGHPASS);
+    cat->addButton("Bandpass CSG", ELEM_FILTER_BANDPASS_CSG);
+    cat->addButton("Bandpass CZPG", ELEM_FILTER_BANDPASS_CZPG);
+    cat->addButton("Notch", ELEM_FILTER_NOTCH);
+    cat->addButton("Moog", ELEM_FILTER_MOOG);
+    
     cat = selector->addCategory("Mix");
     cat->addButton("Mixer", ELEM_MIXER);
 
@@ -306,7 +324,7 @@ int PsychoSynth3D::run(int argc, const char* argv[])
     setupOgre();
     Logger::instance().log("gui", ::Log::INFO, "Initializing OIS.");
     setupInput();
-    Logger::instance().log("gui", ::Log::INFO, "Initializing synthetizer.");
+    Logger::instance().log("gui", ::Log::INFO, "Initializing synthesizer.");
     setupSynth();
     Logger::instance().log("gui", ::Log::INFO, "Initializing networking.");
     setupNet();
@@ -329,7 +347,7 @@ int PsychoSynth3D::run(int argc, const char* argv[])
     closeNet();
     Logger::instance().log("gui", ::Log::INFO, "Closing scene.");
     closeTable();
-    Logger::instance().log("gui", ::Log::INFO, "Closing synthetizer.");
+    Logger::instance().log("gui", ::Log::INFO, "Closing synthesizer.");
     closeSynth();
     Logger::instance().log("gui", ::Log::INFO, "Closing OIS.");
     closeInput();

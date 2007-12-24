@@ -139,11 +139,15 @@ bool CameraControllerRasko::mouseMoved(const OIS::MouseEvent& e)
 	
     if (m_mousecenter) {
 	const Vector3* corners = m_camera->getWorldSpaceCorners();
-	Real h = (corners[0] - corners[3]).length();
-	Real min_dist = h/Math::Tan(m_yangle);
+	/*
+	  Real h = (corners[0] - corners[3]).length();
+	  Real min_dist = h/Math::Tan(m_yangle);
+	*/
 	m_dist += 25.0 * Real(e.state.Y.rel) / m_camera->getViewport()->getActualHeight();
-	if (m_dist < min_dist)
+	/*
+	  if (m_dist < min_dist)
 	    m_dist = min_dist;
+	*/
 	recalculate();
     }
 	

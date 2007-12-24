@@ -68,6 +68,7 @@ Element::~Element()
 	delete *it;
     
     m_scene->destroySceneNode(m_node->getName());
+    delete m_base;
 }
 
 void Element::addComponent(ElemComponent* comp)

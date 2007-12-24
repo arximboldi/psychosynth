@@ -41,7 +41,8 @@ class ElemSecondComponent : public ElemComponent
     
 public:
     ElemSecondComponent(int param, float min_val, float max_val);
-
+    ~ElemSecondComponent();
+    
     void init();
     bool handlePointerMove(Ogre::Vector2 pos);
     bool handlePointerClick(Ogre::Vector2 pos, OIS::MouseButtonID id);

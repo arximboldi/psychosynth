@@ -34,11 +34,19 @@ using namespace Ogre;
 
 
 ElemSecondComponent::ElemSecondComponent(int param, float min_val, float max_val) :
+    m_indicator(NULL),
+    m_indicator_point(NULL),
     m_param(param),
     m_min_val(min_val),
     m_max_val(max_val),
     m_changing(false)
 {
+}
+
+ElemSecondComponent::~ElemSecondComponent()
+{
+    delete m_indicator;
+    delete m_indicator_point;
 }
 
 void ElemSecondComponent::init()

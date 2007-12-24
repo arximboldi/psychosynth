@@ -25,6 +25,12 @@
 #include "output/OutputOss.h"
 #include "common/Error.h"
 
+#include "object/ObjectOutput.h"
+#include "object/ObjectMixer.h"
+#include "object/ObjectOscillator.h"
+#include "object/ObjectLFO.h"
+#include "object/ObjectFilter.h"
+
 using namespace std;
 
 void TableSubject::notifyAddObject(TableObject& obj)
@@ -150,6 +156,12 @@ TableObject Table::addObject(int type)
     switch (type) {
     case OBJ_OSCILLATOR:
 	obj = new ObjectOscillator(m_info);
+	break;
+    case OBJ_LFO:
+	obj = new ObjectLFO(m_info);
+	break;
+    case OBJ_FILTER:
+	obj = new ObjectFilter(m_info);
 	break;
     case OBJ_MIXER:
 	obj = new ObjectMixer(m_info);

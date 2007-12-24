@@ -39,7 +39,7 @@ SelectorWindow::Category::Button::Button(const std::string& name,
 {
     WindowManager& wmgr = WindowManager::getSingleton();
 	
-    m_window = wmgr.createWindow("TaharezLook/Button", name);
+    m_window = wmgr.createWindow("TaharezLook/Button");
     m_window->setText    (name);
     m_window->setSize    ( UVector2(CEGUI::UDim(0, BUT_WIDTH), CEGUI::UDim(0, BUT_HEIGHT)));
     m_window->setWantsMultiClickEvents(false);
@@ -74,7 +74,7 @@ SelectorWindow::Category::Category(const std::string& name, ElementManager* mgr)
 {
     WindowManager& wmgr = WindowManager::getSingleton();
 	
-    m_window = wmgr.createWindow("TaharezLook/ScrollablePane", name);
+    m_window = wmgr.createWindow("TaharezLook/ScrollablePane");
     m_window->setPosition( UVector2(UDim(0, BUT_XGAP),    UDim(0, BUT_YGAP)) );
     m_window->setSize    ( UVector2(UDim(1, -2*BUT_XGAP), UDim(1, -2*BUT_YGAP)) );
     m_window->setText    (name);

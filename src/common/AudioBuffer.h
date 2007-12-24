@@ -62,11 +62,11 @@ public:
 	return m_info;
     }
 	
-    Sample* getChanel(int n) {
+    Sample* getChannel(int n) {
 	return m_data[n];
     }
 	
-    const Sample* getChanel(int n) const {
+    const Sample* getChannel(int n) const {
 	return m_data[n];
     }
 	

@@ -94,6 +94,8 @@ Connection::~Connection()
 
     m_s_obj.deleteListener(this);
     m_d_obj.deleteListener(this);
+
+    delete m_line;
 }
 
 void Connection::handleMoveObject(TableObject& obj)

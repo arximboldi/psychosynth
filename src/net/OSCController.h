@@ -39,6 +39,7 @@ class OSCController : public TableListener,
     int m_skip;
     int m_id;
     bool m_activated;
+    bool m_broadcast;
     
     LO_HANDLER(OSCController, add);
     LO_HANDLER(OSCController, delete);
@@ -58,7 +59,7 @@ class OSCController : public TableListener,
     }
     
 public:
-    OSCController();
+    OSCController(bool broadcast = false);
     ~OSCController();
 
     void setID(int id) {

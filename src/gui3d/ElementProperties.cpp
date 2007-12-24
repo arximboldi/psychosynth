@@ -77,7 +77,7 @@ void ElemGuiParamMulti::handleParamChange(TableObject& obj, int param)
     int new_val;
 
     obj.getParam(param, new_val);
-    cout << "VALOOOORCITOO " << new_val << endl;
+
     m_skip++;
     m_selector->setText(m_op_names[new_val]);
     m_skip--;

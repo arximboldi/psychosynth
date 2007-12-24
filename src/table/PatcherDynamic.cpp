@@ -26,6 +26,8 @@
 #include "object/ObjectOutput.h"
 #include "object/ObjectMixer.h"
 #include "object/ObjectOscillator.h"
+#include "object/ObjectLFO.h"
+#include "object/ObjectFilter.h"
 
 using namespace std;
 
@@ -47,23 +49,47 @@ const PatcherData PATCHER_TABLE[N_OBJECTS][N_OBJECTS] =
 {
     /* ObjectOutput */
     {
-	{Object::LINK_NONE, 0, 0}, /* ObjectOutput */
-	{Object::LINK_NONE, 0, 0}, /* ObjectMixer */
-	{Object::LINK_NONE, 0, 0}  /* ObjectOscillator */
+	{Object::LINK_NONE, 0, 0},  /* ObjectOutput */
+	{Object::LINK_NONE, 0, 0},  /* ObjectMixer */
+	{Object::LINK_NONE, 0, 0},  /* ObjectOscillator */
+	{Object::LINK_NONE, 0, 0},  /* ObjectLFO */
+	{Object::LINK_NONE, 0, 0}   /* ObjectFilter */
     },
 
     /* ObjectMixer */
     {
 	{Object::LINK_AUDIO, ObjectMixer::OUT_A_OUTPUT, ObjectOutput::IN_A_INPUT},  /* ObjectOutput */
 	{Object::LINK_AUDIO, ObjectMixer::OUT_A_OUTPUT, PATCHER_ANY}, /* ObjectMixer */
-	{Object::LINK_NONE, 0, 0} /* ObjectOscillator */
+	{Object::LINK_NONE, 0, 0},/* ObjectOscillator */
+	{Object::LINK_NONE, 0, 0}, /* ObjectLFO */
+	{Object::LINK_AUDIO, ObjectMixer::OUT_A_OUTPUT, ObjectFilter::IN_A_INPUT} /* ObjectFilter */
     },
 
     /* ObjectOscillator */
     {
 	{Object::LINK_NONE, 0, 0}, /* ObjectOutput */
-	{Object::LINK_AUDIO, ObjectMixer::OUT_A_OUTPUT, PATCHER_ANY}, /* ObjectMixer */
-	{Object::LINK_NONE, 0, 0} /* ObjectOscillator */
+	{Object::LINK_AUDIO, ObjectOscillator::OUT_A_OUTPUT, PATCHER_ANY}, /* ObjectMixer */
+	{Object::LINK_NONE, 0, 0}, /* ObjectOscillator */
+	{Object::LINK_NONE, 0, 0}, /* ObjectLFO */
+	{Object::LINK_AUDIO, ObjectMixer::OUT_A_OUTPUT, ObjectFilter::IN_A_INPUT} /* ObjectFilter */
+    },
+
+    /* ObjectLFO */
+    {
+	{Object::LINK_NONE, 0, 0}, /* ObjectOutput */
+	{Object::LINK_CONTROL, ObjectLFO::OUT_C_OUTPUT, ObjectMixer::IN_C_AMPLITUDE}, /* ObjectMixer */
+	{Object::LINK_CONTROL, ObjectLFO::OUT_C_OUTPUT, ObjectOscillator::IN_C_FREQUENCY}, /* ObjectOscillator */
+	{Object::LINK_CONTROL, ObjectLFO::OUT_C_OUTPUT, ObjectLFO::IN_C_FREQUENCY}, /* ObjectLFO */
+	{Object::LINK_CONTROL, ObjectLFO::OUT_C_OUTPUT, ObjectFilter::IN_C_CUTOFF}  /* ObjectFilter */
+    },
+
+    /* ObjectFilter */
+    {
+	{Object::LINK_NONE, 0, 0}, /* ObjectOutput */
+	{Object::LINK_AUDIO, ObjectFilter::OUT_A_OUTPUT, PATCHER_ANY}, /* ObjectMixer */
+	{Object::LINK_NONE, 0, 0}, /* ObjectOscillator */
+	{Object::LINK_NONE, 0, 0}, /* ObjectLFO */
+	{Object::LINK_AUDIO, ObjectFilter::OUT_A_OUTPUT, ObjectFilter::IN_A_INPUT}
     }
 };
 
@@ -89,17 +115,23 @@ bool PatcherDynamic::addObject(Object* obj)
 	    if (i->first == obj->getID())
 		continue;
 	    
-	    other_type = (*i).second.obj->getType(); 
+	    other_type = i->second.obj->getType(); 
 
 	    if (PATCHER_TABLE[this_type][other_type].socket_type != Object::LINK_NONE) {
 		m_links.insert(new Link(obj, (*i).second.obj,
-					obj->sqrDistanceTo(*(*i).second.obj),
+					obj->sqrDistanceTo(*i->second.obj),
+					i->second.obj->getX()*i->second.obj->getX() +
+					i->second.obj->getY()*i->second.obj->getY(),
 					PATCHER_TABLE[this_type][other_type].socket_type,
 					PATCHER_TABLE[this_type][other_type].src_socket,
 					PATCHER_TABLE[this_type][other_type].dest_socket));
-	    } else if (PATCHER_TABLE[other_type][this_type].socket_type != Object::LINK_NONE) {
-		m_links.insert(new Link((*i).second.obj, obj,
-					(*i).second.obj->sqrDistanceTo(*obj),
+	    }
+
+	    if (PATCHER_TABLE[other_type][this_type].socket_type != Object::LINK_NONE) {
+		m_links.insert(new Link(i->second.obj, obj,
+					i->second.obj->sqrDistanceTo(*obj),
+					obj->getX()*obj->getX() +
+					obj->getY()*obj->getY(),
 					PATCHER_TABLE[other_type][this_type].socket_type,
 					PATCHER_TABLE[other_type][this_type].src_socket,
 					PATCHER_TABLE[other_type][this_type].dest_socket));
@@ -158,11 +190,14 @@ void PatcherDynamic::moveObject(Object* obj)
 
 void PatcherDynamic::makeLink(Link& l)
 {
-    cout << "making link, source: " << l.src->getID() << " dest: "<< l.dest->getID() << endl;
+    // cout << "making link, source: " << l.src->getID() << " dest: "<< l.dest->getID() << endl;
 
-    if (l.dest->getInSocket(l.sock_type, l.actual_in_sock).getSourceObject() != NULL)
-	notifyLinkDeleted(PatcherEvent(l.src, l.dest, l.actual_in_sock, l.out_sock, l.sock_type));
-      
+    Object* old_src = l.dest->getInSocket(l.sock_type, l.actual_in_sock).getSourceObject();
+    if (old_src != NULL) {
+	notifyLinkDeleted(PatcherEvent(old_src, l.dest, l.actual_in_sock, l.out_sock, l.sock_type));
+	// cout << "undoing link, source: " << old_src << " dest: "<< l.dest->getID() << endl;
+    }
+    
     l.dest->connectIn(l.sock_type, l.actual_in_sock, l.src, l.out_sock);
     notifyLinkAdded(PatcherEvent(l.src, l.dest, l.actual_in_sock, l.out_sock, l.sock_type));
 }
@@ -171,7 +206,7 @@ void PatcherDynamic::undoLink(Link& l)
 {
     if (l.actual_in_sock >= 0) {
 	if (l.dest->getInSocket(l.sock_type, l.actual_in_sock).getSourceObject() == l.src) {
-	    cout << "undoing link, source: " << l.src->getID() << " dest: "<< l.dest->getID() << endl;
+	    // cout << "undoing link, source: " << l.src->getID() << " dest: "<< l.dest->getID() << endl;
 	    l.dest->connectIn(l.sock_type, l.actual_in_sock, NULL, l.out_sock);
 
 	    notifyLinkDeleted(PatcherEvent(l.src, l.dest, l.actual_in_sock, l.out_sock, l.sock_type));
@@ -193,6 +228,11 @@ void PatcherDynamic::findInSock(Link &l)
     float max_dist = l.dist;
     
     l.actual_in_sock = -1; 
+
+    if (m_nodes[l.dest->getID()].out_used == true &&
+	m_nodes[l.dest->getID()].dest == l.src) {
+	return;
+    }
     
     if (l.in_sock == -1) {
 	for (int i = 0; i < l.dest->getNumInput(l.sock_type); i++) {
@@ -210,7 +250,7 @@ void PatcherDynamic::findInSock(Link &l)
 	}
     } else {
 	Object* obj = l.dest->getInSocket(l.sock_type, l.in_sock).getSourceObject(); 
-	if (obj == NULL || obj->sqrDistanceTo(*l.dest))
+	if (obj == NULL || l.src->sqrDistanceTo(*l.dest) < obj->sqrDistanceTo(*l.dest))
 	    l.actual_in_sock = l.in_sock;
     }
 }
@@ -232,7 +272,7 @@ void PatcherDynamic::update()
 	Node& node = (*n).second;
 	Link& link = **i;
 
-	cout << "trying, src: " << link.src->getID() << " dest: " << link.dest->getID() << " out: " << node.out_used << endl; 
+	//cout << "trying, src: " << link.src->getID() << " dest: " << link.dest->getID() << " out: " << node.out_used << endl; 
 
 	if (!node.out_used) {
 	    if (!isLinked(link)) {
@@ -240,6 +280,7 @@ void PatcherDynamic::update()
 		if (link.actual_in_sock >= 0) {
 		    makeLink(link);
 		    node.out_used = true;
+		    node.dest = link.dest;
 		}
 	    } else
 		node.out_used = true;
@@ -248,7 +289,7 @@ void PatcherDynamic::update()
 	    link.actual_in_sock = -1;
 	}
     }
-    cout << "---" << endl;
+    // cout << "---" << endl;
 
     m_changed = false;
 }

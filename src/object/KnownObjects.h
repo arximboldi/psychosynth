@@ -27,6 +27,8 @@ enum KnownObjectType {
     OBJ_OUTPUT = 0,
     OBJ_MIXER,
     OBJ_OSCILLATOR,
+    OBJ_LFO,
+    OBJ_FILTER,
     N_OBJECTS
 };
 

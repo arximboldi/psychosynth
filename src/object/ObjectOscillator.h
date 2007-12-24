@@ -28,6 +28,7 @@
 
 #include "object/Object.h"
 #include "object/KnownObjects.h"
+#include "object/WaveTable.h"
 
 class ObjectOscillator : public Object
 {		
@@ -47,15 +48,15 @@ public:
 	N_OUT_A_SOCKETS
     };
 	
-    enum OutControlSocketID{
+    enum OutControlSocketID {
 	N_OUT_C_SOCKETS
     };
 
     enum WaveType {
-	OSC_SINE,
-	OSC_SQUARE,
-	OSC_TRIANGLE,
-	OSC_SAWTOOTH,
+	OSC_SINE     = WaveTable::SINE,
+	OSC_SQUARE   = WaveTable::SQUARE,
+	OSC_TRIANGLE = WaveTable::TRIANGLE,
+	OSC_SAWTOOTH = WaveTable::SAWTOOTH,
 	N_OSC_TYPES
     };
 
@@ -66,14 +67,12 @@ public:
 	N_PARAM
     };
 
-private:
-    const static int DEFAULT_FREQ = 110;
-    const static float  DEFAULT_AMPL = 0.5;
-    const static int TABLE_SIZE = 1<<12;
-
-    static Sample m_table[N_OSC_TYPES][TABLE_SIZE];
-    static bool m_initialized;
+    static const float DEFAULT_FREQ = 220.0f;
+    static const float DEFAULT_AMPL = 0.5f;
     
+private:
+    WaveTable& m_table;
+
     float m_time;
     
     int   m_param_mode;
@@ -82,18 +81,10 @@ private:
     float m_old_freq;
 	
     void doUpdate();
-    void initializeSine(Sample* tab, int size);
-    void initializeTriangle(Sample* tab, int size);
-    void initializeSquare(Sample* tab, int size);
-    void initializeSawtooth(Sample* tab, int size);
     
 public:
     ObjectOscillator(const AudioInfo& prop, int mode = OSC_SINE);
     ~ObjectOscillator();
 };
-
-#define NINT(f) ((f)-floor(f) < ceil(f)-(f) ? floor(f) : ceil(f))
-
-#define MPI 3.14159265
 
 #endif /* OBJECTOSCILLATOR_H */

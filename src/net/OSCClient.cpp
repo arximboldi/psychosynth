@@ -50,6 +50,7 @@ void OSCClientSubject::notifyClientDisconnect(OSCClient* param, OSCClientError e
 }
 
 OSCClient::OSCClient() :
+    OSCController(false),
     m_server(NULL),
     m_state(IDLE),
     m_count_next(0)
@@ -145,7 +146,7 @@ int OSCClient::update(int msec)
 void OSCClient::addMethods()
 {
     /* DEBUG */
-    lo_server_add_method(m_server, NULL, NULL, &lo_generic_handler, NULL);
+    // lo_server_add_method(m_server, NULL, NULL, &lo_generic_handler, NULL);
 
     lo_server_add_method(m_server, MSG_DROP, "", &drop_cb, this);
     lo_server_add_method(m_server, MSG_ACCEPT, "i", &accept_cb, this);

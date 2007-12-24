@@ -24,6 +24,7 @@
 #include <pthread.h>
 
 #include "output/OutputAlsa.h"
+#include "common/Logger.h"
 
 using namespace std;
 
@@ -50,9 +51,9 @@ void OutputAlsa::run()
 
 	if ((nframes = snd_pcm_avail_update (alsa_pcm)) < 0) {
 	    if (nframes == -EPIPE)
-		cout << _("ERROR: Alsa buffer underrun ocurred.") << endl;
+		Logger::instance().log("alsa", Log::WARNING, "Buffer underrun ocurred.");
 	    else
-		cout << _("ERROR: Unknown Alsa avail update return value.") << endl;
+		Logger::instance().log("alsa", Log::WARNING, "Unknown snd_pcm_avail_update() return value.");
 	}
 
 	process(getInfo().block_size);
@@ -65,7 +66,7 @@ void OutputAlsa::start()
 	setState(RUNNING);
 	alsa_thread.start();
     } else {
-	cout << _("ERROR: Alsa output thread already started or Alsa subsystem not initialized.") << endl;
+	Logger::instance().log("alsa", Log::WARNING, "Thread already started or subsystem not initialized.");
     }
 }
 
@@ -75,7 +76,7 @@ void OutputAlsa::stop()
 	setState(IDLE);
 	alsa_thread.join();
     } else {
-	cout << _("ERROR: Alsa output thread not running.") << endl;
+	Logger::instance().log("alsa", Log::WARNING, "Thread not running.");
     }
 }
 
@@ -87,8 +88,9 @@ bool OutputAlsa::open()
 	
     if (getState() == NOTINIT) {
 	if ((err = snd_pcm_open (&alsa_pcm, alsa_device.c_str(), SND_PCM_STREAM_PLAYBACK, 0)) < 0) {
-	    cerr << _("ERROR: Cannot open ALSA device: ") << alsa_device 
-		 << " (" << snd_strerror(err) << ")." << endl;
+	    Logger::instance().log("alsa", Log::WARNING,
+				   string("Could not open device. (")
+				   + snd_strerror(err) + ")");
 	    return false;
 	}
 		
@@ -115,7 +117,7 @@ bool OutputAlsa::open()
 		
 	return true;
     } else {
-	cerr << _("WARNING: ALSA output object already initialized.") << endl;
+	Logger::instance().log("alsa", Log::WARNING, "Can not initialize twice.");
 	return false;
     }
 }
@@ -131,7 +133,8 @@ bool OutputAlsa::put(const AudioBuffer& in_buf, size_t nframes)
     if (in_buf.getInfo().num_channels != getInfo().num_channels 
 	|| in_buf.getInfo().sample_rate != getInfo().sample_rate) {
 	/* TODO: Adapt the audio signal to fit our requeriments. */
-	WARNING("Cant send data to the device: data and output system properties missmatch.");
+	Logger::instance().log("alsa", Log::WARNING,
+			       "Cant send data to the device: data and output system properties missmatch.");
 	return false;
     }
 
@@ -154,8 +157,10 @@ bool OutputAlsa::put(const AudioBuffer& in_buf, size_t nframes)
 	    }
 
 	    if ((err = snd_pcm_writei (alsa_pcm, m_buf, copyframes)) != (int)copyframes) {
-		WARNING( _("Write to ALSA audio interface failed.")
-			 << " (" << snd_strerror (err) << ").");
+		Logger::instance().log("alsa", Log::WARNING,
+				       string("Could not write to device. (")
+				       + snd_strerror(err) + ")");
+		close(); /* FIXME: Always needed? */
 		ret = false;
 	    }
 	    
@@ -163,7 +168,7 @@ bool OutputAlsa::put(const AudioBuffer& in_buf, size_t nframes)
 	}
 		
     } else {
-	cerr << _("ERROR: ALSA output device not initialized. Cannot write.") << endl;
+	Logger::instance().log("alsa", Log::WARNING, "Cannot write to an unitialized device");
 	ret = false;
     }
 	
@@ -180,10 +185,11 @@ bool OutputAlsa::close()
 	snd_pcm_hw_params_free(alsa_hwparams);
 	snd_pcm_sw_params_free(alsa_swparams);
 	setState(NOTINIT);
+
+	delete [] m_buf;
 	return true;
-		
     } else {
-	cerr << _("ERROR: ALSA output device not initialized. Cannot end");
+	Logger::instance().log("alsa", Log::WARNING, "Cannot close a device which is not opened.");
 	return false;
     }
 }

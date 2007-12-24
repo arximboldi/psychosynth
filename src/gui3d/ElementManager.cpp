@@ -24,10 +24,16 @@
 
 #include "gui3d/ElementManager.h"
 #include "gui3d/ElementTypes.h"
-#include "gui3d/ElementOscillator.h"
-#include "gui3d/ElementMixer.h"
+#include "gui3d/TheElements.h"
 #include "gui3d/QueryFlags.h"
-#include "common/Error.h"
+
+#include "common/Logger.h"
+
+#include "object/ObjectMixer.h"
+#include "object/ObjectOscillator.h"
+#include "object/ObjectLFO.h"
+#include "object/ObjectFilter.h"
+
 #include "object/KnownObjects.h"
 
 using namespace std;
@@ -44,15 +50,28 @@ ElementManager::ElementManager(Table* table, Ogre::SceneManager* scene,
 {
 }
 
+ElementManager::~ElementManager()
+{
+    for (ElemMapIter it = m_elems.begin(); it != m_elems.end(); ++it)
+	delete it->second;
+
+    for (list<Connection*>::iterator it = m_cons.begin(); it != m_cons.end(); ++it)
+	delete *it;
+
+    delete m_rayquery;
+}
+
 Element* ElementManager::createElement(TableObject& obj)
 {
     switch (obj.getType()) {
     case OBJ_OSCILLATOR:
 	return new ElementOscillator(obj, m_scene);
-
+    case OBJ_LFO:
+	return new ElementLFO(obj, m_scene);
+    case OBJ_FILTER:
+	return new ElementFilter(obj, m_scene);
     case OBJ_MIXER:
 	return new ElementMixer(obj, m_scene);
-	
     default:
 	return NULL;
     }
@@ -66,27 +85,87 @@ void ElementManager::addElement(int e_type)
     case ELEM_OSC_SINE:
 	obj = m_table->addObject(OBJ_OSCILLATOR);
 	obj.setParam(ObjectOscillator::PARAM_WAVE,
-		      ObjectOscillator::OSC_SINE);
+		     ObjectOscillator::OSC_SINE);
 	break;
 	
     case ELEM_OSC_SQUARE:
 	obj = m_table->addObject(OBJ_OSCILLATOR);
 	obj.setParam(ObjectOscillator::PARAM_WAVE,
-		      ObjectOscillator::OSC_SQUARE);
+		     ObjectOscillator::OSC_SQUARE);
 	break;
 	
     case ELEM_OSC_TRIANGLE:
 	obj = m_table->addObject(OBJ_OSCILLATOR);
 	obj.setParam(ObjectOscillator::PARAM_WAVE,
-		      ObjectOscillator::OSC_TRIANGLE);
+		     ObjectOscillator::OSC_TRIANGLE);
 	break;
 	
     case ELEM_OSC_SAWTOOTH:
 	obj = m_table->addObject(OBJ_OSCILLATOR);
 	obj.setParam(ObjectOscillator::PARAM_WAVE,
-		      ObjectOscillator::OSC_SAWTOOTH);
+		     ObjectOscillator::OSC_SAWTOOTH);
 	break;
 
+    case ELEM_LFO_SINE:
+	obj = m_table->addObject(OBJ_LFO);
+	obj.setParam(ObjectLFO::PARAM_WAVE,
+		     ObjectLFO::LFO_SINE);
+	break;
+	
+    case ELEM_LFO_SQUARE:
+	obj = m_table->addObject(OBJ_LFO);
+	obj.setParam(ObjectLFO::PARAM_WAVE,
+		     ObjectLFO::LFO_SQUARE);
+	break;
+	
+    case ELEM_LFO_TRIANGLE:
+	obj = m_table->addObject(OBJ_LFO);
+	obj.setParam(ObjectLFO::PARAM_WAVE,
+		     ObjectLFO::LFO_TRIANGLE);
+	break;
+	
+    case ELEM_LFO_SAWTOOTH:
+	obj = m_table->addObject(OBJ_LFO);
+	obj.setParam(ObjectLFO::PARAM_WAVE,
+		     ObjectLFO::LFO_SAWTOOTH);
+	break;
+
+    case ELEM_FILTER_LOWPASS:
+	obj = m_table->addObject(OBJ_FILTER);
+	obj.setParam(ObjectFilter::PARAM_TYPE,
+		     ObjectFilter::FILTER_LOWPASS);
+	break;
+
+    case ELEM_FILTER_HIGHPASS:
+	obj = m_table->addObject(OBJ_FILTER);
+	obj.setParam(ObjectFilter::PARAM_TYPE,
+		     ObjectFilter::FILTER_HIGHPASS);
+	break;
+
+    case ELEM_FILTER_BANDPASS_CSG:
+	obj = m_table->addObject(OBJ_FILTER);
+	obj.setParam(ObjectFilter::PARAM_TYPE,
+		     ObjectFilter::FILTER_BANDPASS_CSG);
+	break;
+
+    case ELEM_FILTER_BANDPASS_CZPG:
+	obj = m_table->addObject(OBJ_FILTER);
+	obj.setParam(ObjectFilter::PARAM_TYPE,
+		     ObjectFilter::FILTER_BANDPASS_CZPG);
+	break;
+
+    case ELEM_FILTER_NOTCH:
+	obj = m_table->addObject(OBJ_FILTER);
+	obj.setParam(ObjectFilter::PARAM_TYPE,
+		     ObjectFilter::FILTER_NOTCH);
+	break;
+
+    case ELEM_FILTER_MOOG:
+	obj = m_table->addObject(OBJ_FILTER);
+	obj.setParam(ObjectFilter::PARAM_TYPE,
+		     ObjectFilter::FILTER_MOOG);
+	break;
+	
     case ELEM_MIXER:
 	m_table->addObject(OBJ_MIXER);
 	break;
@@ -165,7 +244,7 @@ bool ElementManager::keyPressed(const OIS::KeyEvent &e)
     
     for (ElemMapIter it = m_elems.begin(); it != m_elems.end();)
 	if((*it++).second->keyPressed(e))
-		ret = true;    
+	    ret = true;    
 
     return ret;
 }
@@ -176,7 +255,7 @@ bool ElementManager::keyReleased(const OIS::KeyEvent &e)
     
     for (ElemMapIter it = m_elems.begin(); it != m_elems.end();)
 	if((*it++).second->keyReleased(e))
-		ret = true;    
+	    ret = true;    
     
     return ret;
 }
@@ -218,7 +297,7 @@ void ElementManager::handleLinkAdded(const TablePatcherEvent& ev)
 
 void ElementManager::handleLinkDeleted(const TablePatcherEvent& ev)
 {
-     /* TODO */
+    /* TODO */
     for (list<Connection*>::iterator it = m_cons.begin(); it != m_cons.end();)
 	if ((*it)->getSource() == ev.src && (*it)->getDestiny() == ev.dest) {
 	    delete *it;

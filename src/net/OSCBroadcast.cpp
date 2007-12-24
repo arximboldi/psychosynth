@@ -76,8 +76,12 @@ void OSCBroadcast::broadcastMessageFrom(const char* path, lo_message msg, lo_add
     if (m_sender) {
 	for (list<lo_address>::iterator it = m_dest.begin();
 	     it != m_dest.end(); ++it)
-	    if (!lo_address_equals(*it, source))
+	    if (!lo_address_equals(*it, source)) {
 		lo_send_message_from(*it, m_sender, path, msg);
+		cout << "yeoo!!\n";
+	    }
+	    else
+		cout << "yeah!!\n";
     } else {
 	for (list<lo_address>::iterator it = m_dest.begin();
 	     it != m_dest.end(); ++it)

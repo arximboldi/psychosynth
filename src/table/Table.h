@@ -31,6 +31,7 @@
 #include "table/Patcher.h"
 #include "object/Object.h"
 #include "object/ObjectOutput.h"
+#include "object/ObjectMixer.h"
 #include "object/ObjectManager.h"
 #include "output/Output.h"
 

@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) 2007 Juan Pedro Bolivar Puente                          *
+ *   Copyright (C) Juan Pedro Bolivar Puente 2007                          *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -27,23 +27,28 @@
 
 using namespace std;
 
+void Object::Param::clear()
+{
+    switch(m_type) {
+    case PARAM_INT:
+	delete static_cast<int*>(m_src);
+	break;
+    case PARAM_FLOAT:
+	delete static_cast<float*>(m_src);
+	break;
+    case PARAM_STRING:
+	delete static_cast<std::string*>(m_src);
+	break;
+    default: break;
+    }
+}
+
 void Object::Param::configure(int type, void* dest)
 {
     m_dest = dest;
     
     if (type != m_type) {
-	switch(m_type) {
-	case PARAM_INT:
-	    delete static_cast<int*>(m_src);
-	    break;
-	case PARAM_FLOAT:
-	    delete static_cast<float*>(m_src);
-	    break;
-	case PARAM_STRING:
-	    delete static_cast<std::string*>(m_src);
-	    break;
-	default: break;
-	}
+	clear();
 		
 	m_type = type;
 
