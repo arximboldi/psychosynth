@@ -88,7 +88,7 @@ class Filter
     */
     Sample m_y1, m_y2, m_y3, m_y4, m_oldx, m_oldy1, m_oldy2, m_oldy3;
 public:
-    Filter(FilterValues* coef = NULL) :
+    Filter(FilterValues* coef = 0) :
 	m_coef(coef), m_local_coef(false),
 	m_ou1(0), m_ou2(0),
 	m_in1(0), m_in2(0),
