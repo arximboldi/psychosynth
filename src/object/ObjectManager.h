@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) 2007 Juan Pedro Bolivar Puente                          *
+ *   Copyright (C) Juan Pedro Bolivar Puente 2007                          *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -29,7 +29,8 @@
 #include "object/ObjectManager.h"
 #include "object/ObjectOutput.h"
 
-class ObjectManager {
+class ObjectManager
+{
     std::map<int, Object*> m_objmap;
     std::list<ObjectOutput*> m_outputs;
 	

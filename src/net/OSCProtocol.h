@@ -32,11 +32,10 @@
 #define MSG_GET_STATE   "/ps/get_state"
 
 /* Table constrolling. */
-#define MSG_PARAM       "/ps/param"
-#define MSG_MOVE        "/ps/move"
-#define MSG_ACTIVATE    "/ps/activate"
-#define MSG_DEACTIVATE  "/ps/deactivate"
-#define MSG_ADD         "/ps/add"
-#define MSG_DELETE      "/ps/delete"
+#define MSG_PARAM        "/ps/param"
+#define MSG_ACTIVATE     "/ps/activate"
+#define MSG_DEACTIVATE   "/ps/deactivate"
+#define MSG_ADD          "/ps/add"
+#define MSG_DELETE       "/ps/delete"
 
 #endif /* OSCPROTOCOL_H */

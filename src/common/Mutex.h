@@ -65,28 +65,28 @@ public:
 	destroy();
     }
 
-    bool lock() {
-	if (pthread_mutex_lock(&mutex) == EDEADLK)
+    bool lock() const {
+	if (pthread_mutex_lock((pthread_mutex_t*)&mutex) == EDEADLK)
 	    return true;
 	return false;
     }
 
-    bool tryLock() {
-	if (pthread_mutex_trylock(&mutex) == EBUSY)
+    bool tryLock() const {
+	if (pthread_mutex_trylock((pthread_mutex_t*)&mutex) == EBUSY)
 	    return false;
 	return true;
     }
 
 #if 0
-    bool timedLock(const timespec& delay) {
-	if (pthread_mutex_timedlock_np(&mutex, &delay) == EBUSY)
+    bool timedLock(const timespec& delay) const {
+	if (pthread_mutex_timedlock_np((pthread_mutex_t*)&mutex, &delay) == EBUSY)
 	    return false;
 	return true;
     }
 #endif
 
-    void unlock() {
-	pthread_mutex_unlock(&mutex);
+    void unlock() const {
+	pthread_mutex_unlock((pthread_mutex_t*)&mutex);
     }
 };
 
@@ -103,42 +103,42 @@ public:
 	pthread_rwlock_destroy(&rwlock);
     }
 
-    void readLock() {
-	pthread_rwlock_rdlock(&rwlock);
+    void readLock() const {
+	pthread_rwlock_rdlock((pthread_rwlock_t*)&rwlock);
     }
     
-    void writeLock() {
-	pthread_rwlock_wrlock(&rwlock);
+    void writeLock() const {
+	pthread_rwlock_wrlock((pthread_rwlock_t*)&rwlock);
     }
 
-    bool tryReadLock() {
-	if (pthread_rwlock_tryrdlock(&rwlock) == EBUSY)
+    bool tryReadLock() const {
+	if (pthread_rwlock_tryrdlock((pthread_rwlock_t*)&rwlock) == EBUSY)
 	    return false;
 	return true;
     }
 
     bool tryWriteLock() {
-	if (pthread_rwlock_trywrlock(&rwlock) == EBUSY)
+	if (pthread_rwlock_trywrlock((pthread_rwlock_t*)&rwlock) == EBUSY)
 	    return false;
 	return true;
     }
 
 #if 0
-    bool timedReadLock(const struct timespec* delay) {
-	if (pthread_rwlock_timedrdlock_np(&rwlock, delay) == EBUSY)
+    bool timedReadLock(const struct timespec* delay) const {
+	if (pthread_rwlock_timedrdlock_np((pthread_rwlock_t*)&rwlock, delay) == EBUSY)
 	    return false;
 	return true;
     }
     
-    bool timedWriteLock(const timespec& delay) {
-	if (pthread_rwlock_timedwrlock_np(&rwlock, &delay) == EBUSY)
+    bool timedWriteLock(const timespec& delay) const {
+	if (pthread_rwlock_timedwrlock_np((pthread_rwlock_t*)&rwlock, &delay) == EBUSY)
 	    return false;
 	return true;
     }
 #endif
     
-    void unlock() {
-	pthread_rwlock_unlock(&rwlock);
+    void unlock() const {
+	pthread_rwlock_unlock((pthread_rwlock_t*)&rwlock);
     }
 };
 
@@ -155,28 +155,30 @@ public:
 	pthread_cond_destroy(&cond);
     }
 
-    void broadcast() {
-	pthread_cond_broadcast(&cond);
+    void broadcast() const {
+	pthread_cond_broadcast((pthread_cond_t*)&cond);
     }
 
-    void signal() {
-	pthread_cond_signal(&cond);
+    void signal() const {
+	pthread_cond_signal((pthread_cond_t*)&cond);
     }
 
-    void wait(Mutex& mutex) {
-	pthread_cond_wait(&cond, &mutex.mutex);
+    void wait(Mutex& mutex) const {
+	pthread_cond_wait((pthread_cond_t*)&cond,
+			  (pthread_mutex_t*)&mutex.mutex);
     }
-
     
-    bool timedWait(Mutex& mutex, const timespec& abstime) {
-	if (pthread_cond_timedwait(&cond, &mutex.mutex, &abstime) == ETIMEDOUT)
+    bool timedWait(Mutex& mutex, const timespec& abstime) const {
+	if (pthread_cond_timedwait((pthread_cond_t*)&cond,
+				   (pthread_mutex_t*)&mutex.mutex,
+				   &abstime) == ETIMEDOUT)
 	    return false;
 	return true;
     }
 
 #if 0
     static void calcExpiration(const timespec& delta,
-			       timespec& abstime) {
+			       timespec& abstime) const {
 	pthread_get_expiration_np(&delta, &abstime);
     }
 #endif

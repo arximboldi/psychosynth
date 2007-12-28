@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) 2007 by Juan Pedro Bolivar Puente                       *
+ *   Copyright (C) Juan Pedro Bolivar Puente 2007                          *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -20,68 +20,46 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef PATCHER_H
-#define PATCHER_H
-
-#include <map>
-#include <set>
+#ifndef OBJECTRADAR_H
+#define OBJECTRADAR_H
 
 #include "object/Object.h"
 
-struct PatcherEvent {
-    Object* src;
-    Object* dest;
-    int src_socket;
-    int dest_socket;
-    int socket_type;
-
-    PatcherEvent(Object* s, Object* d, int ss, int ds, int st):
-	src(s), dest(d), src_socket(ss), dest_socket(ds), socket_type(st) {};
-};
-
-class PatcherListener {
-public:
-    virtual ~PatcherListener() {};
-    virtual void handleLinkAdded(const PatcherEvent& ev) = 0;
-    virtual void handleLinkDeleted(const PatcherEvent& ev) = 0;
-};
-
-class PatcherSubject {
-    std::list<PatcherListener*> m_list;
-
-protected:
-    void notifyLinkAdded(const PatcherEvent& ev) {
-	for (std::list<PatcherListener*>::iterator it = m_list.begin();
-	     it != m_list.end(); )
-	    (*it++)->handleLinkAdded(ev);
-    };
-    
-    void notifyLinkDeleted(const PatcherEvent& ev) {
-	for (std::list<PatcherListener*>::iterator it = m_list.begin();
-	     it != m_list.end(); )
-	    (*it++)->handleLinkDeleted(ev);
-    };
-    
-public:
-    void addListener(PatcherListener* l) {
-	m_list.push_back(l);
-    };
-    
-    void deleteListener(PatcherListener* l) {
-	m_list.remove(l);
-    };
-};
-
-class Patcher : public PatcherSubject
+class ObjectRadar : public Object
 {
-public:
-    virtual ~Patcher() {};
+    float m_param_speed;
+    float m_param_angle;
+    float m_angle;
     
-    virtual bool addObject(Object* obj) = 0;
-    virtual bool deleteObject(Object* obj) = 0;
-    virtual void setParamObject(Object* obj, Object::ParamID param) = 0;
-    virtual void update() = 0;
-    virtual void clear() = 0;
+    void doUpdate(const Object* caller, int caller_port_type, int caller_port);
+    void doAdvance();
+    
+public:
+    enum {
+      N_IN_A_SOCKETS
+    };
+	
+    enum InControlSocketID {
+	IN_C_SPEED,
+	N_IN_C_SOCKETS
+    };
+	
+    enum OutAudioSocketID {
+	N_OUT_A_SOCKETS
+    };
+	
+    enum OutControlSocketID {
+	OUT_C_TRIGGER,
+	N_OUT_C_SOCKETS
+    };
+
+    enum ParamID {
+	PARAM_SPEED,
+	PARAM_ANGLE,
+	N_PARAM
+    };
+    
+    ObjectRadar(const AudioInfo& info);
 };
 
-#endif /* PATCHER_H */
+#endif /* OBJECTRADAR_H */

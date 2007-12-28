@@ -31,6 +31,7 @@ psychosynth_SOURCES = \
 	gui3d/Connection.cpp \
 	gui3d/OgreMisc.cpp \
 	gui3d/NetworkWindow.cpp \
+	gui3d/RecordWindow.cpp \
 	gui3d/GuiLogSink.cpp \
 	object/Object.cpp \
 	object/ObjectOscillator.cpp \
@@ -48,6 +49,7 @@ psychosynth_SOURCES = \
 	output/OutputJack.cpp \
 	output/OutputAlsa.cpp \
 	output/OutputOss.cpp \
+	output/OutputWave.cpp \
 	psychosynth.cpp
 
 AM_CPPFLAGS = $(all_includes)
@@ -59,7 +61,8 @@ psychosynth_CXXFLAGS = \
 	$(CEGUIOGRE_CFLAGS) \
 	$(ALSA_CFLAGS) \
 	$(JACK_CFLAGS) \
-	$(LIBLO_CFLAGS)
+	$(LIBLO_CFLAGS) \
+	$(AUDIOFILE_CFLAGS)
 
 psychosynth_LDFLAGS = $(all_libraries)
 psychosynth_LDADD = \
@@ -69,7 +72,8 @@ psychosynth_LDADD = \
 	$(CEGUIOGRE_LIBS)\
 	$(ALSA_LIBS) \
 	$(JACK_LIBS) \
-	$(LIBLO_LIBS)
+	$(LIBLO_LIBS) \
+	$(AUDIOFILE_LIBS)
 
 noinst_HEADERS = \
 	common/ArgParser.h \
@@ -109,6 +113,7 @@ noinst_HEADERS = \
 	gui3d/Connection.h\
 	gui3d/OgreMisc.h \
 	gui3d/NetworkWindow.h \
+	gui3d/RecordWindow.h \
 	gui3d/GuiLogSink.h \
 	object/Object.h \
 	object/ObjectOscillator.h \
@@ -132,5 +137,6 @@ noinst_HEADERS = \
 	output/OutputJack.h \
 	output/OutputAlsa.h \
 	output/OutputOss.h \
+	output/OutputWave.h \
 	psychosynth.h
 

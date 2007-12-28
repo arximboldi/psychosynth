@@ -65,10 +65,9 @@ public:
 
     ~Connection();
     
-    void handleMoveObject(TableObject& obj);
     void handleActivateObject(TableObject& obj) {};
     void handleDeactivateObject(TableObject& obj) {};
-    void handleSetParamObject(TableObject& ob, int param_id) {};
+    void handleSetParamObject(TableObject& ob, Object::ParamID param_id);
 
     const TableObject& getSource() {
 	return m_s_obj;

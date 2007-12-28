@@ -35,9 +35,9 @@ using namespace std;
 
 OutputOss::OutputOss(const AudioInfo& info, const std::string& device) : 
     Output(info),
-    buf(NULL),
-    oss_device(device),
-    oss_thread(this)
+    m_buf(NULL),
+    m_device(device),
+    m_thread(this)
 {
 }
 
@@ -58,7 +58,7 @@ void OutputOss::start()
 {
     if (getState() == IDLE) {
 	setState(RUNNING);
-	oss_thread.start();
+	m_thread.start();
     } else {
 	cout << _("ERROR: OSS output thread already started or OSS subsystem not initialized.") << endl;
     }
@@ -68,7 +68,7 @@ void OutputOss::stop()
 {
     if (getState() == RUNNING) {
 	setState(IDLE);
-	oss_thread.join();
+	m_thread.join();
     } else {
 	cout << _("ERROR: Alsa output thread not running.") << endl;
     }
@@ -77,19 +77,19 @@ void OutputOss::stop()
 bool OutputOss::open()
 {
     if (getState() == NOTINIT) {
-	if ((oss_fd = ::open(oss_device.c_str(), O_WRONLY, 0)) < 0) {
-	    cerr << _("ERROR: Could not open OSS device: ") << oss_device << endl;
+	if ((m_fd = ::open(m_device.c_str(), O_WRONLY, 0)) < 0) {
+	    cerr << _("ERROR: Could not open OSS device: ") << m_device << endl;
 	    return false;
 	}
 		
-	oss_format = AFMT_S16_LE;
-	oss_stereo = getInfo().num_channels == 2 ? 1 : 0;
+	m_format = AFMT_S16_LE;
+	m_stereo = getInfo().num_channels == 2 ? 1 : 0;
 		
-	ioctl(oss_fd, SNDCTL_DSP_SETFMT, &oss_format);
-	ioctl(oss_fd, SNDCTL_DSP_STEREO, &oss_stereo);
-	ioctl(oss_fd, SNDCTL_DSP_SPEED,  &getInfo().sample_rate);
+	ioctl(m_fd, SNDCTL_DSP_SETFMT, &m_format);
+	ioctl(m_fd, SNDCTL_DSP_STEREO, &m_stereo);
+	ioctl(m_fd, SNDCTL_DSP_SPEED,  &getInfo().sample_rate);
 		
-	buf = new short int[getInfo().block_size * getInfo().num_channels * sizeof(short int)];
+	m_buf = new short int[getInfo().block_size * getInfo().num_channels * sizeof(short int)];
 		
 	setState(IDLE);
 	return true;
@@ -100,11 +100,8 @@ bool OutputOss::open()
 }
 
 bool OutputOss::put(const AudioBuffer& in_buf, size_t nframes)
-{
-    int i, j;
-    short int* bufp;
+{  
     bool ret = true;
-    Real r;
 	
     if (in_buf.getInfo().num_channels != getInfo().num_channels 
 	|| in_buf.getInfo().sample_rate != getInfo().sample_rate) {
@@ -115,22 +112,14 @@ bool OutputOss::put(const AudioBuffer& in_buf, size_t nframes)
 
     if (getState() != NOTINIT) {
 	int copyframes = getInfo().block_size;
-	int index = 0;
+
 	while (nframes > 0) {
 	    if ((int)nframes < copyframes)
 		copyframes = nframes;
 			
-	    bufp = buf;
-	    for (i = 0; i < copyframes; i++, index++) {
-		for (j = 0; j < getInfo().num_channels; j++) {
-		    r = in_buf[j][index]; /* TODO: Optimize interleaving */
-		    if (r < -1) r = -1; 
-		    else if (r > 1) r = 1;	
-		    *(bufp++) = (short int)(r*32766.0);
-		}
-	    }
+	    in_buf.interleaveS16(m_buf, copyframes);
 			
-	    write(oss_fd, buf, copyframes * (getInfo().num_channels) * sizeof(short int));
+	    write(m_fd, m_buf, copyframes * (getInfo().num_channels) * sizeof(short int));
 	    nframes -= copyframes;
 	}
 		
@@ -147,8 +136,8 @@ bool OutputOss::close()
     if (getState() != NOTINIT) {
 	if (getState() == RUNNING)
 	    stop();
-	delete [] buf;
-	::close(oss_fd);
+	delete [] m_buf;
+	::close(m_fd);
 	return true;
     } else {
 	cerr << _("ERROR: OSS output device not initialized. Cannot end") << endl;

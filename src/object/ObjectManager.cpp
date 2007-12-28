@@ -101,6 +101,6 @@ void ObjectManager::update()
 	
     list<ObjectOutput*>::iterator out_iter;
     for (out_iter = m_outputs.begin(); out_iter != m_outputs.end(); ++out_iter) {
-	(*out_iter)->update();
+	(*out_iter)->update(NULL, -1, -1);
     }
 }

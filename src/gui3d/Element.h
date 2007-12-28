@@ -40,7 +40,7 @@ class ElemComponent
 public:    
     virtual ~ElemComponent() {};
     virtual void init() = 0;
-    virtual void handleParamChange(TableObject& obj, int param_id) = 0;
+    virtual void handleParamChange(TableObject& obj, Object::ParamID id) = 0;
     virtual bool handlePointerMove(Ogre::Vector2 pos) = 0;
     virtual bool handlePointerClick(Ogre::Vector2 pos, OIS::MouseButtonID id) = 0;
     virtual bool handlePointerRelease(Ogre::Vector2 pos, OIS::MouseButtonID id) = 0;
@@ -93,11 +93,14 @@ class Element : public TableObjectListener
     bool m_moving;
 
     ElementProperties m_gui_prop;
+
+    void objectMoved(TableObject& pos, Vector2f& dest);
+
 public:
     static const Real RADIOUS = 1.0f;
     static const Real Z_POS = 0.001f;
     
-    Element(const TableObject& obj, Ogre::SceneManager* scene);
+    Element(TableObject& obj, Ogre::SceneManager* scene);
     
     virtual ~Element();
 
@@ -115,10 +118,9 @@ public:
     bool keyPressed(const OIS::KeyEvent& e);
     bool keyReleased(const OIS::KeyEvent& e);
     
-    void handleMoveObject(TableObject& obj);
     void handleActivateObject(TableObject& obj);
     void handleDeactivateObject(TableObject& obj);
-    void handleSetParamObject(TableObject& ob, int param_id);
+    void handleSetParamObject(TableObject& ob, Object::ParamID param_id);
     
     bool isGhost() const {
 	return m_ghost;

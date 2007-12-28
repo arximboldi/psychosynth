@@ -42,16 +42,16 @@ ObjectOscillator::ObjectOscillator(const AudioInfo& prop, int mode) :
     m_param_ampl(DEFAULT_AMPL),
     m_old_freq(DEFAULT_FREQ)
 {    
-    configureParam(PARAM_WAVE, PARAM_INT, &m_param_mode);
-    configureParam(PARAM_FREQUENCY, PARAM_FLOAT, &m_param_freq);
-    configureParam(PARAM_AMPLITUDE, PARAM_FLOAT, &m_param_ampl);
+    configureLocalParam(PARAM_WAVE, PARAM_INT, &m_param_mode);
+    configureLocalParam(PARAM_FREQUENCY, PARAM_FLOAT, &m_param_freq);
+    configureLocalParam(PARAM_AMPLITUDE, PARAM_FLOAT, &m_param_ampl);
 }
 
 ObjectOscillator::~ObjectOscillator()
 {
 }
 
-void ObjectOscillator::doUpdate()
+void ObjectOscillator::doUpdate(const Object* caller, int caller_port_type, int caller_port)
 {
     AudioBuffer*         buf = getOutput<AudioBuffer>(LINK_AUDIO, OUT_A_OUTPUT);
     const ControlBuffer* pitch_buf = getInput<ControlBuffer>(LINK_CONTROL, IN_C_FREQUENCY);

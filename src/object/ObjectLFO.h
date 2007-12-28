@@ -77,7 +77,8 @@ private:
     float m_param_ampl;
     float m_old_freq;
 	
-    void doUpdate();
+    void doUpdate(const Object* caller, int caller_port_type, int caller_port);
+    void doAdvance() {}
     
 public:
     ObjectLFO(const AudioInfo& prop, int mode = LFO_SINE);

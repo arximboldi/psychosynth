@@ -28,25 +28,25 @@
 class ElementMixer : public Element
 {  
 public:
-    ElementMixer(const TableObject& obj, Ogre::SceneManager* m_scene);
+    ElementMixer(TableObject& obj, Ogre::SceneManager* m_scene);
 };
 
 class ElementOscillator : public Element
 {
 public:
-    ElementOscillator(const TableObject& obj, Ogre::SceneManager* m_scene);
+    ElementOscillator(TableObject& obj, Ogre::SceneManager* m_scene);
 };
 
 class ElementLFO : public Element
 {
 public:
-    ElementLFO(const TableObject& obj, Ogre::SceneManager* m_scene);
+    ElementLFO(TableObject& obj, Ogre::SceneManager* m_scene);
 };
 
 class ElementFilter : public Element
 {
 public:
-    ElementFilter(const TableObject& obj, Ogre::SceneManager* m_scene);
+    ElementFilter(TableObject& obj, Ogre::SceneManager* m_scene);
 };
 
 #endif /* THEELEMENTS_H */

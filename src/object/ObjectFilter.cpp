@@ -42,16 +42,16 @@ ObjectFilter::ObjectFilter(const AudioInfo& prop, int mode) :
 		    prop.sample_rate),
     m_filter(prop.num_channels, Filter(&m_filter_values))
 {
-    configureParam(PARAM_TYPE, PARAM_INT, &m_param_type);
-    configureParam(PARAM_CUTOFF, PARAM_FLOAT, &m_param_cutoff);
-    configureParam(PARAM_RESONANCE, PARAM_FLOAT, &m_param_resonance);
+    configureLocalParam(PARAM_TYPE, PARAM_INT, &m_param_type);
+    configureLocalParam(PARAM_CUTOFF, PARAM_FLOAT, &m_param_cutoff);
+    configureLocalParam(PARAM_RESONANCE, PARAM_FLOAT, &m_param_resonance);
 }
 
 ObjectFilter::~ObjectFilter()
 {
 }
 
-void ObjectFilter::doUpdate()
+void ObjectFilter::doUpdate(const Object* caller, int caller_port_type, int caller_por)
 {
     const AudioBuffer* input = getInput<AudioBuffer>(LINK_AUDIO, IN_A_INPUT);
     const ControlBuffer* cutoff = getInput<ControlBuffer>(LINK_CONTROL, IN_C_CUTOFF);

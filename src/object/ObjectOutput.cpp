@@ -28,16 +28,37 @@ const int SAFETY_FACTOR = 4;
 
 using namespace std;
 
-void ObjectOutput::doUpdate()
+ObjectOutput::~ObjectOutput()
+{
+    for (std::list<Slot*>::iterator i = m_slots.begin(); i != m_slots.end(); ++i)
+	delete *i;
+
+    for (list<Output*>::iterator it = m_passive_slots.begin();
+	 it != m_passive_slots.end();
+	 ++it)
+	delete *it;
+}
+
+void ObjectOutput::doUpdate(const Object* caller, int caller_port_type, int caller_port)
 {
     const AudioBuffer* in;
-
-    m_buflock.writeLock();
-    if ((in = getInput<AudioBuffer>(LINK_AUDIO, IN_A_INPUT)))
+    
+    if ((in = getInput<AudioBuffer>(LINK_AUDIO, IN_A_INPUT))) {
+	//m_buflock.writeLock();
 	m_buffer.write(*in);
-    else 
+	//m_buflock.unlock();
+	
+	//m_passive_lock.lock();
+	for (list<Output*>::iterator it = m_passive_slots.begin();
+	     it != m_passive_slots.end();
+	     ++it)
+	    (*it)->put(*in);
+	//m_passive_lock.unlock();
+    } else {
+	//m_buflock.writeLock();
 	m_buffer.write(AudioBuffer(getAudioInfo()));
-    m_buflock.unlock();
+	//m_buflock.unlock();
+    }
 }
 
 ObjectOutput::ObjectOutput(AudioInfo& info) :
@@ -59,41 +80,35 @@ void ObjectOutput::outputCallback(int nframes, void* arg)
 	
     slot->m_parent->output(*slot, nframes);
 }
-	
+
+/*
+  TODO:
+  Hay que pensarse bien como sincronizar esto. Aunque no lo necesitamos
+  aún.
+*/
 void ObjectOutput::output(Slot& slot, size_t nframes)
-{    
-    if (nframes > m_buffer.size()) {
-	cout << "nframes: " << nframes << endl;
-	m_buflock.writeLock();
-	m_buffer.resize(nframes * SAFETY_FACTOR);
-	m_buflock.unlock();
+{
+    if (nframes > slot.m_buf.size()) {
+	slot.m_buf.resize(nframes);
     }
 
-    if (nframes > slot.m_buf.size()) {
-	cout << "nframiss: " << nframes << endl;
-	slot.m_buf.resize(nframes);
+    if (nframes > m_buffer.size()) {
+	m_buffer.resize(nframes * SAFETY_FACTOR);
     }
 
     if (m_manager) {
 	int avail;
 
-	m_buflock.readLock();
 	avail = m_buffer.availible(slot.m_ptr);
-	m_buflock.unlock();
-
+	
 	while(avail < nframes) {
 	    m_manager->update();
-
-	    m_buflock.readLock();
+	    
 	    avail = m_buffer.availible(slot.m_ptr);
-	    m_buflock.unlock();
 	}
     }
 
-    m_buflock.readLock();
     m_buffer.read(slot.m_ptr, slot.m_buf, nframes);
-    m_buflock.unlock();
     
     slot.m_out->put(slot.m_buf, nframes);
 }
-

@@ -32,22 +32,25 @@ class ElemSecondComponent : public ElemComponent
     Ogre::SceneNode* m_point_node;
     Ogre::SceneNode* m_point_yaw;
     Ogre::Degree m_angle;
-    
-    int m_param;
+
+    Object::ParamScope m_scope;
+    Object::ParamID m_param;
+
     float m_min_val;
     float m_max_val;
     float m_old_value;
     bool m_changing;
     
 public:
-    ElemSecondComponent(int param, float min_val, float max_val);
+    ElemSecondComponent(Object::ParamID param,
+			float min_val, float max_val);
     ~ElemSecondComponent();
     
     void init();
     bool handlePointerMove(Ogre::Vector2 pos);
     bool handlePointerClick(Ogre::Vector2 pos, OIS::MouseButtonID id);
     bool handlePointerRelease(Ogre::Vector2 pos, OIS::MouseButtonID id);
-    void handleParamChange(TableObject& obj, int param_id);   
+    void handleParamChange(TableObject& obj, Object::ParamID param_id);   
 };
 
 #endif /* ELEMSECONDCOMPONENT_H */

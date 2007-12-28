@@ -31,7 +31,8 @@ using namespace Ogre;
 
 
 ElemMainComponent::ElemMainComponent(const std::string& mesh,
-				     int param, float min_val, float max_val) :
+				     Object::ParamID param,
+				     float min_val, float max_val) :
     m_mesh(mesh),
     m_mesh_ent(NULL),
     m_indicator(NULL),
@@ -128,11 +129,12 @@ void ElemMainComponent::init()
     getSceneNode()->attachObject(m_indicator_fill);
 }
 
-void ElemMainComponent::handleParamChange(TableObject& obj, int param_id)
+void ElemMainComponent::handleParamChange(TableObject& obj, Object::ParamID param_id)
 {
     if (param_id == m_param) {
 	float new_val;
 	obj.getParam(m_param, new_val);
+
 	m_ent_node->yaw(Radian((new_val - m_old_value)/(m_max_val-m_min_val) * 2 * Math::PI));
 	m_indicator_fill->setEndAngle(Degree(INDICATOR_MIN_ANGLE +
 					     new_val/(m_max_val-m_min_val)
@@ -142,15 +144,17 @@ void ElemMainComponent::handleParamChange(TableObject& obj, int param_id)
     }
 }
 
-ElemMultiMainComponent::ElemMultiMainComponent(int param_1, float min_val, float max_val,
-					       int param_2, const char** names) :
+ElemMultiMainComponent::ElemMultiMainComponent(Object::ParamID param_1,
+					       float min_val, float max_val,
+					       Object::ParamID param_2,
+					       const char** names) :
     ElemMainComponent(names[0], param_1, min_val, max_val),
     m_param(param_2),
     m_names(names)
 {
 }
 
-void ElemMultiMainComponent::handleParamChange(TableObject& obj, int param_id)
+void ElemMultiMainComponent::handleParamChange(TableObject& obj, Object::ParamID param_id)
 {
     if (param_id == m_param) {
 	int val;

@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) 2007 Juan Pedro Bolivar Puente                          *
+ *   Copyright (C) Juan Pedro Bolivar Puente 2007                          *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -20,72 +20,40 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef OBJECTOSCILLATOR_H
-#define OBJECTOSCILLATOR_H
+#include "object/ObjectRadar.h"
 
-#include <iostream>
-#include <cmath>
+using namespace std;
 
-#include "object/Object.h"
-#include "object/KnownObjects.h"
-#include "object/WaveTable.h"
+ObjectRadar::ObjectRadar(const AudioInfo& prop, int numchan) : 
+    Object(prop,
+	   OBJ_MIXER,
+	   N_PARAM,
+	   N_IN_A_SOCKETS, 
+	   N_IN_C_SOCKETS,
+	   N_OUT_A_SOCKETS,
+	   N_OUT_C_SOCKETS),
+    m_param_speed(0.5f),
+    m_numchan(numchan)
+{
+    configureLocalParam(PARAM_AMPLITUDE, Object::PARAM_FLOAT, &m_param_ampl);
+}
 
-class ObjectOscillator : public Object
-{		
-public:	
-    enum InAudioSocketID {
-	N_IN_A_SOCKETS
-    };
-	
-    enum InControlSocketID {
-	IN_C_FREQUENCY,
-	IN_C_AMPLITUDE,
-	N_IN_C_SOCKETS
-    };
-	
-    enum OutAudioSocketID {
-	OUT_A_OUTPUT,
-	N_OUT_A_SOCKETS
-    };
-	
-    enum OutControlSocketID {
-	N_OUT_C_SOCKETS
-    };
+void ObjectRadar::doUpdate(const Object* caller, int caller_port_type, int caller_port)
+{
+    if (caller) {
+	Sample* out_buf = getOutput(LINK_CONTROL, OUT_C_TRIGGER)->getData();
+	Vector2f pos;
+	caller->getParam(PARAM_COMMON, PARAM_POSITION, pos);
 
-    enum WaveType {
-	OSC_SINE     = WaveTable::SINE,
-	OSC_SQUARE   = WaveTable::SQUARE,
-	OSC_TRIANGLE = WaveTable::TRIANGLE,
-	OSC_SAWTOOTH = WaveTable::SAWTOOTH,
-	N_OSC_TYPES
-    };
+	for (size_t i = 0; i < getInfo().block_size; ++i) {
+	    new_angle += 1 / getInfo().sample_rate;
+	    *out_buf++ = 
+	}
+    }
+}
 
-    enum ParamID {
-	PARAM_WAVE,
-	PARAM_FREQUENCY,
-	PARAM_AMPLITUDE,
-	N_PARAM
-    };
+void ObjectRadar::doAdvance()
+{
+    m_angle += m_param_speed * getInfo().block_size / getInfo().sample_rate;
+}
 
-    static const float DEFAULT_FREQ = 220.0f;
-    static const float DEFAULT_AMPL = 0.5f;
-    
-private:
-    WaveTable& m_table;
-
-    float m_time;
-    
-    int   m_param_mode;
-    float m_param_freq;
-    float m_param_ampl;
-    float m_old_freq;
-	
-    void doUpdate(const Object* caller, int caller_port_type, int caller_port);
-    void doAdvance() {}
-    
-public:
-    ObjectOscillator(const AudioInfo& prop, int mode = OSC_SINE);
-    ~ObjectOscillator();
-};
-
-#endif /* OBJECTOSCILLATOR_H */

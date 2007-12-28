@@ -30,22 +30,23 @@
 
 class ElementProperties;
 
-class ElemGuiParam {
+class ElemGuiParam
+{
     friend class ElementProperties;
 
     CEGUI::Window* m_window;
     ElementProperties* m_parent;
-    int m_param;
+    Object::ParamID m_param;
     bool changed;
     
 public:
-    ElemGuiParam(int param) :
+    ElemGuiParam(Object::ParamID param) :
 	m_param(param) {};
     
     virtual ~ElemGuiParam() {};
 
     virtual void createGUI() = 0;
-    virtual void handleParamChange(TableObject& obj, int param) = 0;
+    virtual void handleParamChange(TableObject& obj, Object::ParamID id) = 0;
 
     void init(ElementProperties* parent, CEGUI::Window* window) {
 	m_window = window;
@@ -53,7 +54,7 @@ public:
 	createGUI();
     }
     
-    int getParam() {
+    Object::ParamID getParam() {
 	return m_param;
     }
 
@@ -66,7 +67,8 @@ public:
     };
 };
 
-class ElemGuiParamFloat : public ElemGuiParam {
+class ElemGuiParamFloat : public ElemGuiParam
+{
     CEGUI::Window*  m_label;
     CEGUI::Spinner* m_spinner;
     float m_min_val;
@@ -75,10 +77,10 @@ class ElemGuiParamFloat : public ElemGuiParam {
     int m_skip;
     
 public:
-    ElemGuiParamFloat(int param, float min_val, float max_val, const std::string& name);
+    ElemGuiParamFloat(Object::ParamID param, float min_val, float max_val, const std::string& name);
 
     void createGUI();
-    void handleParamChange(TableObject& obj, int param);
+    void handleParamChange(TableObject& obj, Object::ParamID param);
     bool onSpinnerChange(const CEGUI::EventArgs &e);
 };
 
@@ -92,18 +94,18 @@ class ElemGuiParamMulti : public ElemGuiParam {
     int m_skip;
     
 public:
-    ElemGuiParamMulti(int param, int nval, const char** names,
+    ElemGuiParamMulti(Object::ParamID param, int nval, const char** names,
 		      const std::string& name);
 
     void createGUI();
-    void handleParamChange(TableObject& obj, int param);
+    void handleParamChange(TableObject& obj, Object::ParamID param);
     bool onComboboxChange(const CEGUI::EventArgs &e);
 };
 
 class ElementProperties : public ToggableWindow,
 			  public TableObjectListener
 {
-    std::map<int, ElemGuiParam*> m_params;
+    std::map<Object::ParamID, ElemGuiParam*> m_params;
     TableObject m_obj;
     
     CEGUI::Window* m_container;
@@ -123,9 +125,8 @@ public:
     }
 
     void addParameter(ElemGuiParam* e);
-    void handleSetParamObject(TableObject& ob, int param_id);
+    void handleSetParamObject(TableObject& ob, Object::ParamID param_id);
     
-    void handleMoveObject(TableObject& obj) {};
     void handleActivateObject(TableObject& obj) {};
     void handleDeactivateObject(TableObject& obj) {};
     

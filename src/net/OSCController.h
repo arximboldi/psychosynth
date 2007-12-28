@@ -43,7 +43,6 @@ class OSCController : public TableListener,
     
     LO_HANDLER(OSCController, add);
     LO_HANDLER(OSCController, delete);
-    LO_HANDLER(OSCController, move);
     LO_HANDLER(OSCController, param);
     LO_HANDLER(OSCController, activate);
     LO_HANDLER(OSCController, deactivate);
@@ -101,10 +100,9 @@ public:
     
     void handleAddObject(TableObject& obj);
     void handleDeleteObject(TableObject& obj);
-    void handleMoveObject(TableObject& obj);
     void handleActivateObject(TableObject& obj);
     void handleDeactivateObject(TableObject& obj);
-    void handleSetParamObject(TableObject& ob, int param_id);
+    void handleSetParamObject(TableObject& ob, Object::ParamID param_id);
 };
 
 #endif /* OSCCONTROLLER_H */

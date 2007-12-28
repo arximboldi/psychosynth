@@ -67,26 +67,12 @@ public:
 	return m_obj->getType();
     };
     
-    Real getX() const {
-	return m_obj->getX();
-    };
-    
-    Real getY() const {
-	return m_obj->getY();
-    };
-
     Table* getTable() {
 	return m_table;
     }
     
-    std::pair<Real, Real> getPosition() const {
-	return std::pair<Real, Real>(m_obj->getX(), m_obj->getY());
-    };
-
-    inline void move(Real x, Real y);
-    
     template <typename T>
-    inline void setParam(int id, const T& data);
+    inline void setParam(Object::ParamID id, const T& data);
 
     inline void addListener(TableObjectListener* cl);
 
@@ -98,12 +84,12 @@ public:
 
     inline void deactivate();
     
-    int getParamType(int id) {
+    int getParamType(Object::ParamID id) const {
 	return m_obj->getParamType(id);
     };
     
     template <typename T>
-    void getParam(int id, T& data) {
+    void getParam(Object::ParamID id, T& data) const {
 	m_obj->getParam(id, data);
     };
 
@@ -128,10 +114,9 @@ class TableObjectListener
 {
 public:
     virtual ~TableObjectListener() {};
-    virtual void handleMoveObject(TableObject& obj) = 0;
     virtual void handleActivateObject(TableObject& obj) = 0;
     virtual void handleDeactivateObject(TableObject& obj) = 0;
-    virtual void handleSetParamObject(TableObject& ob, int param_id) = 0;
+    virtual void handleSetParamObject(TableObject& ob, Object::ParamID id) = 0;
 };
 
 struct TablePatcherEvent
@@ -168,10 +153,9 @@ class TableSubject
 protected:
     void notifyAddObject(TableObject& obj);
     void notifyDeleteObject(TableObject& obj);
-    void notifyMoveObject(TableObject& obj);
     void notifyActivateObject(TableObject& obj);
     void notifyDeactivateObject(TableObject& obj);
-    void notifySetParamObject(TableObject& obj, int param_id);
+    void notifySetParamObject(TableObject& obj, Object::ParamID param_id);
     void notifyLinkAdded(const TablePatcherEvent& ev);
     void notifyLinkDeleted(const TablePatcherEvent& ev);
     
@@ -239,18 +223,23 @@ public:
 
     void clear();
     
-    const AudioInfo& getInfo() const;
+    const AudioInfo& getInfo() const {
+	return m_info;
+    };
 
     TableObject findObject(int id);
 
     TableObject addObject(int type);
 
-    void moveObject(TableObject& obj, Real x, Real y);
-
     template <typename T>
-    void setParamObject(TableObject& obj, int id, const T& data) {
+    void setParamObject(TableObject& obj,
+			Object::ParamID id, const T& data) {
 	obj.m_obj->setParam(id, data);
+
 	notifySetParamObject(obj, id);
+	
+	if (m_patcher)
+	    m_patcher->setParamObject(obj.m_obj, id);
     }
     
     void deleteObject(TableObject& obj);
@@ -263,8 +252,16 @@ public:
 	m_output->attachOutput(out);
     };
 
-    void dattachOutput(Output* out) {
+    void attachPassiveOutput(Output* out) {
+	m_output->attachPassiveOutput(out);
+    };
+    
+    void detachOutput(Output* out) {
 	m_output->detachOutput(out);
+    };
+
+    void detachPassiveOutput(Output* out) {
+	m_output->detachPassiveOutput(out);
     };
 
     void attachPatcher(Patcher* pat);
@@ -293,12 +290,8 @@ public:
     }
 };
 
-void TableObject::move(Real x, Real y) {
-    m_table->moveObject(*this, x, y);
-};
-    
 template <typename T>
-void TableObject::setParam(int id, const T& data) {
+void TableObject::setParam(Object::ParamID id, const T& data) {
     m_table->setParamObject(*this, id, data);
 };
 

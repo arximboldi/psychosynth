@@ -47,18 +47,6 @@ void TableSubject::notifyDeleteObject(TableObject& obj)
 	(*i)->handleDeleteObject(obj);
 }
     
-void TableSubject::notifyMoveObject(TableObject& obj)
-{
-    for (ObjectListenerIter i = m_all_obj_list.begin(); i != m_all_obj_list.end(); i++)
-	(*i)->handleMoveObject(obj);
-    
-    std::map<int, std::list<TableObjectListener*> >::iterator it;
-    if ((it = m_obj_listeners.find(obj.getID())) != m_obj_listeners.end()) {
-	for (ObjectListenerIter i = it->second.begin(); i != it->second.end(); i++)
-	    (*i)->handleMoveObject(obj);
-    }
-}
-
 void TableSubject::notifyActivateObject(TableObject& obj)
 {
     for (ObjectListenerIter i = m_all_obj_list.begin(); i != m_all_obj_list.end(); i++)
@@ -83,7 +71,7 @@ void TableSubject::notifyDeactivateObject(TableObject& obj)
     }
 }
 
-void TableSubject::notifySetParamObject(TableObject& obj, int param_id)
+void TableSubject::notifySetParamObject(TableObject& obj, Object::ParamID param_id)
 {
     for (ObjectListenerIter i = m_all_obj_list.begin(); i != m_all_obj_list.end(); i++)
 	(*i)->handleSetParamObject(obj, param_id);
@@ -179,14 +167,6 @@ TableObject Table::addObject(int type)
     return tobj;
 }
 
-void Table::moveObject(TableObject& obj, Real x, Real y)
-{
-    obj.m_obj->setXY(x, y);
-    if (m_patcher)
-	m_patcher->moveObject(obj.m_obj);
-    notifyMoveObject(obj);
-}
-
 void Table::deleteObject(TableObject& obj)
 {
     if (m_patcher)
@@ -198,6 +178,9 @@ void Table::deleteObject(TableObject& obj)
 
 void Table::activateObject(TableObject& obj)
 {
+    obj.m_obj->update(NULL, -1, -1);
+    obj.m_obj->advance();
+    
     if (m_patcher)
 	m_patcher->addObject(obj.m_obj);
     notifyActivateObject(obj);

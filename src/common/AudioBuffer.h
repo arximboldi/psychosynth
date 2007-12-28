@@ -57,7 +57,11 @@ public:
     }
 	
     AudioBuffer& operator= (const AudioBuffer& buf);
-	
+
+    void interleave(Sample* dest, size_t n_frames) const;
+    void interleaveS16(short int* dest, size_t n_frames) const;
+    void interleaveI32(int* dest, size_t n_frames) const;
+    
     const AudioInfo& getInfo() const {
 	return m_info;
     }
@@ -77,7 +81,7 @@ public:
     Sample** const getData() const {
 	return m_data;
     }
-	
+    
     Sample* operator[] (int n) {
 	return m_data[n];
     }

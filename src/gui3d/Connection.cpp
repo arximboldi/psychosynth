@@ -75,10 +75,18 @@ Connection::Connection(Ogre::SceneManager* scene,
 		       const TableObject& dest) :
     m_scene(scene),
     m_s_obj(src),
-    m_d_obj(dest),
-    m_src(src.getX(), src.getY()),
-    m_dest(dest.getX(), dest.getY())
+    m_d_obj(dest)
 {
+    Vector2f v;
+
+    src.getParam(Object::ParamID(Object::PARAM_COMMON, Object::PARAM_POSITION), v);
+    m_src.x = v.x;
+    m_src.y = v.y;
+
+    dest.getParam(Object::ParamID(Object::PARAM_COMMON, Object::PARAM_POSITION), v);
+    m_dest.x = v.x;
+    m_dest.y = v.y;
+    
     m_node = m_scene->getRootSceneNode()->createChildSceneNode();
     m_line = new ConnectionObject(m_node->getName(), ColourValue(0.7, 0.7, 0, 0.5),
 				  m_src, m_dest);
@@ -98,37 +106,42 @@ Connection::~Connection()
     delete m_line;
 }
 
-void Connection::handleMoveObject(TableObject& obj)
+void Connection::handleSetParamObject(TableObject& obj, Object::ParamID id)
 {
-    if (obj.getID() == m_s_obj.getID()) {
-	m_src.x = obj.getX();
-	m_src.y = obj.getY();
-    } else if (obj.getID() == m_d_obj.getID()) {
-	m_dest.x = obj.getX();
-	m_dest.y = obj.getY();
-    }
+    if (id == Object::ParamID(Object::PARAM_COMMON, Object::PARAM_POSITION)) {
+	Vector2f pos;
+	obj.getParam(id, pos);
+    
+	if (obj.getID() == m_s_obj.getID()) {
+	    m_src.x = pos.x;
+	    m_src.y = pos.y;
+	} else if (obj.getID() == m_d_obj.getID()) {
+	    m_dest.x = pos.x;
+	    m_dest.y = pos.y;
+	}
 
-    m_line->update(m_src, m_dest);
+	m_line->update(m_src, m_dest);
+    }
 }
 
 /*
-void Connection::updateSource(const Vector2& pos)
-{
-    m_src = pos;
-    m_line->update(m_src, m_dest);
-}
+  void Connection::updateSource(const Vector2& pos)
+  {
+  m_src = pos;
+  m_line->update(m_src, m_dest);
+  }
 
-void Connection::updateDestiny(const Vector2& pos)
-{
-    m_dest = pos;
-    m_line->update(m_src, m_dest);
-}
+  void Connection::updateDestiny(const Vector2& pos)
+  {
+  m_dest = pos;
+  m_line->update(m_src, m_dest);
+  }
 
-void Connection::update(const Vector2& src, const Vector2& dest)
-{
-    m_src = src;
-    m_dest = dest;
-    m_line->update(m_src, m_dest);
-}
+  void Connection::update(const Vector2& src, const Vector2& dest)
+  {
+  m_src = src;
+  m_dest = dest;
+  m_line->update(m_src, m_dest);
+  }
 */
 

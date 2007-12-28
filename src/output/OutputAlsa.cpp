@@ -124,12 +124,9 @@ bool OutputAlsa::open()
 
 bool OutputAlsa::put(const AudioBuffer& in_buf, size_t nframes)
 {
-    int err, j;
-    size_t i;
-    short int* bufp;
+    int err;
     bool ret = true;
-    Real r;
-	
+   	
     if (in_buf.getInfo().num_channels != getInfo().num_channels 
 	|| in_buf.getInfo().sample_rate != getInfo().sample_rate) {
 	/* TODO: Adapt the audio signal to fit our requeriments. */
@@ -140,21 +137,12 @@ bool OutputAlsa::put(const AudioBuffer& in_buf, size_t nframes)
 
     if (getState() != NOTINIT) {
 	size_t copyframes = getInfo().block_size;
-	size_t index = 0;
-	
+		
 	while (nframes > 0) {
 	    if (nframes < copyframes)
 		copyframes = nframes;
-			
-	    bufp = m_buf;
-	    for (i = 0; i < copyframes; i++, index++) {
-		for (j = 0; j < getInfo().num_channels; j++) {
-		    r = in_buf[j][index]; /* TODO: Optimize interleaving */
-		    if (r < -1) r = -1; 
-		    else if (r > 1) r = 1;	
-		    *(bufp++) = (short int)(r*32766.0);
-		}
-	    }
+
+	    in_buf.interleaveS16(m_buf, copyframes);
 
 	    if ((err = snd_pcm_writei (alsa_pcm, m_buf, copyframes)) != (int)copyframes) {
 		Logger::instance().log("alsa", Log::WARNING,

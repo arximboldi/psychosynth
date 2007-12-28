@@ -34,7 +34,7 @@ ObjectMixer::ObjectMixer(const AudioInfo& prop, int numchan) :
     m_param_ampl(0.5f),
     m_numchan(numchan)
 {
-    configureParam(PARAM_AMPLITUDE, Object::PARAM_FLOAT, &m_param_ampl);
+    configureLocalParam(PARAM_AMPLITUDE, Object::PARAM_FLOAT, &m_param_ampl);
 }
 
 void ObjectMixer::mix(AudioBuffer* dest, const AudioBuffer* src,
@@ -62,7 +62,7 @@ void ObjectMixer::mix(AudioBuffer* dest, const AudioBuffer* src,
     }
 }
 
-void ObjectMixer::doUpdate()
+void ObjectMixer::doUpdate(const Object* caller, int caller_port_type, int caller_port)
 {
     AudioBuffer* buf = getOutput<AudioBuffer>(LINK_AUDIO, OUT_A_OUTPUT);
     const AudioBuffer* in = NULL;

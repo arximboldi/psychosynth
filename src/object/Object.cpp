@@ -39,6 +39,9 @@ void Object::Param::clear()
     case PARAM_STRING:
 	delete static_cast<std::string*>(m_src);
 	break;
+    case PARAM_VECTOR2F:
+	delete static_cast<Vector2f*>(m_src);
+	break;
     default: break;
     }
 }
@@ -68,25 +71,36 @@ void Object::Param::configure(int type, void* dest)
 	    m_src = new string;
 	    *static_cast<string*>(m_src) = *static_cast<string*>(m_dest);
 	    break;
+	case PARAM_VECTOR2F:
+	    m_src = new Vector2f;
+	    *static_cast<Vector2f*>(m_src) = *static_cast<Vector2f*>(m_dest);
+	    break;
 	default: break;
 	}
     }
-    
 }
 
 
-Object::Object(const AudioInfo& info, int type, int params,
+Object::Object(const AudioInfo& info, int type, int loc_params,
 	       int n_in_audio, int n_in_control,
-	       int n_out_audio, int n_out_control) :
+	       int n_out_audio, int n_out_control,
+	       bool single_update) :
     m_audioinfo(info),
     m_outdata_audio(n_out_audio, AudioBuffer(info)),
     m_outdata_control(n_out_control, ControlBuffer(info.block_size)),
-    m_params(params),
     m_id(OBJ_NULL_ID),
     m_type(type),
-    m_x(0), m_y(0),
-    m_updated(false)
+    m_param_position(0,0),
+    m_param_radious(5.0f),
+    m_updated(false),
+    m_single_update(single_update)
 {
+    m_params[PARAM_LOCAL].resize(loc_params);
+    m_params[PARAM_COMMON].resize(N_COMMON_PARAMS);
+
+    configureCommonParam(PARAM_POSITION, PARAM_VECTOR2F, &m_param_position);
+    configureCommonParam(PARAM_RADIOUS, PARAM_FLOAT, &m_param_radious);
+    
     m_out_sockets[LINK_AUDIO].resize(n_out_audio, OutSocket(LINK_AUDIO));
     m_out_sockets[LINK_CONTROL].resize(n_out_control, OutSocket(LINK_CONTROL));
     m_in_sockets[LINK_AUDIO].resize(n_in_audio, InSocket(LINK_AUDIO));
@@ -95,7 +109,6 @@ Object::Object(const AudioInfo& info, int type, int params,
 
 Object::~Object()
 {
-    
 }
 
 void Object::connectIn(int type, int in_socket, Object* src, int out_socket)
@@ -110,22 +123,35 @@ void Object::connectIn(int type, int in_socket, Object* src, int out_socket)
 	src->m_out_sockets[type][out_socket].addReference(this, in_socket);
 }
 
-void Object::update()
+inline bool Object::canUpdate(const Object* caller, int caller_port_type,
+			      int caller_port)
 {
-    if (!m_updated) {
-	size_t i, j;
-	
-	m_updated = true;
+    bool ret;
 
-	m_paramlock.lock();
-	for (vector<Param>::iterator i = m_params.begin(); i != m_params.end(); ++i)
-	    (*i).update();
-	m_paramlock.unlock();
+    if (m_single_update || !caller)
+	ret = !m_updated;
+    else
+	ret = m_updated_links[caller_port_type].insert(std::pair<int,int>(caller->getID(),
+									  caller_port)).second;
+     m_updated = true;
+    
+    return ret;
+}
+
+void Object::update(const Object* caller, int caller_port_type, int caller_port)
+{
+    if (canUpdate(caller, caller_port_type, caller_port)) {
+	size_t i, j;
+
+	for (j = 0; j < PARAM_SCOPES; ++j) {
+	    for (vector<Param>::iterator i = m_params[j].begin(); i != m_params[j].end(); ++i)
+		(*i).update();
+	}
 	
 	for (i = 0; i < LINK_TYPES; ++i)
 	    for (j = 0; j < m_in_sockets[i].size(); ++j)
-		m_in_sockets[i][j].updateInput();
+		m_in_sockets[i][j].updateInput(this, i, j);
 
-	doUpdate(); 
+	doUpdate(caller, caller_port_type, caller_port); 
     }
 }

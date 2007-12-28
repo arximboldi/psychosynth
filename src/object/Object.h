@@ -26,13 +26,14 @@
 #include <list>
 #include <vector>
 #include <cmath>
+#include <set>
 #include <iostream>
 
 #include "psychosynth.h"
 #include "common/ControlBuffer.h"
 #include "common/AudioBuffer.h"
 #include "common/Mutex.h"
-
+#include "common/Vector2D.h"
 
 const int OBJ_NULL_ID = -1;
 
@@ -46,18 +47,50 @@ public:
 	LINK_TYPES
     };
 
+    enum ParamScope {
+	PARAM_LOCAL,
+	PARAM_COMMON,
+	PARAM_SCOPES
+    };
+    
     enum ParamType {
 	PARAM_NONE = -1,
 	PARAM_INT,       /* int */
 	PARAM_FLOAT,     /* float */
 	PARAM_STRING,    /* std::string */
+	PARAM_VECTOR2F,  /* Vector2f */
 	PARAM_TYPES
+    };
+
+    enum CommonParams {
+	PARAM_POSITION = 0,
+	PARAM_RADIOUS,
+	N_COMMON_PARAMS
+    };
+
+    class ParamID {
+    public:
+	ParamScope scope;
+	int id;
+
+	ParamID(ParamScope _scope = PARAM_LOCAL, int _id = 0) :
+	    scope(_scope), id(_id) {}
+
+	bool operator== (const ParamID& param) const {
+	    return scope == param.scope && id == param.id;
+	}
+
+	bool operator< (const ParamID& param) const {
+	    return
+		scope < param.scope ||
+		(scope == param.scope && id < param.id);
+	}
     };
     
     class OutSocket {
 	friend class Object;
 
-	int m_type;	
+	int m_type;
 	std::list<std::pair<Object*, int> > m_ref; /* Objetos y puertos destino */
 
     protected:
@@ -99,9 +132,9 @@ public:
 	    m_srcport = port;
 	}
 		
-	void updateInput() {
+	void updateInput(const Object* caller, int caller_port_type, int caller_port) {
 	    if (m_srcobj)
-		m_srcobj->update();
+		m_srcobj->update(caller, caller_port_type, caller_port);
 	}
 
 	template <typename SocketDataType>
@@ -125,6 +158,7 @@ public:
 private:
 
     class Param {
+	Mutex m_lock;
 	int m_type;
 	bool m_changed;
 	void* m_src;
@@ -148,16 +182,21 @@ private:
 	
 	template <typename T>
 	void set(const T& d) {
+	    m_lock.lock();
 	    m_changed = true;
 	    *static_cast<T*>(m_src) = d;
+	    m_lock.unlock();
 	}
 
 	template <typename T>
 	void get(T& d) const {
+	    m_lock.lock();
 	    d = *static_cast<T*>(m_src);
+	    m_lock.unlock();
 	}
 	
 	void update() {
+	    m_lock.lock();
 	    if (m_changed) {
 		switch(m_type) {
 		case PARAM_INT:
@@ -169,10 +208,14 @@ private:
 		case PARAM_STRING:
 		    *static_cast<std::string*>(m_dest) = *static_cast<std::string*>(m_src);
 		    break;
+		case PARAM_VECTOR2F:
+		    *static_cast<Vector2f*>(m_dest) = *static_cast<Vector2f*>(m_src);
+		    break;
 		default: break;
 		};
 		m_changed = false;
 	    }
+	    m_lock.unlock();
 	}
     };
 
@@ -181,13 +224,29 @@ private:
     std::vector<ControlBuffer> m_outdata_control;
     std::vector<OutSocket>     m_out_sockets[LINK_TYPES];
     std::vector<InSocket>      m_in_sockets[LINK_TYPES];
-    std::vector<Param>         m_params;
+    std::vector<Param>         m_params[PARAM_SCOPES];
     int m_id;
     int m_type;
-    float m_x, m_y; /* TODO: Vector2D class? */
+    
+    Vector2f m_param_position;
+    float m_param_radious;
+
+    /* For !m_single_update, contains the objects that has
+     * been updated (<obj_id, port_id>) */
+    std::set<std::pair<int,int> > m_updated_links[LINK_TYPES];
     bool m_updated;
+    bool m_single_update;
+    
     Mutex m_paramlock;
-   
+
+    
+    bool canUpdate(const Object* caller, int caller_port_type,
+		   int caller_port);
+
+    void configureCommonParam(int id, int type, void* val) {
+	m_params[PARAM_COMMON][id].configure(type, val);
+    }
+    
 protected:
     template <typename SocketDataType>
     SocketDataType* getOutput(int type, int socket) {
@@ -206,16 +265,18 @@ protected:
 	return NULL;
     }
 	
-    virtual void doUpdate() = 0;
-
-    void configureParam(int id, int type, void* val) {
-	m_params[id].configure(type, val);
+    virtual void doUpdate(const Object* caller, int caller_port_type, int caller_port) = 0;
+    virtual void doAdvance() = 0;
+    
+    void configureLocalParam(int id, int type, void* val) {
+	m_params[PARAM_LOCAL][id].configure(type, val);
     }
 	
 public:
     Object(const AudioInfo& prop, int type, int params,
 	   int inaudiosocks, int incontrolsocks,
-	   int outaudiosocks, int outcontrolsocks);
+	   int outaudiosocks, int outcontrolsocks,
+	   bool single_update = true);
 	
     virtual ~Object();
     
@@ -228,42 +289,44 @@ public:
 	m_id = id;
     }
 	
-    int getID() {
+    int getID() const {
 	return m_id;
     }
     
-    void update();
-	
-    bool isUpdated() {
-	return m_updated;
-    }
+    void update(const Object* caller, int caller_port_type, int caller_port);
 	
     void advance() {
 	m_updated = false;
+	if (!m_single_update) {
+	    m_updated_links[LINK_AUDIO].clear();
+	    m_updated_links[LINK_CONTROL].clear();
+	}
+
+	doAdvance();
     }
 	
     const AudioInfo& getAudioInfo() const {
 	return m_audioinfo;
     }
-	
-    void move(float x2, float y2);
-	
+
+    const AudioInfo& getInfo() const {
+	return m_audioinfo;
+    }
+    
     void connectIn(int type, int in_socket, Object* src, int out_socket);
 
-    int getParamType(int id) {
-	return m_params[id].type();
+    int getParamType(ParamID id) {
+	return m_params[id.scope][id.id].type();
     };
     
     template <typename T>
-    void setParam(int id, const T& val) {
-	m_paramlock.lock();
-	m_params[id].set(val);
-	m_paramlock.unlock();
+    void setParam(ParamID id, const T& val) {
+	m_params[id.scope][id.id].set(val);
     }
 
     template <typename T>
-    void getParam(int id, T& val) const {
-	m_params[id].get(val);
+    void getParam(ParamID id, T& val) const {
+	m_params[id.scope][id.id].get(val);
     }
 
     template <typename SocketDataType>
@@ -299,36 +362,29 @@ public:
     void setId(int id) {
 	m_id = id;
     };
-    
-    float getX() const {
-	return m_x;
-    };
-	
-    float getY() const {
-	return m_y;
-    };
-	
-    void setX(float nx) {
-	m_x = nx;
-    }
-	
-    void setY(float ny) {
-	m_y = ny;
-    }
-
-    void setXY(float nx, float ny) {
-	m_x = nx;
-	m_y = ny;
-    }
-	
+        
     float distanceTo(const Object &obj) const {
-	return sqrt((m_x - obj.m_x) * (m_x - obj.m_x) + 
-		    (m_y - obj.m_y) * (m_y - obj.m_y));
+	return m_param_position.distance(obj.m_param_position);
     };
 	
     float sqrDistanceTo(const Object &obj) const {
-	return (m_x - obj.m_x) * (m_x - obj.m_x) + 
-	    (m_y - obj.m_y) * (m_y - obj.m_y);
+	return m_param_position.sqrDistance(obj.m_param_position);
+    };
+
+    float distanceToCenter() const {
+	return m_param_position.length();
+    };
+	
+    float sqrDistanceToCenter() const {
+	return m_param_position.sqrLength();
+    };
+    
+    float distanceTo(const Vector2f& obj) const {
+	return m_param_position.distance(obj);
+    };
+	
+    float sqrDistanceTo(const Vector2f &obj) const {
+	return m_param_position.sqrDistance(obj);
     };
 };
 

@@ -79,7 +79,8 @@ private:
     FilterValues m_filter_values;
     std::vector<Filter> m_filter;
     
-    void doUpdate();
+    void doUpdate(const Object* caller, int caller_port_type, int caller_port);
+    void doAdvance() {}
     
 public:
     ObjectFilter(const AudioInfo& prop, int mode = FILTER_LOWPASS);

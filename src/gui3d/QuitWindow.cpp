@@ -40,7 +40,8 @@ FrameWindow* QuitWindow::createWindow()
     button_quit->setText("Quit");
     button_quit->setPosition( UVector2(UDim(0.10, 0), UDim(0, 40)) );
     button_quit->setSize    ( UVector2(UDim(0.80, 0), UDim(0, 20)) );
-	
+    button_quit->setWantsMultiClickEvents(false);
+    
     window->addChildWindow(button_quit);
 	
     button_quit->subscribeEvent(PushButton::EventClicked, 

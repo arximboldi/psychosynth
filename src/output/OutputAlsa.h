@@ -31,14 +31,15 @@
 #include "output/Output.h"
 #include "common/Thread.h"
 
-class OutputAlsa : public Output, Runnable {
+class OutputAlsa : public Output, Runnable
+{
     snd_pcm_t *alsa_pcm;
     snd_pcm_hw_params_t *alsa_hwparams;
     snd_pcm_sw_params_t *alsa_swparams;
     snd_pcm_format_t alsa_format;
     short int* m_buf;
     std::string alsa_device;
-    Thread alsa_thread;
+    Thread<> alsa_thread;
 public:
     OutputAlsa(const AudioInfo& info, const std::string& device);
     ~OutputAlsa();

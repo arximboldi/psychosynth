@@ -28,6 +28,7 @@
 #include "gui3d/QuitWindow.h"
 #include "gui3d/SelectorWindow.h"
 #include "gui3d/NetworkWindow.h"
+#include "gui3d/RecordWindow.h"
 
 #include "gui3d/CameraControllerRasko.h"
 #include "gui3d/Element.h"
@@ -263,6 +264,10 @@ void PsychoSynth3D::setupMenus()
     m_windowlist->addWindow("SelectorWindowButton.imageset",
 			    "SelectorWindowButton.layout",
 			    selector,
+			    OIS::KC_UNASSIGNED);
+    m_windowlist->addWindow("RecordWindowButton.imageset",
+			    "RecordWindowButton.layout",
+			    new RecordWindow(m_table),
 			    OIS::KC_UNASSIGNED);
     m_windowlist->addWindow("NetworkWindowButton.imageset",
 			    "NetworkWindowButton.layout",

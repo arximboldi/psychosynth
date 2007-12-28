@@ -27,40 +27,116 @@
 
 class Runnable {
 public:
-	virtual ~Runnable() {};
-	virtual void run() = 0;
+    virtual ~Runnable() {};
+    virtual void run() = 0;
 };
 
-class Thread {
-	pthread_t m_thread;
-	Runnable* m_obj;
+#define CALL_MEMBER_FN(object, ptr_to_member)  ((object).*(ptr_to_member))
 
-	static void* process(void* obj) {
-		reinterpret_cast<Runnable*>(obj)->run();
-		return NULL;
+template <class Type = Runnable>
+class Thread
+{
+public:
+    typedef void(Type::*FuncType)();
+
+private:    
+    pthread_t m_thread;
+    Type* m_obj;
+    FuncType m_func;
+
+    static void* process(void* obj) {
+	Thread<Type>* m_this = reinterpret_cast<Thread<Type>*>(obj);
+	CALL_MEMBER_FN(m_this->m_obj, m_this->m_func);
+	return NULL;
+    };
+    
+public:	
+    Thread() :
+	m_obj(NULL),
+	m_func(NULL)
+	{
 	};
+
+    Thread(Type* obj) :
+	m_obj(obj),
+	m_func(NULL)
+	{};
+
+    Thread(Type* obj, FuncType func) :
+	m_obj(obj),
+	m_func(func)
+	{};
+
+    void start() {
+	pthread_create(&m_thread, NULL, &Thread<Type>::process, this);
+    };
+    
+    void start(FuncType func) {
+	m_func = func;
+	pthread_create(&m_thread, NULL, &Thread<Type>::process, this);
+    };
+
+    void start(Type* obj) {
+	m_obj = obj;
+	pthread_create(&m_thread, NULL, &Thread<Type>::process, this);
+    };
+
+    void start(FuncType func, Type* obj) {
+	m_obj = obj;
+	m_func = func;
+	pthread_create(&m_thread, NULL, &Thread<Type>::process, this);
+    };
+	
+    void join() {
+	pthread_join(m_thread, NULL);
+    };
+	
+    pthread_t getThreadId() {
+	return m_thread;
+    };
+};
+
+/*
+ * TODO: Why is the code in Thread.h_gcc_bug not working? Also see
+ *       wether we must not allow initialization of m_obj* after creation.
+ */
+template<>
+class Thread<Runnable>
+{
+    pthread_t m_thread;
+    Runnable* m_obj;
+
+    static void* process(void* obj) {
+	reinterpret_cast<Runnable*>(obj)->run();
+	return NULL;
+    };
 	
 public:	
-	Thread(Runnable* obj = NULL)
-		: m_obj(obj) {};
+    Thread(Runnable* obj = NULL)
+	: m_obj(obj) {};
 	
-	void start() {
-		pthread_create(&m_thread, NULL, &Thread::process, m_obj);
-	};
+    void start(Runnable* obj) {
+	m_obj = obj;
+	pthread_create(&m_thread, NULL, &Thread::process, m_obj);
+    };
+
+    void start() {
+	pthread_create(&m_thread, NULL, &Thread::process, m_obj);
+    };
 	
-	void join() {
-		pthread_join(m_thread, NULL);
-	};
+    void join() {
+	pthread_join(m_thread, NULL);
+    };
 	
-	pthread_t getThreadId() {
-		return m_thread;
-	};
+    pthread_t getThreadId() {
+	return m_thread;
+    };
 };
 
-class SelfThread : public Runnable, public Thread {
+class SelfThread : public Runnable, public Thread<Runnable> {
 public:
-	virtual ~SelfThread() {};
-	SelfThread() : Thread(this) {};
+    virtual ~SelfThread() {};
+    SelfThread() : Thread<Runnable>(this) {};
 };
 
 #endif /* THREAD_H */

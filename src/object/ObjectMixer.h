@@ -33,7 +33,10 @@ class ObjectMixer : public Object
 	
     void mix(AudioBuffer* dest, const AudioBuffer* src,
 	     const ControlBuffer* ampl);
-    void doUpdate();
+    
+    void doUpdate(const Object* caller, int caller_port_type, int caller_port);
+    void doAdvance() {}
+    
 public:
     /*enum {
       N_IN_A_SOCKETS

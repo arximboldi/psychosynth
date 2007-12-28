@@ -33,7 +33,8 @@ using namespace std;
 using namespace Ogre;
 
 
-ElemSecondComponent::ElemSecondComponent(int param, float min_val, float max_val) :
+ElemSecondComponent::ElemSecondComponent(Object::ParamID param,
+					 float min_val, float max_val) :
     m_indicator(NULL),
     m_indicator_point(NULL),
     m_param(param),
@@ -120,11 +121,12 @@ bool ElemSecondComponent::handlePointerRelease(Ogre::Vector2 pos, OIS::MouseButt
     return false;
 }
 
-void ElemSecondComponent::handleParamChange(TableObject& obj, int param_id)
+void ElemSecondComponent::handleParamChange(TableObject& obj, Object::ParamID param_id)
 {
     if (param_id == m_param) {
 	Degree new_angle;
 	obj.getParam(m_param, m_old_value);
+	
 	new_angle = Degree(m_old_value / (m_max_val - m_min_val) *
 			   SECOND_RANGE_ANGLE + SECOND_POINT_MIN_ANGLE);
 	m_point_yaw->yaw(new_angle - m_angle);

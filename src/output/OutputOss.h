@@ -29,14 +29,15 @@
 #include "output/Output.h"
 #include "common/Thread.h"
 
-class OutputOss : public Output, Runnable {
-    int oss_fd;
-    int oss_format;
-    int oss_stereo;
-    short int* buf;
-    std::string oss_device;
+class OutputOss : public Output, Runnable
+{
+    int m_fd;
+    int m_format;
+    int m_stereo;
+    short int* m_buf;
+    std::string m_device;
 	
-    Thread oss_thread;
+    Thread<> m_thread;
 public:
     OutputOss(const AudioInfo& info, const std::string& device);
     ~OutputOss();

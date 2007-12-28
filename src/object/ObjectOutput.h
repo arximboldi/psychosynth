@@ -57,15 +57,21 @@ class ObjectOutput : public Object
     
     ObjectManager* m_manager;
     std::list<Slot*> m_slots;
+    std::list<Output*> m_passive_slots;
 
+    /*
     RWLock m_buflock;
-        
+    Mutex m_passive_lock;
+    Mutex m_global_lock;
+    */
+    
     static void outputCallback(int nframes, void* arg);
     
     void output(Slot& slot, size_t nframes);
 	
-    void doUpdate();
-
+    void doUpdate(const Object* caller, int caller_port_type, int caller_port);
+    void doAdvance() {}
+    
 public:
     enum InAudioSocketID {
 	IN_A_INPUT,
@@ -90,10 +96,7 @@ public:
 	
     ObjectOutput(AudioInfo& info);
 
-    ~ObjectOutput() {
-	for (std::list<Slot*>::iterator i = m_slots.begin(); i != m_slots.end(); ++i)
-	    delete *i;
-    }
+    ~ObjectOutput();
 	
     bool setManager(ObjectManager* mgr) {
 	if (m_manager != NULL && mgr != NULL) 
@@ -104,11 +107,23 @@ public:
     }
 	
     void attachOutput(Output* out) {
-	m_buflock.readLock();
+	//m_buflock.readLock();
 	m_slots.push_back(new Slot(out, this, m_buffer.end(), getAudioInfo()));
-	m_buflock.unlock();
+	//m_buflock.unlock();
     };
-	
+
+    void attachPassiveOutput(Output* out) {
+	//m_passive_lock.lock();
+	m_passive_slots.push_back(out);
+	//m_passive_lock.unlock();
+    };
+
+    void detachPassiveOutput(Output* out) {
+	//m_passive_lock.lock();
+	m_passive_slots.remove(out);
+	//m_passive_lock.unlock();
+    };
+    
     void detachOutput(Output* out) {
 	for (std::list<Slot*>::iterator i = m_slots.begin(); i != m_slots.end();) {
 	    if ((*i)->m_out == out) {

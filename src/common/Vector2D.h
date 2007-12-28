@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) 2007 by Juan Pedro Bolivar Puente                       *
+ *   Copyright (C) Juan Pedro Bolivar Puente 2007                          *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -20,68 +20,57 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef PATCHER_H
-#define PATCHER_H
+#ifndef VECTOR2D_H
+#define VECTOR2D_H
 
-#include <map>
-#include <set>
-
-#include "object/Object.h"
-
-struct PatcherEvent {
-    Object* src;
-    Object* dest;
-    int src_socket;
-    int dest_socket;
-    int socket_type;
-
-    PatcherEvent(Object* s, Object* d, int ss, int ds, int st):
-	src(s), dest(d), src_socket(ss), dest_socket(ds), socket_type(st) {};
-};
-
-class PatcherListener {
-public:
-    virtual ~PatcherListener() {};
-    virtual void handleLinkAdded(const PatcherEvent& ev) = 0;
-    virtual void handleLinkDeleted(const PatcherEvent& ev) = 0;
-};
-
-class PatcherSubject {
-    std::list<PatcherListener*> m_list;
-
-protected:
-    void notifyLinkAdded(const PatcherEvent& ev) {
-	for (std::list<PatcherListener*>::iterator it = m_list.begin();
-	     it != m_list.end(); )
-	    (*it++)->handleLinkAdded(ev);
-    };
-    
-    void notifyLinkDeleted(const PatcherEvent& ev) {
-	for (std::list<PatcherListener*>::iterator it = m_list.begin();
-	     it != m_list.end(); )
-	    (*it++)->handleLinkDeleted(ev);
-    };
-    
-public:
-    void addListener(PatcherListener* l) {
-	m_list.push_back(l);
-    };
-    
-    void deleteListener(PatcherListener* l) {
-	m_list.remove(l);
-    };
-};
-
-class Patcher : public PatcherSubject
+/*
+ * TODO: Fast initial implementation. Add more functionality.
+ */
+template<class T>
+class Vector2D
 {
+    static const int NUM_D = 2;
 public:
-    virtual ~Patcher() {};
+    T x;
+    T y;
+
+    Vector2D(T _x = 0, T _y = 0) :
+	x(_x), y(_y)
+	{}
+
+    void set(T _x, T _y) {
+	x = _x;
+	y = _y;
+    }
     
-    virtual bool addObject(Object* obj) = 0;
-    virtual bool deleteObject(Object* obj) = 0;
-    virtual void setParamObject(Object* obj, Object::ParamID param) = 0;
-    virtual void update() = 0;
-    virtual void clear() = 0;
+    T& operator[](size_t index) {
+	return *(&x + index);
+    }
+
+    const T& operator[](size_t index) const {
+	return *(&x + index);
+    }
+    
+    T distance(const Vector2D& v) const {
+	return sqrt(sqrDistance(v));
+    }
+
+    T sqrDistance(const Vector2D& v) const {
+	return
+	    (v.x-x) * (v.x-x) +
+	    (v.y-y) * (v.y-y);
+    }
+
+    T length() const {
+	return sqrt(x*x + y*y);
+    }
+
+    T sqrLength() const {
+	return x*x + y*y;
+    }
+
 };
 
-#endif /* PATCHER_H */
+typedef Vector2D<float> Vector2f;
+    
+#endif

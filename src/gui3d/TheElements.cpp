@@ -33,19 +33,21 @@
 using namespace std;
 using namespace Ogre;
 
-ElementMixer::ElementMixer(const TableObject& obj,
+ElementMixer::ElementMixer(TableObject& obj,
 			   Ogre::SceneManager* m_scene) :
     Element(obj, m_scene)
 { 
     addComponent(new ElemMainComponent("mixer.mesh",
-				       ObjectMixer::PARAM_AMPLITUDE, 0.0f, 1.0f));
+				       Object::ParamID(Object::PARAM_LOCAL, ObjectMixer::PARAM_AMPLITUDE),
+				       0.0f, 1.0f));
 
     getGUIProperties().addParameter(new ElemGuiParamFloat(
-					ObjectMixer::PARAM_AMPLITUDE, 0.0f, 1.0f,
+					Object::ParamID(Object::PARAM_LOCAL, ObjectMixer::PARAM_AMPLITUDE),
+					0.0f, 1.0f,
 					"Amplitude"));
 }
 
-ElementOscillator::ElementOscillator(const TableObject& obj,
+ElementOscillator::ElementOscillator(TableObject& obj,
 				     Ogre::SceneManager* m_scene) :
     Element(obj, m_scene)
 {
@@ -56,29 +58,34 @@ ElementOscillator::ElementOscillator(const TableObject& obj,
 	{"Sine", "Square", "Triangle", "Sawtooth"};
     
     addComponent(new ElemMultiMainComponent(
-		     ObjectOscillator::PARAM_FREQUENCY, 20.0f, 5000.0f,
-		     ObjectOscillator::PARAM_WAVE, mesh_names));
+		     Object::ParamID(Object::PARAM_LOCAL, ObjectOscillator::PARAM_FREQUENCY),
+		     20.0f, 5000.0f,
+		     Object::ParamID(Object::PARAM_LOCAL, ObjectOscillator::PARAM_WAVE),
+		     mesh_names));
     
     addComponent(new ElemSecondComponent(
-		     ObjectOscillator::PARAM_AMPLITUDE, 0.0f, 1.0f));
+		     Object::ParamID(Object::PARAM_LOCAL, ObjectOscillator::PARAM_AMPLITUDE),
+		     0.0f, 1.0f));
 
     
     getGUIProperties().addParameter(new ElemGuiParamMulti(
-					ObjectOscillator::PARAM_WAVE,
+					Object::ParamID(Object::PARAM_LOCAL, ObjectOscillator::PARAM_WAVE),
 					ObjectOscillator::N_OSC_TYPES,
 					wave_names,
 					"Wave"));
     
     getGUIProperties().addParameter(new ElemGuiParamFloat(
-					ObjectOscillator::PARAM_FREQUENCY, 20.0f, 5000.0f,
+					Object::ParamID(Object::PARAM_LOCAL, ObjectOscillator::PARAM_FREQUENCY),
+					20.0f, 5000.0f,
 					"Frequency"));
     
     getGUIProperties().addParameter(new ElemGuiParamFloat(
-					ObjectOscillator::PARAM_AMPLITUDE, 0.0f, 1.0f,
+					Object::ParamID(Object::PARAM_LOCAL, ObjectOscillator::PARAM_AMPLITUDE),
+					0.0f, 1.0f,
 					"Amplitude"));
 }
 
-ElementLFO::ElementLFO(const TableObject& obj,
+ElementLFO::ElementLFO(TableObject& obj,
 		       Ogre::SceneManager* m_scene) :
     Element(obj, m_scene)
 {
@@ -89,29 +96,32 @@ ElementLFO::ElementLFO(const TableObject& obj,
 	{"Sine", "Square", "Triangle", "Sawtooth"};
     
     addComponent(new ElemMultiMainComponent(
-		     ObjectLFO::PARAM_FREQUENCY, 0.01f, 20.0f,
-		     ObjectLFO::PARAM_WAVE, mesh_names));
+		     Object::ParamID(Object::PARAM_LOCAL, ObjectLFO::PARAM_FREQUENCY),
+		     0.01f, 20.0f,
+		     Object::ParamID(Object::PARAM_LOCAL, ObjectLFO::PARAM_WAVE),
+		     mesh_names));
     
     addComponent(new ElemSecondComponent(
-		     ObjectLFO::PARAM_AMPLITUDE, 0.0f, 1.0f));
+		     Object::ParamID(Object::PARAM_LOCAL, ObjectLFO::PARAM_AMPLITUDE),
+		     0.0f, 1.0f));
 
     
     getGUIProperties().addParameter(new ElemGuiParamMulti(
-					ObjectLFO::PARAM_WAVE,
+					Object::ParamID(Object::PARAM_LOCAL, ObjectLFO::PARAM_WAVE),
 					ObjectLFO::N_LFO_TYPES,
 					wave_names,
 					"Wave"));
     
     getGUIProperties().addParameter(new ElemGuiParamFloat(
-					ObjectLFO::PARAM_FREQUENCY, 0.01f, 20.0f,
+					Object::ParamID(Object::PARAM_LOCAL, ObjectLFO::PARAM_FREQUENCY), 0.01f, 20.0f,
 					"Frequency"));
     
     getGUIProperties().addParameter(new ElemGuiParamFloat(
-					ObjectLFO::PARAM_AMPLITUDE, 0.0f, 1.0f,
+					Object::ParamID(Object::PARAM_LOCAL, ObjectLFO::PARAM_AMPLITUDE), 0.0f, 1.0f,
 					"Amplitude"));
 }
 
-ElementFilter::ElementFilter(const TableObject& obj,
+ElementFilter::ElementFilter(TableObject& obj,
 		       Ogre::SceneManager* m_scene) :
     Element(obj, m_scene)
 {	    
@@ -126,24 +136,29 @@ ElementFilter::ElementFilter(const TableObject& obj,
 	 "Notch", "Moog"};
     
     addComponent(new ElemMultiMainComponent(
-		     ObjectFilter::PARAM_CUTOFF, 20.0f, 5000.0f,
-		     ObjectFilter::PARAM_TYPE, mesh_names));
+		     Object::ParamID(Object::PARAM_LOCAL, ObjectFilter::PARAM_CUTOFF),
+		     20.0f, 5000.0f,
+		     Object::ParamID(Object::PARAM_LOCAL, ObjectFilter::PARAM_TYPE),
+		     mesh_names));
     
     addComponent(new ElemSecondComponent(
-		     ObjectFilter::PARAM_RESONANCE, 0.0f, 1.0f));
+		     Object::ParamID(Object::PARAM_LOCAL, ObjectFilter::PARAM_RESONANCE),
+		     0.0f, 1.0f));
 
     
     getGUIProperties().addParameter(new ElemGuiParamMulti(
-					ObjectFilter::PARAM_TYPE,
+					Object::ParamID(Object::PARAM_LOCAL, ObjectFilter::PARAM_TYPE),
 					ObjectFilter::N_FILTER_TYPES,
 					filter_names,
 					"Filter"));
     
     getGUIProperties().addParameter(new ElemGuiParamFloat(
-					ObjectFilter::PARAM_CUTOFF, 20.0f, 5000.0f,
+					Object::ParamID(Object::PARAM_LOCAL, ObjectFilter::PARAM_CUTOFF),
+					20.0f, 5000.0f,
 					"Cut-off Freq."));
     
     getGUIProperties().addParameter(new ElemGuiParamFloat(
-					ObjectFilter::PARAM_RESONANCE, 0.0f, 1.0f,
+					Object::ParamID(Object::PARAM_LOCAL, ObjectFilter::PARAM_RESONANCE),
+					0.0f, 1.0f,
 					"Resonance"));
 }

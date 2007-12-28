@@ -52,3 +52,62 @@ AudioBuffer& AudioBuffer::operator= (const AudioBuffer& buf)
 	}
 	return *this;
 }
+
+void AudioBuffer::interleave(Sample* dest, size_t n_frames) const
+{
+    size_t i, j;
+    Sample* out_buf;
+    const Sample* in_buf;
+    
+    for (i = 0; i < m_info.num_channels; ++i) {
+	in_buf = m_data[i];
+	out_buf = dest + i;
+
+	for (j = 0; j < n_frames; ++j) {
+	    *out_buf = *in_buf++;
+	    out_buf += m_info.num_channels;
+	}
+    }
+}
+
+void AudioBuffer::interleaveS16(short int* dest, size_t n_frames) const
+{
+    size_t i, j;
+    short int* out_buf;
+    const Sample* in_buf;
+    Sample r;
+    
+    for (i = 0; i < m_info.num_channels; ++i) {
+	in_buf = m_data[i];
+	out_buf = dest + i;
+
+	for (j = 0; j < n_frames; ++j) {
+	    r = *in_buf++;
+	    if (r < -1) r = -1; 
+	    else if (r > 1) r = 1;
+	    *out_buf = (short int)(r * 32766.0);
+	    out_buf += m_info.num_channels;
+	}
+    }
+}
+
+void AudioBuffer::interleaveI32(int* dest, size_t n_frames) const
+{
+    size_t i, j;
+    int* out_buf;
+    const Sample* in_buf;
+    Sample r;
+    
+    for (i = 0; i < m_info.num_channels; ++i) {
+	in_buf = m_data[i];
+	out_buf = dest + i;
+
+	for (j = 0; j < n_frames; ++j) {
+	    r = *in_buf++;
+	    if (r < -1) r = -1; 
+	    else if (r > 1) r = 1;
+	    *out_buf = (int)(r * 2147483647.0);
+	    out_buf += m_info.num_channels;
+	}
+    }
+}

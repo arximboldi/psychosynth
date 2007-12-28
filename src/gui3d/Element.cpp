@@ -31,7 +31,7 @@
 using namespace std;
 using namespace Ogre;
 
-Element::Element(const TableObject& obj, Ogre::SceneManager* scene) :
+Element::Element(TableObject& obj, Ogre::SceneManager* scene) :
     m_obj(obj),
     m_col_ghost(0.8, 0.8, 0.1, 0.4),
     m_col_selected(0.8, 0.1, 0.1, 0.7),
@@ -54,8 +54,11 @@ Element::Element(const TableObject& obj, Ogre::SceneManager* scene) :
     m_node = scene->getRootSceneNode()->createChildSceneNode();
     
     m_node->attachObject(m_base);
-    m_pos.x = obj.getX();
-    m_pos.y = obj.getY();
+
+    Vector2f v;
+    obj.getParam(Object::ParamID(Object::PARAM_COMMON, Object::PARAM_POSITION), v);
+    m_pos.x = v.x;
+    m_pos.y = v.y;
     m_node->setPosition(Vector3(m_pos.x, Z_POS, m_pos.y));
 
     m_selected = false;
@@ -94,7 +97,13 @@ void Element::setTarget(const TableObject& obj)
 
     if (!m_target.isNull()) {
 	m_target.addListener(this);
-	m_aimpoint = Vector3(obj.getX(), Z_POS, obj.getY());
+
+	Vector2f v;
+	m_target.getParam(Object::ParamID(Object::PARAM_COMMON, Object::PARAM_POSITION), v);
+	m_aimpoint.x = v.x;
+	m_aimpoint.y = v.y;
+	
+	m_aimpoint = Vector3(v.x, Z_POS, v.y);
     }
 
     m_node->lookAt(m_aimpoint, Node::TS_PARENT);
@@ -111,7 +120,10 @@ void Element::clearTarget(const TableObject& obj)
 
 void Element::setPosition(const Ogre::Vector2& pos)
 {
-    m_obj.move(pos.x, pos.y);
+    Vector2f dest;
+    dest.x = pos.x;
+    dest.y = pos.y;
+    m_obj.setParam(Object::ParamID(Object::PARAM_COMMON, Object::PARAM_POSITION), dest);
 }
 
 void Element::setGhost(bool ghost)
@@ -213,15 +225,15 @@ bool Element::keyReleased(const OIS::KeyEvent& e)
     return false;
 }
 
-void Element::handleMoveObject(TableObject& obj)
+void Element::objectMoved(TableObject& obj, Vector2f& dest)
 {
     if (obj == m_obj) {
-	m_pos.x = obj.getX();
-	m_pos.y = obj.getY();
+	m_pos.x = dest.x;
+	m_pos.y = dest.y;
 	m_node->setPosition(m_pos.x, Z_POS, m_pos.y);
     } else if (obj == m_target) {
-	m_aimpoint.x = obj.getX();
-	m_aimpoint.z = obj.getY();
+	m_aimpoint.x = dest.x;
+	m_aimpoint.z = dest.y;
     }
     
     m_node->lookAt(m_aimpoint, Node::TS_PARENT);
@@ -249,9 +261,16 @@ void Element::handleDeactivateObject(TableObject& obj)
 	setGhost(true);
 }
 
-void Element::handleSetParamObject(TableObject& obj, int param_id)
+void Element::handleSetParamObject(TableObject& obj, Object::ParamID param_id)
 {
-    if (obj == m_obj)
+    if (obj == m_obj) {
+	if (param_id == Object::ParamID(Object::PARAM_COMMON, Object::PARAM_POSITION)) {
+	    Vector2f dest;
+	    obj.getParam(param_id, dest);
+	    objectMoved(obj, dest);
+	}
+    
 	for (ElemComponentIter it = m_comp.begin(); it != m_comp.end(); ++it)
 	    (*it)->handleParamChange(obj, param_id);
+    }
 }

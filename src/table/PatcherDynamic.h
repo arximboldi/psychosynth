@@ -88,7 +88,7 @@ public:
     
     bool addObject(Object* obj);
     bool deleteObject(Object* obj);
-    void moveObject(Object* obj);
+    void setParamObject(Object* obj, Object::ParamID id);
     void update();
     void clear();
 };

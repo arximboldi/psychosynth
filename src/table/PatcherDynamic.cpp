@@ -120,8 +120,7 @@ bool PatcherDynamic::addObject(Object* obj)
 	    if (PATCHER_TABLE[this_type][other_type].socket_type != Object::LINK_NONE) {
 		m_links.insert(new Link(obj, (*i).second.obj,
 					obj->sqrDistanceTo(*i->second.obj),
-					i->second.obj->getX()*i->second.obj->getX() +
-					i->second.obj->getY()*i->second.obj->getY(),
+					i->second.obj->sqrDistanceToCenter(),
 					PATCHER_TABLE[this_type][other_type].socket_type,
 					PATCHER_TABLE[this_type][other_type].src_socket,
 					PATCHER_TABLE[this_type][other_type].dest_socket));
@@ -130,8 +129,7 @@ bool PatcherDynamic::addObject(Object* obj)
 	    if (PATCHER_TABLE[other_type][this_type].socket_type != Object::LINK_NONE) {
 		m_links.insert(new Link(i->second.obj, obj,
 					i->second.obj->sqrDistanceTo(*obj),
-					obj->getX()*obj->getX() +
-					obj->getY()*obj->getY(),
+					obj->distanceToCenter(),
 					PATCHER_TABLE[other_type][this_type].socket_type,
 					PATCHER_TABLE[other_type][this_type].src_socket,
 					PATCHER_TABLE[other_type][this_type].dest_socket));
@@ -167,25 +165,32 @@ bool PatcherDynamic::deleteObject(Object* obj)
     return false;
 }
 
-void PatcherDynamic::moveObject(Object* obj)
+void PatcherDynamic::setParamObject(Object* obj, Object::ParamID id)
 {
-    multiset<Link*>::iterator i, r;
-    list<Link*> readd;
+    if (id.scope == Object::PARAM_COMMON &&
+	id.id == Object::PARAM_POSITION) {
+	multiset<Link*>::iterator i, r;
+	list<Link*> readd;
     
-    for (i = m_links.begin(); i != m_links.end();) {
-	if ((*i)->src == obj || (*i)->dest == obj) {
-	    r = i++;
-	    (*r)->dist = (*r)->src->sqrDistanceTo(*(*r)->dest);
-	    readd.push_back(*r);
-	    m_links.erase(r);
-	    m_changed = true;
-	}
-	else
-	    ++i;
-    }
+	for (i = m_links.begin(); i != m_links.end();) {
+	    if ((*i)->src == obj || (*i)->dest == obj) {
+		r = i++;
 
-    for (list<Link*>::iterator it = readd.begin(); it != readd.end(); ++it)
-	m_links.insert(*it);
+		(*r)->dist = (*r)->src->sqrDistanceTo(*(*r)->dest);
+		if ((*r)->dest == obj)
+		    (*r)->dist_to_center = obj->sqrDistanceToCenter();
+
+		readd.push_back(*r);
+		m_links.erase(r);
+		m_changed = true;
+	    }
+	    else
+		++i;
+	}
+
+	for (list<Link*>::iterator it = readd.begin(); it != readd.end(); ++it)
+	    m_links.insert(*it);
+    }
 }
 
 void PatcherDynamic::makeLink(Link& l)
