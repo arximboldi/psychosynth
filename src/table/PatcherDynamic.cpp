@@ -129,7 +129,7 @@ bool PatcherDynamic::addObject(Object* obj)
 	    if (PATCHER_TABLE[other_type][this_type].socket_type != Object::LINK_NONE) {
 		m_links.insert(new Link(i->second.obj, obj,
 					i->second.obj->sqrDistanceTo(*obj),
-					obj->distanceToCenter(),
+					obj->sqrDistanceToCenter(),
 					PATCHER_TABLE[other_type][this_type].socket_type,
 					PATCHER_TABLE[other_type][this_type].src_socket,
 					PATCHER_TABLE[other_type][this_type].dest_socket));
@@ -195,12 +195,12 @@ void PatcherDynamic::setParamObject(Object* obj, Object::ParamID id)
 
 void PatcherDynamic::makeLink(Link& l)
 {
-    // cout << "making link, source: " << l.src->getID() << " dest: "<< l.dest->getID() << endl;
+    cout << "making link, source: " << l.src->getID() << " dest: "<< l.dest->getID() << endl;
 
     Object* old_src = l.dest->getInSocket(l.sock_type, l.actual_in_sock).getSourceObject();
     if (old_src != NULL) {
 	notifyLinkDeleted(PatcherEvent(old_src, l.dest, l.actual_in_sock, l.out_sock, l.sock_type));
-	// cout << "undoing link, source: " << old_src << " dest: "<< l.dest->getID() << endl;
+	cout << "undoing link, source: " << old_src->getID() << " dest: "<< l.dest->getID() << endl;
     }
     
     l.dest->connectIn(l.sock_type, l.actual_in_sock, l.src, l.out_sock);
@@ -211,7 +211,7 @@ void PatcherDynamic::undoLink(Link& l)
 {
     if (l.actual_in_sock >= 0) {
 	if (l.dest->getInSocket(l.sock_type, l.actual_in_sock).getSourceObject() == l.src) {
-	    // cout << "undoing link, source: " << l.src->getID() << " dest: "<< l.dest->getID() << endl;
+	    cout << "undoing link, source: " << l.src->getID() << " dest: "<< l.dest->getID() << endl;
 	    l.dest->connectIn(l.sock_type, l.actual_in_sock, NULL, l.out_sock);
 
 	    notifyLinkDeleted(PatcherEvent(l.src, l.dest, l.actual_in_sock, l.out_sock, l.sock_type));
@@ -234,11 +234,6 @@ void PatcherDynamic::findInSock(Link &l)
     
     l.actual_in_sock = -1; 
 
-    if (m_nodes[l.dest->getID()].out_used == true &&
-	m_nodes[l.dest->getID()].dest == l.src) {
-	return;
-    }
-    
     if (l.in_sock == -1) {
 	for (int i = 0; i < l.dest->getNumInput(l.sock_type); i++) {
 	    Object* obj = l.dest->getInSocket(l.sock_type, i).getSourceObject(); 
@@ -270,31 +265,37 @@ void PatcherDynamic::update()
 
     for (multiset<Link*>::iterator i = m_links.begin(); i != m_links.end(); ++i) {
 	map<int, Node>::iterator n = m_nodes.find((*i)->src->getID());
+	map<int, Node>::iterator n2 = m_nodes.find((*i)->dest->getID());
 	if (n == m_nodes.end()) {
 	    WARNING("Object with id " << (*i)->src->getID() << "not found.");
 	}
 	
-	Node& node = (*n).second;
+	Node& node_src = (*n).second;
+	Node& node_dest = (*n2).second;
 	Link& link = **i;
 
-	//cout << "trying, src: " << link.src->getID() << " dest: " << link.dest->getID() << " out: " << node.out_used << endl; 
+	cout << "trying, src: " << link.src->getID() << " dest: " << link.dest->getID() << " out: " << node_src.out_used << endl; 
 
-	if (!node.out_used) {
+	if (!node_src.out_used &&
+	    !(node_dest.out_used == true && node_dest.dest == link.src))
+	{
 	    if (!isLinked(link)) {
 		findInSock(link);
 		if (link.actual_in_sock >= 0) {
 		    makeLink(link);
-		    node.out_used = true;
-		    node.dest = link.dest;
+		    node_src.out_used = true;
+		    node_src.dest = link.dest;
 		}
-	    } else
-		node.out_used = true;
+	    } else {
+		node_src.out_used = true;
+	    }
 	} else {
 	    undoLink(link);
 	    link.actual_in_sock = -1;
 	}
     }
-    // cout << "---" << endl;
+    
+    cout << "---" << endl;
 
     m_changed = false;
 }

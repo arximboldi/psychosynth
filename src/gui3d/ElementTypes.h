@@ -42,7 +42,8 @@ enum ElementType
     ELEM_FILTER_NOTCH,
     ELEM_FILTER_MOOG,
 
-    ELEM_MIXER
+    ELEM_MIXER,
+    ELEM_RINGMOD
 };
 
 #endif /* ELEMENTTYPES_H */

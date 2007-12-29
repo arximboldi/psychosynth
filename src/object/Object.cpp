@@ -138,20 +138,31 @@ inline bool Object::canUpdate(const Object* caller, int caller_port_type,
     return ret;
 }
 
+void Object::updateParams()
+{
+    size_t j;
+    
+    for (j = 0; j < PARAM_SCOPES; ++j) {
+	for (vector<Param>::iterator i = m_params[j].begin(); i != m_params[j].end(); ++i)
+	    (*i).update();
+    }
+}
+
+void Object::updateInputs()
+{
+    size_t i, j;
+    
+    for (i = 0; i < LINK_TYPES; ++i)
+	for (j = 0; j < m_in_sockets[i].size(); ++j)
+	    m_in_sockets[i][j].updateInput(this, i, j);
+}
+
 void Object::update(const Object* caller, int caller_port_type, int caller_port)
 {
     if (canUpdate(caller, caller_port_type, caller_port)) {
-	size_t i, j;
-
-	for (j = 0; j < PARAM_SCOPES; ++j) {
-	    for (vector<Param>::iterator i = m_params[j].begin(); i != m_params[j].end(); ++i)
-		(*i).update();
-	}
+	updateParams();
+	updateInputs();
 	
-	for (i = 0; i < LINK_TYPES; ++i)
-	    for (j = 0; j < m_in_sockets[i].size(); ++j)
-		m_in_sockets[i][j].updateInput(this, i, j);
-
 	doUpdate(caller, caller_port_type, caller_port); 
     }
 }

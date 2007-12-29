@@ -167,7 +167,15 @@ void ElementManager::addElement(int e_type)
 	break;
 	
     case ELEM_MIXER:
-	m_table->addObject(OBJ_MIXER);
+	obj = m_table->addObject(OBJ_MIXER);
+	obj.setParam(Object::ParamID(Object::PARAM_LOCAL, ObjectMixer::PARAM_MIXOP),
+		     ObjectMixer::MIX_SUM);
+	break;
+
+    case ELEM_RINGMOD:
+	obj = m_table->addObject(OBJ_MIXER);
+	obj.setParam(Object::ParamID(Object::PARAM_LOCAL, ObjectMixer::PARAM_MIXOP),
+		     ObjectMixer::MIX_PRODUCT);
 	break;
 	
     default:

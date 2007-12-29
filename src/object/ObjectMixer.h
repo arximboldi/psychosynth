@@ -27,18 +27,8 @@
 
 class ObjectMixer : public Object
 {
-    float m_param_ampl;
-    
-    int m_numchan;
-	
-    void mix(AudioBuffer* dest, const AudioBuffer* src,
-	     const ControlBuffer* ampl);
-    
-    void doUpdate(const Object* caller, int caller_port_type, int caller_port);
-    void doAdvance() {}
-    
 public:
-    /*enum {
+       /*enum {
       N_IN_A_SOCKETS
       };*/
 	
@@ -58,10 +48,30 @@ public:
 
     enum ParamID {
 	PARAM_AMPLITUDE,
+	PARAM_MIXOP,
 	N_PARAM
     };
+
+    enum MixOp {
+	MIX_SUM,
+	MIX_PRODUCT,
+	N_MIXOPS
+    };
     
-    ObjectMixer(const AudioInfo& info, int num_chan = 4);
+private:
+    float m_param_ampl;
+    int m_param_mixop;
+    
+    int m_numchan;
+	
+    void mix(AudioBuffer* dest, const AudioBuffer* src,
+	     const ControlBuffer* ampl, MixOp op);
+    
+    void doUpdate(const Object* caller, int caller_port_type, int caller_port);
+    void doAdvance() {}
+    
+public:
+    ObjectMixer(const AudioInfo& info, int num_chan = 2);
 };
 
 #endif /* OBJECTMIXER_H */

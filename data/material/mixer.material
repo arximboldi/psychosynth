@@ -12,6 +12,7 @@ material mixer
 		}
 	}
 }
+
 material mixer_image
 {
 	receive_shadows on
@@ -32,3 +33,25 @@ material mixer_image
 		}
 	}
 }
+
+material ring_image
+{
+	receive_shadows on
+	technique
+	{
+		pass
+		{
+		    scene_blend alpha_blend
+            depth_write off
+
+			texture_unit
+			{
+				texture ring.tga
+				filtering trilinear
+				tex_address_mode wrap
+				
+			}
+		}
+	}
+}
+

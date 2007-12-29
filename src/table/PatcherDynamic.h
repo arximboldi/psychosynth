@@ -46,7 +46,7 @@ class PatcherDynamic : public Patcher
 	    {}
 	
 	bool operator< (const Link& l) const {
-	    return dist == l.dist ? dist_to_center < dist_to_center : dist < l.dist;
+	    return dist == l.dist ? dist_to_center < l.dist_to_center : dist < l.dist;
 	}
     };
 

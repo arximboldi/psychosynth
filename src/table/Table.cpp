@@ -178,9 +178,8 @@ void Table::deleteObject(TableObject& obj)
 
 void Table::activateObject(TableObject& obj)
 {
-    obj.m_obj->update(NULL, -1, -1);
-    obj.m_obj->advance();
-    
+    obj.m_obj->updateParams();
+     
     if (m_patcher)
 	m_patcher->addObject(obj.m_obj);
     notifyActivateObject(obj);

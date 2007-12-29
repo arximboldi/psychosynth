@@ -23,6 +23,8 @@
 #include "object/KnownObjects.h"
 #include "object/ObjectMixer.h"
 
+using namespace std;
+
 ObjectMixer::ObjectMixer(const AudioInfo& prop, int numchan) : 
     Object(prop,
 	   OBJ_MIXER,
@@ -32,13 +34,15 @@ ObjectMixer::ObjectMixer(const AudioInfo& prop, int numchan) :
 	   N_OUT_A_SOCKETS,
 	   N_OUT_C_SOCKETS),
     m_param_ampl(0.5f),
+    m_param_mixop(MIX_SUM),
     m_numchan(numchan)
 {
     configureLocalParam(PARAM_AMPLITUDE, Object::PARAM_FLOAT, &m_param_ampl);
+    configureLocalParam(PARAM_MIXOP, Object::PARAM_INT, &m_param_mixop);
 }
 
 void ObjectMixer::mix(AudioBuffer* dest, const AudioBuffer* src,
-		      const ControlBuffer* ampl)
+		      const ControlBuffer* ampl, MixOp op)
 {
     int i, j;
     int channels = getAudioInfo().num_channels;
@@ -46,19 +50,28 @@ void ObjectMixer::mix(AudioBuffer* dest, const AudioBuffer* src,
     Sample* dbuf;
     const Sample* sbuf;
     const Sample* abuf = NULL;
-    
+
     for (i = 0; i < channels; i++) {
 	dbuf = dest->getChannel(i);
 	sbuf = src->getChannel(i);
 	if (ampl)
 	    abuf = ampl->getData();
-	
-	if (!abuf)
-	    for (j = 0; j < size; j++)
-		*dbuf++ += *sbuf++ * m_param_ampl;
-	else
-	    for (j = 0; j < size; j++)
-		*dbuf++ += *sbuf++ * (m_param_ampl + m_param_ampl * *abuf++);
+
+	if (op == MIX_SUM) 
+	    if (!abuf)
+		for (j = 0; j < size; j++)
+		    *dbuf++ += *sbuf++ * m_param_ampl;
+	    else
+		for (j = 0; j < size; j++)
+		    *dbuf++ += *sbuf++ * (m_param_ampl + m_param_ampl * *abuf++);
+	else if (op == MIX_PRODUCT) {
+	    if (!abuf)
+		for (j = 0; j < size; j++)
+		    *dbuf++ *= *sbuf++ * m_param_ampl;
+	    else
+		for (j = 0; j < size; j++)
+		    *dbuf++ *= *sbuf++ * (m_param_ampl + m_param_ampl * *abuf++);
+	}
     }
 }
 
@@ -68,10 +81,11 @@ void ObjectMixer::doUpdate(const Object* caller, int caller_port_type, int calle
     const AudioBuffer* in = NULL;
     const ControlBuffer* ampl = getInput<ControlBuffer>(LINK_CONTROL, IN_C_AMPLITUDE);
     int i;
-	
+    int n_mixed = 0;
+    
     buf->clear();
 	
     for (i = 0; i < m_numchan; ++i)
 	if ((in = getInput<AudioBuffer>(LINK_AUDIO, i)))
-	    mix (buf, in, ampl);
+	    mix (buf, in, ampl, n_mixed++ == 0 ? MIX_SUM : (MixOp)m_param_mixop);
 }

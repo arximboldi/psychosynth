@@ -292,6 +292,10 @@ public:
     int getID() const {
 	return m_id;
     }
+
+    void updateParams();
+
+    void updateInputs();
     
     void update(const Object* caller, int caller_port_type, int caller_port);
 	
