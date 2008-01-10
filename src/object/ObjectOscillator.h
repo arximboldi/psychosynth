@@ -28,7 +28,7 @@
 
 #include "object/Object.h"
 #include "object/KnownObjects.h"
-#include "object/WaveTable.h"
+#include "object/Oscillator.h"
 
 class ObjectOscillator : public Object
 {		
@@ -42,26 +42,27 @@ public:
 	IN_C_AMPLITUDE,
 	N_IN_C_SOCKETS
     };
-	
-    enum OutAudioSocketID {
-	OUT_A_OUTPUT,
-	N_OUT_A_SOCKETS
-    };
-	
-    enum OutControlSocketID {
-	N_OUT_C_SOCKETS
-    };
 
     enum WaveType {
-	OSC_SINE     = WaveTable::SINE,
-	OSC_SQUARE   = WaveTable::SQUARE,
-	OSC_TRIANGLE = WaveTable::TRIANGLE,
-	OSC_SAWTOOTH = WaveTable::SAWTOOTH,
+	OSC_SINE     = Oscillator::SINE,
+	OSC_SQUARE   = Oscillator::SQUARE,
+	OSC_TRIANGLE = Oscillator::TRIANGLE,
+	OSC_SAWTOOTH = Oscillator::SAWTOOTH,
+	OSC_MOOGSAW  = Oscillator::MOOGSAW,
+	OSC_EXP      = Oscillator::EXP,
 	N_OSC_TYPES
     };
 
+    enum ModType {
+	MOD_FM = Oscillator::FM,
+	MOD_AM = Oscillator::AM,
+	MOD_PM = Oscillator::PM,
+	N_MOD_TYPES
+    };
+    
     enum ParamID {
 	PARAM_WAVE,
+	PARAM_MODULATOR,
 	PARAM_FREQUENCY,
 	PARAM_AMPLITUDE,
 	N_PARAM
@@ -70,21 +71,23 @@ public:
     static const float DEFAULT_FREQ = 220.0f;
     static const float DEFAULT_AMPL = 0.5f;
     
-private:
-    WaveTable& m_table;
+protected:
+    Oscillator m_oscillator;
 
-    float m_time;
+    void updateOscParams();
     
-    int   m_param_mode;
+private:
+    int   m_param_wave;
+    int   m_param_mod;
     float m_param_freq;
     float m_param_ampl;
-    float m_old_freq;
-	
-    void doUpdate(const Object* caller, int caller_port_type, int caller_port);
-    void doAdvance() {}
     
 public:
-    ObjectOscillator(const AudioInfo& prop, int mode = OSC_SINE);
+    ObjectOscillator(const AudioInfo& prop,
+		     int obj_type,
+		     int n_audio_out,
+		     int n_control_out);
+    
     ~ObjectOscillator();
 };
 

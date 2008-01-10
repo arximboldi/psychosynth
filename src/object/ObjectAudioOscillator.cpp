@@ -20,84 +20,26 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef WAVETABLE_H
-#define WAVETABLE_H
+#include "object/ObjectAudioOscillator.h"
 
-#include <cmath>
-#include "common/AudioBuffer.h"
+using namespace std;
 
-class WaveTable
+void ObjectAudioOscillator::doUpdate(const Object* caller, int caller_port_type, int caller_port)
 {
-public:
-    typedef Sample(*wave_func_t)(float);
+    AudioBuffer*         buf = getOutput<AudioBuffer>(LINK_AUDIO, OUT_A_OUTPUT);
+    const ControlBuffer* pitch_buf = getInput<ControlBuffer>(LINK_CONTROL, IN_C_FREQUENCY);
     
-private:
-    Sample* m_table;
-    size_t m_size;
+    Sample*       out = buf->getChannel(0);
+    const Sample* mod = pitch_buf ? pitch_buf->getData() : NULL;
 
-    static inline float phase(float x) {
-	return x - (x >= 0.0f ? static_cast<int>(x) :
-		    static_cast<int>(x) - 1);
-    }
+    updateOscParams();
+
+    if (mod)
+	m_oscillator.update(out, mod, getInfo().block_size);
+    else
+	m_oscillator.update(out, getInfo().block_size);
     
-public:
-    WaveTable() : m_table(NULL), m_size(0) {}
+    for (size_t i = 1; i < (size_t)getAudioInfo().num_channels; i++)
+	memcpy((*buf)[i], (*buf)[0], sizeof(Sample) * getAudioInfo().block_size);
+}
 
-    WaveTable(size_t size) :
-	m_size(size) {
-	m_table = new Sample[size];
-    }
-
-    WaveTable(size_t size, wave_func_t func) :
-	m_size(size) {
-	m_table = new Sample[size];
-	fill(func);
-    }
-    
-    WaveTable(const WaveTable& wave) :
-	m_size(wave.m_size) {
-	m_table = new Sample[m_size];
-	memcpy(m_table, wave.m_table, sizeof(Sample) * m_size);
-    }
-    
-    ~WaveTable() {
-	delete [] m_table;
-    }
-
-    WaveTable& operator= (const WaveTable& wave) {
-	if (&wave != this) {
-	    if (wave.m_size != m_size) {
-		delete m_table;
-		m_size = wave.m_size;
-		m_table = new Sample[m_size];
-	    }
-	    
-	    memcpy(m_table, wave.m_table, sizeof(Sample) * m_size);
-	}
-	return *this;
-    }
-    
-    Sample get(float x) const {
-	float  findex = (m_size - 1) * phase(x);
-	size_t index  = findex;
-	float alpha = findex - index;
-	
-	Sample out = m_table[index];
-	out += alpha * (m_table[index + 1 >= m_size ? 0 : index + 1] - out);
-
-	return out;
-    }
-
-    void fill(size_t new_size, wave_func_t func) {
-	if (m_size != new_size) {
-	    m_size = new_size;
-	    delete [] m_table;
-	    m_table = new Sample[new_size];
-	}
-	fill(func);
-    }
-
-    void fill(wave_func_t func);
-};
-
-#endif /* WAVETABLE_H */

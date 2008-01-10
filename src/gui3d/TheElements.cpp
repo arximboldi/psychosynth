@@ -67,10 +67,14 @@ ElementOscillator::ElementOscillator(TableObject& obj,
     Element(obj, m_scene)
 {
     static const char* mesh_names[ObjectOscillator::N_OSC_TYPES] =
-	{"osc_sine.mesh", "osc_square.mesh", "osc_triangle.mesh", "osc_sawtooth.mesh"};
+	{"osc_sine.mesh", "osc_square.mesh", "osc_triangle.mesh",
+	 "osc_sawtooth.mesh", "osc_moogsaw.mesh", "osc_exp.mesh"};
 
     static const char* wave_names[ObjectOscillator::N_OSC_TYPES] =
-	{"Sine", "Square", "Triangle", "Sawtooth"};
+	{"Sine", "Square", "Triangle", "Sawtooth", "Moogsaw", "Exp."};
+
+    static const char* mod_names[ObjectOscillator::N_MOD_TYPES] =
+	{"Frequency", "Amplitude", "Phase"};
     
     addComponent(new ElemMultiMainComponent(
 		     Object::ParamID(Object::PARAM_LOCAL, ObjectOscillator::PARAM_FREQUENCY),
@@ -88,6 +92,12 @@ ElementOscillator::ElementOscillator(TableObject& obj,
 					ObjectOscillator::N_OSC_TYPES,
 					wave_names,
 					"Wave"));
+
+    getGUIProperties().addParameter(new ElemGuiParamMulti(
+					Object::ParamID(Object::PARAM_LOCAL, ObjectOscillator::PARAM_MODULATOR),
+					ObjectOscillator::N_MOD_TYPES,
+					mod_names,
+					"Modulator"));
     
     getGUIProperties().addParameter(new ElemGuiParamFloat(
 					Object::ParamID(Object::PARAM_LOCAL, ObjectOscillator::PARAM_FREQUENCY),
@@ -104,35 +114,47 @@ ElementLFO::ElementLFO(TableObject& obj,
 		       Ogre::SceneManager* m_scene) :
     Element(obj, m_scene)
 {
-    static const char* mesh_names[ObjectLFO::N_LFO_TYPES] =
-	{"lfo_sine.mesh", "lfo_square.mesh", "lfo_triangle.mesh", "lfo_sawtooth.mesh"};
+    static const char* mesh_names[ObjectOscillator::N_OSC_TYPES] =
+	{"lfo_sine.mesh", "lfo_square.mesh", "lfo_triangle.mesh",
+	 "lfo_sawtooth.mesh", "lfo_moogsaw.mesh", "lfo_exp.mesh"};
 
-    static const char* wave_names[ObjectLFO::N_LFO_TYPES] =
-	{"Sine", "Square", "Triangle", "Sawtooth"};
+    static const char* wave_names[ObjectOscillator::N_OSC_TYPES] =
+	{"Sine", "Square", "Triangle", "Sawtooth", "Moogsaw", "Exp."};
+
+    static const char* mod_names[ObjectOscillator::N_MOD_TYPES] =
+	{"Frequency", "Amplitude", "Phase"};
     
     addComponent(new ElemMultiMainComponent(
-		     Object::ParamID(Object::PARAM_LOCAL, ObjectLFO::PARAM_FREQUENCY),
-		     0.01f, 20.0f,
-		     Object::ParamID(Object::PARAM_LOCAL, ObjectLFO::PARAM_WAVE),
+		     Object::ParamID(Object::PARAM_LOCAL, ObjectOscillator::PARAM_FREQUENCY),
+		     0.01f, 30.0f,
+		     Object::ParamID(Object::PARAM_LOCAL, ObjectOscillator::PARAM_WAVE),
 		     mesh_names));
     
     addComponent(new ElemSecondComponent(
-		     Object::ParamID(Object::PARAM_LOCAL, ObjectLFO::PARAM_AMPLITUDE),
+		     Object::ParamID(Object::PARAM_LOCAL, ObjectOscillator::PARAM_AMPLITUDE),
 		     0.0f, 1.0f));
 
     
     getGUIProperties().addParameter(new ElemGuiParamMulti(
-					Object::ParamID(Object::PARAM_LOCAL, ObjectLFO::PARAM_WAVE),
-					ObjectLFO::N_LFO_TYPES,
+					Object::ParamID(Object::PARAM_LOCAL, ObjectOscillator::PARAM_WAVE),
+					ObjectOscillator::N_OSC_TYPES,
 					wave_names,
 					"Wave"));
+
+    getGUIProperties().addParameter(new ElemGuiParamMulti(
+					Object::ParamID(Object::PARAM_LOCAL, ObjectOscillator::PARAM_MODULATOR),
+					ObjectOscillator::N_MOD_TYPES,
+					mod_names,
+					"Modulator"));
     
     getGUIProperties().addParameter(new ElemGuiParamFloat(
-					Object::ParamID(Object::PARAM_LOCAL, ObjectLFO::PARAM_FREQUENCY), 0.01f, 20.0f,
+					Object::ParamID(Object::PARAM_LOCAL, ObjectOscillator::PARAM_FREQUENCY),
+					0.01f, 30.0f,
 					"Frequency"));
     
     getGUIProperties().addParameter(new ElemGuiParamFloat(
-					Object::ParamID(Object::PARAM_LOCAL, ObjectLFO::PARAM_AMPLITUDE), 0.0f, 1.0f,
+					Object::ParamID(Object::PARAM_LOCAL, ObjectOscillator::PARAM_AMPLITUDE),
+					0.0f, 1.0f,
 					"Amplitude"));
 }
 

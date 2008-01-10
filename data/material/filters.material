@@ -20,14 +20,15 @@ material moog_image
 	{
 		pass
 		{
+			
 		    scene_blend alpha_blend
-            depth_write off
+              depth_write off
 
 			texture_unit
 			{
 				texture moog.tga
 				filtering trilinear
-				tex_address_mode wrap
+				tex_address_mode clamp
 				
 			}
 		}
@@ -48,7 +49,7 @@ material notch_image
 			{
 				texture notch.tga
 				filtering trilinear
-				tex_address_mode wrap
+				tex_address_mode clamp
 				
 			}
 		}
@@ -69,7 +70,7 @@ material bandpass_image
 			{
 				texture bandpass.tga
 				filtering trilinear
-				tex_address_mode wrap
+				tex_address_mode clamp
 				
 			}
 		}
@@ -90,7 +91,7 @@ material highpass_image
 			{
 				texture highpass.tga
 				filtering trilinear
-				tex_address_mode wrap
+				tex_address_mode clamp
 				
 			}
 		}
@@ -111,7 +112,7 @@ material lowpass_image
 			{
 				texture lowpass.tga
 				filtering trilinear
-				tex_address_mode wrap
+				tex_address_mode clamp
 				
 			}
 		}

@@ -45,7 +45,7 @@ public:
 	     Ogre::Real inner_radious = 0.5,
 	     Ogre::Real outer_radious = 1,
 	     Ogre::ColourValue colour = Ogre::ColourValue(),
-	     int num_triangles = 40);
+	     int num_triangles = 20);
 	
     ~FlatRing();
 	

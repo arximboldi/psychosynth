@@ -39,9 +39,11 @@ psychosynth_SOURCES = \
 	object/ObjectManager.cpp \
 	object/ObjectOutput.cpp \
 	object/ObjectLFO.cpp \
+	object/ObjectAudioOscillator.cpp \
 	object/ObjectFilter.cpp \
 	object/Filter.cpp \
 	object/WaveTable.cpp \
+	object/Oscillator.cpp \
 	net/OSCBroadcast.cpp \
 	net/OSCController.cpp \
 	net/OSCServer.cpp \
@@ -121,9 +123,11 @@ noinst_HEADERS = \
 	object/ObjectOutput.h \
 	object/ObjectMixer.h \
 	object/ObjectLFO.h \
+	object/ObjectAudioOscillator.h \
 	object/ObjectFilter.h \
 	object/Filter.h \
 	object/WaveTable.h \
+	object/Oscillator.cpp \
 	object/KnownObjects.h \
 	net/OSCBroadcast.h \
 	net/OSCServer.h \

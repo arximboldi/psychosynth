@@ -25,7 +25,7 @@
 #include "object/Object.h"
 #include "object/ObjectOutput.h"
 #include "object/ObjectMixer.h"
-#include "object/ObjectOscillator.h"
+#include "object/ObjectAudioOscillator.h"
 #include "object/ObjectLFO.h"
 #include "object/ObjectFilter.h"
 
@@ -51,7 +51,7 @@ const PatcherData PATCHER_TABLE[N_OBJECTS][N_OBJECTS] =
     {
 	{Object::LINK_NONE, 0, 0},  /* ObjectOutput */
 	{Object::LINK_NONE, 0, 0},  /* ObjectMixer */
-	{Object::LINK_NONE, 0, 0},  /* ObjectOscillator */
+	{Object::LINK_NONE, 0, 0},  /* ObjectAudioOscillator */
 	{Object::LINK_NONE, 0, 0},  /* ObjectLFO */
 	{Object::LINK_NONE, 0, 0}   /* ObjectFilter */
     },
@@ -60,16 +60,16 @@ const PatcherData PATCHER_TABLE[N_OBJECTS][N_OBJECTS] =
     {
 	{Object::LINK_AUDIO, ObjectMixer::OUT_A_OUTPUT, ObjectOutput::IN_A_INPUT},  /* ObjectOutput */
 	{Object::LINK_AUDIO, ObjectMixer::OUT_A_OUTPUT, PATCHER_ANY}, /* ObjectMixer */
-	{Object::LINK_NONE, 0, 0},/* ObjectOscillator */
+	{Object::LINK_NONE, 0, 0},/* ObjectAudioOscillator */
 	{Object::LINK_NONE, 0, 0}, /* ObjectLFO */
 	{Object::LINK_AUDIO, ObjectMixer::OUT_A_OUTPUT, ObjectFilter::IN_A_INPUT} /* ObjectFilter */
     },
 
-    /* ObjectOscillator */
+    /* ObjectAudioOscillator */
     {
 	{Object::LINK_NONE, 0, 0}, /* ObjectOutput */
-	{Object::LINK_AUDIO, ObjectOscillator::OUT_A_OUTPUT, PATCHER_ANY}, /* ObjectMixer */
-	{Object::LINK_NONE, 0, 0}, /* ObjectOscillator */
+	{Object::LINK_AUDIO, ObjectAudioOscillator::OUT_A_OUTPUT, PATCHER_ANY}, /* ObjectMixer */
+	{Object::LINK_NONE, 0, 0}, /* ObjectAudioOscillator */
 	{Object::LINK_NONE, 0, 0}, /* ObjectLFO */
 	{Object::LINK_AUDIO, ObjectMixer::OUT_A_OUTPUT, ObjectFilter::IN_A_INPUT} /* ObjectFilter */
     },
@@ -78,8 +78,8 @@ const PatcherData PATCHER_TABLE[N_OBJECTS][N_OBJECTS] =
     {
 	{Object::LINK_NONE, 0, 0}, /* ObjectOutput */
 	{Object::LINK_CONTROL, ObjectLFO::OUT_C_OUTPUT, ObjectMixer::IN_C_AMPLITUDE}, /* ObjectMixer */
-	{Object::LINK_CONTROL, ObjectLFO::OUT_C_OUTPUT, ObjectOscillator::IN_C_FREQUENCY}, /* ObjectOscillator */
-	{Object::LINK_CONTROL, ObjectLFO::OUT_C_OUTPUT, ObjectLFO::IN_C_FREQUENCY}, /* ObjectLFO */
+	{Object::LINK_CONTROL, ObjectLFO::OUT_C_OUTPUT, ObjectOscillator::IN_C_FREQUENCY}, /* ObjectAudioOscillator */
+	{Object::LINK_CONTROL, ObjectLFO::OUT_C_OUTPUT, ObjectOscillator::IN_C_FREQUENCY}, /* ObjectLFO */
 	{Object::LINK_CONTROL, ObjectLFO::OUT_C_OUTPUT, ObjectFilter::IN_C_CUTOFF}  /* ObjectFilter */
     },
 
@@ -87,7 +87,7 @@ const PatcherData PATCHER_TABLE[N_OBJECTS][N_OBJECTS] =
     {
 	{Object::LINK_NONE, 0, 0}, /* ObjectOutput */
 	{Object::LINK_AUDIO, ObjectFilter::OUT_A_OUTPUT, PATCHER_ANY}, /* ObjectMixer */
-	{Object::LINK_NONE, 0, 0}, /* ObjectOscillator */
+	{Object::LINK_NONE, 0, 0}, /* ObjectAudioOscillator */
 	{Object::LINK_NONE, 0, 0}, /* ObjectLFO */
 	{Object::LINK_AUDIO, ObjectFilter::OUT_A_OUTPUT, ObjectFilter::IN_A_INPUT}
     }

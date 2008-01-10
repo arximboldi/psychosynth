@@ -241,13 +241,17 @@ void PsychoSynth3D::setupMenus()
     cat->addButton("Square", ELEM_OSC_SQUARE);
     cat->addButton("Sawtooth", ELEM_OSC_SAWTOOTH);
     cat->addButton("Triangle", ELEM_OSC_TRIANGLE);
-
+    cat->addButton("Moogsaw", ELEM_OSC_MOOGSAW);
+    cat->addButton("Exp", ELEM_OSC_EXP);
+    
     cat = selector->addCategory("LFO");
     cat->addButton("Sine", ELEM_LFO_SINE);
     cat->addButton("Square", ELEM_LFO_SQUARE);
     cat->addButton("Sawtooth", ELEM_LFO_SAWTOOTH);
     cat->addButton("Triangle", ELEM_LFO_TRIANGLE);
-
+    cat->addButton("Moogsaw", ELEM_LFO_MOOGSAW);
+    cat->addButton("Exp", ELEM_LFO_EXP);
+    
     cat = selector->addCategory("Filter");
     cat->addButton("Lowpass", ELEM_FILTER_LOWPASS);
     cat->addButton("Highpass", ELEM_FILTER_HIGHPASS);

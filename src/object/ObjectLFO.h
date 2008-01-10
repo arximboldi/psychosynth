@@ -23,66 +23,25 @@
 #ifndef OBJECTLFO_H
 #define OBJECTLFO_H
 
-#include "object/Object.h"
+#include "object/ObjectOscillator.h"
 #include "object/KnownObjects.h"
-#include "object/WaveTable.h"
 
-class ObjectLFO : public Object
+class ObjectLFO : public ObjectOscillator
 {
 public:	
-    enum InAudioSocketID {
-	N_IN_A_SOCKETS
-    };
-	
-    enum InControlSocketID {
-	IN_C_FREQUENCY,
-	IN_C_AMPLITUDE,
-	N_IN_C_SOCKETS
-    };
-	
-    enum OutAudioSocketID {
-	N_OUT_A_SOCKETS
-    };
-	
     enum OutControlSocketID {
 	OUT_C_OUTPUT,
 	N_OUT_C_SOCKETS
     };
 
-    enum WaveType {
-	LFO_SINE     = WaveTable::SINE,
-	LFO_SQUARE   = WaveTable::SQUARE,
-	LFO_TRIANGLE = WaveTable::TRIANGLE,
-	LFO_SAWTOOTH = WaveTable::SAWTOOTH,
-	N_LFO_TYPES
-    };
-
-    enum ParamID {
-	PARAM_WAVE,
-	PARAM_FREQUENCY,
-	PARAM_AMPLITUDE,
-	N_PARAM
-    };
-
-    static const float DEFAULT_FREQ = 2.0f;
-    static const float DEFAULT_AMPL = 0.5f;
-    
 private:
-    WaveTable& m_table;
-
-    float m_time;
-    
-    int   m_param_mode;
-    float m_param_freq;
-    float m_param_ampl;
-    float m_old_freq;
-	
     void doUpdate(const Object* caller, int caller_port_type, int caller_port);
     void doAdvance() {}
     
 public:
-    ObjectLFO(const AudioInfo& prop, int mode = LFO_SINE);
-    ~ObjectLFO();
+    ObjectLFO(const AudioInfo& prop) :
+	ObjectOscillator(prop, OBJ_LFO, 0, N_OUT_C_SOCKETS)
+	{};
 };
 
 #endif /* OBJECTLFO_H */

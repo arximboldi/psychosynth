@@ -106,30 +106,66 @@ void ElementManager::addElement(int e_type)
 		     ObjectOscillator::OSC_SAWTOOTH);
 	break;
 
+    case ELEM_OSC_MOOGSAW:
+	obj = m_table->addObject(OBJ_OSCILLATOR);
+	obj.setParam(Object::ParamID(Object::PARAM_LOCAL, ObjectOscillator::PARAM_WAVE),
+		     ObjectOscillator::OSC_MOOGSAW);
+	break;
+
+    case ELEM_OSC_EXP:
+	obj = m_table->addObject(OBJ_OSCILLATOR);
+	obj.setParam(Object::ParamID(Object::PARAM_LOCAL, ObjectOscillator::PARAM_WAVE),
+		     ObjectOscillator::OSC_EXP);
+	break;
+	
     case ELEM_LFO_SINE:
 	obj = m_table->addObject(OBJ_LFO);
-	obj.setParam(Object::ParamID(Object::PARAM_LOCAL, ObjectLFO::PARAM_WAVE),
-		     ObjectLFO::LFO_SINE);
+	obj.setParam(Object::ParamID(Object::PARAM_LOCAL, ObjectOscillator::PARAM_WAVE),
+		     ObjectOscillator::OSC_SINE);
+	obj.setParam(Object::ParamID(Object::PARAM_LOCAL, ObjectOscillator::PARAM_FREQUENCY),
+		     2.0f);
 	break;
 	
     case ELEM_LFO_SQUARE:
 	obj = m_table->addObject(OBJ_LFO);
-	obj.setParam(Object::ParamID(Object::PARAM_LOCAL, ObjectLFO::PARAM_WAVE),
-		     ObjectLFO::LFO_SQUARE);
+	obj.setParam(Object::ParamID(Object::PARAM_LOCAL, ObjectOscillator::PARAM_WAVE),
+		     ObjectOscillator::OSC_SQUARE);
+	obj.setParam(Object::ParamID(Object::PARAM_LOCAL, ObjectOscillator::PARAM_FREQUENCY),
+		     2.0f);
 	break;
 	
     case ELEM_LFO_TRIANGLE:
 	obj = m_table->addObject(OBJ_LFO);
-	obj.setParam(Object::ParamID(Object::PARAM_LOCAL, ObjectLFO::PARAM_WAVE),
-		     ObjectLFO::LFO_TRIANGLE);
+	obj.setParam(Object::ParamID(Object::PARAM_LOCAL, ObjectOscillator::PARAM_WAVE),
+		     ObjectOscillator::OSC_TRIANGLE);
+	obj.setParam(Object::ParamID(Object::PARAM_LOCAL, ObjectOscillator::PARAM_FREQUENCY),
+		     2.0f);
 	break;
 	
     case ELEM_LFO_SAWTOOTH:
 	obj = m_table->addObject(OBJ_LFO);
-	obj.setParam(Object::ParamID(Object::PARAM_LOCAL, ObjectLFO::PARAM_WAVE),
-		     ObjectLFO::LFO_SAWTOOTH);
+	obj.setParam(Object::ParamID(Object::PARAM_LOCAL, ObjectOscillator::PARAM_WAVE),
+		     ObjectOscillator::OSC_SAWTOOTH);
+	obj.setParam(Object::ParamID(Object::PARAM_LOCAL, ObjectOscillator::PARAM_FREQUENCY),
+		     2.0f);
 	break;
 
+    case ELEM_LFO_MOOGSAW:
+	obj = m_table->addObject(OBJ_LFO);
+	obj.setParam(Object::ParamID(Object::PARAM_LOCAL, ObjectOscillator::PARAM_WAVE),
+		     ObjectOscillator::OSC_MOOGSAW);
+	obj.setParam(Object::ParamID(Object::PARAM_LOCAL, ObjectOscillator::PARAM_FREQUENCY),
+		     2.0f);
+	break;
+	
+    case ELEM_LFO_EXP:
+	obj = m_table->addObject(OBJ_LFO);
+	obj.setParam(Object::ParamID(Object::PARAM_LOCAL, ObjectOscillator::PARAM_WAVE),
+		     ObjectOscillator::OSC_EXP);
+	obj.setParam(Object::ParamID(Object::PARAM_LOCAL, ObjectOscillator::PARAM_FREQUENCY),
+		     2.0f);
+	break;
+	
     case ELEM_FILTER_LOWPASS:
 	obj = m_table->addObject(OBJ_FILTER);
 	obj.setParam(Object::ParamID(Object::PARAM_LOCAL, ObjectFilter::PARAM_TYPE),

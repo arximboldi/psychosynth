@@ -27,7 +27,7 @@
 
 #include "object/ObjectOutput.h"
 #include "object/ObjectMixer.h"
-#include "object/ObjectOscillator.h"
+#include "object/ObjectAudioOscillator.h"
 #include "object/ObjectLFO.h"
 #include "object/ObjectFilter.h"
 
@@ -143,7 +143,7 @@ TableObject Table::addObject(int type)
 
     switch (type) {
     case OBJ_OSCILLATOR:
-	obj = new ObjectOscillator(m_info);
+	obj = new ObjectAudioOscillator(m_info);
 	break;
     case OBJ_LFO:
 	obj = new ObjectLFO(m_info);

@@ -23,51 +23,11 @@
 #include <cmath>
 #include "object/WaveTable.h"
 
-#define NINT(f) ((f)-floor(f) < ceil(f)-(f) ? floor(f) : ceil(f))
-
 using namespace std;
 
-void WaveTable::initializeSine(Sample* tab, int size)
-{
-    for (int i = 0; i < size; i++)
-	*tab++ = sin(i * 2*M_PI/size);
-}
-
-void WaveTable::initializeTriangle(Sample* tab, int size)
-{
-    int i;
-    for (i = 0; i < size/4; i++)
-	*tab++ = (Sample)i / (size/4);
-    for (i = size/4; i > -size/4; i--)
-	*tab++ = (Sample)i / (size/4);
-    for (i = -size/4; i < 0; i++)
-	*tab++ = (Sample)i / (size/4);
-}
-
-void WaveTable::initializeSquare(Sample* tab, int size)
-{
-    for (int i = 0; i < size/2; i++)
-	*tab++ = 0;
-    for (int i = 0; i < size/2; i++)
-	*tab++ = 1;
-}
-
-void WaveTable::initializeSawtooth(Sample* tab, int size)
-{
-    for (int i = -size/2; i < size/2; i++)
-	*tab++ = (Sample)i / (size/2);
-}
-
-WaveTable::WaveTable()
-{
-    initializeSine(m_table[SINE], TABLE_SIZE);
-    initializeSquare(m_table[SQUARE], TABLE_SIZE);
-    initializeTriangle(m_table[TRIANGLE], TABLE_SIZE);
-    initializeSawtooth(m_table[SAWTOOTH], TABLE_SIZE);
-}
-
-WaveTable::~WaveTable()
-{
+void WaveTable::fill(wave_func_t func) {
+    for (size_t i = 0; i < m_size; ++i)
+	m_table[i] = func((float) i / (m_size));
 }
 
 

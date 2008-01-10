@@ -20,84 +20,67 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef WAVETABLE_H
-#define WAVETABLE_H
+#include <iostream>
+#include <object/Oscillator.h>
 
-#include <cmath>
-#include "common/AudioBuffer.h"
+bool Oscillator::m_table_init = false;
+WaveTable Oscillator::TABLE[Oscillator::WAVE_TYPES];
 
-class WaveTable
+using namespace std;
+
+void Oscillator::initializeTables()
 {
-public:
-    typedef Sample(*wave_func_t)(float);
+    TABLE[SINE].fill(TABLE_SIZE, &computeSine);
+    TABLE[SQUARE].fill(TABLE_SIZE, &computeSquare);
+    TABLE[TRIANGLE].fill(TABLE_SIZE, &computeTriangle);
+    TABLE[SAWTOOTH].fill(TABLE_SIZE, &computeSawtooth);
+    TABLE[MOOGSAW].fill(TABLE_SIZE, &computeMoogsaw);
+    TABLE[EXP].fill(TABLE_SIZE, &computeExp);
     
-private:
-    Sample* m_table;
-    size_t m_size;
+    m_table_init = true;
+}
 
-    static inline float phase(float x) {
-	return x - (x >= 0.0f ? static_cast<int>(x) :
-		    static_cast<int>(x) - 1);
-    }
-    
-public:
-    WaveTable() : m_table(NULL), m_size(0) {}
-
-    WaveTable(size_t size) :
-	m_size(size) {
-	m_table = new Sample[size];
+void Oscillator::update(Sample* out_buf, size_t n_frames)
+{
+    float speed = m_freq / m_info.sample_rate;
+    for (size_t i = 0; i < n_frames; ++i) {
+	*out_buf++ = computeSample(m_x) * m_ampl;
+	m_x += speed;
     }
 
-    WaveTable(size_t size, wave_func_t func) :
-	m_size(size) {
-	m_table = new Sample[size];
-	fill(func);
-    }
-    
-    WaveTable(const WaveTable& wave) :
-	m_size(wave.m_size) {
-	m_table = new Sample[m_size];
-	memcpy(m_table, wave.m_table, sizeof(Sample) * m_size);
-    }
-    
-    ~WaveTable() {
-	delete [] m_table;
+    m_x = phase(m_x);
+}
+
+void Oscillator::updateFM(Sample* out_buf, const Sample* mod_buf, size_t n_frames)
+{
+    for (size_t i = 0; i < n_frames; ++i) {
+	*out_buf++ = computeSample(m_x);
+	m_x += (m_freq + m_freq * *mod_buf++) / m_info.sample_rate;
     }
 
-    WaveTable& operator= (const WaveTable& wave) {
-	if (&wave != this) {
-	    if (wave.m_size != m_size) {
-		delete m_table;
-		m_size = wave.m_size;
-		m_table = new Sample[m_size];
-	    }
-	    
-	    memcpy(m_table, wave.m_table, sizeof(Sample) * m_size);
-	}
-	return *this;
-    }
-    
-    Sample get(float x) const {
-	float  findex = (m_size - 1) * phase(x);
-	size_t index  = findex;
-	float alpha = findex - index;
-	
-	Sample out = m_table[index];
-	out += alpha * (m_table[index + 1 >= m_size ? 0 : index + 1] - out);
+    m_x = phase(m_x);
+}
 
-	return out;
+void Oscillator::updatePM(Sample* out_buf, const Sample* mod_buf, size_t n_frames)
+{
+    float speed = m_freq / m_info.sample_rate;
+    for (size_t i = 0; i < n_frames; ++i) {
+	*out_buf++ = computeSample(m_x + *mod_buf) * m_ampl;
+	m_x += speed;
     }
 
-    void fill(size_t new_size, wave_func_t func) {
-	if (m_size != new_size) {
-	    m_size = new_size;
-	    delete [] m_table;
-	    m_table = new Sample[new_size];
-	}
-	fill(func);
+    m_x = phase(m_x);
+}
+
+void Oscillator::updateAM(Sample* out_buf, const Sample* mod_buf, size_t n_frames)
+{
+    float speed = m_freq / m_info.sample_rate;
+    for (size_t i = 0; i < n_frames; ++i) {
+	*out_buf++ = computeSample(m_x) * (m_ampl + m_ampl * *mod_buf++);
+	m_x += speed;
     }
 
-    void fill(wave_func_t func);
-};
+    m_x = phase(m_x);
+}
 
-#endif /* WAVETABLE_H */
+

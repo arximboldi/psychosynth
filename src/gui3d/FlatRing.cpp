@@ -62,11 +62,11 @@ FlatRing::FlatRing(const Ogre::String& id,
     m_colour(colour),
     m_numtrig(num_triangles)
 {
-    setDynamic(true);
     createColourMaterial(getName(), m_colour);
     begin(id, RenderOperation::OT_TRIANGLE_STRIP);
     build();
     end();
+    setDynamic(false);
 }
 
 void FlatRing::update()

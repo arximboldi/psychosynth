@@ -27,67 +27,39 @@
 
 using namespace std;
 
-ObjectOscillator::ObjectOscillator(const AudioInfo& prop, int mode) : 
+ObjectOscillator::ObjectOscillator(const AudioInfo& prop,
+				   int obj_type,
+				   int n_audio_out,
+				   int n_control_out) : 
     Object(prop,
-	   OBJ_OSCILLATOR,
+	   obj_type,
 	   N_PARAM,
 	   N_IN_A_SOCKETS,
 	   N_IN_C_SOCKETS,
-	   N_OUT_A_SOCKETS,
-	   N_OUT_C_SOCKETS),
-    m_table(WaveTable::instance()),
-    m_time(0),
-    m_param_mode(mode),
+	   n_audio_out,
+	   n_control_out),
+    m_oscillator(prop),
+    m_param_wave(OSC_SINE),
+    m_param_mod(MOD_FM),
     m_param_freq(DEFAULT_FREQ),
-    m_param_ampl(DEFAULT_AMPL),
-    m_old_freq(DEFAULT_FREQ)
+    m_param_ampl(DEFAULT_AMPL)
 {    
-    configureLocalParam(PARAM_WAVE, PARAM_INT, &m_param_mode);
+    configureLocalParam(PARAM_WAVE, PARAM_INT, &m_param_wave);
+    configureLocalParam(PARAM_MODULATOR, PARAM_INT, &m_param_mod);
     configureLocalParam(PARAM_FREQUENCY, PARAM_FLOAT, &m_param_freq);
     configureLocalParam(PARAM_AMPLITUDE, PARAM_FLOAT, &m_param_ampl);
+
+    updateOscParams();
 }
 
 ObjectOscillator::~ObjectOscillator()
 {
 }
 
-void ObjectOscillator::doUpdate(const Object* caller, int caller_port_type, int caller_port)
+void ObjectOscillator::updateOscParams()
 {
-    AudioBuffer*         buf = getOutput<AudioBuffer>(LINK_AUDIO, OUT_A_OUTPUT);
-    const ControlBuffer* pitch_buf = getInput<ControlBuffer>(LINK_CONTROL, IN_C_FREQUENCY);
-    
-    Sample*       chan = buf->getChannel(0);
-    const Sample* pitch = NULL;
-
-    float  rate = getAudioInfo().sample_rate;
-    size_t size = getAudioInfo().block_size;
-    
-    float  speed = WaveTable::TABLE_SIZE * m_param_freq  / rate;
-    size_t i;
-
-    if (pitch_buf)
-	pitch = pitch_buf->getData();
-    
-    for (i = 0; i < size; ++i, ++chan) {
-	while ( m_time < 0.0 )
-	    m_time += WaveTable::TABLE_SIZE;
-	while ( m_time >= WaveTable::TABLE_SIZE )
-	    m_time -= WaveTable::TABLE_SIZE;
-	
-	size_t index = m_time;
-	size_t alpha = m_time - index;
-	
-	*chan = m_table[m_param_mode][index];
-	*chan += alpha * (m_table[m_param_mode][++index] - *chan);
-	*chan *= m_param_ampl;
-
-	if (pitch) {
-	    speed = WaveTable::TABLE_SIZE * (m_param_freq + m_param_freq * *pitch++) / rate;
-	}
-	
-	m_time += speed;
-    }
-
-    for (i = 1; i < (size_t)getAudioInfo().num_channels; i++)
-	memcpy((*buf)[i], (*buf)[0], sizeof(Sample) * getAudioInfo().block_size);
+    m_oscillator.setFrequency(m_param_freq);
+    m_oscillator.setAmplitude(m_param_ampl);
+    m_oscillator.setWave((Oscillator::WaveType)m_param_wave);
+    m_oscillator.setModulator((Oscillator::ModType)m_param_mod);
 }

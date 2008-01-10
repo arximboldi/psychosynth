@@ -21,68 +21,21 @@
  ***************************************************************************/
 
 #include "object/ObjectLFO.h"
-#include "object/KnownObjects.h"
 
 using namespace std;
-
-ObjectLFO::ObjectLFO(const AudioInfo& prop, int mode) : 
-    Object(prop,
-	   OBJ_LFO,
-	   N_PARAM,
-	   N_IN_A_SOCKETS,
-	   N_IN_C_SOCKETS,
-	   N_OUT_A_SOCKETS,
-	   N_OUT_C_SOCKETS),
-    m_table(WaveTable::instance()),
-    m_time(0),
-    m_param_mode(mode),
-    m_param_freq(DEFAULT_FREQ),
-    m_param_ampl(DEFAULT_AMPL),
-    m_old_freq(DEFAULT_FREQ)
-{    
-    configureLocalParam(PARAM_WAVE, PARAM_INT, &m_param_mode);
-    configureLocalParam(PARAM_FREQUENCY, PARAM_FLOAT, &m_param_freq);
-    configureLocalParam(PARAM_AMPLITUDE, PARAM_FLOAT, &m_param_ampl);
-}
-
-ObjectLFO::~ObjectLFO()
-{
-}
 
 void ObjectLFO::doUpdate(const Object* caller, int caller_port_type, int caller_port)
 {
     ControlBuffer*       buf = getOutput<ControlBuffer>(LINK_CONTROL, OUT_C_OUTPUT);
     const ControlBuffer* pitch_buf = getInput<ControlBuffer>(LINK_CONTROL, IN_C_FREQUENCY);
 
-    Sample*       chan = buf->getData();
-    const Sample* pitch = NULL;
+    Sample*       out = buf->getData();
+    const Sample* mod = pitch_buf ? pitch_buf->getData() : NULL;
 
-    float  rate  = getAudioInfo().sample_rate;
-    size_t size = getAudioInfo().block_size;
-    
-    float  speed = WaveTable::TABLE_SIZE * m_param_freq  / rate;
-    size_t i;
+    updateOscParams();
 
-    if (pitch_buf)
-	pitch = pitch_buf->getData();
-        
-    for (i = 0; i < size; ++i, ++chan) {
-	while ( m_time < 0.0 )
-	    m_time += WaveTable::TABLE_SIZE;
-	while ( m_time >= WaveTable::TABLE_SIZE )
-	    m_time -= WaveTable::TABLE_SIZE;
-	
-	size_t index = m_time;
-	size_t alpha = m_time - index;
-	
-	*chan = m_table[m_param_mode][index];
-	*chan += alpha * (m_table[m_param_mode][++index] - *chan);
-	*chan *= m_param_ampl;
-
-	if (pitch) {
-	    speed = WaveTable::TABLE_SIZE * (m_param_freq + m_param_freq * *pitch++) / rate;
-	}
-	
-	m_time += speed;
-    }
+    if (!mod)
+	m_oscillator.update(out, getInfo().block_size);
+    else
+	m_oscillator.update(out, mod, getInfo().block_size);
 }
