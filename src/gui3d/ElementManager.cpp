@@ -73,7 +73,6 @@ Element* ElementManager::createElement(TableObject& obj)
     case OBJ_MIXER:
 	return new ElementMixer(obj, m_scene);
     case OBJ_CONTROLMIXER:
-	cout << "yeah!!!\n";
 	return new ElementControlMixer(obj, m_scene);
     default:
 	return NULL;
@@ -83,6 +82,8 @@ Element* ElementManager::createElement(TableObject& obj)
 void ElementManager::addElement(int e_type)
 {
     TableObject obj;
+
+    m_must_own++;
     
     switch(e_type) {
     case ELEM_OSC_SINE:
@@ -230,6 +231,7 @@ void ElementManager::addElement(int e_type)
 	break;
 	
     default:
+	m_must_own--;
 	break;
     }
 }
@@ -324,6 +326,11 @@ void ElementManager::handleAddObject(TableObject& obj)
     Element* elem = createElement(obj);
 
     if (elem != NULL) {
+	if (m_must_own) {
+	    elem->setOwned(true);
+	    m_must_own--;
+	}
+	
 	m_elems.insert(pair<int,Element*>(obj.getID(), elem));
 	obj.addListener(elem);
     }

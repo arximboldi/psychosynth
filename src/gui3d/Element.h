@@ -87,7 +87,8 @@ class Element : public TableObjectListener
     Ogre::Vector3 m_aimpoint;
     Ogre::Vector2 m_click_diff;
     Ogre::Vector2 m_pos;
-	
+
+    bool m_owned;
     bool m_ghost;
     bool m_selected;
     bool m_moving;
@@ -129,11 +130,19 @@ public:
     bool isSelected() const {
 	return m_selected;
     };
-	
+
+    bool isOwned() const {
+	return m_owned;
+    };
+    
     Ogre::Vector2 getPosition() {
 	return m_pos;
     }
 
+    void setOwned(bool owned) {
+	m_owned = owned;
+    }
+    
     Ogre::SceneManager* getScene() {
 	return m_scene;
     }

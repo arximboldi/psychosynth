@@ -48,7 +48,9 @@ class ElementManager : public OIS::MouseListener,
     ElemMap m_elems;
     std::list<Connection*> m_cons;
     int m_elemcount;
-	
+
+    int m_must_own;
+    
     Ogre::Camera* m_camera;
     Ogre::SceneManager* m_scene;
     Ogre::RaySceneQuery* m_rayquery;

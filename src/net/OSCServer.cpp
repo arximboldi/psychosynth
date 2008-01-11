@@ -73,7 +73,7 @@ OSCServer::~OSCServer()
 void OSCServer::addMethods()
 {
     /* DEBUG */
-    //lo_server_add_method(m_server, NULL, NULL, &lo_generic_handler, NULL);
+    lo_server_add_method(m_server, NULL, NULL, &lo_generic_handler, NULL);
 
     lo_server_add_method(m_server, MSG_ALIVE, "", &alive_cb, this);
     lo_server_add_method(m_server, MSG_CONNECT, "", &connect_cb, this);

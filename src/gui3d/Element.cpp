@@ -40,6 +40,8 @@ Element::Element(TableObject& obj, Ogre::SceneManager* scene) :
     m_aimpoint(0, Z_POS, 0),
     m_click_diff(0,0),
     m_pos(0,0),
+    m_owned(false),
+    m_ghost(true),
     m_selected(false),
     m_moving(false),
     m_gui_prop(obj)
@@ -155,7 +157,7 @@ bool Element::pointerClicked(const Ogre::Vector2& pos, OIS::MouseButtonID id)
     
     switch (id) {
     case OIS::MB_Left:
-	if (m_ghost) {
+	if (m_ghost && m_owned) {
 	    m_obj.activate();
 	    return true;
 	} else if ((pos-m_pos).squaredLength() < RADIOUS) {
@@ -181,7 +183,7 @@ bool Element::pointerMoved(const Ogre::Vector2& pos)
 	if ((*it++)->handlePointerMove(pos))
 	    ret = true;
     
-    if (m_ghost)
+    if (m_ghost && m_owned)
 	setPosition(pos);
     else if (m_moving)
 	setPosition(pos - m_click_diff);

@@ -158,7 +158,7 @@ void OSCController::handleSetParamObject(TableObject& obj, Object::ParamID param
 	
 	broadcastMessage(MSG_PARAM, msg);
 
-	lo_message_free(msg);	
+	lo_message_free(msg);
     }
 }
 
@@ -224,7 +224,7 @@ int OSCController::_delete_cb(const char* path, const char* types,
 		lo_message_add_int32(newmsg, argv[0]->i);
 		lo_message_add_int32(newmsg, argv[1]->i);
 		broadcastMessageFrom(MSG_DELETE, newmsg, lo_message_get_source(msg));
-		lo_message_free(msg);
+		lo_message_free(newmsg);
 	    }
 	}
     }
@@ -260,8 +260,9 @@ int OSCController::_param_cb(const char* path, const char* types,
 	    case Object::PARAM_VECTOR2F:
 		m_table->setParamObject(obj, param_id,
 					Vector2f(argv[4]->f, argv[5]->f));
+		break;
 	    default:
-		return 0;
+		break;
 	    }
 	    m_skip--;
 
@@ -287,7 +288,7 @@ int OSCController::_param_cb(const char* path, const char* types,
 		    lo_message_add_float(newmsg, argv[5]->f);
 		    break;
 		default:
-		    return 0;
+		    break;
 		}
 		
 		broadcastMessageFrom(MSG_PARAM, newmsg, lo_message_get_source(msg));
