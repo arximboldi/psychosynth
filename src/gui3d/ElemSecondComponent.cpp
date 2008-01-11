@@ -27,7 +27,7 @@
 #define SECOND_MIN_ANGLE 85
 #define SECOND_POINT_MIN_ANGLE -85
 #define SECOND_RANGE_ANGLE 170
-#define SECOND_POINT_RAD 0.15
+#define SECOND_POINT_RAD 0.2
 
 using namespace std;
 using namespace Ogre;
