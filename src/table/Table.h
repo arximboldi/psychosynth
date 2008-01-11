@@ -31,7 +31,7 @@
 #include "table/Patcher.h"
 #include "object/Object.h"
 #include "object/ObjectOutput.h"
-#include "object/ObjectMixer.h"
+#include "object/ObjectAudioMixer.h"
 #include "object/ObjectManager.h"
 #include "output/Output.h"
 
@@ -206,7 +206,7 @@ class Table : public TableSubject,
     ObjectManager m_objmgr;
     Patcher* m_patcher;
     ObjectOutput* m_output;
-    ObjectMixer* m_mixer;
+    ObjectAudioMixer* m_mixer;
     int m_last_id;
     
     static const int MIXER_CHANNELS = 16;

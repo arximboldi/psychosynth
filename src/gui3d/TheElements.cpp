@@ -62,6 +62,35 @@ ElementMixer::ElementMixer(TableObject& obj,
 					"Amplitude"));
 }
 
+ElementControlMixer::ElementControlMixer(TableObject& obj,
+			   Ogre::SceneManager* m_scene) :
+    Element(obj, m_scene)
+{
+
+    static const char* mesh_names[ObjectMixer::N_MIXOPS] =
+	{"ctrl_mixer.mesh", "ctrl_mixer_ring.mesh"};
+
+    static const char* mixop_names[ObjectMixer::N_MIXOPS] =
+	{"Sum", "Product"};
+
+    addComponent(new ElemMultiMainComponent(
+		     Object::ParamID(Object::PARAM_LOCAL, ObjectMixer::PARAM_AMPLITUDE),
+		     0.0f, 1.0f,
+		     Object::ParamID(Object::PARAM_LOCAL, ObjectMixer::PARAM_MIXOP),
+		     mesh_names));
+	
+    getGUIProperties().addParameter(new ElemGuiParamMulti(
+					Object::ParamID(Object::PARAM_LOCAL, ObjectMixer::PARAM_MIXOP),
+					ObjectMixer::N_MIXOPS,
+					mixop_names,
+					"Operation"));
+    
+    getGUIProperties().addParameter(new ElemGuiParamFloat(
+					Object::ParamID(Object::PARAM_LOCAL, ObjectMixer::PARAM_AMPLITUDE),
+					0.0f, 1.0f,
+					"Amplitude"));
+}
+
 ElementOscillator::ElementOscillator(TableObject& obj,
 				     Ogre::SceneManager* m_scene) :
     Element(obj, m_scene)

@@ -36,6 +36,8 @@ psychosynth_SOURCES = \
 	object/Object.cpp \
 	object/ObjectOscillator.cpp \
 	object/ObjectMixer.cpp \
+	object/ObjectAudioMixer.cpp \
+	object/ObjectControlMixer.cpp \
 	object/ObjectManager.cpp \
 	object/ObjectOutput.cpp \
 	object/ObjectLFO.cpp \
@@ -122,6 +124,8 @@ noinst_HEADERS = \
 	object/ObjectManager.h \
 	object/ObjectOutput.h \
 	object/ObjectMixer.h \
+	object/ObjectAudioMixer.h \
+	object/ObjectControlMixer.h \
 	object/ObjectLFO.h \
 	object/ObjectAudioOscillator.h \
 	object/ObjectFilter.h \

@@ -31,6 +31,12 @@ public:
     ElementMixer(TableObject& obj, Ogre::SceneManager* m_scene);
 };
 
+class ElementControlMixer : public Element
+{  
+public:
+    ElementControlMixer(TableObject& obj, Ogre::SceneManager* m_scene);
+};
+
 class ElementOscillator : public Element
 {
 public:

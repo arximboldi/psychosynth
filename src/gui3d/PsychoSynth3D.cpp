@@ -263,7 +263,9 @@ void PsychoSynth3D::setupMenus()
     cat = selector->addCategory("Mix");
     cat->addButton("Mixer", ELEM_MIXER);
     cat->addButton("Ring Mod.", ELEM_RINGMOD);
-
+    cat->addButton("Ctrl. Mixer", ELEM_CTRLMIXER);
+    cat->addButton("Ctrl. Ring Mod.", ELEM_CTRLRINGMOD);
+    
     m_windowlist = new WindowList();
     
     m_windowlist->addWindow("SelectorWindowButton.imageset",

@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) 2007 Juan Pedro Bolivar Puente                          *
+ *   Copyright (C) Juan Pedro Bolivar Puente 2007                          *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -20,27 +20,23 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef CORENETUPDATER_H
-#define CORENETUPDATER_H
+#include "object/ObjectAudioMixer.h"
 
-#include "core/Core.h"
-#include "common/Packets.h"
-
-class CoreNetUpdater
+void ObjectAudioMixer::doUpdate(const Object* caller, int caller_port_type, int caller_port)
 {
-	Core* m_core;
+    AudioBuffer* buf = getOutput<AudioBuffer>(LINK_AUDIO, OUT_A_OUTPUT);
+    const AudioBuffer* in = NULL;
+    const ControlBuffer* ampl = getInput<ControlBuffer>(LINK_CONTROL, IN_C_AMPLITUDE);
+    int i, j;
 
-	bool processAddObject(const NetMessage& msg);
-	bool processMoveObject(const NetMessage& msg);
-	bool processDeleteObject(const NetMessage& msg);
-public:
-	CoreNetUpdater(Core* core = NULL) : m_core(core) {}
-	
-	void setCore(Core* core) { m_core = core; }
-	Core* getCore() const { return m_core; }
-	
-	bool processMessage(const NetMessage& msg);
-};
+    for (i = 0; i < getInfo().num_channels; ++i) {
+	init(buf->getChannel(i), getInfo().block_size);
 
-#endif /* CORENETUPDATER_H */
-
+	for (j = 0; j < m_numchan; ++j)
+	    if ((in = getInput<AudioBuffer>(LINK_AUDIO, j)))
+		if (!ampl)
+		    mix(buf->getChannel(i), in->getChannel(i), getInfo().block_size);
+		else
+		    mix(buf->getChannel(i), in->getChannel(i), ampl->getData(), getInfo().block_size);
+    }
+}

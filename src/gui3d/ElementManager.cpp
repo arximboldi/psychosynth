@@ -72,6 +72,9 @@ Element* ElementManager::createElement(TableObject& obj)
 	return new ElementFilter(obj, m_scene);
     case OBJ_MIXER:
 	return new ElementMixer(obj, m_scene);
+    case OBJ_CONTROLMIXER:
+	cout << "yeah!!!\n";
+	return new ElementControlMixer(obj, m_scene);
     default:
 	return NULL;
     }
@@ -210,6 +213,18 @@ void ElementManager::addElement(int e_type)
 
     case ELEM_RINGMOD:
 	obj = m_table->addObject(OBJ_MIXER);
+	obj.setParam(Object::ParamID(Object::PARAM_LOCAL, ObjectMixer::PARAM_MIXOP),
+		     ObjectMixer::MIX_PRODUCT);
+	break;
+
+    case ELEM_CTRLMIXER:
+	obj = m_table->addObject(OBJ_CONTROLMIXER);
+	obj.setParam(Object::ParamID(Object::PARAM_LOCAL, ObjectMixer::PARAM_MIXOP),
+		     ObjectMixer::MIX_SUM);
+	break;
+
+    case ELEM_CTRLRINGMOD:
+	obj = m_table->addObject(OBJ_CONTROLMIXER);
 	obj.setParam(Object::ParamID(Object::PARAM_LOCAL, ObjectMixer::PARAM_MIXOP),
 		     ObjectMixer::MIX_PRODUCT);
 	break;

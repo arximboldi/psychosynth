@@ -100,7 +100,7 @@ public:
 	allocate();
     }
     
-    void clear() {
+    void zero() {
 	memset(*m_data, 0, sizeof(Sample) * m_info.block_size * m_info.num_channels);
     }
 };

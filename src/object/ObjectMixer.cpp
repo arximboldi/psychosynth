@@ -25,67 +25,51 @@
 
 using namespace std;
 
-ObjectMixer::ObjectMixer(const AudioInfo& prop, int numchan) : 
-    Object(prop,
-	   OBJ_MIXER,
+ObjectMixer::ObjectMixer(const AudioInfo& info,
+			 int obj_type,
+			 int num_audio_out,
+			 int num_ctrl_out,
+			 int num_in): 
+    Object(info,
+	   obj_type,
 	   N_PARAM,
-	   numchan, 
-	   N_IN_C_SOCKETS,
-	   N_OUT_A_SOCKETS,
-	   N_OUT_C_SOCKETS),
+	   num_audio_out ? num_in : 0, 
+	   num_ctrl_out  ? num_in : N_IN_C_SOCKETS,
+	   num_audio_out,
+	   num_ctrl_out),
+    m_numchan(num_in),
     m_param_ampl(0.5f),
-    m_param_mixop(MIX_SUM),
-    m_numchan(numchan)
+    m_param_mixop(MIX_SUM)
 {
     configureLocalParam(PARAM_AMPLITUDE, Object::PARAM_FLOAT, &m_param_ampl);
     configureLocalParam(PARAM_MIXOP, Object::PARAM_INT, &m_param_mixop);
 }
 
-void ObjectMixer::mix(AudioBuffer* dest, const AudioBuffer* src,
-		      const ControlBuffer* ampl, MixOp op)
+void ObjectMixer::mix(Sample* dest, const Sample* src, size_t n_samples)
 {
-    int i, j;
-    int channels = getAudioInfo().num_channels;
-    int size = getAudioInfo().block_size;
-    Sample* dbuf;
-    const Sample* sbuf;
-    const Sample* abuf = NULL;
-
-    for (i = 0; i < channels; i++) {
-	dbuf = dest->getChannel(i);
-	sbuf = src->getChannel(i);
-	if (ampl)
-	    abuf = ampl->getData();
-
-	if (op == MIX_SUM) 
-	    if (!abuf)
-		for (j = 0; j < size; j++)
-		    *dbuf++ += *sbuf++ * m_param_ampl;
-	    else
-		for (j = 0; j < size; j++)
-		    *dbuf++ += *sbuf++ * (m_param_ampl + m_param_ampl * *abuf++);
-	else if (op == MIX_PRODUCT) {
-	    if (!abuf)
-		for (j = 0; j < size; j++)
-		    *dbuf++ *= *sbuf++ * m_param_ampl;
-	    else
-		for (j = 0; j < size; j++)
-		    *dbuf++ *= *sbuf++ * (m_param_ampl + m_param_ampl * *abuf++);
-	}
-    }
+    if (m_param_mixop == MIX_SUM)
+	while(n_samples--)
+	    *dest++ += *src++ * m_param_ampl;
+    else if (m_param_mixop == MIX_PRODUCT)
+	while(n_samples--)
+	    *dest++ *= *src++ * m_param_ampl;
+}
+  
+void ObjectMixer::mix(Sample* dest, const Sample* src,
+		      const Sample* ampl, size_t n_samples)
+{
+    if (m_param_mixop == MIX_SUM)
+	while(n_samples--)
+	    *dest++ += *src++ * (m_param_ampl + m_param_ampl * *ampl++);
+    else if (m_param_mixop == MIX_PRODUCT)
+	while(n_samples--)
+	    *dest++ *= *src++ * (m_param_ampl + m_param_ampl * *ampl++);
 }
 
-void ObjectMixer::doUpdate(const Object* caller, int caller_port_type, int caller_port)
+void ObjectMixer::init(Sample* dest, size_t n_samples)
 {
-    AudioBuffer* buf = getOutput<AudioBuffer>(LINK_AUDIO, OUT_A_OUTPUT);
-    const AudioBuffer* in = NULL;
-    const ControlBuffer* ampl = getInput<ControlBuffer>(LINK_CONTROL, IN_C_AMPLITUDE);
-    int i;
-    int n_mixed = 0;
+    float def_val = (m_param_mixop == MIX_SUM ? 0.0 : 1.0);
     
-    buf->clear();
-	
-    for (i = 0; i < m_numchan; ++i)
-	if ((in = getInput<AudioBuffer>(LINK_AUDIO, i)))
-	    mix (buf, in, ampl, n_mixed++ == 0 ? MIX_SUM : (MixOp)m_param_mixop);
+    while(n_samples--)
+	*dest++ = def_val;
 }

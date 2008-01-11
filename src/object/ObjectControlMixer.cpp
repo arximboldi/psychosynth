@@ -20,67 +20,18 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <iostream>
-#include <object/Oscillator.h>
+#include "object/ObjectControlMixer.h"
 
-bool Oscillator::m_table_init = false;
-WaveTable Oscillator::TABLE[Oscillator::WAVE_TYPES];
-
-using namespace std;
-
-void Oscillator::initializeTables()
+void ObjectControlMixer::doUpdate(const Object* caller, int caller_port_type, int caller_port)
 {
-    TABLE[SINE].fill(TABLE_SIZE, &computeSine);
-    TABLE[SQUARE].fill(TABLE_SIZE, &computeSquare);
-    TABLE[TRIANGLE].fill(TABLE_SIZE, &computeTriangle);
-    TABLE[SAWTOOTH].fill(TABLE_SIZE, &computeSawtooth);
-    TABLE[MOOGSAW].fill(TABLE_SIZE, &computeMoogsaw);
-    TABLE[EXP].fill(TABLE_SIZE, &computeExp);
+    ControlBuffer* buf = getOutput<ControlBuffer>(LINK_CONTROL, OUT_C_OUTPUT);
+    const ControlBuffer* in = NULL;
+    int j;
+
+    init(buf->getData(), getInfo().block_size);
     
-    m_table_init = true;
+    for (j = 0; j < m_numchan; ++j)
+	if ((in = getInput<ControlBuffer>(LINK_CONTROL, j)))
+	    mix(buf->getData(), in->getData(), getInfo().block_size);
 }
-
-void Oscillator::update(Sample* out_buf, size_t n_frames)
-{
-    float speed = m_freq / m_info.sample_rate;
-    for (size_t i = 0; i < n_frames; ++i) {
-	*out_buf++ = computeSample(m_x) * m_ampl;
-	m_x += speed;
-    }
-
-    m_x = phase(m_x);
-}
-
-void Oscillator::updateFM(Sample* out_buf, const Sample* mod_buf, size_t n_frames)
-{
-    for (size_t i = 0; i < n_frames; ++i) {
-	*out_buf++ = computeSample(m_x) * m_ampl;
-	m_x += (m_freq + m_freq * *mod_buf++) / m_info.sample_rate;
-    }
-
-    m_x = phase(m_x);
-}
-
-void Oscillator::updatePM(Sample* out_buf, const Sample* mod_buf, size_t n_frames)
-{
-    float speed = m_freq / m_info.sample_rate;
-    for (size_t i = 0; i < n_frames; ++i) {
-	*out_buf++ = computeSample(m_x + *mod_buf) * m_ampl;
-	m_x += speed;
-    }
-
-    m_x = phase(m_x);
-}
-
-void Oscillator::updateAM(Sample* out_buf, const Sample* mod_buf, size_t n_frames)
-{
-    float speed = m_freq / m_info.sample_rate;
-    for (size_t i = 0; i < n_frames; ++i) {
-	*out_buf++ = computeSample(m_x) * (m_ampl + m_ampl * *mod_buf++);
-	m_x += speed;
-    }
-
-    m_x = phase(m_x);
-}
-
 

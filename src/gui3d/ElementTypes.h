@@ -47,7 +47,9 @@ enum ElementType
     ELEM_FILTER_MOOG,
 
     ELEM_MIXER,
-    ELEM_RINGMOD
+    ELEM_RINGMOD,
+    ELEM_CTRLMIXER,
+    ELEM_CTRLRINGMOD
 };
 
 #endif /* ELEMENTTYPES_H */

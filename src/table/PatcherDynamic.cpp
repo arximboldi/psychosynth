@@ -24,7 +24,8 @@
 
 #include "object/Object.h"
 #include "object/ObjectOutput.h"
-#include "object/ObjectMixer.h"
+#include "object/ObjectAudioMixer.h"
+#include "object/ObjectControlMixer.h"
 #include "object/ObjectAudioOscillator.h"
 #include "object/ObjectLFO.h"
 #include "object/ObjectFilter.h"
@@ -50,34 +51,49 @@ const PatcherData PATCHER_TABLE[N_OBJECTS][N_OBJECTS] =
     /* ObjectOutput */
     {
 	{Object::LINK_NONE, 0, 0},  /* ObjectOutput */
-	{Object::LINK_NONE, 0, 0},  /* ObjectMixer */
+	{Object::LINK_NONE, 0, 0},  /* ObjectAudioMixer */
+	{Object::LINK_NONE, 0, 0}, /* ObjectControlMixer */
 	{Object::LINK_NONE, 0, 0},  /* ObjectAudioOscillator */
 	{Object::LINK_NONE, 0, 0},  /* ObjectLFO */
 	{Object::LINK_NONE, 0, 0}   /* ObjectFilter */
     },
 
-    /* ObjectMixer */
+    /* ObjectAudioMixer */
     {
-	{Object::LINK_AUDIO, ObjectMixer::OUT_A_OUTPUT, ObjectOutput::IN_A_INPUT},  /* ObjectOutput */
-	{Object::LINK_AUDIO, ObjectMixer::OUT_A_OUTPUT, PATCHER_ANY}, /* ObjectMixer */
-	{Object::LINK_NONE, 0, 0},/* ObjectAudioOscillator */
+	{Object::LINK_AUDIO, ObjectAudioMixer::OUT_A_OUTPUT, ObjectOutput::IN_A_INPUT},  /* ObjectOutput */
+	{Object::LINK_AUDIO, ObjectAudioMixer::OUT_A_OUTPUT, PATCHER_ANY}, /* ObjectAudioMixer */
+	{Object::LINK_NONE, 0, 0}, /* ObjectControlMixer */
+	{Object::LINK_NONE, 0, 0}, /* ObjectAudioOscillator */
 	{Object::LINK_NONE, 0, 0}, /* ObjectLFO */
-	{Object::LINK_AUDIO, ObjectMixer::OUT_A_OUTPUT, ObjectFilter::IN_A_INPUT} /* ObjectFilter */
+	{Object::LINK_AUDIO, ObjectAudioMixer::OUT_A_OUTPUT, ObjectFilter::IN_A_INPUT} /* ObjectFilter */
     },
 
+    /* ObjectControlMixer */
+    {
+	{Object::LINK_NONE, 0, 0},  /* ObjectOutput */
+	{Object::LINK_CONTROL, ObjectControlMixer::OUT_C_OUTPUT, ObjectMixer::IN_C_AMPLITUDE}, /* ObjectAudioMixer */
+	/* TODO: Decide a way to allow controlling control signals amplitude. */
+	{Object::LINK_CONTROL, ObjectControlMixer::OUT_C_OUTPUT, PATCHER_ANY}, /* ObjectControlMixer */
+	{Object::LINK_CONTROL, ObjectControlMixer::OUT_C_OUTPUT, ObjectOscillator::IN_C_FREQUENCY},/* ObjectAudioOscillator */
+	{Object::LINK_CONTROL, ObjectControlMixer::OUT_C_OUTPUT, ObjectOscillator::IN_C_FREQUENCY}, /* ObjectLFO */
+	{Object::LINK_CONTROL, ObjectControlMixer::OUT_C_OUTPUT, ObjectFilter::IN_C_CUTOFF} /* ObjectFilter */
+    },
+    
     /* ObjectAudioOscillator */
     {
 	{Object::LINK_NONE, 0, 0}, /* ObjectOutput */
-	{Object::LINK_AUDIO, ObjectAudioOscillator::OUT_A_OUTPUT, PATCHER_ANY}, /* ObjectMixer */
+	{Object::LINK_AUDIO, ObjectAudioOscillator::OUT_A_OUTPUT, PATCHER_ANY}, /* ObjectAudioMixer */
+	{Object::LINK_NONE, 0, 0}, /* ObjectControlMixer */
 	{Object::LINK_NONE, 0, 0}, /* ObjectAudioOscillator */
 	{Object::LINK_NONE, 0, 0}, /* ObjectLFO */
-	{Object::LINK_AUDIO, ObjectMixer::OUT_A_OUTPUT, ObjectFilter::IN_A_INPUT} /* ObjectFilter */
+	{Object::LINK_AUDIO, ObjectAudioOscillator::OUT_A_OUTPUT, ObjectFilter::IN_A_INPUT} /* ObjectFilter */
     },
 
     /* ObjectLFO */
     {
-	{Object::LINK_NONE, 0, 0}, /* ObjectOutput */
-	{Object::LINK_CONTROL, ObjectLFO::OUT_C_OUTPUT, ObjectMixer::IN_C_AMPLITUDE}, /* ObjectMixer */
+	{Object::LINK_NONE, 0, 0}, /* ObjectOutput */	
+	{Object::LINK_CONTROL, ObjectLFO::OUT_C_OUTPUT, ObjectMixer::IN_C_AMPLITUDE}, /* ObjectAudioMixer */
+	{Object::LINK_CONTROL, ObjectLFO::OUT_C_OUTPUT, PATCHER_ANY}, /* ObjectControlMixer */
 	{Object::LINK_CONTROL, ObjectLFO::OUT_C_OUTPUT, ObjectOscillator::IN_C_FREQUENCY}, /* ObjectAudioOscillator */
 	{Object::LINK_CONTROL, ObjectLFO::OUT_C_OUTPUT, ObjectOscillator::IN_C_FREQUENCY}, /* ObjectLFO */
 	{Object::LINK_CONTROL, ObjectLFO::OUT_C_OUTPUT, ObjectFilter::IN_C_CUTOFF}  /* ObjectFilter */
@@ -86,7 +102,8 @@ const PatcherData PATCHER_TABLE[N_OBJECTS][N_OBJECTS] =
     /* ObjectFilter */
     {
 	{Object::LINK_NONE, 0, 0}, /* ObjectOutput */
-	{Object::LINK_AUDIO, ObjectFilter::OUT_A_OUTPUT, PATCHER_ANY}, /* ObjectMixer */
+	{Object::LINK_AUDIO, ObjectFilter::OUT_A_OUTPUT, PATCHER_ANY}, /* ObjectAudioMixer */
+	{Object::LINK_NONE, 0, 0}, /* ObjectControlMixer */
 	{Object::LINK_NONE, 0, 0}, /* ObjectAudioOscillator */
 	{Object::LINK_NONE, 0, 0}, /* ObjectLFO */
 	{Object::LINK_AUDIO, ObjectFilter::OUT_A_OUTPUT, ObjectFilter::IN_A_INPUT}

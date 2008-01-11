@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) 2007 Juan Pedro Bolivar Puente                          *
+ *   Copyright (C) Juan Pedro Bolivar Puente 2007                          *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -36,15 +36,6 @@ public:
 	IN_C_AMPLITUDE,
 	N_IN_C_SOCKETS
     };
-	
-    enum OutAudioSocketID {
-	OUT_A_OUTPUT,
-	N_OUT_A_SOCKETS
-    };
-	
-    enum OutControlSocketID {
-	N_OUT_C_SOCKETS
-    };
 
     enum ParamID {
 	PARAM_AMPLITUDE,
@@ -57,21 +48,28 @@ public:
 	MIX_PRODUCT,
 	N_MIXOPS
     };
+
+
+protected:
+    int m_numchan;
+
+    void mix(Sample* dest, const Sample* src, size_t n_samples);
+    
+    void mix(Sample* dest, const Sample* src,
+	     const Sample* ampl, size_t n_samples);
+
+    void init(Sample* dest, size_t n_samples);
     
 private:
     float m_param_ampl;
-    int m_param_mixop;
-    
-    int m_numchan;
-	
-    void mix(AudioBuffer* dest, const AudioBuffer* src,
-	     const ControlBuffer* ampl, MixOp op);
-    
-    void doUpdate(const Object* caller, int caller_port_type, int caller_port);
-    void doAdvance() {}
+    int m_param_mixop;    
     
 public:
-    ObjectMixer(const AudioInfo& info, int num_chan = 2);
+    ObjectMixer(const AudioInfo& info,
+		int obj_type,
+		int num_audio_out,
+		int num_ctrl_out,
+		int num_in = 2);
 };
 
 #endif /* OBJECTMIXER_H */

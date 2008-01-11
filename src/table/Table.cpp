@@ -26,7 +26,8 @@
 #include "common/Error.h"
 
 #include "object/ObjectOutput.h"
-#include "object/ObjectMixer.h"
+#include "object/ObjectAudioMixer.h"
+#include "object/ObjectControlMixer.h"
 #include "object/ObjectAudioOscillator.h"
 #include "object/ObjectLFO.h"
 #include "object/ObjectFilter.h"
@@ -103,7 +104,7 @@ Table::Table(const AudioInfo& info) :
     m_last_id(MIN_USER_ID)
 {
     m_output = new ObjectOutput(m_info);
-    m_mixer = new ObjectMixer(m_info, MIXER_CHANNELS);
+    m_mixer = new ObjectAudioMixer(m_info, MIXER_CHANNELS);
     m_objmgr.attachObject(m_output, OUTPUT_ID);
     m_objmgr.attachObject(m_mixer, MIXER_ID);
 }
@@ -152,7 +153,10 @@ TableObject Table::addObject(int type)
 	obj = new ObjectFilter(m_info);
 	break;
     case OBJ_MIXER:
-	obj = new ObjectMixer(m_info);
+	obj = new ObjectAudioMixer(m_info);
+	break;
+    case OBJ_CONTROLMIXER:
+	obj = new ObjectControlMixer(m_info);
 	break;
     default:
 	obj = NULL;

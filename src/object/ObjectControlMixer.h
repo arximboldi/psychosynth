@@ -20,67 +20,36 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <iostream>
-#include <object/Oscillator.h>
+#ifndef OBJECTCONTROLMIXER_H
+#define OBJECTCONTROLMIXER_H
 
-bool Oscillator::m_table_init = false;
-WaveTable Oscillator::TABLE[Oscillator::WAVE_TYPES];
+#include "object/KnownObjects.h"
+#include "object/ObjectMixer.h"
 
-using namespace std;
-
-void Oscillator::initializeTables()
+class ObjectControlMixer : public ObjectMixer
 {
-    TABLE[SINE].fill(TABLE_SIZE, &computeSine);
-    TABLE[SQUARE].fill(TABLE_SIZE, &computeSquare);
-    TABLE[TRIANGLE].fill(TABLE_SIZE, &computeTriangle);
-    TABLE[SAWTOOTH].fill(TABLE_SIZE, &computeSawtooth);
-    TABLE[MOOGSAW].fill(TABLE_SIZE, &computeMoogsaw);
-    TABLE[EXP].fill(TABLE_SIZE, &computeExp);
+public:
+    enum OutAudioSocketID {
+	N_OUT_A_SOCKETS
+    };
+
+    enum OutControlSocketID {
+	OUT_C_OUTPUT,
+	N_OUT_C_SOCKETS
+    };
     
-    m_table_init = true;
-}
+private:
+    void doUpdate(const Object* caller, int caller_port_type, int caller_port);
+    void doAdvance() {}
 
-void Oscillator::update(Sample* out_buf, size_t n_frames)
-{
-    float speed = m_freq / m_info.sample_rate;
-    for (size_t i = 0; i < n_frames; ++i) {
-	*out_buf++ = computeSample(m_x) * m_ampl;
-	m_x += speed;
-    }
+public:  
+    ObjectControlMixer(const AudioInfo& prop, int n_chan = 2) :
+	ObjectMixer(prop,
+		    OBJ_CONTROLMIXER,
+		    N_OUT_A_SOCKETS,
+		    N_OUT_C_SOCKETS,
+		    n_chan)
+	{}
+};
 
-    m_x = phase(m_x);
-}
-
-void Oscillator::updateFM(Sample* out_buf, const Sample* mod_buf, size_t n_frames)
-{
-    for (size_t i = 0; i < n_frames; ++i) {
-	*out_buf++ = computeSample(m_x) * m_ampl;
-	m_x += (m_freq + m_freq * *mod_buf++) / m_info.sample_rate;
-    }
-
-    m_x = phase(m_x);
-}
-
-void Oscillator::updatePM(Sample* out_buf, const Sample* mod_buf, size_t n_frames)
-{
-    float speed = m_freq / m_info.sample_rate;
-    for (size_t i = 0; i < n_frames; ++i) {
-	*out_buf++ = computeSample(m_x + *mod_buf) * m_ampl;
-	m_x += speed;
-    }
-
-    m_x = phase(m_x);
-}
-
-void Oscillator::updateAM(Sample* out_buf, const Sample* mod_buf, size_t n_frames)
-{
-    float speed = m_freq / m_info.sample_rate;
-    for (size_t i = 0; i < n_frames; ++i) {
-	*out_buf++ = computeSample(m_x) * (m_ampl + m_ampl * *mod_buf++);
-	m_x += speed;
-    }
-
-    m_x = phase(m_x);
-}
-
-
+#endif /* OBJECTCONTROLMIXER_H */
