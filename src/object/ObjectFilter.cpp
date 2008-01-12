@@ -55,10 +55,9 @@ void ObjectFilter::doUpdate(const Object* caller, int caller_port_type, int call
 {
     const AudioBuffer* input = getInput<AudioBuffer>(LINK_AUDIO, IN_A_INPUT);
     const ControlBuffer* cutoff = getInput<ControlBuffer>(LINK_CONTROL, IN_C_CUTOFF);
-    
+    AudioBuffer* output = getOutput<AudioBuffer>(LINK_AUDIO, IN_A_INPUT);    
+
     if (input) {
-	AudioBuffer* output = getOutput<AudioBuffer>(LINK_AUDIO, IN_A_INPUT);
-	
 	if (m_param_type != m_filter_values.getType() ||
 	    m_param_cutoff != m_filter_values.getFrequency() ||
 	    m_param_resonance != m_filter_values.getResonance())
@@ -86,5 +85,7 @@ void ObjectFilter::doUpdate(const Object* caller, int caller_port_type, int call
 		}
 	    }
 	}
+    } else {
+	output->zero();
     }
 }

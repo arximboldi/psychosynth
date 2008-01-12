@@ -231,9 +231,10 @@ void ElementManager::addElement(int e_type)
 	break;
 	
     default:
-	m_must_own--;
 	break;
     }
+
+    m_must_own--;
 }
 
 bool ElementManager::getTablePointer(Vector2& res)
@@ -326,10 +327,8 @@ void ElementManager::handleAddObject(TableObject& obj)
     Element* elem = createElement(obj);
 
     if (elem != NULL) {
-	if (m_must_own) {
+	if (m_must_own)
 	    elem->setOwned(true);
-	    m_must_own--;
-	}
 	
 	m_elems.insert(pair<int,Element*>(obj.getID(), elem));
 	obj.addListener(elem);
