@@ -278,9 +278,13 @@ bool ElementManager::mousePressed(const OIS::MouseEvent &e, OIS::MouseButtonID i
     bool ret = false;
     
     if (getTablePointer(pos)) {
-	for (ElemMapIter it = m_elems.begin(); it != m_elems.end();)
-	    if ((*it++).second->pointerClicked(pos, id))
-		ret = true;
+	for (ElemMapIter it = m_elems.begin(); it != m_elems.end(); ++it)
+	    if ((*it).second->pointerClicked(pos, id))
+		return true;//ret = true;
+	
+	for (list<Connection*>::iterator it = m_cons.begin(); it != m_cons.end(); ++it)
+	    if ((*it)->pointerClicked(pos, id))
+		return true;//ret = true;
     }
 	
     return ret;

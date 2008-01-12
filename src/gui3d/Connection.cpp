@@ -21,13 +21,16 @@
  ***************************************************************************/
 
 #include "gui3d/Connection.h"
-#include "gui3d/OgreMisc.h"
 
 using namespace Ogre;
 using namespace std;
 
-#define CON_WIDTH 0.05f
-#define CON_Y     0.001f
+#define CON_CLICK_WIDTH 0.2f
+#define CON_WIDTH       0.07f
+#define CON_Y           0.001f
+
+const ColourValue CON_NORMAL_COLOUR = ColourValue(0.7, 0.7, 0.0, 0.5);
+const ColourValue CON_MUTE_COLOUR = ColourValue(0.0, 0.0, 0.0, 0.7);
 
 void ConnectionObject::build(const Ogre::Vector2& src,
 			     const Ogre::Vector2& dst)
@@ -78,7 +81,9 @@ Connection::Connection(Ogre::SceneManager* scene,
     m_d_obj(dest)
 {
     Vector2f v;
-
+    
+    src.getParam(Object::ParamID(Object::PARAM_COMMON, Object::PARAM_MUTE), m_is_muted);
+  
     src.getParam(Object::ParamID(Object::PARAM_COMMON, Object::PARAM_POSITION), v);
     m_src.x = v.x;
     m_src.y = v.y;
@@ -88,7 +93,10 @@ Connection::Connection(Ogre::SceneManager* scene,
     m_dest.y = v.y;
     
     m_node = m_scene->getRootSceneNode()->createChildSceneNode();
-    m_line = new ConnectionObject(m_node->getName(), ColourValue(0.7, 0.7, 0, 0.5),
+    m_line = new ConnectionObject(m_node->getName(),
+				  m_is_muted ?
+				  CON_MUTE_COLOUR :
+				  CON_NORMAL_COLOUR,
 				  m_src, m_dest);
     m_node->attachObject(m_line);
 
@@ -122,6 +130,36 @@ void Connection::handleSetParamObject(TableObject& obj, Object::ParamID id)
 
 	m_line->update(m_src, m_dest);
     }
+
+    if (id == Object::ParamID(Object::PARAM_COMMON, Object::PARAM_MUTE)
+	&& obj == m_s_obj) {
+	
+	obj.getParam(id, m_is_muted);
+	if (m_is_muted == true)
+	    m_line->setColour(CON_MUTE_COLOUR);
+	else
+	    m_line->setColour(CON_NORMAL_COLOUR);
+	m_line->update(m_src, m_dest);
+    }
+}
+
+bool Connection::pointerClicked(const Ogre::Vector2& pos, OIS::MouseButtonID id)
+{
+    Vector2 side =  (m_src - m_dest).perpendicular().normalisedCopy() * CON_CLICK_WIDTH;
+    Vector2 top_left  = m_src + side;
+    Vector2 top_right = m_src - side;
+    Vector2 bot_left  = m_dest + side;
+    Vector2 bot_right = m_dest - side;
+
+    if (pointIsInPoly(pos, top_left, top_right, bot_right, bot_left)) {
+	m_is_muted = !m_is_muted;
+	m_s_obj.setParam(Object::ParamID(Object::PARAM_COMMON, Object::PARAM_MUTE),
+			 m_is_muted);
+
+	return true;
+    }
+
+    return false;
 }
 
 /*

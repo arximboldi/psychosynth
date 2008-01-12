@@ -65,6 +65,7 @@ public:
     enum CommonParams {
 	PARAM_POSITION = 0,
 	PARAM_RADIOUS,
+	PARAM_MUTE,
 	N_COMMON_PARAMS
     };
 
@@ -230,7 +231,8 @@ private:
     
     Vector2f m_param_position;
     float m_param_radious;
-
+    int m_param_mute;
+    
     /* For !m_single_update, contains the objects that has
      * been updated (<obj_id, port_id>) */
     std::set<std::pair<int,int> > m_updated_links[LINK_TYPES];
@@ -250,6 +252,9 @@ private:
 protected:
     template <typename SocketDataType>
     SocketDataType* getOutput(int type, int socket) {
+	if (m_param_mute)
+	    return NULL;
+	
 	/* TODO: Find a way to do type checking */
 	switch(type) {
 	case LINK_AUDIO:

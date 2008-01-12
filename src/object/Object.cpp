@@ -92,6 +92,7 @@ Object::Object(const AudioInfo& info, int type, int loc_params,
     m_type(type),
     m_param_position(0,0),
     m_param_radious(5.0f),
+    m_param_mute(false),
     m_updated(false),
     m_single_update(single_update)
 {
@@ -100,6 +101,7 @@ Object::Object(const AudioInfo& info, int type, int loc_params,
 
     configureCommonParam(PARAM_POSITION, PARAM_VECTOR2F, &m_param_position);
     configureCommonParam(PARAM_RADIOUS, PARAM_FLOAT, &m_param_radious);
+    configureCommonParam(PARAM_MUTE, PARAM_INT, &m_param_mute);
     
     m_out_sockets[LINK_AUDIO].resize(n_out_audio, OutSocket(LINK_AUDIO));
     m_out_sockets[LINK_CONTROL].resize(n_out_control, OutSocket(LINK_CONTROL));
@@ -161,8 +163,10 @@ void Object::update(const Object* caller, int caller_port_type, int caller_port)
 {
     if (canUpdate(caller, caller_port_type, caller_port)) {
 	updateParams();
-	updateInputs();
-	
-	doUpdate(caller, caller_port_type, caller_port); 
+
+	if (!m_param_mute) {
+	    updateInputs();
+	    doUpdate(caller, caller_port_type, caller_port); 
+	}
     }
 }

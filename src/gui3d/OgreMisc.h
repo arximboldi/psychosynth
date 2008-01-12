@@ -25,6 +25,22 @@
 
 #include <string>
 
+enum LineRelPos {
+    LP_LEFT,
+    LP_RIGHT,
+    LP_INT,
+    LP_EXT
+};
+
+bool pointIsInPoly(const Ogre::Vector2& p,
+		   const Ogre::Vector2& l1,
+		   const Ogre::Vector2& l2,
+		   const Ogre::Vector2& l3,
+		   const Ogre::Vector2& l4);
+
+LineRelPos pointLinePosition(const Ogre::Vector2& l1,
+			     const Ogre::Vector2& l2,
+			     const Ogre::Vector2& p);
 
 inline Ogre::Vector3 yawVector3(const Ogre::Vector3& v, Ogre::Real angle)
 {

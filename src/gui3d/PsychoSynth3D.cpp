@@ -162,7 +162,7 @@ void PsychoSynth3D::setupTable()
     //  m_scene->setShadowTechnique(SHADOWTYPE_STENCIL_ADDITIVE);
 
     m_camera = m_scene->createCamera("camera");
-    m_camera->setNearClipDistance(1);
+    m_camera->setNearClipDistance(0.1);
     m_camera->setCastShadows(false);
     m_camera->setVisible(false);
     m_viewport = m_window->addViewport(m_camera);

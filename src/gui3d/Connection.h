@@ -24,12 +24,15 @@
 #define CONNECTION_H
 
 #include <OGRE/Ogre.h>
+#include <OIS/OIS.h>
 
-#include <table/Table.h>
+#include "table/Table.h"
+#include "gui3d/OgreMisc.h"
 
-
-class ConnectionObject : public Ogre::ManualObject {
-
+class ConnectionObject : public Ogre::ManualObject
+{
+    Ogre::ColourValue m_colour;
+    
     void build(const Ogre::Vector2& src,
 	       const Ogre::Vector2& dest);
 public:
@@ -41,6 +44,11 @@ public:
     void update(const Ogre::Vector2& src,
 		const Ogre::Vector2& dest);
 
+    void setColour(Ogre::ColourValue colour) {
+	m_colour = colour;
+	createColourMaterial(getName(), m_colour);
+    };
+    
     ~ConnectionObject();
 };
 
@@ -56,6 +64,8 @@ class Connection : public TableObjectListener
 
     Ogre::Vector2 m_src;
     Ogre::Vector2 m_dest;
+
+    bool m_is_muted;
     
 public:
 
@@ -64,6 +74,12 @@ public:
 	       const TableObject& dest);
 
     ~Connection();
+
+    bool pointerClicked(const Ogre::Vector2& pos, OIS::MouseButtonID id);
+/*
+    bool pointerReleased(const Ogre::Vector2& pos, OIS::MouseButtonID id);
+    bool pointerMoved(const Ogre::Vector2& pos);
+*/
     
     void handleActivateObject(TableObject& obj) {};
     void handleDeactivateObject(TableObject& obj) {};

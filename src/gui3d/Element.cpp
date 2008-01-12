@@ -274,5 +274,11 @@ void Element::handleSetParamObject(TableObject& obj, Object::ParamID param_id)
     
 	for (ElemComponentIter it = m_comp.begin(); it != m_comp.end(); ++it)
 	    (*it)->handleParamChange(obj, param_id);
+    } else if (obj == m_target) {
+	if (param_id == Object::ParamID(Object::PARAM_COMMON, Object::PARAM_POSITION)) {
+	    Vector2f dest;
+	    obj.getParam(param_id, dest);
+	    objectMoved(obj, dest);
+	}
     }
 }
