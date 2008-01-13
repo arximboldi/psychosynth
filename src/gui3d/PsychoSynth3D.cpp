@@ -78,7 +78,7 @@ void PsychoSynth3D::setupOgre()
 
     resource_manager.initialiseAllResourceGroups();
 
-    m_window = m_ogre->createRenderWindow("PsychoSynth3D", 800, 600, false);
+    m_window = m_ogre->createRenderWindow("PsychoSynth3D", 1280, 800, true);
 	
     m_ogre->addFrameListener(this);
 	
