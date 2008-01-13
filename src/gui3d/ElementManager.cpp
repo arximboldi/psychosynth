@@ -44,6 +44,7 @@ ElementManager::ElementManager(Table* table, Ogre::SceneManager* scene,
     m_table(table),
     m_elems(),
     m_elemcount(0),
+    m_must_own(0),
     m_camera(camera),
     m_scene(scene),
     m_rayquery(scene->createRayQuery(Ogre::Ray()))
