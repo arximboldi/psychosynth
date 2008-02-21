@@ -26,7 +26,9 @@
 #include <map>
 #include <list>
 #include <iostream>
-#include <common/Singleton.h>
+
+#include "common/Singleton.h"
+#include "common/Misc.h"
 
 class Log;
 
@@ -69,14 +71,15 @@ public:
     
     Log() :
 	m_parent(NULL), m_isinit(false) {}
-
-    ~Log();
     
+    ~Log();
+
     void init(const std::string& name, Log* parent) {
 	m_name = name;
 	m_parent = parent;
+	m_isinit = true;
     }
-
+    
     bool isInit() {
 	return m_isinit;
     }

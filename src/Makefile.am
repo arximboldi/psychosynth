@@ -1,6 +1,31 @@
 
 bin_PROGRAMS = psychosynth
 
+AM_CPPFLAGS = $(all_includes)
+
+psychosynth_CXXFLAGS = \
+	$(OGRE_CFLAGS) \
+	$(CEGUI_CFLAGS) \
+	$(OIS_CFLAGS) \
+	$(CEGUIOGRE_CFLAGS) \
+	$(ALSA_CFLAGS) \
+	$(JACK_CFLAGS) \
+	$(LIBLO_CFLAGS) \
+	$(AUDIOFILE_CFLAGS) \
+	$(LIBXML_CFLAGS)
+
+psychosynth_LDFLAGS = $(all_libraries)
+psychosynth_LDADD = \
+	$(OGRE_LIBS) \
+	$(CEGUI_LIBS) \
+	$(OIS_LIBS) \
+	$(CEGUIOGRE_LIBS)\
+	$(ALSA_LIBS) \
+	$(JACK_LIBS) \
+	$(LIBLO_LIBS) \
+	$(AUDIOFILE_LIBS) \
+	$(LIBXML_LIBS)
+
 psychosynth_SOURCES = \
 	common/ArgParser.cpp \
 	common/Error.cpp \
@@ -9,6 +34,8 @@ psychosynth_SOURCES = \
 	common/Mutex.cpp \
 	common/Misc.cpp \
 	common/Logger.cpp \
+	common/Config.cpp \
+	common/ConfBackendXML.cpp \
 	table/Table.cpp \
 	table/Patcher.cpp \
 	table/PatcherDynamic.cpp \
@@ -56,33 +83,9 @@ psychosynth_SOURCES = \
 	output/OutputWave.cpp \
 	psychosynth.cpp
 
-AM_CPPFLAGS = $(all_includes)
-
-psychosynth_CXXFLAGS = \
-	$(OGRE_CFLAGS) \
-	$(CEGUI_CFLAGS) \
-	$(OIS_CFLAGS) \
-	$(CEGUIOGRE_CFLAGS) \
-	$(ALSA_CFLAGS) \
-	$(JACK_CFLAGS) \
-	$(LIBLO_CFLAGS) \
-	$(AUDIOFILE_CFLAGS)
-
-psychosynth_LDFLAGS = $(all_libraries)
-psychosynth_LDADD = \
-	$(OGRE_LIBS) \
-	$(CEGUI_LIBS) \
-	$(OIS_LIBS) \
-	$(CEGUIOGRE_LIBS)\
-	$(ALSA_LIBS) \
-	$(JACK_LIBS) \
-	$(LIBLO_LIBS) \
-	$(AUDIOFILE_LIBS)
-
 noinst_HEADERS = \
 	common/ArgParser.h \
 	common/Error.h \
-	common/Packets.h \
 	common/Singleton.h \
 	common/Thread.h \
 	common/Mutex.h \
@@ -92,6 +95,8 @@ noinst_HEADERS = \
         common/MapIterator.h \
 	common/Misc.h \
 	common/Logger.h \
+	common/Config.h \
+	common/ConfBackendXML.h \
 	table/Table.h \
 	table/Patcher.h\
 	table/PatcherDynamic.h \

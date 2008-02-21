@@ -35,6 +35,9 @@ template <typename Key, typename Data>
 class MapIterator : public std::map<Key, Data>::iterator
 {
 public:
+    MapIterator()
+	{}
+    
     MapIterator (const typename std::map<Key, Data>::iterator& i) :
 	std::map<Key, Data>::iterator(i) {}
 

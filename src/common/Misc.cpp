@@ -20,6 +20,8 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <cmath>
+
 #include "common/Misc.h"
 
 using namespace std;
@@ -43,6 +45,38 @@ char* itoa(int val, int base)
     if (sign) buf[i--] = '-';
 
     return &buf[i+1];
+}
+
+char* ftoa( double f, double sigfigs)
+{
+    char a[81];
+    int prec, width, front;
+
+    front = (f==0)? 1 : (int)log10(fabs(f))+1;
+
+    if (sigfigs < 1.0 && sigfigs >= 0.0) {  // fit number to tolerance
+    
+        double rem = fabs(f) - int(f);
+        prec=0;
+        int num = (int)rem;
+        while (rem * pow(10.0, prec) - num > sigfigs)
+            num = int(rem * pow(10.0, ++prec));
+        width = front;
+        sprintf(a, "%#*.*f", width, prec, f );
+    } else {
+        if ( sigfigs < 2.0 ) sigfigs = 2.0;
+            
+        if ( front > (int)sigfigs )
+            sprintf( a, "%#.*e", (int)sigfigs-1, f );
+        else {
+            prec = (int)sigfigs - front;
+            if ( f==0.0 ) width = 2;
+            else width = front + prec + 1;
+            sprintf( a, "%#*.*f", width, prec, f );
+	}
+    }
+    
+    return strdup(a);
 }
 
 string str_dirname(string str)

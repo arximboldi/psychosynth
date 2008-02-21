@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) 2007 Juan Pedro Bolivar Puente                          *
+ *   Copyright (C) Juan Pedro Bolivar Puente 2007, 2008                    *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -20,69 +20,51 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef PACKETS_H
-#define PACKETS_H
+#ifndef CONFBACKENDXML_H
+#define CONFBACKENDXML_H
 
-#include "net/NetMessage.h"
+#include <string>
+#include <libxml/xmlreader.h>
+#include <libxml/xmlwriter.h>
 
-enum PacketType {
-	PACKET_CONFIG,
-	PACKET_ADDOBJECT,
-	PACKET_MOVEOBJECT,
-	PACKET_DELETEOBJECT
-};
+#include "common/Config.h"
 
-struct PacketConfig {
-	
-	PacketConfig() {}
-	
-	PacketType getType() const {return PACKET_CONFIG;}
-};
-
-struct PacketAddObject {
-	unsigned short type;
-	unsigned short id;
-	float x;
-	float y;
-	
-	PacketAddObject() {};
-	PacketAddObject(unsigned short type_, unsigned short id_, 
-					float x_, float y_) :
-		type(type_), id(id_), x(x_), y(y_) {};
-	
-	PacketType getType() const {return PACKET_ADDOBJECT;}
-};
-
-struct PacketMoveObject {
-	unsigned short id;
-	float x;
-	float y;
-	
-	PacketMoveObject() {};
-	PacketMoveObject(short int id_, float x_, float y_) :
-		id(id_), x(x_), y(y_) {};
-
-	PacketType getType() const {return PACKET_MOVEOBJECT;}
-};
-
-struct PacketDeleteObject {
-	unsigned short id;
-	
-	PacketDeleteObject() {};
-	PacketDeleteObject(short int id_) : id(id_) {};
-
-	PacketType getType() const {return PACKET_DELETEOBJECT;}
-};
-
-template<class SomePacket>
-inline NetMessage makePacketMessage(const SomePacket packet)
+/**
+ * XML configuration backend.
+ */
+class ConfBackendXML : public ConfBackend
 {
-	NetMessage msg(sizeof(unsigned short) + sizeof(packet));
-	
-	msg.putw(packet.getType());
-	msg.puta(&packet, sizeof(packet));
-	
-	return msg;
+    std::string m_file;
+    
+    ConfNode* processNewElement(xmlTextReaderPtr reader, ConfNode* node);
+    ConfNode* processText(xmlTextReaderPtr reader, ConfNode* node);
+    ConfNode* processEndElement(xmlTextReaderPtr reader, ConfNode* node);
+    ConfNode* process(xmlTextReaderPtr reader, ConfNode* node);
+
+    void expand(xmlTextWriterPtr writer, ConfNode& node);
+    void expandChilds(xmlTextWriterPtr writer, ConfNode& node);
+    void expandValue(xmlTextWriterPtr writer, ConfNode& node);
+
+public:
+    ConfBackendXML(const std::string& file) :
+	m_file(file)
+	{}
+    
+    ~ConfBackendXML() {}
+
+    void setFile(const std::string& file) {
+	m_file = file;
+    }
+
+    const std::string& getFile() {
+	return m_file;
+    }
+
+    void attach(ConfNode& node) {};
+    void datach(ConfNode& node) {};
+    
+    void save(ConfNode& node);
+    void load(ConfNode& node);
 };
 
-#endif /* PACKETS_H */
+#endif /* CONFBACKENDXML_H */

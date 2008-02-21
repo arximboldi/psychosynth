@@ -1,9 +1,9 @@
-/**************************************************************************
+/***************************************************************************
  *                                                                         *
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) 2007 Juan Pedro Bolivar Puente                          *
+ *   Copyright (C) Juan Pedro Bolivar Puente 2007                          *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -20,24 +20,39 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef MISC_H
-#define MISC_H
+#include "common/Config.h"
 
-#include <string>
+using namespace std;
 
-class NoCopy
+void ConfSubject::notifyConfChange(const ConfNode& source)
 {
-protected:
-    NoCopy() {}
+    for (list<ConfListener*>::iterator i = m_list.begin();
+	 i != m_list.end();
+	 ++i)
+	(*i)->handleConfChange(source);
+}
 
-private:
-    NoCopy(const NoCopy&);
-    NoCopy& operator= (const NoCopy&);
-};
+void ConfSubject::notifyNewChild(const ConfNode& child)
+{
+    for (list<ConfListener*>::iterator i = m_list.begin();
+	 i != m_list.end();
+	 ++i)
+	(*i)->handleNewChild(child);
+}
 
-char* itoa(int val, int base);
-char* ftoa(double f, double sigfigs);
+ConfNode& ConfNode::getPath(std::string path)
+{
+    string base;
+    for (size_t i = 0; i != path.size(); ++i)
+	if (path[i] == '/') {
+	    base.assign(path, 0, i);
+	    path.erase(0, i);
+	    break;
+	}
 
-std::string str_dirname(std::string str);
+    if (base.empty()) {
+	return getChild(path);
+    }
 
-#endif /* MISC_H */
+    return getChild(base).getPath(path);
+}
