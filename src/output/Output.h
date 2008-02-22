@@ -63,10 +63,6 @@ protected:
 	if (m_callback)
 	    m_callback(n_frames, m_cbdata);
     }
-    
-    State getState() const {
-	return m_state;
-    }
 
     void setState(State state) {
 	m_state = state;
@@ -92,11 +88,10 @@ public:
     virtual bool open() = 0;
     virtual bool close()  = 0;
     virtual bool put(const AudioBuffer& buf, size_t nframes) = 0;
-    virtual void start() = 0;
-    virtual void stop() = 0;
+    virtual bool start() = 0;
+    virtual bool stop() = 0;
 
     virtual ~Output() {};
-
     
     bool put(const AudioBuffer& buf) {
 	return put(buf, buf.size());
@@ -126,6 +121,38 @@ public:
     const AudioInfo& getInfo() const {
 	return m_info;
     }
+
+    /* maybe-TODO: A StepMachine class for this kind of things? */
+    State getState() const {
+	return m_state;
+    }
+
+    bool gotoState(State target) {
+	if (target > m_state) {
+	    switch(m_state) {
+	    case NOTINIT:
+		return open() && gotoState(target);
+	    case IDLE:
+		return start() && gotoState(target);
+	    default:
+		break;
+	    }
+	}
+	
+	if (target < m_state) {
+	    switch(m_state) {
+	    case IDLE:
+		return close() && gotoState(target);
+	    case RUNNING:
+		return stop() && gotoState(target);
+	    default:
+		break;
+	    }
+	}
+	
+	return true;
+    }
 };
 
-#endif
+#endif /* OUTPUT_H */
+

@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) Juan Pedro Bolivar Puente 2007                          *
+ *   Copyright (C) Juan Pedro Bolivar Puente 2007, 2008                    *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -20,44 +20,36 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "common/Config.h"
+#include "psynth/OutputDirectorAlsa.h"
+#include "psynth/OutputDirectorOss.h"
+#include "psynth/OutputDirectorJack.h"
+#include "psynth/PsychosynthApp.h"
+
+#include "common/ConfBackendXML.h"
 
 using namespace std;
 
-void ConfSubject::notifyConfChange(const ConfNode& source)
+int PsychosynthApp::run(int argc, const char* argv[])
 {
-    for (list<ConfListener*>::iterator i = m_list.begin();
-	 i != m_list.end();
-	 ++i)
-	(*i)->handleConfChange(source);
+    int ret_val;
 
-    for (list<ConfEvent>::iterator i = m_change_del.begin();
-	 i != m_change_del.end();
-	 ++i)
-	(*i)(source);    
+    Config::instance().attachBackend(new ConfBackendXML("test_config.xml"));
+    Config::instance().load();
+    
+    m_director.attachOutputDirectorFactory(new OutputDirectorAlsaFactory);
+    m_director.attachOutputDirectorFactory(new OutputDirectorOssFactory);
+    m_director.attachOutputDirectorFactory(new OutputDirectorJackFactory);
+
+    cout << "TIO DUROOO!!\n";
+    
+    m_director.start(Config::instance().getChild("psychosynth"));
+    
+    ret_val = execute();
+
+    m_director.stop();
+
+    Config::instance().save();
+    
+    return ret_val;
 }
 
-void ConfSubject::notifyNewChild(const ConfNode& child)
-{
-    for (list<ConfListener*>::iterator i = m_list.begin();
-	 i != m_list.end();
-	 ++i)
-	(*i)->handleNewChild(child);
-}
-
-ConfNode& ConfNode::getPath(std::string path)
-{
-    string base;
-    for (size_t i = 0; i != path.size(); ++i)
-	if (path[i] == '/') {
-	    base.assign(path, 0, i);
-	    path.erase(0, i);
-	    break;
-	}
-
-    if (base.empty()) {
-	return getChild(path);
-    }
-
-    return getChild(base).getPath(path);
-}

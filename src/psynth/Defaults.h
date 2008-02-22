@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) Juan Pedro Bolivar Puente 2007                          *
+ *   Copyright (C) Juan Pedro Bolivar Puente 2007, 2008                    *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -20,44 +20,12 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "common/Config.h"
+#ifndef DEFAULTS_H
+#define DEFAULTS_H
 
-using namespace std;
+#define DEFAULT_OUTPUT        "alsa"
+#define DEFAULT_NUM_CHANNELS  2
+#define DEFAULT_BLOCK_SIZE    256
+#define DEFAULT_SAMPLE_RATE   44100
 
-void ConfSubject::notifyConfChange(const ConfNode& source)
-{
-    for (list<ConfListener*>::iterator i = m_list.begin();
-	 i != m_list.end();
-	 ++i)
-	(*i)->handleConfChange(source);
-
-    for (list<ConfEvent>::iterator i = m_change_del.begin();
-	 i != m_change_del.end();
-	 ++i)
-	(*i)(source);    
-}
-
-void ConfSubject::notifyNewChild(const ConfNode& child)
-{
-    for (list<ConfListener*>::iterator i = m_list.begin();
-	 i != m_list.end();
-	 ++i)
-	(*i)->handleNewChild(child);
-}
-
-ConfNode& ConfNode::getPath(std::string path)
-{
-    string base;
-    for (size_t i = 0; i != path.size(); ++i)
-	if (path[i] == '/') {
-	    base.assign(path, 0, i);
-	    path.erase(0, i);
-	    break;
-	}
-
-    if (base.empty()) {
-	return getChild(path);
-    }
-
-    return getChild(base).getPath(path);
-}
+#endif /* DEFAULTS_H */

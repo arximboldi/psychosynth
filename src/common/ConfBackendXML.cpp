@@ -83,24 +83,21 @@ ConfNode* ConfBackendXML::processText(xmlTextReaderPtr reader, ConfNode* node)
 	istringstream value_str(CHAR_CAST(value));
 	
 	switch(node->type()) {
-	case CONF_INT:
-	{
+	case CONF_INT: {
 	    int val;
 	    value_str >> val;
 	    node->set(val);
 	}
 	break;
 
-	case CONF_FLOAT:
-	{
+	case CONF_FLOAT: {
 	    float val;
 	    value_str >> val;
 	    node->set(val);
 	}
 	break;
 	
-	case CONF_STRING:
-	{
+	case CONF_STRING: {
 	    string val;
 	    value_str >> val;
 	    node->set(val);
@@ -134,7 +131,7 @@ ConfNode* ConfBackendXML::process(xmlTextReaderPtr reader, ConfNode* node)
     return node;
 }
 
-void ConfBackendXML::save(ConfNode& node)
+void ConfBackendXML::load(ConfNode& node)
 {
     xmlTextReaderPtr reader;
     int ret;
@@ -167,8 +164,7 @@ void ConfBackendXML::save(ConfNode& node)
 void ConfBackendXML::expandValue(xmlTextWriterPtr writer, ConfNode& node)
 {
     switch(node.type()) {
-    case CONF_INT:
-    {
+    case CONF_INT: {
 	int val = 0;
 	node.get(val);
 	xmlTextWriterWriteAttribute(writer, XML_CAST ("type"), XML_CAST ("int"));
@@ -176,8 +172,7 @@ void ConfBackendXML::expandValue(xmlTextWriterPtr writer, ConfNode& node)
     }
     break;
 	
-    case CONF_FLOAT:
-    {
+    case CONF_FLOAT: {
 	float val = 0;
 	node.get(val);
 	xmlTextWriterWriteAttribute(writer, XML_CAST ("type"), XML_CAST ("float"));
@@ -185,8 +180,7 @@ void ConfBackendXML::expandValue(xmlTextWriterPtr writer, ConfNode& node)
     }
     break;
 	
-    case CONF_STRING:
-    {
+    case CONF_STRING: {
 	string val;
 	node.get(val);
 	
@@ -196,6 +190,7 @@ void ConfBackendXML::expandValue(xmlTextWriterPtr writer, ConfNode& node)
     break;
 	    
     default:
+	cout << "no hay valor!\n";
 	break;
     }
 
@@ -217,26 +212,29 @@ void ConfBackendXML::expand(xmlTextWriterPtr writer, ConfNode& node)
 	xmlTextWriterStartElement(writer, XML_CAST (node.getName().c_str()));
     }
 
+    cout << "expanding: " << node.getName() << endl;
+    
     expandValue(writer, node);
     expandChilds(writer, node);
     
     xmlTextWriterEndElement(writer);
 }
 
-void ConfBackendXML::load(ConfNode& node)
+void ConfBackendXML::save(ConfNode& node)
 {
     xmlTextWriterPtr writer;
     
-    /* Create a new XmlWriter for uri, with no compression. */
     writer = xmlNewTextWriterFilename(m_file.c_str(), 0);
     if (writer == NULL) {
 	Logger::instance().log("xmlconf", Log::ERROR, "Could not open config file for writing: " + m_file);
         return;
     }
 
+    xmlTextWriterSetIndent(writer, 1);
     xmlTextWriterStartDocument(writer, NULL, NULL, NULL);
 
     expand(writer, node);
-
+    
+    xmlTextWriterEndDocument(writer);
     xmlFreeTextWriter(writer);
 }

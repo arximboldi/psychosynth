@@ -143,8 +143,10 @@ void PsychoSynth3D::setupSynth()
     m_table->attachOutput(m_output);
     m_table->attachPatcher(new PatcherDynamic());
     m_table->update();
-    m_output->open();
-    m_output->start();
+
+    m_output->gotoState(Output::RUNNING);
+    /*m_output->open();
+      m_output->start();*/
 }
 
 void PsychoSynth3D::setupNet()

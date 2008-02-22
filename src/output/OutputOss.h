@@ -25,7 +25,6 @@
 
 #include <pthread.h>
 
-#include "psychosynth.h"
 #include "output/Output.h"
 #include "common/Thread.h"
 
@@ -38,16 +37,31 @@ class OutputOss : public Output, Runnable
     std::string m_device;
 	
     Thread<> m_thread;
+    
 public:
+    OutputOss();
     OutputOss(const AudioInfo& info, const std::string& device);
     ~OutputOss();
 
+    bool setDevice(const std::string& device) {
+	if (getState() == NOTINIT) {
+	    m_device = device;
+	    return true;
+	}
+	
+	return false;
+    }
+
+    const std::string& getDevice() const {
+	return m_device;
+    }
+    
     bool open();
     bool close();
     bool put(const AudioBuffer& buf, size_t nframes);
     void run();
-    void start();
-    void stop();
+    bool start();
+    bool stop();
 };
 
 #endif /* OUTPUTOSS_H */

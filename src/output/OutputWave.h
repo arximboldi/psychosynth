@@ -50,8 +50,8 @@ public:
     bool open();
     bool close();
     bool put(const AudioBuffer& buf, size_t nframes);
-    void start();
-    void stop();
+    bool start();
+    bool stop();
 };
 
 #endif /* OUTPUTWAVE_H */

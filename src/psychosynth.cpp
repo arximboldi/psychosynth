@@ -23,17 +23,30 @@
 #include <iostream>
 
 #include "common/Logger.h"
-#include "gui3d/PsychoSynth3D.h"
+
+#define PSYCHOSYNTH_APP
+
+#ifdef PSYCHOSYNTH_3D
+# include "gui3d/PsychoSynth3D.h"
+#endif
+#ifdef PSYCHOSYNTH_APP
+# include "psynth/PsychosynthApp.h"
+#endif
 
 using namespace std;
 
 int main(int argc, const char *argv[])
 {
-    PsychoSynth3D main_app;
-
     Logger::instance().attachSink(new LogDefaultSink);
-    
+
+#ifdef PSYCHOSYNTH_3D
+    PsychoSynth3D main_app;
     main_app.run(argc, argv);
-	
+#endif
+#ifdef PSYCHOSYNTH_APP
+    PsychosynthApp main_app;
+    main_app.run(argc, argv);
+#endif
+    
     return 0;
 }

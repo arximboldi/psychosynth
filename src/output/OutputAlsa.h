@@ -20,8 +20,8 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef __OUTPUTALSA_H__
-#define __OUTPUTALSA_H__
+#ifndef OUTPUT_ALSA_H
+#define OUTPUT_ALSA_H
 
 #define ALSA_PCM_NEW_HW_PARAMS_API
 #include <alsa/asoundlib.h>
@@ -40,17 +40,31 @@ class OutputAlsa : public Output, Runnable
     short int* m_buf;
     std::string alsa_device;
     Thread<> alsa_thread;
+    
 public:
+    OutputAlsa();
     OutputAlsa(const AudioInfo& info, const std::string& device);
     ~OutputAlsa();
+
+    bool setDevice(const std::string& device) {
+	if (getState() == NOTINIT) {
+	    alsa_device = device;
+	    return true;
+	}
+	
+	return false;
+    }
+
+    const std::string& getDevice() const {
+	return alsa_device;
+    }
 	
     void run();
     bool open();
     bool close();
     bool put(const AudioBuffer& buf, size_t nframes);
-    void start();
-    void stop();
+    bool start();
+    bool stop();
 };
 
-
-#endif
+#endif /* OUTPUT_ALSA_H */

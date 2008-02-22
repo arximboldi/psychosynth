@@ -104,12 +104,14 @@ bool OutputWave::put(const AudioBuffer& in_buf, size_t nframes)
     return ret;
 }
 
-void OutputWave::start()
+bool OutputWave::start()
 {
     /* This kind of device does no processing. */
+    return false;
 }
 
-void OutputWave::stop()
+bool OutputWave::stop()
 {
     /* This kind of device does no processing. */
+    return false;
 }

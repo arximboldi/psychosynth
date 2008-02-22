@@ -26,6 +26,10 @@
 
 using namespace std;
 
+OutputJack::OutputJack()
+{
+}
+
 OutputJack::OutputJack(const AudioInfo& info) :
     Output(info),
     m_out_ports(info.num_channels)
@@ -70,13 +74,15 @@ bool OutputJack::open()
 				   "Better sound quality is achieved if both are the same.");
 	}
 
+	if (getInfo().num_channels != m_out_ports.size())
+	    m_out_ports.resize(getInfo().num_channels);
+	
 	for (size_t i = 0; i < m_out_ports.size(); ++i)
 	    m_out_ports[i] = jack_port_register(m_client,
 						(string("out_") + itoa(i, 10)).c_str(),
 						JACK_DEFAULT_AUDIO_TYPE,
 						JackPortIsOutput,
 						0);
-						
 
 	setState(IDLE);
 
@@ -136,19 +142,25 @@ void OutputJack::connectPorts()
     free(ports);
 }
 
-void OutputJack::start()
+bool OutputJack::start()
 {
     if (getState() == IDLE) {
 	jack_activate(m_client);
 	connectPorts();
+	return true;
     }
+    
+    return false;
 }
 
-void OutputJack::stop()
+bool OutputJack::stop()
 {
     if (getState() == RUNNING) {
 	jack_deactivate(m_client);
+	return true;
     }
+
+    return false;
 }
 
 void OutputJack::jackProcess(jack_nframes_t nframes)

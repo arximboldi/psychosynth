@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) Juan Pedro Bolivar Puente 2007                          *
+ *   Copyright (C) Juan Pedro Bolivar Puente 2007, 2008                    *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -20,44 +20,67 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "common/Config.h"
+#ifndef PSYNTH_OUTPUT_DIRECTOR_JACK_H
+#define PSYNTH_OUTPUT_DIRECTOR_JACK_H
 
-using namespace std;
+#include "psynth/DefaultsJack.h"
+#include "psynth/OutputDirector.h"
+#include "output/OutputJack.h"
 
-void ConfSubject::notifyConfChange(const ConfNode& source)
+class OutputDirectorJack : public OutputDirector
 {
-    for (list<ConfListener*>::iterator i = m_list.begin();
-	 i != m_list.end();
-	 ++i)
-	(*i)->handleConfChange(source);
+    OutputJack* m_output;
 
-    for (list<ConfEvent>::iterator i = m_change_del.begin();
-	 i != m_change_del.end();
-	 ++i)
-	(*i)(source);    
-}
+    bool onServerChange(const ConfNode& conf) {
+	std::string server;
+	Output::State old_state;
+	
+	conf.get(server);
+	
+	old_state = m_output->getState();
+	m_output->gotoState(Output::NOTINIT);
+	m_output->setServer(server);
+	m_output->gotoState(old_state);
 
-void ConfSubject::notifyNewChild(const ConfNode& child)
-{
-    for (list<ConfListener*>::iterator i = m_list.begin();
-	 i != m_list.end();
-	 ++i)
-	(*i)->handleNewChild(child);
-}
+	return false;
+    }
+  
+    virtual Output* doStart(ConfNode& conf) {
+	std::string server;
 
-ConfNode& ConfNode::getPath(std::string path)
-{
-    string base;
-    for (size_t i = 0; i != path.size(); ++i)
-	if (path[i] == '/') {
-	    base.assign(path, 0, i);
-	    path.erase(0, i);
-	    break;
-	}
+	conf.getChild("server").def(DEFAULT_JACK_SERVER);
+	conf.getChild("server").get(server);
+	conf.getChild("server").addChangeEvent(MakeEvent(this, &OutputDirectorJack::onServerChange));
+	
+	m_output = new OutputJack;
 
-    if (base.empty()) {
-	return getChild(path);
+	m_output->setServer(server);
+
+	return m_output;
+    };
+
+    virtual void doStop(ConfNode& conf) {
+	conf.getChild("server").deleteChangeEvent(MakeEvent(this, &OutputDirectorJack::onServerChange));
+	
+	delete m_output;
+	m_output = NULL;
     }
 
-    return getChild(base).getPath(path);
-}
+public:
+    OutputDirectorJack() :
+	m_output(NULL) {}
+};
+
+class OutputDirectorJackFactory : public OutputDirectorFactory
+{
+public:
+    virtual const char* getName() {
+	return DEFAULT_JACK_NAME;
+    }
+    
+    virtual OutputDirector* createOutputDirector() {
+	return new OutputDirectorJack;
+    }
+};
+
+#endif /* PSYNTH_OUTPUT_DIRECTOR_JACK_H */

@@ -25,10 +25,13 @@
 
 #include <list>
 #include <map>
+#include <iostream>
 
 #include "common/Misc.h"
 #include "common/Singleton.h"
 #include "common/MapIterator.h"
+#include "common/FastDelegate.h"
+
 
 enum ConfType
 {
@@ -94,7 +97,9 @@ class ConfElement {
     
 
 public:
-    ConfElement() {}
+    ConfElement() :
+	m_type(CONF_NONE)
+	{}
 
     ~ConfElement() {
 	destroy();
@@ -141,19 +146,32 @@ class ConfListener {
 public:
     virtual ~ConfListener() {};
     
-    virtual void handleConfChange(const ConfNode& node) = 0;
-    virtual void handleNewChild(const ConfNode& child) = 0;
+    virtual bool handleConfChange(const ConfNode& node) = 0;
+    virtual bool handleNewChild(const ConfNode& child) = 0;
 };
 
-class ConfSubject
-{
-    std::list<ConfListener*> m_list;
-public:
+//typedef fastdelegate::FastDelegate<bool (const ConfNode&)> ConfEvent;
+typedef fastdelegate::FastDelegate1<const ConfNode&, bool> ConfEvent;
+#define MakeEvent fastdelegate::MakeDelegate
 
+class ConfSubject
+{    
+    std::list<ConfListener*> m_list;
+    std::list<ConfEvent> m_change_del;
+    
+public:
+    void addChangeEvent(const ConfEvent& sub) {
+	m_change_del.push_back(sub);
+    }
+    
     void addListener(ConfListener* l) {
 	m_list.push_back(l);
     }
 
+    void deleteChangeEvent(const ConfEvent& sub) {
+	m_change_del.remove(sub);
+    }
+    
     void deleteListener(ConfListener* l) {
 	m_list.remove(l);
     }
@@ -175,6 +193,8 @@ public:
 
 class ConfNode : public ConfSubject
 {
+    /* TODO: This is suboptimal. */
+    
     std::map<std::string, ConfNode> m_childs;
     ConfNode* m_parent;
     std::string m_name;
@@ -187,15 +207,17 @@ public:
     typedef MapIterator<std::string, ConfNode> ChildIter;
     
     ConfNode() :
-	m_parent(NULL), m_isinit(false)
+	m_parent(NULL), m_isinit(false), m_backend(NULL)
 	{};
 
     ~ConfNode() {
-	if (!m_parent || m_parent->m_backend != m_backend)
+	if ((!m_parent || m_parent->m_backend != m_backend)
+	    && m_backend)
 	    delete m_backend;
     }
     
     void init(const std::string& name, ConfNode* parent) {
+	m_isinit = true;
 	m_name = name;
 	m_parent = parent;
 	if (m_parent)
@@ -219,6 +241,14 @@ public:
 	m_element.set(val);
 	notifyConfChange(*this);
     }
+
+    template<class T>
+    void def(const T& val) {
+	if (m_element.type() == CONF_NONE) {
+	    m_element.set(val);
+	    notifyConfChange(*this);
+	}
+    }
     
     template<class T>
     void get(T& data) const {
@@ -230,9 +260,11 @@ public:
     }
 
     ConfNode& getChild(const std::string& name) {
-	if (!m_childs[name].isInit())
+	if (!m_childs[name].isInit()) {
+	    std::cout << "creating child " << m_name << " -> " << name << std::endl;
 	    m_childs[name].init(name, this);
-
+	}
+	
 	return m_childs[name];
     }
     

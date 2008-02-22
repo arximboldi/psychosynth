@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) Juan Pedro Bolivar Puente 2007                          *
+ *   Copyright (C) Juan Pedro Bolivar Puente 2007, 2008                    *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -20,44 +20,65 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "common/Config.h"
+#ifndef PSYNTH_OUTPUT_DIRECTOR_OSS_H
+#define PSYNTH_OUTPUT_DIRECTOR_OSS_H
 
-using namespace std;
+#include "psynth/DefaultsOss.h"
+#include "psynth/OutputDirector.h"
+#include "output/OutputOss.h"
 
-void ConfSubject::notifyConfChange(const ConfNode& source)
+class OutputDirectorOss : public OutputDirector
 {
-    for (list<ConfListener*>::iterator i = m_list.begin();
-	 i != m_list.end();
-	 ++i)
-	(*i)->handleConfChange(source);
+    OutputOss* m_output;
 
-    for (list<ConfEvent>::iterator i = m_change_del.begin();
-	 i != m_change_del.end();
-	 ++i)
-	(*i)(source);    
-}
+    bool onDeviceChange(const ConfNode& conf) {
+	std::string device;
+	Output::State old_state;
+	
+	conf.get(device);
+	
+	old_state = m_output->getState();
+	m_output->gotoState(Output::NOTINIT);
+	m_output->setDevice(device);
+	m_output->gotoState(old_state);
 
-void ConfSubject::notifyNewChild(const ConfNode& child)
-{
-    for (list<ConfListener*>::iterator i = m_list.begin();
-	 i != m_list.end();
-	 ++i)
-	(*i)->handleNewChild(child);
-}
+	return false;
+    }
+    
+    virtual Output* doStart(ConfNode& conf) {
+	std::string device;
+	
+	conf.getChild("out_device").def(DEFAULT_OSS_OUT_DEVICE);
+	conf.getChild("out_device").get(device);
+	conf.getChild("out_device").addChangeEvent(MakeEvent(this, &OutputDirectorOss::onDeviceChange));
 
-ConfNode& ConfNode::getPath(std::string path)
-{
-    string base;
-    for (size_t i = 0; i != path.size(); ++i)
-	if (path[i] == '/') {
-	    base.assign(path, 0, i);
-	    path.erase(0, i);
-	    break;
-	}
+	m_output = new OutputOss;
+	m_output->setDevice(device);
 
-    if (base.empty()) {
-	return getChild(path);
+	return m_output;
+    };
+
+    virtual void doStop(ConfNode& conf) {
+	conf.getChild("out_device").deleteChangeEvent(MakeEvent(this, &OutputDirectorOss::onDeviceChange));
+	delete m_output;
+	m_output = NULL;
     }
 
-    return getChild(base).getPath(path);
-}
+public:
+    OutputDirectorOss() :
+	m_output(NULL) {}
+};
+
+class OutputDirectorOssFactory : public OutputDirectorFactory
+{
+public:
+    virtual const char* getName() {
+	return DEFAULT_OSS_NAME;
+    }
+    
+    virtual OutputDirector* createOutputDirector() {
+	return new OutputDirectorOss;
+    }
+};
+
+#endif /* PSYNTH_OUTPUT_DIRECTOR_OSS_H */

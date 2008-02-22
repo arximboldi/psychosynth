@@ -27,6 +27,8 @@ psychosynth_LDADD = \
 	$(LIBXML_LIBS)
 
 psychosynth_SOURCES = \
+	psynth/Director.cpp \
+	psynth/PsychosynthApp.cpp \
 	common/ArgParser.cpp \
 	common/Error.cpp \
 	common/AudioBuffer.cpp \
@@ -84,6 +86,16 @@ psychosynth_SOURCES = \
 	psychosynth.cpp
 
 noinst_HEADERS = \
+	psynth/Director.h \
+	psynth/Defaults.h \
+	psynth/DefaultsAlsa.h \
+	psynth/OutputDirectorAlsa.h \
+	psynth/DefaultsOss.h \
+	psynth/OutputDirectorOss.h \
+	psynth/DefaultsJack.h \
+	psynth/OutputDirectorJack.h \
+	psynth/OutputDirector.h \
+	psynth/PsychosynthApp.h \
 	common/ArgParser.h \
 	common/Error.h \
 	common/Singleton.h \

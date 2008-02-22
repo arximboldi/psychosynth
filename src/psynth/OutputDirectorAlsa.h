@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) 2007 by Juan Pedro Bolivar Puente                       *
+ *   Copyright (C) Juan Pedro Bolivar Puente 2007, 2008                    *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -20,65 +20,69 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef OUTPUTJACK_H
-#define OUTPUTJACK_H
+#ifndef PSYNTH_OUTPUT_DIRECTOR_ALSA_H
+#define PSYNTH_OUTPUT_DIRECTOR_ALSA_H
 
-#include <vector>
-#include <jack/jack.h>
+#include "psynth/DefaultsAlsa.h"
+#include "psynth/OutputDirector.h"
+#include "output/OutputAlsa.h"
 
-#include "output/Output.h"
+class OutputDirectorAlsa : public OutputDirector
+{
+    OutputAlsa* m_output;
 
-class OutputJack : public Output
-{   
-    static int jack_process_cb(jack_nframes_t nframes, void* jack_client) {
-	static_cast<OutputJack*>(jack_client)->jackProcess(nframes);
-	return 0;
-    }
-
-    static int jack_sample_rate_cb(jack_nframes_t nframes, void* jack_client) {
-	static_cast<OutputJack*>(jack_client)->jackSampleRate(nframes);
-	return 0;
-    }
-
-    static void jack_shutdown_cb(void* jack_client) {
-	static_cast<OutputJack*>(jack_client)->jackShutDown();
-    }
-
-    void jackProcess(jack_nframes_t nframes);
-    void jackSampleRate(jack_nframes_t nframes);
-    void jackShutDown();
-
-    void connectPorts();
-    
-    std::vector<jack_port_t*> m_out_ports;
-    jack_client_t* m_client;
-    std::string m_serv_name;
-    size_t m_actual_rate;
-    
-public:
-    OutputJack();
-    OutputJack(const AudioInfo& info);
-    OutputJack(const AudioInfo& info, const std::string& server_name);
-    ~OutputJack();
-
-    bool setServer(const std::string& server) {
-	if (getState() == NOTINIT) {
-	    m_serv_name = server;
-	    return true;
-	}
+    bool onDeviceChange(const ConfNode& conf) {
+	std::string device;
+	Output::State old_state;
 	
+	conf.get(device);
+	
+	old_state = m_output->getState();
+	m_output->gotoState(Output::NOTINIT);
+	m_output->setDevice(device);
+	m_output->gotoState(old_state);
+
 	return false;
     }
-
-    const std::string& getServer() const {
-	return m_serv_name;
-    }
     
-    bool open();
-    bool close();
-    bool put(const AudioBuffer& buf, size_t nframes);
-    bool start();
-    bool stop();
+    virtual Output* doStart(ConfNode& conf) {
+	std::string device;
+	
+	conf.getChild("out_device").def(DEFAULT_ALSA_OUT_DEVICE);
+	conf.getChild("out_device").get(device);
+	conf.getChild("out_device").addChangeEvent(MakeEvent(this, &OutputDirectorAlsa::onDeviceChange));
+
+	std::cout << "HEHEHEHE!\n";
+	m_output = new OutputAlsa;
+	m_output->setDevice(device);
+
+	return m_output;
+    };
+
+    virtual void doStop(ConfNode& conf) {
+	conf.getChild("out_device").deleteChangeEvent(MakeEvent(this, &OutputDirectorAlsa::onDeviceChange));
+	if (m_output) {
+	    std::cout << m_output << std::endl;
+	    delete m_output;
+	    m_output = NULL;
+	}
+    }
+
+public:
+    OutputDirectorAlsa() :
+	m_output(NULL) {}
 };
 
-#endif /* OUTPUTJACK_H */
+class OutputDirectorAlsaFactory : public OutputDirectorFactory
+{
+public:
+    virtual const char* getName() {
+	return DEFAULT_ALSA_NAME;
+    }
+    
+    virtual OutputDirector* createOutputDirector() {
+	return new OutputDirectorAlsa;
+    }
+};
+
+#endif /* PSYNTH_OUTPUT_DIRECTOR_ALSA_H */

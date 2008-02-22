@@ -28,10 +28,16 @@
 #include <sys/ioctl.h>
 #include <unistd.h>
 
-#include "psychosynth.h"
+#include "common/Logger.h"
 #include "output/OutputOss.h"
 
 using namespace std;
+
+OutputOss::OutputOss() :
+    m_buf(NULL),
+    m_thread(this)
+{
+}
 
 OutputOss::OutputOss(const AudioInfo& info, const std::string& device) : 
     Output(info),
@@ -54,23 +60,29 @@ void OutputOss::run()
     }
 }
 
-void OutputOss::start()
+bool OutputOss::start()
 {
     if (getState() == IDLE) {
 	setState(RUNNING);
 	m_thread.start();
+	return true;
     } else {
-	cout << _("ERROR: OSS output thread already started or OSS subsystem not initialized.") << endl;
+	Logger::instance().log("oss", Log::ERROR,
+			       "Output thread already started or OSS subsystem not initialized.");
+	return false;
     }
 }
 
-void OutputOss::stop()
+bool OutputOss::stop()
 {
     if (getState() == RUNNING) {
 	setState(IDLE);
 	m_thread.join();
+	return true;
     } else {
-	cout << _("ERROR: Alsa output thread not running.") << endl;
+	Logger::instance().log("oss", Log::ERROR,
+			       "Output thread not running.");
+	return false;
     }
 }
 

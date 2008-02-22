@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) Juan Pedro Bolivar Puente 2007                          *
+ *   Copyright (C) Juan Pedro Bolivar Puente 2007, 2008                    *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -20,44 +20,50 @@
  *                                                                         *
  ***************************************************************************/
 
+#ifndef PSYNTH_OUTPUT_DIRECTOR_H
+#define PSYNTH_OUTPUT_DIRECTOR_H
+
 #include "common/Config.h"
 
-using namespace std;
+class Output;
 
-void ConfSubject::notifyConfChange(const ConfNode& source)
+class OutputDirector
 {
-    for (list<ConfListener*>::iterator i = m_list.begin();
-	 i != m_list.end();
-	 ++i)
-	(*i)->handleConfChange(source);
+    ConfNode* m_conf;
+    Output* m_output;
+    
+    virtual Output* doStart(ConfNode& conf) = 0;
+    virtual void doStop(ConfNode& conf) = 0;
 
-    for (list<ConfEvent>::iterator i = m_change_del.begin();
-	 i != m_change_del.end();
-	 ++i)
-	(*i)(source);    
-}
+public:
+    OutputDirector() :
+	m_conf(NULL),
+	m_output(NULL)
+	{}
+    
+    virtual ~OutputDirector() {}
 
-void ConfSubject::notifyNewChild(const ConfNode& child)
-{
-    for (list<ConfListener*>::iterator i = m_list.begin();
-	 i != m_list.end();
-	 ++i)
-	(*i)->handleNewChild(child);
-}
-
-ConfNode& ConfNode::getPath(std::string path)
-{
-    string base;
-    for (size_t i = 0; i != path.size(); ++i)
-	if (path[i] == '/') {
-	    base.assign(path, 0, i);
-	    path.erase(0, i);
-	    break;
-	}
-
-    if (base.empty()) {
-	return getChild(path);
+    void start(ConfNode& conf) {
+	m_conf = &conf;
+	m_output = doStart(conf);
     }
 
-    return getChild(base).getPath(path);
-}
+    void stop() {
+	doStop(*m_conf);
+	m_output = 0;
+    }
+    
+    Output* getOutput() const {
+	return m_output;
+    }
+};
+
+class OutputDirectorFactory
+{
+public:
+    virtual ~OutputDirectorFactory() {}
+    virtual const char* getName() = 0;
+    virtual OutputDirector* createOutputDirector() = 0;
+};
+
+#endif /* PSYNTH_OUTPUT_DIRECTOR_H */

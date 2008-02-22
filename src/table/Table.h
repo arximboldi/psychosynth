@@ -227,6 +227,10 @@ public:
 	return m_info;
     };
 
+    void setInfo(const AudioInfo& info) {
+	/* TODO TODO TODO */
+    };
+    
     TableObject findObject(int id);
 
     TableObject addObject(int type);

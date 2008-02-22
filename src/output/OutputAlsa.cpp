@@ -28,6 +28,11 @@
 
 using namespace std;
 
+OutputAlsa::OutputAlsa() :
+    alsa_thread(this)
+{
+}
+
 OutputAlsa::OutputAlsa(const AudioInfo& info, const std::string& device) :
     Output(info),
     alsa_device(device),
@@ -60,23 +65,27 @@ void OutputAlsa::run()
     }
 }
 
-void OutputAlsa::start()
+bool OutputAlsa::start()
 {
     if (getState() == IDLE) {
 	setState(RUNNING);
 	alsa_thread.start();
+	return true;
     } else {
 	Logger::instance().log("alsa", Log::WARNING, "Thread already started or subsystem not initialized.");
+	return false;
     }
 }
 
-void OutputAlsa::stop()
+bool OutputAlsa::stop()
 {
     if (getState() == RUNNING) {
 	setState(IDLE);
 	alsa_thread.join();
+	return true;
     } else {
 	Logger::instance().log("alsa", Log::WARNING, "Thread not running.");
+	return false;
     }
 }
 
@@ -114,7 +123,8 @@ bool OutputAlsa::open()
 	m_buf = new short int[getInfo().block_size * getInfo().num_channels * sizeof(short int)];
 		
 	setState(IDLE);
-		
+
+	cout << "ALSA OPEN!\n";
 	return true;
     } else {
 	Logger::instance().log("alsa", Log::WARNING, "Can not initialize twice.");

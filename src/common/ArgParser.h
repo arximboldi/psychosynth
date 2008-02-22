@@ -120,6 +120,15 @@ struct ltstr
 
 class ArgParser
 {
+    /* TODO: Generate help screen?
+    struc Item {
+	Option* opt;
+	std::string desc;
+	char short_arg;
+	std::string long_arg;
+    };
+    */
+    
     static const unsigned char NULL_FLAG = '\0';
     std::list<Option*> m_short[256];
     std::map<const char*, std::list<Option*>, ltstr> m_long;

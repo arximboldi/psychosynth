@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) Juan Pedro Bolivar Puente 2007                          *
+ *   Copyright (C) Juan Pedro Bolivar Puente 2007, 2008                    *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -20,44 +20,56 @@
  *                                                                         *
  ***************************************************************************/
 
+#ifndef PSYNTH_DIRECTOR_H
+#define PSYNTH_DIRECTOR_H
+
 #include "common/Config.h"
+#include "common/Misc.h"
+#include "table/Table.h"
+#include "psynth/OutputDirector.h"
 
-using namespace std;
-
-void ConfSubject::notifyConfChange(const ConfNode& source)
+class Director : public NoCopy
 {
-    for (list<ConfListener*>::iterator i = m_list.begin();
-	 i != m_list.end();
-	 ++i)
-	(*i)->handleConfChange(source);
+    typedef std::map<std::string, OutputDirectorFactory*> ODFMap;
+    ODFMap m_outdir;
 
-    for (list<ConfEvent>::iterator i = m_change_del.begin();
-	 i != m_change_del.end();
-	 ++i)
-	(*i)(source);    
-}
+    OutputDirector* m_output;
+    Table* m_table;
 
-void ConfSubject::notifyNewChild(const ConfNode& child)
-{
-    for (list<ConfListener*>::iterator i = m_list.begin();
-	 i != m_list.end();
-	 ++i)
-	(*i)->handleNewChild(child);
-}
+    ConfNode* m_config;
+    AudioInfo m_info;
+    
+    bool onSampleRateChange(const ConfNode& node);
+    bool onBlockSizeChange(const ConfNode& node);
+    bool onNumChannelsChange(const ConfNode& node);
+    bool onOutputChange(const ConfNode& node);
 
-ConfNode& ConfNode::getPath(std::string path)
-{
-    string base;
-    for (size_t i = 0; i != path.size(); ++i)
-	if (path[i] == '/') {
-	    base.assign(path, 0, i);
-	    path.erase(0, i);
-	    break;
-	}
+    void registerConfig();
+    void unregisterConfig();
+    
+    void startOutput();
+    void stopOutput();
 
-    if (base.empty()) {
-	return getChild(path);
+public:
+    Director() :
+	m_output(NULL), m_table(NULL) {}
+
+    ~Director();
+    
+    void attachOutputDirectorFactory(OutputDirectorFactory* fact);
+    void start(ConfNode& conf);
+    void stop();
+    
+    Table* getTable() {
+	return m_table;
     }
 
-    return getChild(base).getPath(path);
-}
+    Output* getOutput() {
+	if (m_output)
+	    return m_output->getOutput();
+	return NULL;
+    }
+};
+
+#endif /* PSYNTH_DIRECTOR_H */
+

@@ -60,9 +60,9 @@ class ObjectOutput : public Object
     std::list<Output*> m_passive_slots;
 
     /*
-    RWLock m_buflock;
-    Mutex m_passive_lock;
-    Mutex m_global_lock;
+      RWLock m_buflock;
+      Mutex m_passive_lock;
+      Mutex m_global_lock;
     */
     
     static void outputCallback(int nframes, void* arg);
@@ -111,6 +111,18 @@ public:
 	m_slots.push_back(new Slot(out, this, m_buffer.end(), getAudioInfo()));
 	//m_buflock.unlock();
     };
+    
+    void detachOutput(Output* out) {
+	for (std::list<Slot*>::iterator i = m_slots.begin(); i != m_slots.end();) {
+	    if ((*i)->m_out == out) {
+		(*i)->m_out->setCallback(NULL, NULL); /* This should take threading into account. */
+		(*i)->m_out = NULL;
+		delete *i;
+		m_slots.erase(i++);
+	    } else
+		++i;
+	}
+    };
 
     void attachPassiveOutput(Output* out) {
 	//m_passive_lock.lock();
@@ -122,17 +134,6 @@ public:
 	//m_passive_lock.lock();
 	m_passive_slots.remove(out);
 	//m_passive_lock.unlock();
-    };
-    
-    void detachOutput(Output* out) {
-	for (std::list<Slot*>::iterator i = m_slots.begin(); i != m_slots.end();) {
-	    if ((*i)->m_out == out) {
-		(*i)->m_out->setCallback(NULL, NULL); /* This should take threading into account. */
-		delete *i;
-		m_slots.erase(i++);
-	    } else
-		++i;
-	}
     };
 };
 
