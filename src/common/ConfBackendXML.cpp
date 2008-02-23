@@ -42,12 +42,14 @@ ConfNode* ConfBackendXML::processNewElement(xmlTextReaderPtr reader, ConfNode* n
     xmlChar* type;
 
     if (xmlTextReaderDepth(reader) == 0) {
-	if ((!node->getName().empty()
-	     && xmlStrcmp(xmlTextReaderConstName(reader), XML_CAST("root")))
-	    || xmlStrcmp(xmlTextReaderConstName(reader),
-			 XML_CAST(node->getName().c_str()))) {
+	if (node->getName().empty()) {
+	    if (xmlStrcmp(xmlTextReaderConstName(reader),
+			  XML_CAST("root")))
+		return NULL;
+	} else if (xmlStrcmp(xmlTextReaderConstName(reader),
+			     XML_CAST(node->getName().c_str()))) 
 	    return NULL;
-	}
+       
     } else if (!xmlTextReaderIsEmptyElement(reader)) {
 	node = &node->getChild(CHAR_CAST(xmlTextReaderConstName(reader)));
     }
@@ -157,7 +159,7 @@ void ConfBackendXML::load(ConfNode& node)
         }
 	
     } else {
-	Logger::instance().log("xmlconf", Log::ERROR, "Could not open config file for writing: " + m_file);
+	Logger::instance().log("xmlconf", Log::ERROR, "Could not open config file for reading: " + m_file);
     }
 }
 
@@ -190,7 +192,6 @@ void ConfBackendXML::expandValue(xmlTextWriterPtr writer, ConfNode& node)
     break;
 	    
     default:
-	cout << "no hay valor!\n";
 	break;
     }
 
@@ -212,8 +213,6 @@ void ConfBackendXML::expand(xmlTextWriterPtr writer, ConfNode& node)
 	xmlTextWriterStartElement(writer, XML_CAST (node.getName().c_str()));
     }
 
-    cout << "expanding: " << node.getName() << endl;
-    
     expandValue(writer, node);
     expandChilds(writer, node);
     

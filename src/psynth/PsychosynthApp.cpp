@@ -39,9 +39,7 @@ int PsychosynthApp::run(int argc, const char* argv[])
     m_director.attachOutputDirectorFactory(new OutputDirectorAlsaFactory);
     m_director.attachOutputDirectorFactory(new OutputDirectorOssFactory);
     m_director.attachOutputDirectorFactory(new OutputDirectorJackFactory);
-
-    cout << "TIO DUROOO!!\n";
-    
+      
     m_director.start(Config::instance().getChild("psychosynth"));
     
     ret_val = execute();

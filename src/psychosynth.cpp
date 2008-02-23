@@ -24,7 +24,7 @@
 
 #include "common/Logger.h"
 
-#define PSYCHOSYNTH_APP
+#define PSYCHOSYNTH_3D
 
 #ifdef PSYCHOSYNTH_3D
 # include "gui3d/PsychoSynth3D.h"

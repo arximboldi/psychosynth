@@ -261,7 +261,6 @@ public:
 
     ConfNode& getChild(const std::string& name) {
 	if (!m_childs[name].isInit()) {
-	    std::cout << "creating child " << m_name << " -> " << name << std::endl;
 	    m_childs[name].init(name, this);
 	}
 	

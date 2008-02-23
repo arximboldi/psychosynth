@@ -43,7 +43,6 @@ void Director::stopOutput()
 	m_table->detachOutput(m_output->getOutput());
 	
 	m_output->stop();   
-	cout << "TUPUTAMADRE!\n";
 	
 	delete m_output;
 	m_output = NULL;
@@ -59,18 +58,13 @@ void Director::startOutput()
     ODFMap::iterator i = m_outdir.find(out_name);
     if (i != m_outdir.end()) {
 	m_output = i->second->createOutputDirector();
-	cout << "siiii!\n";
 	m_output->start(m_config->getChild(i->second->getName()));
 
 	m_table->attachOutput(m_output->getOutput());
 
-	cout << "whatthefuck!\n";
 	m_output->getOutput()->setInfo(m_info);
-	cout << "jejejeje\n";
 	m_output->getOutput()->open();
-	cout << "warrodebug\n";
 	m_output->getOutput()->start();
-	cout << "mmmm\n";
     }
 }
 
@@ -99,10 +93,8 @@ void Director::start(ConfNode& conf)
 {
     m_config = &conf;
 
-    cout << "siiii\n";
     registerConfig();
 
-    cout << "noooo\n";
     conf.getChild("sample_rate").get(m_info.sample_rate);
     conf.getChild("num_channels").get(m_info.num_channels);
     conf.getChild("block_size").get(m_info.block_size);
@@ -126,7 +118,7 @@ void Director::stop()
 
 bool Director::onSampleRateChange(const ConfNode& node)
 {
-    cout << "PARANOYIS!\n";
+    cout << "SAMPLE_RATE_CHANGE!\n";
     node.get(m_info.sample_rate);
     m_table->setInfo(m_info);
     return false;

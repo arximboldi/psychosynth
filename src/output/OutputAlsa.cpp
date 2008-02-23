@@ -124,7 +124,6 @@ bool OutputAlsa::open()
 		
 	setState(IDLE);
 
-	cout << "ALSA OPEN!\n";
 	return true;
     } else {
 	Logger::instance().log("alsa", Log::WARNING, "Can not initialize twice.");
