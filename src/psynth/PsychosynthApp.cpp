@@ -23,18 +23,41 @@
 #include "psynth/OutputDirectorAlsa.h"
 #include "psynth/OutputDirectorOss.h"
 #include "psynth/OutputDirectorJack.h"
+
 #include "psynth/PsychosynthApp.h"
 
+#include "common/Logger.h"
 #include "common/ConfBackendXML.h"
 
 using namespace std;
 
+void PsychosynthApp::printPsynthOptions(ostream& out)
+{
+    out <<
+	"  -h, --help                 Display this information.\n"
+	"  -v, --version              Display program version.\n"
+	"  -s, --sample-rate <value>  Set synth sample rate.\n"
+	"  -b, --buffer-size <value>  Set buffer size. Low values may cause clicking but\n"
+	"                             high values rise latency.\n"
+	"  -c, --channels <value>     Set the number of channels.\n"
+	"  -o, --output <system>      Set the preferred audio output system.\n"
+	"  --alsa-device <device>     Set the ALSA playback device.\n"
+	"  --oss-device <device>      Set the OSS playback device.\n"
+	"  --jack-server <server>     Set the Jack server daemon.\n";
+}
+
 int PsychosynthApp::run(int argc, const char* argv[])
 {
+    ArgParser arg_parser;
     int ret_val;
+    
+    bool is_help;
+    bool is_version;
 
-    Config::instance().attachBackend(new ConfBackendXML("test_config.xml"));
-    Config::instance().load();
+    Logger::instance().attachSink(new LogDefaultSink);
+    Config::instance().getChild("psychosynth").attachBackend(new ConfBackendXML("test_config.xml"));
+
+    Config::instance().defLoad();
     
     m_director.attachOutputDirectorFactory(new OutputDirectorAlsaFactory);
     m_director.attachOutputDirectorFactory(new OutputDirectorOssFactory);
@@ -50,4 +73,3 @@ int PsychosynthApp::run(int argc, const char* argv[])
     
     return ret_val;
 }
-

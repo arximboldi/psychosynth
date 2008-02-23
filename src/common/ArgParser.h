@@ -164,27 +164,27 @@ public:
     ArgParser() {}
     ~ArgParser();
 
-    void addOption(unsigned char flag, const char* str, int* data) {
-	addOption(flag, str, new OptionInt(data));
+    void add(unsigned char flag, const char* str, int* data) {
+	add(flag, str, new OptionInt(data));
     }
     
-    void addOption(unsigned char flag, const char* str, float* data) {
-	addOption(flag, str, new OptionFloat(data));
+    void add(unsigned char flag, const char* str, float* data) {
+	add(flag, str, new OptionFloat(data));
     }
 
-    void addOption(unsigned char flag, const char* str, bool* data) {
-	addOption(flag, str, new OptionFlag(data));
+    void add(unsigned char flag, const char* str, bool* data) {
+	add(flag, str, new OptionFlag(data));
     }
 
-    void addOption(unsigned char flag, const char* str, std::string* data) {
-	addOption(flag, str, new OptionString(data));
+    void add(unsigned char flag, const char* str, std::string* data) {
+	add(flag, str, new OptionString(data));
     }
 
-    void addOption(unsigned char flag, const char* str, const char** data) {
-	addOption(flag, str, new OptionCString(data));
+    void add(unsigned char flag, const char* str, const char** data) {
+	add(flag, str, new OptionCString(data));
     }
     
-    void addOption(unsigned char flag, const char* str, Option* op);
+    void add(unsigned char flag, const char* str, Option* op);
     
     void parseArgs(int argc, const char* argv[]);
 

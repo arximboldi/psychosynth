@@ -32,7 +32,6 @@
 #include "common/MapIterator.h"
 #include "common/FastDelegate.h"
 
-
 enum ConfType
 {
     CONF_NONE,
@@ -188,6 +187,7 @@ public:
     virtual void datach(ConfNode& node) = 0;
     virtual void save(ConfNode& node) = 0;
     virtual void load(ConfNode& node) = 0;
+    virtual void defLoad(ConfNode& node) = 0;
 };
 
 
@@ -294,6 +294,11 @@ public:
 	    m_backend->load(*this);
     }
 
+    void defLoad() {
+	if (m_backend)
+	    m_backend->defLoad(*this);
+    }
+    
     void attachBackend(ConfBackend* backend) {
 	m_backend = backend;
 	m_backend->attach(*this);

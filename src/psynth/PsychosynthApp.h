@@ -25,6 +25,7 @@
 
 #include "common/Misc.h"
 #include "psynth/Director.h"
+#include "common/ArgParser.h"
 
 class PsychosynthApp : public NoCopy
 {
@@ -34,10 +35,15 @@ public:
     };
     
     Director m_director;
-    
-    virtual int execute() {
-	return ERR_GENERIC;
-    }
+
+    virtual void prepare(ArgParser& args) {}
+    virtual int execute() { return ERR_GENERIC; }
+
+    virtual void printHelp() {}
+    virtual void printVersion() {}
+
+protected:
+    void printPsynthOptions(std::ostream& out);
     
 public:
     Table* getTable() {

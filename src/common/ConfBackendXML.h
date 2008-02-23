@@ -35,12 +35,15 @@
 class ConfBackendXML : public ConfBackend
 {
     std::string m_file;
+    bool m_defaulty;
     
     ConfNode* processNewElement(xmlTextReaderPtr reader, ConfNode* node);
     ConfNode* processText(xmlTextReaderPtr reader, ConfNode* node);
     ConfNode* processEndElement(xmlTextReaderPtr reader, ConfNode* node);
     ConfNode* process(xmlTextReaderPtr reader, ConfNode* node);
 
+    void doLoad(ConfNode& node);
+    
     void expand(xmlTextWriterPtr writer, ConfNode& node);
     void expandChilds(xmlTextWriterPtr writer, ConfNode& node);
     void expandValue(xmlTextWriterPtr writer, ConfNode& node);
@@ -64,7 +67,16 @@ public:
     void datach(ConfNode& node) {};
     
     void save(ConfNode& node);
-    void load(ConfNode& node);
+    
+    void load(ConfNode& node) {
+	m_defaulty = false;
+	doLoad(node);
+    }
+
+    void defLoad(ConfNode& node) {
+	m_defaulty = true;
+	doLoad(node);
+    }
 };
 
 #endif /* CONFBACKENDXML_H */

@@ -88,7 +88,8 @@ ConfNode* ConfBackendXML::processText(xmlTextReaderPtr reader, ConfNode* node)
 	case CONF_INT: {
 	    int val;
 	    value_str >> val;
-	    node->set(val);
+	    if (!m_defaulty) node->set(val);
+	    else node->def(val);
 	}
 	break;
 
@@ -96,6 +97,8 @@ ConfNode* ConfBackendXML::processText(xmlTextReaderPtr reader, ConfNode* node)
 	    float val;
 	    value_str >> val;
 	    node->set(val);
+	    if (!m_defaulty) node->set(val);
+	    else node->def(val);
 	}
 	break;
 	
@@ -103,6 +106,8 @@ ConfNode* ConfBackendXML::processText(xmlTextReaderPtr reader, ConfNode* node)
 	    string val;
 	    value_str >> val;
 	    node->set(val);
+	    if (!m_defaulty) node->set(val);
+	    else node->def(val);
 	}
 	break;
 	
@@ -133,7 +138,7 @@ ConfNode* ConfBackendXML::process(xmlTextReaderPtr reader, ConfNode* node)
     return node;
 }
 
-void ConfBackendXML::load(ConfNode& node)
+void ConfBackendXML::doLoad(ConfNode& node)
 {
     xmlTextReaderPtr reader;
     int ret;

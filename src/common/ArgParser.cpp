@@ -30,7 +30,7 @@ ArgParser::~ArgParser()
 	delete *i;
 }
 
-void ArgParser::addOption(unsigned char flag, const char* str, Option* op)
+void ArgParser::add(unsigned char flag, const char* str, Option* op)
 {
     if (flag != NULL_FLAG)
 	m_short[flag].push_back(op);
