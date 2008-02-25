@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<GUILayout>
+<Window Type="TaharezLook/ImageButton" Name="btnQuitWindow">
+	<Property Name="UnifiedPosition" Value="{{1,-32},{1,-32}}" />
+	<Property Name="UnifiedSize" Value="{{0,32},{0,32}}" />
+	<Property Name="NormalImage"     Value="set:QuitWindowButton image:btnNormal" />
+	<Property Name="HoverImage"      Value="set:QuitWindowButton image:btnHover"  />
+	<Property Name="PushedImage"     Value="set:QuitWindowButton image:btnPushed" />
+	<Property Name="DisabledImage"   Value="set:QuitWindowButton image:btnDisabl" />
+</Window>
+</GUILayout>
+
