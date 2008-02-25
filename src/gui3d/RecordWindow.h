@@ -23,9 +23,10 @@
 #ifndef RECORDWINDOW_H
 #define RECORDWINDOW_H
 
-#include "table/Table.h"
+#include <libpsynth/table/Table.h>
+#include <libpsynth/output/OutputWave.h>
+
 #include "gui3d/ToggableWindow.h"
-#include "output/OutputWave.h"
 
 class RecordWindow : public ToggableWindow
 {

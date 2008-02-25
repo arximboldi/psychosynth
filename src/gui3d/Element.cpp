@@ -24,7 +24,8 @@
 
 #include "gui3d/Element.h"
 #include "gui3d/QueryFlags.h"
-#include "common/Misc.h"
+
+#include <libpsynth/common/Misc.h>
 
 #define ROTATION_FACTOR     100.0f
 

@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) 2007 by Juan Pedro Bolivar Puente                       *
+ *   Copyright (C) 2007 Juan Pedro Bolivar Puente                          *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -20,31 +20,87 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <iostream>
+#ifndef CONTROLBUFFER_H
+#define CONTROLBUFFER_H
 
-#include <libpsynth/common/Logger.h>
+#include <libpsynth/common/AudioInfo.h>
 
-#define PSYCHOSYNTH_3D
-
-#ifdef PSYCHOSYNTH_3D
-# include "gui3d/PsychoSynth3D.h"
-#endif
-#ifdef PSYCHOSYNTH_APP
-# include <libpsynth/psynth/PsychosynthApp.h>
-#endif
-
-using namespace std;
-
-int main(int argc, const char *argv[])
+class ControlBuffer
 {
-#ifdef PSYCHOSYNTH_3D
-    PsychoSynth3D main_app;
-    main_app.run(argc, argv);
-#endif
-#ifdef PSYCHOSYNTH_APP
-    PsychosynthApp main_app;
-    main_app.run(argc, argv);
-#endif
+    Sample* m_data;
+    size_t m_size;
+
+    void allocate() {
+	m_data = new Sample[m_size];
+        /* FIXME: what is the effect of new Sample[0] ?*/
+    }
     
-    return 0;
-}
+    void liberate() {
+	delete [] m_data;
+	m_data = NULL;
+    }
+    
+public:
+    ControlBuffer() :
+	m_data(NULL),
+	m_size(0)
+	{}
+
+    ControlBuffer(size_t size) :
+	m_size(size) {
+	allocate();
+    }
+
+    ControlBuffer(const ControlBuffer& buf) :
+	m_size(buf.m_size) {
+	allocate();
+	memcpy(m_data, buf.m_data, sizeof(Sample) * m_size);
+    }
+
+    ~ControlBuffer() {
+	liberate();
+    }
+    
+    ControlBuffer& operator=(const ControlBuffer& buf) {
+	if (&buf != this) {
+	    liberate();
+	    m_size = buf.m_size;
+	    allocate();
+	    memcpy(m_data, buf.m_data, sizeof(Sample) * m_size);
+	}
+	return *this;
+    }
+    
+    Sample& operator[] (size_t i) {
+	return m_data[i];
+    }
+
+    const Sample& operator[] (size_t i) const {
+	return m_data[i];
+    }
+
+    Sample* getData() {
+	return m_data;
+    }
+
+    const Sample* getData() const {
+	return m_data;
+    }
+    
+    void clear() {
+	liberate();
+	m_size = 0;
+    }
+
+    size_t size() {
+	return m_size;
+    }
+
+    void resize(size_t newsize) {
+	liberate();
+	m_size = newsize;
+	allocate();
+    }
+};
+
+#endif /* CONTROLBUFER_H */

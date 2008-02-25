@@ -20,31 +20,50 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <iostream>
+#ifndef OUTPUT_ALSA_H
+#define OUTPUT_ALSA_H
 
-#include <libpsynth/common/Logger.h>
+#define ALSA_PCM_NEW_HW_PARAMS_API
+#include <alsa/asoundlib.h>
+#include <pthread.h>
 
-#define PSYCHOSYNTH_3D
+#include <libpsynth/output/Output.h>
+#include <libpsynth/common/Thread.h>
 
-#ifdef PSYCHOSYNTH_3D
-# include "gui3d/PsychoSynth3D.h"
-#endif
-#ifdef PSYCHOSYNTH_APP
-# include <libpsynth/psynth/PsychosynthApp.h>
-#endif
-
-using namespace std;
-
-int main(int argc, const char *argv[])
+class OutputAlsa : public Output, Runnable
 {
-#ifdef PSYCHOSYNTH_3D
-    PsychoSynth3D main_app;
-    main_app.run(argc, argv);
-#endif
-#ifdef PSYCHOSYNTH_APP
-    PsychosynthApp main_app;
-    main_app.run(argc, argv);
-#endif
+    snd_pcm_t *alsa_pcm;
+    snd_pcm_hw_params_t *alsa_hwparams;
+    snd_pcm_sw_params_t *alsa_swparams;
+    snd_pcm_format_t alsa_format;
+    short int* m_buf;
+    std::string alsa_device;
+    Thread<> alsa_thread;
     
-    return 0;
-}
+public:
+    OutputAlsa();
+    OutputAlsa(const AudioInfo& info, const std::string& device);
+    ~OutputAlsa();
+
+    bool setDevice(const std::string& device) {
+	if (getState() == NOTINIT) {
+	    alsa_device = device;
+	    return true;
+	}
+	
+	return false;
+    }
+
+    const std::string& getDevice() const {
+	return alsa_device;
+    }
+	
+    void run();
+    bool open();
+    bool close();
+    bool put(const AudioBuffer& buf, size_t nframes);
+    bool start();
+    bool stop();
+};
+
+#endif /* OUTPUT_ALSA_H */

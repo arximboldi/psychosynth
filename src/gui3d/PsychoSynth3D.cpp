@@ -20,8 +20,8 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "common/Logger.h"
-#include "common/Misc.h"
+#include <libpsynth/common/Logger.h>
+#include <libpsynth/common/Misc.h>
 
 #include "gui3d/PsychoSynth3D.h"
 
@@ -36,13 +36,17 @@
 #include "gui3d/QueryFlags.h"
 #include "gui3d/FlatRing.h"
 
-#include "output/OutputOss.h"
-#include "output/OutputAlsa.h"
-#include "output/OutputJack.h"
-#include "table/PatcherDynamic.h"
+#include <libpsynth/output/OutputOss.h>
+#include <libpsynth/output/OutputAlsa.h>
+#include <libpsynth/output/OutputJack.h>
+#include <libpsynth/table/PatcherDynamic.h>
 
 using namespace Ogre;
 using namespace std;
+
+#define DEFAULT_SAMPLE_RATE 44100
+#define DEFAULT_BUFFER_SIZE 256
+#define DEFAULT_NUM_CHANNEL 2
 
 PsychoSynth3D::PsychoSynth3D() :
     m_audio_info(DEFAULT_SAMPLE_RATE, DEFAULT_BUFFER_SIZE, DEFAULT_NUM_CHANNEL)

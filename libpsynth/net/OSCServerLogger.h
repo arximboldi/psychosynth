@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) 2007 by Juan Pedro Bolivar Puente                       *
+ *   Copyright (C) 2007 Juan Pedro Bolivar Puente                          *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -20,31 +20,58 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <iostream>
+#ifndef OSCSERVERLOGGER_H
+#define OSCSERVERLOGGER_H
 
-#include <libpsynth/common/Logger.h>
+#include <libpsynth/net/OSCServer.h>
 
-#define PSYCHOSYNTH_3D
-
-#ifdef PSYCHOSYNTH_3D
-# include "gui3d/PsychoSynth3D.h"
-#endif
-#ifdef PSYCHOSYNTH_APP
-# include <libpsynth/psynth/PsychosynthApp.h>
-#endif
-
-using namespace std;
-
-int main(int argc, const char *argv[])
+class OSCServerLogger : public OSCServerListener
 {
-#ifdef PSYCHOSYNTH_3D
-    PsychoSynth3D main_app;
-    main_app.run(argc, argv);
-#endif
-#ifdef PSYCHOSYNTH_APP
-    PsychosynthApp main_app;
-    main_app.run(argc, argv);
-#endif
+public:
+    virtual bool handleServerStartListening(OSCServer* server) {
+	Logger::instance().log("oscserver", Log::INFO, "Server listening.");
+	return false;
+    }
     
-    return 0;
-}
+    virtual bool handleServerStopListening(OSCServer* server, OSCServerError err) {
+	switch(err) {
+	case SE_NONE:
+	    Logger::instance().log("oscserver", Log::INFO, "Server no longer listening.");
+	    break;
+	    
+	case SE_PORT_BINDING:
+	    Logger::instance().log("oscserver", Log::INFO, "Could not bind port.");
+	    break;
+
+	default:
+	    break;
+	}
+
+	return false;
+    }
+    
+    virtual bool handleServerClientConnect(OSCServer* server, int client_id) {
+	Logger::instance().log("oscserver", Log::INFO, "Client connected.");
+	return false;
+    }
+    
+    virtual bool handleServerClientDisconnect(OSCServer* server, int client_id,
+					OSCServerClientError cause) {
+	switch(cause) {
+	case SCE_NONE:
+	    Logger::instance().log("oscserver", Log::INFO, "Client disconnected.");
+	    break;
+
+	case SCE_CLIENT_TIMEOUT:
+	    Logger::instance().log("oscserver", Log::INFO, "Client timeout.");
+	    break;
+	    
+	default:
+	    break;
+	}
+	
+	return false;
+    }
+};
+
+#endif /* OSCSERVERLOGGER_H */

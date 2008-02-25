@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) 2007 by Juan Pedro Bolivar Puente                       *
+ *   Copyright (C) Juan Pedro Bolivar Puente 2007, 2008                    *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -20,31 +20,63 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <iostream>
+#ifndef CONFBACKENDXML_H
+#define CONFBACKENDXML_H
 
-#include <libpsynth/common/Logger.h>
+#include <string>
+#include <libxml/xmlreader.h>
+#include <libxml/xmlwriter.h>
 
-#define PSYCHOSYNTH_3D
+#include <libpsynth/common/Config.h>
 
-#ifdef PSYCHOSYNTH_3D
-# include "gui3d/PsychoSynth3D.h"
-#endif
-#ifdef PSYCHOSYNTH_APP
-# include <libpsynth/psynth/PsychosynthApp.h>
-#endif
-
-using namespace std;
-
-int main(int argc, const char *argv[])
+/**
+ * XML configuration backend.
+ */
+class ConfBackendXML : public ConfBackend
 {
-#ifdef PSYCHOSYNTH_3D
-    PsychoSynth3D main_app;
-    main_app.run(argc, argv);
-#endif
-#ifdef PSYCHOSYNTH_APP
-    PsychosynthApp main_app;
-    main_app.run(argc, argv);
-#endif
+    std::string m_file;
+    bool m_defaulty;
     
-    return 0;
-}
+    ConfNode* processNewElement(xmlTextReaderPtr reader, ConfNode* node);
+    ConfNode* processText(xmlTextReaderPtr reader, ConfNode* node);
+    ConfNode* processEndElement(xmlTextReaderPtr reader, ConfNode* node);
+    ConfNode* process(xmlTextReaderPtr reader, ConfNode* node);
+
+    void doLoad(ConfNode& node);
+    
+    void expand(xmlTextWriterPtr writer, ConfNode& node);
+    void expandChilds(xmlTextWriterPtr writer, ConfNode& node);
+    void expandValue(xmlTextWriterPtr writer, ConfNode& node);
+
+public:
+    ConfBackendXML(const std::string& file) :
+	m_file(file)
+	{}
+    
+    ~ConfBackendXML() {}
+
+    void setFile(const std::string& file) {
+	m_file = file;
+    }
+
+    const std::string& getFile() {
+	return m_file;
+    }
+
+    void attach(ConfNode& node) {};
+    void datach(ConfNode& node) {};
+    
+    void save(ConfNode& node);
+    
+    void load(ConfNode& node) {
+	m_defaulty = false;
+	doLoad(node);
+    }
+
+    void defLoad(ConfNode& node) {
+	m_defaulty = true;
+	doLoad(node);
+    }
+};
+
+#endif /* CONFBACKENDXML_H */

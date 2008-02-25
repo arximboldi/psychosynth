@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) 2007 by Juan Pedro Bolivar Puente                       *
+ *   Copyright (C) Juan Pedro Bolivar Puente 2007                          *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -20,31 +20,56 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <iostream>
+#ifndef OBJECTMIXER_H
+#define OBJECTMIXER_H
 
-#include <libpsynth/common/Logger.h>
+#include <libpsynth/object/Object.h>
 
-#define PSYCHOSYNTH_3D
-
-#ifdef PSYCHOSYNTH_3D
-# include "gui3d/PsychoSynth3D.h"
-#endif
-#ifdef PSYCHOSYNTH_APP
-# include <libpsynth/psynth/PsychosynthApp.h>
-#endif
-
-using namespace std;
-
-int main(int argc, const char *argv[])
+class ObjectMixer : public Object
 {
-#ifdef PSYCHOSYNTH_3D
-    PsychoSynth3D main_app;
-    main_app.run(argc, argv);
-#endif
-#ifdef PSYCHOSYNTH_APP
-    PsychosynthApp main_app;
-    main_app.run(argc, argv);
-#endif
+public:
+       /*enum {
+      N_IN_A_SOCKETS
+      };*/
+	
+    enum InControlSocketID {
+	IN_C_AMPLITUDE,
+	N_IN_C_SOCKETS
+    };
+
+    enum ParamID {
+	PARAM_AMPLITUDE,
+	PARAM_MIXOP,
+	N_PARAM
+    };
+
+    enum MixOp {
+	MIX_SUM,
+	MIX_PRODUCT,
+	N_MIXOPS
+    };
+
+
+protected:
+    int m_numchan;
+
+    void mix(Sample* dest, const Sample* src, size_t n_samples);
     
-    return 0;
-}
+    void mix(Sample* dest, const Sample* src,
+	     const Sample* ampl, size_t n_samples);
+
+    void init(Sample* dest, size_t n_samples);
+    
+private:
+    float m_param_ampl;
+    int m_param_mixop;    
+    
+public:
+    ObjectMixer(const AudioInfo& info,
+		int obj_type,
+		int num_audio_out,
+		int num_ctrl_out,
+		int num_in = 2);
+};
+
+#endif /* OBJECTMIXER_H */

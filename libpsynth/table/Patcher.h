@@ -20,31 +20,68 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <iostream>
+#ifndef PATCHER_H
+#define PATCHER_H
 
-#include <libpsynth/common/Logger.h>
+#include <map>
+#include <set>
 
-#define PSYCHOSYNTH_3D
+#include <libpsynth/object/Object.h>
 
-#ifdef PSYCHOSYNTH_3D
-# include "gui3d/PsychoSynth3D.h"
-#endif
-#ifdef PSYCHOSYNTH_APP
-# include <libpsynth/psynth/PsychosynthApp.h>
-#endif
+struct PatcherEvent {
+    Object* src;
+    Object* dest;
+    int src_socket;
+    int dest_socket;
+    int socket_type;
 
-using namespace std;
+    PatcherEvent(Object* s, Object* d, int ss, int ds, int st):
+	src(s), dest(d), src_socket(ss), dest_socket(ds), socket_type(st) {};
+};
 
-int main(int argc, const char *argv[])
-{
-#ifdef PSYCHOSYNTH_3D
-    PsychoSynth3D main_app;
-    main_app.run(argc, argv);
-#endif
-#ifdef PSYCHOSYNTH_APP
-    PsychosynthApp main_app;
-    main_app.run(argc, argv);
-#endif
+class PatcherListener {
+public:
+    virtual ~PatcherListener() {};
+    virtual void handleLinkAdded(const PatcherEvent& ev) = 0;
+    virtual void handleLinkDeleted(const PatcherEvent& ev) = 0;
+};
+
+class PatcherSubject {
+    std::list<PatcherListener*> m_list;
+
+protected:
+    void notifyLinkAdded(const PatcherEvent& ev) {
+	for (std::list<PatcherListener*>::iterator it = m_list.begin();
+	     it != m_list.end(); )
+	    (*it++)->handleLinkAdded(ev);
+    };
     
-    return 0;
-}
+    void notifyLinkDeleted(const PatcherEvent& ev) {
+	for (std::list<PatcherListener*>::iterator it = m_list.begin();
+	     it != m_list.end(); )
+	    (*it++)->handleLinkDeleted(ev);
+    };
+    
+public:
+    void addListener(PatcherListener* l) {
+	m_list.push_back(l);
+    };
+    
+    void deleteListener(PatcherListener* l) {
+	m_list.remove(l);
+    };
+};
+
+class Patcher : public PatcherSubject
+{
+public:
+    virtual ~Patcher() {};
+    
+    virtual bool addObject(Object* obj) = 0;
+    virtual bool deleteObject(Object* obj) = 0;
+    virtual void setParamObject(Object* obj, Object::ParamID param) = 0;
+    virtual void update() = 0;
+    virtual void clear() = 0;
+};
+
+#endif /* PATCHER_H */

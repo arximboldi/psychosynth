@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) 2007 by Juan Pedro Bolivar Puente                       *
+ *   Copyright (C) Juan Pedro Bolivar Puente 2007, 2008                    *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -20,31 +20,56 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <iostream>
+#ifndef PSYNTH_DIRECTOR_H
+#define PSYNTH_DIRECTOR_H
 
-#include <libpsynth/common/Logger.h>
+#include <libpsynth/common/Config.h>
+#include <libpsynth/common/Misc.h>
+#include <libpsynth/table/Table.h>
+#include <libpsynth/psynth/OutputDirector.h>
 
-#define PSYCHOSYNTH_3D
-
-#ifdef PSYCHOSYNTH_3D
-# include "gui3d/PsychoSynth3D.h"
-#endif
-#ifdef PSYCHOSYNTH_APP
-# include <libpsynth/psynth/PsychosynthApp.h>
-#endif
-
-using namespace std;
-
-int main(int argc, const char *argv[])
+class Director : public NoCopy
 {
-#ifdef PSYCHOSYNTH_3D
-    PsychoSynth3D main_app;
-    main_app.run(argc, argv);
-#endif
-#ifdef PSYCHOSYNTH_APP
-    PsychosynthApp main_app;
-    main_app.run(argc, argv);
-#endif
+    typedef std::map<std::string, OutputDirectorFactory*> ODFMap;
+    ODFMap m_outdir;
+
+    OutputDirector* m_output;
+    Table* m_table;
+
+    ConfNode* m_config;
+    AudioInfo m_info;
     
-    return 0;
-}
+    bool onSampleRateChange(const ConfNode& node);
+    bool onBlockSizeChange(const ConfNode& node);
+    bool onNumChannelsChange(const ConfNode& node);
+    bool onOutputChange(const ConfNode& node);
+
+    void registerConfig();
+    void unregisterConfig();
+    
+    void startOutput();
+    void stopOutput();
+
+public:
+    Director() :
+	m_output(NULL), m_table(NULL) {}
+
+    ~Director();
+    
+    void attachOutputDirectorFactory(OutputDirectorFactory* fact);
+    void start(ConfNode& conf);
+    void stop();
+    
+    Table* getTable() {
+	return m_table;
+    }
+
+    Output* getOutput() {
+	if (m_output)
+	    return m_output->getOutput();
+	return NULL;
+    }
+};
+
+#endif /* PSYNTH_DIRECTOR_H */
+

@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) 2007 by Juan Pedro Bolivar Puente                       *
+ *   Copyright (C) Juan Pedro Bolivar Puente 2007                          *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -20,31 +20,47 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <iostream>
+#ifndef OSCCLIENTLOGGER_H
+#define OSCCLIENTLOGGER_H
 
-#include <libpsynth/common/Logger.h>
+#include <libpsynth/net/OSCClient.h>
 
-#define PSYCHOSYNTH_3D
-
-#ifdef PSYCHOSYNTH_3D
-# include "gui3d/PsychoSynth3D.h"
-#endif
-#ifdef PSYCHOSYNTH_APP
-# include <libpsynth/psynth/PsychosynthApp.h>
-#endif
-
-using namespace std;
-
-int main(int argc, const char *argv[])
+class OSCClientLogger : public OSCClientListener
 {
-#ifdef PSYCHOSYNTH_3D
-    PsychoSynth3D main_app;
-    main_app.run(argc, argv);
-#endif
-#ifdef PSYCHOSYNTH_APP
-    PsychosynthApp main_app;
-    main_app.run(argc, argv);
-#endif
+public:
+    virtual bool handleClientConnect(OSCClient* client) {
+	Logger::instance().log("oscclient", Log::INFO, "Connecting...");
+	return false;
+    }
     
-    return 0;
-}
+    virtual bool handleClientDisconnect(OSCClient* client, OSCClientError err) {
+	switch(err) {
+	case CE_NONE:
+	    Logger::instance().log("oscclient", Log::INFO, "Disconnected.");
+	    break;
+
+	case CE_PORT_BINDING:
+	    Logger::instance().log("oscclient", Log::ERROR, "Could not bind port.");
+	    break;
+
+	case CE_SERVER_DROP:
+	    Logger::instance().log("oscclient", Log::ERROR, "Connection dropped by server.");
+	    break;
+
+	case CE_SERVER_TIMEOUT:
+	    Logger::instance().log("oscclient", Log::ERROR, "Connection timeout");
+	    break;
+
+	default:
+	    break;
+	}
+	return false;
+    }
+    
+    virtual bool handleClientAccept(OSCClient* client) {
+	Logger::instance().log("oscclient", Log::INFO, "Accepted.");
+	return false;
+    }
+};
+
+#endif /* OSCCLIENTLOGGER_H */

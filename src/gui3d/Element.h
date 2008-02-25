@@ -26,9 +26,11 @@
 #include <OGRE/Ogre.h>
 #include <OIS/OIS.h>
 
+#include <libpsynth/table/Table.h>
+
 #include "gui3d/FlatRing.h"
 #include "gui3d/ElementProperties.h"
-#include "table/Table.h"
+
 
 class Element;
 
@@ -98,8 +100,8 @@ class Element : public TableObjectListener
     void objectMoved(TableObject& pos, Vector2f& dest);
 
 public:
-    static const Real RADIOUS = 1.0f;
-    static const Real Z_POS = 0.001f;
+    static const Ogre::Real RADIOUS = 1.0f;
+    static const Ogre::Real Z_POS = 0.001f;
     
     Element(TableObject& obj, Ogre::SceneManager* scene);
     

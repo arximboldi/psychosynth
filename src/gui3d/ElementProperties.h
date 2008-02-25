@@ -26,7 +26,7 @@
 #include <map>
 
 #include "gui3d/ToggableWindow.h"
-#include "table/Table.h"
+#include <libpsynth/table/Table.h>
 
 class ElementProperties;
 

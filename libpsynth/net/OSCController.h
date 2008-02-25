@@ -20,67 +20,89 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef ELEMENTMANAGER_H
-#define ELEMENTMANAGER_H
+#ifndef OSCCONTROLLER_H
+#define OSCCONTROLLER_H
 
 #include <map>
-#include <OIS/OIS.h>
 
 #include <libpsynth/table/Table.h>
+#include <libpsynth/net/OSCMisc.h>
+#include <libpsynth/net/OSCBroadcast.h>
 
-#include "gui3d/Element.h"
-#include "gui3d/QueryFlags.h"
-#include "gui3d/Connection.h"
-
-const int N_MB = OIS::MB_Button7+1;
-
-class ElementManager : public OIS::MouseListener,
-		       public OIS::KeyListener,
-		       public TableListener,
-		       public TablePatcherListener
+class OSCController : public TableListener,
+		      public TableObjectListener,
+		      public OSCBroadcast
 {
-    typedef std::list<Element*> ElemList;
-    typedef std::map<int, Element*> ElemMap; /* TODO: turn back into a list? */
-    typedef ElemList::iterator ElemIter;
-    typedef ElemMap::iterator ElemMapIter;
-    
+    std::map<std::pair<int,int>, int> m_local_id;
+    std::map<int, std::pair<int,int> > m_net_id;
     Table* m_table;
-    ElemList m_clear_elems;
-    ElemMap m_elems;
-    std::list<Connection*> m_cons;
-    int m_elemcount;
-
-    int m_must_own;
+    int m_skip;
+    int m_id;
+    bool m_activated;
+    bool m_broadcast;
     
-    Ogre::Camera* m_camera;
-    Ogre::SceneManager* m_scene;
-    Ogre::RaySceneQuery* m_rayquery;
+    LO_HANDLER(OSCController, add);
+    LO_HANDLER(OSCController, delete);
+    LO_HANDLER(OSCController, param);
+    LO_HANDLER(OSCController, activate);
+    LO_HANDLER(OSCController, deactivate);
 
-    
-    bool getTablePointer(Ogre::Vector2& res);
-    Element* createElement(TableObject& obj);
+    void addToTable(Table* table) {
+	table->addTableListener(this);
+	table->addTableObjectListener(this);
+    }
+
+    void deleteFromTable(Table* table) {
+	table->deleteTableListener(this);
+	table->deleteTableObjectListener(this);
+    }
     
 public:
-    ElementManager(Table* table, Ogre::SceneManager* scene,
-		   Ogre::Camera* camera);
-    ~ElementManager();
-    
-    void update();
-    
-    void addElement(int e_type);
-	
-    bool mouseMoved(const OIS::MouseEvent& e);
-    bool mousePressed(const OIS::MouseEvent &e, OIS::MouseButtonID id);
-    bool mouseReleased(const OIS::MouseEvent &e, OIS::MouseButtonID id);
-    
-    bool keyPressed(const OIS::KeyEvent &e);
-    bool keyReleased(const OIS::KeyEvent &e);
+    OSCController(bool broadcast = false);
+    ~OSCController();
 
+    void setID(int id) {
+	m_id = id;
+    }
+
+    void setTable(Table* table) {
+	deactivate();
+	m_table = table;
+    }
+
+    Table* getTable() {
+	return m_table;
+    }
+
+    void activate() {
+	if (!m_activated && m_table) {
+	    m_activated = true;
+	    addToTable(m_table);
+	}
+    }
+
+    void deactivate() {
+	if (m_activated && m_table) {
+	    m_activated = false;
+	    deleteFromTable(m_table);
+	}
+    }
+
+    void clear() {
+	deactivate();
+	m_local_id.clear();
+	m_net_id.clear();
+	m_skip = 0;
+	OSCBroadcast::clear();
+    }
+
+    void addMethods(lo_server s);
+    
     void handleAddObject(TableObject& obj);
     void handleDeleteObject(TableObject& obj);
-
-    void handleLinkAdded(const TablePatcherEvent& ev);
-    void handleLinkDeleted(const TablePatcherEvent& ev);
+    void handleActivateObject(TableObject& obj);
+    void handleDeactivateObject(TableObject& obj);
+    void handleSetParamObject(TableObject& ob, Object::ParamID param_id);
 };
 
-#endif /* ELEMENTMANAGER_H */
+#endif /* OSCCONTROLLER_H */

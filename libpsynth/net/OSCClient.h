@@ -20,26 +20,86 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef GUILOGSINK_H
-#define GUILOGSINK_H
+#ifndef OSCCLIENT_H
+#define OSCCLIENT_H
 
 #include <libpsynth/common/Logger.h>
-#include <CEGUI/CEGUI.h>
+#include <libpsynth/net/OSCController.h>
 
-class GuiLogSink : public LogSink
+class OSCClient;
+
+enum OSCClientError {
+    CE_NONE = 0,
+    CE_PORT_BINDING,
+    CE_SERVER_TIMEOUT,
+    CE_SERVER_DROP
+};
+
+class OSCClientListener
 {
-    CEGUI::Window* m_window;
-    std::string m_buffer;
+public:
+    virtual ~OSCClientListener() {}
+    
+    virtual bool handleClientConnect(OSCClient* client) = 0;
+    virtual bool handleClientDisconnect(OSCClient* client, OSCClientError err) = 0;
+    virtual bool handleClientAccept(OSCClient* client) = 0;
+};
 
-    void dump(Log& log, int level, const std::string& msg);
+class OSCClientSubject
+{
+    std::list<OSCClientListener*> m_list;
+
+protected:
+    void notifyClientConnect(OSCClient* param);
+    void notifyClientDisconnect(OSCClient* param, OSCClientError err);
+    void notifyClientAccept(OSCClient* param);
     
 public:
-    GuiLogSink(CEGUI::Window* win = NULL) :
-	m_window(win) {}
-
-    void setWindow(CEGUI::Window* win) {
-	m_window = win;
+    void addListener(OSCClientListener* l) {
+	m_list.push_back(l);
+    };
+    
+    void deleteListener(OSCClientListener* l) {
+	m_list.remove(l);
     };
 };
 
-#endif /* GUILOGSINK_H */
+class OSCClient : public OSCController,
+		  public OSCClientSubject
+{
+    lo_address m_target;
+    lo_server m_server;
+    int m_id;
+    int m_state;
+    int m_last_alive_recv;
+    int m_last_alive_sent;
+    int m_count_next;
+    
+    LO_HANDLER(OSCClient, alive);
+    LO_HANDLER(OSCClient, drop);
+    LO_HANDLER(OSCClient, accept);
+
+    void addMethods();
+    void close();
+    
+public:
+    enum State {
+	IDLE,
+	PENDING,
+	CONNECTED,
+	CLOSING
+    };
+    
+    OSCClient();
+    ~OSCClient();
+
+    int getState() {
+	return m_state;
+    }
+    
+    void connect(lo_address target, const char* src_port);
+    void disconnect();
+    int update(int msec);
+};
+
+#endif /* OSCCLIENT_H */

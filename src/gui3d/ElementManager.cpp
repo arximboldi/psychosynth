@@ -27,14 +27,14 @@
 #include "gui3d/TheElements.h"
 #include "gui3d/QueryFlags.h"
 
-#include "common/Logger.h"
+#include <libpsynth/common/Logger.h>
 
-#include "object/ObjectMixer.h"
-#include "object/ObjectOscillator.h"
-#include "object/ObjectLFO.h"
-#include "object/ObjectFilter.h"
+#include <libpsynth/object/ObjectMixer.h>
+#include <libpsynth/object/ObjectOscillator.h>
+#include <libpsynth/object/ObjectLFO.h>
+#include <libpsynth/object/ObjectFilter.h>
 
-#include "object/KnownObjects.h"
+#include <libpsynth/object/KnownObjects.h>
 
 using namespace std;
 using namespace Ogre;

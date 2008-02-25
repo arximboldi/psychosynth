@@ -20,31 +20,48 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <iostream>
+#ifndef OUTPUTOSS_H
+#define OUTPUTOSS_H
 
-#include <libpsynth/common/Logger.h>
+#include <pthread.h>
 
-#define PSYCHOSYNTH_3D
+#include <libpsynth/output/Output.h>
+#include <libpsynth/common/Thread.h>
 
-#ifdef PSYCHOSYNTH_3D
-# include "gui3d/PsychoSynth3D.h"
-#endif
-#ifdef PSYCHOSYNTH_APP
-# include <libpsynth/psynth/PsychosynthApp.h>
-#endif
-
-using namespace std;
-
-int main(int argc, const char *argv[])
+class OutputOss : public Output, Runnable
 {
-#ifdef PSYCHOSYNTH_3D
-    PsychoSynth3D main_app;
-    main_app.run(argc, argv);
-#endif
-#ifdef PSYCHOSYNTH_APP
-    PsychosynthApp main_app;
-    main_app.run(argc, argv);
-#endif
+    int m_fd;
+    int m_format;
+    int m_stereo;
+    short int* m_buf;
+    std::string m_device;
+	
+    Thread<> m_thread;
     
-    return 0;
-}
+public:
+    OutputOss();
+    OutputOss(const AudioInfo& info, const std::string& device);
+    ~OutputOss();
+
+    bool setDevice(const std::string& device) {
+	if (getState() == NOTINIT) {
+	    m_device = device;
+	    return true;
+	}
+	
+	return false;
+    }
+
+    const std::string& getDevice() const {
+	return m_device;
+    }
+    
+    bool open();
+    bool close();
+    bool put(const AudioBuffer& buf, size_t nframes);
+    void run();
+    bool start();
+    bool stop();
+};
+
+#endif /* OUTPUTOSS_H */

@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) 2007 by Juan Pedro Bolivar Puente                       *
+ *   Copyright (C) Juan Pedro Bolivar Puente 2007                          *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -20,31 +20,38 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <iostream>
+#ifndef OUTPUTWAVE_H
+#define OUTPUTWAVE_H
 
-#include <libpsynth/common/Logger.h>
+#include <string>
 
-#define PSYCHOSYNTH_3D
+#include <audiofile.h>
+#include <libpsynth/output/Output.h>
 
-#ifdef PSYCHOSYNTH_3D
-# include "gui3d/PsychoSynth3D.h"
-#endif
-#ifdef PSYCHOSYNTH_APP
-# include <libpsynth/psynth/PsychosynthApp.h>
-#endif
-
-using namespace std;
-
-int main(int argc, const char *argv[])
+class OutputWave : public Output
 {
-#ifdef PSYCHOSYNTH_3D
-    PsychoSynth3D main_app;
-    main_app.run(argc, argv);
-#endif
-#ifdef PSYCHOSYNTH_APP
-    PsychosynthApp main_app;
-    main_app.run(argc, argv);
-#endif
+    AFfilehandle m_af_file;
+    AFfilesetup m_af_setup;
+
+    short int* m_buf;
     
-    return 0;
-}
+    std::string m_file_name;
+    
+public:
+    OutputWave(const AudioInfo& info);
+    OutputWave(const AudioInfo& info, const std::string& fname);
+
+    ~OutputWave();
+
+    void setFileName(const std::string& fname) {
+	m_file_name = fname;
+    }
+    
+    bool open();
+    bool close();
+    bool put(const AudioBuffer& buf, size_t nframes);
+    bool start();
+    bool stop();
+};
+
+#endif /* OUTPUTWAVE_H */

@@ -23,10 +23,10 @@
 #ifndef NETWORKWINDOW_H
 #define NETWORKWINDOW_H
 
-#include "net/OSCClient.h"
-#include "net/OSCServer.h"
-#include "net/OSCClientLogger.h"
-#include "net/OSCServerLogger.h"
+#include <libpsynth/net/OSCClient.h>
+#include <libpsynth/net/OSCServer.h>
+#include <libpsynth/net/OSCClientLogger.h>
+#include <libpsynth/net/OSCServerLogger.h>
 
 #include "gui3d/GuiLogSink.h"
 #include "gui3d/ToggableWindow.h"

@@ -21,7 +21,7 @@
  ***************************************************************************/
 
 #include "gui3d/NetworkWindow.h"
-#include "common/Misc.h"
+#include <libpsynth/common/Misc.h>
 
 using namespace std;
 using namespace CEGUI;

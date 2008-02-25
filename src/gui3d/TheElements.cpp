@@ -25,10 +25,10 @@
 #include "gui3d/ElemMainComponent.h"
 #include "gui3d/ElemSecondComponent.h"
 
-#include "object/ObjectMixer.h"
-#include "object/ObjectOscillator.h"
-#include "object/ObjectLFO.h"
-#include "object/ObjectFilter.h"
+#include <libpsynth/object/ObjectMixer.h>
+#include <libpsynth/object/ObjectOscillator.h>
+#include <libpsynth/object/ObjectLFO.h>
+#include <libpsynth/object/ObjectFilter.h>
 
 using namespace std;
 using namespace Ogre;

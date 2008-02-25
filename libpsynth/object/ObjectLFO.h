@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) 2007 by Juan Pedro Bolivar Puente                       *
+ *   Copyright (C) Juan Pedro Bolivar Puente 2007                          *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -20,31 +20,28 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <iostream>
+#ifndef OBJECTLFO_H
+#define OBJECTLFO_H
 
-#include <libpsynth/common/Logger.h>
+#include <libpsynth/object/ObjectOscillator.h>
+#include <libpsynth/object/KnownObjects.h>
 
-#define PSYCHOSYNTH_3D
-
-#ifdef PSYCHOSYNTH_3D
-# include "gui3d/PsychoSynth3D.h"
-#endif
-#ifdef PSYCHOSYNTH_APP
-# include <libpsynth/psynth/PsychosynthApp.h>
-#endif
-
-using namespace std;
-
-int main(int argc, const char *argv[])
+class ObjectLFO : public ObjectOscillator
 {
-#ifdef PSYCHOSYNTH_3D
-    PsychoSynth3D main_app;
-    main_app.run(argc, argv);
-#endif
-#ifdef PSYCHOSYNTH_APP
-    PsychosynthApp main_app;
-    main_app.run(argc, argv);
-#endif
+public:	
+    enum OutControlSocketID {
+	OUT_C_OUTPUT,
+	N_OUT_C_SOCKETS
+    };
+
+private:
+    void doUpdate(const Object* caller, int caller_port_type, int caller_port);
+    void doAdvance() {}
     
-    return 0;
-}
+public:
+    ObjectLFO(const AudioInfo& prop) :
+	ObjectOscillator(prop, OBJ_LFO, 0, N_OUT_C_SOCKETS)
+	{};
+};
+
+#endif /* OBJECTLFO_H */

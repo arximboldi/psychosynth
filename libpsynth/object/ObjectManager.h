@@ -20,26 +20,68 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef GUILOGSINK_H
-#define GUILOGSINK_H
+#ifndef OBJECTMANAGER_H
+#define OBJECTMANAGER_H
 
-#include <libpsynth/common/Logger.h>
-#include <CEGUI/CEGUI.h>
+#include <map>
 
-class GuiLogSink : public LogSink
+#include <libpsynth/common/MapIterator.h>
+#include <libpsynth/object/ObjectManager.h>
+#include <libpsynth/object/ObjectOutput.h>
+
+class ObjectManager
 {
-    CEGUI::Window* m_window;
-    std::string m_buffer;
-
-    void dump(Log& log, int level, const std::string& msg);
-    
+    std::map<int, Object*> m_objmap;
+    std::list<ObjectOutput*> m_outputs;
+	
 public:
-    GuiLogSink(CEGUI::Window* win = NULL) :
-	m_window(win) {}
+    typedef MapIterator<int, Object*> Iterator;
+    typedef MapConstIterator<int, Object*> ConstIterator;
 
-    void setWindow(CEGUI::Window* win) {
-	m_window = win;
-    };
+    ObjectManager();
+    ~ObjectManager();
+	
+    bool attachObject(Object* obj, int id);
+    bool detachObject(int id);
+    void detachObject(Iterator it);
+    void remove(Iterator it);
+
+    ConstIterator begin() const {
+	return m_objmap.begin();
+    }
+    
+    Iterator begin() {
+	return m_objmap.begin();
+    }
+
+    ConstIterator end() const {
+	return m_objmap.end();
+    }
+    
+    Iterator end() {
+	return m_objmap.end();
+    }
+    
+    Iterator find(int id) {
+	return m_objmap.find(id);
+    }
+
+    ConstIterator find(int id) const {
+	return m_objmap.find(id);
+    }
+
+    /**
+     * Makes a full new update of the objects. This means that it first resets
+     * the is-updated property of the objects and then calls update() on all
+     * the attached ObjectOutputs. The update is propagated via DFS. Some
+     * objects may not be updated if not conected to a subgraph containing an
+     * OutputObject.
+     *
+     * This function may be called by an OutputObject if a registered Output
+     * system calls for new data and not enought data is availible in its
+     * buffer.
+     */
+    void update();
 };
 
-#endif /* GUILOGSINK_H */
+#endif /* OBJECTMANAGER_H */

@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) 2007 by Juan Pedro Bolivar Puente                       *
+ *   Copyright (C) Juan Pedro Bolivar Puente 2007, 2008                    *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -20,31 +20,41 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <iostream>
+#ifndef PSYNTH_PSYCHOSYNTHAPP_H
+#define PSYNTH_PSYCHOSYNTHAPP_H
 
-#include <libpsynth/common/Logger.h>
+#include <libpsynth/common/Misc.h>
+#include <libpsynth/psynth/Director.h>
+#include <libpsynth/common/ArgParser.h>
 
-#define PSYCHOSYNTH_3D
-
-#ifdef PSYCHOSYNTH_3D
-# include "gui3d/PsychoSynth3D.h"
-#endif
-#ifdef PSYCHOSYNTH_APP
-# include <libpsynth/psynth/PsychosynthApp.h>
-#endif
-
-using namespace std;
-
-int main(int argc, const char *argv[])
+class PsychosynthApp : public NoCopy
 {
-#ifdef PSYCHOSYNTH_3D
-    PsychoSynth3D main_app;
-    main_app.run(argc, argv);
-#endif
-#ifdef PSYCHOSYNTH_APP
-    PsychosynthApp main_app;
-    main_app.run(argc, argv);
-#endif
+public:
+    enum ErrCode {
+	ERR_GENERIC = -1
+    };
     
-    return 0;
-}
+    Director m_director;
+
+    virtual void prepare(ArgParser& args) {}
+    virtual int execute() { return ERR_GENERIC; }
+
+    virtual void printHelp() {}
+    virtual void printVersion() {}
+
+protected:
+    void printPsynthOptions(std::ostream& out);
+    
+public:
+    Table* getTable() {
+	return m_director.getTable();
+    };
+    
+    Output* getOutput() {
+	return m_director.getOutput();
+    };
+    
+    int run(int argc, const char* argv[]);
+};
+
+#endif /* PSYNTH_PSYCHOSYNTHAPP_H */

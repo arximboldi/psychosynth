@@ -20,79 +20,89 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef CONNECTION_H
-#define CONNECTION_H
+#ifndef AUDIOBUFFER_H
+#define AUDIOBUFFER_H
 
-#include <OGRE/Ogre.h>
-#include <OIS/OIS.h>
+#include <cstring>
 
-#include <libpsynth/table/Table.h>
+#include <libpsynth/common/AudioInfo.h>
 
-#include "gui3d/OgreMisc.h"
+class AudioBuffer {
+    AudioInfo m_info;
+    Sample** m_data;
 
-class ConnectionObject : public Ogre::ManualObject
-{
-    Ogre::ColourValue m_colour;
-    
-    void build(const Ogre::Vector2& src,
-	       const Ogre::Vector2& dest);
+    void allocate();
+	
+    void liberate();
+
 public:
-    ConnectionObject(const std::string &id,
-		     const Ogre::ColourValue& colour,
-		     const Ogre::Vector2& src,
-		     const Ogre::Vector2& dest);
+    AudioBuffer() :
+	m_info(0,0,0),
+	m_data(NULL) {}
+	
+    AudioBuffer(const AudioInfo& info) : 
+	m_info(info) {
+	allocate();
+    }
+	
+    AudioBuffer(const AudioBuffer& buf) :
+	m_info(buf.m_info) {
+	allocate();
+	memcpy(*m_data, *buf.m_data, sizeof(Sample) * m_info.num_channels * m_info.block_size);
+    }
+	
+    ~AudioBuffer() {
+	liberate();
+    }
+	
+    AudioBuffer& operator= (const AudioBuffer& buf);
+
+    void interleave(Sample* dest, size_t n_frames) const;
+    void interleaveS16(short int* dest, size_t n_frames) const;
+    void interleaveI32(int* dest, size_t n_frames) const;
     
-    void update(const Ogre::Vector2& src,
-		const Ogre::Vector2& dest);
-
-    void setColour(Ogre::ColourValue colour) {
-	m_colour = colour;
-	createColourMaterial(getName(), m_colour);
-    };
+    const AudioInfo& getInfo() const {
+	return m_info;
+    }
+	
+    Sample* getChannel(int n) {
+	return m_data[n];
+    }
+	
+    const Sample* getChannel(int n) const {
+	return m_data[n];
+    }
+	
+    Sample** getData() {
+	return m_data;
+    }
+	
+    Sample** const getData() const {
+	return m_data;
+    }
     
-    ~ConnectionObject();
-};
-
-class Connection : public TableObjectListener
-{
-    Ogre::SceneManager* m_scene;
-    Ogre::SceneNode* m_node;
-    
-    ConnectionObject* m_line;
-
-    TableObject m_s_obj;
-    TableObject m_d_obj;
-
-    Ogre::Vector2 m_src;
-    Ogre::Vector2 m_dest;
-
-    bool m_is_muted;
-    
-public:
-
-    Connection(Ogre::SceneManager* scene,
-	       const TableObject& src,
-	       const TableObject& dest);
-
-    ~Connection();
-
-    bool pointerClicked(const Ogre::Vector2& pos, OIS::MouseButtonID id);
-/*
-    bool pointerReleased(const Ogre::Vector2& pos, OIS::MouseButtonID id);
-    bool pointerMoved(const Ogre::Vector2& pos);
-*/
-    
-    void handleActivateObject(TableObject& obj) {};
-    void handleDeactivateObject(TableObject& obj) {};
-    void handleSetParamObject(TableObject& ob, Object::ParamID param_id);
-
-    const TableObject& getSource() {
-	return m_s_obj;
+    Sample* operator[] (int n) {
+	return m_data[n];
+    }
+	
+    const Sample* operator[] (int n) const {
+	return m_data[n];
     }
 
-    const TableObject& getDestiny() {
-	return m_d_obj;
+    size_t size() const {
+	return m_info.block_size;
+    }
+    
+    void resize(size_t new_size) {
+	liberate();
+	m_info.block_size = new_size;
+	allocate();
+    }
+    
+    void zero() {
+	memset(*m_data, 0, sizeof(Sample) * m_info.block_size * m_info.num_channels);
     }
 };
 
-#endif /* CONNECTION_H */
+#endif /* AUDIOBUFFER_H */
+

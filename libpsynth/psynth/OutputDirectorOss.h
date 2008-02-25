@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) 2007 by Juan Pedro Bolivar Puente                       *
+ *   Copyright (C) Juan Pedro Bolivar Puente 2007, 2008                    *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -20,31 +20,65 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <iostream>
+#ifndef PSYNTH_OUTPUT_DIRECTOR_OSS_H
+#define PSYNTH_OUTPUT_DIRECTOR_OSS_H
 
-#include <libpsynth/common/Logger.h>
+#include <libpsynth/psynth/DefaultsOss.h>
+#include <libpsynth/psynth/OutputDirector.h>
+#include <libpsynth/output/OutputOss.h>
 
-#define PSYCHOSYNTH_3D
-
-#ifdef PSYCHOSYNTH_3D
-# include "gui3d/PsychoSynth3D.h"
-#endif
-#ifdef PSYCHOSYNTH_APP
-# include <libpsynth/psynth/PsychosynthApp.h>
-#endif
-
-using namespace std;
-
-int main(int argc, const char *argv[])
+class OutputDirectorOss : public OutputDirector
 {
-#ifdef PSYCHOSYNTH_3D
-    PsychoSynth3D main_app;
-    main_app.run(argc, argv);
-#endif
-#ifdef PSYCHOSYNTH_APP
-    PsychosynthApp main_app;
-    main_app.run(argc, argv);
-#endif
+    OutputOss* m_output;
+
+    bool onDeviceChange(const ConfNode& conf) {
+	std::string device;
+	Output::State old_state;
+	
+	conf.get(device);
+	
+	old_state = m_output->getState();
+	m_output->gotoState(Output::NOTINIT);
+	m_output->setDevice(device);
+	m_output->gotoState(old_state);
+
+	return false;
+    }
     
-    return 0;
-}
+    virtual Output* doStart(ConfNode& conf) {
+	std::string device;
+	
+	conf.getChild("out_device").def(DEFAULT_OSS_OUT_DEVICE);
+	conf.getChild("out_device").get(device);
+	conf.getChild("out_device").addChangeEvent(MakeEvent(this, &OutputDirectorOss::onDeviceChange));
+
+	m_output = new OutputOss;
+	m_output->setDevice(device);
+
+	return m_output;
+    };
+
+    virtual void doStop(ConfNode& conf) {
+	conf.getChild("out_device").deleteChangeEvent(MakeEvent(this, &OutputDirectorOss::onDeviceChange));
+	delete m_output;
+	m_output = NULL;
+    }
+
+public:
+    OutputDirectorOss() :
+	m_output(NULL) {}
+};
+
+class OutputDirectorOssFactory : public OutputDirectorFactory
+{
+public:
+    virtual const char* getName() {
+	return DEFAULT_OSS_NAME;
+    }
+    
+    virtual OutputDirector* createOutputDirector() {
+	return new OutputDirectorOss;
+    }
+};
+
+#endif /* PSYNTH_OUTPUT_DIRECTOR_OSS_H */

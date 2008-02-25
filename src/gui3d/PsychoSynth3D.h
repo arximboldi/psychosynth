@@ -27,18 +27,19 @@
 #include <CEGUI/CEGUI.h>
 #include <OgreCEGUIRenderer.h>
 
-#include "common/Thread.h"
+#include <libpsynth/common/Thread.h>
+#include <libpsynth/common/Timer.h>
+#include <libpsynth/table/Table.h>
+#include <libpsynth/output/Output.h>
+#include <libpsynth/net/OSCClient.h>
+#include <libpsynth/net/OSCServer.h>
+
 #include "gui3d/InputManager.h"
 #include "gui3d/CeguiInjecter.h"
 #include "gui3d/TaskManager.h"
-#include "gui3d/Timer.h"
 #include "gui3d/ElementManager.h"
 #include "gui3d/WindowList.h"
 #include "gui3d/CameraControllerRasko.h"
-#include "table/Table.h"
-#include "output/Output.h"
-#include "net/OSCClient.h"
-#include "net/OSCServer.h"
 
 class PsychoSynth3D : public Ogre::FrameListener
 {

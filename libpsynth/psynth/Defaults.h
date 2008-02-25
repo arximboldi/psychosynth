@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) 2007 by Juan Pedro Bolivar Puente                       *
+ *   Copyright (C) Juan Pedro Bolivar Puente 2007, 2008                    *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -20,31 +20,12 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <iostream>
+#ifndef PSYNTH_DEFAULTS_H
+#define PSYNTH_DEFAULTS_H
 
-#include <libpsynth/common/Logger.h>
+#define DEFAULT_OUTPUT        "alsa"
+#define DEFAULT_NUM_CHANNELS  2
+#define DEFAULT_BLOCK_SIZE    256
+#define DEFAULT_SAMPLE_RATE   44100
 
-#define PSYCHOSYNTH_3D
-
-#ifdef PSYCHOSYNTH_3D
-# include "gui3d/PsychoSynth3D.h"
-#endif
-#ifdef PSYCHOSYNTH_APP
-# include <libpsynth/psynth/PsychosynthApp.h>
-#endif
-
-using namespace std;
-
-int main(int argc, const char *argv[])
-{
-#ifdef PSYCHOSYNTH_3D
-    PsychoSynth3D main_app;
-    main_app.run(argc, argv);
-#endif
-#ifdef PSYCHOSYNTH_APP
-    PsychosynthApp main_app;
-    main_app.run(argc, argv);
-#endif
-    
-    return 0;
-}
+#endif /* PSYNTH_DEFAULTS_H */

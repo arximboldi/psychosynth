@@ -20,31 +20,77 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <iostream>
+#ifndef PATCHERDYNAMIC_H
+#define PATCHERDYNAMIC_H
 
-#include <libpsynth/common/Logger.h>
+#include <map>
+#include <set>
 
-#define PSYCHOSYNTH_3D
+#include <libpsynth/table/Patcher.h>
 
-#ifdef PSYCHOSYNTH_3D
-# include "gui3d/PsychoSynth3D.h"
-#endif
-#ifdef PSYCHOSYNTH_APP
-# include <libpsynth/psynth/PsychosynthApp.h>
-#endif
+class PatcherDynamic : public Patcher
+{    
+    struct Link {
+	Object* src;
+	Object* dest;
+	float dist;
+	float dist_to_center;
+	int sock_type;
+	int out_sock;
+	int in_sock;
+	int actual_in_sock;
+	
+	Link(Object* s, Object* d, float ds, float dc, int t, int os, int is) :
+	    src(s), dest(d), dist(ds), dist_to_center(dc),
+	    sock_type(t), out_sock(os), in_sock(is), actual_in_sock(-1)
+	    {}
+	
+	bool operator< (const Link& l) const {
+	    return dist == l.dist ? dist_to_center < l.dist_to_center : dist < l.dist;
+	}
+    };
 
-using namespace std;
+    struct Node {
+	Object* obj;
+	Object* dest;
+	bool out_used; /* We output to one object only */
+	int actual_sock_type;
+	int actual_in_sock; 
 
-int main(int argc, const char *argv[])
-{
-#ifdef PSYCHOSYNTH_3D
-    PsychoSynth3D main_app;
-    main_app.run(argc, argv);
-#endif
-#ifdef PSYCHOSYNTH_APP
-    PsychosynthApp main_app;
-    main_app.run(argc, argv);
-#endif
+	Node(Object* o = NULL) :
+	    obj(o),
+	    dest(NULL),
+	    out_used(false),
+	    actual_sock_type(-1),
+	    actual_in_sock(-1) {}
+    };
+
+    class LinkPtrCmp {
+    public:
+	bool operator() (const Link* a, const Link* b) {
+	  return *a < *b;
+	}
+    };
+
+    bool m_changed;
     
-    return 0;
-}
+    std::map<int, Node> m_nodes;
+    std::multiset<Link*, LinkPtrCmp> m_links;
+
+    inline void undoLink(Link& l);
+    inline void makeLink(Link& l);
+    inline void findInSock(Link& l);
+    inline bool isLinked(Link& l);
+    
+public:
+    PatcherDynamic();
+    ~PatcherDynamic();
+    
+    bool addObject(Object* obj);
+    bool deleteObject(Object* obj);
+    void setParamObject(Object* obj, Object::ParamID id);
+    void update();
+    void clear();
+};
+
+#endif /* PATCHERDYNAMIC_H */

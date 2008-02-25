@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) 2007 by Juan Pedro Bolivar Puente                       *
+ *   Copyright (C) Juan Pedro Bolivar Puente 2007                          *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -20,31 +20,71 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <iostream>
+#ifndef OBJECTFILTER_H
+#define OBJECTFILTER_H
 
-#include <libpsynth/common/Logger.h>
+#include <vector>
 
-#define PSYCHOSYNTH_3D
+#include <libpsynth/object/Object.h>
+#include <libpsynth/object/Filter.h>
 
-#ifdef PSYCHOSYNTH_3D
-# include "gui3d/PsychoSynth3D.h"
-#endif
-#ifdef PSYCHOSYNTH_APP
-# include <libpsynth/psynth/PsychosynthApp.h>
-#endif
-
-using namespace std;
-
-int main(int argc, const char *argv[])
+class ObjectFilter : public Object
 {
-#ifdef PSYCHOSYNTH_3D
-    PsychoSynth3D main_app;
-    main_app.run(argc, argv);
-#endif
-#ifdef PSYCHOSYNTH_APP
-    PsychosynthApp main_app;
-    main_app.run(argc, argv);
-#endif
+public:	
+    enum InAudioSocketID {
+	IN_A_INPUT,
+	N_IN_A_SOCKETS
+    };
+	
+    enum InControlSocketID {
+	IN_C_CUTOFF,
+	IN_C_EMPHASIS,
+	N_IN_C_SOCKETS
+    };
+	
+    enum OutAudioSocketID {
+	OUT_A_OUTPUT,
+	N_OUT_A_SOCKETS
+    };
+	
+    enum OutControlSocketID {
+	N_OUT_C_SOCKETS
+    };
+
+    enum FilterType {
+	FILTER_LOWPASS       = FilterValues::LOWPASS,
+	FILTER_HIGHPASS      = FilterValues::HIPASS,
+	FILTER_BANDPASS_CSG  = FilterValues::BANDPASS_CSG,
+	FILTER_BANDPASS_CZPG = FilterValues::BANDPASS_CZPG,
+	FILTER_NOTCH         = FilterValues::NOTCH,
+	FILTER_MOOG          = FilterValues::MOOG,
+	N_FILTER_TYPES,
+    };
+
+    enum ParamID {
+	PARAM_TYPE,
+	PARAM_CUTOFF,
+	PARAM_RESONANCE,
+	N_PARAM
+    };
+
+    static const float DEFAULT_CUTOFF    = 220.0f;
+    static const float DEFAULT_RESONANCE = 0.1f;
     
-    return 0;
-}
+private:
+    int m_param_type;
+    float m_param_cutoff;
+    float m_param_resonance;
+
+    FilterValues m_filter_values;
+    std::vector<Filter> m_filter;
+    
+    void doUpdate(const Object* caller, int caller_port_type, int caller_port);
+    void doAdvance() {}
+    
+public:
+    ObjectFilter(const AudioInfo& prop, int mode = FILTER_LOWPASS);
+    ~ObjectFilter();
+};
+
+#endif /* OBJECTFILTER_H */

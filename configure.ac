@@ -289,7 +289,7 @@ AM_CONDITIONAL([BUILD_PSYNTH3D], [test "x$BUILD_PSYNTH3D" = x1])
 #  psynth dependencies
 # ======================================================================
 
-BUILD_PSYNTH=HAVE_LIBLO
+BUILD_PSYNTH=$HAVE_LIBLO
 AM_CONDITIONAL([BUILD_PSYNTH], [test "x$BUILD_PSYNTH" = x1])
 
 #  Directories
@@ -306,13 +306,41 @@ fi
 PACKAGE_DATA_DIR="${datarootdir}/${PACKAGE}"
 AC_SUBST(PACKAGE_DATA_DIR)
 
+
 #  Create files
 # ======================================================================
 
-AC_OUTPUT(Makefile src/Makefile)
+AC_OUTPUT(Makefile 
+	  src/Makefile
+	  libpsynth/Makefile)
+
 
 #  Result
 # ======================================================================
+
+if test "x${BUILD_PSYNTH3D}" = x1; then BUILD_PSYNTH3D=yes;
+else BUILD_PSYNTH3D=no; fi
+
+if test "x${BUILD_PSYNTH}" = x1; then BUILD_PSYNTH=yes;
+else BUILD_PSYNTH=no; fi 
+
+if test "x${HAVE_LIBLO}" = x1; then HAVE_LIBLO=yes;
+else HAVE_LIBLO=no; fi
+
+if test "x${HAVE_LIBXML}" = x1; then HAVE_LIBXML=yes;
+else HAVE_LIBLO=no; fi
+
+if test "x${HAVE_OSS}" = x1; then HAVE_OSS=yes;
+else HAVE_OSS=no; fi
+
+if test "x${HAVE_ALSA}" = x1; then HAVE_ALSA=yes;
+else HAVE_ALSA=no; fi
+
+if test "x${HAVE_JACK}" = x1; then HAVE_JACK=yes;
+else HAVE_JACK=no; fi
+
+if test "x${HAVE_AUDIOFILE}" = x1; then HAVE_AUDIOFILE=yes;
+else HAVE_AUDIOFILE=no; fi
 
 
 if test "x${psynth_config_ok}" != xyes; then
@@ -333,7 +361,11 @@ AC_MSG_RESULT([
 *
 *  Psychosynth $VERSION:  Automatic configuration OK.
 *
+*
 *   Configuration summary:
+*
+*      3D client (psynth3d) ..... $BUILD_PSYNTH3D
+*      CLI client (psynth) ...... $BUILD_PSYNTH
 * 
 *      OSC support: ............. $HAVE_LIBLO
 *      XML config support: ...... $HAVE_LIBXML
@@ -345,16 +377,17 @@ AC_MSG_RESULT([
 * 
 *   Installation directories:
 * 
-*      Program: .................. ${packageprefix}/bin
-*      Data: ..................... ${packageprefix}/share
+*      Program: ................. ${packageprefix}/bin
+*      Data: .................... ${packageprefix}/share
 * 
-**************************************************************
+**
 * 
-*   Type 'make' to compile and then 'make install' to install.
+*   Type 'make' to compile.
+*   Then type 'make install' to install.
 *   
 *   Have fun!
 * 
-**************************************************************
+*************************************************************
 ])
 
 fi

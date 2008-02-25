@@ -20,31 +20,65 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <iostream>
+#ifndef OUTPUTJACK_H
+#define OUTPUTJACK_H
 
-#include <libpsynth/common/Logger.h>
+#include <vector>
+#include <jack/jack.h>
 
-#define PSYCHOSYNTH_3D
+#include <libpsynth/output/Output.h>
 
-#ifdef PSYCHOSYNTH_3D
-# include "gui3d/PsychoSynth3D.h"
-#endif
-#ifdef PSYCHOSYNTH_APP
-# include <libpsynth/psynth/PsychosynthApp.h>
-#endif
+class OutputJack : public Output
+{   
+    static int jack_process_cb(jack_nframes_t nframes, void* jack_client) {
+	static_cast<OutputJack*>(jack_client)->jackProcess(nframes);
+	return 0;
+    }
 
-using namespace std;
+    static int jack_sample_rate_cb(jack_nframes_t nframes, void* jack_client) {
+	static_cast<OutputJack*>(jack_client)->jackSampleRate(nframes);
+	return 0;
+    }
 
-int main(int argc, const char *argv[])
-{
-#ifdef PSYCHOSYNTH_3D
-    PsychoSynth3D main_app;
-    main_app.run(argc, argv);
-#endif
-#ifdef PSYCHOSYNTH_APP
-    PsychosynthApp main_app;
-    main_app.run(argc, argv);
-#endif
+    static void jack_shutdown_cb(void* jack_client) {
+	static_cast<OutputJack*>(jack_client)->jackShutDown();
+    }
+
+    void jackProcess(jack_nframes_t nframes);
+    void jackSampleRate(jack_nframes_t nframes);
+    void jackShutDown();
+
+    void connectPorts();
     
-    return 0;
-}
+    std::vector<jack_port_t*> m_out_ports;
+    jack_client_t* m_client;
+    std::string m_serv_name;
+    size_t m_actual_rate;
+    
+public:
+    OutputJack();
+    OutputJack(const AudioInfo& info);
+    OutputJack(const AudioInfo& info, const std::string& server_name);
+    ~OutputJack();
+
+    bool setServer(const std::string& server) {
+	if (getState() == NOTINIT) {
+	    m_serv_name = server;
+	    return true;
+	}
+	
+	return false;
+    }
+
+    const std::string& getServer() const {
+	return m_serv_name;
+    }
+    
+    bool open();
+    bool close();
+    bool put(const AudioBuffer& buf, size_t nframes);
+    bool start();
+    bool stop();
+};
+
+#endif /* OUTPUTJACK_H */
