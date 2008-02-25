@@ -20,8 +20,11 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef KNOWNOBJECTS_H
-#define KNOWNOBJECTS_H
+#ifndef PSYNTH_KNOWNOBJECTS_H
+#define PSYNTH_KNOWNOBJECTS_H
+
+namespace psynth
+{
 
 enum KnownObjectType {
     OBJ_OUTPUT = 0,
@@ -33,4 +36,6 @@ enum KnownObjectType {
     N_OBJECTS
 };
 
-#endif /* KNOWNOBJECTS_H */
+} /* namespace psynth */
+
+#endif /* PSYNTH_KNOWNOBJECTS_H */

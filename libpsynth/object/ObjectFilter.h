@@ -20,13 +20,16 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef OBJECTFILTER_H
-#define OBJECTFILTER_H
+#ifndef PSYNTH_OBJECTFILTER_H
+#define PSYNTH_OBJECTFILTER_H
 
 #include <vector>
 
 #include <libpsynth/object/Object.h>
 #include <libpsynth/object/Filter.h>
+
+namespace psynth
+{
 
 class ObjectFilter : public Object
 {
@@ -87,4 +90,6 @@ public:
     ~ObjectFilter();
 };
 
-#endif /* OBJECTFILTER_H */
+} /* namespace psynth */
+
+#endif /* PSYNTH_OBJECTFILTER_H */

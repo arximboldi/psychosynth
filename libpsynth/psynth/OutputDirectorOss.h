@@ -27,6 +27,9 @@
 #include <libpsynth/psynth/OutputDirector.h>
 #include <libpsynth/output/OutputOss.h>
 
+namespace psynth
+{
+
 class OutputDirectorOss : public OutputDirector
 {
     OutputOss* m_output;
@@ -80,5 +83,7 @@ public:
 	return new OutputDirectorOss;
     }
 };
+
+} /* namespace psynth */
 
 #endif /* PSYNTH_OUTPUT_DIRECTOR_OSS_H */

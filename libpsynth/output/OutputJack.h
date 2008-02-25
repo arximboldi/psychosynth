@@ -20,13 +20,16 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef OUTPUTJACK_H
-#define OUTPUTJACK_H
+#ifndef PSYNTH_OUTPUTJACK_H
+#define PSYNTH_OUTPUTJACK_H
 
 #include <vector>
 #include <jack/jack.h>
 
 #include <libpsynth/output/Output.h>
+
+namespace psynth
+{
 
 class OutputJack : public Output
 {   
@@ -81,4 +84,6 @@ public:
     bool stop();
 };
 
-#endif /* OUTPUTJACK_H */
+} /* namespace psynth */
+
+#endif /* PSYNTH_OUTPUTJACK_H */

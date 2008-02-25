@@ -20,10 +20,13 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef CONTROLBUFFER_H
-#define CONTROLBUFFER_H
+#ifndef PSYNTH_CONTROLBUFFER_H
+#define PSYNTH_CONTROLBUFFER_H
 
 #include <libpsynth/common/AudioInfo.h>
+
+namespace psynth
+{
 
 class ControlBuffer
 {
@@ -103,4 +106,6 @@ public:
     }
 };
 
-#endif /* CONTROLBUFER_H */
+} /* namespace psynth */
+
+#endif /* PSYNTH_CONTROLBUFER_H */

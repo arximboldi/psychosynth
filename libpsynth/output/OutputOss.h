@@ -20,13 +20,16 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef OUTPUTOSS_H
-#define OUTPUTOSS_H
+#ifndef PSYNTH_OUTPUTOSS_H
+#define PSYNTH_OUTPUTOSS_H
 
 #include <pthread.h>
 
 #include <libpsynth/output/Output.h>
 #include <libpsynth/common/Thread.h>
+
+namespace psynth
+{
 
 class OutputOss : public Output, Runnable
 {
@@ -63,5 +66,7 @@ public:
     bool start();
     bool stop();
 };
+
+} /* namespace psynth */
 
 #endif /* OUTPUTOSS_H */

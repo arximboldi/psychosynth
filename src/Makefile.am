@@ -79,7 +79,7 @@ psynth3d_SOURCES = \
 	gui3d/NetworkWindow.cpp \
 	gui3d/RecordWindow.cpp \
 	gui3d/GuiLogSink.cpp \
-	psychosynth.cpp \
+	psynth3d.cpp \
 	gui3d/CameraController.h \
 	gui3d/CameraControllerRasko.h \
 	gui3d/CeguiInjecter.h \

@@ -20,11 +20,14 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef OUTPUT_H
-#define OUTPUT_H
+#ifndef PSYNTH_OUTPUT_H
+#define PSYNTH_OUTPUT_H
 
 #include <libpsynth/common/AudioBuffer.h>
 #include <libpsynth/common/Error.h>
+
+namespace psynth
+{
 
 enum {
     OUT_NONE,
@@ -154,5 +157,7 @@ public:
     }
 };
 
-#endif /* OUTPUT_H */
+} /* namespace psynth */
+
+#endif /* PSYNTH_OUTPUT_H */
 

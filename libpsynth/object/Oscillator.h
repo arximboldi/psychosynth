@@ -20,13 +20,16 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef OSCILLATOR_H
-#define OSCILLATOR_H
+#ifndef PSYNTH_OSCILLATOR_H
+#define PSYNTH_OSCILLATOR_H
 
 #include <cmath>
 
 #include <libpsynth/common/AudioBuffer.h>
 #include <libpsynth/object/WaveTable.h>
+
+namespace psynth
+{
 
 class Oscillator
 {
@@ -200,4 +203,6 @@ public:
     }
 };
 
-#endif /* OSCILLATOR_H */
+} /* namespace psynth */
+
+#endif /* PSYNTH_OSCILLATOR_H */

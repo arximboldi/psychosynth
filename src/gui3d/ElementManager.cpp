@@ -38,6 +38,7 @@
 
 using namespace std;
 using namespace Ogre;
+using namespace psynth;
 
 ElementManager::ElementManager(Table* table, Ogre::SceneManager* scene,
 			       Ogre::Camera* camera) :

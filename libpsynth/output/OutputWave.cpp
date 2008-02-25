@@ -25,6 +25,9 @@
 
 using namespace std;
 
+namespace psynth
+{
+
 OutputWave::OutputWave(const AudioInfo& info) :
     Output(info),
     m_file_name("")
@@ -115,3 +118,5 @@ bool OutputWave::stop()
     /* This kind of device does no processing. */
     return false;
 }
+
+} /* namespace psynth */

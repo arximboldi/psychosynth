@@ -20,10 +20,13 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef MAPITERATOR_H
-#define MAPITERATOR_H
+#ifndef PSYNTH_MAPITERATOR_H
+#define PSYNTH_MAPITERATOR_H
 
 #include <map>
+
+namespace psynth
+{
 
 /**
  * @class MapIterator
@@ -80,5 +83,6 @@ public:
     }
 };
 
+} /* namespace psynth */
 
-#endif /* MAPITERATOR_H */
+#endif /* PSYNTH_MAPITERATOR_H */

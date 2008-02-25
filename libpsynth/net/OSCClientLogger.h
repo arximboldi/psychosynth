@@ -20,10 +20,13 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef OSCCLIENTLOGGER_H
-#define OSCCLIENTLOGGER_H
+#ifndef PSYNTH_OSCCLIENTLOGGER_H
+#define PSYNTH_OSCCLIENTLOGGER_H
 
 #include <libpsynth/net/OSCClient.h>
+
+namespace psynth
+{
 
 class OSCClientLogger : public OSCClientListener
 {
@@ -63,4 +66,6 @@ public:
     }
 };
 
-#endif /* OSCCLIENTLOGGER_H */
+} /* namespace psynth */
+
+#endif /* PSYNTH_OSCCLIENTLOGGER_H */

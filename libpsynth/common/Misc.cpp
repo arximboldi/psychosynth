@@ -26,6 +26,9 @@
 
 using namespace std;
 
+namespace psynth
+{
+
 char* itoa(int val, int base)
 {	
     static char buf[32] = {0};
@@ -88,3 +91,5 @@ string str_dirname(string str)
     str.erase(++beg, end);   
     return str;
 }
+
+} /* namespace psynth */

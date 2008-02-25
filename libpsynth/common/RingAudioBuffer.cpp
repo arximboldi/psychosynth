@@ -25,6 +25,9 @@
 
 using namespace std;
 
+namespace psynth
+{
+
 void RingAudioBuffer::allocate()
 {
     int i;
@@ -128,4 +131,6 @@ void RingAudioBuffer::write(const AudioBuffer& buf, int nwrite)
     m_writepos = (m_writepos + nwrite) % m_size;
     m_writecount += nwrite;
 }
+
+} /* namespace psynth */
 

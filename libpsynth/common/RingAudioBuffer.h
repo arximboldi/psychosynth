@@ -20,8 +20,8 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef RINGAUDIOBUFFER_H
-#define RINGAUDIOBUFFER_H
+#ifndef PSYNTH_RINGAUDIOBUFFER_H
+#define PSYNTH_RINGAUDIOBUFFER_H
 
 #include <libpsynth/common/AudioInfo.h>
 #include <libpsynth/common/AudioBuffer.h>
@@ -29,6 +29,9 @@
 /*
  * TODO MULTITHREADING!
  */ 
+
+namespace psynth
+{
 
 class RingAudioBuffer {
 public:
@@ -125,5 +128,6 @@ public:
     void write(const AudioBuffer& buf, int samples);
 };
 
-#endif /* RINGAUDIOBUFFER_H */
+} /* namespace psynth */
 
+#endif /* PSYNTH_RINGAUDIOBUFFER_H */

@@ -28,6 +28,9 @@
 
 using namespace std;
 
+namespace psynth
+{
+
 Timer::Timer() :
 	nowticks(0),
 	sinceticks(0),
@@ -103,3 +106,5 @@ void Timer::updateTicks()
         (now.tv_sec - start.tv_sec) * 1000 + (now.tv_usec -
                                               start.tv_usec) / 1000;
 }
+
+} /* namespace psynth */

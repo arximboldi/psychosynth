@@ -20,8 +20,8 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef OUTPUT_ALSA_H
-#define OUTPUT_ALSA_H
+#ifndef PSYNTH_OUTPUTALSA_H
+#define PSYNTH_OUTPUTALSA_H
 
 #define ALSA_PCM_NEW_HW_PARAMS_API
 #include <alsa/asoundlib.h>
@@ -29,6 +29,9 @@
 
 #include <libpsynth/output/Output.h>
 #include <libpsynth/common/Thread.h>
+
+namespace psynth
+{
 
 class OutputAlsa : public Output, Runnable
 {
@@ -66,4 +69,6 @@ public:
     bool stop();
 };
 
-#endif /* OUTPUT_ALSA_H */
+} /* namespace psynth */
+
+#endif /* PSYNTH_OUTPUTALSA_H */

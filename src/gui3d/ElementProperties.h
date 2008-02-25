@@ -36,17 +36,18 @@ class ElemGuiParam
 
     CEGUI::Window* m_window;
     ElementProperties* m_parent;
-    Object::ParamID m_param;
+    psynth::Object::ParamID m_param;
     bool changed;
     
 public:
-    ElemGuiParam(Object::ParamID param) :
+    ElemGuiParam(psynth::Object::ParamID param) :
 	m_param(param) {};
     
     virtual ~ElemGuiParam() {};
 
     virtual void createGUI() = 0;
-    virtual void handleParamChange(TableObject& obj, Object::ParamID id) = 0;
+    virtual void handleParamChange(psynth::TableObject& obj,
+				   psynth::Object::ParamID id) = 0;
 
     void init(ElementProperties* parent, CEGUI::Window* window) {
 	m_window = window;
@@ -54,7 +55,7 @@ public:
 	createGUI();
     }
     
-    Object::ParamID getParam() {
+    psynth::Object::ParamID getParam() {
 	return m_param;
     }
 
@@ -77,10 +78,12 @@ class ElemGuiParamFloat : public ElemGuiParam
     int m_skip;
     
 public:
-    ElemGuiParamFloat(Object::ParamID param, float min_val, float max_val, const std::string& name);
+    ElemGuiParamFloat(psynth::Object::ParamID param,
+		      float min_val, float max_val, const std::string& name);
 
     void createGUI();
-    void handleParamChange(TableObject& obj, Object::ParamID param);
+    void handleParamChange(psynth::TableObject& obj,
+			   psynth::Object::ParamID param);
     bool onSpinnerChange(const CEGUI::EventArgs &e);
 };
 
@@ -94,19 +97,22 @@ class ElemGuiParamMulti : public ElemGuiParam {
     int m_skip;
     
 public:
-    ElemGuiParamMulti(Object::ParamID param, int nval, const char** names,
+    ElemGuiParamMulti(psynth::Object::ParamID param,
+		      int nval, const char** names,
 		      const std::string& name);
 
     void createGUI();
-    void handleParamChange(TableObject& obj, Object::ParamID param);
+    void handleParamChange(psynth::TableObject& obj,
+			   psynth::Object::ParamID param);
     bool onComboboxChange(const CEGUI::EventArgs &e);
 };
 
 class ElementProperties : public ToggableWindow,
-			  public TableObjectListener
+			  public psynth::TableObjectListener
 {
-    std::map<Object::ParamID, ElemGuiParam*> m_params;
-    TableObject m_obj;
+    std::map<psynth::Object::ParamID,
+	     ElemGuiParam*> m_params;
+    psynth::TableObject m_obj;
     
     CEGUI::Window* m_container;
     float m_y_offset;
@@ -114,7 +120,7 @@ class ElementProperties : public ToggableWindow,
     CEGUI::FrameWindow* createWindow();
 
 public:
-    ElementProperties(const TableObject& obj) :
+    ElementProperties(const psynth::TableObject& obj) :
 	m_obj(obj),
 	m_y_offset(0) {
 	m_obj.addListener(this);
@@ -125,16 +131,15 @@ public:
     }
 
     void addParameter(ElemGuiParam* e);
-    void handleSetParamObject(TableObject& ob, Object::ParamID param_id);
+    void handleSetParamObject(psynth::TableObject& ob,
+			      psynth::Object::ParamID param_id);
     
-    void handleActivateObject(TableObject& obj) {};
-    void handleDeactivateObject(TableObject& obj) {};
+    void handleActivateObject(psynth::TableObject& obj) {};
+    void handleDeactivateObject(psynth::TableObject& obj) {};
     
-    TableObject& getObject() {
+    psynth::TableObject& getObject() {
 	return m_obj;
     }
 };
-
-
 
 #endif /* ELEMENTPROPERTIES_H */

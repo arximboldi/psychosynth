@@ -32,6 +32,9 @@
 
 using namespace std;
 
+namespace psynth
+{
+
 const int PATCHER_ANY  = -1;
 
 struct PatcherData {
@@ -322,3 +325,5 @@ void PatcherDynamic::clear()
     for (multiset<Link*>::iterator i = m_links.begin(); i != m_links.end(); ++i)
 	undoLink(**i);
 }
+
+} /* namespace psynth */

@@ -25,9 +25,14 @@
 
 using namespace std;
 
+namespace psynth
+{
+
 void WaveTable::fill(wave_func_t func) {
     for (size_t i = 0; i < m_size; ++i)
 	m_table[i] = func((float) i / (m_size));
 }
+
+} /* namespace psynth */
 
 

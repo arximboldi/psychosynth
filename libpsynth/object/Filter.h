@@ -20,11 +20,14 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef FILTER_H
-#define FILTER_H
+#ifndef PSYNTH_FILTER_H
+#define PSYNTH_FILTER_H
 
 #include <libpsynth/common/AudioInfo.h>
 #include <cmath>
+
+namespace psynth
+{
 
 class FilterValues
 {
@@ -154,4 +157,6 @@ public:
     Sample update(Sample x);
 };
 
-#endif /* FILTER_H */
+} /* namespace psynth */
+
+#endif /* PSYNTH_FILTER_H */

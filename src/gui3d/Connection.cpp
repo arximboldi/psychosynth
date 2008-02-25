@@ -24,6 +24,7 @@
 
 using namespace Ogre;
 using namespace std;
+using namespace psynth;
 
 #define CON_CLICK_WIDTH 0.2f
 #define CON_WIDTH       0.07f

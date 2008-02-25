@@ -20,10 +20,13 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef OBJECTMIXER_H
-#define OBJECTMIXER_H
+#ifndef PSYNTH_OBJECTMIXER_H
+#define PSYNTH_OBJECTMIXER_H
 
 #include <libpsynth/object/Object.h>
+
+namespace psynth
+{
 
 class ObjectMixer : public Object
 {
@@ -72,4 +75,6 @@ public:
 		int num_in = 2);
 };
 
-#endif /* OBJECTMIXER_H */
+} /* namespace psynth */
+
+#endif /* PSYNTH_OBJECTMIXER_H */

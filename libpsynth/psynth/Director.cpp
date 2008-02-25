@@ -25,6 +25,9 @@
 
 using namespace std;
 
+namespace psynth
+{
+
 Director::~Director()
 {
     for (ODFMap::iterator i = m_outdir.begin(); i != m_outdir.end(); ++i)
@@ -65,6 +68,8 @@ void Director::startOutput()
 	m_output->getOutput()->setInfo(m_info);
 	m_output->getOutput()->open();
 	m_output->getOutput()->start();
+    } else {
+	m_config->getChild("output").set(DEFAULT_OUTPUT);
     }
 }
 
@@ -110,31 +115,47 @@ void Director::stop()
     
     stopOutput();
     delete m_table;
+
     
     m_table = NULL;
     m_output = NULL;
     m_config = NULL;
 }
 
+void Director::updateInfo()
+{
+    m_table->setInfo(m_info);
+
+    Output::State old_state;
+    old_state = m_output->getOutput()->getState();
+    
+    m_output->getOutput()->gotoState(Output::NOTINIT);
+    m_output->getOutput()->setInfo(m_info);
+    m_output->getOutput()->gotoState(old_state);
+}
+
 bool Director::onSampleRateChange(const ConfNode& node)
 {
     cout << "SAMPLE_RATE_CHANGE!\n";
     node.get(m_info.sample_rate);
-    m_table->setInfo(m_info);
+    updateInfo();
+    
     return false;
 }
 
 bool Director::onBlockSizeChange(const ConfNode& node)
 {
     node.get(m_info.block_size);
-    m_table->setInfo(m_info);    
+    updateInfo();
+    
     return false;
 }
 
 bool Director::onNumChannelsChange(const ConfNode& node)
 {
     node.get(m_info.num_channels);
-    m_table->setInfo(m_info);
+    updateInfo();
+    
     return false;
 }
 
@@ -144,3 +165,5 @@ bool Director::onOutputChange(const ConfNode& node)
     startOutput();
     return false;
 }
+
+} /* namespace psynth */

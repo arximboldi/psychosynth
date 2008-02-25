@@ -25,6 +25,9 @@
 
 using namespace std;
 
+namespace psynth
+{
+
 OSCController::OSCController(bool broadcast) :
     m_table(NULL),
     m_skip(0),
@@ -357,3 +360,5 @@ int OSCController::_deactivate_cb(const char* path, const char* types,
     
     return 0;
 }
+
+} /* namespace psynth */

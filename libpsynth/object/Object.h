@@ -20,8 +20,8 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef OBJECT_H
-#define OBJECT_H
+#ifndef PSYNTH_OBJECT_H
+#define PSYNTH_OBJECT_H
 
 #include <list>
 #include <vector>
@@ -33,6 +33,9 @@
 #include <libpsynth/common/AudioBuffer.h>
 #include <libpsynth/common/Mutex.h>
 #include <libpsynth/common/Vector2D.h>
+
+namespace psynth
+{
 
 const int OBJ_NULL_ID = -1;
 
@@ -396,4 +399,6 @@ public:
     };
 };
 
-#endif /* OBJECT_H */
+} /* namespace psynth */
+
+#endif /* PSYNTH_OBJECT_H */

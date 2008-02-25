@@ -22,6 +22,9 @@
 
 #include "object/Filter.h"
 
+namespace psynth
+{
+
 /*
  * Most of this code has been taken from LMMS.
  */
@@ -174,3 +177,5 @@ Sample Filter::update(Sample _in0)
 
     return out;
 }
+
+} /* namespace psynth */

@@ -20,8 +20,8 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef LOGGER_H
-#define LOGGER_H
+#ifndef PSYNTH_LOGGER_H
+#define PSYNTH_LOGGER_H
 
 #include <map>
 #include <list>
@@ -29,6 +29,9 @@
 
 #include <libpsynth/common/Singleton.h>
 #include <libpsynth/common/Misc.h>
+
+namespace psynth
+{
 
 class Log;
 
@@ -151,7 +154,8 @@ public:
     }
 };
 
+} /* namespace psynth */
 
-#endif
+#endif /* PSYNTH_LOGGER_H */
 
 

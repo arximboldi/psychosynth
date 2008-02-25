@@ -28,7 +28,7 @@
 
 using namespace std;
 using namespace Ogre;
-
+using namespace psynth;
 
 ElemMainComponent::ElemMainComponent(const std::string& mesh,
 				     Object::ParamID param,

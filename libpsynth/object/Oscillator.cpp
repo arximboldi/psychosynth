@@ -23,10 +23,13 @@
 #include <iostream>
 #include <object/Oscillator.h>
 
+using namespace std;
+
+namespace psynth
+{
+
 bool Oscillator::m_table_init = false;
 WaveTable Oscillator::TABLE[Oscillator::WAVE_TYPES];
-
-using namespace std;
 
 void Oscillator::initializeTables()
 {
@@ -83,4 +86,4 @@ void Oscillator::updateAM(Sample* out_buf, const Sample* mod_buf, size_t n_frame
     m_x = phase(m_x);
 }
 
-
+} /* namespace psynth */

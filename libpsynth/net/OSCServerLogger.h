@@ -20,10 +20,13 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef OSCSERVERLOGGER_H
-#define OSCSERVERLOGGER_H
+#ifndef PSYNTH_OSCSERVERLOGGER_H
+#define PSYNTH_OSCSERVERLOGGER_H
 
 #include <libpsynth/net/OSCServer.h>
+
+namespace psynth
+{
 
 class OSCServerLogger : public OSCServerListener
 {
@@ -74,4 +77,6 @@ public:
     }
 };
 
-#endif /* OSCSERVERLOGGER_H */
+} /* namespace psynth */
+
+#endif /* PSYNTH_OSCSERVERLOGGER_H */

@@ -1,9 +1,9 @@
-/**************************************************************************
+/***************************************************************************
  *                                                                         *
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) 2007 Juan Pedro Bolivar Puente                          *
+ *   Copyright (C) Juan Pedro Bolivar Puente 2007, 2008                    *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -20,29 +20,36 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef PSYNTH_MISC_H
-#define PSYNTH_MISC_H
+#ifndef PSYNTH_OPTIONCONF_H
+#define PSYNTH_OPTIONCONF_H
 
-#include <string>
+#include <sstream>
+
+#include <libpsynth/common/ArgParser.h>
+#include <libpsynth/common/Config.h>
 
 namespace psynth
 {
 
-class NoCopy
+template <class T>
+class OptionConf : public Option
 {
-protected:
-    NoCopy() {}
+    ConfNode& m_node;
+    
+public:
+    OptionConf(ConfNode& node) :
+	m_node(node) {}
 
-private:
-    NoCopy(const NoCopy&);
-    NoCopy& operator= (const NoCopy&);
+    bool parse(const std::string& arg) {
+	T val;
+	std::istringstream str(arg);
+	arg >> val;
+	m_node.set(val);
+	
+	return true;
+    }
 };
-
-char* itoa(int val, int base);
-char* ftoa(double f, double sigfigs);
-
-std::string str_dirname(std::string str);
 
 } /* namespace psynth */
 
-#endif /* PSYNTH_MISC_H */
+#endif /* PSYNTH_OPTIONCONF_H */

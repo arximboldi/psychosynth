@@ -28,6 +28,9 @@ const int MIN_ALIVE_DELAY = 1000;
 
 using namespace std;
 
+namespace psynth
+{
+
 void OSCClientSubject::notifyClientConnect(OSCClient* param)
 {
     for (list<OSCClientListener*>::iterator it = m_list.begin();
@@ -197,3 +200,5 @@ int OSCClient::_alive_cb(const char* path, const char* types,
     m_last_alive_recv = 0;    
     return 0;
 }
+
+} /* namespace psynth */

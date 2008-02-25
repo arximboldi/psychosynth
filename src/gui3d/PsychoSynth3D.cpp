@@ -43,6 +43,7 @@
 
 using namespace Ogre;
 using namespace std;
+using namespace psynth;
 
 #define DEFAULT_SAMPLE_RATE 44100
 #define DEFAULT_BUFFER_SIZE 256
@@ -340,38 +341,38 @@ void PsychoSynth3D::closeOgre()
 
 int PsychoSynth3D::run(int argc, const char* argv[])
 {
-    Logger::instance().log("gui", ::Log::INFO, "Initializing Ogre.");
+    Logger::instance().log("gui", psynth::Log::INFO, "Initializing Ogre.");
     setupOgre();
-    Logger::instance().log("gui", ::Log::INFO, "Initializing OIS.");
+    Logger::instance().log("gui", psynth::Log::INFO, "Initializing OIS.");
     setupInput();
-    Logger::instance().log("gui", ::Log::INFO, "Initializing synthesizer.");
+    Logger::instance().log("gui", psynth::Log::INFO, "Initializing synthesizer.");
     setupSynth();
-    Logger::instance().log("gui", ::Log::INFO, "Initializing networking.");
+    Logger::instance().log("gui", psynth::Log::INFO, "Initializing networking.");
     setupNet();
-    Logger::instance().log("gui", ::Log::INFO, "Initializing scene.");
+    Logger::instance().log("gui", psynth::Log::INFO, "Initializing scene.");
     setupTable();
-    Logger::instance().log("gui", ::Log::INFO, "Initializing CEGUI.");
+    Logger::instance().log("gui", psynth::Log::INFO, "Initializing CEGUI.");
     setupGui();
-    Logger::instance().log("gui", ::Log::INFO, "Initializing GUI elements.");
+    Logger::instance().log("gui", psynth::Log::INFO, "Initializing GUI elements.");
     setupMenus();
 		
     m_timer.forceFps(120);
 		
     m_ogre->startRendering();
 
-    Logger::instance().log("gui", ::Log::INFO, "Closing GUI elements.");
+    Logger::instance().log("gui", psynth::Log::INFO, "Closing GUI elements.");
     closeMenus();
-    Logger::instance().log("gui", ::Log::INFO, "Closing CEGUI.");
+    Logger::instance().log("gui", psynth::Log::INFO, "Closing CEGUI.");
     closeGui();
-    Logger::instance().log("gui", ::Log::INFO, "Closing networking.");
+    Logger::instance().log("gui", psynth::Log::INFO, "Closing networking.");
     closeNet();
-    Logger::instance().log("gui", ::Log::INFO, "Closing scene.");
+    Logger::instance().log("gui", psynth::Log::INFO, "Closing scene.");
     closeTable();
-    Logger::instance().log("gui", ::Log::INFO, "Closing synthesizer.");
+    Logger::instance().log("gui", psynth::Log::INFO, "Closing synthesizer.");
     closeSynth();
-    Logger::instance().log("gui", ::Log::INFO, "Closing OIS.");
+    Logger::instance().log("gui", psynth::Log::INFO, "Closing OIS.");
     closeInput();
-    Logger::instance().log("gui", ::Log::INFO, "Closing Ogre.");
+    Logger::instance().log("gui", psynth::Log::INFO, "Closing Ogre.");
     closeOgre();
        
     return 0;

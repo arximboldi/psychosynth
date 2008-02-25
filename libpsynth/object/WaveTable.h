@@ -20,11 +20,14 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef WAVETABLE_H
-#define WAVETABLE_H
+#ifndef PSYNTH_WAVETABLE_H
+#define PSYNTH_WAVETABLE_H
 
 #include <cmath>
 #include <libpsynth/common/AudioBuffer.h>
+
+namespace psynth
+{
 
 class WaveTable
 {
@@ -100,4 +103,6 @@ public:
     void fill(wave_func_t func);
 };
 
-#endif /* WAVETABLE_H */
+} /* namespace psynth */
+
+#endif /* PSYNTH_WAVETABLE_H */

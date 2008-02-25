@@ -20,10 +20,13 @@
  *                                                                         *
  ***************************************************************************/
  
-#ifndef THREAD_H
-#define THREAD_H
+#ifndef PSYNTH_THREAD_H
+#define PSYNTH_THREAD_H
 
 #include <pthread.h>
+
+namespace psynth
+{
 
 class Runnable {
 public:
@@ -139,4 +142,6 @@ public:
     SelfThread() : Thread<Runnable>(this) {};
 };
 
-#endif /* THREAD_H */
+} /* namespace psynth */
+
+#endif /* PSYNTH_THREAD_H */

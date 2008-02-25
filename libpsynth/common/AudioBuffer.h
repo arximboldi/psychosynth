@@ -20,12 +20,15 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef AUDIOBUFFER_H
-#define AUDIOBUFFER_H
+#ifndef PSYNTH_AUDIOBUFFER_H
+#define PSYNTH_AUDIOBUFFER_H
 
 #include <cstring>
 
 #include <libpsynth/common/AudioInfo.h>
+
+namespace psynth
+{
 
 class AudioBuffer {
     AudioInfo m_info;
@@ -104,5 +107,7 @@ public:
     }
 };
 
-#endif /* AUDIOBUFFER_H */
+} /* namespace psynth */
+
+#endif /* PSYNTH_AUDIOBUFFER_H */
 

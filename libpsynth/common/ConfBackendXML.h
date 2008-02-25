@@ -20,14 +20,17 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef CONFBACKENDXML_H
-#define CONFBACKENDXML_H
+#ifndef PSYNTH_CONFBACKENDXML_H
+#define PSYNTH_CONFBACKENDXML_H
 
 #include <string>
 #include <libxml/xmlreader.h>
 #include <libxml/xmlwriter.h>
 
 #include <libpsynth/common/Config.h>
+
+namespace psynth
+{
 
 /**
  * XML configuration backend.
@@ -79,4 +82,6 @@ public:
     }
 };
 
-#endif /* CONFBACKENDXML_H */
+} /* namespace psynth */
+
+#endif /* PSYNTH_CONFBACKENDXML_H */

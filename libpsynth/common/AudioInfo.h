@@ -20,8 +20,10 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef AUDIOINFO_H
-#define AUDIOINFO_H
+#ifndef PSYNTH_AUDIOINFO_H
+#define PSYNTH_AUDIOINFO_H
+
+namespace psynth {
 
 typedef float Sample;
 
@@ -36,5 +38,7 @@ struct AudioInfo {
 		sample_rate(r), block_size(s), num_channels(c) {}
 };
 
-#endif /* AUDIOINFO_H */
+} /* namespace psynth */
+
+#endif /* PSYNTH_AUDIOINFO_H */
 

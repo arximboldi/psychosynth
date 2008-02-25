@@ -53,15 +53,15 @@ public:
     ~ConnectionObject();
 };
 
-class Connection : public TableObjectListener
+class Connection : public psynth::TableObjectListener
 {
     Ogre::SceneManager* m_scene;
     Ogre::SceneNode* m_node;
     
     ConnectionObject* m_line;
 
-    TableObject m_s_obj;
-    TableObject m_d_obj;
+    psynth::TableObject m_s_obj;
+    psynth::TableObject m_d_obj;
 
     Ogre::Vector2 m_src;
     Ogre::Vector2 m_dest;
@@ -71,8 +71,8 @@ class Connection : public TableObjectListener
 public:
 
     Connection(Ogre::SceneManager* scene,
-	       const TableObject& src,
-	       const TableObject& dest);
+	       const psynth::TableObject& src,
+	       const psynth::TableObject& dest);
 
     ~Connection();
 
@@ -82,15 +82,16 @@ public:
     bool pointerMoved(const Ogre::Vector2& pos);
 */
     
-    void handleActivateObject(TableObject& obj) {};
-    void handleDeactivateObject(TableObject& obj) {};
-    void handleSetParamObject(TableObject& ob, Object::ParamID param_id);
+    void handleActivateObject(psynth::TableObject& obj) {};
+    void handleDeactivateObject(psynth::TableObject& obj) {};
+    void handleSetParamObject(psynth::TableObject& ob,
+			      psynth::Object::ParamID param_id);
 
-    const TableObject& getSource() {
+    const psynth::TableObject& getSource() {
 	return m_s_obj;
     }
 
-    const TableObject& getDestiny() {
+    const psynth::TableObject& getDestiny() {
 	return m_d_obj;
     }
 };

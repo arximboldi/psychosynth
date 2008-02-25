@@ -22,6 +22,9 @@
 
 #include "object/ObjectAudioMixer.h"
 
+namespace psynth
+{
+
 void ObjectAudioMixer::doUpdate(const Object* caller, int caller_port_type, int caller_port)
 {
     AudioBuffer* buf = getOutput<AudioBuffer>(LINK_AUDIO, OUT_A_OUTPUT);
@@ -40,3 +43,5 @@ void ObjectAudioMixer::doUpdate(const Object* caller, int caller_port_type, int 
 		    mix(buf->getChannel(i), in->getChannel(i), ampl->getData(), getInfo().block_size);
     }
 }
+
+} /* namespace psynth */

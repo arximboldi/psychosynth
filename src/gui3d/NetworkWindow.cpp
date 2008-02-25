@@ -25,6 +25,7 @@
 
 using namespace std;
 using namespace CEGUI;
+using namespace psynth;
 
 const int DEFAULT_CLIENT_PORT = 8192;
 const int DEFAULT_SERVER_PORT = 8191;
@@ -40,7 +41,7 @@ ClientTab::ClientTab(OSCClient* client) :
     m_client->addListener(this);
     m_client->addListener(&m_logger);
     
-    ::Logger::instance().getChild("oscclient").attachSink(&m_logsink);
+    psynth::Logger::instance().getChild("oscclient").attachSink(&m_logsink);
 }
 
 ClientTab::~ClientTab()
@@ -48,7 +49,7 @@ ClientTab::~ClientTab()
     m_client->deleteListener(this);
     m_client->deleteListener(&m_logger);
  
-    ::Logger::instance().getChild("oscclient").dattachSink(&m_logsink);
+    psynth::Logger::instance().getChild("oscclient").dattachSink(&m_logsink);
     m_logsink.setWindow(NULL);
 }
 
@@ -175,7 +176,7 @@ ServerTab::ServerTab(OSCServer* server) :
     m_server->addListener(this);
     m_server->addListener(&m_logger);
  
-    ::Logger::instance().getChild("oscserver").attachSink(&m_logsink);
+    psynth::Logger::instance().getChild("oscserver").attachSink(&m_logsink);
 }
 
 ServerTab::~ServerTab()
@@ -184,7 +185,7 @@ ServerTab::~ServerTab()
     m_server->deleteListener(this);
     m_server->deleteListener(&m_logger);
     
-    ::Logger::instance().getChild("oscserver").dattachSink(&m_logsink);
+    psynth::Logger::instance().getChild("oscserver").dattachSink(&m_logsink);
     m_logsink.setWindow(NULL);
 }
 

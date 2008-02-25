@@ -25,6 +25,9 @@
 
 using namespace std;
 
+namespace psynth
+{
+
 ObjectFilter::ObjectFilter(const AudioInfo& prop, int mode) : 
     Object(prop,
 	   OBJ_FILTER,
@@ -89,3 +92,5 @@ void ObjectFilter::doUpdate(const Object* caller, int caller_port_type, int call
 	output->zero();
     }
 }
+
+} /* namespace psynth */

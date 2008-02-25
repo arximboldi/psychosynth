@@ -24,6 +24,9 @@
 
 using namespace std;
 
+namespace psynth
+{
+
 Log::~Log()
 {
     for (list<LogSink*>::iterator it = m_dumpers.begin();
@@ -60,4 +63,6 @@ void Log::log(Log& log, int level, const string& msg)
     if (m_parent)
 	m_parent->log(log, level, msg);
 }
+
+} /* namespace psynth */
 

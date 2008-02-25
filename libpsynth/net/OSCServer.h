@@ -20,13 +20,16 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef OSCSERVER_H
-#define OSCSERVER_H
+#ifndef PSYNTH_OSCSERVER_H
+#define PSYNTH_OSCSERVER_H
 
 #include <list>
 
 #include <libpsynth/net/OSCMisc.h>
 #include <libpsynth/net/OSCController.h>
+
+namespace psynth
+{
 
 class OSCServer;
 
@@ -130,5 +133,7 @@ public:
     int update(int msec);
 };
 
-#endif /* OSCSERVER_H */
+} /* namespace psynth */
+
+#endif /* PSYNTH_OSCSERVER_H */
 

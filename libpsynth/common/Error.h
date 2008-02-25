@@ -20,8 +20,8 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef _ERROR_H_
-#define _ERROR_H_
+#ifndef PSYNTH_ERROR_H
+#define PSYNTH_ERROR_H
 
 #include <cstdlib>
 #include <iostream>
@@ -38,4 +38,4 @@
  #define FATAL(err) if(1) { std::cerr << "FATAL: " << err << std::endl; exit(-1) } else;
 #endif
 
-#endif /* _ERROR_H_ */
+#endif /* PSYNTH__ERROR_H */

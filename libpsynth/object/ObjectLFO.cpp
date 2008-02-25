@@ -24,6 +24,9 @@
 
 using namespace std;
 
+namespace psynth
+{
+
 void ObjectLFO::doUpdate(const Object* caller, int caller_port_type, int caller_port)
 {
     ControlBuffer*       buf = getOutput<ControlBuffer>(LINK_CONTROL, OUT_C_OUTPUT);
@@ -39,3 +42,5 @@ void ObjectLFO::doUpdate(const Object* caller, int caller_port_type, int caller_
     else
 	m_oscillator.update(out, mod, getInfo().block_size);
 }
+
+} /* namespace psynth */

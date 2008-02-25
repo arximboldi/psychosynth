@@ -1,9 +1,9 @@
-/**************************************************************************
+/***************************************************************************
  *                                                                         *
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) 2007 Juan Pedro Bolivar Puente                          *
+ *   Copyright (C) 2008 Juan Pedro Bolivar Puente                          *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -20,29 +20,35 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef PSYNTH_MISC_H
-#define PSYNTH_MISC_H
+#ifndef PSYNTH_VERSION_H
+#define PSYNTH_VERSION_H
 
-#include <string>
+#define PSYNTH_VERSION "@VERSION@"
 
-namespace psynth
-{
+#define PSYNTH_DATA_DIR "@PACKAGE_DATA_DIR@"
 
-class NoCopy
-{
-protected:
-    NoCopy() {}
+#if @HAVE_ALSA@
+#define PSYNTH_HAVE_ALSA 1
+#endif
 
-private:
-    NoCopy(const NoCopy&);
-    NoCopy& operator= (const NoCopy&);
-};
+#if @HAVE_OSS@
+#define PSYNTH_HAVE_OSS 1
+#endif
 
-char* itoa(int val, int base);
-char* ftoa(double f, double sigfigs);
+#if @HAVE_LIBXML@
+#define PSYNTH_HAVE_XML 1
+#endif
 
-std::string str_dirname(std::string str);
+#if @HAVE_LIBLO@
+#define PSYNTH_HAVE_OSC 1
+#endif
 
-} /* namespace psynth */
+#if @HAVE_AUDIOFILE@
+#define PSYNTH_HAVE_PCM 1
+#endif
 
-#endif /* PSYNTH_MISC_H */
+#if @HAVE_JACK@
+#define PSYNTH_HAVE_JACK 1
+#endif
+
+#endif /* PSYNTH_VERSION_H */

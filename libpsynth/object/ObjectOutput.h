@@ -20,8 +20,8 @@
  *                                                                         *
  ***************************************************************************/
  
-#ifndef OBJECTOUTPUT_H
-#define OBJECTOUTPUT_H
+#ifndef PSYNTH_OBJECTOUTPUT_H
+#define PSYNTH_OBJECTOUTPUT_H
 
 #include <list>
 
@@ -29,6 +29,9 @@
 #include <libpsynth/common/Mutex.h>
 #include <libpsynth/object/Object.h>
 #include <libpsynth/output/Output.h>
+
+namespace psynth
+{
 
 class ObjectManager;
 
@@ -137,4 +140,6 @@ public:
     };
 };
 
-#endif /* OUBJECTOUTPUT_H */
+} /* namespace psynth */
+
+#endif /* PSYNTH_OUBJECTOUTPUT_H */

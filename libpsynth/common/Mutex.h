@@ -20,11 +20,14 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef MUTEX_H
-#define MUTEX_H
+#ifndef PSYNTH_MUTEX_H
+#define PSYNTH_MUTEX_H
 
 #include <pthread.h>
 #include <errno.h>
+
+namespace psynth
+{
 
 class Mutex
 {
@@ -184,4 +187,6 @@ public:
 #endif
 };
 
-#endif /* MUTEX_H */
+} /* namespace psynth */
+
+#endif /* PSYNTH_MUTEX_H */

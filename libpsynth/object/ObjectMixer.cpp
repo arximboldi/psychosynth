@@ -25,6 +25,9 @@
 
 using namespace std;
 
+namespace psynth
+{
+
 ObjectMixer::ObjectMixer(const AudioInfo& info,
 			 int obj_type,
 			 int num_audio_out,
@@ -73,3 +76,5 @@ void ObjectMixer::init(Sample* dest, size_t n_samples)
     while(n_samples--)
 	*dest++ = def_val;
 }
+
+} /* namespace psynth */

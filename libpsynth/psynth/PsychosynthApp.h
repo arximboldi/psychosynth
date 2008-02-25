@@ -27,6 +27,9 @@
 #include <libpsynth/psynth/Director.h>
 #include <libpsynth/common/ArgParser.h>
 
+namespace psynth
+{
+
 class PsychosynthApp : public NoCopy
 {
 public:
@@ -36,6 +39,9 @@ public:
     
     Director m_director;
 
+    std::string getConfigPath();
+    std::string getDataPath();
+    
     virtual void prepare(ArgParser& args) {}
     virtual int execute() { return ERR_GENERIC; }
 
@@ -56,5 +62,7 @@ public:
     
     int run(int argc, const char* argv[]);
 };
+
+} /* namespace psynth */
 
 #endif /* PSYNTH_PSYCHOSYNTHAPP_H */

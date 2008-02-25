@@ -20,13 +20,16 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef OUTPUTWAVE_H
-#define OUTPUTWAVE_H
+#ifndef PSYNTH_OUTPUTWAVE_H
+#define PSYNTH_OUTPUTWAVE_H
 
 #include <string>
 
 #include <audiofile.h>
 #include <libpsynth/output/Output.h>
+
+namespace psynth
+{
 
 class OutputWave : public Output
 {
@@ -54,4 +57,6 @@ public:
     bool stop();
 };
 
-#endif /* OUTPUTWAVE_H */
+} /* namespace psynth */
+
+#endif /* PSYNTH_OUTPUTWAVE_H */

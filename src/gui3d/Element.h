@@ -42,7 +42,8 @@ class ElemComponent
 public:    
     virtual ~ElemComponent() {};
     virtual void init() = 0;
-    virtual void handleParamChange(TableObject& obj, Object::ParamID id) = 0;
+    virtual void handleParamChange(psynth::TableObject& obj,
+				   psynth::Object::ParamID id) = 0;
     virtual bool handlePointerMove(Ogre::Vector2 pos) = 0;
     virtual bool handlePointerClick(Ogre::Vector2 pos, OIS::MouseButtonID id) = 0;
     virtual bool handlePointerRelease(Ogre::Vector2 pos, OIS::MouseButtonID id) = 0;
@@ -66,7 +67,7 @@ public:
     };
 };
 
-class Element : public TableObjectListener
+class Element : public psynth::TableObjectListener
 {
     typedef std::list<ElemComponent*>::iterator ElemComponentIter;
     std::list<ElemComponent*> m_comp;
@@ -76,8 +77,8 @@ class Element : public TableObjectListener
     std::list<Connection*> m_dest_con;
     */
     
-    TableObject m_obj;
-    TableObject m_target;
+    psynth::TableObject m_obj;
+    psynth::TableObject m_target;
     
     Ogre::ColourValue   m_col_ghost;
     Ogre::ColourValue   m_col_selected;
@@ -97,20 +98,21 @@ class Element : public TableObjectListener
 
     ElementProperties m_gui_prop;
 
-    void objectMoved(TableObject& pos, Vector2f& dest);
+    void objectMoved(psynth::TableObject& pos,
+		     psynth::Vector2f& dest);
 
 public:
     static const Ogre::Real RADIOUS = 1.0f;
     static const Ogre::Real Z_POS = 0.001f;
     
-    Element(TableObject& obj, Ogre::SceneManager* scene);
+    Element(psynth::TableObject& obj, Ogre::SceneManager* scene);
     
     virtual ~Element();
 
     void addComponent(ElemComponent* comp);
 
-    void setTarget(const TableObject& obj);
-    void clearTarget(const TableObject& obj);
+    void setTarget(const psynth::TableObject& obj);
+    void clearTarget(const psynth::TableObject& obj);
     void setGhost(bool ghost);
     void setSelected(bool selected);
     void setPosition(const Ogre::Vector2& pos);
@@ -121,9 +123,10 @@ public:
     bool keyPressed(const OIS::KeyEvent& e);
     bool keyReleased(const OIS::KeyEvent& e);
     
-    void handleActivateObject(TableObject& obj);
-    void handleDeactivateObject(TableObject& obj);
-    void handleSetParamObject(TableObject& ob, Object::ParamID param_id);
+    void handleActivateObject(psynth::TableObject& obj);
+    void handleDeactivateObject(psynth::TableObject& obj);
+    void handleSetParamObject(psynth::TableObject& ob,
+			      psynth::Object::ParamID param_id);
     
     bool isGhost() const {
 	return m_ghost;
@@ -149,7 +152,7 @@ public:
 	return m_scene;
     }
 
-    TableObject& getObject() {
+    psynth::TableObject& getObject() {
 	return m_obj;
     }
 

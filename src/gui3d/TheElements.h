@@ -28,31 +28,36 @@
 class ElementMixer : public Element
 {  
 public:
-    ElementMixer(TableObject& obj, Ogre::SceneManager* m_scene);
+    ElementMixer(psynth::TableObject& obj,
+		 Ogre::SceneManager* m_scene);
 };
 
 class ElementControlMixer : public Element
 {  
 public:
-    ElementControlMixer(TableObject& obj, Ogre::SceneManager* m_scene);
+    ElementControlMixer(psynth::TableObject& obj,
+			Ogre::SceneManager* m_scene);
 };
 
 class ElementOscillator : public Element
 {
 public:
-    ElementOscillator(TableObject& obj, Ogre::SceneManager* m_scene);
+    ElementOscillator(psynth::TableObject& obj,
+		      Ogre::SceneManager* m_scene);
 };
 
 class ElementLFO : public Element
 {
 public:
-    ElementLFO(TableObject& obj, Ogre::SceneManager* m_scene);
+    ElementLFO(psynth::TableObject& obj,
+	       Ogre::SceneManager* m_scene);
 };
 
 class ElementFilter : public Element
 {
 public:
-    ElementFilter(TableObject& obj, Ogre::SceneManager* m_scene);
+    ElementFilter(psynth::TableObject& obj,
+		  Ogre::SceneManager* m_scene);
 };
 
 #endif /* THEELEMENTS_H */

@@ -20,8 +20,8 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef CONFIG_H
-#define CONFIG_H
+#ifndef PSYNTH_CONFIG_H
+#define PSYNTH_CONFIG_H
 
 #include <list>
 #include <map>
@@ -31,6 +31,9 @@
 #include <libpsynth/common/Singleton.h>
 #include <libpsynth/common/MapIterator.h>
 #include <libpsynth/common/FastDelegate.h>
+
+namespace psynth
+{
 
 enum ConfType
 {
@@ -317,4 +320,6 @@ class Config : public ConfNode,
 {
 };
 
-#endif /* CONFIG_H */
+} /* namespace psynth */
+
+#endif /* PSYNTH_CONFIG_H */

@@ -22,6 +22,9 @@
 
 #include "object/ObjectRadar.h"
 
+namespace psynth
+{
+
 using namespace std;
 
 ObjectRadar::ObjectRadar(const AudioInfo& prop, int numchan) : 
@@ -56,4 +59,6 @@ void ObjectRadar::doAdvance()
 {
     m_angle += m_param_speed * getInfo().block_size / getInfo().sample_rate;
 }
+
+} /* namespace psynth */
 

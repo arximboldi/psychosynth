@@ -36,15 +36,15 @@ const int N_MB = OIS::MB_Button7+1;
 
 class ElementManager : public OIS::MouseListener,
 		       public OIS::KeyListener,
-		       public TableListener,
-		       public TablePatcherListener
+		       public psynth::TableListener,
+		       public psynth::TablePatcherListener
 {
     typedef std::list<Element*> ElemList;
     typedef std::map<int, Element*> ElemMap; /* TODO: turn back into a list? */
     typedef ElemList::iterator ElemIter;
     typedef ElemMap::iterator ElemMapIter;
     
-    Table* m_table;
+    psynth::Table* m_table;
     ElemList m_clear_elems;
     ElemMap m_elems;
     std::list<Connection*> m_cons;
@@ -58,11 +58,13 @@ class ElementManager : public OIS::MouseListener,
 
     
     bool getTablePointer(Ogre::Vector2& res);
-    Element* createElement(TableObject& obj);
+    Element* createElement(psynth::TableObject& obj);
     
 public:
-    ElementManager(Table* table, Ogre::SceneManager* scene,
+    ElementManager(psynth::Table* table,
+		   Ogre::SceneManager* scene,
 		   Ogre::Camera* camera);
+    
     ~ElementManager();
     
     void update();
@@ -76,11 +78,11 @@ public:
     bool keyPressed(const OIS::KeyEvent &e);
     bool keyReleased(const OIS::KeyEvent &e);
 
-    void handleAddObject(TableObject& obj);
-    void handleDeleteObject(TableObject& obj);
+    void handleAddObject(psynth::TableObject& obj);
+    void handleDeleteObject(psynth::TableObject& obj);
 
-    void handleLinkAdded(const TablePatcherEvent& ev);
-    void handleLinkDeleted(const TablePatcherEvent& ev);
+    void handleLinkAdded(const psynth::TablePatcherEvent& ev);
+    void handleLinkDeleted(const psynth::TablePatcherEvent& ev);
 };
 
 #endif /* ELEMENTMANAGER_H */

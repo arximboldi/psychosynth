@@ -27,6 +27,9 @@
 #include <libpsynth/psynth/OutputDirector.h>
 #include <libpsynth/output/OutputJack.h>
 
+namespace psynth
+{
+
 class OutputDirectorJack : public OutputDirector
 {
     OutputJack* m_output;
@@ -82,5 +85,7 @@ public:
 	return new OutputDirectorJack;
     }
 };
+
+} /* namespace psynth */
 
 #endif /* PSYNTH_OUTPUT_DIRECTOR_JACK_H */

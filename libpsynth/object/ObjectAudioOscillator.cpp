@@ -24,6 +24,9 @@
 
 using namespace std;
 
+namespace psynth
+{
+
 void ObjectAudioOscillator::doUpdate(const Object* caller, int caller_port_type, int caller_port)
 {
     AudioBuffer*         buf = getOutput<AudioBuffer>(LINK_AUDIO, OUT_A_OUTPUT);
@@ -42,4 +45,6 @@ void ObjectAudioOscillator::doUpdate(const Object* caller, int caller_port_type,
     for (size_t i = 1; i < (size_t)getAudioInfo().num_channels; i++)
 	memcpy((*buf)[i], (*buf)[0], sizeof(Sample) * getAudioInfo().block_size);
 }
+
+} /* namespace psynth */
 

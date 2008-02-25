@@ -20,13 +20,16 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef OSCBROADCAST_H
-#define OSCBROADCAST_H
+#ifndef PSYNTH_OSCBROADCAST_H
+#define PSYNTH_OSCBROADCAST_H
 
 #include <list>
 #include <lo/lo.h>
 
 #include <libpsynth/net/OSCMisc.h>
+
+namespace psynth
+{
 
 /*
 template<class T>
@@ -89,4 +92,6 @@ public:
     void broadcastMessageFrom(const char* path, lo_message msg, lo_address from);
 };
 
-#endif /* OSCBROADCAST_H */
+} /* namespace psynth */
+
+#endif /* PSYNTH_OSCBROADCAST_H */

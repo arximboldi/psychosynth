@@ -33,6 +33,9 @@
 
 using namespace std;
 
+namespace psynth
+{
+
 OutputOss::OutputOss() :
     m_buf(NULL),
     m_thread(this)
@@ -155,3 +158,5 @@ bool OutputOss::close()
 	return false;
     }
 }
+
+} /* namespace psynth */

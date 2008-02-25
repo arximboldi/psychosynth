@@ -34,6 +34,9 @@
 
 using namespace std;
 
+namespace psynth
+{
+
 void TableSubject::notifyAddObject(TableObject& obj)
 {
     m_obj_listeners[obj.getID()];
@@ -214,3 +217,4 @@ void Table::dattachPatcher()
     }
 }
 
+} /* namespace psynth */

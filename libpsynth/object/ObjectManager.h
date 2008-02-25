@@ -20,14 +20,17 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef OBJECTMANAGER_H
-#define OBJECTMANAGER_H
+#ifndef PSYNTH_OBJECTMANAGER_H
+#define PSYNTH_OBJECTMANAGER_H
 
 #include <map>
 
 #include <libpsynth/common/MapIterator.h>
 #include <libpsynth/object/ObjectManager.h>
 #include <libpsynth/object/ObjectOutput.h>
+
+namespace psynth
+{
 
 class ObjectManager
 {
@@ -84,4 +87,6 @@ public:
     void update();
 };
 
-#endif /* OBJECTMANAGER_H */
+} /* namespace psynth */
+
+#endif /* PSYNTH_OBJECTMANAGER_H */

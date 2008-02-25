@@ -20,11 +20,14 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef OSCCLIENT_H
-#define OSCCLIENT_H
+#ifndef PSYNTH_OSCCLIENT_H
+#define PSYNTH_OSCCLIENT_H
 
 #include <libpsynth/common/Logger.h>
 #include <libpsynth/net/OSCController.h>
+
+namespace psynth
+{
 
 class OSCClient;
 
@@ -102,4 +105,6 @@ public:
     int update(int msec);
 };
 
-#endif /* OSCCLIENT_H */
+} /* namespace psynth */
+
+#endif /* PSYNTH_OSCCLIENT_H */

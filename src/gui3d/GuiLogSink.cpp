@@ -25,7 +25,7 @@
 using namespace std;
 using namespace CEGUI;
 
-void GuiLogSink::dump(Log& log, int level, const string& msg)
+void GuiLogSink::dump(psynth::Log& log, int level, const string& msg)
 {
     m_buffer += msg;
     m_buffer += "\n";

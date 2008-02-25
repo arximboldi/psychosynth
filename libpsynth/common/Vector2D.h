@@ -20,8 +20,11 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef VECTOR2D_H
-#define VECTOR2D_H
+#ifndef PSYNTH_VECTOR2D_H
+#define PSYNTH_VECTOR2D_H
+
+namespace psynth
+{
 
 /*
  * TODO: Fast initial implementation. Add more functionality.
@@ -72,5 +75,8 @@ public:
 };
 
 typedef Vector2D<float> Vector2f;
-    
-#endif
+
+} /* namespace psynth */
+
+#endif /* PSYNTH_VECTOR2D */
+

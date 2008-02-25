@@ -26,12 +26,12 @@
 #include <libpsynth/common/Logger.h>
 #include <CEGUI/CEGUI.h>
 
-class GuiLogSink : public LogSink
+class GuiLogSink : public psynth::LogSink
 {
     CEGUI::Window* m_window;
     std::string m_buffer;
 
-    void dump(Log& log, int level, const std::string& msg);
+    void dump(psynth::Log& log, int level, const std::string& msg);
     
 public:
     GuiLogSink(CEGUI::Window* win = NULL) :

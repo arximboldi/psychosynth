@@ -27,6 +27,9 @@
 
 using namespace std;
 
+namespace psynth
+{
+
 void OSCBroadcast::clear()
 {
     for (list<lo_address>::iterator it = m_dest.begin();
@@ -90,3 +93,4 @@ void OSCBroadcast::broadcastMessageFrom(const char* path, lo_message msg, lo_add
     }
 }
 
+} /* namespace psynth */

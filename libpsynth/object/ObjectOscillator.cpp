@@ -27,6 +27,9 @@
 
 using namespace std;
 
+namespace psynth
+{
+
 ObjectOscillator::ObjectOscillator(const AudioInfo& prop,
 				   int obj_type,
 				   int n_audio_out,
@@ -63,3 +66,5 @@ void ObjectOscillator::updateOscParams()
     m_oscillator.setWave((Oscillator::WaveType)m_param_wave);
     m_oscillator.setModulator((Oscillator::ModType)m_param_mod);
 }
+
+} /* namespace psynth */

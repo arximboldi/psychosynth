@@ -28,6 +28,9 @@ const int MIN_ALIVE_DELAY = 1000;
 
 using namespace std;
 
+namespace psynth
+{
+
 void OSCServerSubject::notifyServerClientDisconnect(OSCServer* server, int c_id,
 						    OSCServerClientError cause)
 {
@@ -231,3 +234,5 @@ int OSCServer::_disconnect_cb(const char* path, const char* types,
     
     return 0;
 }
+
+} /* namespace psynth */

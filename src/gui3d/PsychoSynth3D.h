@@ -58,13 +58,13 @@ class PsychoSynth3D : public Ogre::FrameListener
     ElementManager*   m_elemmgr;
     WindowList*       m_windowlist;
     CameraController* m_camctrl;
-    Timer m_timer;
+    psynth::Timer m_timer;
 
-    AudioInfo  m_audio_info;
-    Table*     m_table;
-    Output*    m_output;
-    OSCClient* m_oscclient;
-    OSCServer* m_oscserver;
+    psynth::AudioInfo  m_audio_info;
+    psynth::Table*     m_table;
+    psynth::Output*    m_output;
+    psynth::OSCClient* m_oscclient;
+    psynth::OSCServer* m_oscserver;
     
     bool must_quit;
   

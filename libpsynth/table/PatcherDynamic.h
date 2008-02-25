@@ -20,13 +20,16 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef PATCHERDYNAMIC_H
-#define PATCHERDYNAMIC_H
+#ifndef PSYNTH_PATCHERDYNAMIC_H
+#define PSYNTH_PATCHERDYNAMIC_H
 
 #include <map>
 #include <set>
 
 #include <libpsynth/table/Patcher.h>
+
+namespace psynth
+{
 
 class PatcherDynamic : public Patcher
 {    
@@ -93,4 +96,6 @@ public:
     void clear();
 };
 
-#endif /* PATCHERDYNAMIC_H */
+} /* namespace psynth */
+
+#endif /* PSYNTH_PATCHERDYNAMIC_H */

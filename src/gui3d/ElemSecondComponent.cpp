@@ -31,7 +31,7 @@
 
 using namespace std;
 using namespace Ogre;
-
+using namespace psynth;
 
 ElemSecondComponent::ElemSecondComponent(Object::ParamID param,
 					 float min_val, float max_val) :

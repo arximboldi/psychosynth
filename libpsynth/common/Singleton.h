@@ -20,8 +20,11 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef SINGLETON_H
-#define SINGLETON_H
+#ifndef PSYNTH_SINGLETON_H
+#define PSYNTH_SINGLETON_H
+
+namespace psynth
+{
 
 template<typename T>
 class Singleton
@@ -33,4 +36,6 @@ class Singleton
     };
 };
 
-#endif /* SINGLETON_H */
+} /* namespace psynth */
+
+#endif /* PSYNTH_SINGLETON_H */

@@ -22,6 +22,9 @@
 
 #include "object/ObjectControlMixer.h"
 
+namespace psynth
+{
+
 void ObjectControlMixer::doUpdate(const Object* caller, int caller_port_type, int caller_port)
 {
     ControlBuffer* buf = getOutput<ControlBuffer>(LINK_CONTROL, OUT_C_OUTPUT);
@@ -34,4 +37,6 @@ void ObjectControlMixer::doUpdate(const Object* caller, int caller_port_type, in
 	if ((in = getInput<ControlBuffer>(LINK_CONTROL, j)))
 	    mix(buf->getData(), in->getData(), getInfo().block_size);
 }
+
+} /* namespace psynth */
 

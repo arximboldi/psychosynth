@@ -28,6 +28,9 @@ const int SAFETY_FACTOR = 4;
 
 using namespace std;
 
+namespace psynth
+{
+
 ObjectOutput::~ObjectOutput()
 {
     for (std::list<Slot*>::iterator i = m_slots.begin(); i != m_slots.end(); ++i)
@@ -112,3 +115,5 @@ void ObjectOutput::output(Slot& slot, size_t nframes)
     
     slot.m_out->put(slot.m_buf, nframes);
 }
+
+} /* namespace psynth */

@@ -26,6 +26,9 @@
 
 using namespace std;
 
+namespace psynth
+{
+
 void Object::Param::clear()
 {
     switch(m_type) {
@@ -169,3 +172,5 @@ void Object::update(const Object* caller, int caller_port_type, int caller_port)
 	}
     }
 }
+
+} /* namespace psynth */

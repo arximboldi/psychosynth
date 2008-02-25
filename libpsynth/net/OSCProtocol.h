@@ -20,8 +20,8 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef OSCPROTOCOL_H
-#define OSCPROTOCOL_H
+#ifndef PSYNTH_OSCPROTOCOL_H
+#define PSYNTH_OSCPROTOCOL_H
 
 /* Server-Client connection abstraction. */
 #define MSG_ACCEPT      "/ps/accept"
@@ -38,4 +38,4 @@
 #define MSG_ADD          "/ps/add"
 #define MSG_DELETE       "/ps/delete"
 
-#endif /* OSCPROTOCOL_H */
+#endif /* PSYNTH_OSCPROTOCOL_H */

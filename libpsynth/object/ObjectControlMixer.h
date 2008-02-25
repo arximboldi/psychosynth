@@ -20,11 +20,14 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef OBJECTCONTROLMIXER_H
-#define OBJECTCONTROLMIXER_H
+#ifndef PSYNTH_OBJECTCONTROLMIXER_H
+#define PSYNTH_OBJECTCONTROLMIXER_H
 
 #include <libpsynth/object/KnownObjects.h>
 #include <libpsynth/object/ObjectMixer.h>
+
+namespace psynth
+{
 
 class ObjectControlMixer : public ObjectMixer
 {
@@ -51,5 +54,7 @@ public:
 		    n_chan)
 	{}
 };
+
+} /* namespace psynth */
 
 #endif /* OBJECTCONTROLMIXER_H */

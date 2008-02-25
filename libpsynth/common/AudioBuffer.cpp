@@ -22,6 +22,9 @@
 
 #include "common/AudioBuffer.h"
 
+namespace psynth
+{
+
 void AudioBuffer::allocate()
 {
 	int i;
@@ -111,3 +114,5 @@ void AudioBuffer::interleaveI32(int* dest, size_t n_frames) const
 	}
     }
 }
+
+} /* namespace psynth */

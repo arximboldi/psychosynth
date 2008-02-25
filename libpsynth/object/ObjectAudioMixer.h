@@ -20,11 +20,14 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef OBJECTAUDIOMIXER_H
-#define OBJECTAUDIOMIXER_H
+#ifndef PSYNTH_OBJECTAUDIOMIXER_H
+#define PSYNTH_OBJECTAUDIOMIXER_H
 
 #include <libpsynth/object/KnownObjects.h>
 #include <libpsynth/object/ObjectMixer.h>
+
+namespace psynth
+{
 
 class ObjectAudioMixer : public ObjectMixer
 {
@@ -52,4 +55,6 @@ public:
 	{}
 };
 
-#endif /* OBJECTAUDIOMIXER_H */
+} /* namespace psynth */
+
+#endif /* PSYNTH_OBJECTAUDIOMIXER_H */

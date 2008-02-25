@@ -30,8 +30,8 @@
 
 class RecordWindow : public ToggableWindow
 {
-    Table* m_table;
-    OutputWave m_output;
+    psynth::Table* m_table;
+    psynth::OutputWave m_output;
 
     CEGUI::Window* m_button;
     CEGUI::Editbox* m_file;
@@ -41,7 +41,7 @@ class RecordWindow : public ToggableWindow
     virtual CEGUI::FrameWindow* createWindow();
 
 public:
-    RecordWindow(Table* table) :
+    RecordWindow(psynth::Table* table) :
 	m_table(table),
 	m_output(table->getInfo()),
 	m_recording(false)

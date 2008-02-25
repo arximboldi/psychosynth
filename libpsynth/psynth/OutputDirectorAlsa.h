@@ -27,6 +27,9 @@
 #include <libpsynth/psynth/OutputDirector.h>
 #include <libpsynth/output/OutputAlsa.h>
 
+namespace psynth
+{
+
 class OutputDirectorAlsa : public OutputDirector
 {
     OutputAlsa* m_output;
@@ -82,5 +85,7 @@ public:
 	return new OutputDirectorAlsa;
     }
 };
+
+} /* namespace psynth */
 
 #endif /* PSYNTH_OUTPUT_DIRECTOR_ALSA_H */

@@ -25,6 +25,9 @@
 
 #include <libpsynth/common/Config.h>
 
+namespace psynth
+{
+
 class Output;
 
 class OutputDirector
@@ -65,5 +68,7 @@ public:
     virtual const char* getName() = 0;
     virtual OutputDirector* createOutputDirector() = 0;
 };
+
+} /* namespace psynth */
 
 #endif /* PSYNTH_OUTPUT_DIRECTOR_H */

@@ -28,6 +28,7 @@
 
 using namespace std;
 using namespace CEGUI;
+using namespace psynth;
 
 ElemGuiParamMulti::ElemGuiParamMulti(Object::ParamID param, int nval, const char** names,
 				     const std::string& name) :

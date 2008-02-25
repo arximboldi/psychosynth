@@ -24,7 +24,7 @@
 AC_INIT(configure.ac)
 
 AM_CONFIG_HEADER(config.h)
-AM_INIT_AUTOMAKE(psychosynth, 0.1)
+AM_INIT_AUTOMAKE(psychosynth, 0.0.1)
 
 AC_LANG_CPLUSPLUS
 AC_PROG_CXX
@@ -312,7 +312,8 @@ AC_SUBST(PACKAGE_DATA_DIR)
 
 AC_OUTPUT(Makefile 
 	  src/Makefile
-	  libpsynth/Makefile)
+	  libpsynth/Makefile
+	  libpsynth/version.h)
 
 
 #  Result

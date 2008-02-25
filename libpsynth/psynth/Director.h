@@ -28,6 +28,9 @@
 #include <libpsynth/table/Table.h>
 #include <libpsynth/psynth/OutputDirector.h>
 
+namespace psynth
+{
+
 class Director : public NoCopy
 {
     typedef std::map<std::string, OutputDirectorFactory*> ODFMap;
@@ -49,6 +52,7 @@ class Director : public NoCopy
     
     void startOutput();
     void stopOutput();
+    void updateInfo();
 
 public:
     Director() :
@@ -70,6 +74,8 @@ public:
 	return NULL;
     }
 };
+
+} /* namespace psynth */
 
 #endif /* PSYNTH_DIRECTOR_H */
 

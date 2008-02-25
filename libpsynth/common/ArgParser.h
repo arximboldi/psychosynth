@@ -20,14 +20,17 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef ARGPARSER_H
-#define ARGPARSER_H
+#ifndef PSYNTH_ARGPARSER_H
+#define PSYNTH_ARGPARSER_H
 
 #include <string>	
 #include <limits>
 #include <list>
 #include <map>
 #include <ios>
+
+namespace psynth
+{
 
 class Option {
 public:
@@ -112,21 +115,21 @@ typedef OptionGeneric<const char*> OptionCString;
 
 struct ltstr
 {
-  bool operator()(const char* s1, const char* s2) const
-  {
-    return strcmp(s1, s2) < 0;
-  }
+    bool operator()(const char* s1, const char* s2) const
+	{
+	    return strcmp(s1, s2) < 0;
+	}
 };
 
 class ArgParser
 {
     /* TODO: Generate help screen?
-    struc Item {
-	Option* opt;
-	std::string desc;
-	char short_arg;
-	std::string long_arg;
-    };
+       struc Item {
+       Option* opt;
+       std::string desc;
+       char short_arg;
+       std::string long_arg;
+       };
     */
     
     static const unsigned char NULL_FLAG = '\0';
@@ -186,7 +189,7 @@ public:
     
     void add(unsigned char flag, const char* str, Option* op);
     
-    void parseArgs(int argc, const char* argv[]);
+    void parse(int argc, const char* argv[]);
 
     Iterator begin() {
 	return m_free.begin();
@@ -209,5 +212,6 @@ public:
     }
 };
 
+} /* namespace psynth */
 
-#endif /* ARGPARSER_H */
+#endif /* PSYNTH_ARGPARSER_H */

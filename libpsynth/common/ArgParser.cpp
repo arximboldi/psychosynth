@@ -24,6 +24,9 @@
 
 using namespace std;
 
+namespace psynth
+{
+
 ArgParser::~ArgParser()
 {
     for (list<Option*>::iterator i = m_all.begin(); i != m_all.end(); ++i)
@@ -41,7 +44,7 @@ void ArgParser::add(unsigned char flag, const char* str, Option* op)
     m_all.push_back(op);
 }
 
-void ArgParser::parseArgs(int argc, const char* argv[])
+void ArgParser::parse(int argc, const char* argv[])
 {
     int i;
     
@@ -87,5 +90,8 @@ void ArgParser::parseArgs(int argc, const char* argv[])
 	i += skip;
     }
 }
+
+} /* namespace psynth */
+
 
 

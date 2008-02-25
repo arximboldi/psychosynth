@@ -20,13 +20,16 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef PATCHER_H
-#define PATCHER_H
+#ifndef PSYNTH_PATCHER_H
+#define PSYNTH_PATCHER_H
 
 #include <map>
 #include <set>
 
 #include <libpsynth/object/Object.h>
+
+namespace psynth
+{
 
 struct PatcherEvent {
     Object* src;
@@ -84,4 +87,6 @@ public:
     virtual void clear() = 0;
 };
 
-#endif /* PATCHER_H */
+} /* namespace psynth */
+
+#endif /* PSYNTH_PATCHER_H */

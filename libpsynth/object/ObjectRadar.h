@@ -20,10 +20,13 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef OBJECTRADAR_H
-#define OBJECTRADAR_H
+#ifndef PSYNTH_OBJECTRADAR_H
+#define PSYNTH_OBJECTRADAR_H
 
 #include <libpsynth/object/Object.h>
+
+namespace psynth
+{
 
 class ObjectRadar : public Object
 {
@@ -62,4 +65,6 @@ public:
     ObjectRadar(const AudioInfo& info);
 };
 
-#endif /* OBJECTRADAR_H */
+} /* namespace psynth */
+
+#endif /* PSYNTH_OBJECTRADAR_H */

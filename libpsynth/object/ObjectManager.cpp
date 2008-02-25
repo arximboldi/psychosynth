@@ -24,6 +24,9 @@
 
 using namespace std;
 
+namespace psynth
+{
+
 ObjectManager::ObjectManager() :
     m_objmap(),
     m_outputs()
@@ -104,3 +107,5 @@ void ObjectManager::update()
 	(*out_iter)->update(NULL, -1, -1);
     }
 }
+
+} /* namespace psynth */

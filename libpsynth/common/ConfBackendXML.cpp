@@ -37,6 +37,9 @@
 
 using namespace std;
 
+namespace psynth
+{
+
 ConfNode* ConfBackendXML::processNewElement(xmlTextReaderPtr reader, ConfNode* node)
 {
     xmlChar* type;
@@ -242,3 +245,6 @@ void ConfBackendXML::save(ConfNode& node)
     xmlTextWriterEndDocument(writer);
     xmlFreeTextWriter(writer);
 }
+
+} /* namespace psynth */
+

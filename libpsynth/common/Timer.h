@@ -20,36 +20,42 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef TIMER_H
-#define TIMER_H
+#ifndef PSYNTH_TIMER_H
+#define PSYNTH_TIMER_H
 
 #include <ctime>
 
-class Timer {
-	timeval now;
-	timeval start;
+namespace psynth
+{
+
+class Timer
+{
+    timeval now;
+    timeval start;
 	
-	int nowticks;
-	int sinceticks;
-	int ms;
+    int nowticks;
+    int sinceticks;
+    int ms;
     int framecount;
     int rate;
-	float rateticks;
+    float rateticks;
 	
-	void updateTicks();
+    void updateTicks();
 	
 public:
-	Timer();
-	Timer(int fpsrate);
-	~Timer();
+    Timer();
+    Timer(int fpsrate);
+    ~Timer();
 	
-	void forceFps(int fpsrate);
+    void forceFps(int fpsrate);
 	
-	void reset();
-	void update();	
+    void reset();
+    void update();	
 	
-	int ticks() { return nowticks; };
-	int deltaticks() { return ms; };
+    int ticks() { return nowticks; };
+    int deltaticks() { return ms; };
 };
 
-#endif /* TIMER_H */
+} /* namespace psynth */
+
+#endif /* PSYNTH_TIMER_H */

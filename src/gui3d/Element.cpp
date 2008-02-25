@@ -31,6 +31,7 @@
 
 using namespace std;
 using namespace Ogre;
+using namespace psynth;
 
 Element::Element(TableObject& obj, Ogre::SceneManager* scene) :
     m_obj(obj),

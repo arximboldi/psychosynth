@@ -32,6 +32,7 @@
 
 using namespace std;
 using namespace Ogre;
+using namespace psynth;
 
 ElementMixer::ElementMixer(TableObject& obj,
 			   Ogre::SceneManager* m_scene) :

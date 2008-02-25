@@ -20,8 +20,8 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef TABLE_H
-#define TABLE_H
+#ifndef PSYNTH_TABLE_H
+#define PSYNTH_TABLE_H
 
 #include <list>
 #include <map>
@@ -34,6 +34,9 @@
 #include <libpsynth/object/ObjectAudioMixer.h>
 #include <libpsynth/object/ObjectManager.h>
 #include <libpsynth/output/Output.h>
+
+namespace psynth
+{
 
 class Table;
 class TableObjectListener;
@@ -228,8 +231,8 @@ public:
     };
 
     void setInfo(const AudioInfo& info) {
-	/* TODO TODO TODO */
-    };
+	//m_objmgr->setInfo(info);
+    }
     
     TableObject findObject(int id);
 
@@ -319,4 +322,6 @@ void TableObject::deactivate() {
     m_table->deactivateObject(*this);
 }
 
-#endif
+} /* namespace psynth */
+
+#endif /* PSYNTH_TABLE_H */

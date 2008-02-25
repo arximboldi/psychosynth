@@ -26,6 +26,9 @@
 
 using namespace std;
 
+namespace psynth
+{
+
 OutputJack::OutputJack()
 {
 }
@@ -178,4 +181,5 @@ void OutputJack::jackShutDown()
     setState(NOTINIT);
 }
 
+} /* namespace psynth */
 

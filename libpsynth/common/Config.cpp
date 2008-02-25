@@ -24,6 +24,9 @@
 
 using namespace std;
 
+namespace psynth
+{
+
 void ConfSubject::notifyConfChange(const ConfNode& source)
 {
     for (list<ConfListener*>::iterator i = m_list.begin();
@@ -61,3 +64,5 @@ ConfNode& ConfNode::getPath(std::string path)
 
     return getChild(base).getPath(path);
 }
+
+} /* namespace psynth */

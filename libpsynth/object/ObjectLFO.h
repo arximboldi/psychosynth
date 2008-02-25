@@ -20,11 +20,14 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef OBJECTLFO_H
-#define OBJECTLFO_H
+#ifndef PSYNTH_OBJECTLFO_H
+#define PSYNTH_OBJECTLFO_H
 
 #include <libpsynth/object/ObjectOscillator.h>
 #include <libpsynth/object/KnownObjects.h>
+
+namespace psynth
+{
 
 class ObjectLFO : public ObjectOscillator
 {
@@ -44,4 +47,6 @@ public:
 	{};
 };
 
-#endif /* OBJECTLFO_H */
+} /* namespace psynth */
+
+#endif /* PSYNTH_OBJECTLFO_H */

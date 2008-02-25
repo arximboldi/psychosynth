@@ -28,6 +28,9 @@
 
 using namespace std;
 
+namespace psynth
+{
+
 OutputAlsa::OutputAlsa() :
     alsa_thread(this)
 {
@@ -190,3 +193,5 @@ bool OutputAlsa::close()
 	return false;
     }
 }
+
+} /* namespace psynth */

@@ -20,11 +20,14 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef OBJECTAUDIOOSCILLATOR_H
-#define OBJECTAUDIOOSCILLATOR_H
+#ifndef PSYNTH_OBJECTAUDIOOSCILLATOR_H
+#define PSYNTH_OBJECTAUDIOOSCILLATOR_H
 
 #include <libpsynth/object/ObjectOscillator.h>
 #include <libpsynth/object/KnownObjects.h>
+
+namespace psynth
+{
 
 class ObjectAudioOscillator : public ObjectOscillator
 {
@@ -44,4 +47,6 @@ public:
 	{};
 };
 
-#endif /* OBJECTAUDIOSCILLATOR_H */
+} /* namespace psynth */
+
+#endif /* PSYNTH_OBJECTAUDIOSCILLATOR_H */

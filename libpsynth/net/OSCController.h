@@ -20,14 +20,17 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef OSCCONTROLLER_H
-#define OSCCONTROLLER_H
+#ifndef PSYNTH_OSCCONTROLLER_H
+#define PSYNTH_OSCCONTROLLER_H
 
 #include <map>
 
 #include <libpsynth/table/Table.h>
 #include <libpsynth/net/OSCMisc.h>
 #include <libpsynth/net/OSCBroadcast.h>
+
+namespace psynth
+{
 
 class OSCController : public TableListener,
 		      public TableObjectListener,
@@ -105,4 +108,6 @@ public:
     void handleSetParamObject(TableObject& ob, Object::ParamID param_id);
 };
 
-#endif /* OSCCONTROLLER_H */
+} /* namespace psynth */
+
+#endif /* PSYNTH_OSCCONTROLLER_H */

@@ -20,8 +20,8 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef OBJECTOSCILLATOR_H
-#define OBJECTOSCILLATOR_H
+#ifndef PSYNTH_OBJECTOSCILLATOR_H
+#define PSYNTH_OBJECTOSCILLATOR_H
 
 #include <iostream>
 #include <cmath>
@@ -29,6 +29,9 @@
 #include <libpsynth/object/Object.h>
 #include <libpsynth/object/KnownObjects.h>
 #include <libpsynth/object/Oscillator.h>
+
+namespace psynth
+{
 
 class ObjectOscillator : public Object
 {		
@@ -91,4 +94,6 @@ public:
     ~ObjectOscillator();
 };
 
-#endif /* OBJECTOSCILLATOR_H */
+} /* namespace psynth */
+
+#endif /* PSYNTH_OBJECTOSCILLATOR_H */
