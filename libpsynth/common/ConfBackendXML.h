@@ -24,6 +24,7 @@
 #define PSYNTH_CONFBACKENDXML_H
 
 #include <string>
+
 #include <libxml/xmlreader.h>
 #include <libxml/xmlwriter.h>
 

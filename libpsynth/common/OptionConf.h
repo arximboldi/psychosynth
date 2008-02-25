@@ -50,6 +50,21 @@ public:
     }
 };
 
+template<class T>
+class OptionConfValue : public Option
+{
+    ConfNode& m_node;
+    T m_val;
+public:
+    OptionConfValue(const T& val, ConfNode& node) :
+	m_val(val), m_node(node) {}
+
+    bool parse() {
+	m_node.set(m_val);
+	return true;
+    }
+};
+
 } /* namespace psynth */
 
 #endif /* PSYNTH_OPTIONCONF_H */

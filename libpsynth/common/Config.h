@@ -53,6 +53,79 @@ class ConfElement {
 
     ConfType m_type;
     ConfData m_data;
+    bool m_unset;
+    
+    void destroy() {
+	switch(m_type) {
+	case CONF_INT:
+	    delete m_data.intptr;
+	    break;
+	    
+	case CONF_FLOAT:
+	    delete m_data.floatptr;
+	    break;
+	    
+	case CONF_STRING:
+	    delete m_data.stringptr;
+	    break;
+	    
+	default:
+	    break;
+	}
+    }
+    
+
+public:
+    ConfElement() :
+	m_type(CONF_NONE),
+	m_unset(true)
+	{}
+
+    ~ConfElement() {
+	destroy();
+    }
+
+    bool unset() {
+	return m_unset;
+    }
+    
+    ConfType type() const {
+	return m_type;
+    }
+    
+    void set(const float& val) {
+	toType(CONF_FLOAT);
+	*m_data.floatptr = val;
+	m_unset = false;
+    }
+
+    void set(const int& val) {
+	toType(CONF_INT);
+	*m_data.intptr = val;
+	m_unset = false;
+    }
+
+    void set(const std::string& val) {
+	toType(CONF_STRING);
+	*m_data.stringptr = val;
+	m_unset = false;
+    }
+
+    void get(float& val) const {
+	if (m_type == CONF_FLOAT)
+	    val = *m_data.floatptr;
+    }
+
+    void get(int& val) const {
+	if (m_type == CONF_INT)
+	    val = *m_data.intptr;
+	
+    }
+
+    void get(std::string& val) const {
+	if (m_type == CONF_STRING)
+	    val = *m_data.stringptr; 
+    }
 
     void toType(ConfType type) {
 	if (m_type != type) {
@@ -76,69 +149,6 @@ class ConfElement {
 		m_data.intptr = NULL;
 	    }
 	}   
-    }
-
-    void destroy() {
-	switch(m_type) {
-	case CONF_INT:
-	    delete m_data.intptr;
-	    break;
-	    
-	case CONF_FLOAT:
-	    delete m_data.floatptr;
-	    break;
-	    
-	case CONF_STRING:
-	    delete m_data.stringptr;
-	    break;
-	    
-	default:
-	    break;
-	}
-    }
-    
-
-public:
-    ConfElement() :
-	m_type(CONF_NONE)
-	{}
-
-    ~ConfElement() {
-	destroy();
-    }
-
-    ConfType type() const {
-	return m_type;
-    }
-    
-    void set(const float& val) {
-	toType(CONF_FLOAT);
-	*m_data.floatptr = val;
-    }
-
-    void set(const int& val) {
-	toType(CONF_INT);
-	*m_data.intptr = val;
-    }
-
-    void set(const std::string& val) {
-	toType(CONF_STRING);
-	*m_data.stringptr = val;
-    }
-
-    void get(float& val) const {
-	if (m_type == CONF_FLOAT)
-	    val = *m_data.floatptr;
-    }
-
-    void get(int& val) const {
-	if (m_type == CONF_INT)
-	    val = *m_data.intptr;
-    }
-
-    void get(std::string& val) const {
-	if (m_type == CONF_STRING)
-	    val = *m_data.stringptr; 
     }
 };
 
@@ -247,7 +257,7 @@ public:
 
     template<class T>
     void def(const T& val) {
-	if (m_element.type() == CONF_NONE) {
+	if (m_element.unset()) {
 	    m_element.set(val);
 	    notifyConfChange(*this);
 	}
@@ -260,6 +270,15 @@ public:
 
     ConfType type() const {
 	return m_element.type();
+    }
+
+    void setType(ConfType type) {
+	m_element.toType(type);
+    }
+    
+    void defType(ConfType type) {
+	if (m_element.unset())
+	    m_element.toType(type);
     }
 
     ConfNode& getChild(const std::string& name) {

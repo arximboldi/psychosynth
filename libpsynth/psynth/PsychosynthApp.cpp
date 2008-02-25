@@ -43,22 +43,69 @@ using namespace std;
 namespace psynth
 {
 
-std::string getConfigPath()
+void PsychosynthApp::generatePaths()
 {
 #ifdef WIN32
-    return "";
+    m_cfg_dir = ".";
 #else
     char* home_dir = getenv("HOME");
-    return std::string(home_dir) + ".psychosynth";
+    m_cfg_dir = std::string(home_dir) + "/.psychosynth/";
+    if (access(m_cfg_dir.c_str(), F_OK) < 0)
+	mkdir(m_cfg_dir.c_str(), S_IRWXU|S_IRWXG|S_IROTH|S_IXOTH);
 #endif
 }
 
-std::string getDataPath()
+bool PsychosynthApp::parseArgs(int argc, const char* argv[])
+{
+    ArgParser arg_parser;
+    ConfNode& conf = Config::instance().getChild("psychosynth");
+    bool show_help = false;
+    bool show_version = false;
+    
+    arg_parser.add('h', "help", &show_help);
+    arg_parser.add('v', "version", &show_version);
+    arg_parser.add('s', "sample-rate", new OptionConf<int>(conf.getChild("sample_rate")));
+    arg_parser.add('b', "buffer-size", new OptionConf<int>(conf.getChild("block_size")));
+    arg_parser.add('c', "channels", new OptionConf<int>(conf.getChild("num_channels")));
+    arg_parser.add('o', "output", new OptionConf<string>(conf.getChild("output")));
+
+#ifdef PSYNTH_HAVE_ALSA
+    arg_parser.add(0, "alsa-device", new OptionConf<string>(conf.getPath("alsa/out_device")));
+#endif
+#ifdef PSYNTH_HAVE_OSS
+    arg_parser.add(0, "oss-device", new OptionConf<string>(conf.getPath("oss/out_device")));
+#endif
+#ifdef PSYNTH_HAVE_JACK
+    arg_parser.add(0, "jack-server", new OptionConf<string>(conf.getPath("jack/server")));
+#endif
+
+    prepare(arg_parser);
+    arg_parser.parse(argc, argv);
+
+    if (show_help) {
+	printHelp();
+	return false;
+    }
+
+    if (show_version) {
+	printVersion();
+	return false;
+    }
+
+    return true;
+}
+
+std::string PsychosynthApp::getConfigPath()
+{
+    return m_cfg_dir;
+}
+
+std::string PsychosynthApp::getDataPath()
 {
     return PSYNTH_DATA_DIR;
 }
 
-void PsychosynthApp::printPsynthOptions(ostream& out)
+void PsychosynthApp::printBaseOptions(ostream& out)
 {
     out <<
 	"  -h, --help                 Display this information.\n"
@@ -80,48 +127,31 @@ void PsychosynthApp::printPsynthOptions(ostream& out)
 	;
 }
 
+void PsychosynthApp::setupSynth()
+{
+    m_director.start(Config::instance().getChild("psychosynth"));
+}
+    
+void PsychosynthApp::closeSynth()
+{
+    m_director.stop();
+}
+
 int PsychosynthApp::run(int argc, const char* argv[])
 {   
-    ArgParser arg_parser;
     int ret_val;
-    
-    bool show_help = false;
-    bool show_version = false;
-
+ 
     ConfNode& conf = Config::instance().getChild("psychosynth");
     Logger::instance().attachSink(new LogDefaultSink);
 
-    arg_parser.add('h', "help", &show_help);
-    arg_parser.add('v', "version", &show_version);
-    arg_parser.add('s', "sample-rate", new OptionConf<int>(conf.getChild("sample_rate")));
-    arg_parser.add('b', "buffer-size", new OptionConf<int>(conf.getChild("buffer_size")));
-    arg_parser.add('c', "channels", new OptionConf<int>(conf.getChild("num_channels")));
-    arg_parser.add('o', "output", new OptionConf<string>(conf.getChild("output")));
+    if (!parseArgs(argc, argv))
+	return ERR_GENERIC;
 
-#ifdef PSYNTH_HAVE_ALSA
-    arg_parser.add(0, "alsa-device", new OptionConf<string>(conf.getPath("alsa/out_device")));
-#endif
-#ifdef PSYNTH_HAVE_OSS
-    arg_parser.add(0, "oss-device", new OptionConf<string>(conf.getPath("oss/out_device")));
-#endif
-#ifdef PSYNTH_HAVE_JACK
-    arg_parser.add(0, "jack-server", new OptionConf<string>(conf.getPath("jack/server")));
-#endif
-
-    prepare(arg_parser);
-    arg_parser.parse(argc, argv);
-
-    if (show_help) {
-	printHelp();
-	return -1;
-    }
-
-    if (show_version) {
-	printVersion();
-	return -1;
-    }
+    generatePaths();
     
-    conf.attachBackend(new ConfBackendXML("test_config.xml"));
+#ifdef PSYNTH_HAVE_XML
+    conf.attachBackend(new ConfBackendXML(getConfigPath() + "psychosynth.xml"));
+#endif
     conf.defLoad();
 
 #ifdef PSYNTH_HAVE_ALSA
@@ -134,11 +164,9 @@ int PsychosynthApp::run(int argc, const char* argv[])
     m_director.attachOutputDirectorFactory(new OutputDirectorJackFactory);
 #endif
     
-    m_director.start(conf);
     ret_val = execute();
-    m_director.stop();
 
-    if (ret_val == 0)
+    if (ret_val == SUCCESS)
 	conf.save();
     
     return ret_val;

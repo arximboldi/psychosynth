@@ -20,31 +20,10 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <iostream>
-
-#include <libpsynth/common/Logger.h>
-
-#define PSYCHOSYNTH_3D
-
-#ifdef PSYCHOSYNTH_3D
-# include "gui3d/PsychoSynth3D.h"
-#endif
-#ifdef PSYCHOSYNTH_APP
-# include <libpsynth/psynth/PsychosynthApp.h>
-#endif
-
-using namespace std;
+#include "gui3d/Psychosynth3D.h"
 
 int main(int argc, const char *argv[])
 {
-#ifdef PSYCHOSYNTH_3D
-    PsychoSynth3D main_app;
-    main_app.run(argc, argv);
-#endif
-#ifdef PSYCHOSYNTH_APP
-    PsychosynthApp main_app;
-    main_app.run(argc, argv);
-#endif
-    
-    return 0;
+    Psychosynth3D main_app;
+    return main_app.run(argc, argv);
 }

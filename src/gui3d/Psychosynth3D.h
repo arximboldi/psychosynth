@@ -27,10 +27,8 @@
 #include <CEGUI/CEGUI.h>
 #include <OgreCEGUIRenderer.h>
 
-#include <libpsynth/common/Thread.h>
 #include <libpsynth/common/Timer.h>
-#include <libpsynth/table/Table.h>
-#include <libpsynth/output/Output.h>
+#include <libpsynth/psynth/PsychosynthApp.h>
 #include <libpsynth/net/OSCClient.h>
 #include <libpsynth/net/OSCServer.h>
 
@@ -41,7 +39,8 @@
 #include "gui3d/WindowList.h"
 #include "gui3d/CameraControllerRasko.h"
 
-class PsychoSynth3D : public Ogre::FrameListener
+class Psychosynth3D : public psynth::PsychosynthApp,
+		      public Ogre::FrameListener
 {
     Ogre::Root*          m_ogre;
     Ogre::RenderWindow*  m_window;
@@ -60,18 +59,15 @@ class PsychoSynth3D : public Ogre::FrameListener
     CameraController* m_camctrl;
     psynth::Timer m_timer;
 
-    psynth::AudioInfo  m_audio_info;
-    psynth::Table*     m_table;
-    psynth::Output*    m_output;
     psynth::OSCClient* m_oscclient;
     psynth::OSCServer* m_oscserver;
     
     bool must_quit;
-  
-    void setupOgre();
+
+    void setupSettings(psynth::ConfNode& conf);
+    void setupOgre(psynth::ConfNode& conf);
     void setupInput();
     void setupGui();
-    void setupSynth();
     void setupNet();
     void setupMenus();
     void setupTable();
@@ -79,16 +75,19 @@ class PsychoSynth3D : public Ogre::FrameListener
     void closeTable();
     void closeMenus();
     void closeNet();
-    void closeSynth();
     void closeGui();
     void closeInput();
     void closeOgre();
 
+    void printHelp();
+    void printVersion();
+    
 public:
-    PsychoSynth3D();
-    ~PsychoSynth3D();
-		
-    int run(int argc, const char* argv[]);
+    Psychosynth3D();
+    ~Psychosynth3D();
+
+    void prepare(psynth::ArgParser& args);
+    int execute();
        	
     bool frameStarted(const Ogre::FrameEvent& evt);
 };

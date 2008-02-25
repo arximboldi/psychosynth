@@ -206,6 +206,7 @@ void Table::attachPatcher(Patcher* pat)
     pat->addListener(this);
     for (ObjectManager::Iterator it = m_objmgr.begin(); it != m_objmgr.end(); ++it)
 	m_patcher->addObject(*it);
+    m_patcher->update();
 }
 
 void Table::dattachPatcher()

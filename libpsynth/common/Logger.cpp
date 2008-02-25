@@ -41,7 +41,7 @@ Log& Log::getPath(std::string path)
     for (size_t i = 0; i != path.size(); ++i)
 	if (path[i] == '/') {
 	    base.assign(path, 0, i);
-	    while(path[++i] = '/');
+	    while(path[++i] == '/');
 	    path.erase(0, i);
 	    break;
 	}

@@ -58,12 +58,17 @@ psynth3d_LDADD = \
 	$(CEGUIOGRE_LIBS) \
 	../libpsynth/libpsynth.la
 
+if HAVE_LIBXML
+psynth3d_CXXFLAGS += $(LIBXML_CFLAGS)
+psynth3d_LDADD += $(LIBXML_LIBS)
+endif
+
 psynth3d_SOURCES = \
 	gui3d/CameraControllerRasko.cpp \
 	gui3d/QuitWindow.cpp \
 	gui3d/InputManager.cpp \
 	gui3d/SelectorWindow.cpp \
-	gui3d/PsychoSynth3D.cpp \
+	gui3d/Psychosynth3D.cpp \
 	gui3d/TaskManager.cpp \
 	gui3d/ToggableWindow.cpp \
 	gui3d/Element.cpp \
@@ -85,7 +90,7 @@ psynth3d_SOURCES = \
 	gui3d/CeguiInjecter.h \
 	gui3d/QuitWindow.h \
 	gui3d/InputManager.h \
-	gui3d/PsychoSynth3D.h \
+	gui3d/Psychosynth3D.h \
 	gui3d/SelectorWindow.h\
 	gui3d/TaskManager.h\
 	gui3d/ToggableWindow.h\

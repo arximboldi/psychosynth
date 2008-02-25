@@ -22,6 +22,7 @@
 
 #include "psynth/Director.h"
 #include "psynth/Defaults.h"
+#include "table/PatcherDynamic.h"
 
 using namespace std;
 
@@ -103,8 +104,9 @@ void Director::start(ConfNode& conf)
     conf.getChild("sample_rate").get(m_info.sample_rate);
     conf.getChild("num_channels").get(m_info.num_channels);
     conf.getChild("block_size").get(m_info.block_size);
-    
+
     m_table = new Table(m_info);
+    m_table->attachPatcher(new PatcherDynamic); /* FIXME: */
     
     startOutput();
 }
@@ -115,7 +117,6 @@ void Director::stop()
     
     stopOutput();
     delete m_table;
-
     
     m_table = NULL;
     m_output = NULL;

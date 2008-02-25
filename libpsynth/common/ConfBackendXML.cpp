@@ -60,13 +60,18 @@ ConfNode* ConfBackendXML::processNewElement(xmlTextReaderPtr reader, ConfNode* n
     type = xmlTextReaderGetAttribute(reader, XML_CAST ("type"));
 
     if (type != NULL) {
+	ConfType ct;
+	
 	if(xmlStrcmp(type, XML_CAST ("int")) == 0)
-	    node->set(DEFAULT_INT_VALUE);
+	    ct = CONF_INT;
 	else if (xmlStrcmp(type, XML_CAST ("float")) == 0)
-	    node->set(DEFAULT_FLOAT_VALUE);
+	    ct = CONF_FLOAT;
 	else if (xmlStrcmp(type, XML_CAST ("string")) == 0)
-	    node->set(DEFAULT_STRING_VALUE);
-		
+	    ct = CONF_STRING;
+
+	if (!m_defaulty) node->setType(ct);
+	else node->defType(ct);
+	
 	xmlFree(type);
     }
 

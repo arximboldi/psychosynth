@@ -34,11 +34,16 @@ class PsychosynthApp : public NoCopy
 {
 public:
     enum ErrCode {
-	ERR_GENERIC = -1
+	ERR_GENERIC = -1,
+	SUCCESS = 0
     };
     
     Director m_director;
+    std::string m_cfg_dir;
 
+    void generatePaths();
+    bool parseArgs(int argc, const char* argv[]);
+    
     std::string getConfigPath();
     std::string getDataPath();
     
@@ -49,7 +54,7 @@ public:
     virtual void printVersion() {}
 
 protected:
-    void printPsynthOptions(std::ostream& out);
+    void printBaseOptions(std::ostream& out);
     
 public:
     Table* getTable() {
@@ -61,6 +66,9 @@ public:
     };
     
     int run(int argc, const char* argv[]);
+
+    void setupSynth();
+    void closeSynth();
 };
 
 } /* namespace psynth */

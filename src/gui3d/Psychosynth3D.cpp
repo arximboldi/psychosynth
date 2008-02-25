@@ -20,10 +20,17 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <config.h>
+
+#include <libpsynth/version.h>
 #include <libpsynth/common/Logger.h>
 #include <libpsynth/common/Misc.h>
+#include <libpsynth/common/OptionConf.h>
+#ifdef PSYNTH_HAVE_XML
+#include <libpsynth/common/ConfBackendXML.h>
+#endif
 
-#include "gui3d/PsychoSynth3D.h"
+#include "gui3d/Psychosynth3D.h"
 
 #include "gui3d/QuitWindow.h"
 #include "gui3d/SelectorWindow.h"
@@ -36,45 +43,151 @@
 #include "gui3d/QueryFlags.h"
 #include "gui3d/FlatRing.h"
 
-#include <libpsynth/output/OutputOss.h>
-#include <libpsynth/output/OutputAlsa.h>
-#include <libpsynth/output/OutputJack.h>
-#include <libpsynth/table/PatcherDynamic.h>
+#define DEFAULT_SCREEN_WIDTH  800
+#define DEFAULT_SCREEN_HEIGHT 600
+#define DEFAULT_FULLSCREEN    0
+#define DEFAULT_FPS           120
 
 using namespace Ogre;
 using namespace std;
 using namespace psynth;
 
-#define DEFAULT_SAMPLE_RATE 44100
-#define DEFAULT_BUFFER_SIZE 256
-#define DEFAULT_NUM_CHANNEL 2
-
-PsychoSynth3D::PsychoSynth3D() :
-    m_audio_info(DEFAULT_SAMPLE_RATE, DEFAULT_BUFFER_SIZE, DEFAULT_NUM_CHANNEL)
+Psychosynth3D::Psychosynth3D()
 {
 }
 
-PsychoSynth3D::~PsychoSynth3D()
+Psychosynth3D::~Psychosynth3D()
 {
 }
 
-void PsychoSynth3D::setupOgre()
+void Psychosynth3D::printHelp()
 {
-    new LogManager;
-    LogManager::getSingleton().createLog("Ogre.log", false, false, false);  
+    cout <<
+	"Psychosynth3D (c) 2007-2008 Juan Pedro Bolívar Puente\n"
+	"\n"
+	"Usage:\n"
+	"  psynth3d [options]\n"
+	"\n"
+	"Base options:\n";
+    printBaseOptions(cout);
+    cout <<
+	"\n"
+	"GUI options:\n"
+	"  -W, --width <value>   Set the screen width.\n"
+	"  -H, --height <value>  Set the screen height.\n"
+	"  -f, --fullscreen      Run program in fullscreen.\n"
+	"  -w, --window          Run program as a window.\n"
+	"  -F, --fps             Set the frames per second to render.\n";
+}
+
+void Psychosynth3D::printVersion()
+{
+    cout << "Psychosynth3D " << PACKAGE_VERSION << endl;	
+}
+
+void Psychosynth3D::prepare(psynth::ArgParser& arg_parser)
+{
+    ConfNode& conf = Config::instance().getChild("psynth3d");
+    
+    arg_parser.add('W', "width", new OptionConf<int>(conf.getChild("screen_width")));
+    arg_parser.add('H', "height", new OptionConf<int>(conf.getChild("screen_height")));
+    arg_parser.add('f', "fullscreen", new OptionConfValue<int>(1, conf.getChild("fullscreen")));
+    arg_parser.add('w', "window", new OptionConfValue<int>(0, conf.getChild("fullscreen")));
+    arg_parser.add('F', "fps", new OptionConf<int>(conf.getChild("fps")));
+}
+
+int Psychosynth3D::execute()
+{
+    Logger::instance().log("gui", psynth::Log::INFO, "Loading settings.");
+     
+    ConfNode& conf = Config::instance().getChild("psynth3d");
+    setupSettings(conf);
+    
+    Logger::instance().log("gui", psynth::Log::INFO, "Initializing Ogre.");
+    setupOgre(conf);
+    Logger::instance().log("gui", psynth::Log::INFO, "Initializing OIS.");
+    setupInput();
+    Logger::instance().log("gui", psynth::Log::INFO, "Initializing synthesizer.");
+    setupSynth();
+    Logger::instance().log("gui", psynth::Log::INFO, "Initializing networking.");
+    setupNet();
+    Logger::instance().log("gui", psynth::Log::INFO, "Initializing scene.");
+    setupTable();
+    Logger::instance().log("gui", psynth::Log::INFO, "Initializing CEGUI.");
+    setupGui();
+    Logger::instance().log("gui", psynth::Log::INFO, "Initializing GUI elements.");
+    setupMenus();
+		
+    m_ogre->startRendering();
+
+    Logger::instance().log("gui", psynth::Log::INFO, "Closing GUI elements.");
+    closeMenus();
+    Logger::instance().log("gui", psynth::Log::INFO, "Closing CEGUI.");
+    closeGui();
+    Logger::instance().log("gui", psynth::Log::INFO, "Closing networking.");
+    closeNet();
+    Logger::instance().log("gui", psynth::Log::INFO, "Closing scene.");
+    closeTable();
+    Logger::instance().log("gui", psynth::Log::INFO, "Closing synthesizer.");
+    closeSynth();
+    Logger::instance().log("gui", psynth::Log::INFO, "Closing OIS.");
+    closeInput();
+    Logger::instance().log("gui", psynth::Log::INFO, "Closing Ogre.");
+    closeOgre();
+
+    Logger::instance().log("gui", psynth::Log::INFO, "Storing settings.");
+    conf.save();
+    
+    return 0;
+}
+
+bool Psychosynth3D::frameStarted(const Ogre::FrameEvent& evt)
+{
+    m_timer.update();
+    m_inputmgr->capture();
+    m_taskmgr->update(m_timer.deltaticks());
+    getTable()->update();
+    m_elemmgr->update();
+    m_oscclient->update(m_timer.deltaticks());
+    m_oscserver->update(m_timer.deltaticks());
+    
+    return !must_quit;
+}
+
+void Psychosynth3D::setupSettings(ConfNode& conf)
+{
+#ifdef PSYNTH_HAVE_XML
+    conf.attachBackend(new ConfBackendXML(getConfigPath() + "psynth3d.xml"));
+#endif
+    conf.defLoad();
+
+    conf.getChild("screen_width").def(DEFAULT_SCREEN_WIDTH);
+    conf.getChild("screen_height").def(DEFAULT_SCREEN_HEIGHT);
+    conf.getChild("fullscreen").def(DEFAULT_FULLSCREEN);
+    conf.getChild("fps").def(DEFAULT_FPS);
+}
+
+void Psychosynth3D::setupOgre(psynth::ConfNode& conf)
+{
+    int screen_width;
+    int screen_height;
+    int fullscreen;
+    int fps;
+
+    conf.getChild("screen_width").get(screen_width);
+    conf.getChild("screen_height").get(screen_height);
+    conf.getChild("fullscreen").get(fullscreen);
+    conf.getChild("fps").get(fps);
+    
+    (new LogManager)->createLog("Ogre.log", false, false, false);  
     m_ogre = new Root("data/plugins.cfg", "data/ogre.cfg");
 
     ResourceGroupManager& resource_manager = ResourceGroupManager::getSingleton();
-    resource_manager.addResourceLocation("data",               "FileSystem", "General");
-    resource_manager.addResourceLocation("data/mesh",          "FileSystem", "General");
-    resource_manager.addResourceLocation("data/texture",       "FileSystem", "General");
-    resource_manager.addResourceLocation("data/material",      "FileSystem", "General");
-    resource_manager.addResourceLocation("data/gui/schemes",   "FileSystem", "GUI");
-    resource_manager.addResourceLocation("data/gui/fonts",     "FileSystem", "GUI");
-    resource_manager.addResourceLocation("data/gui/configs",   "FileSystem", "GUI");
-    resource_manager.addResourceLocation("data/gui/imagesets", "FileSystem", "GUI");
-    resource_manager.addResourceLocation("data/gui/looknfeel", "FileSystem", "GUI");
-    resource_manager.addResourceLocation("data/gui/layouts",   "FileSystem", "GUI");
+    resource_manager.addResourceLocation("data", "FileSystem", "General");
+    resource_manager.addResourceLocation("data/mesh", "FileSystem", "General");
+    resource_manager.addResourceLocation("data/texture", "FileSystem", "General");
+    resource_manager.addResourceLocation("data/material", "FileSystem", "General");
+    resource_manager.addResourceLocation("data/gui", "FileSystem", "GUI");
 
     if (!m_ogre->restoreConfig() && !m_ogre->showConfigDialog())
 	m_ogre->setRenderSystem( *(m_ogre->getAvailableRenderers()->begin()) );
@@ -83,16 +196,20 @@ void PsychoSynth3D::setupOgre()
 
     resource_manager.initialiseAllResourceGroups();
 
-    m_window = m_ogre->createRenderWindow("PsychoSynth3D", 800, 600, false);
+
+    m_window = m_ogre->createRenderWindow("Psychosynth3D",
+					  screen_width,
+					  screen_height,
+					  fullscreen);
 	
     m_ogre->addFrameListener(this);
 	
     m_scene = m_ogre->createSceneManager(Ogre::ST_GENERIC, "main");
 
-    /* TODO: This scene creation code must be separated? */
+    m_timer.forceFps(fps);
 }
 
-void PsychoSynth3D::setupInput()
+void Psychosynth3D::setupInput()
 {
     OIS::ParamList pl;
     size_t window_hnd = 0;
@@ -116,7 +233,7 @@ void PsychoSynth3D::setupInput()
     m_inputmgr = new InputManager(pl);
 }
 
-void PsychoSynth3D::setupGui()
+void Psychosynth3D::setupGui()
 {
     m_ceguirender = new CEGUI::OgreCEGUIRenderer(m_window,
 						 Ogre::RENDER_QUEUE_OVERLAY, false,
@@ -132,41 +249,24 @@ void PsychoSynth3D::setupGui()
     CEGUI::Window *sheet = win->createWindow("DefaultGUISheet", "root"); // TODO: root?
     m_gui->setGUISheet(sheet);
 
-    m_guiinput   = new CeguiInjecter(); 
+    m_guiinput = new CeguiInjecter(); 
     m_inputmgr->addMouseListener(m_guiinput);
     m_inputmgr->addKeyListener(m_guiinput);
 }
 
-void PsychoSynth3D::setupSynth()
-{
-    m_table = new Table(m_audio_info);
-
-    m_output = new OutputAlsa(m_audio_info, "default");
-    //m_output = new OutputOss(m_audio_info, "/dev/dsp");
-    //m_output = new OutputJack(m_audio_info);
-
-    m_table->attachOutput(m_output);
-    m_table->attachPatcher(new PatcherDynamic());
-    m_table->update();
-
-    m_output->gotoState(Output::RUNNING);
-    /*m_output->open();
-      m_output->start();*/
-}
-
-void PsychoSynth3D::setupNet()
+void Psychosynth3D::setupNet()
 {
     m_oscclient = new OSCClient();
     m_oscserver = new OSCServer();
 
-    m_oscclient->setTable(m_table);
-    m_oscserver->setTable(m_table);
+    m_oscclient->setTable(getTable());
+    m_oscserver->setTable(getTable());
 }
 
-void PsychoSynth3D::setupTable()
+void Psychosynth3D::setupTable()
 {
     m_scene->setAmbientLight(ColourValue(0, 0, 0));
-    //  m_scene->setShadowTechnique(SHADOWTYPE_STENCIL_ADDITIVE);
+    //m_scene->setShadowTechnique(SHADOWTYPE_STENCIL_ADDITIVE);
 
     m_camera = m_scene->createCamera("camera");
     m_camera->setNearClipDistance(0.1);
@@ -179,39 +279,17 @@ void PsychoSynth3D::setupTable()
     Light* light;
     light = m_scene->createLight("light1");
     light->setType(Light::LT_POINT);
-    light->setPosition(Vector3(-30, 30, -30));
+    light->setPosition(Vector3(-20, 50, -20));
     light->setDiffuseColour(1.0, 1.0, 1.0);
     light->setSpecularColour(1.0, 1.0, 1.0);
-    light->setAttenuation(100, 3, 0, 0);
-   
+    light->setAttenuation(100, 1.6, 0, 0);
+
     light = m_scene->createLight("light2");
     light->setType(Light::LT_POINT);
-    light->setPosition(Vector3(30, 30, 30));
+    light->setPosition(Vector3(20, 50, 20));
     light->setDiffuseColour(1.0, 1.0, 1.0);
     light->setSpecularColour(1.0, 1.0, 1.0);
-    light->setAttenuation(100, 3, 0, 0);
-   
-    light = m_scene->createLight("light3");
-    light->setType(Light::LT_POINT);
-    light->setPosition(Vector3(30, 30, -30));
-    light->setDiffuseColour(1.0, 1.0, 1.0);
-    light->setSpecularColour(1.0, 1.0, 1.0);
-    light->setAttenuation(100, 2, 0, 0);
-       
-    light = m_scene->createLight("light4");
-    light->setType(Light::LT_POINT);
-    light->setPosition(Vector3(-30, 30, 30));
-    light->setDiffuseColour(1.0, 1.0, 1.0);
-    light->setSpecularColour(1.0, 1.0, 1.0);
-    light->setAttenuation(100, 2.5, 0, 0);
-    
-    /*
-    light = m_scene->createLight("light2");
-    light->setType(Light::LT_POINT);
-    light->setPosition(Vector3(30, 30, 30));
-    light->setDiffuseColour(0.7, 0.4, 0.3);
-    light->setSpecularColour(0.7, 0.4, 0.3);
-    */
+    light->setAttenuation(100, 1.6, 0, 0);
 	
     Entity *ent1 = m_scene->createEntity( "object1", "table.mesh" );
     ent1->setQueryFlags(QFLAG_TABLE);
@@ -228,7 +306,7 @@ void PsychoSynth3D::setupTable()
     node->setPosition(Vector3(0,0.001,0));
 
     m_taskmgr = new TaskManager();
-    m_elemmgr = new ElementManager(m_table, m_scene, m_camera);
+    m_elemmgr = new ElementManager(getTable(), m_scene, m_camera);
     m_camctrl = new CameraControllerRasko(m_camera, m_taskmgr);
 
     m_inputmgr->addMouseListener(m_camctrl);
@@ -236,11 +314,11 @@ void PsychoSynth3D::setupTable()
     m_inputmgr->addKeyListener(m_camctrl);
     m_inputmgr->addKeyListener(m_elemmgr);
 
-    m_table->addTableListener(m_elemmgr);
-    m_table->addTablePatcherListener(m_elemmgr);
+    getTable()->addTableListener(m_elemmgr);
+    getTable()->addTablePatcherListener(m_elemmgr);
 }
 
-void PsychoSynth3D::setupMenus()
+void Psychosynth3D::setupMenus()
 {
     SelectorWindow* selector = new SelectorWindow(m_elemmgr);
     SelectorWindow::Category* cat = NULL;
@@ -283,7 +361,7 @@ void PsychoSynth3D::setupMenus()
 			    OIS::KC_UNASSIGNED);
     m_windowlist->addWindow("RecordWindowButton.imageset",
 			    "RecordWindowButton.layout",
-			    new RecordWindow(m_table),
+			    new RecordWindow(getTable()),
 			    OIS::KC_UNASSIGNED);
     m_windowlist->addWindow("NetworkWindowButton.imageset",
 			    "NetworkWindowButton.layout",
@@ -298,30 +376,25 @@ void PsychoSynth3D::setupMenus()
     m_inputmgr->addKeyListener(m_windowlist);
 }
 
-void PsychoSynth3D::closeTable()
+void Psychosynth3D::closeTable()
 {
     delete m_taskmgr;
     delete m_camctrl;
     delete m_elemmgr;
 }
 
-void PsychoSynth3D::closeMenus()
+void Psychosynth3D::closeMenus()
 {
     delete m_windowlist;
 }
 
-void PsychoSynth3D::closeNet()
+void Psychosynth3D::closeNet()
 {
     delete m_oscclient;
     delete m_oscserver;
 }
 
-void PsychoSynth3D::closeSynth()
-{
-    delete m_table;
-}
-
-void PsychoSynth3D::closeGui()
+void Psychosynth3D::closeGui()
 {
     delete m_guiinput;
 // TODO
@@ -329,64 +402,12 @@ void PsychoSynth3D::closeGui()
 //	delete m_gui; /
 }
 
-void PsychoSynth3D::closeInput()
+void Psychosynth3D::closeInput()
 {
     delete m_inputmgr;
 }
 
-void PsychoSynth3D::closeOgre()
+void Psychosynth3D::closeOgre()
 {
     delete m_ogre;
-}
-
-int PsychoSynth3D::run(int argc, const char* argv[])
-{
-    Logger::instance().log("gui", psynth::Log::INFO, "Initializing Ogre.");
-    setupOgre();
-    Logger::instance().log("gui", psynth::Log::INFO, "Initializing OIS.");
-    setupInput();
-    Logger::instance().log("gui", psynth::Log::INFO, "Initializing synthesizer.");
-    setupSynth();
-    Logger::instance().log("gui", psynth::Log::INFO, "Initializing networking.");
-    setupNet();
-    Logger::instance().log("gui", psynth::Log::INFO, "Initializing scene.");
-    setupTable();
-    Logger::instance().log("gui", psynth::Log::INFO, "Initializing CEGUI.");
-    setupGui();
-    Logger::instance().log("gui", psynth::Log::INFO, "Initializing GUI elements.");
-    setupMenus();
-		
-    m_timer.forceFps(120);
-		
-    m_ogre->startRendering();
-
-    Logger::instance().log("gui", psynth::Log::INFO, "Closing GUI elements.");
-    closeMenus();
-    Logger::instance().log("gui", psynth::Log::INFO, "Closing CEGUI.");
-    closeGui();
-    Logger::instance().log("gui", psynth::Log::INFO, "Closing networking.");
-    closeNet();
-    Logger::instance().log("gui", psynth::Log::INFO, "Closing scene.");
-    closeTable();
-    Logger::instance().log("gui", psynth::Log::INFO, "Closing synthesizer.");
-    closeSynth();
-    Logger::instance().log("gui", psynth::Log::INFO, "Closing OIS.");
-    closeInput();
-    Logger::instance().log("gui", psynth::Log::INFO, "Closing Ogre.");
-    closeOgre();
-       
-    return 0;
-}
-
-bool PsychoSynth3D::frameStarted(const Ogre::FrameEvent& evt)
-{
-    m_timer.update();
-    m_inputmgr->capture();
-    m_taskmgr->update(m_timer.deltaticks());
-    m_table->update();
-    m_elemmgr->update();
-    m_oscclient->update(m_timer.deltaticks());
-    m_oscserver->update(m_timer.deltaticks());
-    
-    return !must_quit;
 }
