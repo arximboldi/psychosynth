@@ -77,7 +77,7 @@ void Psychosynth3D::printHelp()
 	"  -H, --height <value>  Set the screen height.\n"
 	"  -f, --fullscreen      Run program in fullscreen.\n"
 	"  -w, --window          Run program as a window.\n"
-	"  -F, --fps             Set the frames per second to render.\n";
+	"  -F, --fps <value>     Set the frames per second to render.\n";
 }
 
 void Psychosynth3D::printVersion()
@@ -182,19 +182,19 @@ void Psychosynth3D::setupOgre(psynth::ConfNode& conf)
     (new LogManager)->createLog("Ogre.log", false, false, false);  
     m_ogre = new Root("data/plugins.cfg", "data/ogre.cfg");
 
-    ResourceGroupManager& resource_manager = ResourceGroupManager::getSingleton();
-    resource_manager.addResourceLocation("data", "FileSystem", "General");
-    resource_manager.addResourceLocation("data/mesh", "FileSystem", "General");
-    resource_manager.addResourceLocation("data/texture", "FileSystem", "General");
-    resource_manager.addResourceLocation("data/material", "FileSystem", "General");
-    resource_manager.addResourceLocation("data/gui", "FileSystem", "GUI");
+    ResourceGroupManager& res_mgr = ResourceGroupManager::getSingleton();
+    res_mgr.addResourceLocation("data", "FileSystem", "General");
+    res_mgr.addResourceLocation("data/mesh", "FileSystem", "General");
+    res_mgr.addResourceLocation("data/texture", "FileSystem", "General");
+    res_mgr.addResourceLocation("data/material", "FileSystem", "General");
+    res_mgr.addResourceLocation("data/gui", "FileSystem", "GUI");
 
     if (!m_ogre->restoreConfig() && !m_ogre->showConfigDialog())
 	m_ogre->setRenderSystem( *(m_ogre->getAvailableRenderers()->begin()) );
 
     m_ogre->initialise(false);
 
-    resource_manager.initialiseAllResourceGroups();
+    res_mgr.initialiseAllResourceGroups();
 
 
     m_window = m_ogre->createRenderWindow("Psychosynth3D",

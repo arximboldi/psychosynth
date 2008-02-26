@@ -40,12 +40,27 @@ public:
     OptionConf(ConfNode& node) :
 	m_node(node) {}
 
-    bool parse(const std::string& arg) {
+    bool parse(const char* arg) {
 	T val;
 	std::istringstream str(arg);
-	arg >> val;
+	str >> val;
 	m_node.set(val);
 	
+	return true;
+    }
+};
+
+template <>
+class OptionConf<std::string> : public Option
+{
+    ConfNode& m_node;
+    
+public:
+    OptionConf(ConfNode& node) :
+	m_node(node) {}
+
+    bool parse(const char* arg) {
+	m_node.set(std::string(arg));
 	return true;
     }
 };

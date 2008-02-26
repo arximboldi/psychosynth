@@ -104,7 +104,6 @@ ConfNode* ConfBackendXML::processText(xmlTextReaderPtr reader, ConfNode* node)
 	case CONF_FLOAT: {
 	    float val;
 	    value_str >> val;
-	    node->set(val);
 	    if (!m_defaulty) node->set(val);
 	    else node->def(val);
 	}
@@ -113,7 +112,6 @@ ConfNode* ConfBackendXML::processText(xmlTextReaderPtr reader, ConfNode* node)
 	case CONF_STRING: {
 	    string val;
 	    value_str >> val;
-	    node->set(val);
 	    if (!m_defaulty) node->set(val);
 	    else node->def(val);
 	}

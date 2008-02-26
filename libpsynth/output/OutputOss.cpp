@@ -151,7 +151,9 @@ bool OutputOss::close()
 	if (getState() == RUNNING)
 	    stop();
 	delete [] m_buf;
+	m_buf = NULL;
 	::close(m_fd);
+	setState(NOTINIT);
 	return true;
     } else {
 	Logger::instance().log("oss", Log::ERROR, "Cannot close uninitialized device.");
