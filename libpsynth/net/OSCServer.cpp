@@ -129,11 +129,14 @@ void OSCServer::close()
     m_state = IDLE;
 }
 
-int OSCServer::update(int msec)
+int OSCServer::update(int msec, int time_out)
 {
     if (m_state != IDLE) {
-	lo_server_recv_noblock(m_server, 0);
-
+	if (time_out >= 0)
+	    lo_server_recv_noblock(m_server, time_out);
+	else
+	    lo_server_recv(m_server);
+	
 	for (SlotMap::iterator it = m_slots.begin();
 	     it != m_slots.end();) {
 	    Slot& cl = it->second;

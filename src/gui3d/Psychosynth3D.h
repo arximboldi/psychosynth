@@ -27,6 +27,7 @@
 #include <CEGUI/CEGUI.h>
 #include <OgreCEGUIRenderer.h>
 
+#include <libpsynth/version.h>
 #include <libpsynth/common/Timer.h>
 #include <libpsynth/psynth/PsychosynthApp.h>
 #include <libpsynth/net/OSCClient.h>
@@ -59,8 +60,10 @@ class Psychosynth3D : public psynth::PsychosynthApp,
     CameraController* m_camctrl;
     psynth::Timer m_timer;
 
+#ifdef PSYNTH_HAVE_OSC
     psynth::OSCClient* m_oscclient;
     psynth::OSCServer* m_oscserver;
+#endif
     
     bool must_quit;
 
@@ -68,13 +71,17 @@ class Psychosynth3D : public psynth::PsychosynthApp,
     void setupOgre(psynth::ConfNode& conf);
     void setupInput();
     void setupGui();
+#ifdef PSYNTH_HAVE_OSC
     void setupNet();
+#endif
     void setupMenus();
     void setupTable();
 
     void closeTable();
     void closeMenus();
+#ifdef PSYNTH_HAVE_OSC
     void closeNet();
+#endif
     void closeGui();
     void closeInput();
     void closeOgre();

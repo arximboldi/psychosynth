@@ -28,6 +28,9 @@
 #include <libpsynth/net/OSCMisc.h>
 #include <libpsynth/net/OSCController.h>
 
+#define PSYNTH_DEFAULT_SERVER_PORT     8191
+#define PSYNTH_DEFAULT_SERVER_PORT_STR "8191"
+
 namespace psynth
 {
 
@@ -126,11 +129,16 @@ public:
 	return m_listening;
     };
 
+    State getState() {
+	return m_state;
+    }
+    
     void listen(const char* port);
     void stop();
     void close();
 
-    int update(int msec);
+    /* time_out < 0 for blocking operation. */
+    int update(int msec, int time_out = 0);
 };
 
 } /* namespace psynth */

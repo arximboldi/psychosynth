@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) 2008 Juan Pedro Bolivar Puente                          *
+ *   Copyright (C) Juan Pedro Bolivar Puente 2008                          *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -20,35 +20,29 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef PSYNTH_VERSION_H
-#define PSYNTH_VERSION_H
+#ifndef PSYCHOSYNTHCLI_H
+#define PSYCHOSYNTHCLI_H
 
-#define PSYNTH_VERSION "@VERSION@"
+#include <libpsynth/psynth/PsychosynthApp.h>
+#include <libpsynth/version.h>
 
-#define PSYNTH_DATA_DIR "@PACKAGE_DATA_DIR@"
+class PsychosynthCli : public psynth::PsychosynthApp
+{
+    bool m_run_server;
+    std::string m_client_port;
+    std::string m_server_port;
+    std::string m_host;
+    
+    void printHelp();
+    void printVersion();
+    void prepare(psynth::ArgParser& arg_parser);
+    void init();
+    
+    int execute();
+    int runServer();
+    int runClient();
+public:
+    PsychosynthCli() {};
+};
 
-#if @HAVE_ALSA_P@
-#define PSYNTH_HAVE_ALSA 1
-#endif
-
-#if @HAVE_OSS_P@
-#define PSYNTH_HAVE_OSS 1
-#endif
-
-#if @HAVE_LIBXML_P@
-#define PSYNTH_HAVE_XML 1
-#endif
-
-#if @HAVE_LIBLO_P@
-#define PSYNTH_HAVE_OSC 1
-#endif
-
-#if @HAVE_AUDIOFILE_P@
-#define PSYNTH_HAVE_PCM 1
-#endif
-
-#if @HAVE_JACK_P@
-#define PSYNTH_HAVE_JACK 1
-#endif
-
-#endif /* PSYNTH_VERSION_H */
+#endif /* PSYCHOSYNTHCLI_H */

@@ -114,27 +114,30 @@ void OSCClient::disconnect()
     }
 }
 
-int OSCClient::update(int msec)
+int OSCClient::update(int msec, int time_out)
 {
     if (m_state != IDLE) {
-	lo_server_recv_noblock(m_server, 0);
-
+	if (time_out >= 0)
+	    lo_server_recv_noblock(m_server, time_out);
+	else
+	    lo_server_recv(m_server);
+	
 	if (!m_count_next) {
 	    m_last_alive_recv += msec;
 	    m_last_alive_sent += msec;
 	} else
 	    m_count_next = 0;
-	
-	if (m_last_alive_recv > MAX_ALIVE_DELAY) {
-	    notifyClientDisconnect(this, CE_SERVER_TIMEOUT);
-	    m_state = CLOSING;
-	}
 
 	if (m_last_alive_sent > MIN_ALIVE_DELAY) {
 	    lo_message msg = lo_message_new();
 	    broadcastMessage(MSG_ALIVE, msg);
 	    lo_message_free(msg);
 	    m_last_alive_sent = 0;
+	}
+
+	if (m_last_alive_recv > MAX_ALIVE_DELAY) {
+	    notifyClientDisconnect(this, CE_SERVER_TIMEOUT);
+	    close();
 	}
 	
 	if (m_state == CLOSING) {

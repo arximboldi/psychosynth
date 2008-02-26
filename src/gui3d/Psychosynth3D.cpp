@@ -34,8 +34,12 @@
 
 #include "gui3d/QuitWindow.h"
 #include "gui3d/SelectorWindow.h"
+#ifdef PSYNTH_HAVE_OSC
 #include "gui3d/NetworkWindow.h"
+#endif
+#ifdef PSYNTH_HAVE_PCM
 #include "gui3d/RecordWindow.h"
+#endif
 
 #include "gui3d/CameraControllerRasko.h"
 #include "gui3d/Element.h"
@@ -82,7 +86,7 @@ void Psychosynth3D::printHelp()
 
 void Psychosynth3D::printVersion()
 {
-    cout << "Psychosynth3D " << PACKAGE_VERSION << endl;	
+    cout << "Psychosynth3D " << VERSION << endl;	
 }
 
 void Psychosynth3D::prepare(psynth::ArgParser& arg_parser)
@@ -109,8 +113,10 @@ int Psychosynth3D::execute()
     setupInput();
     Logger::instance().log("gui", psynth::Log::INFO, "Initializing synthesizer.");
     setupSynth();
+#ifdef PSYNTH_HAVE_OSC
     Logger::instance().log("gui", psynth::Log::INFO, "Initializing networking.");
     setupNet();
+#endif
     Logger::instance().log("gui", psynth::Log::INFO, "Initializing scene.");
     setupTable();
     Logger::instance().log("gui", psynth::Log::INFO, "Initializing CEGUI.");
@@ -124,8 +130,10 @@ int Psychosynth3D::execute()
     closeMenus();
     Logger::instance().log("gui", psynth::Log::INFO, "Closing CEGUI.");
     closeGui();
+#ifdef PSYNTH_HAVE_OSC
     Logger::instance().log("gui", psynth::Log::INFO, "Closing networking.");
     closeNet();
+#endif
     Logger::instance().log("gui", psynth::Log::INFO, "Closing scene.");
     closeTable();
     Logger::instance().log("gui", psynth::Log::INFO, "Closing synthesizer.");
@@ -254,6 +262,7 @@ void Psychosynth3D::setupGui()
     m_inputmgr->addKeyListener(m_guiinput);
 }
 
+#ifdef PSYNTH_HAVE_OSC
 void Psychosynth3D::setupNet()
 {
     m_oscclient = new OSCClient();
@@ -262,6 +271,7 @@ void Psychosynth3D::setupNet()
     m_oscclient->setTable(getTable());
     m_oscserver->setTable(getTable());
 }
+#endif
 
 void Psychosynth3D::setupTable()
 {
@@ -359,15 +369,19 @@ void Psychosynth3D::setupMenus()
 			    "SelectorWindowButton.layout",
 			    selector,
 			    OIS::KC_UNASSIGNED);
+#ifdef PSYNTH_HAVE_PCM
     m_windowlist->addWindow("RecordWindowButton.imageset",
 			    "RecordWindowButton.layout",
 			    new RecordWindow(getTable()),
 			    OIS::KC_UNASSIGNED);
+#endif
+#ifdef PSYNTH_HAVE_OSC
     m_windowlist->addWindow("NetworkWindowButton.imageset",
 			    "NetworkWindowButton.layout",
 			    new NetworkWindow(m_oscclient,
 					      m_oscserver),
 			    OIS::KC_UNASSIGNED);
+#endif
     m_windowlist->addWindow("QuitWindowButton.imageset",
 			    "QuitWindowButton.layout",
 			    new QuitWindow(),
@@ -388,11 +402,13 @@ void Psychosynth3D::closeMenus()
     delete m_windowlist;
 }
 
+#ifdef PSYNTH_HAVE_OSC
 void Psychosynth3D::closeNet()
 {
     delete m_oscclient;
     delete m_oscserver;
 }
+#endif
 
 void Psychosynth3D::closeGui()
 {

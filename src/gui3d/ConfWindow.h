@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) 2008 Juan Pedro Bolivar Puente                          *
+ *   Copyright (C) Juan Pedro Bolivar Puente 2008                          *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -20,35 +20,24 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef PSYNTH_VERSION_H
-#define PSYNTH_VERSION_H
+#ifndef CONFWINDOW_H
+#define CONFWINDOW_H
 
-#define PSYNTH_VERSION "@VERSION@"
+#include <libpsynth/common/Config.h>
+#include "gui3d/ToggableWindow.h"
 
-#define PSYNTH_DATA_DIR "@PACKAGE_DATA_DIR@"
+class ConfWindow : public ToggableWindow
+{
+    psynth::ConfNode& m_gui_conf;
+    psynth::ConfNode& m_psynth_conf;
 
-#if @HAVE_ALSA_P@
-#define PSYNTH_HAVE_ALSA 1
-#endif
+public:
+    ConfWindow(psynth::ConfNode& gui_conf,
+	       psynth::ConfNode& psynth_conf) :
+	m_gui_conf(gui_conf),
+	m_psynth_conf(psynth_conf) {}
 
-#if @HAVE_OSS_P@
-#define PSYNTH_HAVE_OSS 1
-#endif
+    CEGUI::FrameWindow* createWindow();
+};
 
-#if @HAVE_LIBXML_P@
-#define PSYNTH_HAVE_XML 1
-#endif
-
-#if @HAVE_LIBLO_P@
-#define PSYNTH_HAVE_OSC 1
-#endif
-
-#if @HAVE_AUDIOFILE_P@
-#define PSYNTH_HAVE_PCM 1
-#endif
-
-#if @HAVE_JACK_P@
-#define PSYNTH_HAVE_JACK 1
-#endif
-
-#endif /* PSYNTH_VERSION_H */
+#endif /* CONFWINDOW_H */

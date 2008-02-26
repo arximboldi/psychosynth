@@ -26,6 +26,9 @@
 #include <libpsynth/common/Logger.h>
 #include <libpsynth/net/OSCController.h>
 
+#define PSYNTH_DEFAULT_CLIENT_PORT      8192
+#define PSYNTH_DEFAULT_CLIENT_PORT_STR "8192"
+
 namespace psynth
 {
 
@@ -102,7 +105,8 @@ public:
     
     void connect(lo_address target, const char* src_port);
     void disconnect();
-    int update(int msec);
+    /* Timeout < 0 for blocking operation. */
+    int update(int msec, int time_out = 0);
 };
 
 } /* namespace psynth */

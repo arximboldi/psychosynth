@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) 2008 Juan Pedro Bolivar Puente                          *
+ *   Copyright (C) Juan Pedro Bolivar Puente 2007                          *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -20,35 +20,12 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef PSYNTH_VERSION_H
-#define PSYNTH_VERSION_H
+#include "gui3d/ConfWindow.h"
 
-#define PSYNTH_VERSION "@VERSION@"
+using namespace psynth;
+using namespace CEGUI;
 
-#define PSYNTH_DATA_DIR "@PACKAGE_DATA_DIR@"
-
-#if @HAVE_ALSA_P@
-#define PSYNTH_HAVE_ALSA 1
-#endif
-
-#if @HAVE_OSS_P@
-#define PSYNTH_HAVE_OSS 1
-#endif
-
-#if @HAVE_LIBXML_P@
-#define PSYNTH_HAVE_XML 1
-#endif
-
-#if @HAVE_LIBLO_P@
-#define PSYNTH_HAVE_OSC 1
-#endif
-
-#if @HAVE_AUDIOFILE_P@
-#define PSYNTH_HAVE_PCM 1
-#endif
-
-#if @HAVE_JACK_P@
-#define PSYNTH_HAVE_JACK 1
-#endif
-
-#endif /* PSYNTH_VERSION_H */
+CEGUI::FrameWindow* ConfWindow::createWindow()
+{
+    
+}

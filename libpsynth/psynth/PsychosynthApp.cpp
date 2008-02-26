@@ -21,11 +21,13 @@
  ***************************************************************************/
 
 #include <libpsynth/version.h>
+#include <sys/stat.h>
 
 #include "common/Logger.h"
-#include "common/ConfBackendXML.h"
 #include "common/OptionConf.h"
-
+#ifdef PSYNTH_HAVE_XML
+#include "common/ConfBackendXML.h"
+#endif
 #ifdef PSYNTH_HAVE_ALSA
 #include "psynth/OutputDirectorAlsa.h"
 #endif
