@@ -242,6 +242,7 @@ AM_CONDITIONAL([BUILD_PSYNTH3D], [test "x$BUILD_PSYNTH3D" = xyes])
 
 AC_OUTPUT(Makefile 
 	  src/Makefile
+	  data/Makefile
 	  libpsynth/Makefile
 	  libpsynth/version.h)
 
