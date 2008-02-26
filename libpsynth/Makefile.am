@@ -37,34 +37,8 @@ libpsynth_la_CXXFLAGS =
 libpsynth_la_LDFLAGS = 
 libpsynth_la_LIBADD =
 
-libpsynth_la_SOURCES = \
-	psynth/Director.cpp \
-	psynth/PsychosynthApp.cpp \
-	common/ArgParser.cpp \
-	common/Error.cpp \
-	common/AudioBuffer.cpp \
-	common/RingAudioBuffer.cpp \
-	common/Mutex.cpp \
-	common/Misc.cpp \
-	common/Logger.cpp \
-	common/Config.cpp \
-	common/Timer.cpp \
-	table/Table.cpp \
-	table/Patcher.cpp \
-	table/PatcherDynamic.cpp \
-	object/Object.cpp \
-	object/ObjectOscillator.cpp \
-	object/ObjectMixer.cpp \
-	object/ObjectAudioMixer.cpp \
-	object/ObjectControlMixer.cpp \
-	object/ObjectManager.cpp \
-	object/ObjectOutput.cpp \
-	object/ObjectLFO.cpp \
-	object/ObjectAudioOscillator.cpp \
-	object/ObjectFilter.cpp \
-	object/Filter.cpp \
-	object/WaveTable.cpp \
-	object/Oscillator.cpp \
+libpsynth_la_includedir = $(includedir)/libpsynth
+nobase_libpsynth_la_include_HEADERS = \
 	psynth/Director.h \
 	psynth/Defaults.h \
 	psynth/OutputDirector.h \
@@ -103,23 +77,49 @@ libpsynth_la_SOURCES = \
 	output/Output.h\
 	version.h
 
+libpsynth_la_SOURCES = \
+	psynth/Director.cpp \
+	psynth/PsychosynthApp.cpp \
+	common/ArgParser.cpp \
+	common/Error.cpp \
+	common/AudioBuffer.cpp \
+	common/RingAudioBuffer.cpp \
+	common/Mutex.cpp \
+	common/Misc.cpp \
+	common/Logger.cpp \
+	common/Config.cpp \
+	common/Timer.cpp \
+	table/Table.cpp \
+	table/Patcher.cpp \
+	table/PatcherDynamic.cpp \
+	object/Object.cpp \
+	object/ObjectOscillator.cpp \
+	object/ObjectMixer.cpp \
+	object/ObjectAudioMixer.cpp \
+	object/ObjectControlMixer.cpp \
+	object/ObjectManager.cpp \
+	object/ObjectOutput.cpp \
+	object/ObjectLFO.cpp \
+	object/ObjectAudioOscillator.cpp \
+	object/ObjectFilter.cpp \
+	object/Filter.cpp \
+	object/WaveTable.cpp \
+	object/Oscillator.cpp
+
 if HAVE_LIBXML
 libpsynth_la_CXXFLAGS += $(LIBXML_CFLAGS)
 libpsynth_la_LIBADD += $(LIBXML_LIBS)
 libpsynth_la_SOURCES += \
-	common/ConfBackendXML.cpp \
+	common/ConfBackendXML.cpp
+nobase_libpsynth_la_include_HEADERS += \
 	common/ConfBackendXML.h
 endif
 
 if HAVE_LIBLO
 libpsynth_la_CXXFLAGS += $(LIBLO_CFLAGS)
 libpsynth_la_LIBADD += $(LIBLO_LIBS)
-libpsynth_la_SOURCES += \
-	net/OSCBroadcast.cpp \
-	net/OSCController.cpp \
-	net/OSCServer.cpp \
-	net/OSCClient.cpp \
-	net/OSCBroadcast.h \
+nobase_libpsynth_la_include_HEADERS += \
+	net/OSCBroadcast.h\
 	net/OSCServer.h \
 	net/OSCClient.h \
 	net/OSCServerLogger.h \
@@ -127,40 +127,52 @@ libpsynth_la_SOURCES += \
 	net/OSCController.h \
 	net/OSCMisc.h \
 	net/OSCProtocol.h
+libpsynth_la_SOURCES += \
+	net/OSCBroadcast.cpp \
+	net/OSCController.cpp \
+	net/OSCServer.cpp \
+	net/OSCClient.cpp
 endif
 
 if HAVE_ALSA
 libpsynth_la_CXXFLAGS += $(ALSA_CFLAGS)
 libpsynth_la_LIBADD += $(ALSA_LIBS)
-libpsynth_la_SOURCES += \
+nobase_libpsynth_la_include_HEADERS += \
 	psynth/DefaultsAlsa.h \
 	psynth/OutputDirectorAlsa.h \
-	output/OutputAlsa.h \
+	output/OutputAlsa.h	
+libpsynth_la_SOURCES += \
 	output/OutputAlsa.cpp
 endif
 
 if HAVE_OSS
-libpsynth_la_SOURCES += \
+nobase_libpsynth_la_include_HEADERS += \
 	psynth/DefaultsOss.h \
 	psynth/OutputDirectorOss.h \
-	output/OutputOss.h \
+	output/OutputOss.h
+libpsynth_la_SOURCES += \
 	output/OutputOss.cpp
 endif
 
 if HAVE_JACK
 libpsynth_la_CXXFLAGS += $(JACK_CFLAGS)
 libpsynth_la_LDFLAGS += $(JACK_LIBS)
-libpsynth_la_SOURCES += \
+nobase_libpsynth_la_include_HEADERS += \
 	psynth/DefaultsJack.h \
 	psynth/OutputDirectorJack.h \
-	output/OutputJack.h \
+	output/OutputJack.h
+libpsynth_la_SOURCES += \
 	output/OutputJack.cpp
 endif
 
 if HAVE_AUDIOFILE
 libpsynth_la_CXXFLAGS += $(AUDIOFILE_CFLAGS)
 libpsynth_la_LIBADD += $(AUDIOFILE_LIBS)
+nobase_libpsynth_la_include_HEADERS += \
+	output/OutputWave.h
 libpsynth_la_SOURCES += \
-	output/OutputWave.h \
 	output/OutputWave.cpp
 endif
+
+
+libpsynth_la_SOURCES += nobase_libpsynth_la_include_HEADERS

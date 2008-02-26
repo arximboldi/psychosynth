@@ -18,9 +18,9 @@
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-AUTOMAKE_OPTIONS = 
+pkgdatadir = $(datadir)/psychosynth
 
-ACLOCAL_AMFLAGS = -I m4
-
-SUBDIRS = libpsynth src data
-
+nobase_pkgdata_DATA = \
+	ogre.cfg \
+	plugins.cfg
+ 

@@ -202,7 +202,7 @@ else
   packageprefix=${prefix}
 fi
 
-PACKAGE_DATA_DIR="${datarootdir}/${PACKAGE}"
+PACKAGE_DATA_DIR="${pkgdatadir}"
 AC_SUBST(PACKAGE_DATA_DIR)
 
 #  Conditions
@@ -283,8 +283,11 @@ AC_MSG_RESULT([
 * 
 *   Installation directories:
 * 
-*      Program: ................. ${packageprefix}/bin
-*      Data: .................... ${packageprefix}/share
+*      Program: ................. ${bindir}
+*      Data: .................... ${pkgdatadir}/psychosynth
+*      Library: ................. ${libdir}
+*      Includes: ................ ${includedir}/libpsynth
+*
 * 
 **
 * 
