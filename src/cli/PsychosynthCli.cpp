@@ -33,7 +33,7 @@
 using namespace std;
 using namespace psynth;
 
-#define TIME_OUT 1000
+#define TIME_OUT 20
 
 void PsychosynthCli::printHelp()
 {
@@ -114,8 +114,12 @@ int PsychosynthCli::runClient()
     timer.update();
     while(ret_val == 0) {
 	timer.update();
-	client.update(timer.deltaticks(), TIME_OUT);
+	
+	while(client.receive(TIME_OUT));
+	client.update(timer.deltaticks());
 
+	getTable()->update();
+	
 	if (client.getState() == OSCClient::IDLE)
 	    ret_val = -1;
     }
@@ -139,8 +143,12 @@ int PsychosynthCli::runServer()
     timer.update();
     while(ret_val == 0) {
 	timer.update();
-	server.update(timer.deltaticks(), TIME_OUT);
 
+	while(server.receive(TIME_OUT));
+	server.update(timer.deltaticks());
+
+	getTable()->update();
+	
 	if (server.getState() == OSCServer::IDLE)
 	    ret_val = -1;
     }

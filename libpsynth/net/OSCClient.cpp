@@ -114,14 +114,23 @@ void OSCClient::disconnect()
     }
 }
 
-int OSCClient::update(int msec, int time_out)
+int OSCClient::receive(int time_out)
 {
+    int n_recv = 0;
+
     if (m_state != IDLE) {
 	if (time_out >= 0)
-	    lo_server_recv_noblock(m_server, time_out);
+	    n_recv = lo_server_recv_noblock(m_server, time_out);
 	else
-	    lo_server_recv(m_server);
-	
+	    n_recv = lo_server_recv(m_server);
+    }
+
+    return n_recv;
+}
+
+int OSCClient::update(int msec)
+{    
+    if (m_state != IDLE) {	
 	if (!m_count_next) {
 	    m_last_alive_recv += msec;
 	    m_last_alive_sent += msec;

@@ -40,12 +40,25 @@ void ConfSubject::notifyConfChange(const ConfNode& source)
 	(*i)(source);    
 }
 
-void ConfSubject::notifyNewChild(const ConfNode& child)
+void ConfSubject::notifyConfNudge(const ConfNode& source)
 {
     for (list<ConfListener*>::iterator i = m_list.begin();
 	 i != m_list.end();
 	 ++i)
-	(*i)->handleNewChild(child);
+	(*i)->handleConfNudge(source);
+
+    for (list<ConfEvent>::iterator i = m_nudge_del.begin();
+	 i != m_nudge_del.end();
+	 ++i)
+	(*i)(source);    
+}
+
+void ConfSubject::notifyConfNewChild(const ConfNode& child)
+{
+    for (list<ConfListener*>::iterator i = m_list.begin();
+	 i != m_list.end();
+	 ++i)
+	(*i)->handleConfNewChild(child);
 }
 
 ConfNode& ConfNode::getPath(std::string path)

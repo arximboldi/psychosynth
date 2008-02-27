@@ -105,8 +105,10 @@ public:
     
     void connect(lo_address target, const char* src_port);
     void disconnect();
+
     /* Timeout < 0 for blocking operation. */
-    int update(int msec, int time_out = 0);
+    int receive(int time_out = 0);
+    int update(int msec);
 };
 
 } /* namespace psynth */

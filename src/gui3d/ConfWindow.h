@@ -31,6 +31,8 @@ class ConfWindow : public ToggableWindow
     psynth::ConfNode& m_gui_conf;
     psynth::ConfNode& m_psynth_conf;
 
+    CEGUI::Window* createAudioSettingsWindow();
+    CEGUI::Window* createVideoSettingsWindow();
 public:
     ConfWindow(psynth::ConfNode& gui_conf,
 	       psynth::ConfNode& psynth_conf) :
@@ -41,3 +43,4 @@ public:
 };
 
 #endif /* CONFWINDOW_H */
+

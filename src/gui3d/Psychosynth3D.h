@@ -30,8 +30,10 @@
 #include <libpsynth/version.h>
 #include <libpsynth/common/Timer.h>
 #include <libpsynth/psynth/PsychosynthApp.h>
+#ifdef PSYNTH_HAVE_OSC
 #include <libpsynth/net/OSCClient.h>
 #include <libpsynth/net/OSCServer.h>
+#endif
 
 #include "gui3d/InputManager.h"
 #include "gui3d/CeguiInjecter.h"

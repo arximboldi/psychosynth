@@ -156,7 +156,9 @@ bool Psychosynth3D::frameStarted(const Ogre::FrameEvent& evt)
     m_taskmgr->update(m_timer.deltaticks());
     getTable()->update();
     m_elemmgr->update();
+    while(m_oscclient->receive());
     m_oscclient->update(m_timer.deltaticks());
+    while(m_oscserver->receive());
     m_oscserver->update(m_timer.deltaticks());
     
     return !must_quit;
@@ -219,6 +221,9 @@ void Psychosynth3D::setupOgre(psynth::ConfNode& conf)
 
 void Psychosynth3D::setupInput()
 {
+    int fullscreen; /* I prefer not using the singleton here. */
+    Config::instance().getPath("psynth3d/fullscreen").get(fullscreen);
+    
     OIS::ParamList pl;
     size_t window_hnd = 0;
 
@@ -234,7 +239,7 @@ void Psychosynth3D::setupInput()
 #elif defined OIS_LINUX_PLATFORM 
     pl.insert(std::make_pair(std::string("x11_mouse_grab"), std::string("false"))); 
     pl.insert(std::make_pair(std::string("x11_mouse_hide"), std::string("true"))); 
-    pl.insert(std::make_pair(std::string("x11_keyboard_grab"), std::string("true"))); 
+    pl.insert(std::make_pair(std::string("x11_keyboard_grab"), std::string(fullscreen ? "true" : "false"))); 
     pl.insert(std::make_pair(std::string("XAutoRepeatOn"), std::string("true"))); 
 #endif
 
@@ -289,6 +294,7 @@ void Psychosynth3D::setupTable()
     Light* light;
     light = m_scene->createLight("light1");
     light->setType(Light::LT_POINT);
+
     light->setPosition(Vector3(-20, 50, -20));
     light->setDiffuseColour(1.0, 1.0, 1.0);
     light->setSpecularColour(1.0, 1.0, 1.0);

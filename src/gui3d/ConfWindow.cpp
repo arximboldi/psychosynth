@@ -25,7 +25,35 @@
 using namespace psynth;
 using namespace CEGUI;
 
+#define CW_WIDTH 100
+#define CW_HEIGHT 100
+
+CEGUI::Window* ConfWindow::createAudioSettingsWindow()
+{
+}
+
+CEGUI::Window* ConfWindow::createVideoSettingsWindow()
+{
+}
+
 CEGUI::FrameWindow* ConfWindow::createWindow()
 {
+    WindowManager& wmgr = WindowManager::getSingleton();
     
+    FrameWindow* window = dynamic_cast<FrameWindow*>
+	(wmgr.createWindow("TaharezLook/FrameWindow"));
+	
+    window->setPosition(UVector2(UDim(0.5, -CW_WIDTH/2), UDim(0.5, -CW_HEIGHT/2)));
+    window->setSize    (UVector2(UDim(0, CW_WIDTH),UDim(0, CW_HEIGHT)));
+    window->setText("Settings");
+    
+    Window* container = wmgr.createWindow("TaharezLook/TabControl");
+    container->setPosition( UVector2(UDim(0, 10), UDim(0, 30)) );
+    container->setSize    ( UVector2(UDim(1, -20),     UDim(1, -40)) );
+
+    window->addChildWindow(container);
+    //container->addChildWindow(client_win);
+    //container->addChildWindow(server_win);
+
+    return window;
 }

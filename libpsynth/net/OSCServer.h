@@ -138,7 +138,8 @@ public:
     void close();
 
     /* time_out < 0 for blocking operation. */
-    int update(int msec, int time_out = 0);
+    int receive(int time_out = 0);
+    int update(int msec);
 };
 
 } /* namespace psynth */

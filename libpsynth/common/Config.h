@@ -158,8 +158,9 @@ class ConfListener {
 public:
     virtual ~ConfListener() {};
     
+    virtual bool handleConfNudge(const ConfNode& node) = 0;
     virtual bool handleConfChange(const ConfNode& node) = 0;
-    virtual bool handleNewChild(const ConfNode& child) = 0;
+    virtual bool handleConfNewChild(const ConfNode& child) = 0;
 };
 
 //typedef fastdelegate::FastDelegate<bool (const ConfNode&)> ConfEvent;
@@ -170,10 +171,14 @@ class ConfSubject
 {    
     std::list<ConfListener*> m_list;
     std::list<ConfEvent> m_change_del;
-    
+    std::list<ConfEvent> m_nudge_del;
 public:
     void addChangeEvent(const ConfEvent& sub) {
 	m_change_del.push_back(sub);
+    }
+
+    void addNudgeEvent(const ConfEvent& sub) {
+	m_nudge_del.push_back(sub);
     }
     
     void addListener(ConfListener* l) {
@@ -183,13 +188,18 @@ public:
     void deleteChangeEvent(const ConfEvent& sub) {
 	m_change_del.remove(sub);
     }
+
+    void deleteNudgeEvent(const ConfEvent& sub) {
+	m_nudge_del.remove(sub);
+    }
     
     void deleteListener(ConfListener* l) {
 	m_list.remove(l);
     }
 
+    void notifyConfNudge(const ConfNode& source);
     void notifyConfChange(const ConfNode& source);
-    void notifyNewChild(const ConfNode& child);
+    void notifyConfNewChild(const ConfNode& child);
 };
 
 class ConfBackend
@@ -304,6 +314,10 @@ public:
 
     const std::string& getName() const {
 	return m_name;
+    }
+
+    void nudge() {
+	notifyConfNudge(*this);
     }
     
     void save() {
