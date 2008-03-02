@@ -74,6 +74,7 @@ class ObjectOutput : public Object
 	
     void doUpdate(const Object* caller, int caller_port_type, int caller_port);
     void doAdvance() {}
+    void onInfoChange() {}
     
 public:
     enum InAudioSocketID {

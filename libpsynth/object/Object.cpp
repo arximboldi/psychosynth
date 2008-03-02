@@ -173,4 +173,18 @@ void Object::update(const Object* caller, int caller_port_type, int caller_port)
     }
 }
 
+void Object::setInfo(const AudioInfo& info)
+{
+    int i;
+    
+    for (i = 0; i < m_outdata_audio.size(); ++i)
+	m_outdata_audio[i].setInfo(info);
+
+    if (m_audioinfo.block_size != info.block_size)
+	for (i = 0; i < m_outdata_control.size(); ++i)
+	    m_outdata_control[i].resize(info.block_size);
+
+    m_audioinfo = info;
+}   
+
 } /* namespace psynth */

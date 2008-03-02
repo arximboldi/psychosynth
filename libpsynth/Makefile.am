@@ -41,6 +41,9 @@ libpsynth_la_includedir = $(includedir)/libpsynth
 nobase_libpsynth_la_include_HEADERS = \
 	psynth/Director.h \
 	psynth/Defaults.h \
+	psynth/DefaultsJack.h \
+	psynth/DefaultsOss.h \
+	psynth/DefaultsAlsa.h \
 	psynth/OutputDirector.h \
 	psynth/PsychosynthApp.h \
 	common/ArgParser.h \

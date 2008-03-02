@@ -34,7 +34,12 @@ class OutputDirectorAlsa : public OutputDirector
 {
     OutputAlsa* m_output;
 
-    bool onDeviceChange(const ConfNode& conf) {
+    ~OutputDirectorAlsa() {
+	if (m_output)
+	    stop();
+    }
+    
+    bool onDeviceChange(ConfNode& conf) {
 	std::string device;
 	Output::State old_state;
 	
@@ -51,7 +56,6 @@ class OutputDirectorAlsa : public OutputDirector
     virtual Output* doStart(ConfNode& conf) {
 	std::string device;
 	
-	conf.getChild("out_device").def(DEFAULT_ALSA_OUT_DEVICE);
 	conf.getChild("out_device").get(device);
 	conf.getChild("out_device").addChangeEvent(MakeEvent(this, &OutputDirectorAlsa::onDeviceChange));
 
@@ -70,6 +74,10 @@ class OutputDirectorAlsa : public OutputDirector
     }
 
 public:
+    void defaults(ConfNode& conf) {
+	conf.getChild("out_device").def(DEFAULT_ALSA_OUT_DEVICE);
+    }
+    
     OutputDirectorAlsa() :
 	m_output(NULL) {}
 };

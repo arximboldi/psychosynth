@@ -28,6 +28,7 @@
 #include <libpsynth/common/MapIterator.h>
 #include <libpsynth/object/ObjectManager.h>
 #include <libpsynth/object/ObjectOutput.h>
+#include <libpsynth/common/Mutex.h>
 
 namespace psynth
 {
@@ -36,7 +37,8 @@ class ObjectManager
 {
     std::map<int, Object*> m_objmap;
     std::list<ObjectOutput*> m_outputs;
-	
+    Mutex m_update_lock;
+    
 public:
     typedef MapIterator<int, Object*> Iterator;
     typedef MapConstIterator<int, Object*> ConstIterator;
@@ -72,6 +74,8 @@ public:
     ConstIterator find(int id) const {
 	return m_objmap.find(id);
     }
+
+    void setInfo(const AudioInfo& info);
 
     /**
      * Makes a full new update of the objects. This means that it first resets

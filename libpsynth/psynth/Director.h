@@ -36,17 +36,21 @@ class Director : public NoCopy
     typedef std::map<std::string, OutputDirectorFactory*> ODFMap;
     ODFMap m_outdir;
 
+    std::string m_old_output;
     OutputDirector* m_output;
     Table* m_table;
 
     ConfNode* m_config;
     AudioInfo m_info;
-    
-    bool onSampleRateChange(const ConfNode& node);
-    bool onBlockSizeChange(const ConfNode& node);
-    bool onNumChannelsChange(const ConfNode& node);
-    bool onOutputChange(const ConfNode& node);
 
+    bool onConfigNudge(ConfNode& node);
+#if 0
+    bool onSampleRateChange(ConfNode& node);
+    bool onBlockSizeChange(ConfNode& node);
+    bool onNumChannelsChange(ConfNode& node);
+    bool onOutputChange(ConfNode& node);
+#endif
+    
     void registerConfig();
     void unregisterConfig();
     

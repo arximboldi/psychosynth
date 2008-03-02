@@ -39,6 +39,8 @@ class OutputDirector
     virtual void doStop(ConfNode& conf) = 0;
 
 public:
+    virtual void defaults(ConfNode& conf) = 0;
+    
     OutputDirector() :
 	m_conf(NULL),
 	m_output(NULL)

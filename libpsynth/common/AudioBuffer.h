@@ -30,7 +30,8 @@
 namespace psynth
 {
 
-class AudioBuffer {
+class AudioBuffer
+{
     AudioInfo m_info;
     Sample** m_data;
 
@@ -104,6 +105,16 @@ public:
     
     void zero() {
 	memset(*m_data, 0, sizeof(Sample) * m_info.block_size * m_info.num_channels);
+    }
+
+    void setInfo(const AudioInfo& info) {
+	if (m_info.block_size != info.block_size ||
+	    m_info.num_channels != info.num_channels) {
+	    liberate();
+	    m_info = info;
+	    allocate();
+	} else
+	    m_info = info;	    
     }
 };
 

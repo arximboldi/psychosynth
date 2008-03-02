@@ -33,6 +33,7 @@
 #include "gui3d/Psychosynth3D.h"
 
 #include "gui3d/QuitWindow.h"
+#include "gui3d/ConfWindow.h"
 #include "gui3d/SelectorWindow.h"
 #ifdef PSYNTH_HAVE_OSC
 #include "gui3d/NetworkWindow.h"
@@ -55,6 +56,7 @@
 using namespace Ogre;
 using namespace std;
 using namespace psynth;
+
 
 Psychosynth3D::Psychosynth3D()
 {
@@ -175,6 +177,10 @@ void Psychosynth3D::setupSettings(ConfNode& conf)
     conf.getChild("screen_height").def(DEFAULT_SCREEN_HEIGHT);
     conf.getChild("fullscreen").def(DEFAULT_FULLSCREEN);
     conf.getChild("fps").def(DEFAULT_FPS);
+
+    /* Is it dangerous to have this set before the gui is initialized? */
+    conf.addNudgeEvent(MakeEvent(this, &Psychosynth3D::onConfigChange));
+    conf.getChild("fps").addChangeEvent(MakeEvent(this, &Psychosynth3D::onFpsChange));
 }
 
 void Psychosynth3D::setupOgre(psynth::ConfNode& conf)
@@ -236,7 +242,7 @@ void Psychosynth3D::setupInput()
     pl.insert(std::make_pair(std::string("w32_mouse"), std::string("DISCL_NONEXCLUSIVE"))); 
     pl.insert(std::make_pair(std::string("w32_keyboard"), std::string("DISCL_FOREGROUND"))); 
     pl.insert(std::make_pair(std::string("w32_keyboard"), std::string("DISCL_NONEXCLUSIVE"))); 
-#elif defined OIS_LINUX_PLATFORM 
+#elif defined OIS_LINUX_PLATFORM
     pl.insert(std::make_pair(std::string("x11_mouse_grab"), std::string("false"))); 
     pl.insert(std::make_pair(std::string("x11_mouse_hide"), std::string("true"))); 
     pl.insert(std::make_pair(std::string("x11_keyboard_grab"), std::string(fullscreen ? "true" : "false"))); 
@@ -388,6 +394,11 @@ void Psychosynth3D::setupMenus()
 					      m_oscserver),
 			    OIS::KC_UNASSIGNED);
 #endif
+    m_windowlist->addWindow("ConfWindowButton.imageset",
+			    "ConfWindowButton.layout",
+			    new ConfWindow(Config::instance().getChild("psynth3d"),
+					   Config::instance().getChild("psychosynth")),
+			    OIS::KC_UNASSIGNED);
     m_windowlist->addWindow("QuitWindowButton.imageset",
 			    "QuitWindowButton.layout",
 			    new QuitWindow(),
@@ -433,3 +444,33 @@ void Psychosynth3D::closeOgre()
 {
     delete m_ogre;
 }
+
+bool Psychosynth3D::onConfigChange(psynth::ConfNode& conf)
+{
+    int sc_width;
+    int sc_height;
+    int sc_fullscreen;
+    int fps;
+
+    conf.getChild("screen_width").get(sc_width);
+    conf.getChild("screen_height").get(sc_height);
+    conf.getChild("fullscreen").get(sc_fullscreen);
+    conf.getChild("fps").get(fps);
+
+    m_timer.forceFps(fps);
+    m_window->setFullscreen(sc_fullscreen,
+			    sc_width,
+			    sc_height);
+    return true;
+}
+
+bool Psychosynth3D::onFpsChange(psynth::ConfNode& conf)
+{
+    int fps;
+    
+    conf.get(fps);
+    m_timer.forceFps(fps);
+
+    return true;
+}
+

@@ -95,8 +95,22 @@ void ObjectManager::remove(Iterator it)
     delete obj;
 }
 
+void ObjectManager::setInfo(const AudioInfo& info)
+{
+    m_update_lock.lock();
+
+    map<int, Object*>::iterator map_iter;
+    for (map_iter = m_objmap.begin(); map_iter != m_objmap.end(); ++map_iter) {
+	map_iter->second->setInfo(info);
+    }
+    
+    m_update_lock.unlock();
+}
+
 void ObjectManager::update()
 {
+    m_update_lock.lock();
+    
     map<int, Object*>::iterator map_iter;
     for (map_iter = m_objmap.begin(); map_iter != m_objmap.end(); ++map_iter) {
 	(*map_iter).second->advance();
@@ -106,6 +120,8 @@ void ObjectManager::update()
     for (out_iter = m_outputs.begin(); out_iter != m_outputs.end(); ++out_iter) {
 	(*out_iter)->update(NULL, -1, -1);
     }
+
+    m_update_lock.unlock();
 }
 
 } /* namespace psynth */

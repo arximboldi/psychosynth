@@ -27,7 +27,7 @@ using namespace std;
 namespace psynth
 {
 
-void ConfSubject::notifyConfChange(const ConfNode& source)
+void ConfSubject::notifyConfChange(ConfNode& source)
 {
     for (list<ConfListener*>::iterator i = m_list.begin();
 	 i != m_list.end();
@@ -40,7 +40,7 @@ void ConfSubject::notifyConfChange(const ConfNode& source)
 	(*i)(source);    
 }
 
-void ConfSubject::notifyConfNudge(const ConfNode& source)
+void ConfSubject::notifyConfNudge(ConfNode& source)
 {
     for (list<ConfListener*>::iterator i = m_list.begin();
 	 i != m_list.end();
@@ -53,7 +53,7 @@ void ConfSubject::notifyConfNudge(const ConfNode& source)
 	(*i)(source);    
 }
 
-void ConfSubject::notifyConfNewChild(const ConfNode& child)
+void ConfSubject::notifyConfNewChild(ConfNode& child)
 {
     for (list<ConfListener*>::iterator i = m_list.begin();
 	 i != m_list.end();

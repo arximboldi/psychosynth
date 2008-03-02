@@ -158,13 +158,13 @@ class ConfListener {
 public:
     virtual ~ConfListener() {};
     
-    virtual bool handleConfNudge(const ConfNode& node) = 0;
-    virtual bool handleConfChange(const ConfNode& node) = 0;
-    virtual bool handleConfNewChild(const ConfNode& child) = 0;
+    virtual bool handleConfNudge(ConfNode& node) = 0;
+    virtual bool handleConfChange(ConfNode& node) = 0;
+    virtual bool handleConfNewChild(ConfNode& child) = 0;
 };
 
 //typedef fastdelegate::FastDelegate<bool (const ConfNode&)> ConfEvent;
-typedef fastdelegate::FastDelegate1<const ConfNode&, bool> ConfEvent;
+typedef fastdelegate::FastDelegate1<ConfNode&, bool> ConfEvent;
 #define MakeEvent fastdelegate::MakeDelegate
 
 class ConfSubject
@@ -197,9 +197,9 @@ public:
 	m_list.remove(l);
     }
 
-    void notifyConfNudge(const ConfNode& source);
-    void notifyConfChange(const ConfNode& source);
-    void notifyConfNewChild(const ConfNode& child);
+    void notifyConfNudge(ConfNode& source);
+    void notifyConfChange(ConfNode& source);
+    void notifyConfNewChild(ConfNode& child);
 };
 
 class ConfBackend

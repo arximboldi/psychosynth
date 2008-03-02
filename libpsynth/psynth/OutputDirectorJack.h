@@ -34,7 +34,12 @@ class OutputDirectorJack : public OutputDirector
 {
     OutputJack* m_output;
 
-    bool onServerChange(const ConfNode& conf) {
+    ~OutputDirectorJack() {
+	if (m_output)
+	    stop();
+    }
+    
+    bool onServerChange(ConfNode& conf) {
 	std::string server;
 	Output::State old_state;
 	
@@ -51,8 +56,7 @@ class OutputDirectorJack : public OutputDirector
     virtual Output* doStart(ConfNode& conf) {
 	std::string server;
 
-	conf.getChild("server").def(DEFAULT_JACK_SERVER);
-	conf.getChild("server").get(server);
+     	conf.getChild("server").get(server);
 	conf.getChild("server").addChangeEvent(MakeEvent(this, &OutputDirectorJack::onServerChange));
 	
 	m_output = new OutputJack;
@@ -70,6 +74,10 @@ class OutputDirectorJack : public OutputDirector
     }
 
 public:
+    void defaults(ConfNode& conf) {
+	conf.getChild("server").def(DEFAULT_JACK_SERVER);
+    }
+
     OutputDirectorJack() :
 	m_output(NULL) {}
 };

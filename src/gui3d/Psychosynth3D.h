@@ -90,7 +90,10 @@ class Psychosynth3D : public psynth::PsychosynthApp,
 
     void printHelp();
     void printVersion();
-    
+
+    bool onConfigChange(psynth::ConfNode& conf);
+    bool onFpsChange(psynth::ConfNode& conf);
+
 public:
     Psychosynth3D();
     ~Psychosynth3D();

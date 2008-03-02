@@ -44,7 +44,8 @@ public:
 private:
     void doUpdate(const Object* caller, int caller_port_type, int caller_port);
     void doAdvance() {}
-
+    void onInfoChange() {}
+    
 public:  
     ObjectAudioMixer(const AudioInfo& prop, int n_chan = 2) :
 	ObjectMixer(prop,

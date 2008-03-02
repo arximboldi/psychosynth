@@ -231,7 +231,8 @@ public:
     };
 
     void setInfo(const AudioInfo& info) {
-	//m_objmgr->setInfo(info);
+	if (m_info != info)
+	    m_objmgr.setInfo(info);
     }
     
     TableObject findObject(int id);

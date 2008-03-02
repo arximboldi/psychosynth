@@ -72,6 +72,8 @@ void Director::startOutput()
     } else {
 	m_config->getChild("output").set(DEFAULT_OUTPUT);
     }
+
+    m_old_output = out_name;
 }
 
 void Director::registerConfig()
@@ -81,24 +83,39 @@ void Director::registerConfig()
     m_config->getChild("num_channels").def(DEFAULT_NUM_CHANNELS);
     m_config->getChild("output")      .def(DEFAULT_OUTPUT);
 
-    m_config->getChild("sample_rate") .addChangeEvent(MakeEvent(this, &Director::onSampleRateChange));
-    m_config->getChild("block_size")  .addChangeEvent(MakeEvent(this, &Director::onBlockSizeChange));
+    m_config->addNudgeEvent(MakeEvent(this, &Director::onConfigNudge));
+
+#if 0
+    m_config->getChild("sample_rate").addChangeEvent(MakeEvent(this, &Director::onSampleRateChange));
+    m_config->getChild("block_size").addChangeEvent(MakeEvent(this, &Director::onBlockSizeChange));
     m_config->getChild("num_channels").addChangeEvent(MakeEvent(this, &Director::onNumChannelsChange));
-    m_config->getChild("output")      .addChangeEvent(MakeEvent(this, &Director::onOutputChange));
+    m_config->getChild("output").addChangeEvent(MakeEvent(this, &Director::onOutputChange));
+#endif
 }
 
 void Director::unregisterConfig()
 {
-    m_config->getChild("sample_rate") .deleteChangeEvent(MakeEvent(this, &Director::onSampleRateChange));
-    m_config->getChild("block_size")  .deleteChangeEvent(MakeEvent(this, &Director::onBlockSizeChange));
+    m_config->deleteNudgeEvent(MakeEvent(this, &Director::onConfigNudge));
+
+#if 0
+    m_config->getChild("sample_rate").deleteChangeEvent(MakeEvent(this, &Director::onSampleRateChange));
+    m_config->getChild("block_size").deleteChangeEvent(MakeEvent(this, &Director::onBlockSizeChange));
     m_config->getChild("num_channels").deleteChangeEvent(MakeEvent(this, &Director::onNumChannelsChange));
-    m_config->getChild("output")      .deleteChangeEvent(MakeEvent(this, &Director::onOutputChange));    
+    m_config->getChild("output").deleteChangeEvent(MakeEvent(this, &Director::onOutputChange));    
+#endif
 }
 
 void Director::start(ConfNode& conf)
 {
     m_config = &conf;
 
+    /* A bit dirty... */
+    for (ODFMap::iterator i = m_outdir.begin(); i != m_outdir.end(); ++i) {
+	OutputDirector* od = i->second->createOutputDirector();
+	od->defaults(m_config->getChild(i->first));
+	delete od;
+    }
+    
     registerConfig();
 
     conf.getChild("sample_rate").get(m_info.sample_rate);
@@ -135,7 +152,33 @@ void Director::updateInfo()
     m_output->getOutput()->gotoState(old_state);
 }
 
-bool Director::onSampleRateChange(const ConfNode& node)
+bool Director::onConfigNudge(ConfNode& node)
+{
+    string out;
+    
+    node.getChild("sample_rate").get(m_info.sample_rate);
+    node.getChild("block_size").get(m_info.block_size);
+    node.getChild("num_channels").get(m_info.num_channels);
+    node.getChild("output").get(out);
+
+    m_table->setInfo(m_info);
+
+    Output::State old_state;
+    old_state = m_output->getOutput()->getState();
+    if (m_output && out == m_old_output) {    
+	m_output->getOutput()->gotoState(Output::NOTINIT);
+	m_output->getOutput()->setInfo(m_info);
+	m_output->getOutput()->gotoState(old_state);
+    } else {
+	stopOutput();
+	startOutput();
+    }
+    
+    return false;
+}
+
+#if 0
+bool Director::onSampleRateChange(ConfNode& node)
 {
     cout << "SAMPLE_RATE_CHANGE!\n";
     node.get(m_info.sample_rate);
@@ -144,7 +187,7 @@ bool Director::onSampleRateChange(const ConfNode& node)
     return false;
 }
 
-bool Director::onBlockSizeChange(const ConfNode& node)
+bool Director::onBlockSizeChange(ConfNode& node)
 {
     node.get(m_info.block_size);
     updateInfo();
@@ -152,7 +195,7 @@ bool Director::onBlockSizeChange(const ConfNode& node)
     return false;
 }
 
-bool Director::onNumChannelsChange(const ConfNode& node)
+bool Director::onNumChannelsChange(ConfNode& node)
 {
     node.get(m_info.num_channels);
     updateInfo();
@@ -160,11 +203,12 @@ bool Director::onNumChannelsChange(const ConfNode& node)
     return false;
 }
 
-bool Director::onOutputChange(const ConfNode& node)
+bool Director::onOutputChange(ConfNode& node)
 {
     stopOutput();
     startOutput();
     return false;
 }
+#endif
 
 } /* namespace psynth */

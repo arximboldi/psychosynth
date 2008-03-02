@@ -51,10 +51,10 @@ void ElemGuiParamMulti::createGUI()
 
     m_selector = dynamic_cast<Combobox*>(wmgr.createWindow("TaharezLook/Combobox"));
     m_selector->setPosition(UVector2(UDim(0.5, 0), UDim(0, 0)));
-    m_selector->setSize(UVector2(UDim(0.5, 0), UDim(0, 20 * (m_nval+1))));
-
+    m_selector->setSize(UVector2(UDim(0.5, 0), UDim(0, 30 + 18 * (m_nval+1))));
+    m_selector->getDropList()->setClippedByParent(false);
     m_selector->setReadOnly(true);
-	
+    m_selector->setWantsMultiClickEvents(false);
     for (int i = 0; i < m_nval; ++i) {
 	ListboxItem* item = new ListboxTextItem(m_op_names[i], i);
 	m_selector->addItem(item);
@@ -125,9 +125,9 @@ void ElemGuiParamFloat::createGUI()
     m_spinner->setMaximumValue(m_max_val);
     m_spinner->setMinimumValue(m_min_val);
     m_spinner->setTextInputMode(Spinner::FloatingPoint);
-    m_spinner->subscribeEvent(Spinner::EventValueChanged, 
+    /*m_spinner->subscribeEvent(Spinner::EventValueChanged, 
 			      Event::Subscriber(&ElemGuiParamFloat::onSpinnerChange, this));
-
+    */
     float value;
     getParent()->getObject().getParam(getParam(), value);
     m_skip++;

@@ -27,15 +27,31 @@ namespace psynth {
 
 typedef float Sample;
 
-struct AudioInfo {
-	int sample_rate;
-	int block_size;
-	int num_channels;
+struct AudioInfo
+{
+    int sample_rate;
+    int block_size;
+    int num_channels;
 		
-	AudioInfo(const AudioInfo& i) :
-		sample_rate(i.sample_rate), block_size(i.block_size), num_channels(i.num_channels) {}
-	AudioInfo(int r = 0, int s = 0, int c = 0) :
-		sample_rate(r), block_size(s), num_channels(c) {}
+    AudioInfo(const AudioInfo& i) :
+	sample_rate(i.sample_rate), block_size(i.block_size), num_channels(i.num_channels) {}
+
+    AudioInfo(int r = 0, int s = 0, int c = 0) :
+	sample_rate(r), block_size(s), num_channels(c) {}
+
+    bool operator== (const AudioInfo& i) {
+	return
+	    sample_rate == i.sample_rate &&
+	    block_size == i.block_size &&
+	    num_channels == i.num_channels;
+    }
+
+    bool operator!= (const AudioInfo& i) {
+	return
+	    sample_rate != i.sample_rate ||
+	    block_size != i.block_size ||
+	    num_channels != i.num_channels;
+    }
 };
 
 } /* namespace psynth */

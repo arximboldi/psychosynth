@@ -40,6 +40,7 @@ public:
 private:
     void doUpdate(const Object* caller, int caller_port_type, int caller_port);
     void doAdvance() {}
+    void onInfoChange() {}
     
 public:
     ObjectAudioOscillator(const AudioInfo& prop) :

@@ -274,6 +274,7 @@ protected:
 	
     virtual void doUpdate(const Object* caller, int caller_port_type, int caller_port) = 0;
     virtual void doAdvance() = 0;
+    virtual void onInfoChange() = 0;
     
     void configureLocalParam(int id, int type, void* val) {
 	m_params[PARAM_LOCAL][id].configure(type, val);
@@ -323,6 +324,8 @@ public:
     const AudioInfo& getInfo() const {
 	return m_audioinfo;
     }
+
+    void setInfo(const AudioInfo& info);
     
     void connectIn(int type, int in_socket, Object* src, int out_socket);
 
