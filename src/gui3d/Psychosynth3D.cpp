@@ -158,10 +158,13 @@ bool Psychosynth3D::frameStarted(const Ogre::FrameEvent& evt)
     m_taskmgr->update(m_timer.deltaticks());
     getTable()->update();
     m_elemmgr->update();
+
+#ifdef PSYNTH_HAVE_OSC
     while(m_oscclient->receive());
     m_oscclient->update(m_timer.deltaticks());
     while(m_oscserver->receive());
     m_oscserver->update(m_timer.deltaticks());
+#endif
     
     return !must_quit;
 }
