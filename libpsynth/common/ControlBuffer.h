@@ -23,6 +23,7 @@
 #ifndef PSYNTH_CONTROLBUFFER_H
 #define PSYNTH_CONTROLBUFFER_H
 
+#include <cstring>
 #include <libpsynth/common/AudioInfo.h>
 
 namespace psynth

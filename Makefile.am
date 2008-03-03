@@ -18,9 +18,13 @@
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-AUTOMAKE_OPTIONS = 
+AUTOMAKE_OPTIONS = foreign
 
 ACLOCAL_AMFLAGS = -I m4
 
 SUBDIRS = libpsynth src data
+
+pkgconfigdir = $(libdir)/pkgconfig
+pkgconfig_DATA = libpsynth.pc
+
 

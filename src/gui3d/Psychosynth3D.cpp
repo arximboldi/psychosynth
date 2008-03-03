@@ -195,15 +195,17 @@ void Psychosynth3D::setupOgre(psynth::ConfNode& conf)
     conf.getChild("fullscreen").get(fullscreen);
     conf.getChild("fps").get(fps);
     
-    (new LogManager)->createLog("Ogre.log", false, false, false);  
-    m_ogre = new Root("data/plugins.cfg", "data/ogre.cfg");
+    (new LogManager)->createLog(getConfigPath() + "/psynth3d_Ogre.log",
+				false, false, false);  
+    m_ogre = new Root(getDataPath() + "/plugins.cfg",
+		      getDataPath() + "/ogre.cfg");
 
     ResourceGroupManager& res_mgr = ResourceGroupManager::getSingleton();
-    res_mgr.addResourceLocation("data", "FileSystem", "General");
-    res_mgr.addResourceLocation("data/mesh", "FileSystem", "General");
-    res_mgr.addResourceLocation("data/texture", "FileSystem", "General");
-    res_mgr.addResourceLocation("data/material", "FileSystem", "General");
-    res_mgr.addResourceLocation("data/gui", "FileSystem", "GUI");
+    res_mgr.addResourceLocation(getDataPath(), "FileSystem", "General");
+    res_mgr.addResourceLocation(getDataPath() + "/mesh", "FileSystem", "General");
+    res_mgr.addResourceLocation(getDataPath() + "/texture", "FileSystem", "General");
+    res_mgr.addResourceLocation(getDataPath() + "/material", "FileSystem", "General");
+    res_mgr.addResourceLocation(getDataPath() + "/gui", "FileSystem", "GUI");
 
     if (!m_ogre->restoreConfig() && !m_ogre->showConfigDialog())
 	m_ogre->setRenderSystem( *(m_ogre->getAvailableRenderers()->begin()) );
@@ -253,12 +255,13 @@ void Psychosynth3D::setupInput()
 }
 
 void Psychosynth3D::setupGui()
-{
+{  
     m_ceguirender = new CEGUI::OgreCEGUIRenderer(m_window,
-						 Ogre::RENDER_QUEUE_OVERLAY, false,
-						 3000, m_scene);
+						 Ogre::RENDER_QUEUE_OVERLAY,
+						 false, 3000, m_scene);
+
     m_gui = new CEGUI::System(m_ceguirender);
-	
+    CEGUI::Logger::getSingleton().setLogFilename(getConfigPath() + "/psynth3d_CEGUI.log");
     CEGUI::SchemeManager::getSingleton().loadScheme("TaharezLook.scheme");
     m_gui->setDefaultMouseCursor("TaharezLook", "MouseArrow");
     m_gui->setDefaultFont(CEGUI::FontManager::getSingleton().

@@ -32,6 +32,18 @@ AM_PROG_LIBTOOL
 
 psynth_config_ok="yes"
 
+# Tool m4 functions
+# ======================================================================
+
+define([XE_EXPAND_VARIABLE],
+[$2=[$]$1
+while true; do
+  case "[$]$2" in
+    *\[$]* ) eval "$2=[$]$2" ;;
+    *) break ;;
+  esac
+done]) dnl XE_EXPAND_VARIABLE
+
 #  Optional libraries
 # ======================================================================
 
@@ -195,15 +207,26 @@ BUILD_PSYNTH=$HAVE_LIBLO
 #  Directories
 # ======================================================================
 
-# Set PACKAGE PREFIX
+# Set PREFIX
 if test "x${prefix}" = "xNONE"; then
-  packageprefix=${ac_default_prefix}
-else
-  packageprefix=${prefix}
+  prefix=${ac_default_prefix}
+  exec_prefix=${ac_default_prefix}
 fi
 
-PACKAGE_DATA_DIR="${pkgdatadir}"
+XE_EXPAND_VARIABLE(datadir, PACKAGE_DATA_DIR)
+PACKAGE_DATA_DIR="$PACKAGE_DATA_DIR/psychosynth"
+XE_EXPAND_VARIABLE(includedir, PACKAGE_INCLUDE_DIR)
+PACKAGE_INCLUDE_DIR="$PACKAGE_INCLUDE_DIR/libpsynth"
+XE_EXPAND_VARIABLE(bindir, PACKAGE_BIN_DIR)
+XE_EXPAND_VARIABLE(libdir, PACKAGE_LIB_DIR)
+
+# Uncomment only for development purposes
+# PACKAGE_DATA_DIR="./data"
+
 AC_SUBST(PACKAGE_DATA_DIR)
+AC_SUBST(PACKAGE_BIN_DIR)
+AC_SUBST(PACKAGE_INCLUDE_DIR)
+AC_SUBST(PACKAGE_LIB_DIR)
 
 #  Conditions
 # ======================================================================
@@ -240,7 +263,8 @@ AM_CONDITIONAL([BUILD_PSYNTH3D], [test "x$BUILD_PSYNTH3D" = xyes])
 #  Create files
 # ======================================================================
 
-AC_OUTPUT(Makefile 
+AC_OUTPUT(libpsynth.pc
+	  Makefile
 	  src/Makefile
 	  data/Makefile
 	  libpsynth/Makefile
@@ -284,10 +308,10 @@ AC_MSG_RESULT([
 * 
 *   Installation directories:
 * 
-*      Program: ................. ${bindir}
-*      Data: .................... ${pkgdatadir}/psychosynth
-*      Library: ................. ${libdir}
-*      Includes: ................ ${includedir}/libpsynth
+*      Program: ................. $PACKAGE_BIN_DIR
+*      Data: .................... $PACKAGE_DATA_DIR
+*      Library: ................. $PACKAGE_LIB_DIR
+*      Includes: ................ $PACKAGE_INCLUDE_DIR
 *
 * 
 **

@@ -1,0 +1,10 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+
+Name: libpsynth
+Description: A free library for interactive modular sound synthesizers.
+Version: @VERSION@
+Libs: -L${libdir} -llibpsynth
+Cflags: -I${includedir}

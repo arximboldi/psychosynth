@@ -37,8 +37,9 @@ libpsynth_la_CXXFLAGS =
 libpsynth_la_LDFLAGS = 
 libpsynth_la_LIBADD =
 
-libpsynth_la_includedir = $(includedir)/libpsynth
-nobase_libpsynth_la_include_HEADERS = \
+libpsynthincdir = @PACKAGE_INCLUDE_DIR@
+
+nobase_libpsynthinc_HEADERS = \
 	psynth/Director.h \
 	psynth/Defaults.h \
 	psynth/DefaultsJack.h \
@@ -52,6 +53,9 @@ nobase_libpsynth_la_include_HEADERS = \
 	common/Thread.h \
 	common/Mutex.h \
 	common/AudioBuffer.h \
+	common/ControlBuffer.h\
+	common/FastDelegate.h\
+	common/FastDelegateBind.h\
 	common/RingAudioBuffer.h \
 	common/AudioInfo.h \
         common/MapIterator.h \
@@ -60,6 +64,7 @@ nobase_libpsynth_la_include_HEADERS = \
 	common/Config.h \
 	common/OptionConf.h \
 	common/Timer.h \
+	common/Vector2D.h\
 	table/Table.h \
 	table/Patcher.h\
 	table/PatcherDynamic.h \
@@ -86,6 +91,7 @@ libpsynth_la_SOURCES = \
 	common/ArgParser.cpp \
 	common/Error.cpp \
 	common/AudioBuffer.cpp \
+	common/ControlBuffer.cpp \
 	common/RingAudioBuffer.cpp \
 	common/Mutex.cpp \
 	common/Misc.cpp \
@@ -114,14 +120,14 @@ libpsynth_la_CXXFLAGS += $(LIBXML_CFLAGS)
 libpsynth_la_LIBADD += $(LIBXML_LIBS)
 libpsynth_la_SOURCES += \
 	common/ConfBackendXML.cpp
-nobase_libpsynth_la_include_HEADERS += \
+nobase_libpsynthinc_HEADERS += \
 	common/ConfBackendXML.h
 endif
 
 if HAVE_LIBLO
 libpsynth_la_CXXFLAGS += $(LIBLO_CFLAGS)
 libpsynth_la_LIBADD += $(LIBLO_LIBS)
-nobase_libpsynth_la_include_HEADERS += \
+nobase_libpsynthinc_HEADERS += \
 	net/OSCBroadcast.h\
 	net/OSCServer.h \
 	net/OSCClient.h \
@@ -140,7 +146,7 @@ endif
 if HAVE_ALSA
 libpsynth_la_CXXFLAGS += $(ALSA_CFLAGS)
 libpsynth_la_LIBADD += $(ALSA_LIBS)
-nobase_libpsynth_la_include_HEADERS += \
+nobase_libpsynthinc_HEADERS += \
 	psynth/DefaultsAlsa.h \
 	psynth/OutputDirectorAlsa.h \
 	output/OutputAlsa.h	
@@ -149,7 +155,7 @@ libpsynth_la_SOURCES += \
 endif
 
 if HAVE_OSS
-nobase_libpsynth_la_include_HEADERS += \
+nobase_libpsynthinc_HEADERS += \
 	psynth/DefaultsOss.h \
 	psynth/OutputDirectorOss.h \
 	output/OutputOss.h
@@ -160,7 +166,7 @@ endif
 if HAVE_JACK
 libpsynth_la_CXXFLAGS += $(JACK_CFLAGS)
 libpsynth_la_LDFLAGS += $(JACK_LIBS)
-nobase_libpsynth_la_include_HEADERS += \
+nobase_libpsynthinc_HEADERS += \
 	psynth/DefaultsJack.h \
 	psynth/OutputDirectorJack.h \
 	output/OutputJack.h
@@ -171,11 +177,13 @@ endif
 if HAVE_AUDIOFILE
 libpsynth_la_CXXFLAGS += $(AUDIOFILE_CFLAGS)
 libpsynth_la_LIBADD += $(AUDIOFILE_LIBS)
-nobase_libpsynth_la_include_HEADERS += \
+nobase_libpsynthinc_HEADERS += \
 	output/OutputWave.h
 libpsynth_la_SOURCES += \
 	output/OutputWave.cpp
 endif
 
 
-libpsynth_la_SOURCES += nobase_libpsynth_la_include_HEADERS
+libpsynth_la_SOURCES += $(nobase_libpsynthinc_HEADERS)
+
+EXTRA_DIST = version.h.in

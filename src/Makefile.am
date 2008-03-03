@@ -49,7 +49,7 @@ psynth_LDADD = \
 
 psynth_SOURCES = \
 	cli/PsychosynthCli.cpp\
-	psynth.cpp
+	psynth.cpp\
 	cli/PsychosynthCli.h
 
 #  psynth3d compilation
@@ -101,6 +101,7 @@ psynth3d_SOURCES = \
 	gui3d/ToggableWindow.h\
 	gui3d/TaskManager.h\
 	gui3d/Element.h\
+	gui3d/ElementTypes.h\
 	gui3d/ElemMainComponent.h \
 	gui3d/ElemSecondComponent.h \
 	gui3d/ElementManager.h\

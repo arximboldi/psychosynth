@@ -48,7 +48,7 @@ namespace psynth
 void PsychosynthApp::generatePaths()
 {
 #ifdef WIN32
-    m_cfg_dir = ".";
+    m_cfg_dir = "./";
 #else
     char* home_dir = getenv("HOME");
     m_cfg_dir = std::string(home_dir) + "/.psychosynth/";
@@ -104,7 +104,7 @@ std::string PsychosynthApp::getConfigPath()
 
 std::string PsychosynthApp::getDataPath()
 {
-    return PSYNTH_DATA_DIR;
+    return string(PSYNTH_DATA_DIR) + "/";
 }
 
 void PsychosynthApp::printBaseOptions(ostream& out)
