@@ -38,7 +38,7 @@ ObjectRadar::ObjectRadar(const AudioInfo& prop, int numchan) :
     m_param_speed(0.5f),
     m_numchan(numchan)
 {
-    configureLocalParam(PARAM_AMPLITUDE, Object::PARAM_FLOAT, &m_param_ampl);
+    addParam("amplitude", Object::PARAM_FLOAT, &m_param_ampl);
 }
 
 void ObjectRadar::doUpdate(const Object* caller, int caller_port_type, int caller_port)

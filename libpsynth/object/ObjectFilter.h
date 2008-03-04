@@ -65,7 +65,7 @@ public:
     };
 
     enum ParamID {
-	PARAM_TYPE,
+	PARAM_TYPE = Object::N_COMMON_PARAMS,
 	PARAM_CUTOFF,
 	PARAM_RESONANCE,
 	N_PARAM

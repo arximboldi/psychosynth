@@ -90,145 +90,145 @@ void ElementManager::addElement(int e_type)
     switch(e_type) {
     case ELEM_OSC_SINE:
 	obj = m_table->addObject(OBJ_OSCILLATOR);
-	obj.setParam(Object::ParamID(Object::PARAM_LOCAL, ObjectOscillator::PARAM_WAVE),
+	obj.setParam(ObjectOscillator::PARAM_WAVE,
 		     ObjectOscillator::OSC_SINE);
 	break;
 	
     case ELEM_OSC_SQUARE:
 	obj = m_table->addObject(OBJ_OSCILLATOR);
-	obj.setParam(Object::ParamID(Object::PARAM_LOCAL, ObjectOscillator::PARAM_WAVE),
+	obj.setParam(ObjectOscillator::PARAM_WAVE,
 		     ObjectOscillator::OSC_SQUARE);
 	break;
 	
     case ELEM_OSC_TRIANGLE:
 	obj = m_table->addObject(OBJ_OSCILLATOR);
-	obj.setParam(Object::ParamID(Object::PARAM_LOCAL, ObjectOscillator::PARAM_WAVE),
+	obj.setParam(ObjectOscillator::PARAM_WAVE,
 		     ObjectOscillator::OSC_TRIANGLE);
 	break;
 	
     case ELEM_OSC_SAWTOOTH:
 	obj = m_table->addObject(OBJ_OSCILLATOR);
-	obj.setParam(Object::ParamID(Object::PARAM_LOCAL, ObjectOscillator::PARAM_WAVE),
+	obj.setParam(ObjectOscillator::PARAM_WAVE,
 		     ObjectOscillator::OSC_SAWTOOTH);
 	break;
 
     case ELEM_OSC_MOOGSAW:
 	obj = m_table->addObject(OBJ_OSCILLATOR);
-	obj.setParam(Object::ParamID(Object::PARAM_LOCAL, ObjectOscillator::PARAM_WAVE),
+	obj.setParam(ObjectOscillator::PARAM_WAVE,
 		     ObjectOscillator::OSC_MOOGSAW);
 	break;
 
     case ELEM_OSC_EXP:
 	obj = m_table->addObject(OBJ_OSCILLATOR);
-	obj.setParam(Object::ParamID(Object::PARAM_LOCAL, ObjectOscillator::PARAM_WAVE),
+	obj.setParam(ObjectOscillator::PARAM_WAVE,
 		     ObjectOscillator::OSC_EXP);
 	break;
 	
     case ELEM_LFO_SINE:
 	obj = m_table->addObject(OBJ_LFO);
-	obj.setParam(Object::ParamID(Object::PARAM_LOCAL, ObjectOscillator::PARAM_WAVE),
+	obj.setParam(ObjectOscillator::PARAM_WAVE,
 		     ObjectOscillator::OSC_SINE);
-	obj.setParam(Object::ParamID(Object::PARAM_LOCAL, ObjectOscillator::PARAM_FREQUENCY),
+	obj.setParam(ObjectOscillator::PARAM_FREQUENCY,
 		     2.0f);
 	break;
 	
     case ELEM_LFO_SQUARE:
 	obj = m_table->addObject(OBJ_LFO);
-	obj.setParam(Object::ParamID(Object::PARAM_LOCAL, ObjectOscillator::PARAM_WAVE),
+	obj.setParam(ObjectOscillator::PARAM_WAVE,
 		     ObjectOscillator::OSC_SQUARE);
-	obj.setParam(Object::ParamID(Object::PARAM_LOCAL, ObjectOscillator::PARAM_FREQUENCY),
+	obj.setParam(ObjectOscillator::PARAM_FREQUENCY,
 		     2.0f);
 	break;
 	
     case ELEM_LFO_TRIANGLE:
 	obj = m_table->addObject(OBJ_LFO);
-	obj.setParam(Object::ParamID(Object::PARAM_LOCAL, ObjectOscillator::PARAM_WAVE),
+	obj.setParam(ObjectOscillator::PARAM_WAVE,
 		     ObjectOscillator::OSC_TRIANGLE);
-	obj.setParam(Object::ParamID(Object::PARAM_LOCAL, ObjectOscillator::PARAM_FREQUENCY),
+	obj.setParam(ObjectOscillator::PARAM_FREQUENCY,
 		     2.0f);
 	break;
 	
     case ELEM_LFO_SAWTOOTH:
 	obj = m_table->addObject(OBJ_LFO);
-	obj.setParam(Object::ParamID(Object::PARAM_LOCAL, ObjectOscillator::PARAM_WAVE),
+	obj.setParam(ObjectOscillator::PARAM_WAVE,
 		     ObjectOscillator::OSC_SAWTOOTH);
-	obj.setParam(Object::ParamID(Object::PARAM_LOCAL, ObjectOscillator::PARAM_FREQUENCY),
+	obj.setParam(ObjectOscillator::PARAM_FREQUENCY,
 		     2.0f);
 	break;
 
     case ELEM_LFO_MOOGSAW:
 	obj = m_table->addObject(OBJ_LFO);
-	obj.setParam(Object::ParamID(Object::PARAM_LOCAL, ObjectOscillator::PARAM_WAVE),
+	obj.setParam(ObjectOscillator::PARAM_WAVE,
 		     ObjectOscillator::OSC_MOOGSAW);
-	obj.setParam(Object::ParamID(Object::PARAM_LOCAL, ObjectOscillator::PARAM_FREQUENCY),
+	obj.setParam(ObjectOscillator::PARAM_FREQUENCY,
 		     2.0f);
 	break;
 	
     case ELEM_LFO_EXP:
 	obj = m_table->addObject(OBJ_LFO);
-	obj.setParam(Object::ParamID(Object::PARAM_LOCAL, ObjectOscillator::PARAM_WAVE),
+	obj.setParam(ObjectOscillator::PARAM_WAVE,
 		     ObjectOscillator::OSC_EXP);
-	obj.setParam(Object::ParamID(Object::PARAM_LOCAL, ObjectOscillator::PARAM_FREQUENCY),
+	obj.setParam(ObjectOscillator::PARAM_FREQUENCY,
 		     2.0f);
 	break;
 	
     case ELEM_FILTER_LOWPASS:
 	obj = m_table->addObject(OBJ_FILTER);
-	obj.setParam(Object::ParamID(Object::PARAM_LOCAL, ObjectFilter::PARAM_TYPE),
+	obj.setParam(ObjectFilter::PARAM_TYPE,
 		     ObjectFilter::FILTER_LOWPASS);
 	break;
 
     case ELEM_FILTER_HIGHPASS:
 	obj = m_table->addObject(OBJ_FILTER);
-	obj.setParam(Object::ParamID(Object::PARAM_LOCAL, ObjectFilter::PARAM_TYPE),
+	obj.setParam(ObjectFilter::PARAM_TYPE,
 		     ObjectFilter::FILTER_HIGHPASS);
 	break;
 
     case ELEM_FILTER_BANDPASS_CSG:
 	obj = m_table->addObject(OBJ_FILTER);
-	obj.setParam(Object::ParamID(Object::PARAM_LOCAL, ObjectFilter::PARAM_TYPE),
+	obj.setParam(ObjectFilter::PARAM_TYPE,
 		     ObjectFilter::FILTER_BANDPASS_CSG);
 	break;
 
     case ELEM_FILTER_BANDPASS_CZPG:
 	obj = m_table->addObject(OBJ_FILTER);
-	obj.setParam(Object::ParamID(Object::PARAM_LOCAL, ObjectFilter::PARAM_TYPE),
+	obj.setParam(ObjectFilter::PARAM_TYPE,
 		     ObjectFilter::FILTER_BANDPASS_CZPG);
 	break;
 
     case ELEM_FILTER_NOTCH:
 	obj = m_table->addObject(OBJ_FILTER);
-	obj.setParam(Object::ParamID(Object::PARAM_LOCAL, ObjectFilter::PARAM_TYPE),
+	obj.setParam(ObjectFilter::PARAM_TYPE,
 		     ObjectFilter::FILTER_NOTCH);
 	break;
 
     case ELEM_FILTER_MOOG:
 	obj = m_table->addObject(OBJ_FILTER);
-	obj.setParam(Object::ParamID(Object::PARAM_LOCAL, ObjectFilter::PARAM_TYPE),
+	obj.setParam(ObjectFilter::PARAM_TYPE,
 		     ObjectFilter::FILTER_MOOG);
 	break;
 	
     case ELEM_MIXER:
 	obj = m_table->addObject(OBJ_MIXER);
-	obj.setParam(Object::ParamID(Object::PARAM_LOCAL, ObjectMixer::PARAM_MIXOP),
+	obj.setParam(ObjectMixer::PARAM_MIXOP,
 		     ObjectMixer::MIX_SUM);
 	break;
 
     case ELEM_RINGMOD:
 	obj = m_table->addObject(OBJ_MIXER);
-	obj.setParam(Object::ParamID(Object::PARAM_LOCAL, ObjectMixer::PARAM_MIXOP),
+	obj.setParam(ObjectMixer::PARAM_MIXOP,
 		     ObjectMixer::MIX_PRODUCT);
 	break;
 
     case ELEM_CTRLMIXER:
 	obj = m_table->addObject(OBJ_CONTROLMIXER);
-	obj.setParam(Object::ParamID(Object::PARAM_LOCAL, ObjectMixer::PARAM_MIXOP),
+	obj.setParam(ObjectMixer::PARAM_MIXOP,
 		     ObjectMixer::MIX_SUM);
 	break;
 
     case ELEM_CTRLRINGMOD:
 	obj = m_table->addObject(OBJ_CONTROLMIXER);
-	obj.setParam(Object::ParamID(Object::PARAM_LOCAL, ObjectMixer::PARAM_MIXOP),
+	obj.setParam(ObjectMixer::PARAM_MIXOP,
 		     ObjectMixer::MIX_PRODUCT);
 	break;
 	

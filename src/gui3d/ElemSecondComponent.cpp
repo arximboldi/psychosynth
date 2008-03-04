@@ -33,7 +33,7 @@ using namespace std;
 using namespace Ogre;
 using namespace psynth;
 
-ElemSecondComponent::ElemSecondComponent(Object::ParamID param,
+ElemSecondComponent::ElemSecondComponent(int param,
 					 float min_val, float max_val) :
     m_indicator(NULL),
     m_indicator_point(NULL),
@@ -121,7 +121,7 @@ bool ElemSecondComponent::handlePointerRelease(Ogre::Vector2 pos, OIS::MouseButt
     return false;
 }
 
-void ElemSecondComponent::handleParamChange(TableObject& obj, Object::ParamID param_id)
+void ElemSecondComponent::handleParamChange(TableObject& obj, int param_id)
 {
     if (param_id == m_param) {
 	Degree new_angle;

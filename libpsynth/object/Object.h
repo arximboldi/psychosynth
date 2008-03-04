@@ -34,6 +34,8 @@
 #include <libpsynth/common/Mutex.h>
 #include <libpsynth/common/Vector2D.h>
 
+#include <libpsynth/object/ObjParam.h>
+
 namespace psynth
 {
 
@@ -48,46 +50,12 @@ public:
 	LINK_CONTROL,
 	LINK_TYPES
     };
-
-    enum ParamScope {
-	PARAM_LOCAL,
-	PARAM_COMMON,
-	PARAM_SCOPES
-    };
     
-    enum ParamType {
-	PARAM_NONE = -1,
-	PARAM_INT,       /* int */
-	PARAM_FLOAT,     /* float */
-	PARAM_STRING,    /* std::string */
-	PARAM_VECTOR2F,  /* Vector2f */
-	PARAM_TYPES
-    };
-
     enum CommonParams {
 	PARAM_POSITION = 0,
 	PARAM_RADIOUS,
 	PARAM_MUTE,
 	N_COMMON_PARAMS
-    };
-
-    class ParamID {
-    public:
-	ParamScope scope;
-	int id;
-
-	ParamID(ParamScope _scope = PARAM_LOCAL, int _id = 0) :
-	    scope(_scope), id(_id) {}
-
-	bool operator== (const ParamID& param) const {
-	    return scope == param.scope && id == param.id;
-	}
-
-	bool operator< (const ParamID& param) const {
-	    return
-		scope < param.scope ||
-		(scope == param.scope && id < param.id);
-	}
     };
     
     class OutSocket {
@@ -159,75 +127,18 @@ public:
     };
 
 private:
-
-    class Param {
-	Mutex m_lock;
-	int m_type;
-	bool m_changed;
-	void* m_src;
-	void* m_dest;
-
-    public:
-	Param() :
-	    m_type(PARAM_NONE), m_changed(false), m_src(NULL), m_dest(NULL) {}
-
-	~Param() {
-	    clear();
-	}
-
-	void clear();
-	
-	void configure(int type, void* dest);
-
-	int type() const {
-	    return m_type;
-	};
-	
-	template <typename T>
-	void set(const T& d) {
-	    m_lock.lock();
-	    m_changed = true;
-	    *static_cast<T*>(m_src) = d;
-	    m_lock.unlock();
-	}
-
-	template <typename T>
-	void get(T& d) const {
-	    m_lock.lock();
-	    d = *static_cast<T*>(m_src);
-	    m_lock.unlock();
-	}
-	
-	void update() {
-	    m_lock.lock();
-	    if (m_changed) {
-		switch(m_type) {
-		case PARAM_INT:
-		    *static_cast<int*>(m_dest) = *static_cast<int*>(m_src);
-		    break;
-		case PARAM_FLOAT:
-		    *static_cast<float*>(m_dest) = *static_cast<float*>(m_src);
-		    break;
-		case PARAM_STRING:
-		    *static_cast<std::string*>(m_dest) = *static_cast<std::string*>(m_src);
-		    break;
-		case PARAM_VECTOR2F:
-		    *static_cast<Vector2f*>(m_dest) = *static_cast<Vector2f*>(m_src);
-		    break;
-		default: break;
-		};
-		m_changed = false;
-	    }
-	    m_lock.unlock();
-	}
-    };
-
     AudioInfo m_audioinfo;
-    std::vector<AudioBuffer>   m_outdata_audio;
+
+    std::vector<AudioBuffer> m_outdata_audio;
     std::vector<ControlBuffer> m_outdata_control;
-    std::vector<OutSocket>     m_out_sockets[LINK_TYPES];
-    std::vector<InSocket>      m_in_sockets[LINK_TYPES];
-    std::vector<Param>         m_params[PARAM_SCOPES];
+
+    std::vector<OutSocket> m_out_sockets[LINK_TYPES];
+    std::vector<InSocket> m_in_sockets[LINK_TYPES];
+
+    std::vector<ObjParam>  m_params;
+    ObjParam m_null_param;
+    int m_nparam;
+    
     int m_id;
     int m_type;
     
@@ -247,10 +158,6 @@ private:
     bool canUpdate(const Object* caller, int caller_port_type,
 		   int caller_port);
 
-    void configureCommonParam(int id, int type, void* val) {
-	m_params[PARAM_COMMON][id].configure(type, val);
-    }
-    
 protected:
     template <typename SocketDataType>
     SocketDataType* getOutput(int type, int socket) {
@@ -271,17 +178,15 @@ protected:
 	
 	return NULL;
     }
-	
+    
     virtual void doUpdate(const Object* caller, int caller_port_type, int caller_port) = 0;
     virtual void doAdvance() = 0;
     virtual void onInfoChange() = 0;
     
-    void configureLocalParam(int id, int type, void* val) {
-	m_params[PARAM_LOCAL][id].configure(type, val);
-    }
+    void addParam(const std::string&, int type, void* val);
 	
 public:
-    Object(const AudioInfo& prop, int type, int params,
+    Object(const AudioInfo& prop, int type,
 	   int inaudiosocks, int incontrolsocks,
 	   int outaudiosocks, int outcontrolsocks,
 	   bool single_update = true);
@@ -329,20 +234,18 @@ public:
     
     void connectIn(int type, int in_socket, Object* src, int out_socket);
 
-    int getParamType(ParamID id) {
-	return m_params[id.scope][id.id].type();
-    };
+    ObjParam& param(int id) {
+	return m_params[id];
+    }
+
+    const ObjParam& param(int id) const {
+	return m_params[id];
+    }
+
+    ObjParam& param(const std::string& name);
+
+    const ObjParam& param(const std::string& name) const;
     
-    template <typename T>
-    void setParam(ParamID id, const T& val) {
-	m_params[id.scope][id.id].set(val);
-    }
-
-    template <typename T>
-    void getParam(ParamID id, T& val) const {
-	m_params[id.scope][id.id].get(val);
-    }
-
     template <typename SocketDataType>
     const SocketDataType* getOutput(int type, int socket) const {
 	return getOutput<SocketDataType>(type, socket);

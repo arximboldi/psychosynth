@@ -83,13 +83,13 @@ Connection::Connection(Ogre::SceneManager* scene,
 {
     Vector2f v;
     
-    src.getParam(Object::ParamID(Object::PARAM_COMMON, Object::PARAM_MUTE), m_is_muted);
+    src.getParam(Object::PARAM_MUTE, m_is_muted);
   
-    src.getParam(Object::ParamID(Object::PARAM_COMMON, Object::PARAM_POSITION), v);
+    src.getParam(Object::PARAM_POSITION, v);
     m_src.x = v.x;
     m_src.y = v.y;
 
-    dest.getParam(Object::ParamID(Object::PARAM_COMMON, Object::PARAM_POSITION), v);
+    dest.getParam(Object::PARAM_POSITION, v);
     m_dest.x = v.x;
     m_dest.y = v.y;
     
@@ -115,9 +115,9 @@ Connection::~Connection()
     delete m_line;
 }
 
-void Connection::handleSetParamObject(TableObject& obj, Object::ParamID id)
+void Connection::handleSetParamObject(TableObject& obj, int id)
 {
-    if (id == Object::ParamID(Object::PARAM_COMMON, Object::PARAM_POSITION)) {
+    if (id == Object::PARAM_POSITION) {
 	Vector2f pos;
 	obj.getParam(id, pos);
     
@@ -132,7 +132,7 @@ void Connection::handleSetParamObject(TableObject& obj, Object::ParamID id)
 	m_line->update(m_src, m_dest);
     }
 
-    if (id == Object::ParamID(Object::PARAM_COMMON, Object::PARAM_MUTE)
+    if (id == Object::PARAM_MUTE
 	&& obj == m_s_obj) {
 	
 	obj.getParam(id, m_is_muted);
@@ -154,8 +154,7 @@ bool Connection::pointerClicked(const Ogre::Vector2& pos, OIS::MouseButtonID id)
 
     if (pointIsInPoly(pos, top_left, top_right, bot_right, bot_left)) {
 	m_is_muted = !m_is_muted;
-	m_s_obj.setParam(Object::ParamID(Object::PARAM_COMMON, Object::PARAM_MUTE),
-			 m_is_muted);
+	m_s_obj.setParam(Object::PARAM_MUTE, m_is_muted);
 
 	return true;
     }

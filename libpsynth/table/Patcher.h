@@ -82,7 +82,7 @@ public:
     
     virtual bool addObject(Object* obj) = 0;
     virtual bool deleteObject(Object* obj) = 0;
-    virtual void setParamObject(Object* obj, Object::ParamID param) = 0;
+    virtual void setParamObject(Object* obj, int param) = 0;
     virtual void update() = 0;
     virtual void clear() = 0;
 };

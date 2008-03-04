@@ -82,6 +82,7 @@ nobase_libpsynthinc_HEADERS = \
 	object/WaveTable.h \
 	object/Oscillator.h \
 	object/KnownObjects.h \
+	object/ObjParam.h\
 	output/Output.h\
 	version.h
 
@@ -113,7 +114,8 @@ libpsynth_la_SOURCES = \
 	object/ObjectFilter.cpp \
 	object/Filter.cpp \
 	object/WaveTable.cpp \
-	object/Oscillator.cpp
+	object/Oscillator.cpp\
+	object/ObjParam.cpp
 
 if HAVE_LIBXML
 libpsynth_la_CXXFLAGS += $(LIBXML_CFLAGS)

@@ -75,7 +75,7 @@ void TableSubject::notifyDeactivateObject(TableObject& obj)
     }
 }
 
-void TableSubject::notifySetParamObject(TableObject& obj, Object::ParamID param_id)
+void TableSubject::notifySetParamObject(TableObject& obj, int param_id)
 {
     for (ObjectListenerIter i = m_all_obj_list.begin(); i != m_all_obj_list.end(); i++)
 	(*i)->handleSetParamObject(obj, param_id);

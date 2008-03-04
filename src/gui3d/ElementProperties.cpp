@@ -30,7 +30,7 @@ using namespace std;
 using namespace CEGUI;
 using namespace psynth;
 
-ElemGuiParamMulti::ElemGuiParamMulti(Object::ParamID param, int nval, const char** names,
+ElemGuiParamMulti::ElemGuiParamMulti(int param, int nval, const char** names,
 				     const std::string& name) :
     ElemGuiParam(param),
     m_op_names(names),
@@ -73,7 +73,7 @@ void ElemGuiParamMulti::createGUI()
     getParentWindow()->addChildWindow(m_selector);
 }
 
-void ElemGuiParamMulti::handleParamChange(TableObject& obj, Object::ParamID param)
+void ElemGuiParamMulti::handleParamChange(TableObject& obj, int param)
 {
     int new_val;
 
@@ -99,7 +99,7 @@ bool ElemGuiParamMulti::onComboboxChange(const CEGUI::EventArgs &e)
     return true;
 }
 
-ElemGuiParamFloat::ElemGuiParamFloat(Object::ParamID param, float min_val, float max_val,
+ElemGuiParamFloat::ElemGuiParamFloat(int param, float min_val, float max_val,
 				     const std::string& name) :
     ElemGuiParam(param),
     m_min_val(min_val),
@@ -138,7 +138,7 @@ void ElemGuiParamFloat::createGUI()
     getParentWindow()->addChildWindow(m_spinner);
 }
 
-void ElemGuiParamFloat::handleParamChange(TableObject& obj, Object::ParamID param)
+void ElemGuiParamFloat::handleParamChange(TableObject& obj, int param)
 {
     float new_val;
 
@@ -158,7 +158,7 @@ bool ElemGuiParamFloat::onSpinnerChange(const CEGUI::EventArgs &e)
     return true;
 }
 
-void ElementProperties::handleSetParamObject(TableObject& obj, Object::ParamID param_id)
+void ElementProperties::handleSetParamObject(TableObject& obj, int param_id)
 {
     if (m_params.find(param_id) != m_params.end())
 	m_params[param_id]->handleParamChange(obj, param_id);

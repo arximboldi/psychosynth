@@ -43,7 +43,7 @@ public:
     virtual ~ElemComponent() {};
     virtual void init() = 0;
     virtual void handleParamChange(psynth::TableObject& obj,
-				   psynth::Object::ParamID id) = 0;
+				   int id) = 0;
     virtual bool handlePointerMove(Ogre::Vector2 pos) = 0;
     virtual bool handlePointerClick(Ogre::Vector2 pos, OIS::MouseButtonID id) = 0;
     virtual bool handlePointerRelease(Ogre::Vector2 pos, OIS::MouseButtonID id) = 0;
@@ -126,7 +126,7 @@ public:
     void handleActivateObject(psynth::TableObject& obj);
     void handleDeactivateObject(psynth::TableObject& obj);
     void handleSetParamObject(psynth::TableObject& ob,
-			      psynth::Object::ParamID param_id);
+			      int param_id);
     
     bool isGhost() const {
 	return m_ghost;

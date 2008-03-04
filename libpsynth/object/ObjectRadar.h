@@ -57,7 +57,7 @@ public:
     };
 
     enum ParamID {
-	PARAM_SPEED,
+	PARAM_SPEED = Object::N_COMMON_PARAM,
 	PARAM_ANGLE,
 	N_PARAM
     };

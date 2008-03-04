@@ -46,19 +46,19 @@ ElementMixer::ElementMixer(TableObject& obj,
 	{"Sum", "Product"};
 
     addComponent(new ElemMultiMainComponent(
-		     Object::ParamID(Object::PARAM_LOCAL, ObjectMixer::PARAM_AMPLITUDE),
+		     ObjectMixer::PARAM_AMPLITUDE,
 		     0.0f, 1.0f,
-		     Object::ParamID(Object::PARAM_LOCAL, ObjectMixer::PARAM_MIXOP),
+		     ObjectMixer::PARAM_MIXOP,
 		     mesh_names));
 	
     getGUIProperties().addParameter(new ElemGuiParamMulti(
-					Object::ParamID(Object::PARAM_LOCAL, ObjectMixer::PARAM_MIXOP),
+					ObjectMixer::PARAM_MIXOP,
 					ObjectMixer::N_MIXOPS,
 					mixop_names,
 					"Operation"));
     
     getGUIProperties().addParameter(new ElemGuiParamFloat(
-					Object::ParamID(Object::PARAM_LOCAL, ObjectMixer::PARAM_AMPLITUDE),
+					ObjectMixer::PARAM_AMPLITUDE,
 					0.0f, 1.0f,
 					"Amplitude"));
 }
@@ -75,19 +75,19 @@ ElementControlMixer::ElementControlMixer(TableObject& obj,
 	{"Sum", "Product"};
 
     addComponent(new ElemMultiMainComponent(
-		     Object::ParamID(Object::PARAM_LOCAL, ObjectMixer::PARAM_AMPLITUDE),
+		     ObjectMixer::PARAM_AMPLITUDE,
 		     0.0f, 1.0f,
-		     Object::ParamID(Object::PARAM_LOCAL, ObjectMixer::PARAM_MIXOP),
+		     ObjectMixer::PARAM_MIXOP,
 		     mesh_names));
 	
     getGUIProperties().addParameter(new ElemGuiParamMulti(
-					Object::ParamID(Object::PARAM_LOCAL, ObjectMixer::PARAM_MIXOP),
+					ObjectMixer::PARAM_MIXOP,
 					ObjectMixer::N_MIXOPS,
 					mixop_names,
 					"Operation"));
     
     getGUIProperties().addParameter(new ElemGuiParamFloat(
-					Object::ParamID(Object::PARAM_LOCAL, ObjectMixer::PARAM_AMPLITUDE),
+					ObjectMixer::PARAM_AMPLITUDE,
 					0.0f, 1.0f,
 					"Amplitude"));
 }
@@ -107,35 +107,35 @@ ElementOscillator::ElementOscillator(TableObject& obj,
 	{"Frequency", "Amplitude", "Phase"};
     
     addComponent(new ElemMultiMainComponent(
-		     Object::ParamID(Object::PARAM_LOCAL, ObjectOscillator::PARAM_FREQUENCY),
+		     ObjectOscillator::PARAM_FREQUENCY,
 		     20.0f, 5000.0f,
-		     Object::ParamID(Object::PARAM_LOCAL, ObjectOscillator::PARAM_WAVE),
+		     ObjectOscillator::PARAM_WAVE,
 		     mesh_names));
     
     addComponent(new ElemSecondComponent(
-		     Object::ParamID(Object::PARAM_LOCAL, ObjectOscillator::PARAM_AMPLITUDE),
+		     ObjectOscillator::PARAM_AMPLITUDE,
 		     0.0f, 1.0f));
 
     
     getGUIProperties().addParameter(new ElemGuiParamMulti(
-					Object::ParamID(Object::PARAM_LOCAL, ObjectOscillator::PARAM_WAVE),
+					ObjectOscillator::PARAM_WAVE,
 					ObjectOscillator::N_OSC_TYPES,
 					wave_names,
 					"Wave"));
 
     getGUIProperties().addParameter(new ElemGuiParamMulti(
-					Object::ParamID(Object::PARAM_LOCAL, ObjectOscillator::PARAM_MODULATOR),
+					ObjectOscillator::PARAM_MODULATOR,
 					ObjectOscillator::N_MOD_TYPES,
 					mod_names,
 					"Modulator"));
     
     getGUIProperties().addParameter(new ElemGuiParamFloat(
-					Object::ParamID(Object::PARAM_LOCAL, ObjectOscillator::PARAM_FREQUENCY),
+					ObjectOscillator::PARAM_FREQUENCY,
 					20.0f, 5000.0f,
 					"Frequency"));
     
     getGUIProperties().addParameter(new ElemGuiParamFloat(
-					Object::ParamID(Object::PARAM_LOCAL, ObjectOscillator::PARAM_AMPLITUDE),
+					ObjectOscillator::PARAM_AMPLITUDE,
 					0.0f, 1.0f,
 					"Amplitude"));
 }
@@ -155,35 +155,35 @@ ElementLFO::ElementLFO(TableObject& obj,
 	{"Frequency", "Amplitude", "Phase"};
     
     addComponent(new ElemMultiMainComponent(
-		     Object::ParamID(Object::PARAM_LOCAL, ObjectOscillator::PARAM_FREQUENCY),
+		     ObjectOscillator::PARAM_FREQUENCY,
 		     0.01f, 30.0f,
-		     Object::ParamID(Object::PARAM_LOCAL, ObjectOscillator::PARAM_WAVE),
+		     ObjectOscillator::PARAM_WAVE,
 		     mesh_names));
     
     addComponent(new ElemSecondComponent(
-		     Object::ParamID(Object::PARAM_LOCAL, ObjectOscillator::PARAM_AMPLITUDE),
+		     ObjectOscillator::PARAM_AMPLITUDE,
 		     0.0f, 1.0f));
 
     
     getGUIProperties().addParameter(new ElemGuiParamMulti(
-					Object::ParamID(Object::PARAM_LOCAL, ObjectOscillator::PARAM_WAVE),
+					ObjectOscillator::PARAM_WAVE,
 					ObjectOscillator::N_OSC_TYPES,
 					wave_names,
 					"Wave"));
 
     getGUIProperties().addParameter(new ElemGuiParamMulti(
-					Object::ParamID(Object::PARAM_LOCAL, ObjectOscillator::PARAM_MODULATOR),
+					ObjectOscillator::PARAM_MODULATOR,
 					ObjectOscillator::N_MOD_TYPES,
 					mod_names,
 					"Modulator"));
     
     getGUIProperties().addParameter(new ElemGuiParamFloat(
-					Object::ParamID(Object::PARAM_LOCAL, ObjectOscillator::PARAM_FREQUENCY),
+					ObjectOscillator::PARAM_FREQUENCY,
 					0.01f, 30.0f,
 					"Frequency"));
     
     getGUIProperties().addParameter(new ElemGuiParamFloat(
-					Object::ParamID(Object::PARAM_LOCAL, ObjectOscillator::PARAM_AMPLITUDE),
+					ObjectOscillator::PARAM_AMPLITUDE,
 					0.0f, 1.0f,
 					"Amplitude"));
 }
@@ -203,29 +203,29 @@ ElementFilter::ElementFilter(TableObject& obj,
 	 "Notch", "Moog"};
     
     addComponent(new ElemMultiMainComponent(
-		     Object::ParamID(Object::PARAM_LOCAL, ObjectFilter::PARAM_CUTOFF),
+		     ObjectFilter::PARAM_CUTOFF,
 		     20.0f, 5000.0f,
-		     Object::ParamID(Object::PARAM_LOCAL, ObjectFilter::PARAM_TYPE),
+		     ObjectFilter::PARAM_TYPE,
 		     mesh_names));
     
     addComponent(new ElemSecondComponent(
-		     Object::ParamID(Object::PARAM_LOCAL, ObjectFilter::PARAM_RESONANCE),
+		     ObjectFilter::PARAM_RESONANCE,
 		     0.0f, 1.0f));
 
     
     getGUIProperties().addParameter(new ElemGuiParamMulti(
-					Object::ParamID(Object::PARAM_LOCAL, ObjectFilter::PARAM_TYPE),
+					ObjectFilter::PARAM_TYPE,
 					ObjectFilter::N_FILTER_TYPES,
 					filter_names,
 					"Filter"));
     
     getGUIProperties().addParameter(new ElemGuiParamFloat(
-					Object::ParamID(Object::PARAM_LOCAL, ObjectFilter::PARAM_CUTOFF),
+					ObjectFilter::PARAM_CUTOFF,
 					20.0f, 5000.0f,
 					"Cut-off Freq."));
     
     getGUIProperties().addParameter(new ElemGuiParamFloat(
-					Object::ParamID(Object::PARAM_LOCAL, ObjectFilter::PARAM_RESONANCE),
+					ObjectFilter::PARAM_RESONANCE,
 					0.0f, 1.0f,
 					"Resonance"));
 }

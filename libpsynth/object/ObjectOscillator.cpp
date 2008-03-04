@@ -36,7 +36,6 @@ ObjectOscillator::ObjectOscillator(const AudioInfo& prop,
 				   int n_control_out) : 
     Object(prop,
 	   obj_type,
-	   N_PARAM,
 	   N_IN_A_SOCKETS,
 	   N_IN_C_SOCKETS,
 	   n_audio_out,
@@ -47,10 +46,10 @@ ObjectOscillator::ObjectOscillator(const AudioInfo& prop,
     m_param_freq(DEFAULT_FREQ),
     m_param_ampl(DEFAULT_AMPL)
 {    
-    configureLocalParam(PARAM_WAVE, PARAM_INT, &m_param_wave);
-    configureLocalParam(PARAM_MODULATOR, PARAM_INT, &m_param_mod);
-    configureLocalParam(PARAM_FREQUENCY, PARAM_FLOAT, &m_param_freq);
-    configureLocalParam(PARAM_AMPLITUDE, PARAM_FLOAT, &m_param_ampl);
+    addParam("wave", ObjParam::INT, &m_param_wave);
+    addParam("modulator", ObjParam::INT, &m_param_mod);
+    addParam("frequency", ObjParam::FLOAT, &m_param_freq);
+    addParam("amplitude", ObjParam::FLOAT, &m_param_ampl);
 
     updateOscParams();
 }

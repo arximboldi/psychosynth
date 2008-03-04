@@ -64,7 +64,7 @@ public:
     };
     
     enum ParamID {
-	PARAM_WAVE,
+	PARAM_WAVE = Object::N_COMMON_PARAMS,
 	PARAM_MODULATOR,
 	PARAM_FREQUENCY,
 	PARAM_AMPLITUDE,

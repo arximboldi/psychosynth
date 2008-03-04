@@ -31,7 +31,6 @@ namespace psynth
 ObjectFilter::ObjectFilter(const AudioInfo& prop, int mode) : 
     Object(prop,
 	   OBJ_FILTER,
-	   N_PARAM,
 	   N_IN_A_SOCKETS,
 	   N_IN_C_SOCKETS,
 	   N_OUT_A_SOCKETS,
@@ -45,9 +44,9 @@ ObjectFilter::ObjectFilter(const AudioInfo& prop, int mode) :
 		    prop.sample_rate),
     m_filter(prop.num_channels, Filter(&m_filter_values))
 {
-    configureLocalParam(PARAM_TYPE, PARAM_INT, &m_param_type);
-    configureLocalParam(PARAM_CUTOFF, PARAM_FLOAT, &m_param_cutoff);
-    configureLocalParam(PARAM_RESONANCE, PARAM_FLOAT, &m_param_resonance);
+    addParam("type", ObjParam::INT, &m_param_type);
+    addParam("cutoff", ObjParam::FLOAT, &m_param_cutoff);
+    addParam("resonance", ObjParam::FLOAT, &m_param_resonance);
 }
 
 ObjectFilter::~ObjectFilter()

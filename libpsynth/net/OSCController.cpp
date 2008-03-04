@@ -116,7 +116,7 @@ void OSCController::handleDeactivateObject(TableObject& obj)
     }
 }
 
-void OSCController::handleSetParamObject(TableObject& obj, Object::ParamID param_id)
+void OSCController::handleSetParamObject(TableObject& obj, int param_id)
 {
     if (!m_skip) {
 	int local_id(obj.getID());
@@ -126,29 +126,28 @@ void OSCController::handleSetParamObject(TableObject& obj, Object::ParamID param
 	
 	lo_message_add_int32(msg, net_id.first);
 	lo_message_add_int32(msg, net_id.second);
-	lo_message_add_int32(msg, param_id.scope);
-	lo_message_add_int32(msg, param_id.id);
+	lo_message_add_int32(msg, param_id);
 
 	switch(obj.getParamType(param_id)) {
-	case Object::PARAM_INT: {
+	case ObjParam::INT: {
 	    int val;
 	    obj.getParam(param_id, val);
 	    lo_message_add_int32(msg, val);
 	    break;
 	}    
-	case Object::PARAM_FLOAT: {
+	case ObjParam::FLOAT: {
 	    float val;
 	    obj.getParam(param_id, val);
 	    lo_message_add_float(msg, val);
 	    break;
 	}  
-	case Object::PARAM_STRING: {
+	case ObjParam::STRING: {
 	    string val;
 	    obj.getParam(param_id, val);
 	    lo_message_add_string(msg, val.c_str());
 	    break;
 	}
-	case Object::PARAM_VECTOR2F: {
+	case ObjParam::VECTOR2F: {
 	    Vector2f val;
 	    obj.getParam(param_id, val);
 	    lo_message_add_float(msg, val.x);
@@ -247,22 +246,22 @@ int OSCController::_param_cb(const char* path, const char* types,
 	if (it != m_local_id.end() &&
 	    !(obj = m_table->findObject(it->second)).isNull()) {
 
-	    Object::ParamID param_id((Object::ParamScope)argv[2]->i, argv[3]->i);
+	    int param_id = argv[2]->i;
 	    
 	    m_skip++;
 	    switch(obj.getParamType(param_id)) {
-	    case Object::PARAM_FLOAT:
-		m_table->setParamObject(obj, param_id, argv[4]->f);
+	    case ObjParam::FLOAT:
+		m_table->setParamObject(obj, param_id, argv[3]->f);
 		break;
-	    case Object::PARAM_INT:
-		m_table->setParamObject(obj, param_id, argv[4]->i);
+	    case ObjParam::INT:
+		m_table->setParamObject(obj, param_id, argv[3]->i);
 		break;
-	    case Object::PARAM_STRING:
-		m_table->setParamObject(obj, param_id, string(&argv[4]->s));
+	    case ObjParam::STRING:
+		m_table->setParamObject(obj, param_id, string(&argv[3]->s));
 		break;
-	    case Object::PARAM_VECTOR2F:
+	    case ObjParam::VECTOR2F:
 		m_table->setParamObject(obj, param_id,
-					Vector2f(argv[4]->f, argv[5]->f));
+					Vector2f(argv[3]->f, argv[4]->f));
 		break;
 	    default:
 		break;
@@ -274,21 +273,20 @@ int OSCController::_param_cb(const char* path, const char* types,
 		lo_message_add_int32(newmsg, argv[0]->i);
 		lo_message_add_int32(newmsg, argv[1]->i);
 		lo_message_add_int32(newmsg, argv[2]->i);
-		lo_message_add_int32(newmsg, argv[3]->i);
 		
 		switch(obj.getParamType(param_id)) {
-		case Object::PARAM_FLOAT:
+		case ObjParam::FLOAT:
+		    lo_message_add_float(newmsg, argv[3]->f);
+		    break;
+		case ObjParam::INT:
+		    lo_message_add_int32(newmsg, argv[3]->i);
+		    break;
+		case ObjParam::STRING:
+		    lo_message_add_string(newmsg, &argv[3]->s);
+		    break;
+		case ObjParam::VECTOR2F:
+		    lo_message_add_float(newmsg, argv[3]->f);
 		    lo_message_add_float(newmsg, argv[4]->f);
-		    break;
-		case Object::PARAM_INT:
-		    lo_message_add_int32(newmsg, argv[4]->i);
-		    break;
-		case Object::PARAM_STRING:
-		    lo_message_add_string(newmsg, &argv[4]->s);
-		    break;
-		case Object::PARAM_VECTOR2F:
-		    lo_message_add_float(newmsg, argv[4]->f);
-		    lo_message_add_float(newmsg, argv[5]->f);
 		    break;
 		default:
 		    break;

@@ -31,7 +31,7 @@ using namespace Ogre;
 using namespace psynth;
 
 ElemMainComponent::ElemMainComponent(const std::string& mesh,
-				     Object::ParamID param,
+				     int param,
 				     float min_val, float max_val) :
     m_mesh(mesh),
     m_mesh_ent(NULL),
@@ -129,7 +129,7 @@ void ElemMainComponent::init()
     getSceneNode()->attachObject(m_indicator_fill);
 }
 
-void ElemMainComponent::handleParamChange(TableObject& obj, Object::ParamID param_id)
+void ElemMainComponent::handleParamChange(TableObject& obj, int param_id)
 {
     if (param_id == m_param) {
 	float new_val;
@@ -144,9 +144,9 @@ void ElemMainComponent::handleParamChange(TableObject& obj, Object::ParamID para
     }
 }
 
-ElemMultiMainComponent::ElemMultiMainComponent(Object::ParamID param_1,
+ElemMultiMainComponent::ElemMultiMainComponent(int param_1,
 					       float min_val, float max_val,
-					       Object::ParamID param_2,
+					       int param_2,
 					       const char** names) :
     ElemMainComponent(names[0], param_1, min_val, max_val),
     m_param(param_2),
@@ -154,7 +154,7 @@ ElemMultiMainComponent::ElemMultiMainComponent(Object::ParamID param_1,
 {
 }
 
-void ElemMultiMainComponent::handleParamChange(TableObject& obj, Object::ParamID param_id)
+void ElemMultiMainComponent::handleParamChange(TableObject& obj, int param_id)
 {
     if (param_id == m_param) {
 	int val;

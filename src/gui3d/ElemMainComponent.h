@@ -35,7 +35,7 @@ class ElemMainComponent : public ElemComponent
     FlatRing* m_indicator_fill;
     Ogre::Vector2 m_last_mouse_pos;
 
-    psynth::Object::ParamID m_param;
+    int m_param;
 
     float m_min_val;
     float m_max_val;
@@ -44,7 +44,7 @@ class ElemMainComponent : public ElemComponent
     
 public:
     ElemMainComponent(const std::string& mesh,
-		      psynth::Object::ParamID param,
+		      int param,
 		      float min_val, float max_val);
     ~ElemMainComponent();
     
@@ -55,21 +55,21 @@ public:
     bool handlePointerClick(Ogre::Vector2 pos, OIS::MouseButtonID id);
     bool handlePointerRelease(Ogre::Vector2 pos, OIS::MouseButtonID id);
     virtual void handleParamChange(psynth::TableObject& obj,
-				   psynth::Object::ParamID id);
+				   int id);
 };
 
 class ElemMultiMainComponent : public ElemMainComponent
 {
-    psynth::Object::ParamID m_param;
+    int m_param;
     const char** m_names;
 public:
-    ElemMultiMainComponent(psynth::Object::ParamID param_1,
+    ElemMultiMainComponent(int param_1,
 			   float min_val, float max_val,
-			   psynth::Object::ParamID param_2,
+			   int param_2,
 			   const char** names);
     
     void handleParamChange(psynth::TableObject& obj,
-			   psynth::Object::ParamID id);
+			   int id);
 };
 
 #endif /* ELEMMAIMCOMPONENT */

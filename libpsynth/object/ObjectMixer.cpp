@@ -35,7 +35,6 @@ ObjectMixer::ObjectMixer(const AudioInfo& info,
 			 int num_in): 
     Object(info,
 	   obj_type,
-	   N_PARAM,
 	   num_audio_out ? num_in : 0, 
 	   num_ctrl_out  ? num_in : N_IN_C_SOCKETS,
 	   num_audio_out,
@@ -44,8 +43,8 @@ ObjectMixer::ObjectMixer(const AudioInfo& info,
     m_param_ampl(0.5f),
     m_param_mixop(MIX_SUM)
 {
-    configureLocalParam(PARAM_AMPLITUDE, Object::PARAM_FLOAT, &m_param_ampl);
-    configureLocalParam(PARAM_MIXOP, Object::PARAM_INT, &m_param_mixop);
+    addParam("amplitude", ObjParam::FLOAT, &m_param_ampl);
+    addParam("mixop", ObjParam::INT, &m_param_mixop);
 }
 
 void ObjectMixer::mix(Sample* dest, const Sample* src, size_t n_samples)

@@ -36,18 +36,18 @@ class ElemGuiParam
 
     CEGUI::Window* m_window;
     ElementProperties* m_parent;
-    psynth::Object::ParamID m_param;
+    int m_param;
     bool changed;
     
 public:
-    ElemGuiParam(psynth::Object::ParamID param) :
+    ElemGuiParam(int param) :
 	m_param(param) {};
     
     virtual ~ElemGuiParam() {};
 
     virtual void createGUI() = 0;
     virtual void handleParamChange(psynth::TableObject& obj,
-				   psynth::Object::ParamID id) = 0;
+				   int id) = 0;
 
     void init(ElementProperties* parent, CEGUI::Window* window) {
 	m_window = window;
@@ -55,7 +55,7 @@ public:
 	createGUI();
     }
     
-    psynth::Object::ParamID getParam() {
+    int getParam() {
 	return m_param;
     }
 
@@ -78,12 +78,12 @@ class ElemGuiParamFloat : public ElemGuiParam
     int m_skip;
     
 public:
-    ElemGuiParamFloat(psynth::Object::ParamID param,
-		      float min_val, float max_val, const std::string& name);
+    ElemGuiParamFloat(int param, float min_val, float max_val,
+		      const std::string& name);
 
     void createGUI();
     void handleParamChange(psynth::TableObject& obj,
-			   psynth::Object::ParamID param);
+			   int param);
     bool onSpinnerChange(const CEGUI::EventArgs &e);
 };
 
@@ -97,20 +97,20 @@ class ElemGuiParamMulti : public ElemGuiParam {
     int m_skip;
     
 public:
-    ElemGuiParamMulti(psynth::Object::ParamID param,
+    ElemGuiParamMulti(int param,
 		      int nval, const char** names,
 		      const std::string& name);
 
     void createGUI();
     void handleParamChange(psynth::TableObject& obj,
-			   psynth::Object::ParamID param);
+			   int param);
     bool onComboboxChange(const CEGUI::EventArgs &e);
 };
 
 class ElementProperties : public ToggableWindow,
 			  public psynth::TableObjectListener
 {
-    std::map<psynth::Object::ParamID,
+    std::map<int,
 	     ElemGuiParam*> m_params;
     psynth::TableObject m_obj;
     
@@ -131,8 +131,7 @@ public:
     }
 
     void addParameter(ElemGuiParam* e);
-    void handleSetParamObject(psynth::TableObject& ob,
-			      psynth::Object::ParamID param_id);
+    void handleSetParamObject(psynth::TableObject& ob, int param_id);
     
     void handleActivateObject(psynth::TableObject& obj) {};
     void handleDeactivateObject(psynth::TableObject& obj) {};

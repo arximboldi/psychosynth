@@ -33,8 +33,7 @@ class ElemSecondComponent : public ElemComponent
     Ogre::SceneNode* m_point_yaw;
     Ogre::Degree m_angle;
 
-    psynth::Object::ParamScope m_scope;
-    psynth::Object::ParamID m_param;
+    int m_param;
 
     float m_min_val;
     float m_max_val;
@@ -42,7 +41,7 @@ class ElemSecondComponent : public ElemComponent
     bool m_changing;
     
 public:
-    ElemSecondComponent(psynth::Object::ParamID param,
+    ElemSecondComponent(int param,
 			float min_val, float max_val);
     ~ElemSecondComponent();
     
@@ -51,7 +50,7 @@ public:
     bool handlePointerClick(Ogre::Vector2 pos, OIS::MouseButtonID id);
     bool handlePointerRelease(Ogre::Vector2 pos, OIS::MouseButtonID id);
     void handleParamChange(psynth::TableObject& obj,
-			   psynth::Object::ParamID param_id);   
+			   int param_id);   
 };
 
 #endif /* ELEMSECONDCOMPONENT_H */

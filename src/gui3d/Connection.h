@@ -85,7 +85,7 @@ public:
     void handleActivateObject(psynth::TableObject& obj) {};
     void handleDeactivateObject(psynth::TableObject& obj) {};
     void handleSetParamObject(psynth::TableObject& ob,
-			      psynth::Object::ParamID param_id);
+			      int param_id);
 
     const psynth::TableObject& getSource() {
 	return m_s_obj;

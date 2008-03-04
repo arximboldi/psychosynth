@@ -74,9 +74,6 @@ public:
 	return m_table;
     }
     
-    template <typename T>
-    inline void setParam(Object::ParamID id, const T& data);
-
     inline void addListener(TableObjectListener* cl);
 
     inline void deleteListener(TableObjectListener* cl);
@@ -86,15 +83,38 @@ public:
     inline void activate();
 
     inline void deactivate();
+
+    template <typename T>
+    inline void setParam(int id, const T& data);
+
+    template <typename T>
+    inline void setParam(const std::string& name, const T& data);
+
+    int getParamID(const std::string& name) const {
+	m_obj->param(name).getID();
+    }
+
+    const std::string& getParamName(int id) const {
+	m_obj->param(id).getName();
+    }
     
-    int getParamType(Object::ParamID id) const {
-	return m_obj->getParamType(id);
-    };
+    int getParamType(int id) const {
+	return m_obj->param(id).type();
+    }
+
+    int getParamType(const std::string& name) const {
+	return m_obj->param(name).type();
+    }
     
     template <typename T>
-    void getParam(Object::ParamID id, T& data) const {
-	m_obj->getParam(id, data);
-    };
+    void getParam(int id, T& data) const {
+	m_obj->param(id).get(data);
+    }
+
+    template <typename T>
+    void getParam(const std::string& name, T& data) const {
+	m_obj->param(name).get(data);
+    }
 
     bool operator==(const TableObject& o) const {
 	return m_obj == o.m_obj;
@@ -119,7 +139,7 @@ public:
     virtual ~TableObjectListener() {};
     virtual void handleActivateObject(TableObject& obj) = 0;
     virtual void handleDeactivateObject(TableObject& obj) = 0;
-    virtual void handleSetParamObject(TableObject& ob, Object::ParamID id) = 0;
+    virtual void handleSetParamObject(TableObject& ob, int id) = 0;
 };
 
 struct TablePatcherEvent
@@ -158,7 +178,7 @@ protected:
     void notifyDeleteObject(TableObject& obj);
     void notifyActivateObject(TableObject& obj);
     void notifyDeactivateObject(TableObject& obj);
-    void notifySetParamObject(TableObject& obj, Object::ParamID param_id);
+    void notifySetParamObject(TableObject& obj, int param_id);
     void notifyLinkAdded(const TablePatcherEvent& ev);
     void notifyLinkDeleted(const TablePatcherEvent& ev);
     
@@ -240,14 +260,20 @@ public:
     TableObject addObject(int type);
 
     template <typename T>
-    void setParamObject(TableObject& obj,
-			Object::ParamID id, const T& data) {
-	obj.m_obj->setParam(id, data);
-
+    void setParamObject(TableObject& obj, int id, const T& data) {
+	obj.m_obj->param(id).set(data);
 	notifySetParamObject(obj, id);
-	
 	if (m_patcher)
 	    m_patcher->setParamObject(obj.m_obj, id);
+    }
+
+    template <typename T>
+    void setParamObject(TableObject& obj, const std::string& name, const T& data) {
+	ObjParam& param = obj.m_obj->param(name);
+	param.set(data);
+	notifySetParamObject(obj, param.getID());
+	if (m_patcher)
+	    m_patcher->setParamObject(obj.m_obj, param.getID());
     }
     
     void deleteObject(TableObject& obj);
@@ -299,8 +325,13 @@ public:
 };
 
 template <typename T>
-void TableObject::setParam(Object::ParamID id, const T& data) {
+void TableObject::setParam(int id, const T& data) {
     m_table->setParamObject(*this, id, data);
+};
+
+template <typename T>
+void TableObject::setParam(const std::string& name, const T& data) {
+    m_table->setParamObject(*this, name, data);
 };
 
 void TableObject::addListener(TableObjectListener* cl) {

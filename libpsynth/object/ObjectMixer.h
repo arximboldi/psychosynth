@@ -41,7 +41,7 @@ public:
     };
 
     enum ParamID {
-	PARAM_AMPLITUDE,
+	PARAM_AMPLITUDE = Object::N_COMMON_PARAMS,
 	PARAM_MIXOP,
 	N_PARAM
     };

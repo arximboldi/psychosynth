@@ -67,7 +67,6 @@ void ObjectOutput::doUpdate(const Object* caller, int caller_port_type, int call
 ObjectOutput::ObjectOutput(AudioInfo& info) :
     Object(info,
 	   OBJ_OUTPUT,
-	   N_PARAM,
 	   N_IN_A_SOCKETS, 
 	   N_IN_C_SOCKETS,
 	   N_OUT_A_SOCKETS,

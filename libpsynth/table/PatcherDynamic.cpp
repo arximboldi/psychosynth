@@ -185,10 +185,9 @@ bool PatcherDynamic::deleteObject(Object* obj)
     return false;
 }
 
-void PatcherDynamic::setParamObject(Object* obj, Object::ParamID id)
+void PatcherDynamic::setParamObject(Object* obj, int id)
 {
-    if (id.scope == Object::PARAM_COMMON &&
-	id.id == Object::PARAM_POSITION) {
+    if (id == Object::PARAM_POSITION) {
 	multiset<Link*>::iterator i, r;
 	list<Link*> readd;
     

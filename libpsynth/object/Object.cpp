@@ -29,67 +29,14 @@ using namespace std;
 namespace psynth
 {
 
-void Object::Param::clear()
-{
-    switch(m_type) {
-    case PARAM_INT:
-	delete static_cast<int*>(m_src);
-	break;
-    case PARAM_FLOAT:
-	delete static_cast<float*>(m_src);
-	break;
-    case PARAM_STRING:
-	delete static_cast<std::string*>(m_src);
-	break;
-    case PARAM_VECTOR2F:
-	delete static_cast<Vector2f*>(m_src);
-	break;
-    default: break;
-    }
-}
-
-void Object::Param::configure(int type, void* dest)
-{
-    m_dest = dest;
-    
-    if (type != m_type) {
-	clear();
-		
-	m_type = type;
-
-	switch(m_type) {
-	case PARAM_NONE:
-	    m_src = NULL;
-	    break;
-	case PARAM_INT:
-	    m_src = new int;
-	    *static_cast<int*>(m_src) = *static_cast<int*>(m_dest);
-	    break;
-	case PARAM_FLOAT:
-	    m_src = new float;
-	    *static_cast<float*>(m_src) = *static_cast<float*>(m_dest);
-	    break;
-	case PARAM_STRING:
-	    m_src = new string;
-	    *static_cast<string*>(m_src) = *static_cast<string*>(m_dest);
-	    break;
-	case PARAM_VECTOR2F:
-	    m_src = new Vector2f;
-	    *static_cast<Vector2f*>(m_src) = *static_cast<Vector2f*>(m_dest);
-	    break;
-	default: break;
-	}
-    }
-}
-
-
-Object::Object(const AudioInfo& info, int type, int loc_params,
+Object::Object(const AudioInfo& info, int type,
 	       int n_in_audio, int n_in_control,
 	       int n_out_audio, int n_out_control,
 	       bool single_update) :
     m_audioinfo(info),
     m_outdata_audio(n_out_audio, AudioBuffer(info)),
     m_outdata_control(n_out_control, ControlBuffer(info.block_size)),
+    m_nparam(0),
     m_id(OBJ_NULL_ID),
     m_type(type),
     m_param_position(0,0),
@@ -98,12 +45,9 @@ Object::Object(const AudioInfo& info, int type, int loc_params,
     m_updated(false),
     m_single_update(single_update)
 {
-    m_params[PARAM_LOCAL].resize(loc_params);
-    m_params[PARAM_COMMON].resize(N_COMMON_PARAMS);
-
-    configureCommonParam(PARAM_POSITION, PARAM_VECTOR2F, &m_param_position);
-    configureCommonParam(PARAM_RADIOUS, PARAM_FLOAT, &m_param_radious);
-    configureCommonParam(PARAM_MUTE, PARAM_INT, &m_param_mute);
+    addParam("position", ObjParam::VECTOR2F, &m_param_position);
+    addParam("radious", ObjParam::FLOAT, &m_param_radious);
+    addParam("mute", ObjParam::INT, &m_param_mute);
     
     m_out_sockets[LINK_AUDIO].resize(n_out_audio, OutSocket(LINK_AUDIO));
     m_out_sockets[LINK_CONTROL].resize(n_out_control, OutSocket(LINK_CONTROL));
@@ -113,6 +57,35 @@ Object::Object(const AudioInfo& info, int type, int loc_params,
 
 Object::~Object()
 {
+}
+
+void Object::addParam(const std::string& name, int type, void* val)
+{
+    m_params.resize(m_nparam + 1);
+    m_params[m_nparam].configure(m_nparam, name, type, val);
+    m_nparam++;   
+}
+
+ObjParam& Object::param(const std::string& name)
+{
+    for (vector<ObjParam>::iterator it = m_params.begin();
+	 it != m_params.end();
+	 ++it)
+	if (name == it->getName())
+	    return *it;
+    
+    return m_null_param;
+}
+
+const ObjParam& Object::param(const std::string& name) const
+{
+    for (vector<ObjParam>::const_iterator it = m_params.begin();
+	 it != m_params.end();
+	 ++it)
+	if (name == it->getName())
+	    return *it;
+    
+    return m_null_param;
 }
 
 void Object::connectIn(int type, int in_socket, Object* src, int out_socket)
@@ -146,10 +119,8 @@ void Object::updateParams()
 {
     size_t j;
     
-    for (j = 0; j < PARAM_SCOPES; ++j) {
-	for (vector<Param>::iterator i = m_params[j].begin(); i != m_params[j].end(); ++i)
-	    (*i).update();
-    }
+    for (vector<ObjParam>::iterator i = m_params.begin(); i != m_params.end(); ++i)
+	(*i).update();
 }
 
 void Object::updateInputs()
