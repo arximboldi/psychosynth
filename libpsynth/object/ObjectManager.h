@@ -37,6 +37,8 @@ class ObjectManager
 {
     std::map<int, Object*> m_objmap;
     std::list<ObjectOutput*> m_outputs;
+    std::list<Object*> m_delete_list;
+    
     Mutex m_update_lock;
     
 public:
@@ -49,7 +51,8 @@ public:
     bool attachObject(Object* obj, int id);
     bool detachObject(int id);
     void detachObject(Iterator it);
-    void remove(Iterator it);
+    bool deleteObject(int id);
+    void deleteObject(Iterator it);
 
     ConstIterator begin() const {
 	return m_objmap.begin();

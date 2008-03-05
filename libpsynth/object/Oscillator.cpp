@@ -22,6 +22,7 @@
 
 #include <iostream>
 #include <object/Oscillator.h>
+#include <object/SimpleEnvelope.h>
 
 using namespace std;
 
@@ -54,32 +55,35 @@ void Oscillator::update(Sample* out_buf, size_t n_frames)
     m_x = phase(m_x);
 }
 
-void Oscillator::updateFM(Sample* out_buf, const Sample* mod_buf, size_t n_frames)
+void Oscillator::updateFM(Sample* out_buf, const Sample* mod_buf,
+			  SimpleEnvelope& mod_env, size_t n_frames)
 {
     for (size_t i = 0; i < n_frames; ++i) {
 	*out_buf++ = computeSample(m_x) * m_ampl;
-	m_x += (m_freq + m_freq * *mod_buf++) / m_info.sample_rate;
+	m_x += (m_freq + m_freq * *mod_buf++ * mod_env.update()) / m_info.sample_rate;
     }
 
     m_x = phase(m_x);
 }
 
-void Oscillator::updatePM(Sample* out_buf, const Sample* mod_buf, size_t n_frames)
+void Oscillator::updatePM(Sample* out_buf, const Sample* mod_buf,
+			  SimpleEnvelope& mod_env, size_t n_frames)
 {
     float speed = m_freq / m_info.sample_rate;
     for (size_t i = 0; i < n_frames; ++i) {
-	*out_buf++ = computeSample(m_x + *mod_buf) * m_ampl;
+	*out_buf++ = computeSample(m_x + *mod_buf * mod_env.update()) * m_ampl;
 	m_x += speed;
     }
 
     m_x = phase(m_x);
 }
 
-void Oscillator::updateAM(Sample* out_buf, const Sample* mod_buf, size_t n_frames)
+void Oscillator::updateAM(Sample* out_buf, const Sample* mod_buf,
+			  SimpleEnvelope& mod_env, size_t n_frames)
 {
     float speed = m_freq / m_info.sample_rate;
     for (size_t i = 0; i < n_frames; ++i) {
-	*out_buf++ = computeSample(m_x) * (m_ampl + m_ampl * *mod_buf++);
+	*out_buf++ = computeSample(m_x) * (m_ampl + m_ampl * *mod_buf++ * mod_env.update());
 	m_x += speed;
     }
 

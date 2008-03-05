@@ -83,6 +83,7 @@ nobase_libpsynthinc_HEADERS = \
 	object/Oscillator.h \
 	object/KnownObjects.h \
 	object/ObjParam.h\
+	object/SimpleEnvelope.h\
 	output/Output.h\
 	version.h
 

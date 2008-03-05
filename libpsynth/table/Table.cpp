@@ -127,7 +127,8 @@ Table::clear()
 		m_patcher->deleteObject(*it);
 	    TableObject obj(*it, this);
 	    notifyDeleteObject(obj);
-	    m_objmgr.remove(it++);
+	    //m_objmgr.remove(it++);
+	    m_objmgr.deleteObject(it);
 	} else
 	    ++it;
 }
@@ -179,8 +180,11 @@ void Table::deleteObject(TableObject& obj)
     if (m_patcher)
 	m_patcher->deleteObject(obj.m_obj);
     notifyDeleteObject(obj);
+/*
     m_objmgr.detachObject(obj.m_obj->getID());
     delete obj.m_obj;
+*/
+    m_objmgr.deleteObject(obj.m_obj->getID());
 }
 
 void Table::activateObject(TableObject& obj)

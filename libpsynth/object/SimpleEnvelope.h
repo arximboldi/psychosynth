@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) Juan Pedro Bolivar Puente 2007                          *
+ *   Copyright (C) Juan Pedro Bolivar Puente 2008                          *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -20,32 +20,71 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "object/ObjectAudioOscillator.h"
+#ifndef PSYNTH_SIMPLEENVELOPE_H
+#define PSYNTH_SIMPLEENVELOPE_H
 
-using namespace std;
-
+/**
+ * Simplistic evenlope implementation to soften object connects/disconnects.
+ */
 namespace psynth
 {
 
-void ObjectAudioOscillator::doUpdate(const Object* caller, int caller_port_type, int caller_port)
+class SimpleEnvelope
 {
-    AudioBuffer*         buf = getOutput<AudioBuffer>(LINK_AUDIO, OUT_A_OUTPUT);
-    const ControlBuffer* pitch_buf = getInput<ControlBuffer>(LINK_CONTROL, IN_C_FREQUENCY);
+    float m_rise_dt;
+    float m_fall_dt;
+    float m_curr_dt;
+    float m_val;
     
-    Sample*       out = buf->getChannel(0);
-    const Sample* mod = pitch_buf ? pitch_buf->getData() : NULL;
-
-    updateOscParams();
-
-    if (mod) {
-	SimpleEnvelope mod_env = getInEnvelope(LINK_CONTROL, IN_C_FREQUENCY); 
-	m_oscillator.update(out, mod, mod_env, getInfo().block_size);
-    } else
-	m_oscillator.update(out, getInfo().block_size);
+public:
+    SimpleEnvelope() :
+	m_rise_dt(0.0f),
+	m_fall_dt(0.0f),
+	m_curr_dt(0.0f),
+	m_val(0.0f)
+	{}
     
-    for (size_t i = 1; i < (size_t)getAudioInfo().num_channels; i++)
-	memcpy((*buf)[i], (*buf)[0], sizeof(Sample) * getAudioInfo().block_size);
-}
+    SimpleEnvelope(float rise_dt, float fall_dt) :
+	m_rise_dt(rise_dt),
+	m_fall_dt(fall_dt),
+	m_curr_dt(0.0f),
+	m_val(0.0f)
+	{}
+
+    float setDeltas(float rise_dt, float fall_dt) {
+	m_rise_dt = rise_dt;
+	m_fall_dt = fall_dt;
+    }
+    
+    float update() {
+	float val = m_val;
+	m_val = m_val + m_curr_dt;
+	if (m_val > 1.0f) m_val = 1.0;
+	else if (m_val < 0.0f) m_val = 0.0;
+	return val;
+    }
+
+    float update(float sample) {
+	float val = m_val;
+	m_val = m_val + m_curr_dt * sample;
+	if (m_val > 1.0f) m_val = 1.0;
+	else if (m_val < 0.0f) m_val = 0.0;
+	return val;
+    }
+
+    void press() {
+	m_curr_dt = m_rise_dt;
+    }
+
+    void release() {
+	m_curr_dt = m_fall_dt;
+    }
+
+    bool finished() {
+	return m_val <= 0.0f;
+    }
+};
 
 } /* namespace psynth */
 
+#endif /* PSYNTH_SIMPLEENVELOPE_H */

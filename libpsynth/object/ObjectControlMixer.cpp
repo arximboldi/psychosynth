@@ -34,8 +34,10 @@ void ObjectControlMixer::doUpdate(const Object* caller, int caller_port_type, in
     init(buf->getData(), getInfo().block_size);
     
     for (j = 0; j < m_numchan; ++j)
-	if ((in = getInput<ControlBuffer>(LINK_CONTROL, j)))
-	    mix(buf->getData(), in->getData(), getInfo().block_size);
+	if ((in = getInput<ControlBuffer>(LINK_CONTROL, j))) {
+	    SimpleEnvelope env = getInEnvelope(LINK_CONTROL, j);
+	    mix(buf->getData(), in->getData(), env, getInfo().block_size);
+	}
 }
 
 } /* namespace psynth */

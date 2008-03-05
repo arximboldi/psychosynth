@@ -88,11 +88,33 @@ void ObjectManager::detachObject(Iterator it)
     m_objmap.erase(iter);
 }
 
-void ObjectManager::remove(Iterator it)
+bool ObjectManager::deleteObject(int id)
+{
+    map<int, Object*>::iterator iter;
+    iter = m_objmap.find(id);
+    
+    if (iter == m_objmap.end())
+	return false;
+
+    deleteObject(iter);
+
+    return true;
+}
+
+void ObjectManager::deleteObject(Iterator it)
 {
     Object* obj = it->second;
-    detachObject(it);
-    delete obj;
+/*    
+    detachObject(it); 
+*/
+    obj->clearConnections();
+
+    if (!obj->hasConnections()) {
+	detachObject(it);
+	delete obj;
+    }
+    else
+	m_delete_list.push_back(obj);
 }
 
 void ObjectManager::setInfo(const AudioInfo& info)
@@ -121,6 +143,16 @@ void ObjectManager::update()
 	(*out_iter)->update(NULL, -1, -1);
     }
 
+    list<Object*>::iterator del_iter;
+    for (del_iter = m_delete_list.begin(); del_iter != m_delete_list.end();) {
+	if (!(*del_iter)->hasConnections()) {
+	    detachObject((*del_iter)->getID());
+	    delete *del_iter;
+	    m_delete_list.erase(del_iter++);
+	} else
+	    ++del_iter;
+    }
+    
     m_update_lock.unlock();
 }
 

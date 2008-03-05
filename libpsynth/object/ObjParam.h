@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) Juan Pedro Bolivar Puente 2007                          *
+ *   Copyright (C) Juan Pedro Bolivar Puente 2008                          *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -20,32 +20,89 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "object/ObjectAudioOscillator.h"
+#ifndef PSYNTH_OBJPARAM
+#define PSYNTH_OBJPARAM
 
-using namespace std;
+#include <libpsynth/common/Mutex.h>
+#include <string>
 
 namespace psynth
 {
 
-void ObjectAudioOscillator::doUpdate(const Object* caller, int caller_port_type, int caller_port)
+class ObjParam
 {
-    AudioBuffer*         buf = getOutput<AudioBuffer>(LINK_AUDIO, OUT_A_OUTPUT);
-    const ControlBuffer* pitch_buf = getInput<ControlBuffer>(LINK_CONTROL, IN_C_FREQUENCY);
-    
-    Sample*       out = buf->getChannel(0);
-    const Sample* mod = pitch_buf ? pitch_buf->getData() : NULL;
+    friend class Object;
+	
+    Mutex m_lock;
+    std::string m_name;
+    int m_id;
+    int m_type;
+    bool m_changed;
+    void* m_src;
+    void* m_dest;
 
-    updateOscParams();
+    void clear();
+    void configure(int id, std::string name, int type, void* dest);
+    void update();
 
-    if (mod) {
-	SimpleEnvelope mod_env = getInEnvelope(LINK_CONTROL, IN_C_FREQUENCY); 
-	m_oscillator.update(out, mod, mod_env, getInfo().block_size);
-    } else
-	m_oscillator.update(out, getInfo().block_size);
+public:
+    enum Type {
+	NONE = -1,
+	INT,       /* int */
+	FLOAT,     /* float */
+	STRING,    /* std::string */
+	VECTOR2F,  /* Vector2f */
+	TYPES
+    };
+
+    ObjParam() :
+	m_type(NONE), m_changed(false), m_src(NULL), m_dest(NULL) {}
+
+    ObjParam(const ObjParam& obj) :
+	m_type(NONE),
+	m_changed(false) {
+	configure(obj.m_id, obj.m_name, obj.m_type, obj.m_dest);
+    }
     
-    for (size_t i = 1; i < (size_t)getAudioInfo().num_channels; i++)
-	memcpy((*buf)[i], (*buf)[0], sizeof(Sample) * getAudioInfo().block_size);
-}
+    ~ObjParam() {
+	clear();
+    }
+
+    ObjParam& operator= (const ObjParam& obj) {
+	if (this != &obj)
+	    configure(obj.m_id, obj.m_name, obj.m_type, obj.m_dest);
+
+	return *this;
+    }
+    
+    int getID() const {
+	return m_id;
+    }
+
+    const std::string& getName() const {
+	return m_name;
+    }
+	
+    int type() const {
+	return m_type;
+    };
+	
+    template <typename T>
+    void set(const T& d) {
+	m_lock.lock();
+	m_changed = true;
+	*static_cast<T*>(m_src) = d;
+	m_lock.unlock();
+    }
+
+    template <typename T>
+    void get(T& d) const {
+	m_lock.lock();
+	d = *static_cast<T*>(m_src);
+	m_lock.unlock();
+    }
+};
 
 } /* namespace psynth */
 
+#endif /* PSYNTH_OBJPARAM */

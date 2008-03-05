@@ -35,6 +35,7 @@
 #include <libpsynth/common/Vector2D.h>
 
 #include <libpsynth/object/ObjParam.h>
+#include <libpsynth/object/SimpleEnvelope.h>
 
 namespace psynth
 {
@@ -66,6 +67,10 @@ public:
 
     protected:
 	OutSocket(int type) : m_type(type) {}
+
+	bool isEmpty() {
+	    return m_ref.empty();
+	}
 	
 	void addReference(Object* obj, int port) {
 	    m_ref.push_back(std::pair<Object*, int>(obj, port));
@@ -76,9 +81,11 @@ public:
 	}
 		
 	void clearReferences() {
-	    std::list<std::pair<Object*, int> >::iterator i;
-	    for (i = m_ref.begin(); i != m_ref.end(); i++)
-		(*i).first->m_in_sockets[ m_type ][ (*i).second ].set(NULL, 0);
+	    std::list<std::pair<Object*, int> >::iterator i, r;
+	    for (i = m_ref.begin(); i != m_ref.end(); ) {
+		r = i++;
+		r->first->connectIn(m_type, r->second, NULL, 0);
+	    }
 	}
 
     public:
@@ -87,17 +94,22 @@ public:
 	}
     };
 	
-    class InSocket {
+    class InSocket
+    {
 	friend class Object;
 
+    protected:
 	int m_type;
 	Object* m_srcobj;
 	int m_srcport;
 
-    protected:
 	InSocket(int type) :
 	    m_type(type), m_srcobj(NULL), m_srcport(0) {}
-			
+	
+	bool isEmpty() {
+	    return m_srcobj == NULL;
+	}
+	
 	void set(Object* srcobj, int port) {
 	    m_srcobj = srcobj;
 	    m_srcport = port;
@@ -117,13 +129,39 @@ public:
 	}
 	
     public:
-	Object* getSourceObject() const {
+	virtual ~InSocket() {}
+	
+	virtual Object* getSourceObject() const {
 	    return m_srcobj;
 	}
 
-	int getSourceSocket() const {
+	virtual int getSourceSocket() const {
 	    return m_srcport;
 	}
+    };
+
+    class InSocketManual : public InSocket
+    {
+	friend class Object;
+	
+	bool must_update;
+	Object* src_obj;
+	int src_sock;
+
+    public:
+	InSocketManual(int type) :
+	    InSocket(LINK_AUDIO),
+	    must_update(false),
+	    src_obj(NULL),
+	    src_sock(-1) {}
+
+	virtual Object* getSourceObject() const {
+	    return src_obj;
+	}
+
+	virtual int getSourceSocket() const {
+	    return src_sock;
+	}	
     };
 
 private:
@@ -133,8 +171,9 @@ private:
     std::vector<ControlBuffer> m_outdata_control;
 
     std::vector<OutSocket> m_out_sockets[LINK_TYPES];
-    std::vector<InSocket> m_in_sockets[LINK_TYPES];
-
+    std::vector<InSocketManual> m_in_sockets[LINK_TYPES];
+    std::vector<SimpleEnvelope> m_in_envelope[LINK_TYPES];
+    
     std::vector<ObjParam>  m_params;
     ObjParam m_null_param;
     int m_nparam;
@@ -154,7 +193,9 @@ private:
     
     Mutex m_paramlock;
 
-    
+    void updateInSockets();
+    void setEnvelopesDeltas();
+    void updateEnvelopes();
     bool canUpdate(const Object* caller, int caller_port_type,
 		   int caller_port);
 
@@ -184,7 +225,11 @@ protected:
     virtual void onInfoChange() = 0;
     
     void addParam(const std::string&, int type, void* val);
-	
+
+    SimpleEnvelope getInEnvelope(int type, int sock) {
+	return m_in_envelope[type][sock];
+    }
+
 public:
     Object(const AudioInfo& prop, int type,
 	   int inaudiosocks, int incontrolsocks,
@@ -205,7 +250,7 @@ public:
     int getID() const {
 	return m_id;
     }
-
+    
     void updateParams();
 
     void updateInputs();
@@ -234,6 +279,12 @@ public:
     
     void connectIn(int type, int in_socket, Object* src, int out_socket);
 
+    void forceConnectIn(int type, int in_socket, Object* src, int out_socket);
+
+    void clearConnections();
+
+    bool hasConnections();
+    
     ObjParam& param(int id) {
 	return m_params[id];
     }

@@ -61,6 +61,13 @@ protected:
     void mix(Sample* dest, const Sample* src,
 	     const Sample* ampl, size_t n_samples);
 
+    void mix(Sample* dest, const Sample* src,
+	     SimpleEnvelope& env, size_t n_samples);
+
+    void mix(Sample* dest, const Sample* src, const Sample* ampl,
+	     SimpleEnvelope& env, SimpleEnvelope& ctrl_env,
+	     size_t n_samples);
+    
     void init(Sample* dest, size_t n_samples);
     
 private:

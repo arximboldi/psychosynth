@@ -366,7 +366,10 @@ void ElementManager::update()
 void ElementManager::handleLinkAdded(const TablePatcherEvent& ev)
 {
     m_cons.push_back(new Connection(m_scene, ev.src, ev.dest));
-    m_elems[ev.src.getID()]->setTarget(ev.dest);
+
+    ElemMapIter it = m_elems.find(ev.src.getID());
+    if (it != m_elems.end())
+	it->second->setTarget(ev.dest);
 }
 
 void ElementManager::handleLinkDeleted(const TablePatcherEvent& ev)
@@ -379,5 +382,7 @@ void ElementManager::handleLinkDeleted(const TablePatcherEvent& ev)
 	} else
 	    ++it;
 
-    m_elems[ev.src.getID()]->clearTarget(ev.dest);
+    ElemMapIter it = m_elems.find(ev.src.getID());
+    if (it != m_elems.end())
+	it->second->clearTarget(ev.dest);
 }

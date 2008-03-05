@@ -31,6 +31,9 @@
 namespace psynth
 {
 
+/* TODO: Find a way to avoid this. */
+class SimpleEnvelope;
+
 class Oscillator
 {
 public:
@@ -71,9 +74,12 @@ private:
 
     void initializeTables();
 
-    void updateFM(Sample* out_buf, const Sample* mod_buf, size_t n_frames);
-    void updateAM(Sample* out_buf, const Sample* mod_buf, size_t n_frames);
-    void updatePM(Sample* out_buf, const Sample* mod_buf, size_t n_frames);    
+    void updateFM(Sample* out_buf, const Sample* mod_buf,
+		  SimpleEnvelope& mod_env, size_t n_frames);
+    void updateAM(Sample* out_buf, const Sample* mod_buf,
+		  SimpleEnvelope& mod_env, size_t n_frames);
+    void updatePM(Sample* out_buf, const Sample* mod_buf,
+		  SimpleEnvelope& mod_env, size_t n_frames);    
 
 public:
     Oscillator(const AudioInfo& info,
@@ -157,16 +163,17 @@ public:
 
     void update(Sample* out_buf, size_t n_frames);
     
-    void update(Sample* out_buf, const Sample* mod_buf, size_t n_frames) {
+    void update(Sample* out_buf, const Sample* mod_buf,
+		SimpleEnvelope& mod_env, size_t n_frames) {
 	switch(m_mod) {
 	case AM:
-	    updateAM(out_buf, mod_buf, n_frames);
+	    updateAM(out_buf, mod_buf, mod_env, n_frames);
 	    break;
 	case FM:
-	    updateFM(out_buf, mod_buf, n_frames);
+	    updateFM(out_buf, mod_buf, mod_env, n_frames);
 	    break;
 	case PM:
-	    updatePM(out_buf, mod_buf, n_frames);
+	    updatePM(out_buf, mod_buf, mod_env, n_frames);
 	    break;
 	default:
 	    break;

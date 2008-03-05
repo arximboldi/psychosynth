@@ -68,6 +68,33 @@ void ObjectMixer::mix(Sample* dest, const Sample* src,
 	    *dest++ *= *src++ * (m_param_ampl + m_param_ampl * *ampl++);
 }
 
+void ObjectMixer::mix(Sample* dest, const Sample* src,
+		      SimpleEnvelope& env, size_t n_samples)
+{
+    if (m_param_mixop == MIX_SUM)
+	while(n_samples--)
+	    *dest++ += *src++ * m_param_ampl * env.update();
+    else if (m_param_mixop == MIX_PRODUCT)
+	while(n_samples--)
+	    *dest++ *= *src++ * m_param_ampl * env.update();
+}
+  
+void ObjectMixer::mix(Sample* dest, const Sample* src,
+		      const Sample* ampl,
+		      SimpleEnvelope& env,
+		      SimpleEnvelope& ctrl_env,
+		      size_t n_samples)
+{
+    if (m_param_mixop == MIX_SUM)
+	while(n_samples--)
+	    *dest++ +=
+		*src++ * (m_param_ampl + m_param_ampl * *ampl++ * ctrl_env.update()) * env.update();
+    else if (m_param_mixop == MIX_PRODUCT)
+	while(n_samples--)
+	    *dest++ *=
+		*src++ * (m_param_ampl + m_param_ampl * *ampl++ * ctrl_env.update()) * env.update();
+}
+
 void ObjectMixer::init(Sample* dest, size_t n_samples)
 {
     float def_val = (m_param_mixop == MIX_SUM ? 0.0 : 1.0);

@@ -24,6 +24,10 @@
 
 #include <cmath>
 
+#define ENV_RISE_SECONDS  0.05f
+#define ENV_FALL_SECONDS  0.05f
+#define ENV_DELTA(srate, sec)  (1/((sec)*(srate)))
+
 using namespace std;
 
 namespace psynth
@@ -44,19 +48,50 @@ Object::Object(const AudioInfo& info, int type,
     m_param_mute(false),
     m_updated(false),
     m_single_update(single_update)
-{
+{   
     addParam("position", ObjParam::VECTOR2F, &m_param_position);
     addParam("radious", ObjParam::FLOAT, &m_param_radious);
     addParam("mute", ObjParam::INT, &m_param_mute);
     
     m_out_sockets[LINK_AUDIO].resize(n_out_audio, OutSocket(LINK_AUDIO));
     m_out_sockets[LINK_CONTROL].resize(n_out_control, OutSocket(LINK_CONTROL));
-    m_in_sockets[LINK_AUDIO].resize(n_in_audio, InSocket(LINK_AUDIO));
-    m_in_sockets[LINK_CONTROL].resize(n_in_control, InSocket(LINK_CONTROL));
+    m_in_sockets[LINK_AUDIO].resize(n_in_audio, InSocketManual(LINK_CONTROL));;
+    m_in_sockets[LINK_CONTROL].resize(n_in_control, InSocketManual(LINK_CONTROL));
+    m_in_envelope[LINK_AUDIO].resize(n_in_audio);
+    m_in_envelope[LINK_CONTROL].resize(n_in_control);
+    
+    setEnvelopesDeltas();
 }
 
 Object::~Object()
 {
+//    cout << "Deleting object.\n";
+}
+
+void Object::setEnvelopesDeltas()
+{
+    int i;
+    
+    float rise_dt = ENV_DELTA(m_audioinfo.sample_rate, ENV_RISE_SECONDS);
+    float fall_dt = -ENV_DELTA(m_audioinfo.sample_rate, ENV_FALL_SECONDS);
+
+    for (i = 0; i < LINK_TYPES; ++i)
+	for (vector<SimpleEnvelope>::iterator it = m_in_envelope[i].begin();
+	     it != m_in_envelope[i].end();
+	     ++it) {
+	    it->setDeltas(rise_dt, fall_dt);
+	}
+}
+
+void Object::updateEnvelopes()
+{
+    int i;
+    
+    for (i = 0; i < LINK_TYPES; ++i)
+	for (vector<SimpleEnvelope>::iterator it = m_in_envelope[i].begin();
+	     it != m_in_envelope[i].end();
+	     ++it)
+	    it->update(m_audioinfo.block_size);
 }
 
 void Object::addParam(const std::string& name, int type, void* val)
@@ -88,16 +123,81 @@ const ObjParam& Object::param(const std::string& name) const
     return m_null_param;
 }
 
+void Object::updateInSockets()
+{
+    int i, j;
+
+    /* TODO: Thread synch! */
+    for (j = 0; j < LINK_TYPES; ++j)
+	for (i = 0; i < m_in_envelope[j].size(); ++i) {
+	    if (m_in_sockets[j][i].must_update &&
+		m_in_envelope[j][i].finished()) {
+		forceConnectIn(j, i,
+			       m_in_sockets[j][i].src_obj,
+			       m_in_sockets[j][i].src_sock);
+		m_in_sockets[j][i].must_update = false;
+	    }
+	}
+}
+
+void Object::clearConnections()
+{
+    int i, j;
+
+    for (i = 0; i < LINK_TYPES; ++i)
+	for (j = 0; j < m_in_sockets[i].size(); ++j)
+	    if (!m_in_sockets[i][j].isEmpty())
+		connectIn(i, j, NULL, 0);    
+    
+    for (i = 0; i < LINK_TYPES; ++i)
+	for (j = 0; j < m_out_sockets[i].size(); ++j)
+	    if (!m_out_sockets[i][j].isEmpty())
+		m_out_sockets[i][j].clearReferences();
+}
+
+bool Object::hasConnections()
+{
+    int i, j;
+
+    for (i = 0; i < LINK_TYPES; ++i)
+	for (j = 0; j < m_in_sockets[i].size(); ++j)
+	    if (!m_in_sockets[i][j].isEmpty())
+		return true;
+    
+    for (i = 0; i < LINK_TYPES; ++i)
+	for (j = 0; j < m_out_sockets[i].size(); ++j)
+	    if (!m_out_sockets[i][j].isEmpty())
+		return true;
+
+    return false;
+}
+
 void Object::connectIn(int type, int in_socket, Object* src, int out_socket)
 {
-    if (m_in_sockets[type][in_socket].getSourceObject())
-	m_in_sockets[type][in_socket].getSourceObject()->
-	    m_out_sockets[type][out_socket].removeReference(this, in_socket);
-	
-    m_in_sockets[type][in_socket].set(src, out_socket);
+    m_in_sockets[type][in_socket].src_obj = src;
+    m_in_sockets[type][in_socket].src_sock = out_socket;
 
+    if (!m_in_envelope[type][in_socket].finished()) {
+	m_in_sockets[type][in_socket].must_update = true;
+	m_in_envelope[type][in_socket].release();
+    } else {
+	m_in_sockets[type][in_socket].must_update = false;
+	forceConnectIn(type, in_socket, src, out_socket);
+    }
+}
+
+void Object::forceConnectIn(int type, int in_socket, Object* src, int out_socket)
+{
+    m_in_envelope[type][in_socket].press();
+    
+    if (m_in_sockets[type][in_socket].m_srcobj)
+	m_in_sockets[type][in_socket].m_srcobj->
+	    m_out_sockets[type][out_socket].removeReference(this, in_socket);
+    
+    m_in_sockets[type][in_socket].set(src, out_socket);
+    
     if (src)
-	src->m_out_sockets[type][out_socket].addReference(this, in_socket);
+	src->m_out_sockets[type][out_socket].addReference(this, in_socket);    
 }
 
 inline bool Object::canUpdate(const Object* caller, int caller_port_type,
@@ -108,9 +208,10 @@ inline bool Object::canUpdate(const Object* caller, int caller_port_type,
     if (m_single_update || !caller)
 	ret = !m_updated;
     else
-	ret = m_updated_links[caller_port_type].insert(std::pair<int,int>(caller->getID(),
-									  caller_port)).second;
-     m_updated = true;
+	ret =
+	    m_updated_links[caller_port_type].insert(make_pair(caller->getID(),
+							       caller_port)).second;
+    m_updated = true;
     
     return ret;
 }
@@ -125,8 +226,8 @@ void Object::updateParams()
 
 void Object::updateInputs()
 {
-    size_t i, j;
-    
+    size_t j, i;
+
     for (i = 0; i < LINK_TYPES; ++i)
 	for (j = 0; j < m_in_sockets[i].size(); ++j)
 	    m_in_sockets[i][j].updateInput(this, i, j);
@@ -141,6 +242,9 @@ void Object::update(const Object* caller, int caller_port_type, int caller_port)
 	    updateInputs();
 	    doUpdate(caller, caller_port_type, caller_port); 
 	}
+
+	updateEnvelopes();
+	updateInSockets();
     }
 }
 
@@ -156,6 +260,8 @@ void Object::setInfo(const AudioInfo& info)
 	    m_outdata_control[i].resize(info.block_size);
 
     m_audioinfo = info;
+
+    setEnvelopesDeltas();
 }   
 
 } /* namespace psynth */
