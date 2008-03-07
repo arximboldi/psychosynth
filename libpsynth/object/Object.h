@@ -33,9 +33,11 @@
 #include <libpsynth/common/AudioBuffer.h>
 #include <libpsynth/common/Mutex.h>
 #include <libpsynth/common/Vector2D.h>
+#include <libpsynth/common/Deleter.h>
 
 #include <libpsynth/object/ObjParam.h>
 #include <libpsynth/object/SimpleEnvelope.h>
+#include <libpsynth/object/Watch.h>
 
 namespace psynth
 {
@@ -98,11 +100,20 @@ public:
     {
 	friend class Object;
 
+	void attachWatch(Watch* watch) {
+	    m_watchs.push_back(watch);
+	}
+
+	void detachWatch(Watch* watch) {
+	    m_watchs.remove(watch);
+	};
+	
     protected:
 	int m_type;
 	Object* m_srcobj;
 	int m_srcport;
-
+	std::list<Watch*> m_watchs;
+	
 	InSocket(int type) :
 	    m_type(type), m_srcobj(NULL), m_srcport(0) {}
 	
@@ -115,10 +126,7 @@ public:
 	    m_srcport = port;
 	}
 		
-	void updateInput(const Object* caller, int caller_port_type, int caller_port) {
-	    if (m_srcobj)
-		m_srcobj->update(caller, caller_port_type, caller_port);
-	}
+	void updateInput(const Object* caller, int caller_port_type, int caller_port);
 
 	template <typename SocketDataType>
 	const SocketDataType* getData(int type) const {
@@ -129,7 +137,9 @@ public:
 	}
 	
     public:
-	virtual ~InSocket() {}
+	virtual ~InSocket() {
+	    for_each(m_watchs.begin(), m_watchs.end(), Deleter<Watch*>());
+	}
 	
 	virtual Object* getSourceObject() const {
 	    return m_srcobj;
@@ -150,7 +160,7 @@ public:
 
     public:
 	InSocketManual(int type) :
-	    InSocket(LINK_AUDIO),
+	    InSocket(type),
 	    must_update(false),
 	    src_obj(NULL),
 	    src_sock(-1) {}
@@ -276,6 +286,15 @@ public:
     }
 
     void setInfo(const AudioInfo& info);
+
+    void attachWatch(int type, int in_socket, Watch* watch) {
+	watch->setInfo(m_audioinfo);
+	m_in_sockets[type][in_socket].attachWatch(watch);
+    }
+
+    void detachWatch(int type, int in_socket, Watch* watch) {
+	m_in_sockets[type][in_socket].detachWatch(watch);
+    }
     
     void connectIn(int type, int in_socket, Object* src, int out_socket);
 

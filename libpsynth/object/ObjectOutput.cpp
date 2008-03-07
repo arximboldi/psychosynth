@@ -42,6 +42,14 @@ ObjectOutput::~ObjectOutput()
 	delete *it;
 }
 
+void ObjectOutput::onInfoChange()
+{
+    m_buffer.setAudioInfo(getInfo());
+    for (std::list<Slot*>::iterator i = m_slots.begin(); i != m_slots.end(); ++i)
+	(*i)->m_buf.setInfo(getInfo());
+    
+}
+
 void ObjectOutput::doUpdate(const Object* caller, int caller_port_type, int caller_port)
 {
     const AudioBuffer* in;

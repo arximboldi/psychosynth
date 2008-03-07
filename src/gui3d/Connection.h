@@ -30,14 +30,14 @@
 
 #include "gui3d/OgreMisc.h"
 
-class ConnectionObject : public Ogre::ManualObject
+class ConnectionLine : public Ogre::ManualObject
 {
     Ogre::ColourValue m_colour;
     
     void build(const Ogre::Vector2& src,
 	       const Ogre::Vector2& dest);
 public:
-    ConnectionObject(const std::string &id,
+    ConnectionLine(const std::string &id,
 		     const Ogre::ColourValue& colour,
 		     const Ogre::Vector2& src,
 		     const Ogre::Vector2& dest);
@@ -50,18 +50,44 @@ public:
 	createColourMaterial(getName(), m_colour);
     };
     
-    ~ConnectionObject();
+    ~ConnectionLine();
+};
+
+class ConnectionWave : public Ogre::ManualObject
+{
+    Ogre::ColourValue m_colour;
+    
+    void build(const Ogre::Vector2& src,
+	       const Ogre::Vector2& dest,
+	       const psynth::Sample* samples, int n_samples);
+public:
+    ConnectionWave(const std::string &id,
+		     const Ogre::ColourValue& colour,
+		     const Ogre::Vector2& src,
+		     const Ogre::Vector2& dest);
+    
+    void update(const Ogre::Vector2& src,
+		const Ogre::Vector2& dest,
+		const psynth::Sample* samples, int n_samples);
+
+    void setColour(Ogre::ColourValue colour) {
+	m_colour = colour;
+	createColourMaterial(getName(), m_colour);
+    };
+    
+    ~ConnectionWave();
 };
 
 class Connection : public psynth::TableObjectListener
 {
     Ogre::SceneManager* m_scene;
     Ogre::SceneNode* m_node;
-    
-    ConnectionObject* m_line;
 
-    psynth::TableObject m_s_obj;
-    psynth::TableObject m_d_obj;
+    psynth::Watch* m_watch;
+    ConnectionLine* m_line;
+    ConnectionWave* m_wave;
+    
+    psynth::TablePatcherEvent m_link;
 
     Ogre::Vector2 m_src;
     Ogre::Vector2 m_dest;
@@ -70,13 +96,12 @@ class Connection : public psynth::TableObjectListener
     
 public:
 
-    Connection(Ogre::SceneManager* scene,
-	       const psynth::TableObject& src,
-	       const psynth::TableObject& dest);
+    Connection(Ogre::SceneManager* scene, const psynth::TablePatcherEvent& ev);
 
     ~Connection();
 
     bool pointerClicked(const Ogre::Vector2& pos, OIS::MouseButtonID id);
+
 /*
     bool pointerReleased(const Ogre::Vector2& pos, OIS::MouseButtonID id);
     bool pointerMoved(const Ogre::Vector2& pos);
@@ -87,12 +112,14 @@ public:
     void handleSetParamObject(psynth::TableObject& ob,
 			      int param_id);
 
+    void update();
+    
     const psynth::TableObject& getSource() {
-	return m_s_obj;
+	return m_link.src;
     }
 
     const psynth::TableObject& getDestiny() {
-	return m_d_obj;
+	return m_link.dest;
     }
 };
 

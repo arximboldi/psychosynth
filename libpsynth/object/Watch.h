@@ -20,93 +20,24 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef PSYNTH_CONTROLBUFFER_H
-#define PSYNTH_CONTROLBUFFER_H
-
-#include <cstring>
-#include <libpsynth/common/AudioInfo.h>
+#ifndef PSYNTH_WATCH_H
+#define PSYNTH_WATCH_H
 
 namespace psynth
 {
 
-class ControlBuffer
+class ControlBuffer;
+class AudioBuffer;
+class AudioInfo;
+
+class Watch
 {
-    Sample* m_data;
-    size_t m_size;
-
-    void allocate() {
-	m_data = new Sample[m_size];
-        /* FIXME: what is the effect of new Sample[0] ?*/
-    }
-    
-    void liberate() {
-	delete [] m_data;
-	m_data = NULL;
-    }
-    
 public:
-    ControlBuffer() :
-	m_data(NULL),
-	m_size(0)
-	{}
-
-    ControlBuffer(size_t size) :
-	m_size(size) {
-	allocate();
-    }
-
-    ControlBuffer(const ControlBuffer& buf) :
-	m_size(buf.m_size) {
-	allocate();
-	memcpy(m_data, buf.m_data, sizeof(Sample) * m_size);
-    }
-
-    ~ControlBuffer() {
-	liberate();
-    }
-    
-    ControlBuffer& operator=(const ControlBuffer& buf) {
-	if (&buf != this) {
-	    liberate();
-	    m_size = buf.m_size;
-	    allocate();
-	    memcpy(m_data, buf.m_data, sizeof(Sample) * m_size);
-	}
-	return *this;
-    }
-    
-    Sample& operator[] (size_t i) {
-	return m_data[i];
-    }
-
-    const Sample& operator[] (size_t i) const {
-	return m_data[i];
-    }
-
-    Sample* getData() {
-	return m_data;
-    }
-
-    const Sample* getData() const {
-	return m_data;
-    }
-    
-    void clear() {
-	liberate();
-	m_size = 0;
-    }
-
-    size_t size() const {
-	return m_size;
-    }
-
-    void resize(size_t newsize) {
-	liberate();
-	m_size = newsize;
-	allocate();
-    }
+    virtual void setInfo(const AudioInfo& info) {}
+    virtual void update(const ControlBuffer& buf) {}
+    virtual void update(const AudioBuffer& buf) {}
 };
 
 } /* namespace psynth */
 
-#endif /* PSYNTH_CONTROLBUFER_H */
+#endif /* PSYNTH_WATCH_H */

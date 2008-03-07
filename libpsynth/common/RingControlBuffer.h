@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) 2007 Juan Pedro Bolivar Puente                          *
+ *   Copyright (C) Juan Pedro Bolivar Puente 2008                          *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -20,20 +20,19 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef PSYNTH_RINGAUDIOBUFFER_H
-#define PSYNTH_RINGAUDIOBUFFER_H
+#ifndef PSYNTH_RINGCONTROLBUFFER
+#define PSYNTH_RINGCONTROLBUFFER
 
-#include <libpsynth/common/AudioInfo.h>
-#include <libpsynth/common/AudioBuffer.h>
+#include <libpsynth/common/ControlBuffer.h>
 
 namespace psynth
 {
 
-class RingAudioBuffer
+class RingControlBuffer
 {
 public:
     class ReadPtr {
-	friend class RingAudioBuffer;
+	friend class RingControlBuffer;
 		
 	int m_pos;
 	int m_count;
@@ -51,63 +50,31 @@ public:
     };
 	
 private:
-    AudioInfo m_info;
-    Sample** m_data;
+    Sample* m_data;
     int m_size;
     int m_writepos;
     int m_writecount;
     float m_fr_count;
-    
+
     void allocate();
 	
     void liberate() {
-	if (m_data) {
-	    delete [] *m_data;
-	    delete [] m_data;
-	}
+	delete [] m_data;
     }
 
 public:
-    RingAudioBuffer();
-
-    RingAudioBuffer(int size);
-    
-    RingAudioBuffer(const AudioInfo& info);
+    RingControlBuffer();
 	
-    RingAudioBuffer(const AudioInfo& info, int size);
+    RingControlBuffer(int size);
 	
-    RingAudioBuffer(const RingAudioBuffer& buf);
+    RingControlBuffer(const RingControlBuffer& buf);
 	
-    ~RingAudioBuffer() {
+    ~RingControlBuffer() {
 	liberate();
     }
 	
-    RingAudioBuffer& operator= (RingAudioBuffer& buf);
-	
-    const AudioInfo& getAudioInfo() const {
-	return m_info;
-    }
-
-    void setAudioInfo(const AudioInfo& info) {
-	if (info.num_channels != m_info.num_channels) {
-	    liberate();
-	    m_info = info;
-	    allocate();
-	} else
-	    m_info = info;
-    }
-
-    void setAudioInfo(const AudioInfo& info, int new_size) {
-	if (info.num_channels != m_info.num_channels
-	    || m_size != new_size) {
-	    liberate();
-	    m_size = new_size;
-	    m_info = info;
-	    allocate();
-	} else
-	    m_info = info;
-    }
-    
+    RingControlBuffer& operator= (RingControlBuffer& buf);
+	    
     int size() const {
 	return m_size;
     }
@@ -137,30 +104,29 @@ public:
 	return ERR_NONE;
     }
 	
-    int read(ReadPtr& r, AudioBuffer& buf) const {
+    int read(ReadPtr& r, ControlBuffer& buf) const {
 	return read(r, buf, buf.size());
     };
 	
-    int read(ReadPtr& r, AudioBuffer& buf, int samples) const;
+    int read(ReadPtr& r, ControlBuffer& buf, int samples) const;
 	
-    void write(const AudioBuffer& buf) {
+    void write(const ControlBuffer& buf) {
 	write(buf, buf.size());
     }
+	
+    void write(const ControlBuffer& buf, int samples);
 
-    void writeFastResample(const AudioBuffer& buf, float factor) {
+    void writeFastResample(const ControlBuffer& buf, float factor) {
 	writeFastResample(buf, buf.size(), factor);
     }
     
-    void writeFastResample(const AudioBuffer& buf, int samples, float factor);
-    
-    void write(const AudioBuffer& buf, int samples);
+    void writeFastResample(const ControlBuffer& buf, int samples, float factor);
 
     void zero() {
-	if (m_data)
-	    memset(*m_data, 0, sizeof(Sample) * m_size * m_info.num_channels);
+	memset(m_data, 0, m_size * sizeof(Sample));
     }
 };
 
 } /* namespace psynth */
 
-#endif /* PSYNTH_RINGAUDIOBUFFER_H */
+#endif /* PSYNTH_RINGCONTROLBUFFER */

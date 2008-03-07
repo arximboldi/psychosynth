@@ -33,6 +33,26 @@ using namespace std;
 namespace psynth
 {
 
+void Object::InSocket::updateInput(const Object* caller, int caller_port_type, int caller_port)
+{
+    if (m_srcobj) {
+	m_srcobj->update(caller, caller_port_type, caller_port);
+
+	if (m_type == LINK_AUDIO) {
+	    const AudioBuffer* buf = m_srcobj->getOutput<AudioBuffer>(m_type, m_srcport);
+	    if (buf)
+		for (list<Watch*>::iterator it = m_watchs.begin(); it != m_watchs.end(); ++it)
+		    (*it)->update(*buf);
+	} else {
+	    const ControlBuffer* buf = m_srcobj->getOutput<ControlBuffer>(m_type, m_srcport);
+	    if (buf)
+		for (list<Watch*>::iterator it = m_watchs.begin(); it != m_watchs.end(); ++it) {
+		    (*it)->update(*buf);
+		}
+	}
+    }
+}
+
 Object::Object(const AudioInfo& info, int type,
 	       int n_in_audio, int n_in_control,
 	       int n_out_audio, int n_out_control,
@@ -55,7 +75,7 @@ Object::Object(const AudioInfo& info, int type,
     
     m_out_sockets[LINK_AUDIO].resize(n_out_audio, OutSocket(LINK_AUDIO));
     m_out_sockets[LINK_CONTROL].resize(n_out_control, OutSocket(LINK_CONTROL));
-    m_in_sockets[LINK_AUDIO].resize(n_in_audio, InSocketManual(LINK_CONTROL));;
+    m_in_sockets[LINK_AUDIO].resize(n_in_audio, InSocketManual(LINK_AUDIO));
     m_in_sockets[LINK_CONTROL].resize(n_in_control, InSocketManual(LINK_CONTROL));
     m_in_envelope[LINK_AUDIO].resize(n_in_audio);
     m_in_envelope[LINK_CONTROL].resize(n_in_control);

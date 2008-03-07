@@ -48,6 +48,7 @@ nobase_libpsynthinc_HEADERS = \
 	psynth/OutputDirector.h \
 	psynth/PsychosynthApp.h \
 	common/ArgParser.h \
+	common/Deleter.h \
 	common/Error.h \
 	common/Singleton.h \
 	common/Thread.h \
@@ -57,6 +58,7 @@ nobase_libpsynthinc_HEADERS = \
 	common/FastDelegate.h\
 	common/FastDelegateBind.h\
 	common/RingAudioBuffer.h \
+	common/RingControlBuffer.h \
 	common/AudioInfo.h \
         common/MapIterator.h \
 	common/Misc.h \
@@ -84,6 +86,8 @@ nobase_libpsynthinc_HEADERS = \
 	object/KnownObjects.h \
 	object/ObjParam.h\
 	object/SimpleEnvelope.h\
+	object/Watch.h\
+	object/WatchViewer.h\
 	output/Output.h\
 	version.h
 
@@ -95,6 +99,7 @@ libpsynth_la_SOURCES = \
 	common/AudioBuffer.cpp \
 	common/ControlBuffer.cpp \
 	common/RingAudioBuffer.cpp \
+	common/RingControlBuffer.cpp \
 	common/Mutex.cpp \
 	common/Misc.cpp \
 	common/Logger.cpp \

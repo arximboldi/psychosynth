@@ -360,12 +360,16 @@ void ElementManager::update()
 {
     for (ElemIter it = m_clear_elems.begin(); it != m_clear_elems.end(); ++it)
 	delete *it;
+    
+    for (list<Connection*>::iterator it = m_cons.begin(); it != m_cons.end(); ++it)
+	(*it)->update();
+    
     m_clear_elems.clear();
 }
 
 void ElementManager::handleLinkAdded(const TablePatcherEvent& ev)
 {
-    m_cons.push_back(new Connection(m_scene, ev.src, ev.dest));
+    m_cons.push_back(new Connection(m_scene, ev));
 
     ElemMapIter it = m_elems.find(ev.src.getID());
     if (it != m_elems.end())

@@ -218,12 +218,12 @@ void PatcherDynamic::makeLink(Link& l)
 
     Object* old_src = l.dest->getInSocket(l.sock_type, l.actual_in_sock).getSourceObject();
     if (old_src != NULL) {
-	notifyLinkDeleted(PatcherEvent(old_src, l.dest, l.actual_in_sock, l.out_sock, l.sock_type));
+	notifyLinkDeleted(PatcherEvent(old_src, l.dest, l.out_sock, l.actual_in_sock, l.sock_type));
 	cout << "undoing link, source: " << old_src->getID() << " dest: "<< l.dest->getID() << endl;
     }
     
     l.dest->connectIn(l.sock_type, l.actual_in_sock, l.src, l.out_sock);
-    notifyLinkAdded(PatcherEvent(l.src, l.dest, l.actual_in_sock, l.out_sock, l.sock_type));
+    notifyLinkAdded(PatcherEvent(l.src, l.dest, l.out_sock, l.actual_in_sock, l.sock_type));
 }
 
 void PatcherDynamic::undoLink(Link& l)
@@ -233,7 +233,7 @@ void PatcherDynamic::undoLink(Link& l)
 	    cout << "undoing link, source: " << l.src->getID() << " dest: "<< l.dest->getID() << endl;
 	    l.dest->connectIn(l.sock_type, l.actual_in_sock, NULL, l.out_sock);
 
-	    notifyLinkDeleted(PatcherEvent(l.src, l.dest, l.actual_in_sock, l.out_sock, l.sock_type));
+	    notifyLinkDeleted(PatcherEvent(l.src, l.dest, l.out_sock, l.actual_in_sock, l.sock_type));
 	}
     }
 }

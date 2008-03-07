@@ -90,6 +90,14 @@ public:
     template <typename T>
     inline void setParam(const std::string& name, const T& data);
 
+    void attachWatch(int type, int in_sock, Watch* watch) {
+	m_obj->attachWatch(type, in_sock, watch);
+    }
+
+    void detachWatch(int type, int in_sock, Watch* watch) {
+	m_obj->detachWatch(type, in_sock, watch);
+    }
+    
     int getParamID(const std::string& name) const {
 	m_obj->param(name).getID();
     }
@@ -151,7 +159,7 @@ struct TablePatcherEvent
     int socket_type;
     
     TablePatcherEvent(const TableObject& s, const TableObject& d,
-		      int ss, int ds, int st) :
+	      int ss, int ds, int st) :
 	src(s), dest(d), src_socket(ss), dest_socket(ds), socket_type(st) {}
 };
 

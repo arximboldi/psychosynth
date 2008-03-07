@@ -62,9 +62,10 @@ void OutputAlsa::run()
 		Logger::instance().log("alsa", Log::WARNING, "Buffer underrun ocurred.");
 	    else
 		Logger::instance().log("alsa", Log::WARNING, "Unknown snd_pcm_avail_update() return value.");
+	} else {
+	    cout << "processing " << nframes << endl; 
+	    process(getInfo().block_size); //getInfo().block_size);
 	}
-
-	process(getInfo().block_size);
     }
 }
 
@@ -99,19 +100,23 @@ bool OutputAlsa::open()
     unsigned int uirate = getInfo().sample_rate;
 	
     if (getState() == NOTINIT) {
+	cout << "sample_rate " << getInfo().sample_rate << endl;
+	cout << "block_size " << getInfo().block_size << endl;
+	cout << "num_channels " << getInfo().num_channels << endl;
+	
 	if ((err = snd_pcm_open (&alsa_pcm, alsa_device.c_str(), SND_PCM_STREAM_PLAYBACK, 0)) < 0) {
 	    Logger::instance().log("alsa", Log::WARNING,
 				   string("Could not open device. (")
 				   + snd_strerror(err) + ")");
 	    return false;
 	}
-		
+	
 	snd_pcm_hw_params_malloc (&alsa_hwparams);
 	snd_pcm_hw_params_any (alsa_pcm, alsa_hwparams);
 	snd_pcm_hw_params_set_access (alsa_pcm, alsa_hwparams, SND_PCM_ACCESS_RW_INTERLEAVED);
 		
 	alsa_format = SND_PCM_FORMAT_S16;
-		
+
 	snd_pcm_hw_params_set_format (alsa_pcm, alsa_hwparams, alsa_format);
 	snd_pcm_hw_params_set_rate_near (alsa_pcm, alsa_hwparams, &uirate, &dir);
 	snd_pcm_hw_params_set_channels (alsa_pcm, alsa_hwparams, getInfo().num_channels);
@@ -122,11 +127,17 @@ bool OutputAlsa::open()
 	snd_pcm_sw_params_set_avail_min(alsa_pcm, alsa_swparams, getInfo().block_size);
 	snd_pcm_sw_params_set_start_threshold (alsa_pcm, alsa_swparams, 0U);
 	snd_pcm_sw_params (alsa_pcm, alsa_swparams);
-		
-	m_buf = new short int[getInfo().block_size * getInfo().num_channels * sizeof(short int)];
-		
-	setState(IDLE);
 
+	if ((err = snd_pcm_prepare (alsa_pcm)) < 0) {
+	    Logger::instance().log("alsa", Log::WARNING,
+				   string("Could not prepare device. (")
+				   + snd_strerror(err) + ")");	    
+	} else {
+	    m_buf = new short int[getInfo().block_size * getInfo().num_channels * sizeof(short int)];
+	    
+	    setState(IDLE);
+	}
+	
 	return true;
     } else {
 	Logger::instance().log("alsa", Log::WARNING, "Can not initialize twice.");
@@ -138,7 +149,8 @@ bool OutputAlsa::put(const AudioBuffer& in_buf, size_t nframes)
 {
     int err;
     bool ret = true;
-   	
+
+    //cout << "writting: " << nframes << endl;
     if (in_buf.getInfo().num_channels != getInfo().num_channels 
 	|| in_buf.getInfo().sample_rate != getInfo().sample_rate) {
 	/* TODO: Adapt the audio signal to fit our requeriments. */
@@ -160,7 +172,9 @@ bool OutputAlsa::put(const AudioBuffer& in_buf, size_t nframes)
 		Logger::instance().log("alsa", Log::WARNING,
 				       string("Could not write to device. (")
 				       + snd_strerror(err) + ")");
-		close(); /* FIXME: Always needed? */
+                //close(); /* WTF! */
+		snd_pcm_recover(alsa_pcm, err, 1);
+		snd_pcm_prepare(alsa_pcm);
 		ret = false;
 	    }
 	    
