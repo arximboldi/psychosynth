@@ -40,7 +40,7 @@ const ColourValue LINE_MUTE_COLOUR = ColourValue(0.0, 0.0, 0.0, 0.7);
 #define LINE_Y           0.005f
 
 #define WAVE_POINTS  1000
-#define WAVE_LENGTH  1.0f
+#define WAVE_LENGTH  20.0f
 #define WAVE_A_SECS  0.05f
 #define WAVE_C_SECS  1.0f
 #define WAVE_WIDTH   1.0f
@@ -103,24 +103,24 @@ void ConnectionWave::build(const Ogre::Vector2& src,
 	    length >= WAVE_LENGTH ?
 	    n_samples : length / ((float) WAVE_LENGTH / n_samples);
 	Real delta = length / (float) real_samples;
-	Vector2 run = (src - dst).normalisedCopy() * delta;
-	Vector2 base = dst;
-	Vector2 side = (src - dst).perpendicular().normalisedCopy() * WAVE_WIDTH;
+	Vector2 run = (dst - src).normalisedCopy() * delta;
+	Vector2 base = src;
+	Vector2 side = (dst - src).perpendicular().normalisedCopy() * WAVE_WIDTH;
 	Vector2 tmp;
 	
-	i = 0;
-	while(i < real_samples) {
-	    if (i != 0 || samples[i] >= 0)
+	i = n_samples - 1;
+	while(i >= n_samples - real_samples) {
+	    if (i !=  n_samples - 1 || samples[i] >= 0)
 		position(base.x, WAVE_Y, base.y);
-	    tmp = base + side * samples[i] * (sin(i * M_PI / real_samples) * .7 + 0.3);
+	    tmp = base + side * samples[i] * (sin((n_samples - i) * M_PI / real_samples) * .7 + 0.3);
 	    position(tmp.x, WAVE_Y, tmp.y);
 
-	    for (i++; i < real_samples &&
-		     (samples[i-1] >= 0) == (samples[i] >= 0);
-		 ++i) {
+	    for (--i; i >= n_samples - real_samples &&
+		     (samples[i+1] >= 0) == (samples[i] >= 0);
+		 --i) {
 		base += run;
 		position(base.x, WAVE_Y, base.y);
-		tmp = base + side * samples[i] * (sin(i * M_PI / real_samples) * 0.7 + 0.3);
+		tmp = base + side * samples[i] * (sin((n_samples - i) * M_PI / real_samples) * 0.7 + 0.3);
 		position(tmp.x, WAVE_Y, tmp.y);
 	    }
 	    
