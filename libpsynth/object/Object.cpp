@@ -33,26 +33,6 @@ using namespace std;
 namespace psynth
 {
 
-void Object::InSocket::updateInput(const Object* caller, int caller_port_type, int caller_port)
-{
-    if (m_srcobj) {
-	m_srcobj->update(caller, caller_port_type, caller_port);
-
-	if (m_type == LINK_AUDIO) {
-	    const AudioBuffer* buf = m_srcobj->getOutput<AudioBuffer>(m_type, m_srcport);
-	    if (buf)
-		for (list<Watch*>::iterator it = m_watchs.begin(); it != m_watchs.end(); ++it)
-		    (*it)->update(*buf);
-	} else {
-	    const ControlBuffer* buf = m_srcobj->getOutput<ControlBuffer>(m_type, m_srcport);
-	    if (buf)
-		for (list<Watch*>::iterator it = m_watchs.begin(); it != m_watchs.end(); ++it) {
-		    (*it)->update(*buf);
-		}
-	}
-    }
-}
-
 Object::Object(const AudioInfo& info, int type,
 	       int n_in_audio, int n_in_control,
 	       int n_out_audio, int n_out_control,
@@ -101,17 +81,9 @@ void Object::setEnvelopesDeltas()
 	     ++it) {
 	    it->setDeltas(rise_dt, fall_dt);
 	}
-}
 
-void Object::updateEnvelopes()
-{
-    int i;
-    
-    for (i = 0; i < LINK_TYPES; ++i)
-	for (vector<SimpleEnvelope>::iterator it = m_in_envelope[i].begin();
-	     it != m_in_envelope[i].end();
-	     ++it)
-	    it->update(m_audioinfo.block_size);
+    m_out_envelope.setDeltas(rise_dt, fall_dt);
+    m_out_envelope.set(1.0f);
 }
 
 void Object::addParam(const std::string& name, int type, void* val)
@@ -141,23 +113,6 @@ const ObjParam& Object::param(const std::string& name) const
 	    return *it;
     
     return m_null_param;
-}
-
-void Object::updateInSockets()
-{
-    int i, j;
-
-    /* TODO: Thread synch! */
-    for (j = 0; j < LINK_TYPES; ++j)
-	for (i = 0; i < m_in_envelope[j].size(); ++i) {
-	    if (m_in_sockets[j][i].must_update &&
-		m_in_envelope[j][i].finished()) {
-		forceConnectIn(j, i,
-			       m_in_sockets[j][i].src_obj,
-			       m_in_sockets[j][i].src_sock);
-		m_in_sockets[j][i].must_update = false;
-	    }
-	}
 }
 
 void Object::clearConnections()
@@ -236,12 +191,78 @@ inline bool Object::canUpdate(const Object* caller, int caller_port_type,
     return ret;
 }
 
+void Object::InSocket::updateInput(const Object* caller, int caller_port_type, int caller_port)
+{
+    if (m_srcobj) {
+	m_srcobj->update(caller, caller_port_type, caller_port);
+
+	if (m_type == LINK_AUDIO) {
+	    const AudioBuffer* buf = m_srcobj->getOutput<AudioBuffer>(m_type, m_srcport);
+	    if (buf)
+		for (list<Watch*>::iterator it = m_watchs.begin(); it != m_watchs.end(); ++it)
+		    (*it)->update(*buf);
+	} else {
+	    const ControlBuffer* buf = m_srcobj->getOutput<ControlBuffer>(m_type, m_srcport);
+	    if (buf)
+		for (list<Watch*>::iterator it = m_watchs.begin(); it != m_watchs.end(); ++it) {
+		    (*it)->update(*buf);
+		}
+	}
+    }
+}
+
+void Object::updateEnvelopes()
+{
+    int i, j;
+    
+    for (i = 0; i < LINK_TYPES; ++i)
+	for (vector<SimpleEnvelope>::iterator it = m_in_envelope[i].begin();
+	     it != m_in_envelope[i].end();
+	     ++it)
+	    it->update(m_audioinfo.block_size);
+
+    /* Apply envelopes to output (for soft muting) */
+    for (i = 0; i < m_outdata_audio.size(); ++i)
+	for (j = 0; j < m_audioinfo.num_channels; ++j) {
+	    SimpleEnvelope env = m_out_envelope;
+	    env.update(m_outdata_audio[i][j], m_audioinfo.block_size);
+	}
+    for (i = 0; i < m_outdata_control.size(); ++i) {
+	SimpleEnvelope env = m_out_envelope;
+	env.update(m_outdata_control[i].getData(), m_audioinfo.block_size);
+    }
+
+    m_out_envelope.update(m_audioinfo.block_size);
+}
+
+void Object::updateInSockets()
+{
+    int i, j;
+
+    /* TODO: Thread synch! */
+    for (j = 0; j < LINK_TYPES; ++j)
+	for (i = 0; i < m_in_envelope[j].size(); ++i) {
+	    if (m_in_sockets[j][i].must_update &&
+		m_in_envelope[j][i].finished()) {
+		forceConnectIn(j, i,
+			       m_in_sockets[j][i].src_obj,
+			       m_in_sockets[j][i].src_sock);
+		m_in_sockets[j][i].must_update = false;
+	    }
+	}
+}
+
 void Object::updateParams()
 {
     size_t j;
     
     for (vector<ObjParam>::iterator i = m_params.begin(); i != m_params.end(); ++i)
 	(*i).update();
+
+    if (m_param_mute)
+	m_out_envelope.release();
+    else
+	m_out_envelope.press();
 }
 
 void Object::updateInputs()
@@ -258,7 +279,7 @@ void Object::update(const Object* caller, int caller_port_type, int caller_port)
     if (canUpdate(caller, caller_port_type, caller_port)) {
 	updateParams();
 
-	if (!m_param_mute) {
+	if (!m_param_mute || !m_out_envelope.finished()) {
 	    updateInputs();
 	    doUpdate(caller, caller_port_type, caller_port); 
 	}

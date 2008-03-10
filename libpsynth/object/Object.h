@@ -183,6 +183,7 @@ private:
     std::vector<OutSocket> m_out_sockets[LINK_TYPES];
     std::vector<InSocketManual> m_in_sockets[LINK_TYPES];
     std::vector<SimpleEnvelope> m_in_envelope[LINK_TYPES];
+    SimpleEnvelope m_out_envelope;
     
     std::vector<ObjParam>  m_params;
     ObjParam m_null_param;
@@ -212,7 +213,7 @@ private:
 protected:
     template <typename SocketDataType>
     SocketDataType* getOutput(int type, int socket) {
-	if (m_param_mute)
+	if (m_param_mute && m_out_envelope.finished())
 	    return NULL;
 	
 	/* TODO: Find a way to do type checking */

@@ -55,6 +55,10 @@ public:
 	m_rise_dt = rise_dt;
 	m_fall_dt = fall_dt;
     }
+
+    void set(float value) {
+	m_val = value;
+    }
     
     float update() {
 	float val = m_val;
@@ -70,6 +74,11 @@ public:
 	if (m_val > 1.0f) m_val = 1.0;
 	else if (m_val < 0.0f) m_val = 0.0;
 	return val;
+    }
+
+    float update(float* samples, int n_samples) {
+	while(n_samples--)
+	    *samples++ *= update();
     }
 
     void press() {
