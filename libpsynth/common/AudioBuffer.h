@@ -62,8 +62,15 @@ public:
     AudioBuffer& operator= (const AudioBuffer& buf);
 
     void interleave(Sample* dest, size_t n_frames) const;
+    void interleaveC8(char* dest, size_t n_frames) const;
     void interleaveS16(short int* dest, size_t n_frames) const;
     void interleaveI32(int* dest, size_t n_frames) const;
+
+    void deinterleave(const Sample* src, size_t n_frames);
+    void deinterleaveC8(const char* src, size_t n_frames);
+    void deinterleaveS16(const short int* src, size_t n_frames);
+    void deinterleaveI32(const int* src, size_t n_frames);
+
     
     const AudioInfo& getInfo() const {
 	return m_info;

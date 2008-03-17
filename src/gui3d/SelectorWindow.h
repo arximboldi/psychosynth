@@ -25,6 +25,7 @@
 
 #include <map>
 #include <list>
+#include <libpsynth/table/TableObjectCreator.h>
 
 #include "gui3d/ToggableWindow.h"
 #include "gui3d/ElementManager.h"
@@ -34,17 +35,18 @@ class SelectorWindow : public ToggableWindow
 public:
     class Category {
 	class Button {
-	    int m_elem_type;
 	    ElementManager* m_mgr;
 	    CEGUI::Window* m_window;
 	    int m_index;
-			
+	    psynth::TableObjectCreator m_creator;
+	    
 	public:
 	    Button(const std::string& name, ElementManager* m_mgr,
-		   int elem_type, int index);
+		   const psynth::TableObjectCreator& objcre, int index);
 			
 	    ~Button() {
 		//delete m_window;
+		//delete m_creator;
 	    }
 			
 	    CEGUI::Window* getWindow() {
@@ -54,7 +56,7 @@ public:
 	    void setPosition();
 			
 	    bool onClick(const CEGUI::EventArgs &e) {
-		m_mgr->addElement(m_elem_type);
+		m_mgr->addElement(m_creator);
 		return true;
 	    }
 			
@@ -78,7 +80,7 @@ public:
 	    return m_window;
 	};
 		
-	void addButton(const std::string& name, int elem_id);
+	void addButton(const std::string& name, const psynth::TableObjectCreator& objcre);
     };
 	
 private:	

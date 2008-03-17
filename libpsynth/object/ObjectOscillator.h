@@ -88,6 +88,7 @@ private:
 public:
     ObjectOscillator(const AudioInfo& prop,
 		     int obj_type,
+		     const std::string& name,
 		     int n_audio_out,
 		     int n_control_out);
     

@@ -33,6 +33,7 @@
 #include <libpsynth/object/ObjectOscillator.h>
 #include <libpsynth/object/ObjectLFO.h>
 #include <libpsynth/object/ObjectFilter.h>
+#include <libpsynth/object/ObjectSampler.h>
 
 #include <libpsynth/object/KnownObjects.h>
 
@@ -76,11 +77,21 @@ Element* ElementManager::createElement(TableObject& obj)
 	return new ElementMixer(obj, m_scene);
     case OBJ_CONTROLMIXER:
 	return new ElementControlMixer(obj, m_scene);
+    case OBJ_SAMPLER:
+	return new ElementSampler(obj, m_scene);
     default:
 	return NULL;
     }
 }
 
+void ElementManager::addElement(psynth::TableObjectCreator& creator)
+{
+    m_must_own++;
+    creator.create(*m_table);
+    m_must_own--;
+}
+
+/*
 void ElementManager::addElement(int e_type)
 {
     TableObject obj;
@@ -238,6 +249,7 @@ void ElementManager::addElement(int e_type)
 
     m_must_own--;
 }
+*/
 
 bool ElementManager::getTablePointer(Vector2& res)
 {

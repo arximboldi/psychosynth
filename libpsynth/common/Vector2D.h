@@ -23,6 +23,8 @@
 #ifndef PSYNTH_VECTOR2D_H
 #define PSYNTH_VECTOR2D_H
 
+#include <iostream>
+
 namespace psynth
 {
 
@@ -73,6 +75,13 @@ public:
     }
 
 };
+
+template<class T>
+std::ostream& operator<< (std::ostream& os, const psynth::Vector2D<T> v)
+{
+    os << v.x << " " << v.y;
+    return os;
+}
 
 typedef Vector2D<float> Vector2f;
 

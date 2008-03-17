@@ -30,7 +30,7 @@ using namespace CEGUI;
 #define RW_WIDTH  220
 #define RW_HEIGHT 90
 
-#define DEFAULT_FILE "record.wav"
+#define DEFAULT_FILE "record.au"
 
 CEGUI::FrameWindow* RecordWindow::createWindow()
 {

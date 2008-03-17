@@ -35,6 +35,8 @@
 #include "gui3d/QuitWindow.h"
 #include "gui3d/ConfWindow.h"
 #include "gui3d/SelectorWindow.h"
+#include "gui3d/DefaultSelectorPopulator.h"
+
 #ifdef PSYNTH_HAVE_OSC
 #include "gui3d/NetworkWindow.h"
 #endif
@@ -182,8 +184,8 @@ void Psychosynth3D::setupSettings(ConfNode& conf)
     conf.getChild("fps").def(DEFAULT_FPS);
 
     /* Is it dangerous to have this set before the gui is initialized? */
-    conf.addNudgeEvent(MakeEvent(this, &Psychosynth3D::onConfigChange));
-    conf.getChild("fps").addChangeEvent(MakeEvent(this, &Psychosynth3D::onFpsChange));
+    conf.addNudgeEvent(MakeDelegate(this, &Psychosynth3D::onConfigChange));
+    conf.getChild("fps").addChangeEvent(MakeDelegate(this, &Psychosynth3D::onFpsChange));
 }
 
 void Psychosynth3D::setupOgre(psynth::ConfNode& conf)
@@ -273,7 +275,8 @@ void Psychosynth3D::setupGui()
     CEGUI::WindowManager *win = CEGUI::WindowManager::getSingletonPtr();
     CEGUI::Window *sheet = win->createWindow("DefaultGUISheet", "root"); // TODO: root?
     m_gui->setGUISheet(sheet);
-
+    m_gui->setDefaultTooltip("TaharezLook/Tooltip");
+    
     m_guiinput = new CeguiInjecter(); 
     m_inputmgr->addMouseListener(m_guiinput);
     m_inputmgr->addKeyListener(m_guiinput);
@@ -349,8 +352,12 @@ void Psychosynth3D::setupTable()
 void Psychosynth3D::setupMenus()
 {
     SelectorWindow* selector = new SelectorWindow(m_elemmgr);
-    SelectorWindow::Category* cat = NULL;
     
+    DefaultSelectorPopulator populator;
+
+    populator.populate(getDataPath(), selector);
+    
+    /*
     cat = selector->addCategory("Wave");
     cat->addButton("Sine", ELEM_OSC_SINE);
     cat->addButton("Square", ELEM_OSC_SQUARE);
@@ -380,33 +387,39 @@ void Psychosynth3D::setupMenus()
     cat->addButton("Ring Mod.", ELEM_RINGMOD);
     cat->addButton("Ctrl. Mixer", ELEM_CTRLMIXER);
     cat->addButton("Ctrl. Ring Mod.", ELEM_CTRLRINGMOD);
+    */
     
     m_windowlist = new WindowList();
     
     m_windowlist->addWindow("SelectorWindowButton.imageset",
 			    "SelectorWindowButton.layout",
+			    "Place objects in the table.",
 			    selector,
 			    OIS::KC_UNASSIGNED);
 #ifdef PSYNTH_HAVE_PCM
     m_windowlist->addWindow("RecordWindowButton.imageset",
 			    "RecordWindowButton.layout",
+			    "Record the playing sound.",
 			    new RecordWindow(getTable()),
 			    OIS::KC_UNASSIGNED);
 #endif
 #ifdef PSYNTH_HAVE_OSC
     m_windowlist->addWindow("NetworkWindowButton.imageset",
 			    "NetworkWindowButton.layout",
+			    "Create network sessions.",
 			    new NetworkWindow(m_oscclient,
 					      m_oscserver),
 			    OIS::KC_UNASSIGNED);
 #endif
     m_windowlist->addWindow("ConfWindowButton.imageset",
 			    "ConfWindowButton.layout",
+			    "Configure the program settings.",
 			    new ConfWindow(Config::instance().getChild("psynth3d"),
 					   Config::instance().getChild("psychosynth")),
 			    OIS::KC_UNASSIGNED);
     m_windowlist->addWindow("QuitWindowButton.imageset",
 			    "QuitWindowButton.layout",
+			    "Leave this fancy program.",
 			    new QuitWindow(),
 			    OIS::KC_ESCAPE);
 

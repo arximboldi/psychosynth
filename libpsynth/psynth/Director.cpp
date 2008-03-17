@@ -83,25 +83,25 @@ void Director::registerConfig()
     m_config->getChild("num_channels").def(DEFAULT_NUM_CHANNELS);
     m_config->getChild("output")      .def(DEFAULT_OUTPUT);
 
-    m_config->addNudgeEvent(MakeEvent(this, &Director::onConfigNudge));
+    m_config->addNudgeEvent(MakeDelegate(this, &Director::onConfigNudge));
 
 #if 0
-    m_config->getChild("sample_rate").addChangeEvent(MakeEvent(this, &Director::onSampleRateChange));
-    m_config->getChild("block_size").addChangeEvent(MakeEvent(this, &Director::onBlockSizeChange));
-    m_config->getChild("num_channels").addChangeEvent(MakeEvent(this, &Director::onNumChannelsChange));
-    m_config->getChild("output").addChangeEvent(MakeEvent(this, &Director::onOutputChange));
+    m_config->getChild("sample_rate").addChangeEvent(MakeDelegate(this, &Director::onSampleRateChange));
+    m_config->getChild("block_size").addChangeEvent(MakeDelegate(this, &Director::onBlockSizeChange));
+    m_config->getChild("num_channels").addChangeEvent(MakeDelegate(this, &Director::onNumChannelsChange));
+    m_config->getChild("output").addChangeEvent(MakeDelegate(this, &Director::onOutputChange));
 #endif
 }
 
 void Director::unregisterConfig()
 {
-    m_config->deleteNudgeEvent(MakeEvent(this, &Director::onConfigNudge));
+    m_config->deleteNudgeEvent(MakeDelegate(this, &Director::onConfigNudge));
 
 #if 0
-    m_config->getChild("sample_rate").deleteChangeEvent(MakeEvent(this, &Director::onSampleRateChange));
-    m_config->getChild("block_size").deleteChangeEvent(MakeEvent(this, &Director::onBlockSizeChange));
-    m_config->getChild("num_channels").deleteChangeEvent(MakeEvent(this, &Director::onNumChannelsChange));
-    m_config->getChild("output").deleteChangeEvent(MakeEvent(this, &Director::onOutputChange));    
+    m_config->getChild("sample_rate").deleteChangeEvent(MakeDelegate(this, &Director::onSampleRateChange));
+    m_config->getChild("block_size").deleteChangeEvent(MakeDelegate(this, &Director::onBlockSizeChange));
+    m_config->getChild("num_channels").deleteChangeEvent(MakeDelegate(this, &Director::onNumChannelsChange));
+    m_config->getChild("output").deleteChangeEvent(MakeDelegate(this, &Director::onOutputChange));    
 #endif
 }
 

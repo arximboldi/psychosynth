@@ -29,6 +29,7 @@
 #include <libpsynth/common/Mutex.h>
 #include <libpsynth/object/Object.h>
 #include <libpsynth/output/Output.h>
+#include <libpsynth/object/ObjectFactory.h>
 
 namespace psynth
 {
@@ -98,7 +99,7 @@ public:
 	N_PARAM
     };
 	
-    ObjectOutput(AudioInfo& info);
+    ObjectOutput(const AudioInfo& info);
 
     ~ObjectOutput();
 	
@@ -140,6 +141,8 @@ public:
 	//m_passive_lock.unlock();
     };
 };
+
+PSYNTH_DECLARE_OBJECT_FACTORY(ObjectOutput, "output");
 
 } /* namespace psynth */
 

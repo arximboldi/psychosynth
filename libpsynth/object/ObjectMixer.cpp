@@ -30,11 +30,13 @@ namespace psynth
 
 ObjectMixer::ObjectMixer(const AudioInfo& info,
 			 int obj_type,
+			 const std::string& name,
 			 int num_audio_out,
 			 int num_ctrl_out,
 			 int num_in): 
     Object(info,
 	   obj_type,
+	   name,
 	   num_audio_out ? num_in : 0, 
 	   num_ctrl_out  ? num_in : N_IN_C_SOCKETS,
 	   num_audio_out,

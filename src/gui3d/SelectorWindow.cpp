@@ -31,17 +31,19 @@ const float BUT_WIDTH = 100;
 const float BUT_HEIGHT = 20;
 
 SelectorWindow::Category::Button::Button(const std::string& name, 
-					  ElementManager* mgr, int elem_type,
-					  int index) :
-    m_elem_type(elem_type),
+					 ElementManager* mgr,
+					 const psynth::TableObjectCreator& objcre,
+					 int index) :
     m_mgr(mgr),
-    m_index(index)
+    m_index(index),
+    m_creator(objcre)
 {
     WindowManager& wmgr = WindowManager::getSingleton();
 	
     m_window = wmgr.createWindow("TaharezLook/Button");
     m_window->setText    (name);
     m_window->setSize    ( UVector2(CEGUI::UDim(0, BUT_WIDTH), CEGUI::UDim(0, BUT_HEIGHT)));
+    
     m_window->setWantsMultiClickEvents(false);
     m_window->subscribeEvent(PushButton::EventClicked,
 			     Event::Subscriber(&SelectorWindow::Category::Button::onClick, this));
@@ -83,15 +85,16 @@ SelectorWindow::Category::Category(const std::string& name, ElementManager* mgr)
 SelectorWindow::Category::~Category()
 {
     list<Button*>::iterator i;
-    for (i = m_buts.begin(); i != m_buts.end(); i++);
-    delete *i;
+    for (i = m_buts.begin(); i != m_buts.end(); i++)
+	delete *i;
 	
     //delete m_window;
 }
 
-void SelectorWindow::Category::addButton(const std::string& name, int elem_id)
+void SelectorWindow::Category::addButton(const std::string& name,
+					 const psynth::TableObjectCreator& objcre)
 {
-    Button* but = new Button(name, m_mgr, elem_id, m_nbut++);
+    Button* but = new Button(name, m_mgr, objcre, m_nbut++);
     m_buts.push_back(but);
 
     m_window->addChildWindow( but->getWindow() );
@@ -126,6 +129,7 @@ SelectorWindow::Category* SelectorWindow::addCategory(const std::string& name)
 
     Category* newcat = new Category(name, m_mgr);
     m_container->addChildWindow(newcat->getWindow());
+
     m_cat[name] = newcat;
 	
     return newcat;

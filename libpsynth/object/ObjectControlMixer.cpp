@@ -25,6 +25,8 @@
 namespace psynth
 {
 
+PSYNTH_DEFINE_OBJECT_FACTORY(ObjectControlMixer);
+
 void ObjectControlMixer::doUpdate(const Object* caller, int caller_port_type, int caller_port)
 {
     ControlBuffer* buf = getOutput<ControlBuffer>(LINK_CONTROL, OUT_C_OUTPUT);

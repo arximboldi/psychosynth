@@ -25,6 +25,7 @@
 
 #include <libpsynth/object/KnownObjects.h>
 #include <libpsynth/object/ObjectMixer.h>
+#include <libpsynth/object/ObjectFactory.h>
 
 namespace psynth
 {
@@ -50,11 +51,14 @@ public:
     ObjectControlMixer(const AudioInfo& prop, int n_chan = 2) :
 	ObjectMixer(prop,
 		    OBJ_CONTROLMIXER,
+		    "control_mixer",
 		    N_OUT_A_SOCKETS,
 		    N_OUT_C_SOCKETS,
 		    n_chan)
 	{}
 };
+
+PSYNTH_DECLARE_OBJECT_FACTORY(ObjectControlMixer, "control_mixer");
 
 } /* namespace psynth */
 

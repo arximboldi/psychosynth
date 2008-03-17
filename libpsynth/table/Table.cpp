@@ -31,6 +31,7 @@
 #include "object/ObjectAudioOscillator.h"
 #include "object/ObjectLFO.h"
 #include "object/ObjectFilter.h"
+#include "object/ObjectSampler.h"
 
 using namespace std;
 
@@ -110,6 +111,19 @@ Table::Table(const AudioInfo& info) :
     m_mixer = new ObjectAudioMixer(m_info, MIXER_CHANNELS);
     m_objmgr.attachObject(m_output, OUTPUT_ID);
     m_objmgr.attachObject(m_mixer, MIXER_ID);
+
+    registerDefaultObjectFactory();
+}
+
+void Table::registerDefaultObjectFactory()
+{
+    registerObjectFactory(getObjectAudioMixerFactory());
+    registerObjectFactory(getObjectControlMixerFactory());
+    registerObjectFactory(getObjectAudioOscillatorFactory());
+    registerObjectFactory(getObjectLFOFactory());
+    registerObjectFactory(getObjectOutputFactory());
+    registerObjectFactory(getObjectFilterFactory());
+    registerObjectFactory(getObjectSamplerFactory());
 }
 
 Table::~Table()
@@ -162,6 +176,9 @@ TableObject Table::addObject(int type)
     case OBJ_CONTROLMIXER:
 	obj = new ObjectControlMixer(m_info);
 	break;
+    case OBJ_SAMPLER:
+	obj = new ObjectSampler(m_info);
+	break;
     default:
 	obj = NULL;
 	return TableObject(NULL, NULL);
@@ -175,14 +192,32 @@ TableObject Table::addObject(int type)
     return tobj;
 }
 
+TableObject Table::addObject(const std::string& name)
+{
+    Object* obj;
+    TableObject tobj;
+	
+    obj = m_objfact.create(name, m_info);
+
+    if (obj) {
+	if (!m_objmgr.attachObject(obj, m_last_id++))
+	    return TableObject(NULL, NULL);
+    
+	tobj = TableObject(obj, this);
+	notifyAddObject(tobj);
+    }
+    
+    return tobj;
+}
+
 void Table::deleteObject(TableObject& obj)
 {
     if (m_patcher)
 	m_patcher->deleteObject(obj.m_obj);
     notifyDeleteObject(obj);
 /*
-    m_objmgr.detachObject(obj.m_obj->getID());
-    delete obj.m_obj;
+  m_objmgr.detachObject(obj.m_obj->getID());
+  delete obj.m_obj;
 */
     m_objmgr.deleteObject(obj.m_obj->getID());
 }

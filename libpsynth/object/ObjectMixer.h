@@ -77,6 +77,7 @@ private:
 public:
     ObjectMixer(const AudioInfo& info,
 		int obj_type,
+		const std::string& name,
 		int num_audio_out,
 		int num_ctrl_out,
 		int num_in = 2);

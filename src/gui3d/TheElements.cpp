@@ -29,6 +29,7 @@
 #include <libpsynth/object/ObjectOscillator.h>
 #include <libpsynth/object/ObjectLFO.h>
 #include <libpsynth/object/ObjectFilter.h>
+#include <libpsynth/object/ObjectSampler.h>
 
 using namespace std;
 using namespace Ogre;
@@ -228,4 +229,32 @@ ElementFilter::ElementFilter(TableObject& obj,
 					ObjectFilter::PARAM_RESONANCE,
 					0.0f, 1.0f,
 					"Resonance"));
+}
+
+
+ElementSampler::ElementSampler(TableObject& obj,
+		       Ogre::SceneManager* m_scene) :
+    Element(obj, m_scene)
+{	    
+    static const char* mesh_name = "sampler.mesh";
+    
+    addComponent(new ElemMainComponent(
+		     string(mesh_name), 
+		     ObjectSampler::PARAM_PITCH,
+		     0.1f, 10.0f));
+    
+    addComponent(new ElemSecondComponent(
+		     ObjectSampler::PARAM_AMPLITUDE,
+		     0.0f, 1.0f));
+
+
+    getGUIProperties().addParameter(new ElemGuiParamFloat(
+					ObjectSampler::PARAM_AMPLITUDE,
+					0.0f, 1.0f,
+					"Amplitude"));
+    
+    getGUIProperties().addParameter(new ElemGuiParamFloat(
+					ObjectSampler::PARAM_PITCH,
+					0.1f, 10.0f,
+					"Pitch"));
 }

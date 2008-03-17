@@ -40,8 +40,9 @@ private:
 
 char* itoa(int val, int base);
 char* ftoa(double f, double sigfigs);
-
+int strcmp_i(const char* a, const char* b);
 std::string str_dirname(std::string str);
+const char* getExtension(const char* file);
 
 } /* namespace psynth */
 

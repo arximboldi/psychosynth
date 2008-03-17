@@ -30,10 +30,15 @@
 #include <libpsynth/common/Misc.h>
 #include <libpsynth/common/Singleton.h>
 #include <libpsynth/common/MapIterator.h>
-#include <libpsynth/common/FastDelegate.h>
 
 namespace psynth
 {
+
+/*
+ * We wanto to put the delegate into our own namespace.
+ */
+#include <libpsynth/common/FastDelegate.h>
+using namespace fastdelegate;
 
 enum ConfType
 {
@@ -165,7 +170,6 @@ public:
 
 //typedef fastdelegate::FastDelegate<bool (const ConfNode&)> ConfEvent;
 typedef fastdelegate::FastDelegate1<ConfNode&, bool> ConfEvent;
-#define MakeEvent fastdelegate::MakeDelegate
 
 class ConfSubject
 {    

@@ -33,6 +33,7 @@ enum KnownObjectType {
     OBJ_OSCILLATOR,
     OBJ_LFO,
     OBJ_FILTER,
+    OBJ_SAMPLER,
     N_OBJECTS
 };
 

@@ -60,4 +60,11 @@ public:
 		  Ogre::SceneManager* m_scene);
 };
 
+class ElementSampler : public Element
+{
+public:
+    ElementSampler(psynth::TableObject& obj,
+		   Ogre::SceneManager* m_scene);
+};
+
 #endif /* THEELEMENTS_H */

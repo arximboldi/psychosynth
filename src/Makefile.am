@@ -74,6 +74,7 @@ psynth3d_SOURCES = \
 	gui3d/Psychosynth3D.cpp \
 	gui3d/InputManager.cpp \
 	gui3d/SelectorWindow.cpp \
+	gui3d/DefaultSelectorPopulator.cpp\
 	gui3d/QuitWindow.cpp \
 	gui3d/ToggableWindow.cpp \
 	gui3d/ConfWindow.cpp \
@@ -98,6 +99,7 @@ psynth3d_SOURCES = \
 	gui3d/QuitWindow.h \
 	gui3d/ConfWindow.h \
 	gui3d/SelectorWindow.h\
+	gui3d/DefaultSelectorPopulator.h\
 	gui3d/ToggableWindow.h\
 	gui3d/TaskManager.h\
 	gui3d/Element.h\
@@ -127,9 +129,9 @@ psynth3d_SOURCES += \
 	gui3d/NetworkWindow.h
 endif
 
-if HAVE_AUDIOFILE
-psynth3d_CXXFLAGS += $(AUDIOFILE_CFLAGS)
-psynth3d_LDADD += $(AUDIOFILE_LIBS)
+if HAVE_SNDFILE
+psynth3d_CXXFLAGS += $(SNDFILE_CFLAGS)
+psynth3d_LDADD += $(SNDFILE_LIBS)
 psynth3d_SOURCES += \
 	gui3d/RecordWindow.cpp \
 	gui3d/RecordWindow.h

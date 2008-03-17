@@ -24,6 +24,7 @@
 #define PSYNTH_OBJECTRADAR_H
 
 #include <libpsynth/object/Object.h>
+#include <libpsynth/object/ObjectFactory.h>
 
 namespace psynth
 {
@@ -64,6 +65,8 @@ public:
     
     ObjectRadar(const AudioInfo& info);
 };
+
+PSYNTH_DECLARE_OBJECT_FACTORY(ObjectAudioMixer, "radar");
 
 } /* namespace psynth */
 

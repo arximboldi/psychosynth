@@ -29,8 +29,15 @@
 namespace psynth
 {
 
+#include <libpsynth/common/FastDelegate.h>
+using namespace fastdelegate;
+
 class ObjParam
 {
+public:
+    typedef FastDelegate1<ObjParam&, void> Event;
+
+private:
     friend class Object;
 	
     Mutex m_lock;
@@ -38,11 +45,13 @@ class ObjParam
     int m_id;
     int m_type;
     bool m_changed;
+    Event m_event;
     void* m_src;
     void* m_dest;
-
+    
     void clear();
     void configure(int id, std::string name, int type, void* dest);
+    void configure(int id, std::string name, int type, void* dest, Event ev);
     void update();
 
 public:
@@ -56,12 +65,16 @@ public:
     };
 
     ObjParam() :
-	m_type(NONE), m_changed(false), m_src(NULL), m_dest(NULL) {}
+	m_type(NONE),
+	m_changed(false),
+	m_src(NULL),
+	m_dest(NULL)
+	{}
 
     ObjParam(const ObjParam& obj) :
 	m_type(NONE),
 	m_changed(false) {
-	configure(obj.m_id, obj.m_name, obj.m_type, obj.m_dest);
+	configure(obj.m_id, obj.m_name, obj.m_type, obj.m_dest, obj.m_event);
     }
     
     ~ObjParam() {
@@ -70,7 +83,7 @@ public:
 
     ObjParam& operator= (const ObjParam& obj) {
 	if (this != &obj)
-	    configure(obj.m_id, obj.m_name, obj.m_type, obj.m_dest);
+	    configure(obj.m_id, obj.m_name, obj.m_type, obj.m_dest, obj.m_event);
 
 	return *this;
     }
@@ -93,6 +106,7 @@ public:
 	m_changed = true;
 	*static_cast<T*>(m_src) = d;
 	m_lock.unlock();
+	if (!m_event.empty()) m_event(*this);
     }
 
     template <typename T>

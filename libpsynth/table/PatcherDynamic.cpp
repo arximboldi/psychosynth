@@ -29,6 +29,7 @@
 #include "object/ObjectAudioOscillator.h"
 #include "object/ObjectLFO.h"
 #include "object/ObjectFilter.h"
+#include "object/ObjectSampler.h"
 
 using namespace std;
 
@@ -58,7 +59,8 @@ const PatcherData PATCHER_TABLE[N_OBJECTS][N_OBJECTS] =
 	{Object::LINK_NONE, 0, 0}, /* ObjectControlMixer */
 	{Object::LINK_NONE, 0, 0},  /* ObjectAudioOscillator */
 	{Object::LINK_NONE, 0, 0},  /* ObjectLFO */
-	{Object::LINK_NONE, 0, 0}   /* ObjectFilter */
+	{Object::LINK_NONE, 0, 0},   /* ObjectFilter */
+	{Object::LINK_NONE, 0, 0}, /* ObjectSampler */
     },
 
     /* ObjectAudioMixer */
@@ -68,7 +70,8 @@ const PatcherData PATCHER_TABLE[N_OBJECTS][N_OBJECTS] =
 	{Object::LINK_NONE, 0, 0}, /* ObjectControlMixer */
 	{Object::LINK_NONE, 0, 0}, /* ObjectAudioOscillator */
 	{Object::LINK_NONE, 0, 0}, /* ObjectLFO */
-	{Object::LINK_AUDIO, ObjectAudioMixer::OUT_A_OUTPUT, ObjectFilter::IN_A_INPUT} /* ObjectFilter */
+	{Object::LINK_AUDIO, ObjectAudioMixer::OUT_A_OUTPUT, ObjectFilter::IN_A_INPUT}, /* ObjectFilter */
+	{Object::LINK_NONE, 0, 0}, /* ObjectSampler */
     },
 
     /* ObjectControlMixer */
@@ -79,7 +82,8 @@ const PatcherData PATCHER_TABLE[N_OBJECTS][N_OBJECTS] =
 	{Object::LINK_CONTROL, ObjectControlMixer::OUT_C_OUTPUT, PATCHER_ANY}, /* ObjectControlMixer */
 	{Object::LINK_CONTROL, ObjectControlMixer::OUT_C_OUTPUT, ObjectOscillator::IN_C_FREQUENCY},/* ObjectAudioOscillator */
 	{Object::LINK_CONTROL, ObjectControlMixer::OUT_C_OUTPUT, ObjectOscillator::IN_C_FREQUENCY}, /* ObjectLFO */
-	{Object::LINK_CONTROL, ObjectControlMixer::OUT_C_OUTPUT, ObjectFilter::IN_C_CUTOFF} /* ObjectFilter */
+	{Object::LINK_CONTROL, ObjectControlMixer::OUT_C_OUTPUT, ObjectFilter::IN_C_CUTOFF}, /* ObjectFilter */
+	{Object::LINK_CONTROL, ObjectControlMixer::OUT_C_OUTPUT, ObjectSampler::IN_C_PITCH} /* ObjectSampler */
     },
     
     /* ObjectAudioOscillator */
@@ -89,7 +93,8 @@ const PatcherData PATCHER_TABLE[N_OBJECTS][N_OBJECTS] =
 	{Object::LINK_NONE, 0, 0}, /* ObjectControlMixer */
 	{Object::LINK_NONE, 0, 0}, /* ObjectAudioOscillator */
 	{Object::LINK_NONE, 0, 0}, /* ObjectLFO */
-	{Object::LINK_AUDIO, ObjectAudioOscillator::OUT_A_OUTPUT, ObjectFilter::IN_A_INPUT} /* ObjectFilter */
+	{Object::LINK_AUDIO, ObjectAudioOscillator::OUT_A_OUTPUT, ObjectFilter::IN_A_INPUT}, /* ObjectFilter */
+	{Object::LINK_NONE, 0, 0}, /* ObjectSampler */
     },
 
     /* ObjectLFO */
@@ -99,7 +104,8 @@ const PatcherData PATCHER_TABLE[N_OBJECTS][N_OBJECTS] =
 	{Object::LINK_CONTROL, ObjectLFO::OUT_C_OUTPUT, PATCHER_ANY}, /* ObjectControlMixer */
 	{Object::LINK_CONTROL, ObjectLFO::OUT_C_OUTPUT, ObjectOscillator::IN_C_FREQUENCY}, /* ObjectAudioOscillator */
 	{Object::LINK_CONTROL, ObjectLFO::OUT_C_OUTPUT, ObjectOscillator::IN_C_FREQUENCY}, /* ObjectLFO */
-	{Object::LINK_CONTROL, ObjectLFO::OUT_C_OUTPUT, ObjectFilter::IN_C_CUTOFF}  /* ObjectFilter */
+	{Object::LINK_CONTROL, ObjectLFO::OUT_C_OUTPUT, ObjectFilter::IN_C_CUTOFF},  /* ObjectFilter */
+	{Object::LINK_CONTROL, ObjectLFO::OUT_C_OUTPUT, ObjectSampler::IN_C_PITCH} /* ObjectSampler */
     },
 
     /* ObjectFilter */
@@ -109,7 +115,19 @@ const PatcherData PATCHER_TABLE[N_OBJECTS][N_OBJECTS] =
 	{Object::LINK_NONE, 0, 0}, /* ObjectControlMixer */
 	{Object::LINK_NONE, 0, 0}, /* ObjectAudioOscillator */
 	{Object::LINK_NONE, 0, 0}, /* ObjectLFO */
-	{Object::LINK_AUDIO, ObjectFilter::OUT_A_OUTPUT, ObjectFilter::IN_A_INPUT}
+	{Object::LINK_AUDIO, ObjectFilter::OUT_A_OUTPUT, ObjectFilter::IN_A_INPUT},
+	{Object::LINK_NONE, 0, 0}, /* ObjectSampler */
+    },
+
+    /* ObjectSampler */
+    {
+	{Object::LINK_NONE, 0, 0}, /* ObjectOutput */
+	{Object::LINK_AUDIO, ObjectFilter::OUT_A_OUTPUT, PATCHER_ANY}, /* ObjectAudioMixer */
+	{Object::LINK_NONE, 0, 0}, /* ObjectControlMixer */
+	{Object::LINK_NONE, 0, 0}, /* ObjectAudioOscillator */
+	{Object::LINK_NONE, 0, 0}, /* ObjectLFO */
+	{Object::LINK_AUDIO, ObjectFilter::OUT_A_OUTPUT, ObjectFilter::IN_A_INPUT},
+	{Object::LINK_NONE, 0, 0}, /* ObjectSampler */
     }
 };
 
@@ -214,12 +232,12 @@ void PatcherDynamic::setParamObject(Object* obj, int id)
 
 void PatcherDynamic::makeLink(Link& l)
 {
-    cout << "making link, source: " << l.src->getID() << " dest: "<< l.dest->getID() << endl;
+    //cout << "making link, source: " << l.src->getID() << " dest: "<< l.dest->getID() << endl;
 
     Object* old_src = l.dest->getInSocket(l.sock_type, l.actual_in_sock).getSourceObject();
     if (old_src != NULL) {
 	notifyLinkDeleted(PatcherEvent(old_src, l.dest, l.out_sock, l.actual_in_sock, l.sock_type));
-	cout << "undoing link, source: " << old_src->getID() << " dest: "<< l.dest->getID() << endl;
+	//cout << "undoing link, source: " << old_src->getID() << " dest: "<< l.dest->getID() << endl;
     }
     
     l.dest->connectIn(l.sock_type, l.actual_in_sock, l.src, l.out_sock);
@@ -230,7 +248,7 @@ void PatcherDynamic::undoLink(Link& l)
 {
     if (l.actual_in_sock >= 0) {
 	if (l.dest->getInSocket(l.sock_type, l.actual_in_sock).getSourceObject() == l.src) {
-	    cout << "undoing link, source: " << l.src->getID() << " dest: "<< l.dest->getID() << endl;
+	    //cout << "undoing link, source: " << l.src->getID() << " dest: "<< l.dest->getID() << endl;
 	    l.dest->connectIn(l.sock_type, l.actual_in_sock, NULL, l.out_sock);
 
 	    notifyLinkDeleted(PatcherEvent(l.src, l.dest, l.out_sock, l.actual_in_sock, l.sock_type));
@@ -293,7 +311,7 @@ void PatcherDynamic::update()
 	Node& node_dest = (*n2).second;
 	Link& link = **i;
 
-	cout << "trying, src: " << link.src->getID() << " dest: " << link.dest->getID() << " out: " << node_src.out_used << endl; 
+	//cout << "trying, src: " << link.src->getID() << " dest: " << link.dest->getID() << " out: " << node_src.out_used << endl; 
 
 	if (!node_src.out_used &&
 	    !(node_dest.out_used == true && node_dest.dest == link.src))
@@ -314,7 +332,7 @@ void PatcherDynamic::update()
 	}
     }
     
-    cout << "---" << endl;
+    //cout << "---" << endl;
 
     m_changed = false;
 }

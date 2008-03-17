@@ -25,7 +25,7 @@
 
 #include <string>
 
-#include <audiofile.h>
+#include <sndfile.h>
 #include <libpsynth/output/Output.h>
 
 namespace psynth
@@ -33,10 +33,7 @@ namespace psynth
 
 class OutputWave : public Output
 {
-    AFfilehandle m_af_file;
-    AFfilesetup m_af_setup;
-
-    short int* m_buf;
+    SNDFILE* m_file;
     
     std::string m_file_name;
     

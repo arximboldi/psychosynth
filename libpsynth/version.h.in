@@ -46,8 +46,12 @@
 #define PSYNTH_HAVE_OSC 1
 #endif
 
-#if @HAVE_AUDIOFILE_P@
+#if @HAVE_SNDFILE_P@
 #define PSYNTH_HAVE_PCM 1
+#endif
+
+#if @HAVE_VORBIS_P@
+#define PSYNTH_HAVE_OGG 1
 #endif
 
 #if @HAVE_JACK_P@

@@ -70,6 +70,7 @@ nobase_libpsynthinc_HEADERS = \
 	table/Table.h \
 	table/Patcher.h\
 	table/PatcherDynamic.h \
+	table/TableObjectCreator.h\
 	object/Object.h \
 	object/ObjectOscillator.h \
 	object/ObjectManager.h \
@@ -80,6 +81,7 @@ nobase_libpsynthinc_HEADERS = \
 	object/ObjectLFO.h \
 	object/ObjectAudioOscillator.h \
 	object/ObjectFilter.h \
+	object/ObjectSampler.h \
 	object/Filter.h \
 	object/WaveTable.h \
 	object/Oscillator.h \
@@ -88,7 +90,11 @@ nobase_libpsynthinc_HEADERS = \
 	object/SimpleEnvelope.h\
 	object/Watch.h\
 	object/WatchViewer.h\
+	object/ObjectFactory.h\
+	object/ObjectFactoryManager.h\
 	output/Output.h\
+	input/FileReader.h\
+	input/FileReaderAny.h\
 	version.h
 
 libpsynth_la_SOURCES = \
@@ -108,6 +114,7 @@ libpsynth_la_SOURCES = \
 	table/Table.cpp \
 	table/Patcher.cpp \
 	table/PatcherDynamic.cpp \
+	table/TableObjectCreator.cpp\
 	object/Object.cpp \
 	object/ObjectOscillator.cpp \
 	object/ObjectMixer.cpp \
@@ -118,10 +125,13 @@ libpsynth_la_SOURCES = \
 	object/ObjectLFO.cpp \
 	object/ObjectAudioOscillator.cpp \
 	object/ObjectFilter.cpp \
+	object/ObjectSampler.cpp \
 	object/Filter.cpp \
 	object/WaveTable.cpp \
 	object/Oscillator.cpp\
-	object/ObjParam.cpp
+	object/ObjParam.cpp\
+	object/ObjectFactoryManager.cpp\
+	input/FileReaderAny.cpp
 
 if HAVE_LIBXML
 libpsynth_la_CXXFLAGS += $(LIBXML_CFLAGS)
@@ -182,15 +192,25 @@ libpsynth_la_SOURCES += \
 	output/OutputJack.cpp
 endif
 
-if HAVE_AUDIOFILE
-libpsynth_la_CXXFLAGS += $(AUDIOFILE_CFLAGS)
-libpsynth_la_LIBADD += $(AUDIOFILE_LIBS)
+if HAVE_SNDFILE
+libpsynth_la_CXXFLAGS += $(SNDFILE_CFLAGS)
+libpsynth_la_LIBADD += $(SNDFILE_LIBS)
 nobase_libpsynthinc_HEADERS += \
-	output/OutputWave.h
+	output/OutputWave.h\
+	input/FileReaderWave.h
 libpsynth_la_SOURCES += \
-	output/OutputWave.cpp
+	output/OutputWave.cpp\
+	input/FileReaderWave.cpp
 endif
 
+if HAVE_VORBIS
+libpsynth_la_CXXFLAGS += $(VORBIS_CFLAGS)
+libpsynth_la_LIBADD += $(VORBIS_LIBS)
+nobase_libpsynthinc_HEADERS += \
+	input/FileReaderOgg.h
+libpsynth_la_SOURCES += \
+	input/FileReaderOgg.cpp
+endif
 
 libpsynth_la_SOURCES += $(nobase_libpsynthinc_HEADERS)
 

@@ -49,23 +49,21 @@ OutputWave::~OutputWave()
 bool OutputWave::open()
 {
     if (getState() == NOTINIT) {
-	m_af_setup = afNewFileSetup();
-	afInitFileFormat(m_af_setup, AF_FILE_WAVE);
-	afInitByteOrder(m_af_setup, AF_DEFAULT_TRACK, AF_BYTEORDER_LITTLEENDIAN);
-	afInitChannels(m_af_setup, AF_DEFAULT_TRACK, getInfo().num_channels);
-	afInitRate(m_af_setup, AF_DEFAULT_TRACK, getInfo().sample_rate);
-	afInitSampleFormat(m_af_setup, AF_DEFAULT_TRACK, AF_SAMPFMT_TWOSCOMP, 16);
+	SF_INFO sfinfo;
 
-	m_af_file = afOpenFile(m_file_name.c_str(), "w", m_af_setup);
+	sfinfo.frames	  = 0;
+	sfinfo.channels	  = getInfo().num_channels;
+	sfinfo.samplerate = getInfo().sample_rate;
+	sfinfo.format	  = (SF_FORMAT_AU | SF_FORMAT_PCM_24);
 
-	if (m_af_file == NULL) {
-	    Logger::instance().log("wav_out", Log::ERROR, "Could not open file.");
+	m_file = sf_open (m_file_name.c_str(), SFM_WRITE, &sfinfo);
 
-	    afFreeFileSetup(m_af_setup);
+	if (m_file == NULL) {
+	    Logger::instance().log("wave", Log::ERROR,
+				   string("Could not open file ") + m_file_name);
 	    return false;
 	}
-
-	m_buf = new short int[getInfo().block_size * getInfo().num_channels];
+	
 	setState(IDLE);
     }
 
@@ -75,10 +73,7 @@ bool OutputWave::open()
 bool OutputWave::close()
 {
     if (getState() != NOTINIT) {
-	afCloseFile(m_af_file);
-	afFreeFileSetup(m_af_setup);
-
-	delete [] m_buf;
+	sf_close(m_file);
 	return true;
     }
 
@@ -90,18 +85,10 @@ bool OutputWave::put(const AudioBuffer& in_buf, size_t nframes)
     bool ret = false;
     
     if (getState() != NOTINIT) {
-	size_t copyframes = getInfo().block_size;
+	float buf [nframes * in_buf.getInfo().num_channels];
 
-	ret = true;
-	while (nframes > 0) {
-	    if (nframes < copyframes)
-		copyframes = nframes;
-
-	    in_buf.interleaveS16(m_buf, copyframes);
-	    afWriteFrames(m_af_file, AF_DEFAULT_TRACK, m_buf, copyframes);
-
-	    nframes -= copyframes;
-	}
+	in_buf.interleave(buf, nframes);
+	sf_writef_float(m_file, buf, nframes);
     }
 
     return ret;

@@ -28,9 +28,12 @@ using namespace std;
 namespace psynth
 {
 
+PSYNTH_DEFINE_OBJECT_FACTORY(ObjectFilter);
+
 ObjectFilter::ObjectFilter(const AudioInfo& prop, int mode) : 
     Object(prop,
 	   OBJ_FILTER,
+	   "filter",
 	   N_IN_A_SOCKETS,
 	   N_IN_C_SOCKETS,
 	   N_OUT_A_SOCKETS,

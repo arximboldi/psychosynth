@@ -25,6 +25,8 @@
 namespace psynth
 {
 
+PSYNTH_DEFINE_OBJECT_FACTORY(ObjectAudioMixer);
+
 void ObjectAudioMixer::doUpdate(const Object* caller, int caller_port_type, int caller_port)
 {
     AudioBuffer* buf = getOutput<AudioBuffer>(LINK_AUDIO, OUT_A_OUTPUT);

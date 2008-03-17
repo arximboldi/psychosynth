@@ -191,6 +191,7 @@ private:
     
     int m_id;
     int m_type;
+    std::string m_name;
     
     Vector2f m_param_position;
     float m_param_radious;
@@ -236,6 +237,7 @@ protected:
     virtual void onInfoChange() = 0;
     
     void addParam(const std::string&, int type, void* val);
+    void addParam(const std::string&, int type, void* val, ObjParam::Event ev);
 
     SimpleEnvelope getInEnvelope(int type, int sock) {
 	return m_in_envelope[type][sock];
@@ -243,6 +245,7 @@ protected:
 
 public:
     Object(const AudioInfo& prop, int type,
+	   const std::string& name,
 	   int inaudiosocks, int incontrolsocks,
 	   int outaudiosocks, int outcontrolsocks,
 	   bool single_update = true);
@@ -253,6 +256,10 @@ public:
 	return m_type;
     };
 
+    const std::string& getName() const {
+	return m_name;
+    }
+    
     /* Only to be used by ObjectManager */
     void setID(int id) {
 	m_id = id;

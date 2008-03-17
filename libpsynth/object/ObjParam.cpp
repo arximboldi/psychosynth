@@ -20,6 +20,8 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <iostream>
+
 #include "object/ObjParam.h"
 #include "common/Vector2D.h"
 
@@ -69,6 +71,14 @@ void ObjParam::clear()
 	break;
     default: break;
     }
+}
+
+void ObjParam::configure(int id, std::string name,
+			 int type, void* dest,
+			 ObjParam::Event ev)
+{
+    m_event = ev;
+    configure(id, name, type, dest);
 }
 
 void ObjParam::configure(int id, std::string name,

@@ -27,6 +27,8 @@ using namespace std;
 namespace psynth
 {
 
+PSYNTH_DEFINE_OBJECT_FACTORY(ObjectLFO);
+
 void ObjectLFO::doUpdate(const Object* caller, int caller_port_type, int caller_port)
 {
     ControlBuffer*       buf = getOutput<ControlBuffer>(LINK_CONTROL, OUT_C_OUTPUT);

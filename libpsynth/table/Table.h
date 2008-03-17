@@ -33,6 +33,7 @@
 #include <libpsynth/object/ObjectOutput.h>
 #include <libpsynth/object/ObjectAudioMixer.h>
 #include <libpsynth/object/ObjectManager.h>
+#include <libpsynth/object/ObjectFactoryManager.h>
 #include <libpsynth/output/Output.h>
 
 namespace psynth
@@ -68,6 +69,10 @@ public:
     
     int getType() const {
 	return m_obj->getType();
+    };
+
+    const std::string& getName() {
+	return m_obj->getName();
     };
     
     Table* getTable() {
@@ -232,16 +237,18 @@ public:
 
 class Table : public TableSubject,
 	      public PatcherListener
-{
+{    
     AudioInfo m_info;
     ObjectManager m_objmgr;
     Patcher* m_patcher;
     ObjectOutput* m_output;
     ObjectAudioMixer* m_mixer;
     int m_last_id;
+    ObjectFactoryManager m_objfact;
     
     static const int MIXER_CHANNELS = 16;
 
+    void registerDefaultObjectFactory();
 public:
     enum {
 	OUTPUT_ID = 0,
@@ -262,11 +269,16 @@ public:
 	if (m_info != info)
 	    m_objmgr.setInfo(info);
     }
+
+    void registerObjectFactory(ObjectFactory& f) {
+	m_objfact.registerFactory(f);
+    }
     
     TableObject findObject(int id);
 
     TableObject addObject(int type);
-
+    TableObject addObject(const std::string& type_name);
+    
     template <typename T>
     void setParamObject(TableObject& obj, int id, const T& data) {
 	obj.m_obj->param(id).set(data);

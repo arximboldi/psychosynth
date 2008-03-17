@@ -27,6 +27,7 @@
 #include <OIS/OIS.h>
 
 #include <libpsynth/table/Table.h>
+#include <libpsynth/table/TableObjectCreator.h>
 
 #include "gui3d/Element.h"
 #include "gui3d/QueryFlags.h"
@@ -68,9 +69,13 @@ public:
     ~ElementManager();
     
     void update();
-    
+
+    /*
     void addElement(int e_type);
-	
+    */
+
+    void addElement(psynth::TableObjectCreator& obj);
+    
     bool mouseMoved(const OIS::MouseEvent& e);
     bool mousePressed(const OIS::MouseEvent &e, OIS::MouseButtonID id);
     bool mouseReleased(const OIS::MouseEvent &e, OIS::MouseButtonID id);

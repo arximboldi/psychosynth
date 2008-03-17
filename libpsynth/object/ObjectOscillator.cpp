@@ -32,10 +32,12 @@ namespace psynth
 
 ObjectOscillator::ObjectOscillator(const AudioInfo& prop,
 				   int obj_type,
+				   const std::string& name,
 				   int n_audio_out,
 				   int n_control_out) : 
     Object(prop,
 	   obj_type,
+	   name,
 	   N_IN_A_SOCKETS,
 	   N_IN_C_SOCKETS,
 	   n_audio_out,

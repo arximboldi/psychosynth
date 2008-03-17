@@ -57,7 +57,7 @@ class OutputDirectorJack : public OutputDirector
 	std::string server;
 
      	conf.getChild("server").get(server);
-	conf.getChild("server").addChangeEvent(MakeEvent(this, &OutputDirectorJack::onServerChange));
+	conf.getChild("server").addChangeEvent(MakeDelegate(this, &OutputDirectorJack::onServerChange));
 	
 	m_output = new OutputJack;
 
@@ -67,7 +67,7 @@ class OutputDirectorJack : public OutputDirector
     };
 
     virtual void doStop(ConfNode& conf) {
-	conf.getChild("server").deleteChangeEvent(MakeEvent(this, &OutputDirectorJack::onServerChange));
+	conf.getChild("server").deleteChangeEvent(MakeDelegate(this, &OutputDirectorJack::onServerChange));
 	
 	delete m_output;
 	m_output = NULL;

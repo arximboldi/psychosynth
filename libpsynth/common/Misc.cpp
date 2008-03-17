@@ -21,6 +21,7 @@
  ***************************************************************************/
 
 #include <cmath>
+#include <cctype>
 
 #include "common/Misc.h"
 
@@ -28,6 +29,28 @@ using namespace std;
 
 namespace psynth
 {
+
+const char* getExtension(const char* file)
+{
+    const char* ext;
+    
+    for (ext = file; *ext != '\0'; ext++);
+    while(--ext >= file && *ext != '.');
+
+    return ext+1;
+}
+
+int strcmp_i(const char* a, const char* b)
+{
+    while (*a && *b && tolower(*a++) == tolower(*b++));
+
+    if (*a == *b)
+	return 0;
+    else if (*a < *b)
+	return -1;
+    else
+	return 1;
+}
 
 char* itoa(int val, int base)
 {	
@@ -52,7 +75,7 @@ char* itoa(int val, int base)
 
 char* ftoa( double f, double sigfigs)
 {
-    char a[81];
+    static char a[81];
     int prec, width, front;
 
     front = (f==0)? 1 : (int)log10(fabs(f))+1;

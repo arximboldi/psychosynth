@@ -54,7 +54,7 @@ void OSCController::handleAddObject(TableObject& obj)
 	
 	lo_message_add_int32(msg, net_id.first);
 	lo_message_add_int32(msg, net_id.second);
-	lo_message_add_int32(msg, obj.getType());
+	lo_message_add_string(msg, obj.getName().c_str());
 
 	broadcastMessage(MSG_ADD, msg);
 
@@ -166,7 +166,7 @@ void OSCController::handleSetParamObject(TableObject& obj, int param_id)
 
 void OSCController::addMethods(lo_server s)
 {
-    lo_server_add_method (s, MSG_ADD, "iii", &add_cb, this);
+    lo_server_add_method (s, MSG_ADD, "iis", &add_cb, this);
     lo_server_add_method (s, MSG_DELETE, "ii", &delete_cb, this);
     lo_server_add_method (s, MSG_PARAM, NULL, &param_cb, this);
     lo_server_add_method (s, MSG_ACTIVATE, "ii", &activate_cb, this);
@@ -180,7 +180,7 @@ int OSCController::_add_cb(const char* path, const char* types,
 	pair<int,int> net_id(argv[0]->i, argv[1]->i);
 
 	m_skip++;
-	TableObject obj = m_table->addObject(argv[2]->i);
+	TableObject obj = m_table->addObject(std::string(&argv[2]->s));
 	m_skip--;
 	
 	if (!obj.isNull()) {
@@ -192,7 +192,7 @@ int OSCController::_add_cb(const char* path, const char* types,
 		lo_message newmsg = lo_message_new();
 		lo_message_add_int32(newmsg, argv[0]->i);
 		lo_message_add_int32(newmsg, argv[1]->i);
-		lo_message_add_int32(newmsg, argv[2]->i);
+		lo_message_add_string(newmsg, &argv[2]->s);
 		broadcastMessageFrom(MSG_ADD, newmsg, lo_message_get_source(msg));
 		lo_message_free(newmsg);
 	    }

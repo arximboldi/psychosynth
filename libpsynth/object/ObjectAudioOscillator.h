@@ -25,6 +25,7 @@
 
 #include <libpsynth/object/ObjectOscillator.h>
 #include <libpsynth/object/KnownObjects.h>
+#include <libpsynth/object/ObjectFactory.h>
 
 namespace psynth
 {
@@ -44,9 +45,15 @@ private:
     
 public:
     ObjectAudioOscillator(const AudioInfo& prop) :
-	ObjectOscillator(prop, OBJ_OSCILLATOR, N_OUT_A_SOCKETS, 0)
+	ObjectOscillator(prop,
+			 OBJ_OSCILLATOR,
+			 "oscillator",
+			 N_OUT_A_SOCKETS,
+			 0)
 	{};
 };
+
+PSYNTH_DECLARE_OBJECT_FACTORY(ObjectAudioOscillator, "oscillator");
 
 } /* namespace psynth */
 

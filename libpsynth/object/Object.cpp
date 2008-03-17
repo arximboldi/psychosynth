@@ -34,6 +34,7 @@ namespace psynth
 {
 
 Object::Object(const AudioInfo& info, int type,
+	       const std::string& name,
 	       int n_in_audio, int n_in_control,
 	       int n_out_audio, int n_out_control,
 	       bool single_update) :
@@ -43,6 +44,7 @@ Object::Object(const AudioInfo& info, int type,
     m_nparam(0),
     m_id(OBJ_NULL_ID),
     m_type(type),
+    m_name(name),
     m_param_position(0,0),
     m_param_radious(5.0f),
     m_param_mute(false),
@@ -91,6 +93,13 @@ void Object::addParam(const std::string& name, int type, void* val)
     m_params.resize(m_nparam + 1);
     m_params[m_nparam].configure(m_nparam, name, type, val);
     m_nparam++;   
+}
+
+void Object::addParam(const std::string& name, int type, void* val, ObjParam::Event ev)
+{
+    m_params.resize(m_nparam + 1);
+    m_params[m_nparam].configure(m_nparam, name, type, val, ev);
+    m_nparam++;
 }
 
 ObjParam& Object::param(const std::string& name)

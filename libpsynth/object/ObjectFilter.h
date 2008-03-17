@@ -27,6 +27,7 @@
 
 #include <libpsynth/object/Object.h>
 #include <libpsynth/object/Filter.h>
+#include <libpsynth/object/ObjectFactory.h>
 
 namespace psynth
 {
@@ -90,6 +91,8 @@ public:
     ObjectFilter(const AudioInfo& prop, int mode = FILTER_LOWPASS);
     ~ObjectFilter();
 };
+
+PSYNTH_DECLARE_OBJECT_FACTORY(ObjectFilter, "filter");
 
 } /* namespace psynth */
 

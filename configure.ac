@@ -87,24 +87,44 @@ else
     HAVE_LIBXML=disabled
 fi
 
-#  Audiofile
+#  Sndfile
 # ----------------------------------------------------------------------
 
-AC_ARG_ENABLE([audiofile],
-    AC_HELP_STRING([--disable-audiofile], [Disable optional Audiofile support]),
-        [audiofile=$enableval], [audiofile=auto])
+AC_ARG_ENABLE([sndfile],
+    AC_HELP_STRING([--disable-sndfile], [Disable optional Sndfile support]),
+        [sndfile=$enableval], [sndfile=auto])
 
-if test "x${audiofile}" != xno ; then
-    PKG_CHECK_MODULES(AUDIOFILE, [ audiofile >= 0.2 ],
+if test "x${sndfile}" != xno ; then
+    PKG_CHECK_MODULES(SNDFILE, [ sndfile >= 0.2 ],
         [
-            HAVE_AUDIOFILE=yes
-            AC_DEFINE([HAVE_AUDIOFILE], 1, [Have Audiofile?])
+            HAVE_SNDFILE=yes
+            AC_DEFINE([HAVE_SNDFILE], 1, [Have Sndfile?])
         ],
         [
-            HAVE_AUDIOFILE=no
+            HAVE_SNDFILE=no
         ])
 else
-    HAVE_AUDIOFILE=disabled
+    HAVE_SNDFILE=disabled
+fi
+
+#  OGG Vorbis
+# ----------------------------------------------------------------------
+
+AC_ARG_ENABLE([vorbis],
+    AC_HELP_STRING([--disable-vorbis], [Disable optional Vorbis support]),
+        [vorbis=$enableval], [vorbis=auto])
+
+if test "x${vorbis}" != xno ; then
+    PKG_CHECK_MODULES(VORBIS, [ vorbisfile ],
+        [
+            HAVE_VORBIS=yes
+            AC_DEFINE([HAVE_VORBIS], 1, [Have Vorbis?])
+        ],
+        [
+            HAVE_VORBIS=no
+        ])
+else
+    HAVE_VORBIS=disabled
 fi
 
 #  OSS
@@ -235,8 +255,10 @@ if test "x$HAVE_LIBLO" = xyes; then HAVE_LIBLO_P=1
 else HAVE_LIBLO_P=0; fi
 if test "x$HAVE_LIBXML" = xyes; then HAVE_LIBXML_P=1
 else HAVE_LIBXML_P=0; fi
-if test "x$HAVE_AUDIOFILE" = xyes; then HAVE_AUDIOFILE_P=1
-else HAVE_AUDIOFILE_P=0; fi
+if test "x$HAVE_VORBIS" = xyes; then HAVE_VORBIS_P=1
+else HAVE_VORBIS_P=0; fi
+if test "x$HAVE_SNDFILE" = xyes; then HAVE_SNDFILE_P=1
+else HAVE_SNDFILE_P=0; fi
 if test "x$HAVE_OSS" = xyes; then HAVE_OSS_P=1
 else HAVE_OSS_P=0; fi
 if test "x$HAVE_ALSA" = xyes; then HAVE_ALSA_P=1
@@ -246,14 +268,16 @@ else HAVE_JACK_P=0; fi
 
 AC_SUBST(HAVE_LIBLO_P)
 AC_SUBST(HAVE_LIBXML_P)
-AC_SUBST(HAVE_AUDIOFILE_P)
+AC_SUBST(HAVE_VORBIS_P)
+AC_SUBST(HAVE_SNDFILE_P)
 AC_SUBST(HAVE_OSS_P)
 AC_SUBST(HAVE_ALSA_P)
 AC_SUBST(HAVE_JACK_P)
 
 AM_CONDITIONAL([HAVE_LIBLO], [test "x$HAVE_LIBLO" = xyes])
 AM_CONDITIONAL([HAVE_LIBXML], [test "x$HAVE_LIBXML" = xyes])
-AM_CONDITIONAL([HAVE_AUDIOFILE], [test "x$HAVE_AUDIOFILE" = xyes])
+AM_CONDITIONAL([HAVE_VORBIS], [test "x$HAVE_VORBIS" = xyes])
+AM_CONDITIONAL([HAVE_SNDFILE], [test "x$HAVE_SNDFILE" = xyes])
 AM_CONDITIONAL([HAVE_OSS], [test "x$HAVE_OSS" = xyes])
 AM_CONDITIONAL([HAVE_ALSA], [test "x$HAVE_ALSA" = xyes])
 AM_CONDITIONAL([HAVE_JACK], [test "x$HAVE_JACK" = xyes])
@@ -300,7 +324,8 @@ AC_MSG_RESULT([
 * 
 *      OSC support: ............. $HAVE_LIBLO
 *      XML config support: ...... $HAVE_LIBXML
-*      Audio recording: ......... $HAVE_AUDIOFILE
+*      PCM support: ............. $HAVE_SNDFILE
+*      OGG support: ............. $HAVE_VORBIS
 *      OSS support: ............. $HAVE_OSS
 *      ALSA support: ............ $HAVE_ALSA
 *      Jack support: ............ $HAVE_JACK

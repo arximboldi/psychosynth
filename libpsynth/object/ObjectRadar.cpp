@@ -22,14 +22,17 @@
 
 #include "object/ObjectRadar.h"
 
+using namespace std;
+
 namespace psynth
 {
 
-using namespace std;
+PSYNTH_DEFINE_OBJECT_FACTORY(ObjectRadar);
 
 ObjectRadar::ObjectRadar(const AudioInfo& prop, int numchan) : 
     Object(prop,
-	   OBJ_MIXER,
+	   OBJ_RADAR,
+	   "radar",
 	   N_PARAM,
 	   N_IN_A_SOCKETS, 
 	   N_IN_C_SOCKETS,

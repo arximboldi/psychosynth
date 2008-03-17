@@ -31,6 +31,8 @@ using namespace std;
 namespace psynth
 {
 
+PSYNTH_DEFINE_OBJECT_FACTORY(ObjectOutput);
+
 ObjectOutput::~ObjectOutput()
 {
     for (std::list<Slot*>::iterator i = m_slots.begin(); i != m_slots.end(); ++i)
@@ -72,9 +74,10 @@ void ObjectOutput::doUpdate(const Object* caller, int caller_port_type, int call
     }
 }
 
-ObjectOutput::ObjectOutput(AudioInfo& info) :
+ObjectOutput::ObjectOutput(const AudioInfo& info) :
     Object(info,
 	   OBJ_OUTPUT,
+	   "name",
 	   N_IN_A_SOCKETS, 
 	   N_IN_C_SOCKETS,
 	   N_OUT_A_SOCKETS,

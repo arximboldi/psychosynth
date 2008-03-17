@@ -40,19 +40,21 @@ class WindowList : public OIS::KeyListener
 		
 	ToggableWindow *m_toggable;
 	CEGUI::Window *m_window;
+	CEGUI::Window *m_tooltip;
 	OIS::KeyCode m_key;
     public:
-	Button(std::string imageset, std::string layout, ToggableWindow* window,
+	Button(const std::string& imageset, const std::string &layout,
+	       const std::string& tooltip,
+	       ToggableWindow* window,
 	       OIS::KeyCode key, int i);
 		
 	~Button() {
 	    delete m_toggable;
 	}
 		
-	bool onClick(const CEGUI::EventArgs &e) {
-	    m_toggable->toggle();
-	    return true;
-	};
+	bool onClick(const CEGUI::EventArgs &e);
+	bool onLeave(const CEGUI::EventArgs &e);
+	bool onEnter(const CEGUI::EventArgs &e);
     };
 	
     std::list<Button*> m_lwind;
@@ -61,29 +63,15 @@ class WindowList : public OIS::KeyListener
 public:
     WindowList() : m_nwind(0) {}
 	
-    ~WindowList() {
-	std::list<Button*>::iterator i;
-	for (i = m_lwind.begin(); i != m_lwind.end(); i++)
-	    delete *i;
-    }
+    ~WindowList();
 	
     void addWindow(std::string but_imageset, std::string but_layout,
-		   ToggableWindow* window, OIS::KeyCode key) {
-	m_lwind.push_back( new Button(but_imageset, but_layout, window, key, m_nwind++) );
-    }
+		   std::string tooltip,
+		   ToggableWindow* window, OIS::KeyCode key);
 	
-    bool keyPressed( const OIS::KeyEvent &arg ) {
-	std::list<Button*>::iterator i;
-	for (i = m_lwind.begin(); i != m_lwind.end(); i++) {
-	    if ((*i)->m_key == arg.key) {
-		(*i)->m_toggable->toggle();
-		return true;
-	    }
-	}
-	return false;
-    };
+    bool keyPressed(const OIS::KeyEvent &arg);
 	
-    bool keyReleased( const OIS::KeyEvent &arg ) {
+    bool keyReleased(const OIS::KeyEvent &arg) {
 	return false;
     };	
 };

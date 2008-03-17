@@ -57,7 +57,7 @@ class OutputDirectorAlsa : public OutputDirector
 	std::string device;
 	
 	conf.getChild("out_device").get(device);
-	conf.getChild("out_device").addChangeEvent(MakeEvent(this, &OutputDirectorAlsa::onDeviceChange));
+	conf.getChild("out_device").addChangeEvent(MakeDelegate(this, &OutputDirectorAlsa::onDeviceChange));
 
 	m_output = new OutputAlsa;
 	m_output->setDevice(device);
@@ -66,7 +66,7 @@ class OutputDirectorAlsa : public OutputDirector
     };
 
     virtual void doStop(ConfNode& conf) {
-	conf.getChild("out_device").deleteChangeEvent(MakeEvent(this, &OutputDirectorAlsa::onDeviceChange));
+	conf.getChild("out_device").deleteChangeEvent(MakeDelegate(this, &OutputDirectorAlsa::onDeviceChange));
 	if (m_output) {
 	    delete m_output;
 	    m_output = NULL;
