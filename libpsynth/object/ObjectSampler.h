@@ -27,6 +27,7 @@
 #include <libpsynth/object/Object.h>
 #include <libpsynth/input/FileReaderAny.h>
 #include <libpsynth/object/ObjectFactory.h>
+#include <libpsynth/common/ScalerST.h>
 
 namespace psynth
 {
@@ -66,6 +67,7 @@ private:
     RingAudioBuffer m_buffer;
     RingAudioBuffer::ReadPtr m_read_ptr;
     AudioBuffer m_inbuf;
+    ScalerST m_scaler;
     
     float m_param_ampl;
     float m_param_pitch;

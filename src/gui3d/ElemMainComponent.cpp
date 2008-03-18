@@ -120,7 +120,7 @@ void ElemMainComponent::init()
     m_indicator_fill = new FlatRing(string("IND2")+getSceneNode()->getName(),
 				    Degree(INDICATOR_MIN_ANGLE),
 				    Degree(INDICATOR_MIN_ANGLE +
-					   m_old_value / (m_max_val-m_min_val) *
+					   (m_old_value-m_min_val) / (m_max_val-m_min_val) *
 					   INDICATOR_RANGE_ANGLE),
 				    Element::RADIOUS + 0.1, Element::RADIOUS + 0.3,
 				    ColourValue(1,1,1,0.6));
@@ -137,7 +137,7 @@ void ElemMainComponent::handleParamChange(TableObject& obj, int param_id)
 
 	m_ent_node->yaw(Radian((new_val - m_old_value)/(m_max_val-m_min_val) * 2 * Math::PI));
 	m_indicator_fill->setEndAngle(Degree(INDICATOR_MIN_ANGLE +
-					     new_val/(m_max_val-m_min_val)
+					     ((new_val-m_min_val)/(m_max_val-m_min_val))
 					     * INDICATOR_RANGE_ANGLE));
 	m_indicator_fill->update();
 	m_old_value = new_val;

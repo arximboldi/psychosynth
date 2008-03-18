@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) Juan Pedro Bolivar Puente 2007, 2008                    *
+ *   Copyright (C) Juan Pedro Bolivar Puente 2008                          *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -20,62 +20,78 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "input/FileReaderWave.h"
-#include "common/Logger.h"
+#ifndef PSYNTH_SCALERST_H
+#define PSYNTH_SCALERST_H
 
-using namespace std;
+#include <soundtouch/SoundTouch.h>
+#include <libpsynth/common/Scaler.h>
 
 namespace psynth
 {
 
-void FileReaderWave::open(const char* file)
+class ScalerST : public Scaler
 {
-    if (!isOpen()) {
-	SF_INFO sfinfo;
-	
-	m_file = sf_open(file, SFM_READ, &sfinfo);
+    float m_tempo;
+    float m_rate;
+    float m_pitch;
+    int m_chan;
     
-	if (m_file == NULL) {
-	    Logger::instance().log("wave", Log::ERROR, string("Could not open file: ") + file);
-	    return;
-	}
-
-	AudioInfo info;
-	info.sample_rate  = sfinfo.samplerate;
-	info.num_channels = sfinfo.channels;
-	info.block_size   = sfinfo.frames;
-	setInfo(info);
+    soundtouch::SoundTouch m_st;
     
-	cout << "channels: " << info.num_channels << endl;
-	cout << "sample_rate: " << info.sample_rate << endl;
-		
-	setIsOpen(true);
+public:
+    void setTempo(float tempo) {
+	m_tempo = tempo;
+	m_st.setTempo(tempo);
     }
-}
-
-void FileReaderWave::seek(size_t pos)
-{
-    sf_seek(m_file, pos, SEEK_SET);
-}
-
-int FileReaderWave::read(AudioBuffer& outbuf, int n_samples)
-{
-    int n_read;
-
-    float buf [n_samples * getInfo().num_channels];
     
-    n_read = sf_readf_float(m_file, buf, n_samples);
-    outbuf.deinterleave(buf, n_read);
-    
-    return n_read;
-}
-
-void FileReaderWave::close()
-{
-    if (isOpen()) {
-	sf_close(m_file);
-	setIsOpen(false);
+    void setRate(float rate) {
+	m_rate = rate;
+	m_st.setRate(rate);
     }
-}
+    
+    void setPitch(float pitch) {
+	m_pitch = pitch;
+	m_st.setPitch(pitch);
+    }
+    
+    void setChannels(int chan) {
+	m_chan = chan;
+	m_st.setChannels(chan);
+    }
+
+    void setSampleRate(int samplerate) {
+	m_st.setSampleRate(samplerate);
+    }
+    
+    float getTempo() {
+	return m_tempo;;
+    }
+    
+    float getRate() {
+	return m_rate;
+    }
+    
+    float getPitch() {
+	return m_pitch;
+    }
+    
+    int getChannels() {
+	return m_chan;
+    }
+    
+    int availible() {
+	return m_st.numSamples();
+    }
+    
+    int receive(float* data, int samples) {
+	m_st.receiveSamples(data, samples);
+    }
+    
+    void update(float* data, int samples) {
+	m_st.putSamples(data, samples);
+    };
+};
 
 } /* namespace psynth */
+
+#endif /* PSYNTH_SCALERST_H */

@@ -38,6 +38,19 @@ private:
     NoCopy& operator= (const NoCopy&);
 };
 
+inline float phase(float x)
+{
+    return x - (x >= 0.0f ?
+		static_cast<int>(x) :
+		static_cast<int>(x) - 1);
+}
+
+template <class T>
+inline T linearInterp(T val, T next, T delta)
+{
+    return val + delta * (next - val); 
+}
+
 char* itoa(int val, int base);
 char* ftoa(double f, double sigfigs);
 int strcmp_i(const char* a, const char* b);

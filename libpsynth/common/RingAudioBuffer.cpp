@@ -23,6 +23,9 @@
 #include <iostream>
 #include <cmath>
 #include "common/RingAudioBuffer.h"
+#include "common/Misc.h"
+#include "common/Logger.h"
+#include "common/Scaler.h"
 
 using namespace std;
 
@@ -135,9 +138,10 @@ int RingAudioBuffer::read(ReadPtr& r, AudioBuffer& buf, int samples) const
 void RingAudioBuffer::write(const AudioBuffer& buf, int nwrite)
 {
     int offset = 0;
+
     if (nwrite > m_size) {
-	offset = nwrite - m_size;
-	nwrite = m_size;
+	Logger::instance().log("core", Log::WARNING, "Ring buffer overflow.");
+	return;
     }
     
     for (int i = 0; i < m_info.num_channels; i++) {
@@ -156,29 +160,92 @@ void RingAudioBuffer::write(const AudioBuffer& buf, int nwrite)
     m_writecount += nwrite;
 }
 
+void RingAudioBuffer::deinterleave(const Sample* buf, int to_write)
+{
+    if (to_write > m_size) {
+	Logger::instance().log("core", Log::WARNING, "Ring buffer overflow.");
+	return;
+    }
+
+    const Sample* inbuf;
+    Sample* outbuf;
+    int j;
+    int nwrite;
+    
+    for (int i = 0; i < m_info.num_channels; i++) {
+	nwrite = to_write;
+	if (m_writepos + nwrite > m_size) {
+	    outbuf = m_data[i] + m_writepos;
+	    inbuf = buf + i;
+	    for (j = m_writepos; j < m_size; ++j, --nwrite) {
+		*outbuf++ = *inbuf;
+		inbuf += m_info.num_channels;
+	    }
+	    outbuf = m_data[i];
+	    while(nwrite-- > 0) {
+		*outbuf++ = *inbuf;
+		inbuf += m_info.num_channels;
+	    }
+	} else {
+	    outbuf = m_data[i] + m_writepos;
+	    inbuf = buf + i;
+	    while (nwrite-- > 0) {
+		*outbuf++ = *inbuf;
+		inbuf += m_info.num_channels;
+	    }
+	}
+    }
+	
+    m_writepos = (m_writepos + to_write) % m_size;
+    m_writecount += to_write;
+}
+
+void RingAudioBuffer::writeScaler(const AudioBuffer& inbuf, int samples,
+				  Scaler& scaler)
+{
+    Sample buf[samples * inbuf.getInfo().num_channels];
+    int nframes;
+    
+    inbuf.interleave(buf, samples);
+
+    scaler.update(buf, samples);
+
+    while (scaler.availible() > 0) {
+	nframes = scaler.receive(buf, samples);
+	deinterleave(buf, nframes);
+    }
+}
+
 void RingAudioBuffer::writeFastResample(const AudioBuffer& buf, int samples,
 					float factor)
 {
+    samples--;
     float count = m_fr_count;
     int i, j;
-    int real_samples = ceil(samples * (1.0f / factor));
+    int real_samples = ceil((float)samples / factor);
 
     if (real_samples > m_size) {
-	real_samples -= m_size;
-	m_fr_count += (real_samples - real_samples) * factor;
+	Logger::instance().log("core", Log::WARNING, "Ring buffer overflow.");
+	return;
     }
     
     if (m_fr_count < samples) {
 	for (j = 0; j < m_info.num_channels; ++j) {
 	    if (m_writepos + real_samples > m_size) {
 		for (i = m_writepos, count = m_fr_count; i < m_size; count += factor, ++i)
-		    m_data[j][i] = buf[j][(int)count];
+		    m_data[j][i] = linearInterp(buf[j][(int)count],
+						buf[j][(int)count + 1],
+						phase(count));
 	
 		for (i = 0; count < samples; count += factor, ++i)
-		    m_data[j][i] = buf[j][(int)count];
+		    m_data[j][i] = linearInterp(buf[j][(int)count],
+						buf[j][(int)count + 1],
+						phase(count));
 	    } else {
 		for (i = m_writepos, count = m_fr_count; count < samples; count += factor, ++i)
-		    m_data[j][i] = buf[j][(int)count];
+		    m_data[j][i] = linearInterp(buf[j][(int)count],
+						buf[j][(int)count + 1],
+						phase(count));
 	    }
 	}
 

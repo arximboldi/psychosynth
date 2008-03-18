@@ -29,6 +29,8 @@
 namespace psynth
 {
 
+class Scaler;
+
 class RingAudioBuffer
 {
 public:
@@ -56,7 +58,9 @@ private:
     int m_size;
     int m_writepos;
     int m_writecount;
+
     float m_fr_count;
+    float m_prev_val;
     
     void allocate();
 	
@@ -142,11 +146,19 @@ public:
     };
 	
     int read(ReadPtr& r, AudioBuffer& buf, int samples) const;
-	
+
+    void deinterleave(const Sample* buf, int samples);
+    
     void write(const AudioBuffer& buf) {
 	write(buf, buf.size());
     }
 
+    void writeScaler(const AudioBuffer& buf, Scaler& scaler) {
+	writeScaler(buf, buf.size(), scaler);
+    }
+    
+    void writeScaler(const AudioBuffer& buf, int samples, Scaler& scaler);
+    
     void writeFastResample(const AudioBuffer& buf, float factor) {
 	writeFastResample(buf, buf.size(), factor);
     }

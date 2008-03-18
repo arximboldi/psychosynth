@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) Juan Pedro Bolivar Puente 2007                          *
+ *   Copyright (C) Juan Pedro Bolivar Puente 2008                          *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -29,6 +29,8 @@
 
 using namespace std;
 
+#define SAMPLER_BLOCK_SIZE  16
+
 namespace psynth
 {
 
@@ -49,11 +51,14 @@ ObjectSampler::ObjectSampler(const AudioInfo& info):
 {
     m_read_ptr = m_buffer.begin();
     
-    addParam("file", ObjParam::STRING, &m_param_file, MakeDelegate(this, &ObjectSampler::onFileChange));
+    addParam("file", ObjParam::STRING, &m_param_file,
+	     MakeDelegate(this, &ObjectSampler::onFileChange));
     addParam("amplitude", ObjParam::FLOAT, &m_param_ampl);
     addParam("pitch", ObjParam::FLOAT, &m_param_pitch);
 
-    m_reader.setBufferSize(getInfo().block_size);
+    m_reader.setBufferSize(info.block_size);
+    m_scaler.setChannels(info.num_channels);
+    m_scaler.setRate(1.0);
 }
 
 void ObjectSampler::onFileChange(ObjParam& par)
@@ -68,6 +73,8 @@ void ObjectSampler::onFileChange(ObjParam& par)
 	m_reader.close();
 
     m_reader.open(val.c_str());
+
+    m_scaler.setSampleRate(m_reader.getInfo().sample_rate);
     
     m_update_lock.unlock();
 }
@@ -76,32 +83,40 @@ void ObjectSampler::doUpdate(const Object* caller, int caller_port_type, int cal
 {
     AudioBuffer* out = getOutput<AudioBuffer>(Object::LINK_AUDIO, OUT_A_OUTPUT);
     const ControlBuffer* pitch = getInput<ControlBuffer>(Object::LINK_CONTROL, IN_C_PITCH);
+    const Sample* pitch_buf = NULL;
+
+    if (pitch)
+	pitch_buf = pitch->getData();
     
     float factor =
 	(float) getInfo().sample_rate / m_reader.getInfo().sample_rate * m_param_pitch;
 
     int must_read;
     int nread;
+    float pos;
     
     if (m_reader.isOpen()) {
-	while(m_buffer.availible(m_read_ptr) < getInfo().block_size) {	
+	while(m_buffer.availible(m_read_ptr) < getInfo().block_size) {
 	    if (factor < 1.0)
-		must_read = getInfo().block_size * factor;
+		must_read = SAMPLER_BLOCK_SIZE * factor;
 	    else
-		must_read = getInfo().block_size;
+		must_read = SAMPLER_BLOCK_SIZE;
 
 	    m_update_lock.lock();
 	    nread = m_reader.read(m_inbuf, must_read);
-	    m_update_lock.unlock();
-	    
+	    	    
 	    if (nread < must_read)
 		m_reader.seek(0);
 
-	    m_buffer.writeFastResample(m_inbuf, nread, factor);
-	    cout << "read: " << nread << endl;
-	    cout << "must read: " << must_read << endl;
-	    cout << "buffer: " << m_reader.getBufferSize() << endl;
-	    cout << "factor: " << factor << endl;
+	    if (pitch)
+		m_scaler.setRate(factor + factor * pitch_buf[(int) pos]);
+	    else
+		m_scaler.setRate(factor);
+	    pos += nread / factor;
+	    
+	    m_update_lock.unlock();
+
+	    m_buffer.writeScaler(m_inbuf, nread, m_scaler);
 	}
 
 	m_buffer.read(m_read_ptr, *out);
@@ -122,8 +137,9 @@ void ObjectSampler::doAdvance()
 void ObjectSampler::onInfoChange()
 {
     m_buffer.setAudioInfo(getInfo());
-    m_buffer.resize(getInfo().block_size);
+    m_buffer.resize(getInfo().block_size * 4);
     m_reader.setBufferSize(getInfo().block_size);
+    m_scaler.setChannels(getInfo().num_channels);
 }
 
 } /* namespace psynth */

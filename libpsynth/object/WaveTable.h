@@ -25,6 +25,7 @@
 
 #include <cmath>
 #include <libpsynth/common/AudioBuffer.h>
+#include <libpsynth/common/Misc.h>
 
 namespace psynth
 {
@@ -37,11 +38,6 @@ public:
 private:
     Sample* m_table;
     size_t m_size;
-
-    static inline float phase(float x) {
-	return x - (x >= 0.0f ? static_cast<int>(x) :
-		    static_cast<int>(x) - 1);
-    }
     
 public:
     WaveTable() : m_table(NULL), m_size(0) {}

@@ -67,6 +67,7 @@ nobase_libpsynthinc_HEADERS = \
 	common/OptionConf.h \
 	common/Timer.h \
 	common/Vector2D.h\
+	common/Scaler.h\
 	table/Table.h \
 	table/Patcher.h\
 	table/PatcherDynamic.h \
@@ -132,6 +133,24 @@ libpsynth_la_SOURCES = \
 	object/ObjParam.cpp\
 	object/ObjectFactoryManager.cpp\
 	input/FileReaderAny.cpp
+
+if HAVE_SAMPLERATE
+libpsynth_la_CXXFLAGS += $(SAMPLERATE_CFLAGS)
+libpsynth_la_LIBADD += $(SAMPLERATE_LIBS)
+libpsynth_la_SOURCES += \
+	common/ScalerSRC.cpp
+nobase_libpsynthinc_HEADERS += \
+	common/ScalerSRC.h
+endif
+
+if HAVE_SOUNDTOUCH
+libpsynth_la_CXXFLAGS += $(SOUNDTOUCH_CFLAGS)
+libpsynth_la_LIBADD += $(SOUNDTOUCH_LIBS)
+libpsynth_la_SOURCES += \
+	common/ScalerST.cpp
+nobase_libpsynthinc_HEADERS += \
+	common/ScalerST.h
+endif
 
 if HAVE_LIBXML
 libpsynth_la_CXXFLAGS += $(LIBXML_CFLAGS)

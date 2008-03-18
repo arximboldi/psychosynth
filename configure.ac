@@ -95,7 +95,7 @@ AC_ARG_ENABLE([sndfile],
         [sndfile=$enableval], [sndfile=auto])
 
 if test "x${sndfile}" != xno ; then
-    PKG_CHECK_MODULES(SNDFILE, [ sndfile >= 0.2 ],
+    PKG_CHECK_MODULES(SNDFILE, [ sndfile ],
         [
             HAVE_SNDFILE=yes
             AC_DEFINE([HAVE_SNDFILE], 1, [Have Sndfile?])
@@ -105,6 +105,46 @@ if test "x${sndfile}" != xno ; then
         ])
 else
     HAVE_SNDFILE=disabled
+fi
+
+#  Soundtouch
+# ----------------------------------------------------------------------
+
+AC_ARG_ENABLE([soundtouch],
+    AC_HELP_STRING([--disable-soundtouch], [Disable optional Soundtouch support]),
+        [soundtouch=$enableval], [soundtouch=auto])
+
+if test "x${soundtouch}" != xno ; then
+    PKG_CHECK_MODULES(SOUNDTOUCH, [ libSoundTouch ],
+        [
+            HAVE_SOUNDTOUCH=yes
+            AC_DEFINE([HAVE_SOUNDTOUCH], 1, [Have Soundtouch?])
+        ],
+        [
+            HAVE_SOUNDTOUCH=no
+        ])
+else
+    HAVE_SOUNDTOUCH=disabled
+fi
+
+#  Samplerate
+# ----------------------------------------------------------------------
+
+AC_ARG_ENABLE([samplerate],
+    AC_HELP_STRING([--disable-samplerate], [Disable optional Samplerate support]),
+        [samplerate=$enableval], [samplerate=auto])
+
+if test "x${samplerate}" != xno ; then
+    PKG_CHECK_MODULES(SAMPLERATE, [ samplerate ],
+        [
+            HAVE_SAMPLERATE=yes
+            AC_DEFINE([HAVE_SAMPLERATE], 1, [Have Samplerate?])
+        ],
+        [
+            HAVE_SAMPLERATE=no
+        ])
+else
+    HAVE_SAMPLERATE=disabled
 fi
 
 #  OGG Vorbis
@@ -259,6 +299,10 @@ if test "x$HAVE_VORBIS" = xyes; then HAVE_VORBIS_P=1
 else HAVE_VORBIS_P=0; fi
 if test "x$HAVE_SNDFILE" = xyes; then HAVE_SNDFILE_P=1
 else HAVE_SNDFILE_P=0; fi
+if test "x$HAVE_SOUNDTOUCH" = xyes; then HAVE_SOUNDTOUCH_P=1
+else HAVE_SOUNDTOUCH_P=0; fi
+if test "x$HAVE_SAMPLERATE" = xyes; then HAVE_SAMPLERATE_P=1
+else HAVE_SAMPLERATE_P=0; fi
 if test "x$HAVE_OSS" = xyes; then HAVE_OSS_P=1
 else HAVE_OSS_P=0; fi
 if test "x$HAVE_ALSA" = xyes; then HAVE_ALSA_P=1
@@ -270,6 +314,8 @@ AC_SUBST(HAVE_LIBLO_P)
 AC_SUBST(HAVE_LIBXML_P)
 AC_SUBST(HAVE_VORBIS_P)
 AC_SUBST(HAVE_SNDFILE_P)
+AC_SUBST(HAVE_SOUNDTOUCH_P)
+AC_SUBST(HAVE_SAMPLERATE_P)
 AC_SUBST(HAVE_OSS_P)
 AC_SUBST(HAVE_ALSA_P)
 AC_SUBST(HAVE_JACK_P)
@@ -278,6 +324,8 @@ AM_CONDITIONAL([HAVE_LIBLO], [test "x$HAVE_LIBLO" = xyes])
 AM_CONDITIONAL([HAVE_LIBXML], [test "x$HAVE_LIBXML" = xyes])
 AM_CONDITIONAL([HAVE_VORBIS], [test "x$HAVE_VORBIS" = xyes])
 AM_CONDITIONAL([HAVE_SNDFILE], [test "x$HAVE_SNDFILE" = xyes])
+AM_CONDITIONAL([HAVE_SOUNDTOUCH], [test "x$HAVE_SOUNDTOUCH" = xyes])
+AM_CONDITIONAL([HAVE_SAMPLERATE], [test "x$HAVE_SAMPLERATE" = xyes])
 AM_CONDITIONAL([HAVE_OSS], [test "x$HAVE_OSS" = xyes])
 AM_CONDITIONAL([HAVE_ALSA], [test "x$HAVE_ALSA" = xyes])
 AM_CONDITIONAL([HAVE_JACK], [test "x$HAVE_JACK" = xyes])
@@ -324,6 +372,8 @@ AC_MSG_RESULT([
 * 
 *      OSC support: ............. $HAVE_LIBLO
 *      XML config support: ...... $HAVE_LIBXML
+*      Samplerate support: ...... $HAVE_SAMPLERATE
+*      SoundTouch support: ...... $HAVE_SOUNDTOUCH
 *      PCM support: ............. $HAVE_SNDFILE
 *      OGG support: ............. $HAVE_VORBIS
 *      OSS support: ............. $HAVE_OSS
