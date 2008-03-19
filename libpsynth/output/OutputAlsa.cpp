@@ -63,7 +63,7 @@ void OutputAlsa::run()
 	    else
 		Logger::instance().log("alsa", Log::WARNING, "Unknown snd_pcm_avail_update() return value.");
 	} else {
-	    cout << "processing " << nframes << endl; 
+//	    cout << "processing " << nframes << endl; 
 	    process(getInfo().block_size); //getInfo().block_size);
 	}
     }
@@ -172,7 +172,7 @@ bool OutputAlsa::put(const AudioBuffer& in_buf, size_t nframes)
 		Logger::instance().log("alsa", Log::WARNING,
 				       string("Could not write to device. (")
 				       + snd_strerror(err) + ")");
-                //close(); /* WTF! */
+               //close(); /* WTF! */
 		snd_pcm_recover(alsa_pcm, err, 1);
 		snd_pcm_prepare(alsa_pcm);
 		ret = false;

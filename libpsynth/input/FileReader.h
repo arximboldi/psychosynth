@@ -49,14 +49,6 @@ public:
 	m_isopen(false) {}
     
     virtual ~FileReader() {};
-
-    void setBufferSize(int size) {
-	m_bufsize = size;
-    }
-
-    int getBufferSize() {
-	return m_bufsize;
-    }
     
     bool isOpen() {
 	return m_isopen;

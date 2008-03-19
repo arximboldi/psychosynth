@@ -24,12 +24,16 @@
 #include "common/RingAudioBuffer.h"
 #include "common/AudioBuffer.h"
 #include "common/Mutex.h"
+#include "common/Misc.h"
 #include "object/KnownObjects.h"
 #include "object/ObjectSampler.h"
 
 using namespace std;
 
-#define SAMPLER_BLOCK_SIZE  16
+
+//#define SAMPLER_BLOCK_SIZE  16
+#define SAMPLER_BLOCK_SIZE  getInfo().block_size
+#define SCALER_TRAINER_SIZE 1024
 
 namespace psynth
 {
@@ -46,6 +50,9 @@ ObjectSampler::ObjectSampler(const AudioInfo& info):
 	   N_OUT_C_SOCKETS),
     m_buffer(info, 2 * info.block_size),
     m_inbuf(info),
+    m_read_pos(0),
+    m_end_pos(0),
+    m_ctrl_pos(0),
     m_param_ampl(0.5f),
     m_param_pitch(1.0f)
 {
@@ -56,9 +63,16 @@ ObjectSampler::ObjectSampler(const AudioInfo& info):
     addParam("amplitude", ObjParam::FLOAT, &m_param_ampl);
     addParam("pitch", ObjParam::FLOAT, &m_param_pitch);
 
-    m_reader.setBufferSize(info.block_size);
     m_scaler.setChannels(info.num_channels);
     m_scaler.setRate(1.0);
+    m_scaler.setSampleRate(info.sample_rate);
+
+    /* It seems that first scaling is too slow, lets clear the scaler first. */
+    Sample buf [info.num_channels * SCALER_TRAINER_SIZE];
+    memset(buf, 0, sizeof(Sample) * SCALER_TRAINER_SIZE * info.num_channels);
+    m_scaler.update(buf, SCALER_TRAINER_SIZE);
+    while(m_scaler.availible() > 0)
+	m_scaler.receive(buf, SCALER_TRAINER_SIZE);
 }
 
 void ObjectSampler::onFileChange(ObjParam& par)
@@ -76,7 +90,8 @@ void ObjectSampler::onFileChange(ObjParam& par)
 
 //    m_inbuf.setInfo(m_reader.getInfo(), getInfo().block_size);
     m_scaler.setSampleRate(m_reader.getInfo().sample_rate);
-    
+    m_end_pos = m_reader.getInfo().block_size;
+    m_read_pos = 0;
     m_update_lock.unlock();
 }
 
@@ -89,38 +104,77 @@ void ObjectSampler::doUpdate(const Object* caller, int caller_port_type, int cal
     if (pitch)
 	pitch_buf = pitch->getData();
     
-    float factor =
+    float base_factor =
 	(float) m_reader.getInfo().sample_rate / getInfo().sample_rate * m_param_pitch;
 
     int must_read;
     int nread;
-    float pos;
+    float factor = base_factor;
+    bool backwards;
     
     if (m_reader.isOpen()) {
 	while(m_buffer.availible(m_read_ptr) < getInfo().block_size) {
+	    if (pitch)
+		factor = base_factor + base_factor * pitch_buf[(int) m_ctrl_pos];
+	    else
+		factor = base_factor;
+#if 0
+	    cout << "factor: " << factor << endl;
+	    cout << "m_read_pos: " << m_read_pos << endl;
+#endif
+	    
+	    if (factor < 0) {
+		backwards = true;
+		factor = -factor;
+	    } else
+		backwards = false;
+
+	    if (factor < 0.2)
+		factor = 0.2;
 	    if (factor < 1.0)
 		must_read = SAMPLER_BLOCK_SIZE * factor;
 	    else
 		must_read = SAMPLER_BLOCK_SIZE;
 
 	    m_update_lock.lock();
+
+	    if (backwards) {
+		if (m_read_pos == 0)
+		    m_read_pos = m_end_pos - must_read;
+		else if (must_read > m_read_pos) {
+		    must_read = m_read_pos;
+		    m_read_pos = 0;
+		} else
+		    m_read_pos -= must_read;
+		m_reader.seek(m_read_pos);
+	    }
+
 	    nread = m_reader.read(m_inbuf, must_read);
 
-	    if (nread == 0) {
-		m_reader.seek(0);
-		m_update_lock.unlock();
-		continue;
+#if 0
+	    cout << "must_read: " << must_read << endl;
+	    cout << "nread: " << nread << endl;
+	    cout << "m_end_pos: " << m_end_pos << endl;
+#endif
+	    if (!backwards) {
+		m_read_pos += nread;
+		if (nread == 0) {
+		    m_read_pos = 0;
+		    m_reader.seek(0);
+		}
+	    } else {
+		m_inbuf.reverse(nread);
 	    }
 	    
-	    if (pitch)
-		m_scaler.setRate(factor + factor * pitch_buf[(int) pos]);
-	    else
-		m_scaler.setRate(factor);
-	    pos += nread / factor;
+	    m_ctrl_pos += (float) nread / factor;
+	    if (m_ctrl_pos >= getInfo().block_size)
+		m_ctrl_pos = phase(m_ctrl_pos) + ((int) m_ctrl_pos % getInfo().block_size);
+	    
+	    m_scaler.setRate(factor);
+	    m_buffer.writeScaler(m_inbuf, nread, m_scaler);
+	    //m_buffer.write(m_inbuf, nread);
 	    
 	    m_update_lock.unlock();
-
-	    m_buffer.writeScaler(m_inbuf, nread, m_scaler);
 	}
 
 	m_buffer.read(m_read_ptr, *out);
@@ -142,7 +196,6 @@ void ObjectSampler::onInfoChange()
 {
     m_buffer.setAudioInfo(getInfo());
     m_buffer.resize(getInfo().block_size * 4);
-    m_reader.setBufferSize(getInfo().block_size);
     m_scaler.setChannels(getInfo().num_channels);
 }
 

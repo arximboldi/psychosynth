@@ -68,11 +68,15 @@ private:
     RingAudioBuffer::ReadPtr m_read_ptr;
     AudioBuffer m_inbuf;
     ScalerST m_scaler;
+    int m_read_pos;
+    int m_end_pos;
+    float m_ctrl_pos;
     
     float m_param_ampl;
     float m_param_pitch;
     std::string m_param_file;
 
+    
     Mutex m_update_lock;
     
     void onFileChange(ObjParam& par);

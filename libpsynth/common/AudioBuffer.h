@@ -61,6 +61,12 @@ public:
 	
     AudioBuffer& operator= (const AudioBuffer& buf);
 
+    void reverse() {
+	reverse(size());
+    }
+    
+    void reverse(int n_frames);
+    
     void interleave(Sample* dest, size_t n_frames) const;
     void interleaveC8(char* dest, size_t n_frames) const;
     void interleaveS16(short int* dest, size_t n_frames) const;

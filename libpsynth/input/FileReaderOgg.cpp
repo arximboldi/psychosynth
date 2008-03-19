@@ -31,7 +31,7 @@ namespace psynth
 void FileReaderOgg::open(const char* file)
 {
     if (!isOpen()) {
-	/* vorbis code sucks a little bit... */
+	/* const_cast cause vorbis code sucks a little bit... */
 	if (ov_fopen(const_cast<char*>(file), &m_file)) {
 	    Logger::instance().log("ogg", Log::ERROR, string("Could not open file: ") + file);
 	    return;
@@ -42,7 +42,7 @@ void FileReaderOgg::open(const char* file)
 	oi = ov_info(&m_file, -1);
 	info.num_channels = oi->channels;
 	info.sample_rate = oi->rate;
-	info.block_size = 0;
+	info.block_size = ov_pcm_total(&m_file, -1);
 	setInfo(info);
 
 	setIsOpen(true);
@@ -63,10 +63,17 @@ int FileReaderOgg::read(AudioBuffer& buf, int n_samples)
     n_read = ov_read_float(&m_file, &pcm, n_samples, &bitstream);
 
     /* TODO: Test bitstream changes? */
-    if (n_read)
-	for (int i = 0; i < buf.getInfo().num_channels; ++i)
+    int n_chan = min(getInfo().num_channels,
+		     buf.getInfo().num_channels);
+    if (n_read) {
+	int i;
+	
+	for (i = 0; i < n_chan; ++i)
 	    memcpy(buf.getData()[i], pcm[i], sizeof(float) * n_read);
-
+	for (; i < buf.getInfo().num_channels; ++i)
+	    memcpy(buf.getData()[i], pcm[i-n_chan], sizeof(float) * n_read);
+    }
+    
     return n_read;
 }
 

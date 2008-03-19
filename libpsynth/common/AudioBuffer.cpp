@@ -63,6 +63,15 @@ AudioBuffer& AudioBuffer::operator= (const AudioBuffer& buf)
     return *this;
 }
 
+void AudioBuffer::reverse(int n_frames)
+{
+    int i;
+    
+    for (i = 0; i < m_info.num_channels; ++i) {
+	std::reverse(m_data[i], m_data[i] + n_frames);
+    }    
+}
+
 void AudioBuffer::interleave(Sample* dest, size_t n_frames) const
 {
     size_t i, j;
