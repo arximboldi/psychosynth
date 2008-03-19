@@ -20,6 +20,8 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <OGRE/Ogre.h>
+
 #include "gui3d/QuitWindow.h"
 
 using namespace CEGUI;
@@ -33,21 +35,49 @@ FrameWindow* QuitWindow::createWindow()
 	wmgr.createWindow("TaharezLook/FrameWindow", "window_menu"));
 	
     window->setPosition( UVector2(UDim(0.5, -100), UDim(0.5, -50)) );
-    window->setSize    ( UVector2(UDim(0, 200),     UDim(0, 80)) );
+    window->setSize    ( UVector2(UDim(0, 240),     UDim(0, 100)) );
     window->setText("Quit Window");
-	
-    Window *button_quit = wmgr.createWindow("TaharezLook/Button", "button_quit");
-    button_quit->setText("Quit");
-    button_quit->setPosition( UVector2(UDim(0.10, 0), UDim(0, 40)) );
-    button_quit->setSize    ( UVector2(UDim(0.80, 0), UDim(0, 20)) );
-    button_quit->setWantsMultiClickEvents(false);
+
+    Window* label = wmgr.createWindow("TaharezLook/StaticText");
+    label->setProperty("FrameEnabled", "false");
+    label->setProperty("BackgroundEnabled", "false");
+    label->setPosition(UVector2(UDim(0.1, 0), UDim(0, 35)));
+    label->setSize(UVector2(UDim(0.8, 0), UDim(0, 20)));
+    label->setText("Do you really want to quit?");
     
+    Window *button_quit = wmgr.createWindow("TaharezLook/Button");
+    button_quit->setText("Yes...");
+    button_quit->setPosition( UVector2(UDim(0.10, 0), UDim(0, 65)));
+    button_quit->setSize    ( UVector2(UDim(0.35, 0), UDim(0, 20)));
+    button_quit->setWantsMultiClickEvents(false);
+
+    Window *button_cancel = wmgr.createWindow("TaharezLook/Button");
+    button_cancel->setText("No!");
+    button_cancel->setPosition(UVector2(UDim(0.55, 0), UDim(0, 65)));
+    button_cancel->setSize    (UVector2(UDim(0.35, 0), UDim(0, 20)));
+    button_cancel->setWantsMultiClickEvents(false);
+
+    window->addChildWindow(label);
     window->addChildWindow(button_quit);
+    window->addChildWindow(button_cancel);
 	
     button_quit->subscribeEvent(PushButton::EventClicked, 
 				Event::Subscriber(&QuitWindow::onQuit, this));
-           
+    button_cancel->subscribeEvent(PushButton::EventClicked, 
+				  Event::Subscriber(&QuitWindow::onCancel, this));
     return window;
+}
+
+bool QuitWindow::onQuit(const CEGUI::EventArgs &e)
+{
+    Ogre::Root::getSingleton().queueEndRendering();
+    return true;
+}
+
+bool QuitWindow::onCancel(const CEGUI::EventArgs &e)
+{
+    toggle();
+    return false;
 }
 
 QuitWindow::QuitWindow()

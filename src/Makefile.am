@@ -76,6 +76,7 @@ psynth3d_SOURCES = \
 	gui3d/SelectorWindow.cpp \
 	gui3d/DefaultSelectorPopulator.cpp\
 	gui3d/QuitWindow.cpp \
+	gui3d/InfoWindow.cpp \
 	gui3d/ToggableWindow.cpp \
 	gui3d/ConfWindow.cpp \
 	gui3d/TaskManager.cpp \
@@ -99,6 +100,7 @@ psynth3d_SOURCES = \
 	gui3d/QuitWindow.h \
 	gui3d/ConfWindow.h \
 	gui3d/SelectorWindow.h\
+	gui3d/InfoWindow.h\
 	gui3d/DefaultSelectorPopulator.h\
 	gui3d/ToggableWindow.h\
 	gui3d/TaskManager.h\

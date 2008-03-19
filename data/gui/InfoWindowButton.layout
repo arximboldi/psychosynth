@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<GUILayout>
+<Window Type="TaharezLook/ImageButton" Name="btnInfoWindow">
+	<Property Name="UnifiedPosition" Value="{{0,0},{1,-32}}" />
+	<Property Name="UnifiedSize" Value="{{0,32},{0,32}}" />
+	<Property Name="NormalImage"     Value="set:InfoWindowButton image:btnNormal" />
+	<Property Name="HoverImage"      Value="set:InfoWindowButton image:btnHover"  />
+	<Property Name="PushedImage"     Value="set:InfoWindowButton image:btnPushed" />
+	<Property Name="DisabledImage"   Value="set:InfoWindowButton image:btnDisabl" />
+</Window>
+</GUILayout>
+

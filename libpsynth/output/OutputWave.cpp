@@ -74,6 +74,7 @@ bool OutputWave::close()
 {
     if (getState() != NOTINIT) {
 	sf_close(m_file);
+	setState(NOTINIT);
 	return true;
     }
 

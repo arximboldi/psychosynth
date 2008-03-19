@@ -82,6 +82,7 @@ bool RecordWindow::onClick(const CEGUI::EventArgs &e)
 	}
     } else {
 	m_table->detachPassiveOutput(&m_output);
+	m_output.close();
 	m_button->setText("Start");
 	m_file->enable();
 	m_recording = false;

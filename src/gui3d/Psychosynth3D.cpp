@@ -34,6 +34,7 @@
 
 #include "gui3d/QuitWindow.h"
 #include "gui3d/ConfWindow.h"
+#include "gui3d/InfoWindow.h"
 #include "gui3d/SelectorWindow.h"
 #include "gui3d/DefaultSelectorPopulator.h"
 
@@ -393,7 +394,7 @@ void Psychosynth3D::setupMenus()
     
     m_windowlist->addWindow("SelectorWindowButton.imageset",
 			    "SelectorWindowButton.layout",
-			    "Place objects in the table.",
+			    "Add objects to the table.",
 			    selector,
 			    OIS::KC_UNASSIGNED);
 #ifdef PSYNTH_HAVE_PCM
@@ -406,7 +407,7 @@ void Psychosynth3D::setupMenus()
 #ifdef PSYNTH_HAVE_OSC
     m_windowlist->addWindow("NetworkWindowButton.imageset",
 			    "NetworkWindowButton.layout",
-			    "Create network sessions.",
+			    "Create or join network sessions.",
 			    new NetworkWindow(m_oscclient,
 					      m_oscserver),
 			    OIS::KC_UNASSIGNED);
@@ -416,6 +417,11 @@ void Psychosynth3D::setupMenus()
 			    "Configure the program settings.",
 			    new ConfWindow(Config::instance().getChild("psynth3d"),
 					   Config::instance().getChild("psychosynth")),
+			    OIS::KC_UNASSIGNED);
+    m_windowlist->addWindow("InfoWindowButton.imageset",
+			    "InfoWindowButton.layout",
+			    "General information about the program.",
+			    new InfoWindow(),
 			    OIS::KC_UNASSIGNED);
     m_windowlist->addWindow("QuitWindowButton.imageset",
 			    "QuitWindowButton.layout",
