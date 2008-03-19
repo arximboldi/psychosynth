@@ -195,7 +195,8 @@ void RingAudioBuffer::deinterleave(const Sample* buf, int to_write)
 	    }
 	}
     }
-	
+    //cout << m_writepos << endl;
+    //cout << m_writecount << endl;
     m_writepos = (m_writepos + to_write) % m_size;
     m_writecount += to_write;
 }
@@ -225,8 +226,10 @@ void RingAudioBuffer::writeFastResample(const AudioBuffer& buf, int samples,
     int real_samples = ceil((float)samples / factor);
 
     if (real_samples > m_size) {
-	Logger::instance().log("core", Log::WARNING, "Ring buffer overflow.");
-	return;
+	real_samples = m_size;
+	samples = (float) real_samples * factor;
+        //Logger::instance().log("core", Log::WARNING, "Ring buffer overflow.");
+	//return;
     }
     
     if (m_fr_count < samples) {

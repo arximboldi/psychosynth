@@ -42,13 +42,15 @@ public:
     };
 	
     enum InControlSocketID {
-	IN_C_PITCH,
+	IN_C_RATE,
 	N_IN_C_SOCKETS
     };
 
     enum ParamID {
 	PARAM_FILE = Object::N_COMMON_PARAMS,
 	PARAM_AMPLITUDE,
+	PARAM_RATE,
+	PARAM_TEMPO,
 	PARAM_PITCH,
 	N_PARAM
     };
@@ -73,9 +75,11 @@ private:
     float m_ctrl_pos;
     
     float m_param_ampl;
+    float m_param_rate;
+    float m_param_tempo;
     float m_param_pitch;
+    
     std::string m_param_file;
-
     
     Mutex m_update_lock;
     

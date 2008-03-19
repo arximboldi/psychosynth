@@ -54,6 +54,8 @@ ObjectSampler::ObjectSampler(const AudioInfo& info):
     m_end_pos(0),
     m_ctrl_pos(0),
     m_param_ampl(0.5f),
+    m_param_rate(1.0f),
+    m_param_tempo(1.0f),
     m_param_pitch(1.0f)
 {
     m_read_ptr = m_buffer.begin();
@@ -61,18 +63,13 @@ ObjectSampler::ObjectSampler(const AudioInfo& info):
     addParam("file", ObjParam::STRING, &m_param_file,
 	     MakeDelegate(this, &ObjectSampler::onFileChange));
     addParam("amplitude", ObjParam::FLOAT, &m_param_ampl);
+    addParam("rate", ObjParam::FLOAT, &m_param_rate);
+    addParam("tempo", ObjParam::FLOAT, &m_param_tempo);
     addParam("pitch", ObjParam::FLOAT, &m_param_pitch);
 
     m_scaler.setChannels(info.num_channels);
     m_scaler.setRate(1.0);
     m_scaler.setSampleRate(info.sample_rate);
-
-    /* It seems that first scaling is too slow, lets clear the scaler first. */
-    Sample buf [info.num_channels * SCALER_TRAINER_SIZE];
-    memset(buf, 0, sizeof(Sample) * SCALER_TRAINER_SIZE * info.num_channels);
-    m_scaler.update(buf, SCALER_TRAINER_SIZE);
-    while(m_scaler.availible() > 0)
-	m_scaler.receive(buf, SCALER_TRAINER_SIZE);
 }
 
 void ObjectSampler::onFileChange(ObjParam& par)
@@ -92,30 +89,36 @@ void ObjectSampler::onFileChange(ObjParam& par)
     m_scaler.setSampleRate(m_reader.getInfo().sample_rate);
     m_end_pos = m_reader.getInfo().block_size;
     m_read_pos = 0;
+
     m_update_lock.unlock();
 }
 
 void ObjectSampler::doUpdate(const Object* caller, int caller_port_type, int caller_port)
 {
     AudioBuffer* out = getOutput<AudioBuffer>(Object::LINK_AUDIO, OUT_A_OUTPUT);
-    const ControlBuffer* pitch = getInput<ControlBuffer>(Object::LINK_CONTROL, IN_C_PITCH);
-    const Sample* pitch_buf = NULL;
+    const ControlBuffer* rate = getInput<ControlBuffer>(Object::LINK_CONTROL, IN_C_RATE);
+    const Sample* rate_buf = NULL;
 
-    if (pitch)
-	pitch_buf = pitch->getData();
+    if (rate)
+	rate_buf = rate->getData();
     
     float base_factor =
-	(float) m_reader.getInfo().sample_rate / getInfo().sample_rate * m_param_pitch;
+	(float) m_reader.getInfo().sample_rate / getInfo().sample_rate * m_param_rate;
 
     int must_read;
     int nread;
     float factor = base_factor;
     bool backwards;
+
+    m_update_lock.lock();
+    m_scaler.setTempo(m_param_tempo);
+    m_scaler.setPitch(m_param_pitch);
+    m_update_lock.unlock();
     
     if (m_reader.isOpen()) {
 	while(m_buffer.availible(m_read_ptr) < getInfo().block_size) {
-	    if (pitch)
-		factor = base_factor + base_factor * pitch_buf[(int) m_ctrl_pos];
+	    if (rate)
+		factor = base_factor + base_factor * rate_buf[(int) m_ctrl_pos];
 	    else
 		factor = base_factor;
 #if 0
@@ -131,8 +134,8 @@ void ObjectSampler::doUpdate(const Object* caller, int caller_port_type, int cal
 
 	    if (factor < 0.2)
 		factor = 0.2;
-	    if (factor < 1.0)
-		must_read = SAMPLER_BLOCK_SIZE * factor;
+	    if (factor * m_param_tempo < 1.0)
+		must_read = SAMPLER_BLOCK_SIZE * factor * m_param_tempo;
 	    else
 		must_read = SAMPLER_BLOCK_SIZE;
 
@@ -171,6 +174,7 @@ void ObjectSampler::doUpdate(const Object* caller, int caller_port_type, int cal
 		m_ctrl_pos = phase(m_ctrl_pos) + ((int) m_ctrl_pos % getInfo().block_size);
 	    
 	    m_scaler.setRate(factor);
+	    
 	    m_buffer.writeScaler(m_inbuf, nread, m_scaler);
 	    //m_buffer.write(m_inbuf, nread);
 	    

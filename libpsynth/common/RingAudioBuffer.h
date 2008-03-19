@@ -123,8 +123,10 @@ public:
     }
     
     ReadPtr begin() const {
-	return ReadPtr(m_writepos, m_writecount - m_size < 0 ?
-		       m_writecount - m_size : 0);
+	return ReadPtr(m_writepos,
+		       m_writecount - m_size < 0 ?
+		       0 :
+		       m_writecount - m_size);
     };
 	
     ReadPtr end() const {

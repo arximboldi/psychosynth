@@ -83,7 +83,7 @@ const PatcherData PATCHER_TABLE[N_OBJECTS][N_OBJECTS] =
 	{Object::LINK_CONTROL, ObjectControlMixer::OUT_C_OUTPUT, ObjectOscillator::IN_C_FREQUENCY},/* ObjectAudioOscillator */
 	{Object::LINK_CONTROL, ObjectControlMixer::OUT_C_OUTPUT, ObjectOscillator::IN_C_FREQUENCY}, /* ObjectLFO */
 	{Object::LINK_CONTROL, ObjectControlMixer::OUT_C_OUTPUT, ObjectFilter::IN_C_CUTOFF}, /* ObjectFilter */
-	{Object::LINK_CONTROL, ObjectControlMixer::OUT_C_OUTPUT, ObjectSampler::IN_C_PITCH} /* ObjectSampler */
+	{Object::LINK_CONTROL, ObjectControlMixer::OUT_C_OUTPUT, ObjectSampler::IN_C_RATE} /* ObjectSampler */
     },
     
     /* ObjectAudioOscillator */
@@ -105,7 +105,7 @@ const PatcherData PATCHER_TABLE[N_OBJECTS][N_OBJECTS] =
 	{Object::LINK_CONTROL, ObjectLFO::OUT_C_OUTPUT, ObjectOscillator::IN_C_FREQUENCY}, /* ObjectAudioOscillator */
 	{Object::LINK_CONTROL, ObjectLFO::OUT_C_OUTPUT, ObjectOscillator::IN_C_FREQUENCY}, /* ObjectLFO */
 	{Object::LINK_CONTROL, ObjectLFO::OUT_C_OUTPUT, ObjectFilter::IN_C_CUTOFF},  /* ObjectFilter */
-	{Object::LINK_CONTROL, ObjectLFO::OUT_C_OUTPUT, ObjectSampler::IN_C_PITCH} /* ObjectSampler */
+	{Object::LINK_CONTROL, ObjectLFO::OUT_C_OUTPUT, ObjectSampler::IN_C_RATE} /* ObjectSampler */
     },
 
     /* ObjectFilter */

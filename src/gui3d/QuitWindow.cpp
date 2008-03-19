@@ -44,6 +44,7 @@ FrameWindow* QuitWindow::createWindow()
     label->setPosition(UVector2(UDim(0.1, 0), UDim(0, 35)));
     label->setSize(UVector2(UDim(0.8, 0), UDim(0, 20)));
     label->setText("Do you really want to quit?");
+    label->setProperty("HorzFormatting", "WordWrapLeftAligned");
     
     Window *button_quit = wmgr.createWindow("TaharezLook/Button");
     button_quit->setText("Yes...");

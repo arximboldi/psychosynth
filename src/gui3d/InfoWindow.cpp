@@ -131,7 +131,6 @@ CEGUI::FrameWindow* InfoWindow::createWindow()
     slogan->setPosition(UVector2(UDim(0.5, -logoimg->getImageWidth("the_logo")/2),
 				 UDim(0, logoimg->getImageHeight("the_logo") + 26)));
     slogan->setSize(UVector2(UDim(0, logoimg->getImageWidth("the_logo")), UDim(0, 20)));
-    slogan->setProperty("FrameEnabled", "False");
     slogan->setProperty("BackgroundEnabled", "false");
     slogan->setText("Psychosynth "  VERSION);
 

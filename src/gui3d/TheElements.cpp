@@ -240,8 +240,8 @@ ElementSampler::ElementSampler(TableObject& obj,
     
     addComponent(new ElemMainComponent(
 		     string(mesh_name), 
-		     ObjectSampler::PARAM_PITCH,
-		     -2.0f, 2.0f));
+		     ObjectSampler::PARAM_RATE,
+		     -3.0f, 3.0f));
     
     addComponent(new ElemSecondComponent(
 		     ObjectSampler::PARAM_AMPLITUDE,
@@ -254,7 +254,15 @@ ElementSampler::ElementSampler(TableObject& obj,
 					"Amplitude"));
     
     getGUIProperties().addParameter(new ElemGuiParamFloat(
+					ObjectSampler::PARAM_RATE,
+					-3.0f, 3.0f,
+					"Rate"));
+    getGUIProperties().addParameter(new ElemGuiParamFloat(
+					ObjectSampler::PARAM_TEMPO,
+					0.2f, 3.0f,
+					"Tempo"));
+    getGUIProperties().addParameter(new ElemGuiParamFloat(
 					ObjectSampler::PARAM_PITCH,
-					-2.0f, 2.0f,
+					0.2f, 3.0f,
 					"Pitch"));
 }

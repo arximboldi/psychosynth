@@ -125,9 +125,9 @@ void ElemGuiParamFloat::createGUI()
     m_spinner->setMaximumValue(m_max_val);
     m_spinner->setMinimumValue(m_min_val);
     m_spinner->setTextInputMode(Spinner::FloatingPoint);
-    /*m_spinner->subscribeEvent(Spinner::EventValueChanged, 
+    m_spinner->subscribeEvent(Spinner::EventValueChanged, 
 			      Event::Subscriber(&ElemGuiParamFloat::onSpinnerChange, this));
-    */
+    
     float value;
     getParent()->getObject().getParam(getParam(), value);
     m_skip++;

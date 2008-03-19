@@ -153,7 +153,7 @@ void DefaultSelectorPopulator::populate(const std::string& data_path,
 	    !strcmp_i(ext, "au") ||
 	    !strcmp_i(ext, "ogg")) {
 	    creat.setParam("file", *it);
-	    cout << "set_param: " << *it << endl;
+	    //cout << "set_param: " << *it << endl;
 	    cat->addButton(basename(it->c_str()), creat);
 	}
     }
