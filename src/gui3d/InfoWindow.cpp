@@ -83,7 +83,7 @@ static const char* COMPILE_OPTIONS_TEXT =
     "";
 
 static const char* CREDITS_TEXT =
-    "This program was done with care and effort by all these people. We hope you liked it :-)";
+    "This program was done with care and effort by everyone listed bellow. We hope you liked it :-)";
 
 static const char* CREDITS_LIST_TEXT =
     "[ Project leader ]\n"
