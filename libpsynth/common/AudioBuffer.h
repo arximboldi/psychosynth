@@ -66,7 +66,7 @@ public:
     void interleaveS16(short int* dest, size_t n_frames) const;
     void interleaveI32(int* dest, size_t n_frames) const;
 
-    void deinterleave(const Sample* src, size_t n_frames);
+    void deinterleave(const Sample* src, size_t n_frames, int num_chan);
     void deinterleaveC8(const char* src, size_t n_frames);
     void deinterleaveS16(const short int* src, size_t n_frames);
     void deinterleaveI32(const int* src, size_t n_frames);
@@ -119,6 +119,17 @@ public:
 	    m_info.num_channels != info.num_channels) {
 	    liberate();
 	    m_info = info;
+	    allocate();
+	} else
+	    m_info = info;	    
+    }
+
+    void setInfo(const AudioInfo& info, int size) {
+	if (m_info.block_size != size ||
+	    m_info.num_channels != info.num_channels) {
+	    liberate();
+	    m_info = info;
+	    m_info.block_size = size;
 	    allocate();
 	} else
 	    m_info = info;	    

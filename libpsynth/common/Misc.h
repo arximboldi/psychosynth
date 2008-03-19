@@ -54,7 +54,8 @@ inline T linearInterp(T val, T next, T delta)
 char* itoa(int val, int base);
 char* ftoa(double f, double sigfigs);
 int strcmp_i(const char* a, const char* b);
-std::string str_dirname(std::string str);
+std::string dirnameStr(std::string str);
+std::string basenameStr(std::string str);
 const char* getExtension(const char* file);
 
 } /* namespace psynth */

@@ -65,7 +65,9 @@ int FileReaderWave::read(AudioBuffer& outbuf, int n_samples)
     float buf [n_samples * getInfo().num_channels];
     
     n_read = sf_readf_float(m_file, buf, n_samples);
-    outbuf.deinterleave(buf, n_read);
+
+    if (n_read)
+	outbuf.deinterleave(buf, n_read, getInfo().num_channels);
     
     return n_read;
 }

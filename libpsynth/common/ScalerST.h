@@ -39,6 +39,10 @@ class ScalerST : public Scaler
     soundtouch::SoundTouch m_st;
     
 public:
+    ScalerST() {
+	m_st.clear();
+    }
+    
     void setTempo(float tempo) {
 	m_tempo = tempo;
 	m_st.setTempo(tempo);

@@ -74,6 +74,7 @@ void ObjectSampler::onFileChange(ObjParam& par)
 
     m_reader.open(val.c_str());
 
+//    m_inbuf.setInfo(m_reader.getInfo(), getInfo().block_size);
     m_scaler.setSampleRate(m_reader.getInfo().sample_rate);
     
     m_update_lock.unlock();
@@ -89,7 +90,7 @@ void ObjectSampler::doUpdate(const Object* caller, int caller_port_type, int cal
 	pitch_buf = pitch->getData();
     
     float factor =
-	(float) getInfo().sample_rate / m_reader.getInfo().sample_rate * m_param_pitch;
+	(float) m_reader.getInfo().sample_rate / getInfo().sample_rate * m_param_pitch;
 
     int must_read;
     int nread;
@@ -104,10 +105,13 @@ void ObjectSampler::doUpdate(const Object* caller, int caller_port_type, int cal
 
 	    m_update_lock.lock();
 	    nread = m_reader.read(m_inbuf, must_read);
-	    	    
-	    if (nread < must_read)
-		m_reader.seek(0);
 
+	    if (nread == 0) {
+		m_reader.seek(0);
+		m_update_lock.unlock();
+		continue;
+	    }
+	    
 	    if (pitch)
 		m_scaler.setRate(factor + factor * pitch_buf[(int) pos]);
 	    else

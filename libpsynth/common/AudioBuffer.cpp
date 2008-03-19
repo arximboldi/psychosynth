@@ -20,11 +20,14 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <algorithm>
 #include "common/AudioBuffer.h"
 
 #define INT_MAX_VALUE_F    2147483647.0
 #define SHORT_MAX_VALUE_F  32766.0
 #define CHAR_MAX_VALUE_F    128.0
+
+using namespace std;
 
 namespace psynth
 {
@@ -125,7 +128,7 @@ void AudioBuffer::interleaveI32(int* dest, size_t n_frames) const
     int* out_buf;
     const Sample* in_buf;
     Sample r;
-    
+
     for (i = 0; i < m_info.num_channels; ++i) {
 	in_buf = m_data[i];
 	out_buf = dest + i;
@@ -140,19 +143,31 @@ void AudioBuffer::interleaveI32(int* dest, size_t n_frames) const
     }
 }
 
-void AudioBuffer::deinterleave(const Sample* src, size_t n_frames)
+void AudioBuffer::deinterleave(const Sample* src, size_t n_frames, int num_chan)
 {
     size_t i, j;
     Sample* out_buf;
     const Sample* in_buf;
 
-    for (i = 0; i < m_info.num_channels; ++i) {
+    num_chan = min(m_info.num_channels, num_chan);
+    
+    for (i = 0; i < num_chan; ++i) {
 	out_buf = m_data[i];
 	in_buf = src + i;
 
 	for (j = 0; j < n_frames; ++j) {
 	    *out_buf++ = *in_buf;
-	    in_buf += m_info.num_channels;
+	    in_buf += num_chan;
+	}
+    }
+
+    for (; i < m_info.num_channels; ++i) {
+	out_buf = m_data[i];
+	in_buf = m_data[i - num_chan];
+
+	for (j = 0; j < n_frames; ++j) {
+	    *out_buf++ = *in_buf;
+	    in_buf += num_chan;
 	}
     }
 }
