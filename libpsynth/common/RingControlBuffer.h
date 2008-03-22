@@ -24,36 +24,19 @@
 #define PSYNTH_RINGCONTROLBUFFER
 
 #include <libpsynth/common/ControlBuffer.h>
+#include <libpsynth/common/RingBuffer.h>
 
 namespace psynth
 {
 
-class RingControlBuffer
+/**
+ * A ring buffer for control data.
+ * @see ControlBuffer.
+ */
+class RingControlBuffer : public RingBuffer
 {
-public:
-    class ReadPtr {
-	friend class RingControlBuffer;
-		
-	int m_pos;
-	int m_count;
-    public:
-	ReadPtr(int pos = 0, int count = 0) :
-	    m_pos(pos),
-	    m_count(count) {}
-    };
-
-    enum {
-	ERR_NONE,
-	ERR_UNDERRUN,
-	ERR_OVERRUN,
-	ERR_CODES
-    };
-	
 private:
     Sample* m_data;
-    int m_size;
-    int m_writepos;
-    int m_writecount;
     float m_fr_count;
 
     void allocate();
@@ -63,65 +46,90 @@ private:
     }
 
 public:
+    /** Constructor. */
     RingControlBuffer();
-	
+
+    /**
+     * Constructor.
+     * @param size Size of the ring buffer.
+     */
     RingControlBuffer(int size);
-	
+
+    /** Copy constructor. */
     RingControlBuffer(const RingControlBuffer& buf);
-	
+
+    /** Destructor. */
     ~RingControlBuffer() {
 	liberate();
     }
-	
-    RingControlBuffer& operator= (RingControlBuffer& buf);
-	    
-    int size() const {
-	return m_size;
-    }
 
+    /** Assignment operator. */
+    RingControlBuffer& operator= (RingControlBuffer& buf);
+
+    /**
+     * Changes the size of the ring buffer destroying any previous data.
+     * @param new_size The new size of the buffer.
+     */
     void resize(int new_size) {
 	liberate();
 	m_size = new_size;
 	allocate();
     }
-    
-    ReadPtr begin() const {
-	return ReadPtr(m_writepos, m_writecount - m_size < 0 ?
-		       m_writecount - m_size : 0);
-    };
-	
-    ReadPtr end() const {
-	return ReadPtr(m_writepos, m_writecount);
-    };
-	
-    int availible(const ReadPtr& r) const {
-	return m_writecount - r.m_count;
-    }
-	
-    int error(const ReadPtr& reader) const {
-	if (reader.m_pos + m_size < m_writepos) return ERR_UNDERRUN;
-	if (reader.m_count > m_writecount) return ERR_OVERRUN;
-	return ERR_NONE;
-    }
-	
+
+    /**
+     * Fills a ControlBuffer with data from the ring buffer.
+     * @param r The reader pointer.
+     * @param buf The buffer to fill with the data.
+     */
     int read(ReadPtr& r, ControlBuffer& buf) const {
 	return read(r, buf, buf.size());
     };
-	
+
+    /**
+     * Fills a ControlBuffer with data from the ring buffer.
+     * @param r The reader pointer.
+     * @param buf The buffer to fill with the data.
+     * @param samples The number of samples to read.
+     */
     int read(ReadPtr& r, ControlBuffer& buf, int samples) const;
-	
+
+    /**
+     * Write all the data in a ControlBuffer to the ring buffer.
+     * @param buf The buffer to write.
+     */
     void write(const ControlBuffer& buf) {
 	write(buf, buf.size());
     }
-	
+
+    /**
+     * Write some data in a ControlBuffer to the ring buffer.
+     * @param buf The buffer to write.
+     * @param samples The number of samples to write.
+     */
     void write(const ControlBuffer& buf, int samples);
 
+    /**
+     * Write all the data from a ControlBuffer in the ring buffer applying
+     * some resampling to it.
+     * @param buf The buffer to write.
+     * @param factor The resampling factor: old_sample_rate / new_sample_rate.
+     */
     void writeFastResample(const ControlBuffer& buf, float factor) {
 	writeFastResample(buf, buf.size(), factor);
     }
-    
+
+    /**
+     * Write all the data from a ControlBuffer in the ring buffer applying
+     * some resampling to it.
+     * @param buf The buffer to write.
+     * @param samples Number of samples from the original buffer to write.
+     * @param factor The resampling factor: old_sample_rate / new_sample_rate.
+     */
     void writeFastResample(const ControlBuffer& buf, int samples, float factor);
 
+    /**
+     * Sets to zero all the contents of the buffer.
+     */
     void zero() {
 	memset(m_data, 0, m_size * sizeof(Sample));
     }

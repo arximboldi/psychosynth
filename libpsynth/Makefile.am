@@ -57,6 +57,7 @@ nobase_libpsynthinc_HEADERS = \
 	common/ControlBuffer.h\
 	common/FastDelegate.h\
 	common/FastDelegateBind.h\
+	common/RingBuffer.h\
 	common/RingAudioBuffer.h \
 	common/RingControlBuffer.h \
 	common/AudioInfo.h \

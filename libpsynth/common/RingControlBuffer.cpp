@@ -39,28 +39,21 @@ void RingControlBuffer::allocate()
 
 RingControlBuffer::RingControlBuffer() :
     m_data(NULL),
-    m_size(0),
-    m_writepos(0),
-    m_writecount(0),
     m_fr_count(0)
 {
 };
 
 RingControlBuffer::RingControlBuffer(int size) :
+    RingBuffer(size),
     m_data(NULL),
-    m_size(size),
-    m_writepos(0),
-    m_writecount(0),
     m_fr_count(0)
 {
     allocate();
 };
 
 RingControlBuffer::RingControlBuffer(const RingControlBuffer& buf) :
+    RingBuffer(buf),
     m_data(NULL),
-    m_size(buf.m_size),
-    m_writepos(buf.m_writepos),
-    m_writecount(buf.m_writecount),
     m_fr_count(0)
 {
     allocate();
@@ -86,17 +79,16 @@ int RingControlBuffer::read(ReadPtr& r, ControlBuffer& buf, int samples) const
 {
     int nread = min(availible(r), samples);
 	
-    if (r.m_pos + nread > m_size) {
-	memcpy(buf.getData(), m_data + r.m_pos,
-	       sizeof(Sample) * (m_size - r.m_pos));
-	memcpy(buf.getData() + m_size - r.m_pos, m_data,
-	       sizeof(Sample) * (r.m_pos + nread - m_size));
+    if (position(r) + nread > m_size) {
+	memcpy(buf.getData(), m_data + position(r),
+	       sizeof(Sample) * (m_size - position(r)));
+	memcpy(buf.getData() + m_size - position(r), m_data,
+	       sizeof(Sample) * (position(r) + nread - m_size));
     } else {
-	memcpy(buf.getData(), m_data + r.m_pos, sizeof(Sample) * nread);
+	memcpy(buf.getData(), m_data + position(r), sizeof(Sample) * nread);
     }
 	
-    r.m_pos = (r.m_pos + nread) % m_size;
-    r.m_count += nread;
+    advance(r, nread);
 	
     return nread;
 }
@@ -118,8 +110,7 @@ void RingControlBuffer::write(const ControlBuffer& buf, int nwrite)
 	memcpy(m_data + m_writepos, buf.getData() + offset, sizeof(Sample) * nwrite);
     }
 	
-    m_writepos = (m_writepos + nwrite) % m_size;
-    m_writecount += nwrite;
+    advance(nwrite);
 }
 
 void RingControlBuffer::writeFastResample(const ControlBuffer& buf, int samples, float factor)

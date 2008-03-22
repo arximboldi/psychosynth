@@ -25,39 +25,25 @@
 
 #include <libpsynth/common/AudioInfo.h>
 #include <libpsynth/common/AudioBuffer.h>
+#include <libpsynth/common/RingBuffer.h>
 
 namespace psynth
 {
 
 class Scaler;
 
-class RingAudioBuffer
+/**
+ * A ring buffer of audio data. In contrast with an AudioBuffer, the size of the
+ * buffer does not need to match the AudioInfo @c block_size.
+ * @see AudioBuffer.
+ */
+class RingAudioBuffer : public RingBuffer
 {
 public:
-    class ReadPtr {
-	friend class RingAudioBuffer;
-		
-	int m_pos;
-	int m_count;
-    public:
-	ReadPtr(int pos = 0, int count = 0) :
-	    m_pos(pos),
-	    m_count(count) {}
-    };
-
-    enum {
-	ERR_NONE,
-	ERR_UNDERRUN,
-	ERR_OVERRUN,
-	ERR_CODES
-    };
 	
 private:
     AudioInfo m_info;
     Sample** m_data;
-    int m_size;
-    int m_writepos;
-    int m_writecount;
 
     float m_fr_count;
     float m_prev_val;
@@ -72,26 +58,50 @@ private:
     }
 
 public:
+    /** Constructor. */
     RingAudioBuffer();
 
+    /**
+     * Constructor.
+     * @param size Size of the buffer.
+     */
     RingAudioBuffer(int size);
-    
+
+    /**
+     * Constructor.
+     * @param info Audio info of the data contained.
+     */
     RingAudioBuffer(const AudioInfo& info);
-	
+
+    /**
+     * Constructor.
+     * @param info of the contained data.
+     */
     RingAudioBuffer(const AudioInfo& info, int size);
-	
+
+    /** Copy constructor. */
     RingAudioBuffer(const RingAudioBuffer& buf);
-	
+
+    /** Destructor. */
     ~RingAudioBuffer() {
 	liberate();
     }
-	
+
+    /** Assignment operator. */
     RingAudioBuffer& operator= (RingAudioBuffer& buf);
-	
+
+    /**
+     * Returns the AudioInfo of the data contained in the buffer.
+     */
     const AudioInfo& getAudioInfo() const {
 	return m_info;
     }
 
+    /**
+     * Changes the AudioInfo of the data contained in the buffer. If the
+     * number of channels changes the data is destroyed on the resize.
+     * @param info The new AudioInfo of the buffer.
+     */
     void setAudioInfo(const AudioInfo& info) {
 	if (info.num_channels != m_info.num_channels) {
 	    liberate();
@@ -101,6 +111,12 @@ public:
 	    m_info = info;
     }
 
+    /**
+     * Changes the AudioInfo of the data contained in the buffer and
+     * the size of the buffer. The buffer data is destroyed.
+     * @param info The new AudioInfo of the buffer.
+     * @param new_size The new size of the buffer.
+     */
     void setAudioInfo(const AudioInfo& info, int new_size) {
 	if (info.num_channels != m_info.num_channels
 	    || m_size != new_size) {
@@ -111,64 +127,95 @@ public:
 	} else
 	    m_info = info;
     }
-    
-    int size() const {
-	return m_size;
-    }
 
+    /**
+     * Changes the buffer size.
+     * @param new_size The new size of the buffer.
+     */
     void resize(int new_size) {
 	liberate();
 	m_size = new_size;
 	allocate();
     }
-    
-    ReadPtr begin() const {
-	return ReadPtr(m_writepos,
-		       m_writecount - m_size < 0 ?
-		       0 :
-		       m_writecount - m_size);
-    };
-	
-    ReadPtr end() const {
-	return ReadPtr(m_writepos, m_writecount);
-    };
-	
-    int availible(const ReadPtr& r) const {
-	return m_writecount - r.m_count;
-    }
-	
-    int error(const ReadPtr& reader) const {
-	if (reader.m_pos + m_size < m_writepos) return ERR_UNDERRUN;
-	if (reader.m_count > m_writecount) return ERR_OVERRUN;
-	return ERR_NONE;
-    }
-	
+
+    /**
+     * Fills an AudioBuffer with data from the ring buffer.
+     * @param r The position where we want to start reading.
+     * @param buf The buffer to fill.
+     */
     int read(ReadPtr& r, AudioBuffer& buf) const {
 	return read(r, buf, buf.size());
     };
-	
+
+    /**
+     * Fills an AudioBuffer with data from the ring buffer.
+     * @param r The position where we want to start reading.
+     * @param buf The buffer to fill.
+     * @param samples The number of samples to write.
+     */
     int read(ReadPtr& r, AudioBuffer& buf, int samples) const;
 
+    /**
+     * Writes data comming in interleaved format into the ring buffer.
+     * @param buf The buffer with the interleaved data.
+     * @param samples The number of samples to write.
+     */
     void deinterleave(const Sample* buf, int samples);
-    
+
+    /**
+     * Writes all the data contained in a AudioBuffer into the ring buffer.
+     * @param buf The buffer with the data to write.
+     */
     void write(const AudioBuffer& buf) {
 	write(buf, buf.size());
     }
 
+    /**
+     * Writes some data contained in a AudioBuffer into the ring buffer.
+     * @param buf The buffer with the data to write.
+     * @param samples The number of samples to write.
+     */
+    void write(const AudioBuffer& buf, int samples);
+
+    /**
+     * Writes all the data contained in a AudioBuffer into the ring buffer,
+     * passing it through a scaler first.
+     * @param buf The buffer with the data to write.
+     * @param scaler The Scaler to apply to the data.
+     */
     void writeScaler(const AudioBuffer& buf, Scaler& scaler) {
 	writeScaler(buf, buf.size(), scaler);
     }
-    
+
+    /**
+     * Writes some data contained in a AudioBuffer into the ring buffer,
+     * passing it through a scaler first.
+     * @param buf The buffer with the data to write.
+     * @param buf The number of samples from the original buffer to write.
+     * @param scaler The Scaler to apply to the data.
+     */
     void writeScaler(const AudioBuffer& buf, int samples, Scaler& scaler);
-    
+
+    /**
+     * Writes the data in the AudioBuffer applying some fast resampling to it.
+     * @param buf The buffer with the data.
+     * @param factor The resampling factor: original_sample_rate / new_sample_rate.
+     */
     void writeFastResample(const AudioBuffer& buf, float factor) {
 	writeFastResample(buf, buf.size(), factor);
     }
-    
-    void writeFastResample(const AudioBuffer& buf, int samples, float factor);
-    
-    void write(const AudioBuffer& buf, int samples);
 
+    /**
+     * Writes the data in the AudioBuffer applying some fast resampling to it.
+     * @param buf The buffer with the data.
+     * @param samples The number of samples from the original buffer to write.
+     * @param factor The resampling factor: original_sample_rate / new_sample_rate.
+     */
+    void writeFastResample(const AudioBuffer& buf, int samples, float factor);
+
+    /**
+     * Sets all the data in the buffer to zero.
+     */
     void zero() {
 	if (m_data)
 	    memset(*m_data, 0, sizeof(Sample) * m_size * m_info.num_channels);

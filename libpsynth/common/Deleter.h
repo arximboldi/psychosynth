@@ -26,6 +26,10 @@
 namespace psynth
 {
 
+/**
+ * Functor for the delete operator, usefull to clear pointer containers with
+ * for_each.
+ */
 template<class PtrT>
 class Deleter
 {

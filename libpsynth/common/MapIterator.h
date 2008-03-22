@@ -29,55 +29,73 @@ namespace psynth
 {
 
 /**
- * @class MapIterator
- *
- * This class acts as interface to a map<a,b>::iterator. It just changes the
- * opearator* behaviour, which now returns a pointer to type Data
+ * This class acts as wrapper to a map::iterator. It just changes the
+ * opearator* behaviour, which now returns a pointer to the contained value
+ * hidding the user the value key.
  */
 template <typename Key, typename Data>
 class MapIterator : public std::map<Key, Data>::iterator
 {
 public:
+    /** Constructor. */
     MapIterator()
 	{}
-    
+
+    /** Constructor from a map::iterator. */
     MapIterator (const typename std::map<Key, Data>::iterator& i) :
 	std::map<Key, Data>::iterator(i) {}
 
+    /** Copy constructor. */
     MapIterator (const MapIterator<Key, Data>& i) :
 	std::map<Key, Data>::iterator(static_cast<const typename std::map<Key, Data>::iterator>(i))
 	{}
 
+    /**
+     * Indirection operator, returns a reference to the referred value.
+     */
     Data& operator*() {
 	return std::map<Key, Data>::iterator::operator*().second;
     }
 
+    /**
+     * Const indirection operator, returns a constant reference to the
+     * referred value.
+     */
     const Data& operator*() const {
 	return std::map<Key, Data>::iterator::operator*().second;
     }
 };
 
 /**
- * @class MapIterator
- *
- * This class acts as interface to a map<a,b>::iterator. It just changes the
- * opearator* behaviour, which now returns a pointer to type Data
+ * This class acts as wrapper to a @c map::const_iterator. It just changes the
+ * opearator* behaviour, which now returns a pointer to the contained value
+ * hidding the user the value key. Just a @c const version of @c MapIterator
+ * to hold constant data.
  */
 template <typename Key, typename Data>
 class MapConstIterator : public std::map<Key, Data>::const_iterator
 {
 public:
+    /** Constructor from a @c map::const_iterator */
     MapConstIterator (const typename std::map<Key, Data>::const_iterator& i) :
 	std::map<Key, Data>::const_iterator(i) {}
 
+    /** Copy constructor. */
     MapConstIterator (const MapConstIterator<Key, Data>& i) :
 	std::map<Key, Data>::const_iterator(static_cast<const typename std::map<Key, Data>::const_iterator>(i))
 	{}
 
+    /**
+     * Indirection operator, returns a reference to the referred value.
+     */
     const Data& operator*() {
 	return std::map<Key, Data>::const_iterator::operator*().second;
     }
 
+    /**
+     * Const indirection operator, returns a constant reference to the
+     * referred value.
+     */
     const Data& operator*() const {
 	return std::map<Key, Data>::const_iterator::operator*().second;
     }

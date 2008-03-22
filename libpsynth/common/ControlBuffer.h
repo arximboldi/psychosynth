@@ -24,11 +24,17 @@
 #define PSYNTH_CONTROLBUFFER_H
 
 #include <cstring>
+
 #include <libpsynth/common/AudioInfo.h>
 
 namespace psynth
 {
 
+/**
+ * A buffer for control data. It holds only one channel of scalar samples
+ * and contains no information about sampling rate or other audio signal related
+ * information, in contrast with @c AudioBuffer.
+ */
 class ControlBuffer
 {
     Sample* m_data;
@@ -45,26 +51,31 @@ class ControlBuffer
     }
     
 public:
+    /** Constructor. */
     ControlBuffer() :
 	m_data(NULL),
 	m_size(0)
 	{}
 
+    /** Destructor. */
     ControlBuffer(size_t size) :
 	m_size(size) {
 	allocate();
     }
 
+    /** Copy constructor. */
     ControlBuffer(const ControlBuffer& buf) :
 	m_size(buf.m_size) {
 	allocate();
 	memcpy(m_data, buf.m_data, sizeof(Sample) * m_size);
     }
 
+    /** Destructor. */
     ~ControlBuffer() {
 	liberate();
     }
-    
+
+    /** Assignment operator. */
     ControlBuffer& operator=(const ControlBuffer& buf) {
 	if (&buf != this) {
 	    liberate();
@@ -74,32 +85,56 @@ public:
 	}
 	return *this;
     }
-    
+
+    /**
+     * Returns a reference to a sample contained in the buffer.
+     * @param i Index to the sample we want.
+     */
     Sample& operator[] (size_t i) {
 	return m_data[i];
     }
 
+    /**
+     * Returns a constant reference to a sample contained in the buffer.
+     * @param i Index to the sample we want.
+     */
     const Sample& operator[] (size_t i) const {
 	return m_data[i];
     }
 
+    /**
+     * Returns a pointer to the raw data of the buffer.
+     */
     Sample* getData() {
 	return m_data;
     }
 
+    /**
+     * Returns a constant pointer to the raw data of the buffer.
+     */
     const Sample* getData() const {
 	return m_data;
     }
-    
+
+    /**
+     * Free all the data in the buffer setting its size to 0.
+     */
     void clear() {
 	liberate();
 	m_size = 0;
     }
 
+    /**
+     * Returns the current size of the buffer.
+     */
     size_t size() const {
 	return m_size;
     }
 
+    /**
+     * Gives the buffer a new size.
+     * @param newsize The new size of the buffer.
+     */
     void resize(size_t newsize) {
 	liberate();
 	m_size = newsize;

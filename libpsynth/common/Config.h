@@ -217,7 +217,9 @@ public:
 };
 
 /**
- * A configuration node.
+ * A configuration node. It stores a value of any type in @c ConfType. It has
+ * some childs identifyed by its name crating a whole hierarchy that allows
+ * a better organization of the values and the information.
  */
 class ConfNode : public ConfSubject
 {
@@ -357,7 +359,7 @@ public:
     }
 
     /**
-     * Sets the name and the parent of the config node.
+     * Initializes by setting the name and the parent of the config node.
      * @param name The name of the config node.
      * @param parent The paren of this config node.
      */
@@ -448,7 +450,8 @@ public:
     }
 
     /**
-     * Returns a reference to the child of this node mathing a name.
+     * Returns a reference to the child of this node mathing a name. The child
+     * is created if it does not exist yet.
      * @param name The name of the child.
      */
     ConfNode& getChild(const std::string& name) {
@@ -461,7 +464,8 @@ public:
 
     /**
      * Returns a reference to the child matching a path. The path is constructed
-     * by separating consecutive childs by / like paths in filenames.
+     * by separating consecutive childs by / like paths in filenames. Any
+     * node in the path that does not exist yet is created.
      */
     ConfNode& getPath(std::string name);
 
