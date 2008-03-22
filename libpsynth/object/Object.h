@@ -36,7 +36,7 @@
 #include <libpsynth/common/Deleter.h>
 
 #include <libpsynth/object/ObjParam.h>
-#include <libpsynth/object/SimpleEnvelope.h>
+#include <libpsynth/object/EnvelopeSimple.h>
 #include <libpsynth/object/Watch.h>
 
 namespace psynth
@@ -182,8 +182,8 @@ private:
 
     std::vector<OutSocket> m_out_sockets[LINK_TYPES];
     std::vector<InSocketManual> m_in_sockets[LINK_TYPES];
-    std::vector<SimpleEnvelope> m_in_envelope[LINK_TYPES];
-    SimpleEnvelope m_out_envelope;
+    std::vector<EnvelopeSimple> m_in_envelope[LINK_TYPES];
+    EnvelopeSimple m_out_envelope;
     
     std::vector<ObjParam>  m_params;
     ObjParam m_null_param;
@@ -239,7 +239,7 @@ protected:
     void addParam(const std::string&, int type, void* val);
     void addParam(const std::string&, int type, void* val, ObjParam::Event ev);
 
-    SimpleEnvelope getInEnvelope(int type, int sock) {
+    EnvelopeSimple getInEnvelope(int type, int sock) {
 	return m_in_envelope[type][sock];
     }
 

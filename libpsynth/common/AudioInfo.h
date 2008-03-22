@@ -25,14 +25,20 @@
 
 namespace psynth {
 
+/**
+ * An audio Sample type.
+ */
 typedef float Sample;
 
+/**
+ * Basic information of an audio stream.
+ */
 struct AudioInfo
 {
-    int sample_rate;
-    int block_size;
-    int num_channels;
-		
+    int sample_rate;   /**< Sampling rate of the stream. */
+    int block_size;    /**< Size of processing buffers. */
+    int num_channels;  /**< Number of channels of the audio stream. */
+    
     AudioInfo(const AudioInfo& i) :
 	sample_rate(i.sample_rate), block_size(i.block_size), num_channels(i.num_channels) {}
 

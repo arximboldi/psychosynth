@@ -42,7 +42,7 @@ void ObjectLFO::doUpdate(const Object* caller, int caller_port_type, int caller_
     if (!mod) {
 	m_oscillator.update(out, getInfo().block_size);
     } else {
-	SimpleEnvelope mod_env = getInEnvelope(LINK_CONTROL, IN_C_FREQUENCY);
+	EnvelopeSimple mod_env = getInEnvelope(LINK_CONTROL, IN_C_FREQUENCY);
 	m_oscillator.update(out, mod, mod_env, getInfo().block_size);
     }
 }

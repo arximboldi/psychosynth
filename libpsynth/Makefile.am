@@ -88,7 +88,9 @@ nobase_libpsynthinc_HEADERS = \
 	object/Oscillator.h \
 	object/KnownObjects.h \
 	object/ObjParam.h\
-	object/SimpleEnvelope.h\
+	object/EnvelopeSimple.h\
+	object/EnvelopeMulti.h
+	object/Envelope.h\
 	object/Watch.h\
 	object/WatchViewer.h\
 	object/ObjectFactory.h\
@@ -132,6 +134,7 @@ libpsynth_la_SOURCES = \
 	object/Oscillator.cpp\
 	object/ObjParam.cpp\
 	object/ObjectFactoryManager.cpp\
+	object/EnvelopeMulti.cpp\
 	input/FileReaderAny.cpp
 
 if HAVE_SAMPLERATE

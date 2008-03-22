@@ -78,7 +78,7 @@ void Object::setEnvelopesDeltas()
     float fall_dt = -ENV_DELTA(m_audioinfo.sample_rate, ENV_FALL_SECONDS);
 
     for (i = 0; i < LINK_TYPES; ++i)
-	for (vector<SimpleEnvelope>::iterator it = m_in_envelope[i].begin();
+	for (vector<EnvelopeSimple>::iterator it = m_in_envelope[i].begin();
 	     it != m_in_envelope[i].end();
 	     ++it) {
 	    it->setDeltas(rise_dt, fall_dt);
@@ -225,7 +225,7 @@ void Object::updateEnvelopes()
     int i, j;
     
     for (i = 0; i < LINK_TYPES; ++i)
-	for (vector<SimpleEnvelope>::iterator it = m_in_envelope[i].begin();
+	for (vector<EnvelopeSimple>::iterator it = m_in_envelope[i].begin();
 	     it != m_in_envelope[i].end();
 	     ++it)
 	    it->update(m_audioinfo.block_size);
@@ -233,11 +233,11 @@ void Object::updateEnvelopes()
     /* Apply envelopes to output (for soft muting) */
     for (i = 0; i < m_outdata_audio.size(); ++i)
 	for (j = 0; j < m_audioinfo.num_channels; ++j) {
-	    SimpleEnvelope env = m_out_envelope;
+	    EnvelopeSimple env = m_out_envelope;
 	    env.update(m_outdata_audio[i][j], m_audioinfo.block_size);
 	}
     for (i = 0; i < m_outdata_control.size(); ++i) {
-	SimpleEnvelope env = m_out_envelope;
+	EnvelopeSimple env = m_out_envelope;
 	env.update(m_outdata_control[i].getData(), m_audioinfo.block_size);
     }
 

@@ -20,16 +20,18 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef PSYNTH_SIMPLEENVELOPE_H
-#define PSYNTH_SIMPLEENVELOPE_H
+#ifndef PSYNTH_ENVELOPESIMPLE_H
+#define PSYNTH_ENVELOPESIMPLE_H
 
-/**
- * Simplistic evenlope implementation to soften object connects/disconnects.
- */
+#include <libpsynth/object/Envelope.h>
+
 namespace psynth
 {
 
-class SimpleEnvelope
+/**
+ * Simplistic evenlope implementation with only two points.
+ */
+class EnvelopeSimple : public Envelope
 {
     float m_rise_dt;
     float m_fall_dt;
@@ -37,14 +39,14 @@ class SimpleEnvelope
     float m_val;
     
 public:
-    SimpleEnvelope() :
+    EnvelopeSimple() :
 	m_rise_dt(0.0f),
 	m_fall_dt(0.0f),
 	m_curr_dt(0.0f),
 	m_val(0.0f)
 	{}
     
-    SimpleEnvelope(float rise_dt, float fall_dt) :
+    EnvelopeSimple(float rise_dt, float fall_dt) :
 	m_rise_dt(rise_dt),
 	m_fall_dt(fall_dt),
 	m_curr_dt(0.0f),
@@ -76,7 +78,7 @@ public:
 	return val;
     }
 
-    float update(float* samples, int n_samples) {
+    void update(float* samples, int n_samples) {
 	while(n_samples--)
 	    *samples++ *= update();
     }
@@ -96,4 +98,4 @@ public:
 
 } /* namespace psynth */
 
-#endif /* PSYNTH_SIMPLEENVELOPE_H */
+#endif /* PSYNTH_ENVELOPESIMPLE_H */

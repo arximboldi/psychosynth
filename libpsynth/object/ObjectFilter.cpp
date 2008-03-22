@@ -75,12 +75,12 @@ void ObjectFilter::doUpdate(const Object* caller, int caller_port_type, int call
 	    Sample* outbuf = output->getChannel(i);
 	    const Sample* inbuf = input->getChannel(i);
 	    Filter& filter = m_filter[i];
-	    SimpleEnvelope env = getInEnvelope(LINK_AUDIO, i);
+	    EnvelopeSimple env = getInEnvelope(LINK_AUDIO, i);
 	    if (!cutoff)
 		for (size_t j = 0; j < output->size(); ++j)
 		    *outbuf++ = filter.update(*inbuf++ * env.update());
 	    else {
-		SimpleEnvelope mod_env = getInEnvelope(LINK_CONTROL,
+		EnvelopeSimple mod_env = getInEnvelope(LINK_CONTROL,
 						       IN_C_CUTOFF);
 		const Sample* cutoff_buf = cutoff->getData();
 		

@@ -22,7 +22,7 @@
 
 #include <iostream>
 #include <object/Oscillator.h>
-#include <object/SimpleEnvelope.h>
+#include <object/EnvelopeSimple.h>
 
 using namespace std;
 
@@ -56,7 +56,7 @@ void Oscillator::update(Sample* out_buf, size_t n_frames)
 }
 
 void Oscillator::updateFM(Sample* out_buf, const Sample* mod_buf,
-			  SimpleEnvelope& mod_env, size_t n_frames)
+			  EnvelopeSimple& mod_env, size_t n_frames)
 {
     for (size_t i = 0; i < n_frames; ++i) {
 	*out_buf++ = computeSample(m_x) * m_ampl;
@@ -67,7 +67,7 @@ void Oscillator::updateFM(Sample* out_buf, const Sample* mod_buf,
 }
 
 void Oscillator::updatePM(Sample* out_buf, const Sample* mod_buf,
-			  SimpleEnvelope& mod_env, size_t n_frames)
+			  EnvelopeSimple& mod_env, size_t n_frames)
 {
     float speed = m_freq / m_info.sample_rate;
     for (size_t i = 0; i < n_frames; ++i) {
@@ -79,7 +79,7 @@ void Oscillator::updatePM(Sample* out_buf, const Sample* mod_buf,
 }
 
 void Oscillator::updateAM(Sample* out_buf, const Sample* mod_buf,
-			  SimpleEnvelope& mod_env, size_t n_frames)
+			  EnvelopeSimple& mod_env, size_t n_frames)
 {
     float speed = m_freq / m_info.sample_rate;
     for (size_t i = 0; i < n_frames; ++i) {

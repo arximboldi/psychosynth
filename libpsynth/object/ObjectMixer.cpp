@@ -71,7 +71,7 @@ void ObjectMixer::mix(Sample* dest, const Sample* src,
 }
 
 void ObjectMixer::mix(Sample* dest, const Sample* src,
-		      SimpleEnvelope& env, size_t n_samples)
+		      EnvelopeSimple& env, size_t n_samples)
 {
     if (m_param_mixop == MIX_SUM)
 	while(n_samples--)
@@ -83,8 +83,8 @@ void ObjectMixer::mix(Sample* dest, const Sample* src,
   
 void ObjectMixer::mix(Sample* dest, const Sample* src,
 		      const Sample* ampl,
-		      SimpleEnvelope& env,
-		      SimpleEnvelope& ctrl_env,
+		      EnvelopeSimple& env,
+		      EnvelopeSimple& ctrl_env,
 		      size_t n_samples)
 {
     if (m_param_mixop == MIX_SUM)

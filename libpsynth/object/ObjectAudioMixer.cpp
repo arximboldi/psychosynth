@@ -39,12 +39,12 @@ void ObjectAudioMixer::doUpdate(const Object* caller, int caller_port_type, int 
 
 	for (j = 0; j < m_numchan; ++j)
 	    if ((in = getInput<AudioBuffer>(LINK_AUDIO, j))) {
-		SimpleEnvelope env = getInEnvelope(LINK_AUDIO, j);
+		EnvelopeSimple env = getInEnvelope(LINK_AUDIO, j);
 		if (!ampl)
 		    mix(buf->getChannel(i), in->getChannel(i),
 			env, getInfo().block_size);
 		else {
-		    SimpleEnvelope ctrl_env = getInEnvelope(LINK_CONTROL,
+		    EnvelopeSimple ctrl_env = getInEnvelope(LINK_CONTROL,
 							    IN_C_AMPLITUDE);
 		    mix(buf->getChannel(i), in->getChannel(i), ampl->getData(),
 			env, ctrl_env, getInfo().block_size);

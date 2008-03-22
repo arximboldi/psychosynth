@@ -27,4 +27,7 @@ SUBDIRS = libpsynth src data
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = libpsynth.pc
 
+.PHONY: doc
 
+doc:
+	\doxygen doc/Doxyfile

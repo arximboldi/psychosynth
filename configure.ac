@@ -24,7 +24,7 @@
 AC_INIT(configure.ac)
 
 AM_CONFIG_HEADER(config.h)
-AM_INIT_AUTOMAKE(psychosynth, 0.0.1)
+AM_INIT_AUTOMAKE(psychosynth, 0.0.2-svn)
 
 AC_LANG_CPLUSPLUS
 AC_PROG_CXX
@@ -337,6 +337,7 @@ AM_CONDITIONAL([BUILD_PSYNTH3D], [test "x$BUILD_PSYNTH3D" = xyes])
 
 AC_OUTPUT(libpsynth.pc
 	  Makefile
+	  doc/Doxyfile
 	  src/Makefile
 	  data/Makefile
 	  libpsynth/Makefile

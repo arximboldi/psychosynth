@@ -62,10 +62,10 @@ protected:
 	     const Sample* ampl, size_t n_samples);
 
     void mix(Sample* dest, const Sample* src,
-	     SimpleEnvelope& env, size_t n_samples);
+	     EnvelopeSimple& env, size_t n_samples);
 
     void mix(Sample* dest, const Sample* src, const Sample* ampl,
-	     SimpleEnvelope& env, SimpleEnvelope& ctrl_env,
+	     EnvelopeSimple& env, EnvelopeSimple& ctrl_env,
 	     size_t n_samples);
     
     void init(Sample* dest, size_t n_samples);

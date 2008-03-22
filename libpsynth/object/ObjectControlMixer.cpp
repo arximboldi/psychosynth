@@ -37,7 +37,7 @@ void ObjectControlMixer::doUpdate(const Object* caller, int caller_port_type, in
     
     for (j = 0; j < m_numchan; ++j)
 	if ((in = getInput<ControlBuffer>(LINK_CONTROL, j))) {
-	    SimpleEnvelope env = getInEnvelope(LINK_CONTROL, j);
+	    EnvelopeSimple env = getInEnvelope(LINK_CONTROL, j);
 	    mix(buf->getData(), in->getData(), env, getInfo().block_size);
 	}
 }

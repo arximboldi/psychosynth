@@ -34,7 +34,9 @@ namespace psynth
 {
 
 /**
- * XML configuration backend.
+ * XML configuration backend that stores the config to an XML file. This
+ * is not a live backend so it needs explicit calls on @c save and @c load
+ * on the @c ConfNode.
  */
 class ConfBackendXML : public ConfBackend
 {
@@ -53,30 +55,57 @@ class ConfBackendXML : public ConfBackend
     void expandValue(xmlTextWriterPtr writer, ConfNode& node);
 
 public:
+    /**
+     * Constructor.
+     * @param file The name of the file where to store and load
+     * the configuration.
+     */
     ConfBackendXML(const std::string& file) :
 	m_file(file)
 	{}
-    
+
+    /** Constructor */
     ~ConfBackendXML() {}
 
+    /**
+     * Changes the name of the file to use.
+     * @param file The new file name to use.
+     */
     void setFile(const std::string& file) {
 	m_file = file;
     }
 
+    /**
+     * Returns the name of the current filename.
+     */
     const std::string& getFile() {
 	return m_file;
     }
 
+    /** Called when attached to a node. Does nothing. */
     void attach(ConfNode& node) {};
+    /** Called when dattached from a node. Does nothing. */
     void datach(ConfNode& node) {};
-    
+
+    /**
+     * Permanently stores the configuration in the currently set file.
+     * @param node The configuration to store.
+     */
     void save(ConfNode& node);
-    
+
+    /**
+     * Loads the conentent of the XML file into a node.
+     * @param node The node where to store the config.
+     */
     void load(ConfNode& node) {
 	m_defaulty = false;
 	doLoad(node);
     }
 
+    /**
+     * Loads the content of the XML file into a node but preserving the node
+     * values that are already set.
+     */
     void defLoad(ConfNode& node) {
 	m_defaulty = true;
 	doLoad(node);
