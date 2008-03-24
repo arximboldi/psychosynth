@@ -32,12 +32,42 @@ namespace psynth
 class Envelope
 {
 public:
+
+    /**
+     * Updates the envelope for one sample.
+     * @return The value of the envelope.
+     */
     virtual float update() = 0;
-    virtual float update(float sample) = 0;
+
+    /**
+     * Updates the envelope for several samples.
+     * @param samples the number of samples to advance.
+     * @return The value of the envelope.
+     */
+    virtual float update(float samples) = 0;
+
+    /**
+     * Fills a buffer with samples from the envelope.
+     * @param samples The buffer to fill.
+     * @param n_samples The number of samples to fill.
+     */
     virtual void update(float* samples, int n_samples) = 0;
 
+    /**
+     * Start the envelope effect.
+     */
     virtual void press() = 0;
+
+    /**
+     * Start finishing the envelope.
+     */
     virtual void release() = 0;
+
+    /**
+     * Returns wether the envelope has finished.
+     * @return @c true if the envelope has finished and @c false otherwise.
+     */
+    virtual bool finished() = 0;
 };
 
 } /* namespace psynth */

@@ -84,6 +84,7 @@ nobase_libpsynthinc_HEADERS = \
 	object/ObjectAudioOscillator.h \
 	object/ObjectFilter.h \
 	object/ObjectSampler.h \
+	object/ObjectStepSeq.h \
 	object/Filter.h \
 	object/WaveTable.h \
 	object/Oscillator.h \
@@ -130,6 +131,7 @@ libpsynth_la_SOURCES = \
 	object/ObjectAudioOscillator.cpp \
 	object/ObjectFilter.cpp \
 	object/ObjectSampler.cpp \
+	object/ObjectStepSeq.cpp \
 	object/Filter.cpp \
 	object/WaveTable.cpp \
 	object/Oscillator.cpp\

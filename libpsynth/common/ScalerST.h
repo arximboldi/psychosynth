@@ -29,6 +29,11 @@
 namespace psynth
 {
 
+/**
+ * Scaler implementation using the SoundTouch library.
+ *
+ * @see Scaler
+ */
 class ScalerST : public Scaler
 {
     float m_tempo;
@@ -39,58 +44,106 @@ class ScalerST : public Scaler
     soundtouch::SoundTouch m_st;
     
 public:
+    /** Constructor. */
     ScalerST() {
 	m_st.clear();
     }
-    
+
+    /**
+     * Sets the tempo factor.
+     * @param tempo The new tempo factor.
+     */
     void setTempo(float tempo) {
 	m_tempo = tempo;
 	m_st.setTempo(tempo);
     }
-    
+
+    /**
+     * Sets the new sampling rate factor.
+     * @param rate The new rate factor.
+     */
     void setRate(float rate) {
 	m_rate = rate;
 	m_st.setRate(rate);
     }
-    
+
+    /**
+     * Sets the new pitch factor.
+     * @param pitch The new pitch factor.
+     */
     void setPitch(float pitch) {
 	m_pitch = pitch;
 	m_st.setPitch(pitch);
     }
-    
+
+    /**
+     * Sets the new number of channels.
+     * @param chan The new number of channels.
+     */
     void setChannels(int chan) {
 	m_chan = chan;
 	m_st.setChannels(chan);
     }
 
+    /**
+     * Sets the sample rate of the original signal.
+     * @param samplerate The sampling rate.
+     */
     void setSampleRate(int samplerate) {
 	m_st.setSampleRate(samplerate);
     }
-    
+
+    /**
+     * Returns the tempo scaling factor.
+     */
     float getTempo() {
 	return m_tempo;;
     }
-    
+
+    /**
+     * Returns the rate scaling factor.
+     */
     float getRate() {
 	return m_rate;
     }
-    
+
+    /**
+     * Returns the pitch scaling factor.
+     */
     float getPitch() {
 	return m_pitch;
     }
-    
+
+    /**
+     * Returns the number of channels of the scaler.
+     */
     int getChannels() {
 	return m_chan;
     }
-    
+
+    /**
+     * Returns the ammount of data availible in the scaler.
+     */
     int availible() {
 	return m_st.numSamples();
     }
-    
+
+    /**
+     * Pops some data already processed in the scaler.
+     * @param data The buffer to store the data. It will be stored in
+     * interleaved format.
+     * @param samples The maximum number of samples to receive.
+     * @return The actual number of samples received.
+     */
     int receive(float* data, int samples) {
 	m_st.receiveSamples(data, samples);
     }
-    
+
+    /**
+     * Push some data for scaling.
+     * @param data The buffer with the data to scale in interleaved format.
+     * @param samples The number of samples to push.
+     */
     void update(float* data, int samples) {
 	m_st.putSamples(data, samples);
     };

@@ -34,6 +34,7 @@ enum KnownObjectType {
     OBJ_LFO,
     OBJ_FILTER,
     OBJ_SAMPLER,
+    OBJ_STEPSEQ,
     N_OBJECTS
 };
 

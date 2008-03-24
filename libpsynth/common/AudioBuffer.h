@@ -126,7 +126,7 @@ public:
      * Fills this buffer with data comming from a buffer with interleaved
      * samples.
      * @param src The interleaved buffer.
-     * @param n_samples the number of samples to fill.
+     * @param n_frames the number of samples to fill.
      * @param num_chan The number of channels in the interleaved buffer.
      */
     void deinterleave(const Sample* src, size_t n_frames, int num_chan);
@@ -135,7 +135,7 @@ public:
      * Fills this buffer with data comming from a buffer with interleaved
      * @c char samples.
      * @param src The interleaved buffer.
-     * @param n_samples the number of samples to fill.
+     * @param n_frames the number of samples to fill.
      */
     void deinterleaveC8(const char* src, size_t n_frames);
 
@@ -143,7 +143,7 @@ public:
      * Fills this buffer with data comming from a buffer with interleaved
      * @c short int samples.
      * @param src The interleaved buffer.
-     * @param n_samples the number of samples to fill.
+     * @param n_frames the number of samples to fill.
      */
     void deinterleaveS16(const short int* src, size_t n_frames);
 
@@ -151,7 +151,7 @@ public:
      * Fills this buffer with data comming from a buffer with interleaved
      * @c int samples.
      * @param src The interleaved buffer.
-     * @param n_samples the number of samples to fill.
+     * @param n_frames the number of samples to fill.
      */
     void deinterleaveI32(const int* src, size_t n_frames);
 
