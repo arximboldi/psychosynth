@@ -140,6 +140,13 @@ public:
 	m_size = newsize;
 	allocate();
     }
+
+    /**
+     * Fills the whole buffer with value zero.
+     */
+    void zero() {
+	memset(m_data, 0, sizeof(Sample) * m_size);
+    }
 };
 
 } /* namespace psynth */

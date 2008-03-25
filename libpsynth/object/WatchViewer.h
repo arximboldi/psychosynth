@@ -53,6 +53,7 @@ public:
 	m_updated(false)
 	{
 	    m_ring.zero();
+	    m_buffer.zero();
 	}
     
     virtual void setInfo(const AudioInfo& info) {

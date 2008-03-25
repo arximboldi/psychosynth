@@ -32,14 +32,14 @@ namespace psynth
 {
 
 OutputAlsa::OutputAlsa() :
-    alsa_thread(this)
+    alsa_thread(*this)
 {
 }
 
 OutputAlsa::OutputAlsa(const AudioInfo& info, const std::string& device) :
     Output(info),
     alsa_device(device),
-    alsa_thread(this)
+    alsa_thread(*this)
 {
 }
 

@@ -41,7 +41,7 @@ class OutputAlsa : public Output, Runnable
     snd_pcm_format_t alsa_format;
     short int* m_buf;
     std::string alsa_device;
-    Thread<> alsa_thread;
+    Thread alsa_thread;
     
 public:
     OutputAlsa();

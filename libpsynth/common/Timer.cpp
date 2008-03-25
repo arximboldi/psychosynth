@@ -32,27 +32,27 @@ namespace psynth
 {
 
 Timer::Timer() :
-	nowticks(0),
-	sinceticks(0),
-	ms(0),
-	framecount(0),
+    nowticks(0),
+    sinceticks(0),
+    ms(0),
+    framecount(0),
     rate(-1),
-	rateticks(1)
+    rateticks(1)
 {
-	reset();
-	updateTicks();
+    reset();
+    updateTicks();
 };
 
 Timer::Timer(int fpsrate):
-	nowticks(0),
-	sinceticks(0),
-	ms(0),
-	framecount(0),
+    nowticks(0),
+    sinceticks(0),
+    ms(0),
+    framecount(0),
     rate(fpsrate),
     rateticks(1000.0/fpsrate)
 {
-	reset();
-	updateTicks();
+    reset();
+    updateTicks();
 };
 
 Timer::~Timer()
@@ -61,24 +61,24 @@ Timer::~Timer()
 	
 void Timer::forceFps(int fpsrate)
 {
-	framecount = 0;
-	rate = fpsrate;
-	rateticks = (1000.0 /rate);
+    framecount = 0;
+    rate = fpsrate;
+    rateticks = (1000.0 /rate);
 }
 	
 void Timer::reset()
 {
-	gettimeofday(&start, NULL);
+    gettimeofday(&start, NULL);
 }
 
 void Timer::update()
 {
-	int lastticks;
+    int lastticks;
     int targetticks;
     
     lastticks = nowticks;
     
-	updateTicks();
+    updateTicks();
 	
     if (rate > 0) {
         framecount++;
@@ -93,7 +93,7 @@ void Timer::update()
             sinceticks = nowticks;
         }
     } else {
-		updateTicks();
+	updateTicks();
     }
     
     ms = nowticks - lastticks;
@@ -101,8 +101,8 @@ void Timer::update()
 
 void Timer::updateTicks()
 {
-	gettimeofday(&now, NULL);
-	nowticks =
+    gettimeofday(&now, NULL);
+    nowticks =
         (now.tv_sec - start.tv_sec) * 1000 + (now.tv_usec -
                                               start.tv_usec) / 1000;
 }

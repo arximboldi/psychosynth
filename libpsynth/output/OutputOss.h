@@ -39,7 +39,7 @@ class OutputOss : public Output, Runnable
     short int* m_buf;
     std::string m_device;
 	
-    Thread<> m_thread;
+    Thread m_thread;
     
 public:
     OutputOss();

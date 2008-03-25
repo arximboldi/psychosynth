@@ -28,118 +28,149 @@
 namespace psynth
 {
 
-class Runnable {
+#include <libpsynth/common/FastDelegate.h>
+using namespace fastdelegate;
+
+/**
+ * Class with a @c run function..
+ *
+ * If you inherit from this class and attach it to a Thread the @c run()
+ * function will be run in a new thread. You can use it anyways for any
+ * other purpose where a virtual run function makes sense.
+ */
+class Runnable
+{
 public:
     virtual ~Runnable() {};
+
+    /**
+     * Function to be run in a thread.
+     */
     virtual void run() = 0;
 };
 
-#define CALL_MEMBER_FN(object, ptr_to_member)  ((object).*(ptr_to_member))
+/**
+ * A delegate callable in a thread.
+ */
+typedef FastDelegate0<void> ThreadDelegate;
 
-template <class Type = Runnable>
+/**
+ * A Thread is an objects to execute pieces of code concurrently allowing
+ * shared access to the process memory.
+ *
+ * You can attach to a thread a Runnable object or a ThreadDelegate. When you
+ * run @c start() the Runnable @c run() function or the function to which the
+ * ThreadDelegate points will be called in a new thread, this means that the
+ * normal flow of the code will contine but the function will run concurrently
+ * too.
+ *
+ * Mutex, RWMutex and Condition classes provide some synchronization methods
+ * to avoid race conditions in concurrent code.
+ */
 class Thread
 {
-public:
-    typedef void(Type::*FuncType)();
-
 private:    
     pthread_t m_thread;
-    Type* m_obj;
-    FuncType m_func;
+    ThreadDelegate m_delegate;
 
     static void* process(void* obj) {
-	Thread<Type>* m_this = reinterpret_cast<Thread<Type>*>(obj);
-	CALL_MEMBER_FN(m_this->m_obj, m_this->m_func);
+	Thread* the_this = reinterpret_cast<Thread*>(obj);
+	the_this->m_delegate();
+	
 	return NULL;
     };
     
-public:	
-    Thread() :
-	m_obj(NULL),
-	m_func(NULL)
-	{
-	};
-
-    Thread(Type* obj) :
-	m_obj(obj),
-	m_func(NULL)
-	{};
-
-    Thread(Type* obj, FuncType func) :
-	m_obj(obj),
-	m_func(func)
-	{};
-
-    void start() {
-	pthread_create(&m_thread, NULL, &Thread<Type>::process, this);
-    };
-    
-    void start(FuncType func) {
-	m_func = func;
-	pthread_create(&m_thread, NULL, &Thread<Type>::process, this);
-    };
-
-    void start(Type* obj) {
-	m_obj = obj;
-	pthread_create(&m_thread, NULL, &Thread<Type>::process, this);
-    };
-
-    void start(FuncType func, Type* obj) {
-	m_obj = obj;
-	m_func = func;
-	pthread_create(&m_thread, NULL, &Thread<Type>::process, this);
-    };
-	
-    void join() {
-	pthread_join(m_thread, NULL);
-    };
-	
-    pthread_t getThreadId() {
-	return m_thread;
-    };
-};
-
-/*
- * TODO: Why is the code in Thread.h_gcc_bug not working? Also see
- *       wether we must not allow initialization of m_obj* after creation.
- */
-template<>
-class Thread<Runnable>
-{
-    pthread_t m_thread;
-    Runnable* m_obj;
-
-    static void* process(void* obj) {
-	reinterpret_cast<Runnable*>(obj)->run();
-	return NULL;
-    };
-	
-public:	
-    Thread(Runnable* obj = NULL)
-	: m_obj(obj) {};
-	
-    void start(Runnable* obj) {
-	m_obj = obj;
-	pthread_create(&m_thread, NULL, &Thread::process, m_obj);
-    };
-
-    void start() {
-	pthread_create(&m_thread, NULL, &Thread::process, m_obj);
-    };
-	
-    void join() {
-	pthread_join(m_thread, NULL);
-    };
-	
-    pthread_t getThreadId() {
-	return m_thread;
-    };
-};
-
-class SelfThread : public Runnable, public Thread<Runnable> {
 public:
+    /**
+     * Contructor that attaches a runnable object to the Thread.
+     * @param obj The runnable object that will be attached to the thread.
+     */
+    Thread(Runnable& obj) {
+	m_delegate = MakeDelegate(&obj, &Runnable::run);
+    }
+
+    /**
+     * Constructor that attaches a delegate to the Thread.
+     * @param func The functor that will be attached to thread.
+     */
+    Thread(ThreadDelegate func) {
+	m_delegate = func;
+    }
+
+    /**
+     * Sets a runnable object to attach to the Thread.
+     * @param obj The Runnable to attach.
+     */
+    void set(Runnable& obj) {
+	m_delegate = MakeDelegate(&obj, &Runnable::run);
+    }
+
+    /**
+     * Sets a delegate to attach to the Thread.
+     * @param func The delegate to attach.
+     */
+    void set(ThreadDelegate func) {
+	m_delegate = func;
+    }
+
+    /**
+     * Starts the concurrent execution of the attached entity.
+     */
+    void start() {
+	pthread_create(&m_thread, NULL, &Thread::process, this);
+    }
+
+    /**
+     * Attaches a Runnable and starts its concurrent execution.
+     * @param obj The runnable to attach.
+     */
+    void start(Runnable& obj) {
+	m_delegate = MakeDelegate(&obj, &Runnable::run);
+	pthread_create(&m_thread, NULL, &Thread::process, this);
+    }
+
+    /**
+     * Attaches a delegate and starts its concurrent execution.
+     * @param func The delegate to attach.
+     */
+    void start(ThreadDelegate func) {
+	m_delegate = func;
+	pthread_create(&m_thread, NULL, &Thread::process, this);
+    }
+
+    /**
+     * Blocks untill the last started thread finished. Note that if you
+     * call @c start() twice you will be only able to join the last called
+     * function. If you want to be able to join both create a different Thread
+     * instance for each.
+     */
+    void join() {
+	pthread_join(m_thread, NULL);
+    }
+
+    /*
+    pthread_t getThreadId() {
+	return m_thread;
+    };
+    */
+};
+
+/**
+ * A Thread that is also a Runnable which has itself automatically attached
+ * to the thread, so every @c start() call will thread itself's @c run()
+ * function. Inherit from it to build such automatically threadable objects.
+ */
+class SelfThread : public Runnable,
+		   public Thread
+{
+public:
+    /** Virtual destructor. */
     virtual ~SelfThread() {};
-    SelfThread() : Thread<Runnable>(this) {};
+
+    /** Constructor. */
+    SelfThread() :
+	Thread(static_cast<Runnable&>(*this))
+	{};
 };
 
 } /* namespace psynth */

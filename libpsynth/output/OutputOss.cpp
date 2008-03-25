@@ -38,7 +38,8 @@ namespace psynth
 
 OutputOss::OutputOss() :
     m_buf(NULL),
-    m_thread(this)
+    m_thread(*
+	     this)
 {
 }
 
@@ -46,7 +47,7 @@ OutputOss::OutputOss(const AudioInfo& info, const std::string& device) :
     Output(info),
     m_buf(NULL),
     m_device(device),
-    m_thread(this)
+    m_thread(*this)
 {
 }
 

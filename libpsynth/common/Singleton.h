@@ -26,10 +26,36 @@
 namespace psynth
 {
 
+/**
+ * Singleton pattern implementation.
+ *
+ * A singleton class is one that can be instantiated only once and that has
+ * global access to it. Try to use it only if both needs apply for your class
+ * and not like a fancier global variable.
+ *
+ * Any class will be a singleton just by inheriting from this class. 
+ */
 template<typename T>
 class Singleton
 {
+protected:
+    /** Hidden constructor. */
+    Singleton() {};
+
+    /** Hidden copy constructor. */
+    Singleton(Singleton const&) {};
+
+    /** Hidden copy operator. */
+    Singleton& operator=(Singleton const&) {};
+
+    /** Hidden destructor. */
+    ~Singleton() {};
+    
   public:
+    
+    /**
+     * Returns the instance of the Singleton.
+     */
     static T& instance() {
         static T _instance;
         return _instance;
