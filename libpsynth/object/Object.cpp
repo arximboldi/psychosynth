@@ -20,6 +20,7 @@
  *                                                                         *
  ***************************************************************************/
 
+#include "common/Deleter.h"
 #include "object/Object.h"
 
 #include <cmath>
@@ -67,6 +68,7 @@ Object::Object(const AudioInfo& info, int type,
 
 Object::~Object()
 {
+    for_each(m_params.begin(), m_params.end(), Deleter<ObjParam*>());
 //    cout << "Deleting object.\n";
 }
 
@@ -90,36 +92,42 @@ void Object::setEnvelopesDeltas()
 
 void Object::addParam(const std::string& name, int type, void* val)
 {
-    m_params.resize(m_nparam + 1);
-    m_params[m_nparam].configure(m_nparam, name, type, val);
+    m_params.push_back(new ObjParam);
+    m_params[m_nparam]->configure(m_nparam, name, type, val);
     m_nparam++;   
 }
 
 void Object::addParam(const std::string& name, int type, void* val, ObjParam::Event ev)
 {
-    m_params.resize(m_nparam + 1);
-    m_params[m_nparam].configure(m_nparam, name, type, val, ev);
+    m_params.push_back(new ObjParam);
+    m_params[m_nparam]->configure(m_nparam, name, type, val, ev);
     m_nparam++;
+}
+
+void Object::delParam(int index)
+{
+    
+    m_nparam--;
 }
 
 ObjParam& Object::param(const std::string& name)
 {
-    for (vector<ObjParam>::iterator it = m_params.begin();
+    for (vector<ObjParam*>::iterator it = m_params.begin();
 	 it != m_params.end();
 	 ++it)
-	if (name == it->getName())
-	    return *it;
+	if (name == (*it)->getName())
+	    return **it;
     
     return m_null_param;
 }
 
 const ObjParam& Object::param(const std::string& name) const
 {
-    for (vector<ObjParam>::const_iterator it = m_params.begin();
+    for (vector<ObjParam*>::const_iterator it = m_params.begin();
 	 it != m_params.end();
 	 ++it)
-	if (name == it->getName())
-	    return *it;
+	if (name == (*it)->getName())
+	    return **it;
     
     return m_null_param;
 }
@@ -265,8 +273,8 @@ void Object::updateParams()
 {
     size_t j;
     
-    for (vector<ObjParam>::iterator i = m_params.begin(); i != m_params.end(); ++i)
-	(*i).update();
+    for (vector<ObjParam*>::iterator i = m_params.begin(); i != m_params.end(); ++i)
+	(*i)->update();
 
     if (m_param_mute)
 	m_out_envelope.release();

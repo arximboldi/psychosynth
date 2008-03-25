@@ -185,7 +185,7 @@ private:
     std::vector<EnvelopeSimple> m_in_envelope[LINK_TYPES];
     EnvelopeSimple m_out_envelope;
     
-    std::vector<ObjParam>  m_params;
+    std::vector<ObjParam*> m_params;
     ObjParam m_null_param;
     int m_nparam;
     
@@ -235,7 +235,8 @@ protected:
     virtual void doUpdate(const Object* caller, int caller_port_type, int caller_port) = 0;
     virtual void doAdvance() = 0;
     virtual void onInfoChange() = 0;
-    
+
+    void delParam(int index);
     void addParam(const std::string&, int type, void* val);
     void addParam(const std::string&, int type, void* val, ObjParam::Event ev);
 
@@ -313,11 +314,11 @@ public:
     bool hasConnections();
     
     ObjParam& param(int id) {
-	return m_params[id];
+	return *m_params[id];
     }
 
     const ObjParam& param(int id) const {
-	return m_params[id];
+	return *m_params[id];
     }
 
     ObjParam& param(const std::string& name);
