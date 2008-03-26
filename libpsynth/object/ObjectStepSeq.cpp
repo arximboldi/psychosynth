@@ -20,8 +20,12 @@
  *                                                                         *
  ***************************************************************************/
 
+#include "common/Misc.h"
 #include "object/KnownObjects.h"
+#include "object/EnvelopeMulti.h"
 #include "object/ObjectStepSeq.h"
+
+using namespace std;
 
 namespace psynth
 {
@@ -35,14 +39,56 @@ ObjectStepSeq::ObjectStepSeq(const AudioInfo& info) :
 	   N_IN_A_SOCKETS,
 	   N_IN_C_SOCKETS,
 	   N_OUT_A_SOCKETS,
-	   N_OUT_C_SOCKETS)
+	   N_OUT_C_SOCKETS),
+    m_param_bpm(DEFAULT_BPM),
+    m_param_high(DEFAULT_HIGH),
+    m_param_slope(DEFAULT_SLOPE),
+    m_param_num_steps(DEFAULT_NUM_STEPS),
+    m_env(&m_hi_env_vals),
+    m_cur_step(0)
 {
+    int i;
+    
+    addParam("bpm", ObjParam::FLOAT, &m_param_bpm);
+    addParam("high", ObjParam::FLOAT, &m_param_high);
+    addParam("slope", ObjParam::FLOAT, &m_param_slope);
+    addParam("num_steps", ObjParam::INT, &m_param_num_steps);
+
+    for (i = 0; i < MAX_STEPS; ++i) {
+	m_param_step[i] = DEFAULT_STEP;
+	addParam(string("step") + itoa(i, 10), ObjParam::INT, &m_param_step[i]);
+    }
+
+    initEnvelopeValues();
 }
 
 void ObjectStepSeq::doUpdate(const Object* caller,
 			     int caller_port_type,
 			     int caller_port)
 {
+    ControlBuffer* outbuf = getOutput<ControlBuffer>(LINK_CONTROL, OUT_C_OUTPUT);
+    Sample* output = outbuf->getData();
+    const ControlBuffer* bpmbuf = getInput<ControlBuffer>(LINK_CONTROL, IN_C_BPM);
+    const Sample* bpm = bpmbuf ? bpmbuf->getData() : 0;
+    int i;
+
+    updateEnvelopeValues();
+    
+    for (i = 0; i < getInfo().block_size; ++i) {
+	if (bpm)
+	    updateEnvelopeFactor(*bpm++);
+	*output++ = m_env.update();
+	
+	if (m_env.finished()) {
+	    m_cur_step = (m_cur_step + 1) % m_param_num_steps; 
+	    if (m_param_step[m_cur_step])
+		m_env.setValues(&m_hi_env_vals);
+	    else
+		m_env.setValues(&m_lo_env_vals);
+	    m_env.press();
+	    m_env.release();
+	}
+    }
 }
 
 void ObjectStepSeq::doAdvance()
@@ -51,6 +97,41 @@ void ObjectStepSeq::doAdvance()
 
 void ObjectStepSeq::onInfoChange()
 {
+}
+
+void ObjectStepSeq::initEnvelopeValues()
+{
+    m_lo_env_vals.resize(2);
+    m_lo_env_vals[0] = EnvPoint(0.0f, 0.0f);
+    m_lo_env_vals[1] = EnvPoint(1.0f, 0.0f);
+
+    m_hi_env_vals.resize(5);
+    m_hi_env_vals[0] = EnvPoint(0.0f, 0.0f);
+    m_hi_env_vals[1] = EnvPoint(m_param_slope * m_param_high, 1.0f);
+    m_hi_env_vals[2] = EnvPoint(m_param_high - m_param_slope * m_param_high, 1.0f);
+    m_hi_env_vals[3] = EnvPoint(m_param_high, 0.0f);
+    m_hi_env_vals[4] = EnvPoint(0.0f, 0.0f);
+}
+
+void ObjectStepSeq::updateEnvelopeValues()
+{
+    m_hi_env_vals[1] = EnvPoint(m_param_slope * m_param_high, 1.0f);
+    m_hi_env_vals[2] = EnvPoint(m_param_high - m_param_slope * m_param_high, 1.0f);
+    m_hi_env_vals[3] = EnvPoint(m_param_high, 0.0f);    
+
+    if (m_param_step[m_cur_step])
+	m_env.setValues(&m_hi_env_vals);
+    else
+	m_env.setValues(&m_lo_env_vals);
+
+    updateEnvelopeFactor(0);
+}
+
+void ObjectStepSeq::updateEnvelopeFactor(float mod)
+{
+    float factor = (m_param_bpm + m_param_bpm * mod) / (60.0f  * getInfo().sample_rate);
+    m_lo_env_vals.setFactor(factor);
+    m_hi_env_vals.setFactor(factor);
 }
 
 }

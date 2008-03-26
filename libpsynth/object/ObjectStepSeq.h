@@ -29,22 +29,50 @@
 namespace psynth
 {
 
+class EnvelopeMulti;
+class EnvelopeMultiValues;
+
 class ObjectStepSeq : public Object
 {
 public:
+    static const int MAX_STEPS = 16;
+    static const float DEFAULT_BPM = 100.0;
+    static const int DEFAULT_NUM_STEPS = 12;
+    static const int DEFAULT_STEP = true;
+    static const float DEFAULT_HIGH = 0.8;
+    static const int DEFAULT_SLOPE = 0.1f;
+    
     enum InAudioSocketID {
 	N_IN_A_SOCKETS
     };
 	
     enum InControlSocketID {
-	IN_C_RATE,
+	IN_C_BPM,
 	N_IN_C_SOCKETS
     };
 
     enum ParamID {
-	PARAM_SPEED = Object::N_COMMON_PARAMS,
+	PARAM_BPM = Object::N_COMMON_PARAMS,
+	PARAM_HIGH,
+	PARAM_SLOPE,
 	PARAM_NUM_STEPS,
-	N_PARAM
+	PARAM_STEP_0,
+	PARAM_STEP_1,
+	PARAM_STEP_2,
+	PARAM_STEP_3,
+	PARAM_STEP_4,
+	PARAM_STEP_5,
+	PARAM_STEP_6,
+	PARAM_STEP_7,
+	PARAM_STEP_8,
+	PARAM_STEP_9,
+	PARAM_STEP_10,
+	PARAM_STEP_11,
+	PARAM_STEP_12,
+	PARAM_STEP_13,
+	PARAM_STEP_14,
+	PARAM_STEP_15,
+	N_PARAM,
     };
     
     enum OutAudioSocketID {
@@ -60,7 +88,21 @@ private:
     void doUpdate(const Object* caller, int caller_port_type, int caller_port);
     void doAdvance();
     void onInfoChange();
+
+    float m_param_bpm;
+    float m_param_high;
+    float m_param_slope;
+    int m_param_num_steps;
+    int m_param_step[MAX_STEPS];
     
+    EnvelopeMultiValues m_hi_env_vals;
+    EnvelopeMultiValues m_lo_env_vals;
+    EnvelopeMulti m_env;
+    int m_cur_step;
+
+    void initEnvelopeValues();
+    void updateEnvelopeValues();
+    void updateEnvelopeFactor(float mod);
 public:
     ObjectStepSeq(const AudioInfo& info);   
 };

@@ -47,12 +47,21 @@ class EnvelopeMultiValues
     
     std::vector<EnvPoint> m_points;
     int m_sustain;
+    float m_factor;
     
 public:
 
+    EnvelopeMultiValues() :
+	m_factor(1.0f)
+	{}
+    
     void setASR(EnvPoint a, EnvPoint s, EnvPoint r);
     void setADSR(EnvPoint a, EnvPoint d, EnvPoint s, EnvPoint r);
 
+    void setFactor(float factor) {
+	m_factor = factor;
+    }
+    
     void set(const std::vector<EnvPoint>& p, int sustain) {
 	m_points = p;
 	m_sustain = sustain;
@@ -77,6 +86,10 @@ public:
     int size() const {
 	return m_points.size();
     }
+
+    void resize(size_t size) {
+	m_points.resize(size);
+    }
 };
 
 class EnvelopeMulti : public Envelope
@@ -93,6 +106,14 @@ public:
 	m_time(0.0f),
 	m_pressed(false)
 	{}
+
+    void setValues(EnvelopeMultiValues* vals) {
+	m_val = vals;
+    }
+
+    EnvelopeMultiValues* getValues() {
+	return m_val;
+    }
     
     void press() {
 	if (finished()) {
@@ -106,7 +127,9 @@ public:
 	m_pressed = false;
     }
 
-    float update();
+    float update() {
+	return update(1.0f);
+    }
     
     float update(float sample);
     
