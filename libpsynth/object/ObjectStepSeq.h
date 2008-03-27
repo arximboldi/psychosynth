@@ -25,12 +25,10 @@
 
 #include <libpsynth/object/Object.h>
 #include <libpsynth/object/ObjectFactory.h>
+#include <libpsynth/object/EnvelopeMulti.h>
 
 namespace psynth
 {
-
-class EnvelopeMulti;
-class EnvelopeMultiValues;
 
 class ObjectStepSeq : public Object
 {
@@ -39,8 +37,8 @@ public:
     static const float DEFAULT_BPM = 100.0;
     static const int DEFAULT_NUM_STEPS = 12;
     static const int DEFAULT_STEP = true;
-    static const float DEFAULT_HIGH = 0.8;
-    static const int DEFAULT_SLOPE = 0.1f;
+    static const float DEFAULT_HIGH = 0.8f;
+    static const float DEFAULT_SLOPE = 0.1f;
     
     enum InAudioSocketID {
 	N_IN_A_SOCKETS
@@ -94,6 +92,7 @@ private:
     float m_param_slope;
     int m_param_num_steps;
     int m_param_step[MAX_STEPS];
+    float m_old_param_high;
     
     EnvelopeMultiValues m_hi_env_vals;
     EnvelopeMultiValues m_lo_env_vals;
@@ -107,7 +106,7 @@ public:
     ObjectStepSeq(const AudioInfo& info);   
 };
 
-PSYNTH_DECLARE_OBJECT_FACTORY(ObjectStepSeq, "step_sequencer");
+PSYNTH_DECLARE_OBJECT_FACTORY(ObjectStepSeq, "stepseq");
 
 } /* namespace psynth */
 

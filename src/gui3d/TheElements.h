@@ -67,4 +67,11 @@ public:
 		   Ogre::SceneManager* m_scene);
 };
 
+class ElementStepSeq : public Element
+{
+public:
+    ElementStepSeq(psynth::TableObject& obj,
+		   Ogre::SceneManager* m_scene);
+};
+
 #endif /* THEELEMENTS_H */

@@ -43,6 +43,7 @@ public:
     enum InControlSocketID {
 	IN_C_FREQUENCY,
 	IN_C_AMPLITUDE,
+	IN_C_TRIGGER,
 	N_IN_C_SOCKETS
     };
 
@@ -78,12 +79,14 @@ protected:
     Oscillator m_oscillator;
 
     void updateOscParams();
+    void updateOsc(Sample* out);
     
 private:
     int   m_param_wave;
     int   m_param_mod;
     float m_param_freq;
     float m_param_ampl;
+    bool  m_restart;
     
 public:
     ObjectOscillator(const AudioInfo& prop,

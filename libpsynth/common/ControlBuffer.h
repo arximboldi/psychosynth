@@ -142,6 +142,28 @@ public:
     }
 
     /**
+     * Finds the next hill. We define a hill as a secuence of consecutive non
+     * zero values plus any trailing zeros until the next non zero value.
+     * This is quite usefull to analize trigger data.
+     * @param start Where to start looking for the hill.
+     * @return The position of the first non zero value after the hill.
+     */
+    size_t findHill(size_t start = 0) const;
+
+    /**
+     * Returns wether a point may be the end of a hill.
+     * @see findHill
+     */
+    bool isHillEnd(size_t end) const {
+	if (end == 0)
+	    return false;
+	else if (m_data[end-1] != 0)
+	    return false;
+	
+	return true;
+    }
+    
+    /**
      * Fills the whole buffer with value zero.
      */
     void zero() {

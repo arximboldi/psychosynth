@@ -29,13 +29,8 @@
 
 #include <libpsynth/common/Logger.h>
 
-#include <libpsynth/object/ObjectMixer.h>
-#include <libpsynth/object/ObjectOscillator.h>
-#include <libpsynth/object/ObjectLFO.h>
-#include <libpsynth/object/ObjectFilter.h>
-#include <libpsynth/object/ObjectSampler.h>
-
 #include <libpsynth/object/KnownObjects.h>
+
 
 using namespace std;
 using namespace Ogre;
@@ -79,6 +74,8 @@ Element* ElementManager::createElement(TableObject& obj)
 	return new ElementControlMixer(obj, m_scene);
     case OBJ_SAMPLER:
 	return new ElementSampler(obj, m_scene);
+    case OBJ_STEPSEQ:
+	return new ElementStepSeq(obj, m_scene);
     default:
 	return NULL;
     }

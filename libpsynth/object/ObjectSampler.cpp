@@ -53,7 +53,7 @@ ObjectSampler::ObjectSampler(const AudioInfo& info):
     m_read_pos(0),
     m_end_pos(0),
     m_ctrl_pos(0),
-    m_param_ampl(0.5f),
+    m_param_ampl(0.75f),
     m_param_rate(1.0f),
     m_param_tempo(1.0f),
     m_param_pitch(1.0f)

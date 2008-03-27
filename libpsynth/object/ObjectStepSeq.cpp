@@ -35,7 +35,7 @@ PSYNTH_DEFINE_OBJECT_FACTORY(ObjectStepSeq);
 ObjectStepSeq::ObjectStepSeq(const AudioInfo& info) :
     Object(info,
 	   OBJ_STEPSEQ,
-	   "step_sequencer",
+	   "stepseq",
 	   N_IN_A_SOCKETS,
 	   N_IN_C_SOCKETS,
 	   N_OUT_A_SOCKETS,
@@ -78,9 +78,11 @@ void ObjectStepSeq::doUpdate(const Object* caller,
 	if (bpm)
 	    updateEnvelopeFactor(*bpm++);
 	*output++ = m_env.update();
+
+	//cout << *(output-1) << endl;
 	
 	if (m_env.finished()) {
-	    m_cur_step = (m_cur_step + 1) % m_param_num_steps; 
+	    m_cur_step = (m_cur_step + 1) % m_param_num_steps;
 	    if (m_param_step[m_cur_step])
 		m_env.setValues(&m_hi_env_vals);
 	    else
@@ -89,6 +91,8 @@ void ObjectStepSeq::doUpdate(const Object* caller,
 	    m_env.release();
 	}
     }
+
+    m_old_param_high = m_param_high;
 }
 
 void ObjectStepSeq::doAdvance()
@@ -110,7 +114,15 @@ void ObjectStepSeq::initEnvelopeValues()
     m_hi_env_vals[1] = EnvPoint(m_param_slope * m_param_high, 1.0f);
     m_hi_env_vals[2] = EnvPoint(m_param_high - m_param_slope * m_param_high, 1.0f);
     m_hi_env_vals[3] = EnvPoint(m_param_high, 0.0f);
-    m_hi_env_vals[4] = EnvPoint(0.0f, 0.0f);
+    m_hi_env_vals[4] = EnvPoint(1.0f, 0.0f);
+
+    cout << "m_param_high " << m_param_high << endl;
+    cout << "m_param_slope " << m_param_slope << endl;
+    
+    for (int i = 0; i < 5; ++i)
+	cout << m_hi_env_vals[i].dt << ", " << m_hi_env_vals[i].val << endl;
+
+    updateEnvelopeFactor(0);
 }
 
 void ObjectStepSeq::updateEnvelopeValues()
@@ -124,12 +136,19 @@ void ObjectStepSeq::updateEnvelopeValues()
     else
 	m_env.setValues(&m_lo_env_vals);
 
+    m_env.setTime(m_env.getTime() * m_param_high/m_old_param_high);
+    
     updateEnvelopeFactor(0);
 }
 
 void ObjectStepSeq::updateEnvelopeFactor(float mod)
 {
-    float factor = (m_param_bpm + m_param_bpm * mod) / (60.0f  * getInfo().sample_rate);
+    //cout << "m_param_bpm: " << m_param_bpm << endl;
+    //cout << "mod: " << mod << endl;
+    //cout << "sample_rate: " << getInfo().sample_rate;
+    float factor =
+	(m_param_bpm + m_param_bpm * mod) /
+	(60.0f  * getInfo().sample_rate);
     m_lo_env_vals.setFactor(factor);
     m_hi_env_vals.setFactor(factor);
 }

@@ -21,3 +21,20 @@
  ***************************************************************************/
 
 #include "common/ControlBuffer.h"
+
+namespace psynth
+{
+
+size_t ControlBuffer::findHill(size_t start) const
+{
+    ++start;
+    
+    while (start < m_size &&
+	   (m_data[start-1] != 0.0f ||
+	    m_data[start] == 0.0f))
+	++start;
+
+    return start;
+}
+
+} /* namespace psynth */

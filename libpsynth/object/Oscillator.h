@@ -99,6 +99,10 @@ public:
 	if (wave_table && !m_table_init)
 	    initializeTables();
     }
+
+    void restart() {
+	m_x = 0.0f;
+    }
     
     static Sample computeSine(float x) {
 	return sin(x * 2 * M_PI);
@@ -162,7 +166,7 @@ public:
     }
 
     void update(Sample* out_buf, size_t n_frames);
-    
+        
     void update(Sample* out_buf, const Sample* mod_buf,
 		EnvelopeSimple& mod_env, size_t n_frames) {
 	switch(m_mod) {

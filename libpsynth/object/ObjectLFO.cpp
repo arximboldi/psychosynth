@@ -32,19 +32,9 @@ PSYNTH_DEFINE_OBJECT_FACTORY(ObjectLFO);
 void ObjectLFO::doUpdate(const Object* caller, int caller_port_type, int caller_port)
 {
     ControlBuffer*       buf = getOutput<ControlBuffer>(LINK_CONTROL, OUT_C_OUTPUT);
-    const ControlBuffer* pitch_buf = getInput<ControlBuffer>(LINK_CONTROL, IN_C_FREQUENCY);
-
     Sample*       out = buf->getData();
-    const Sample* mod = pitch_buf ? pitch_buf->getData() : NULL;
 
-    updateOscParams();
-
-    if (!mod) {
-	m_oscillator.update(out, getInfo().block_size);
-    } else {
-	EnvelopeSimple mod_env = getInEnvelope(LINK_CONTROL, IN_C_FREQUENCY);
-	m_oscillator.update(out, mod, mod_env, getInfo().block_size);
-    }
+    updateOsc(out);
 }
 
 } /* namespace psynth */

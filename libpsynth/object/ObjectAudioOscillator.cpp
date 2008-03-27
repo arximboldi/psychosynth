@@ -32,19 +32,11 @@ PSYNTH_DEFINE_OBJECT_FACTORY(ObjectAudioOscillator);
 void ObjectAudioOscillator::doUpdate(const Object* caller, int caller_port_type, int caller_port)
 {
     AudioBuffer*         buf = getOutput<AudioBuffer>(LINK_AUDIO, OUT_A_OUTPUT);
-    const ControlBuffer* pitch_buf = getInput<ControlBuffer>(LINK_CONTROL, IN_C_FREQUENCY);
-    
     Sample*       out = buf->getChannel(0);
-    const Sample* mod = pitch_buf ? pitch_buf->getData() : NULL;
 
-    updateOscParams();
-
-    if (mod) {
-	EnvelopeSimple mod_env = getInEnvelope(LINK_CONTROL, IN_C_FREQUENCY); 
-	m_oscillator.update(out, mod, mod_env, getInfo().block_size);
-    } else
-	m_oscillator.update(out, getInfo().block_size);
-    
+    updateOsc(out);
+	
+    /* Copy on the other channels. */
     for (size_t i = 1; i < (size_t)getAudioInfo().num_channels; i++)
 	memcpy((*buf)[i], (*buf)[0], sizeof(Sample) * getAudioInfo().block_size);
 }

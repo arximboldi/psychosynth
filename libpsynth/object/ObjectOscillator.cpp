@@ -46,7 +46,8 @@ ObjectOscillator::ObjectOscillator(const AudioInfo& prop,
     m_param_wave(OSC_SINE),
     m_param_mod(MOD_FM),
     m_param_freq(DEFAULT_FREQ),
-    m_param_ampl(DEFAULT_AMPL)
+    m_param_ampl(DEFAULT_AMPL),
+    m_restart(false)
 {    
     addParam("wave", ObjParam::INT, &m_param_wave);
     addParam("modulator", ObjParam::INT, &m_param_mod);
@@ -66,6 +67,58 @@ void ObjectOscillator::updateOscParams()
     m_oscillator.setAmplitude(m_param_ampl);
     m_oscillator.setWave((Oscillator::WaveType)m_param_wave);
     m_oscillator.setModulator((Oscillator::ModType)m_param_mod);
+}
+
+void ObjectOscillator::updateOsc(Sample* out)
+{
+    const ControlBuffer* pitch_buf = getInput<ControlBuffer>(LINK_CONTROL, IN_C_FREQUENCY);
+    const ControlBuffer* trig_buf = getInput<ControlBuffer>(LINK_CONTROL, IN_C_TRIGGER);
+    EnvelopeSimple mod_env = getInEnvelope(LINK_CONTROL, IN_C_FREQUENCY);
+    EnvelopeSimple trig_env =  getInEnvelope(LINK_CONTROL, IN_C_TRIGGER);
+    
+    const Sample* mod = pitch_buf ? pitch_buf->getData() : NULL;
+
+    updateOscParams();
+
+    /* Fill the output. */
+    size_t start = 0;
+    size_t end = getInfo().block_size;
+
+    while(start < getInfo().block_size) {
+	if (m_restart) {
+	    if (trig_buf && trig_buf->getData()[start] != 0.0f)
+		m_oscillator.restart();
+	    m_restart = false;
+	}
+	
+	if (trig_buf)
+	    end = trig_buf->findHill(start);
+	
+	if (mod) {
+	    m_oscillator.update(out + start, mod, mod_env, end - start);
+	} else
+	    m_oscillator.update(out + start, end - start);
+
+	float env_val = trig_env.update(end - start);
+	if (env_val == 1.0f && trig_buf && trig_buf->getData()[end - 1] == 0.0f)
+	    m_restart = true;
+	    
+	start = end;
+    }
+
+    /* Modulate amplitude with trigger envelope. */
+    if (trig_buf) {
+	int n_samp = getInfo().block_size;
+	const Sample* trig = trig_buf->getData();
+	trig_env = getInEnvelope(LINK_CONTROL, IN_C_TRIGGER);
+
+	while (n_samp--) {
+	    float env_val = trig_env.update();
+	    *out = *out * ((1.0f - env_val) + (env_val * *trig)); 	    
+	    ++out;
+	    ++trig;
+	}
+    }
 }
 
 } /* namespace psynth */

@@ -32,6 +32,7 @@
 #include "object/ObjectLFO.h"
 #include "object/ObjectFilter.h"
 #include "object/ObjectSampler.h"
+#include "object/ObjectStepSeq.h"
 
 using namespace std;
 
@@ -124,6 +125,7 @@ void Table::registerDefaultObjectFactory()
     registerObjectFactory(getObjectOutputFactory());
     registerObjectFactory(getObjectFilterFactory());
     registerObjectFactory(getObjectSamplerFactory());
+    registerObjectFactory(getObjectStepSeqFactory());
 }
 
 Table::~Table()

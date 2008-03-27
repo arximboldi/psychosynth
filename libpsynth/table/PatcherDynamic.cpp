@@ -30,6 +30,7 @@
 #include "object/ObjectLFO.h"
 #include "object/ObjectFilter.h"
 #include "object/ObjectSampler.h"
+#include "object/ObjectStepSeq.h"
 
 using namespace std;
 
@@ -61,6 +62,7 @@ const PatcherData PATCHER_TABLE[N_OBJECTS][N_OBJECTS] =
 	{Object::LINK_NONE, 0, 0},  /* ObjectLFO */
 	{Object::LINK_NONE, 0, 0},   /* ObjectFilter */
 	{Object::LINK_NONE, 0, 0}, /* ObjectSampler */
+	{Object::LINK_NONE, 0, 0} /* ObjectStepSeq */
     },
 
     /* ObjectAudioMixer */
@@ -72,6 +74,7 @@ const PatcherData PATCHER_TABLE[N_OBJECTS][N_OBJECTS] =
 	{Object::LINK_NONE, 0, 0}, /* ObjectLFO */
 	{Object::LINK_AUDIO, ObjectAudioMixer::OUT_A_OUTPUT, ObjectFilter::IN_A_INPUT}, /* ObjectFilter */
 	{Object::LINK_NONE, 0, 0}, /* ObjectSampler */
+	{Object::LINK_NONE, 0, 0} /* ObjectStepSeq */
     },
 
     /* ObjectControlMixer */
@@ -83,7 +86,8 @@ const PatcherData PATCHER_TABLE[N_OBJECTS][N_OBJECTS] =
 	{Object::LINK_CONTROL, ObjectControlMixer::OUT_C_OUTPUT, ObjectOscillator::IN_C_FREQUENCY},/* ObjectAudioOscillator */
 	{Object::LINK_CONTROL, ObjectControlMixer::OUT_C_OUTPUT, ObjectOscillator::IN_C_FREQUENCY}, /* ObjectLFO */
 	{Object::LINK_CONTROL, ObjectControlMixer::OUT_C_OUTPUT, ObjectFilter::IN_C_CUTOFF}, /* ObjectFilter */
-	{Object::LINK_CONTROL, ObjectControlMixer::OUT_C_OUTPUT, ObjectSampler::IN_C_RATE} /* ObjectSampler */
+	{Object::LINK_CONTROL, ObjectControlMixer::OUT_C_OUTPUT, ObjectSampler::IN_C_RATE}, /* ObjectSampler */
+	{Object::LINK_CONTROL, ObjectControlMixer::OUT_C_OUTPUT, ObjectStepSeq::IN_C_BPM} /* ObjectStepSeq */
     },
     
     /* ObjectAudioOscillator */
@@ -95,6 +99,7 @@ const PatcherData PATCHER_TABLE[N_OBJECTS][N_OBJECTS] =
 	{Object::LINK_NONE, 0, 0}, /* ObjectLFO */
 	{Object::LINK_AUDIO, ObjectAudioOscillator::OUT_A_OUTPUT, ObjectFilter::IN_A_INPUT}, /* ObjectFilter */
 	{Object::LINK_NONE, 0, 0}, /* ObjectSampler */
+	{Object::LINK_NONE, 0, 0} /* ObjectStepSeq */
     },
 
     /* ObjectLFO */
@@ -105,7 +110,8 @@ const PatcherData PATCHER_TABLE[N_OBJECTS][N_OBJECTS] =
 	{Object::LINK_CONTROL, ObjectLFO::OUT_C_OUTPUT, ObjectOscillator::IN_C_FREQUENCY}, /* ObjectAudioOscillator */
 	{Object::LINK_CONTROL, ObjectLFO::OUT_C_OUTPUT, ObjectOscillator::IN_C_FREQUENCY}, /* ObjectLFO */
 	{Object::LINK_CONTROL, ObjectLFO::OUT_C_OUTPUT, ObjectFilter::IN_C_CUTOFF},  /* ObjectFilter */
-	{Object::LINK_CONTROL, ObjectLFO::OUT_C_OUTPUT, ObjectSampler::IN_C_RATE} /* ObjectSampler */
+	{Object::LINK_CONTROL, ObjectLFO::OUT_C_OUTPUT, ObjectSampler::IN_C_RATE}, /* ObjectSampler */
+	{Object::LINK_CONTROL, ObjectControlMixer::OUT_C_OUTPUT, ObjectStepSeq::IN_C_BPM} /* ObjectStepSeq */
     },
 
     /* ObjectFilter */
@@ -115,8 +121,9 @@ const PatcherData PATCHER_TABLE[N_OBJECTS][N_OBJECTS] =
 	{Object::LINK_NONE, 0, 0}, /* ObjectControlMixer */
 	{Object::LINK_NONE, 0, 0}, /* ObjectAudioOscillator */
 	{Object::LINK_NONE, 0, 0}, /* ObjectLFO */
-	{Object::LINK_AUDIO, ObjectFilter::OUT_A_OUTPUT, ObjectFilter::IN_A_INPUT},
+	{Object::LINK_AUDIO, ObjectFilter::OUT_A_OUTPUT, ObjectFilter::IN_A_INPUT}, /* ObjectFilter */
 	{Object::LINK_NONE, 0, 0}, /* ObjectSampler */
+	{Object::LINK_NONE, 0, 0} /* ObjectStepSeq */
     },
 
     /* ObjectSampler */
@@ -126,8 +133,21 @@ const PatcherData PATCHER_TABLE[N_OBJECTS][N_OBJECTS] =
 	{Object::LINK_NONE, 0, 0}, /* ObjectControlMixer */
 	{Object::LINK_NONE, 0, 0}, /* ObjectAudioOscillator */
 	{Object::LINK_NONE, 0, 0}, /* ObjectLFO */
-	{Object::LINK_AUDIO, ObjectFilter::OUT_A_OUTPUT, ObjectFilter::IN_A_INPUT},
+	{Object::LINK_AUDIO, ObjectFilter::OUT_A_OUTPUT, ObjectFilter::IN_A_INPUT}, /* ObjectFilter */
 	{Object::LINK_NONE, 0, 0}, /* ObjectSampler */
+	{Object::LINK_NONE, 0, 0} /* ObjectStepSeq */
+    },
+
+    /* ObjectStepSeq */
+    {
+	{Object::LINK_NONE, 0, 0}, /* ObjectOutput */
+	{Object::LINK_NONE, 0, 0}, /* ObjectAudioMixer */
+	{Object::LINK_NONE, 0, 0}, /* ObjectControlMixer */
+	{Object::LINK_CONTROL, ObjectStepSeq::OUT_C_OUTPUT, ObjectOscillator::IN_C_TRIGGER}, /* ObjectAudioOscillator */
+	{Object::LINK_CONTROL, ObjectStepSeq::OUT_C_OUTPUT, ObjectOscillator::IN_C_TRIGGER}, /* ObjectLFO */
+	{Object::LINK_NONE, 0, 0}, /* ObjectFilter */
+	{Object::LINK_NONE, 0, 0}, /* ObjectSampler */
+	{Object::LINK_NONE, 0, 0}, /* ObjectStepSeq */
     }
 };
 

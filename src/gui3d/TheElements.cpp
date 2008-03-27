@@ -30,6 +30,7 @@
 #include <libpsynth/object/ObjectLFO.h>
 #include <libpsynth/object/ObjectFilter.h>
 #include <libpsynth/object/ObjectSampler.h>
+#include <libpsynth/object/ObjectStepSeq.h>
 
 using namespace std;
 using namespace Ogre;
@@ -266,3 +267,30 @@ ElementSampler::ElementSampler(TableObject& obj,
 					0.2f, 3.0f,
 					"Pitch"));
 }
+
+ElementStepSeq::ElementStepSeq(TableObject& obj,
+			       Ogre::SceneManager* m_scene) :
+    Element(obj, m_scene)
+{	    
+    static const char* mesh_name = "stepseq_square.mesh";
+    cout << mesh_name << endl;
+    addComponent(new ElemMainComponent(
+		     string(mesh_name), 
+		     ObjectStepSeq::PARAM_BPM,
+		     40.0f, 400.0f));
+    
+    addComponent(new ElemSecondComponent(
+		     ObjectStepSeq::PARAM_HIGH,
+		     0.1f, 1.0f));
+
+
+    getGUIProperties().addParameter(new ElemGuiParamFloat(
+					ObjectStepSeq::PARAM_BPM,
+					40.0f, 400.0f,
+					"BPM"));
+    getGUIProperties().addParameter(new ElemGuiParamFloat(
+					ObjectStepSeq::PARAM_HIGH,
+					0.1f, 1.0f,
+					"Hold"));
+}
+

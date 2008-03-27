@@ -31,11 +31,11 @@ namespace psynth
 
 struct EnvPoint
 {
-    int dt;
-    int val;
+    float dt;
+    float val;
 
     EnvPoint() {};
-    EnvPoint(int _dt, int _val) :
+    EnvPoint(float _dt, float _val) :
 	dt(_dt),
 	val(_val)
 	{}
@@ -114,6 +114,14 @@ public:
     EnvelopeMultiValues* getValues() {
 	return m_val;
     }
+
+    float getTime() const {
+	return m_time;
+    }
+
+    float setTime(float time) {
+	m_time = time;
+    }
     
     void press() {
 	if (finished()) {
@@ -139,7 +147,7 @@ public:
     }
 
     bool finished() {
-	return m_cur_point >= m_val->size();
+	return m_cur_point >= m_val->size() - 1;
     }
     
 };

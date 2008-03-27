@@ -139,9 +139,14 @@ void DefaultSelectorPopulator::populate(const std::string& data_path,
     cat->addButton("Control Mul", creat);
 
     creat.clear();
+    cat = sel->addCategory("Sequencing");
+    creat.setName("stepseq");
+    cat->addButton("Step seq.", creat);
+    
+    creat.clear();
     cat = sel->addCategory("Samples");
     creat.setName("sampler");
-
+    
     list<string> files;
     getFileList(data_path + "samples/", files);
 
