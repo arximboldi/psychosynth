@@ -33,8 +33,8 @@ namespace psynth
 class ObjectStepSeq : public Object
 {
 public:
-    static const int MAX_STEPS = 16;
-    static const float DEFAULT_BPM = 100.0;
+    static const int MAX_STEPS = 32;
+    static const float DEFAULT_BPM = 260.0;
     static const int DEFAULT_NUM_STEPS = 12;
     static const int DEFAULT_STEP = true;
     static const float DEFAULT_HIGH = 0.8f;
@@ -53,6 +53,7 @@ public:
 	PARAM_BPM = Object::N_COMMON_PARAMS,
 	PARAM_HIGH,
 	PARAM_SLOPE,
+	PARAM_CURRENT_STEP,
 	PARAM_NUM_STEPS,
 	PARAM_STEP_0,
 	PARAM_STEP_1,
@@ -70,6 +71,22 @@ public:
 	PARAM_STEP_13,
 	PARAM_STEP_14,
 	PARAM_STEP_15,
+	PARAM_STEP_16,
+	PARAM_STEP_17,
+	PARAM_STEP_18,
+	PARAM_STEP_19,
+	PARAM_STEP_20,
+	PARAM_STEP_21,
+	PARAM_STEP_22,
+	PARAM_STEP_23,
+	PARAM_STEP_24,
+	PARAM_STEP_25,
+	PARAM_STEP_26,
+	PARAM_STEP_27,
+	PARAM_STEP_28,
+	PARAM_STEP_29,
+	PARAM_STEP_30,
+	PARAM_STEP_31,
 	N_PARAM,
     };
     

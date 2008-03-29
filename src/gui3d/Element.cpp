@@ -29,15 +29,19 @@
 
 #define ROTATION_FACTOR     100.0f
 
+#define ELEMENT_GHOST_COLOUR    ColourValue(0.8, 0.8, 0.1, 0.4)
+#define ELEMENT_NORMAL_COLOUR   ColourValue(1, 1, 1, 0.5)
+#define ELEMENT_SELECTED_COLOUR ColourValue(1, 0, 0, 0.7)
+
 using namespace std;
 using namespace Ogre;
 using namespace psynth;
 
 Element::Element(TableObject& obj, Ogre::SceneManager* scene) :
     m_obj(obj),
-    m_col_ghost(0.8, 0.8, 0.1, 0.4),
-    m_col_selected(0.8, 0.1, 0.1, 0.7),
-    m_col_normal(0.5, 0.8, 0.5, 0.5),
+    m_col_ghost(ELEMENT_GHOST_COLOUR),
+    m_col_selected(ELEMENT_SELECTED_COLOUR),
+    m_col_normal(ELEMENT_NORMAL_COLOUR),
     m_scene(scene),
     m_aimpoint(0, Z_POS, 0),
     m_click_diff(0,0),
@@ -83,6 +87,7 @@ void Element::addComponent(ElemComponent* comp)
     SceneNode* node;
     m_comp.push_back(comp);
     node = m_node->createChildSceneNode();
+    node->yaw(Radian(Math::PI / 2), Node::TS_LOCAL);
     comp->setSceneNode(node);
     comp->setParent(this);
     comp->init();

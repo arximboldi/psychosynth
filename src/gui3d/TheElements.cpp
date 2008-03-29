@@ -24,6 +24,7 @@
 
 #include "gui3d/ElemMainComponent.h"
 #include "gui3d/ElemSecondComponent.h"
+#include "gui3d/ElemTogglerComponent.h"
 
 #include <libpsynth/object/ObjectMixer.h>
 #include <libpsynth/object/ObjectOscillator.h>
@@ -117,7 +118,6 @@ ElementOscillator::ElementOscillator(TableObject& obj,
     addComponent(new ElemSecondComponent(
 		     ObjectOscillator::PARAM_AMPLITUDE,
 		     0.0f, 1.0f));
-
     
     getGUIProperties().addParameter(new ElemGuiParamMulti(
 					ObjectOscillator::PARAM_WAVE,
@@ -283,7 +283,15 @@ ElementStepSeq::ElementStepSeq(TableObject& obj,
 		     ObjectStepSeq::PARAM_HIGH,
 		     0.1f, 1.0f));
 
+    addComponent(new ElemTogglerComponent(
+		     ObjectStepSeq::PARAM_NUM_STEPS,
+		     ObjectStepSeq::PARAM_STEP_0,
+		     ObjectStepSeq::PARAM_CURRENT_STEP));
 
+    getGUIProperties().addParameter(new ElemGuiParamInt(
+					ObjectStepSeq::PARAM_NUM_STEPS,
+					1, 32,
+					"Steps"));
     getGUIProperties().addParameter(new ElemGuiParamFloat(
 					ObjectStepSeq::PARAM_BPM,
 					40.0f, 400.0f,

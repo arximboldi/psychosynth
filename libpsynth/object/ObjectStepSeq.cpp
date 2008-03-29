@@ -52,14 +52,20 @@ ObjectStepSeq::ObjectStepSeq(const AudioInfo& info) :
     addParam("bpm", ObjParam::FLOAT, &m_param_bpm);
     addParam("high", ObjParam::FLOAT, &m_param_high);
     addParam("slope", ObjParam::FLOAT, &m_param_slope);
+    addParam("current_step", ObjParam::INT, &m_cur_step);
     addParam("num_steps", ObjParam::INT, &m_param_num_steps);
-
+	
     for (i = 0; i < MAX_STEPS; ++i) {
 	m_param_step[i] = DEFAULT_STEP;
 	addParam(string("step") + itoa(i, 10), ObjParam::INT, &m_param_step[i]);
     }
 
     initEnvelopeValues();
+
+    if (m_param_step[m_cur_step])
+	m_env.setValues(&m_hi_env_vals);
+    else
+	m_env.setValues(&m_lo_env_vals);
 }
 
 void ObjectStepSeq::doUpdate(const Object* caller,
@@ -79,16 +85,14 @@ void ObjectStepSeq::doUpdate(const Object* caller,
 	    updateEnvelopeFactor(*bpm++);
 	*output++ = m_env.update();
 
-	//cout << *(output-1) << endl;
-	
 	if (m_env.finished()) {
 	    m_cur_step = (m_cur_step + 1) % m_param_num_steps;
+	    m_env.press();
+	    m_env.release();
 	    if (m_param_step[m_cur_step])
 		m_env.setValues(&m_hi_env_vals);
 	    else
 		m_env.setValues(&m_lo_env_vals);
-	    m_env.press();
-	    m_env.release();
 	}
     }
 
@@ -116,12 +120,6 @@ void ObjectStepSeq::initEnvelopeValues()
     m_hi_env_vals[3] = EnvPoint(m_param_high, 0.0f);
     m_hi_env_vals[4] = EnvPoint(1.0f, 0.0f);
 
-    cout << "m_param_high " << m_param_high << endl;
-    cout << "m_param_slope " << m_param_slope << endl;
-    
-    for (int i = 0; i < 5; ++i)
-	cout << m_hi_env_vals[i].dt << ", " << m_hi_env_vals[i].val << endl;
-
     updateEnvelopeFactor(0);
 }
 
@@ -129,12 +127,7 @@ void ObjectStepSeq::updateEnvelopeValues()
 {
     m_hi_env_vals[1] = EnvPoint(m_param_slope * m_param_high, 1.0f);
     m_hi_env_vals[2] = EnvPoint(m_param_high - m_param_slope * m_param_high, 1.0f);
-    m_hi_env_vals[3] = EnvPoint(m_param_high, 0.0f);    
-
-    if (m_param_step[m_cur_step])
-	m_env.setValues(&m_hi_env_vals);
-    else
-	m_env.setValues(&m_lo_env_vals);
+    m_hi_env_vals[3] = EnvPoint(m_param_high, 0.0f);
 
     m_env.setTime(m_env.getTime() * m_param_high/m_old_param_high);
     

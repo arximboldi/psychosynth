@@ -22,3 +22,16 @@
 
 #include "TaskManager.h"
 
+void TaskManager::update(int ms)
+{
+    TaskIter i = m_tasks.begin();
+    while (i != m_tasks.end())
+	if ((*i)->m_is_finished) {
+	    delete *i;
+	    i = m_tasks.erase(i);
+	} else {
+	    if (!(*i)->m_is_paused)
+		(*i)->update(ms);
+	    i++;
+	}    
+}

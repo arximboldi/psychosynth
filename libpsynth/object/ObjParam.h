@@ -52,8 +52,10 @@ private:
     void clear();
     void configure(int id, std::string name, int type, void* dest);
     void configure(int id, std::string name, int type, void* dest, Event ev);
-    void update();
 
+    void updateIn();
+    void updateOut();
+    
 public:
     enum Type {
 	NONE = -1,

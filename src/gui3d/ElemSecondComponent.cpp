@@ -24,10 +24,14 @@
 #include "gui3d/OgreMisc.h"
 
 #define SECOND_RAD 1.2
-#define SECOND_MIN_ANGLE 85
-#define SECOND_POINT_MIN_ANGLE -85
+#define SECOND_MIN_ANGLE -5
+#define SECOND_POINT_MIN_ANGLE 5
 #define SECOND_RANGE_ANGLE 170
 #define SECOND_POINT_RAD 0.2
+
+#define SECOND_COLOUR       ColourValue(1,1,1,0.4)
+#define SECOND_POINT_COLOUR ColourValue(1,1,1,0.7)
+#define SECOND_POINT_CLICK_COLOUR ColourValue(1,0,0,0.7)
 
 using namespace std;
 using namespace Ogre;
@@ -57,15 +61,16 @@ void ElemSecondComponent::init()
 		     SECOND_RANGE_ANGLE + SECOND_POINT_MIN_ANGLE);
 
     m_indicator = new FlatRing(string("SEC1")+getSceneNode()->getName(),
-			       Degree(SECOND_MIN_ANGLE), Degree(SECOND_MIN_ANGLE +
-								SECOND_RANGE_ANGLE),
-			       SECOND_RAD - 0.05, SECOND_RAD + 0.05,
-			       ColourValue(1,1,1,0.5));
+			       Degree(SECOND_MIN_ANGLE),
+			       Degree(SECOND_MIN_ANGLE + SECOND_RANGE_ANGLE),
+			       SECOND_RAD - 0.05,
+			       SECOND_RAD + 0.05,
+			       SECOND_COLOUR);
 
     m_indicator_point = new FlatRing(string("SECP")+getSceneNode()->getName(),
 				     Degree(0), Degree(360),
 				     0, 0.15,
-				     ColourValue(1,1,1,0.7));
+				     SECOND_POINT_COLOUR);
 
     getSceneNode()->attachObject(m_indicator);
 
@@ -84,12 +89,12 @@ bool ElemSecondComponent::handlePointerMove(Ogre::Vector2 pos)
 	Vector2 abs_pos = Vector2(abs_position.x, abs_position.z);
 
 	pos -= abs_pos;
-	pos = yawVector2(pos, orig_angle.getYaw().valueRadians());
-	float new_angle = Math::ATan2(pos.x, pos.y).valueRadians();
+	pos = yawVector2(pos, orig_angle.getYaw().valueRadians() - 3*Math::PI/2);
+	float new_angle = Math::PI - Math::ATan2(pos.x, pos.y).valueRadians();
 
 	if (new_angle < -Math::PI/2)
 	    new_angle = Math::PI;
-
+	
 	float new_val = new_angle/Math::PI * (m_max_val - m_min_val) + m_min_val;
 	
 	if (new_val < m_min_val)
@@ -108,6 +113,8 @@ bool ElemSecondComponent::handlePointerClick(Ogre::Vector2 pos, OIS::MouseButton
     Vector2 real_pos = Vector2(real_position.x, real_position.z);
 
     if ((pos - real_pos).length() < SECOND_POINT_RAD) {
+	m_indicator_point->setColour(SECOND_POINT_CLICK_COLOUR);
+	m_indicator_point->update();
 	m_changing = true;
 	return true;
     }
@@ -117,7 +124,11 @@ bool ElemSecondComponent::handlePointerClick(Ogre::Vector2 pos, OIS::MouseButton
 
 bool ElemSecondComponent::handlePointerRelease(Ogre::Vector2 pos, OIS::MouseButtonID id)
 {
-    m_changing = false;
+    if (m_changing) {
+	m_indicator_point->setColour(SECOND_POINT_COLOUR);
+	m_indicator_point->update();
+	m_changing = false;
+    }
     return false;
 }
 
@@ -126,10 +137,10 @@ void ElemSecondComponent::handleParamChange(TableObject& obj, int param_id)
     if (param_id == m_param) {
 	Degree new_angle;
 	obj.getParam(m_param, m_old_value);
-	
-	new_angle = Degree((m_old_value - m_min_val) / (m_max_val - m_min_val) *
-			   SECOND_RANGE_ANGLE + SECOND_POINT_MIN_ANGLE);
-	m_point_yaw->yaw(new_angle - m_angle);
+
+	new_angle = -Degree((m_old_value - m_min_val) / (m_max_val - m_min_val) *
+			   SECOND_RANGE_ANGLE + SECOND_POINT_MIN_ANGLE + 180.0f);
+	m_point_yaw->yaw((new_angle - m_angle));
 	m_angle = new_angle;
     }
 }

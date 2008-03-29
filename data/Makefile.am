@@ -32,6 +32,7 @@ nobase_pkgdata_DATA = \
 	$(wildcard gui/*.tff)\
 	$(wildcard gui/*.font)\
 	$(wildcard material/*.material)\
+	$(wildcard material/*.cg)\
 	$(wildcard mesh/*.mesh)\
 	$(wildcard texture/*.tga)\
 	$(wildcard samples/*.wav)\

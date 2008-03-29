@@ -218,6 +218,13 @@ public:
 class Logger : public Singleton<Logger>,
 	       public Log
 {
+    friend class Singleton<Logger>;
+
+    /** Hidden constructor. */
+    Logger() {};
+
+     /** Hidden destructor. */
+    ~Logger() {};
 public:
 };
 

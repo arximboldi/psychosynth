@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) 2007 Juan Pedro Bolivar Puente                          *
+ *   Copyright (C) Juan Pedro Bolivar Puente 2008                          *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -20,47 +20,44 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef PSYNTH_SINGLETON_H
-#define PSYNTH_SINGLETON_H
+#ifndef ELEMTOGGLERCOMPONENT_H
+#define ELEMTOGGLERCOMPONENT_H
 
-namespace psynth
+#include <vector>
+#include "gui3d/Element.h"
+#include "gui3d/TaskManager.h"
+
+class ElemTogglerComponent : public ElemComponent,
+			     public Task
 {
+    typedef std::pair<FlatRing*, int> Toggle;
+    std::vector<Toggle> m_toggles;
 
-/**
- * Singleton pattern implementation.
- *
- * A singleton class is one that can be instantiated only once and that has
- * global access to it. Try to use it only if both needs apply for your class
- * and not like a fancier global variable.
- *
- * Any class will be a singleton just by inheriting from this class. 
- */
-template<typename T>
-class Singleton
-{
-    /** Hidden copy constructor. */
-    Singleton(Singleton const&) {};
-
-    /** Hidden copy operator. */
-    Singleton& operator=(Singleton const&) {};
-
-protected:
-    /** Hidden constructor. */
-    Singleton() {};
-
-    /** Hidden destructor. */
-    ~Singleton() {};
+    int m_param_num;
+    int m_param_first;
+    int m_param_step;
+    
+    int m_step;
+    
+    void createToggles();
+    void destroyToggles();
+    void updateCurrentStepColour(int step);
+    void updateStepColour(int step);
     
 public:
-    /**
-     * Returns the instance of the Singleton.
-     */
-    static T& instance() {
-        static T _instance;
-        return _instance;
-    };
+    ElemTogglerComponent(int num_param,
+			 int first_param,
+			 int step_param);
+    ~ElemTogglerComponent();
+    
+    void init();
+    void update(int ms);
+    bool handlePointerMove(Ogre::Vector2 pos);
+    bool handlePointerClick(Ogre::Vector2 pos, OIS::MouseButtonID id);
+    bool handlePointerRelease(Ogre::Vector2 pos, OIS::MouseButtonID id);
+    void handleParamChange(psynth::TableObject& obj,
+			   int param_id);   
 };
 
-} /* namespace psynth */
+#endif /* ELEMTOGGLERCOMPONENT_H */
 
-#endif /* PSYNTH_SINGLETON_H */

@@ -226,7 +226,7 @@ void Table::deleteObject(TableObject& obj)
 
 void Table::activateObject(TableObject& obj)
 {
-    obj.m_obj->updateParams();
+    obj.m_obj->updateParamsIn();
      
     if (m_patcher)
 	m_patcher->addObject(obj.m_obj);

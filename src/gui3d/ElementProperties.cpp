@@ -158,6 +158,64 @@ bool ElemGuiParamFloat::onSpinnerChange(const CEGUI::EventArgs &e)
     return true;
 }
 
+ElemGuiParamInt::ElemGuiParamInt(int param, int min_val, int max_val,
+				     const std::string& name) :
+    ElemGuiParam(param),
+    m_min_val(min_val),
+    m_max_val(max_val),
+    m_name(name),
+    m_skip(0)
+{
+}
+
+void ElemGuiParamInt::createGUI()
+{
+    WindowManager& wmgr = WindowManager::getSingleton();
+
+    m_label = dynamic_cast<Window*>(wmgr.createWindow("TaharezLook/StaticText"));
+    m_label->setPosition(UVector2(UDim(0, 0), UDim(0, 0)));
+    m_label->setSize(UVector2(UDim(0.5, -5), UDim(0, 20)));
+    m_label->setText(m_name);
+
+    m_spinner = dynamic_cast<Spinner*>(wmgr.createWindow("TaharezLook/Spinner"));
+    m_spinner->setPosition(UVector2(UDim(0.5, 0), UDim(0, 0)));
+    m_spinner->setSize(UVector2(UDim(0.5, 0), UDim(0, 20)));
+    m_spinner->setMaximumValue(m_max_val);
+    m_spinner->setMinimumValue(m_min_val);
+    m_spinner->setTextInputMode(Spinner::Integer);
+    m_spinner->subscribeEvent(Spinner::EventValueChanged, 
+			      Event::Subscriber(&ElemGuiParamInt::onSpinnerChange, this));
+    
+    int value;
+    getParent()->getObject().getParam(getParam(), value);
+    m_skip++;
+    m_spinner->setCurrentValue(value);
+    m_skip--;
+    
+    getParentWindow()->addChildWindow(m_label);
+    getParentWindow()->addChildWindow(m_spinner);
+}
+
+void ElemGuiParamInt::handleParamChange(TableObject& obj, int param)
+{
+    int new_val;
+
+    obj.getParam(param, new_val);
+    m_skip++;
+    m_spinner->setCurrentValue(new_val);
+    m_skip--;
+}
+
+bool ElemGuiParamInt::onSpinnerChange(const CEGUI::EventArgs &e)
+{
+    if (!m_skip) {
+	int new_val = m_spinner->getCurrentValue();
+	getParent()->getObject().setParam(getParam(), new_val);
+    }
+    
+    return true;
+}
+
 void ElementProperties::handleSetParamObject(TableObject& obj, int param_id)
 {
     if (m_params.find(param_id) != m_params.end())

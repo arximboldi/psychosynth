@@ -87,6 +87,25 @@ public:
     bool onSpinnerChange(const CEGUI::EventArgs &e);
 };
 
+class ElemGuiParamInt : public ElemGuiParam
+{
+    CEGUI::Window*  m_label;
+    CEGUI::Spinner* m_spinner;
+    int m_min_val;
+    int m_max_val;
+    std::string m_name;
+    int m_skip;
+    
+public:
+    ElemGuiParamInt(int param, int min_val, int max_val,
+		      const std::string& name);
+
+    void createGUI();
+    void handleParamChange(psynth::TableObject& obj,
+			   int param);
+    bool onSpinnerChange(const CEGUI::EventArgs &e);
+};
+
 class ElemGuiParamMulti : public ElemGuiParam {
     CEGUI::Window*  m_label;
     CEGUI::Combobox* m_selector;

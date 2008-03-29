@@ -32,16 +32,19 @@ void FlatRing::build()
     Real angle = m_startangle.valueRadians();
     Real step = (angle - m_endangle.valueRadians()) / n_steps;
     int i;
-	
-    for (i = 0; i <= n_steps; i++) {
-	position(m_innerrad * Math::Cos(angle), 0, m_innerrad * Math::Sin(angle));
-	//normal(0, 1, 0);
-	//colour(m_colour);
-	position(m_outerrad * Math::Cos(angle), 0, m_outerrad * Math::Sin(angle));
-	//normal(0, 1, 0);
-	//colour(m_colour);	
-	angle += step;
-    }
+
+    if (step < 0)
+	for (i = 0; i <= n_steps; i++) {
+	    position(m_innerrad * Math::Cos(angle), 0, m_innerrad * Math::Sin(angle));
+	    position(m_outerrad * Math::Cos(angle), 0, m_outerrad * Math::Sin(angle));
+	    angle += step;
+	}
+    else
+	for (i = 0; i <= n_steps; i++) {
+	    position(m_outerrad * Math::Cos(angle), 0, m_outerrad * Math::Sin(angle));
+	    position(m_innerrad * Math::Cos(angle), 0, m_innerrad * Math::Sin(angle));
+	    angle += step;
+	}
 }
 
 FlatRing::~FlatRing()

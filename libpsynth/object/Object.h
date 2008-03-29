@@ -205,6 +205,8 @@ private:
     
     Mutex m_paramlock;
 
+    void updateParamsOut();
+    void updateInputs();
     void updateInSockets();
     void setEnvelopesDeltas();
     void updateEnvelopes();
@@ -260,7 +262,7 @@ public:
     const std::string& getName() const {
 	return m_name;
     }
-    
+
     /* Only to be used by ObjectManager */
     void setID(int id) {
 	m_id = id;
@@ -269,11 +271,8 @@ public:
     int getID() const {
 	return m_id;
     }
-    
-    void updateParams();
 
-    void updateInputs();
-    
+    void updateParamsIn();
     void update(const Object* caller, int caller_port_type, int caller_port);
 	
     void advance() {

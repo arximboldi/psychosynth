@@ -205,7 +205,7 @@ void Psychosynth3D::setupOgre(psynth::ConfNode& conf)
 				false, false, false);  
     m_ogre = new Root(getDataPath() + "/plugins.cfg",
 		      getDataPath() + "/ogre.cfg");
-
+        
     ResourceGroupManager& res_mgr = ResourceGroupManager::getSingleton();
     res_mgr.addResourceLocation(getDataPath(), "FileSystem", "General");
     res_mgr.addResourceLocation(getDataPath() + "/mesh", "FileSystem", "General");
@@ -310,25 +310,38 @@ void Psychosynth3D::setupTable()
     Light* light;
     light = m_scene->createLight("light1");
     light->setType(Light::LT_POINT);
-
-    light->setPosition(Vector3(-20, 50, -20));
+    light->setPosition(Vector3(-30, 20, -25));
     light->setDiffuseColour(1.0, 1.0, 1.0);
     light->setSpecularColour(1.0, 1.0, 1.0);
-    light->setAttenuation(100, 1.6, 0, 0);
+    light->setAttenuation(100, 1.1, 0, 0);
 
     light = m_scene->createLight("light2");
     light->setType(Light::LT_POINT);
-    light->setPosition(Vector3(20, 50, 20));
+    light->setPosition(Vector3(20, 20, 15));
     light->setDiffuseColour(1.0, 1.0, 1.0);
     light->setSpecularColour(1.0, 1.0, 1.0);
-    light->setAttenuation(100, 1.6, 0, 0);
-	
+    light->setAttenuation(100, 1.5, 0, 0);
+
+    light = m_scene->createLight("light3");
+    light->setType(Light::LT_POINT);
+    light->setPosition(Vector3(20, 20, -15));
+    light->setDiffuseColour(1.0, 0.5, 0.5);
+    light->setSpecularColour(1.0, 1.0, 1.0);
+    light->setAttenuation(100, 1.3, 0, 0);
+
+    light = m_scene->createLight("light4");
+    light->setType(Light::LT_POINT);
+    light->setPosition(Vector3(-20, 20, 15));
+    light->setDiffuseColour(1.0, 0.3, 0.3);
+    light->setSpecularColour(1.0, 1.0, 0.3);
+    light->setAttenuation(100, 1.5, 0, 0);
+    
     Entity *ent1 = m_scene->createEntity( "object1", "table.mesh" );
     ent1->setQueryFlags(QFLAG_TABLE);
     SceneNode *node1 = m_scene->getRootSceneNode()->createChildSceneNode();
     //node1->setScale(Vector3(1.5, 1.5, 1.5));
     node1->attachObject(ent1);
-    node1->setScale(1.5, 1.5, 1.5);
+    node1->setScale(2, 2, 2);
     
     SceneNode *node = m_scene->getRootSceneNode()->createChildSceneNode();
     /* FIXME: Memory leak. */
@@ -337,7 +350,7 @@ void Psychosynth3D::setupTable()
     node->attachObject(ring);
     node->setPosition(Vector3(0,0.001,0));
 
-    m_taskmgr = new TaskManager();
+    m_taskmgr = &TaskManager::instance();
     m_elemmgr = new ElementManager(getTable(), m_scene, m_camera);
     m_camctrl = new CameraControllerRasko(m_camera, m_taskmgr);
 
@@ -434,7 +447,6 @@ void Psychosynth3D::setupMenus()
 
 void Psychosynth3D::closeTable()
 {
-    delete m_taskmgr;
     delete m_camctrl;
     delete m_elemmgr;
 }

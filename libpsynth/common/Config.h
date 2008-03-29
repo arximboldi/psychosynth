@@ -554,6 +554,14 @@ public:
 class Config : public ConfNode,
 	       public Singleton<Config>
 {
+    friend class Singleton<Config>;
+
+    /** Hidden constructor. */
+    Config() {};
+
+     /** Hidden destructor. */
+    ~Config() {};
+public:
 };
 
 } /* namespace psynth */

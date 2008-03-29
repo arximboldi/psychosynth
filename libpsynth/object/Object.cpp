@@ -269,17 +269,25 @@ void Object::updateInSockets()
 	}
 }
 
-void Object::updateParams()
+void Object::updateParamsIn()
 {
     size_t j;
     
     for (vector<ObjParam*>::iterator i = m_params.begin(); i != m_params.end(); ++i)
-	(*i)->update();
+	(*i)->updateIn();
 
     if (m_param_mute)
 	m_out_envelope.release();
     else
 	m_out_envelope.press();
+}
+
+void Object::updateParamsOut()
+{
+    size_t j;
+    
+    for (vector<ObjParam*>::iterator i = m_params.begin(); i != m_params.end(); ++i)
+	(*i)->updateOut();
 }
 
 void Object::updateInputs()
@@ -294,13 +302,15 @@ void Object::updateInputs()
 void Object::update(const Object* caller, int caller_port_type, int caller_port)
 {
     if (canUpdate(caller, caller_port_type, caller_port)) {
-	updateParams();
+	updateParamsIn();
 
 	if (!m_param_mute || !m_out_envelope.finished()) {
 	    updateInputs();
 	    doUpdate(caller, caller_port_type, caller_port); 
+	    
 	}
-
+	
+	updateParamsOut();
 	updateEnvelopes();
 	updateInSockets();
     }

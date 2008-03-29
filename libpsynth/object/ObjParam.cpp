@@ -30,7 +30,7 @@ using namespace std;
 namespace psynth
 {
 
-void ObjParam::update()
+void ObjParam::updateIn()
 {
     m_lock.lock();
     if (m_changed) {
@@ -51,6 +51,27 @@ void ObjParam::update()
 	};
 	m_changed = false;
     }
+    m_lock.unlock();
+}
+
+void ObjParam::updateOut()
+{
+    m_lock.lock();
+    switch(m_type) {
+	case INT:
+	    *static_cast<int*>(m_src) = *static_cast<int*>(m_dest);
+	    break;
+	case FLOAT:
+	    *static_cast<float*>(m_src) = *static_cast<float*>(m_dest);
+	    break;
+	case STRING:
+	    *static_cast<std::string*>(m_src) = *static_cast<std::string*>(m_dest);
+	    break;
+	case VECTOR2F:
+	    *static_cast<Vector2f*>(m_src) = *static_cast<Vector2f*>(m_dest);
+	    break;
+	default: break;
+    };
     m_lock.unlock();
 }
 

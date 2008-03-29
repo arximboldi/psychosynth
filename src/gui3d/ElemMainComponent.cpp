@@ -23,8 +23,11 @@
 #include "gui3d/ElemMainComponent.h"
 #include <libpsynth/common/Misc.h>
 
-#define INDICATOR_MIN_ANGLE 265
+#define INDICATOR_MIN_ANGLE 175
 #define INDICATOR_RANGE_ANGLE 170
+
+#define COLOUR_ACTIVE  ColourValue(1, 1, 1, 0.7)
+#define COLOUR_PASSIVE ColourValue(1, 1, 1, 0.4)
 
 using namespace std;
 using namespace Ogre;
@@ -115,7 +118,7 @@ void ElemMainComponent::init()
 			       Degree(INDICATOR_MIN_ANGLE), Degree(INDICATOR_MIN_ANGLE +
 				   INDICATOR_RANGE_ANGLE),
 			       Element::RADIOUS + 0.1, Element::RADIOUS + 0.3,
-			       ColourValue(1,1,1,0.5));
+			       COLOUR_PASSIVE);
 
     m_indicator_fill = new FlatRing(string("IND2")+getSceneNode()->getName(),
 				    Degree(INDICATOR_MIN_ANGLE),
@@ -123,7 +126,7 @@ void ElemMainComponent::init()
 					   (m_old_value-m_min_val) / (m_max_val-m_min_val) *
 					   INDICATOR_RANGE_ANGLE),
 				    Element::RADIOUS + 0.1, Element::RADIOUS + 0.3,
-				    ColourValue(1,1,1,0.6));
+				    COLOUR_ACTIVE);
 
     getSceneNode()->attachObject(m_indicator);
     getSceneNode()->attachObject(m_indicator_fill);

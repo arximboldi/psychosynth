@@ -51,7 +51,10 @@ void FileReaderOgg::open(const char* file)
 
 void FileReaderOgg::seek(size_t pos)
 {
-    ov_pcm_seek(&m_file, pos);
+    if (ov_seekable(&m_file))
+	ov_pcm_seek(&m_file, pos); //*getInfo().num_channels);
+    else
+	Logger::instance().log("ogg", Log::ERROR, "Stream not seekable.");
 }
 
 int FileReaderOgg::read(AudioBuffer& buf, int n_samples)
@@ -59,22 +62,30 @@ int FileReaderOgg::read(AudioBuffer& buf, int n_samples)
     float** pcm;
     int bitstream;
     int n_read;
-
-    n_read = ov_read_float(&m_file, &pcm, n_samples, &bitstream);
-
-    /* TODO: Test bitstream changes? */
-    int n_chan = min(getInfo().num_channels,
-		     buf.getInfo().num_channels);
-    if (n_read) {
-	int i;
+    int index = 0;
 	
-	for (i = 0; i < n_chan; ++i)
-	    memcpy(buf.getData()[i], pcm[i], sizeof(float) * n_read);
-	for (; i < buf.getInfo().num_channels; ++i)
-	    memcpy(buf.getData()[i], pcm[i-n_chan], sizeof(float) * n_read);
+    while(n_samples > 0) {
+	n_read = ov_read_float(&m_file, &pcm, n_samples, &bitstream);
+	
+	if (n_read) {
+	    int n_chan = min(getInfo().num_channels,
+			     buf.getInfo().num_channels);
+	
+	    int i;
+	
+	    for (i = 0; i < n_chan; ++i)
+		memcpy(buf.getData()[i] + index, pcm[i], sizeof(float) * n_read);
+	    for (; i < buf.getInfo().num_channels; ++i)
+		memcpy(buf.getData()[i] + index, pcm[i-n_chan], sizeof(float) * n_read);
+
+	    index += n_read;
+	    n_samples -= n_read;
+	} else {
+	    n_samples = 0;
+	}
     }
     
-    return n_read;
+    return index;
 }
 
 void FileReaderOgg::close()

@@ -83,6 +83,7 @@ psynth3d_SOURCES = \
 	gui3d/Element.cpp \
 	gui3d/ElemMainComponent.cpp \
 	gui3d/ElemSecondComponent.cpp \
+	gui3d/ElemTogglerComponent.cpp \
 	gui3d/ElementManager.cpp \
 	gui3d/ElementProperties.cpp \
 	gui3d/TheElements.cpp \
@@ -108,6 +109,7 @@ psynth3d_SOURCES = \
 	gui3d/ElementTypes.h\
 	gui3d/ElemMainComponent.h \
 	gui3d/ElemSecondComponent.h \
+	gui3d/ElemTogglerComponent.h \
 	gui3d/ElementManager.h\
 	gui3d/ElementProperties.h \
 	gui3d/TheElements.h \
