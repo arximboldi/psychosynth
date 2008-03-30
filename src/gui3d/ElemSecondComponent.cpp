@@ -57,8 +57,8 @@ ElemSecondComponent::~ElemSecondComponent()
 void ElemSecondComponent::init()
 {
     getParent()->getObject().getParam(m_param, m_old_value);
-    m_angle = Degree((m_old_value - m_min_val) / (m_max_val - m_min_val) *
-		     SECOND_RANGE_ANGLE + SECOND_POINT_MIN_ANGLE);
+    m_angle = Degree(180-((m_old_value - m_min_val) / (m_max_val - m_min_val) *
+			  SECOND_RANGE_ANGLE + SECOND_POINT_MIN_ANGLE));
 
     m_indicator = new FlatRing(string("SEC1")+getSceneNode()->getName(),
 			       Degree(SECOND_MIN_ANGLE),

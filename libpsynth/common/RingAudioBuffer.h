@@ -200,6 +200,7 @@ public:
      * Writes the data in the AudioBuffer applying some fast resampling to it.
      * @param buf The buffer with the data.
      * @param factor The resampling factor: original_sample_rate / new_sample_rate.
+     * @todo This function is not backwards safe yet.
      */
     void writeFastResample(const AudioBuffer& buf, float factor) {
 	writeFastResample(buf, buf.size(), factor);
@@ -210,6 +211,7 @@ public:
      * @param buf The buffer with the data.
      * @param samples The number of samples from the original buffer to write.
      * @param factor The resampling factor: original_sample_rate / new_sample_rate.
+     * @todo This function is not backwards safe yet.
      */
     void writeFastResample(const AudioBuffer& buf, int samples, float factor);
 

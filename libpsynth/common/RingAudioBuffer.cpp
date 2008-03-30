@@ -106,6 +106,9 @@ int RingAudioBuffer::read(ReadPtr& r, AudioBuffer& buf, int samples) const
 {
     int nread = min(availible(r), samples);
 
+    if (isBackwards())
+	advance(r, -nread);
+    
     for (int i = 0; i < m_info.num_channels; i++) {
 	if (position(r) + nread > m_size) {
 	    memcpy(buf[i], m_data[i] + position(r), 
@@ -117,8 +120,9 @@ int RingAudioBuffer::read(ReadPtr& r, AudioBuffer& buf, int samples) const
 	    memcpy(buf[i], m_data[i] + position(r), sizeof(Sample) * nread);
 	}
     }
-    
-    advance(r, nread);
+
+    if (!isBackwards())
+	advance(r, nread);
     
     return nread;
 }
@@ -131,6 +135,9 @@ void RingAudioBuffer::write(const AudioBuffer& buf, int nwrite)
 	Logger::instance().log("core", Log::WARNING, "Ring buffer overflow.");
 	return;
     }
+
+    if (isBackwards())
+	advance(-nwrite);
     
     for (int i = 0; i < m_info.num_channels; i++) {
 	if (m_writepos + nwrite > m_size) {
@@ -143,8 +150,9 @@ void RingAudioBuffer::write(const AudioBuffer& buf, int nwrite)
 	    memcpy(m_data[i] + m_writepos, buf[i] + offset, sizeof(Sample) * nwrite);
 	}
     }
-
-    advance(nwrite);
+    
+    if(!isBackwards())
+	advance(nwrite);
 }
 
 void RingAudioBuffer::deinterleave(const Sample* buf, int to_write)
@@ -158,6 +166,9 @@ void RingAudioBuffer::deinterleave(const Sample* buf, int to_write)
     Sample* outbuf;
     int j;
     int nwrite;
+
+    if (isBackwards())
+	advance(-to_write);
     
     for (int i = 0; i < m_info.num_channels; i++) {
 	nwrite = to_write;
@@ -182,9 +193,9 @@ void RingAudioBuffer::deinterleave(const Sample* buf, int to_write)
 	    }
 	}
     }
-    //cout << m_writepos << endl;
-    //cout << m_writecount << endl;
-    advance(to_write);
+
+    if (!isBackwards())
+	advance(to_write);
 }
 
 void RingAudioBuffer::writeScaler(const AudioBuffer& inbuf, int samples,

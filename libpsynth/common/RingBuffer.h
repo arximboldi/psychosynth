@@ -23,6 +23,8 @@
 #ifndef PSYNTH_RINGBUFFER
 #define PSYNTH_RINGBUFFER
 
+#include <algorithm>
+
 namespace psynth
 {
 
@@ -80,12 +82,16 @@ public:
 	/** Number of error codes.*/
 	ERR_CODES
     };
-    
+
+    bool m_backwards; /**< @c true if we are reading and writting the
+			 ringbuffer backwards. */
+    int m_startpos;  /**< The new starting position of the ring buffer. */
+	
 protected:
     int m_size;       /**< The size of the buffer. */
     int m_writepos;   /**< The current writting position of the buffer. */
     int m_writecount; /**< Total number of elements written to the buffer. */ 
-
+    		 
     /**
      * Accessor function to allow childs get and set a ReadPtr position.
      * @param r The ReadPtr to consult.
@@ -108,8 +114,15 @@ protected:
      * @param n The number of elements to advance.
      */
     void advance(ReadPtr& r, int n) const {
-	r.m_pos = (r.m_pos + n) % m_size;
-	r.m_count += n;
+	if (n >= 0) {
+	    r.m_pos = (r.m_pos + n) % m_size;
+	    r.m_count += n;
+	} else {
+	    r.m_pos += n;
+	    while(r.m_pos < 0)
+		r.m_pos += m_size;
+	    r.m_count -= n;
+	}
     }
 
     /**
@@ -117,8 +130,15 @@ protected:
      * @param n The number of elements to advance.
      */
     void advance(int n) {
-	m_writepos = (m_writepos + n) % m_size;
-	m_writecount += n;
+	if (n >= 0) {
+	    m_writepos = (m_writepos + n) % m_size;
+	    m_writecount += n;
+	} else {
+	    m_writepos += n;
+	    while(m_writepos < 0)
+		m_writepos += m_size;
+	    m_writecount -= n;
+	}
     }
 
     /**
@@ -128,14 +148,18 @@ protected:
     RingBuffer(int size = 0) :
 	m_size(size),
 	m_writepos(0),
-	m_writecount(0)
+	m_writecount(0),
+	m_backwards(false),
+	m_startpos(0)
 	{}
 
     /** Copy constructor */
     RingBuffer(const RingBuffer& buf) :
 	m_size(buf.m_size),
 	m_writepos(buf.m_writepos),
-	m_writecount(buf.m_writecount)
+	m_writecount(buf.m_writecount),
+	m_backwards(buf.m_backwards),
+	m_startpos(0)
 	{}
     
 public:
@@ -147,14 +171,15 @@ public:
 	return m_size;
     }
 
-        /**
+    /**
      * Returns a read pointer to the beginning of the availible data.
      */
     ReadPtr begin() const {
-	return ReadPtr(m_writepos,
-		       m_writecount - m_size < 0 ?
-		       0 :
-		       m_writecount - m_size);
+	if (m_writecount < m_size)
+	    return ReadPtr(m_startpos, 0);
+	else
+	    return ReadPtr(m_writepos,
+			   m_writecount - m_size);
     };
 
     /**
@@ -181,6 +206,47 @@ public:
 	if (reader.m_count > m_writecount)
 	return ERR_OVERRUN;
 	return ERR_NONE;
+    }
+
+    /**
+     * Returns wether this buffer is being written backwards.
+     */
+    bool isBackwards() const {
+	return m_backwards;
+    }
+    
+    /**
+     * Changes the reading direction of the current pointer write pointer.
+     * If you are using this buffer as an intermediate buffer from another
+     * medium and your where reading that medium forwards, this allows you to
+     * not to lose the already read data remaining in the buffer if you
+     * change the reading direction.
+     * @see sync()
+     */
+    void backwards() {
+	m_backwards = !m_backwards;
+	if (m_writecount < m_size)
+	    std::swap(m_startpos, m_writepos);
+    }
+
+    /**
+     * Returns a new ReadPtr in the same position but with the read count
+     * calculated from the read position to the write position.
+     * This function may be called to get back from an erratic ReadPtr
+     * and @b must be called whenever the write direction is changed using
+     * the @c backwards() function.
+     */
+    ReadPtr sync(const ReadPtr& r) {
+	if (!m_backwards)
+	    return ReadPtr(r.m_pos,
+			   r.m_pos <= m_writepos ?
+			   m_writepos - r.m_pos :
+			   m_size - r.m_pos + m_writepos);
+	else
+	    return ReadPtr(r.m_pos,
+			   r.m_pos >= m_writepos ?
+			   r.m_pos - m_writepos :
+			   m_size - m_writepos + r.m_pos);
     }
 };
 

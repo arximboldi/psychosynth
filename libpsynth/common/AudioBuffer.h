@@ -61,12 +61,23 @@ public:
     }
     
     /**
-     * Construct the object with some @c AudioInfo. The buffer whil have the same
+     * Construct the object with some @c AudioInfo. The buffer will have the same
      * size of @a info.block_size.
      * @param info The @c AudioInfo of the data contained.
      */
     AudioBuffer(const AudioInfo& info) : 
 	m_info(info) {
+	allocate();
+    }
+
+    /**
+     * Construct the object with some @c AudioInfo. The buffer will be of size
+     * @a size, and its AudioInfo's @c block_size will be set to @a size.
+     * @param info The @c AudioInfo of the data contained.
+     * @param size The size of the AudioBuffer.
+     */
+    AudioBuffer(const AudioInfo& info, int size) : 
+	m_info(info.sample_rate, size) {
 	allocate();
     }
 

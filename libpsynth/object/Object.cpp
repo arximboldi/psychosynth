@@ -244,6 +244,7 @@ void Object::updateEnvelopes()
 	    EnvelopeSimple env = m_out_envelope;
 	    env.update(m_outdata_audio[i][j], m_audioinfo.block_size);
 	}
+    
     for (i = 0; i < m_outdata_control.size(); ++i) {
 	EnvelopeSimple env = m_out_envelope;
 	env.update(m_outdata_control[i].getData(), m_audioinfo.block_size);

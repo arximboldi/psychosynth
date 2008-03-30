@@ -100,6 +100,7 @@ nobase_libpsynthinc_HEADERS = \
 	output/Output.h\
 	input/FileReader.h\
 	input/FileReaderAny.h\
+	input/FileReaderFetcher.cpp\
 	version.h
 
 libpsynth_la_SOURCES = \
@@ -109,6 +110,7 @@ libpsynth_la_SOURCES = \
 	common/Error.cpp \
 	common/AudioBuffer.cpp \
 	common/ControlBuffer.cpp \
+	common/RingBuffer.cpp \
 	common/RingAudioBuffer.cpp \
 	common/RingControlBuffer.cpp \
 	common/Mutex.cpp \
@@ -138,7 +140,8 @@ libpsynth_la_SOURCES = \
 	object/ObjParam.cpp\
 	object/ObjectFactoryManager.cpp\
 	object/EnvelopeMulti.cpp\
-	input/FileReaderAny.cpp
+	input/FileReaderAny.cpp\
+	input/FileReaderFetcher.cpp
 
 if HAVE_SAMPLERATE
 libpsynth_la_CXXFLAGS += $(SAMPLERATE_CFLAGS)

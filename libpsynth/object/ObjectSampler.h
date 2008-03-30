@@ -26,6 +26,7 @@
 #include <libpsynth/common/RingAudioBuffer.h>
 #include <libpsynth/object/Object.h>
 #include <libpsynth/input/FileReaderAny.h>
+#include <libpsynth/input/FileReaderFetcher.h>
 #include <libpsynth/object/ObjectFactory.h>
 #include <libpsynth/common/ScalerST.h>
 
@@ -66,12 +67,9 @@ public:
     
 private:
     FileReaderAny m_reader;
-    RingAudioBuffer m_buffer;
-    RingAudioBuffer::ReadPtr m_read_ptr;
+    FileReaderFetcher m_fetcher;
     AudioBuffer m_inbuf;
     ScalerST m_scaler;
-    int m_read_pos;
-    int m_end_pos;
     float m_ctrl_pos;
     
     float m_param_ampl;
@@ -90,7 +88,8 @@ private:
     void onInfoChange();
     
 public:
-    ObjectSampler(const AudioInfo& info);   
+    ObjectSampler(const AudioInfo& info);
+    ~ObjectSampler();
 };
 
 PSYNTH_DECLARE_OBJECT_FACTORY(ObjectSampler, "sampler");
