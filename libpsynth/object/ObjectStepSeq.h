@@ -39,6 +39,14 @@ public:
     static const int DEFAULT_STEP = true;
     static const float DEFAULT_HIGH = 0.8f;
     static const float DEFAULT_SLOPE = 0.1f;
+
+    enum Shape {
+	SHAPE_SQUARE,
+	SHAPE_TRIANGLE,
+	SHAPE_FWSAWTOOTH,
+	SHAPE_BWSAWTOOTH,
+	N_SHAPES
+    };
     
     enum InAudioSocketID {
 	N_IN_A_SOCKETS
@@ -51,6 +59,7 @@ public:
 
     enum ParamID {
 	PARAM_BPM = Object::N_COMMON_PARAMS,
+	PARAM_SHAPE,
 	PARAM_HIGH,
 	PARAM_SLOPE,
 	PARAM_CURRENT_STEP,
@@ -103,13 +112,18 @@ private:
     void doUpdate(const Object* caller, int caller_port_type, int caller_port);
     void doAdvance();
     void onInfoChange();
-
+    void createShape();
+    void updateShape();
+    
     float m_param_bpm;
+    int m_param_shape;
     float m_param_high;
     float m_param_slope;
     int m_param_num_steps;
     int m_param_step[MAX_STEPS];
+
     float m_old_param_high;
+    int m_old_param_shape;
     
     EnvelopeMultiValues m_hi_env_vals;
     EnvelopeMultiValues m_lo_env_vals;

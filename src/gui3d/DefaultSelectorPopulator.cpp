@@ -32,6 +32,7 @@
 #include <libpsynth/object/ObjectLFO.h>
 #include <libpsynth/object/ObjectFilter.h>
 #include <libpsynth/object/ObjectSampler.h>
+#include <libpsynth/object/ObjectStepSeq.h>
 
 #include "gui3d/SelectorWindow.h"
 #include "gui3d/DefaultSelectorPopulator.h"
@@ -141,7 +142,14 @@ void DefaultSelectorPopulator::populate(const std::string& data_path,
     creat.clear();
     cat = sel->addCategory("Sequencing");
     creat.setName("stepseq");
-    cat->addButton("Step seq.", creat);
+    creat.setParam("shape", (int) ObjectStepSeq::SHAPE_SQUARE);
+    cat->addButton("Step Square", creat);
+    creat.setParam("shape", (int) ObjectStepSeq::SHAPE_TRIANGLE);
+    cat->addButton("Step Triangle", creat);
+    creat.setParam("shape", (int) ObjectStepSeq::SHAPE_FWSAWTOOTH);
+    cat->addButton("Step FW Saw", creat);
+    creat.setParam("shape", (int) ObjectStepSeq::SHAPE_BWSAWTOOTH);
+    cat->addButton("Step BW Saw", creat);
     
     creat.clear();
     cat = sel->addCategory("Samples");

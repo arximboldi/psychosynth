@@ -79,3 +79,24 @@ material stepseq_sawtooth_image
 	}
 }
 
+material stepseq_bwsawtooth_image
+{
+	receive_shadows on
+	technique
+	{
+		pass
+		{
+			
+		    scene_blend alpha_blend
+              depth_write off
+
+			texture_unit
+			{
+				texture stepseq_bwsawtooth.tga
+				filtering trilinear
+				tex_address_mode clamp
+				
+			}
+		}
+	}
+}

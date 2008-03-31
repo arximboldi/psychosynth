@@ -41,6 +41,7 @@ ObjectStepSeq::ObjectStepSeq(const AudioInfo& info) :
 	   N_OUT_A_SOCKETS,
 	   N_OUT_C_SOCKETS),
     m_param_bpm(DEFAULT_BPM),
+    m_param_shape(SHAPE_SQUARE),
     m_param_high(DEFAULT_HIGH),
     m_param_slope(DEFAULT_SLOPE),
     m_param_num_steps(DEFAULT_NUM_STEPS),
@@ -50,6 +51,7 @@ ObjectStepSeq::ObjectStepSeq(const AudioInfo& info) :
     int i;
     
     addParam("bpm", ObjParam::FLOAT, &m_param_bpm);
+    addParam("shape", ObjParam::INT, &m_param_shape);
     addParam("high", ObjParam::FLOAT, &m_param_high);
     addParam("slope", ObjParam::FLOAT, &m_param_slope);
     addParam("current_step", ObjParam::INT, &m_cur_step);
@@ -96,6 +98,7 @@ void ObjectStepSeq::doUpdate(const Object* caller,
 	}
     }
 
+    m_old_param_shape = m_param_shape;
     m_old_param_high = m_param_high;
 }
 
@@ -113,23 +116,68 @@ void ObjectStepSeq::initEnvelopeValues()
     m_lo_env_vals[0] = EnvPoint(0.0f, 0.0f);
     m_lo_env_vals[1] = EnvPoint(1.0f, 0.0f);
 
-    m_hi_env_vals.resize(5);
-    m_hi_env_vals[0] = EnvPoint(0.0f, 0.0f);
-    m_hi_env_vals[1] = EnvPoint(m_param_slope * m_param_high, 1.0f);
-    m_hi_env_vals[2] = EnvPoint(m_param_high - m_param_slope * m_param_high, 1.0f);
-    m_hi_env_vals[3] = EnvPoint(m_param_high, 0.0f);
-    m_hi_env_vals[4] = EnvPoint(1.0f, 0.0f);
-
+    createShape();
+    
     updateEnvelopeFactor(0);
+}
+
+void ObjectStepSeq::createShape()
+{
+    switch(m_param_shape) {
+    case SHAPE_SQUARE:
+	m_hi_env_vals.resize(5);
+	break;
+    case SHAPE_TRIANGLE:
+    case SHAPE_FWSAWTOOTH:
+    case SHAPE_BWSAWTOOTH:
+	m_hi_env_vals.resize(4);
+	break;
+    default:
+	break;
+    }
+
+    m_hi_env_vals[0] = EnvPoint(0.0f, 0.0f);
+    m_hi_env_vals[m_hi_env_vals.size()-1] = EnvPoint(1.0f, 0.0f);
+    
+    updateShape();
+}
+
+void ObjectStepSeq::updateShape()
+{
+    switch(m_param_shape) {
+    case SHAPE_SQUARE:
+	m_hi_env_vals[1] = EnvPoint(m_param_slope * m_param_high, 1.0f);
+	m_hi_env_vals[2] = EnvPoint(m_param_high - m_param_slope * m_param_high, 1.0f);
+	m_hi_env_vals[3] = EnvPoint(m_param_high, 0.0f);
+	break;
+    case SHAPE_TRIANGLE:
+	m_hi_env_vals[1] = EnvPoint(m_param_high/2.0f, 1.0f);
+	m_hi_env_vals[2] = EnvPoint(m_param_high, 0.0f);
+	break;
+    case SHAPE_FWSAWTOOTH:
+	m_hi_env_vals[1] = EnvPoint(m_param_high - m_param_slope * m_param_high, 1.0f);
+	m_hi_env_vals[2] = EnvPoint(m_param_high, 0.0f);
+	break;
+    case SHAPE_BWSAWTOOTH:
+	m_hi_env_vals[1] = EnvPoint(m_param_slope * m_param_high, 1.0f);
+	m_hi_env_vals[2] = EnvPoint(m_param_high, 0.0f);
+	break;
+    default:
+	break;
+    }
 }
 
 void ObjectStepSeq::updateEnvelopeValues()
 {
-    m_hi_env_vals[1] = EnvPoint(m_param_slope * m_param_high, 1.0f);
-    m_hi_env_vals[2] = EnvPoint(m_param_high - m_param_slope * m_param_high, 1.0f);
-    m_hi_env_vals[3] = EnvPoint(m_param_high, 0.0f);
+    if (m_param_shape != m_old_param_shape) {
+	createShape();
+	m_env.restart();
+    }
 
-    m_env.setTime(m_env.getTime() * m_param_high/m_old_param_high);
+    if (m_param_high != m_old_param_high) {
+	updateShape();
+	m_env.setTime(m_env.getTime() * m_param_high/m_old_param_high);
+    }
     
     updateEnvelopeFactor(0);
 }

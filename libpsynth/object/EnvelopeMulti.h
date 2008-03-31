@@ -122,12 +122,15 @@ public:
     float setTime(float time) {
 	m_time = time;
     }
+
+    void restart() {
+	m_time = 0;
+	m_cur_point = 0;
+    }
     
     void press() {
-	if (finished()) {
-	    m_cur_point = 0;
-	    m_time = 0;
-	}
+	if (finished())
+	    restart();
 	m_pressed = true;
     }
 

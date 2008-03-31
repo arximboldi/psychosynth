@@ -271,13 +271,20 @@ ElementSampler::ElementSampler(TableObject& obj,
 ElementStepSeq::ElementStepSeq(TableObject& obj,
 			       Ogre::SceneManager* m_scene) :
     Element(obj, m_scene)
-{	    
-    static const char* mesh_name = "stepseq_square.mesh";
-    cout << mesh_name << endl;
-    addComponent(new ElemMainComponent(
-		     string(mesh_name), 
+{
+    static const char* mesh_names[ObjectOscillator::N_OSC_TYPES] =
+	{"stepseq_square.mesh", "stepseq_triangle.mesh",
+	 "stepseq_sawtooth.mesh", "stepseq_bwsawtooth.mesh"};
+
+    static const char* shape_names[ObjectOscillator::N_OSC_TYPES] =
+	{"Square", "Triangle", "FW Sawtooth", "BW Sawtooth"};
+    
+
+    addComponent(new ElemMultiMainComponent(
 		     ObjectStepSeq::PARAM_BPM,
-		     40.0f, 400.0f));
+		     40.0f, 400.0f,
+		     ObjectStepSeq::PARAM_SHAPE,
+		     mesh_names));
     
     addComponent(new ElemSecondComponent(
 		     ObjectStepSeq::PARAM_HIGH,
@@ -288,6 +295,11 @@ ElementStepSeq::ElementStepSeq(TableObject& obj,
 		     ObjectStepSeq::PARAM_STEP_0,
 		     ObjectStepSeq::PARAM_CURRENT_STEP));
 
+    getGUIProperties().addParameter(new ElemGuiParamMulti(
+					ObjectStepSeq::PARAM_SHAPE,
+					ObjectStepSeq::N_SHAPES,
+					shape_names,
+					"Shape"));
     getGUIProperties().addParameter(new ElemGuiParamInt(
 					ObjectStepSeq::PARAM_NUM_STEPS,
 					1, 32,
