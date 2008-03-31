@@ -44,6 +44,7 @@ public:
 	
     enum InControlSocketID {
 	IN_C_RATE,
+	IN_C_TRIGGER,
 	N_IN_C_SOCKETS
     };
 
@@ -76,13 +77,17 @@ private:
     float m_param_rate;
     float m_param_tempo;
     float m_param_pitch;
+
+    bool m_restart;
     
     std::string m_param_file;
     
     Mutex m_update_lock;
     
     void onFileChange(ObjParam& par);
-	
+    void read(AudioBuffer& buf, int start, int end);
+    void restart();
+    
     void doUpdate(const Object* caller, int caller_port_type, int caller_port);
     void doAdvance();
     void onInfoChange();

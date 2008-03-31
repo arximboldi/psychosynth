@@ -78,6 +78,7 @@ public:
     
     void open(const char* file);
     void seek(size_t pos);
+    void forceSeek(size_t pos);
     int read(AudioBuffer& buf, int n_samples);
     void close();
     void finish();

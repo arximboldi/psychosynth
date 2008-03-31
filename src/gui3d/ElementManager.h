@@ -46,6 +46,7 @@ class ElementManager : public OIS::MouseListener,
     typedef ElemMap::iterator ElemMapIter;
     
     psynth::Table* m_table;
+    psynth::TableObject m_adding;
     ElemList m_clear_elems;
     ElemMap m_elems;
     std::list<Connection*> m_cons;

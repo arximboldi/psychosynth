@@ -46,14 +46,34 @@ FileReaderFetcher::FileReaderFetcher(FileReader* reader,
 
 void FileReaderFetcher::setBackwards(bool backwards)
 {
+    int old_avail;
+    int new_avail;
+    int diff_avail;
+    
     if (m_backwards != backwards) {
 	m_buffer_lock.lock();
 	m_reader_lock.lock();
 
+	old_avail = m_buffer.availible(m_read_ptr);
+	
 	m_backwards = backwards;
 	m_buffer.backwards();
 	m_read_ptr = m_buffer.sync(m_read_ptr);
-		
+
+	new_avail = m_buffer.availible(m_read_ptr);
+	diff_avail = old_avail - new_avail;
+
+	/* Fix reading position. */
+	if (m_backwards) {
+	    m_new_read_pos -= diff_avail;
+	    if (m_new_read_pos < 0)
+		m_new_read_pos += getInfo().block_size;
+	} else {
+	    m_new_read_pos += diff_avail;
+	    if (m_new_read_pos >= getInfo().block_size)
+		m_new_read_pos -= getInfo().block_size;
+	}
+	
 	m_buffer_lock.unlock();
 	m_reader_lock.unlock();
     }
@@ -81,24 +101,43 @@ void FileReaderFetcher::seek(size_t pos)
     m_new_read_pos = pos;
 }
 
+void FileReaderFetcher::forceSeek(size_t pos)
+{
+    m_buffer_lock.lock();
+    m_reader_lock.lock();
+
+    m_read_pos = pos;
+    m_reader->seek(pos);
+
+    m_read_ptr = m_buffer.end();
+        
+    m_reader_lock.unlock();
+    m_cond.broadcast();
+    m_buffer_lock.unlock();
+}
+
 int FileReaderFetcher::read(AudioBuffer& buf, int n_samples)
 {
     int n_read;
     
     m_buffer_lock.lock();
 
-    if(m_buffer.availible(m_read_ptr) >= n_samples)
-	n_read = m_buffer.read(m_read_ptr, buf, n_samples);
-    else
-	n_read = 0;
+    while (m_buffer.availible(m_read_ptr) == 0)
+	m_cond.wait(m_buffer_lock);
+	
+    n_read = min(n_samples, m_buffer.availible(m_read_ptr));
 
-    if (m_buffer.availible(m_read_ptr) < m_threshold)
-	m_cond.broadcast();
-    m_buffer_lock.unlock();
-
-    if (m_backwards)
-	buf.reverse(n_read);
+    if (n_read) {
+	m_buffer.read(m_read_ptr, buf, n_samples);
     
+	if (m_buffer.availible(m_read_ptr) < m_threshold)
+	    m_cond.broadcast();
+	m_buffer_lock.unlock();
+
+	if (m_backwards)
+	    buf.reverse(n_read);
+    }
+
     return n_read;
 }
 
@@ -144,11 +183,7 @@ void FileReaderFetcher::run()
 	    }
 
 	    n_read = m_reader->read(m_tmp_buffer, must_read);
-	    /*for (int i = 0; i < n_read; ++i)
-		cout << m_tmp_buffer[0][i] << endl;
-	    cout << "-----\n";
-	    */
-	    
+
 	    /* Check wether whe have finished reading and loop. */
 	    if (!n_read && !m_backwards) {
 		m_read_pos += n_read;
@@ -162,6 +197,7 @@ void FileReaderFetcher::run()
 	if (n_read) {
 	    m_buffer_lock.lock();
 	    m_buffer.write(m_tmp_buffer, n_read);
+	    m_cond.broadcast();
 	    m_buffer_lock.unlock();
 	}
 

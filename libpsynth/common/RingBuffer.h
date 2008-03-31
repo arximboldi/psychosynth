@@ -239,14 +239,16 @@ public:
     ReadPtr sync(const ReadPtr& r) {
 	if (!m_backwards)
 	    return ReadPtr(r.m_pos,
-			   r.m_pos <= m_writepos ?
-			   m_writepos - r.m_pos :
-			   m_size - r.m_pos + m_writepos);
+			   m_writecount -
+			   (r.m_pos <= m_writepos ?
+			    m_writepos - r.m_pos :
+			    m_size - r.m_pos + m_writepos));
 	else
 	    return ReadPtr(r.m_pos,
-			   r.m_pos >= m_writepos ?
-			   r.m_pos - m_writepos :
-			   m_size - m_writepos + r.m_pos);
+			   m_writecount -
+			   (r.m_pos >= m_writepos ?
+			    r.m_pos - m_writepos :
+			    m_size - m_writepos + r.m_pos));
     }
 };
 

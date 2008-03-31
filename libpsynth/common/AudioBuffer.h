@@ -144,6 +144,16 @@ public:
 
     /**
      * Fills this buffer with data comming from a buffer with interleaved
+     * samples.
+     * @param src The interleaved buffer.
+     * @param start The start position where to fill.
+     * @param end The last position where to fill.
+     * @param num_chan The number of channels in the interleaved buffer.
+     */
+    void deinterleave(const Sample* src, size_t start, size_t end, int num_chan);
+    
+    /**
+     * Fills this buffer with data comming from a buffer with interleaved
      * @c char samples.
      * @param src The interleaved buffer.
      * @param n_frames the number of samples to fill.

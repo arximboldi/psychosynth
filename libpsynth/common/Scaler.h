@@ -102,6 +102,11 @@ public:
      * @return The actual number of frames received.
      */
     virtual int receive(float* data, int frames) = 0;
+
+    /**
+     * Clears all the data left in the scaler.
+     */
+    virtual void clear() = 0;
 };
 
 } /* namespace psynth */

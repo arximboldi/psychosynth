@@ -147,6 +147,13 @@ public:
     void update(float* data, int samples) {
 	m_st.putSamples(data, samples);
     };
+
+    /**
+     * Clears all the data left in the scaler.
+     */
+    void clear() {
+	m_st.clear();
+    }
 };
 
 } /* namespace psynth */

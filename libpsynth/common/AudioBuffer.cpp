@@ -181,6 +181,35 @@ void AudioBuffer::deinterleave(const Sample* src, size_t n_frames, int num_chan)
     }
 }
 
+void AudioBuffer::deinterleave(const Sample* src, size_t start, size_t end, int num_chan)
+{
+    size_t i, j;
+    Sample* out_buf;
+    const Sample* in_buf;
+
+    num_chan = min(m_info.num_channels, num_chan);
+    
+    for (i = 0; i < num_chan; ++i) {
+	out_buf = m_data[i];
+	in_buf = src + i;
+
+	for (j = start; j < end; ++j) {
+	    *out_buf++ = *in_buf;
+	    in_buf += num_chan;
+	}
+    }
+
+    for (; i < m_info.num_channels; ++i) {
+	out_buf = m_data[i];
+	in_buf = m_data[i - num_chan];
+
+	for (j = start; j < end; ++j) {
+	    *out_buf++ = *in_buf;
+	    in_buf += num_chan;
+	}
+    }
+}
+
 void AudioBuffer::deinterleaveC8(const char* src, size_t n_frames)
 {
     size_t i, j;

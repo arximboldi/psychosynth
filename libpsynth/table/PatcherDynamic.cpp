@@ -146,7 +146,7 @@ const PatcherData PATCHER_TABLE[N_OBJECTS][N_OBJECTS] =
 	{Object::LINK_CONTROL, ObjectStepSeq::OUT_C_OUTPUT, ObjectOscillator::IN_C_TRIGGER}, /* ObjectAudioOscillator */
 	{Object::LINK_CONTROL, ObjectStepSeq::OUT_C_OUTPUT, ObjectOscillator::IN_C_TRIGGER}, /* ObjectLFO */
 	{Object::LINK_NONE, 0, 0}, /* ObjectFilter */
-	{Object::LINK_NONE, 0, 0}, /* ObjectSampler */
+	{Object::LINK_CONTROL, ObjectStepSeq::OUT_C_OUTPUT, ObjectSampler::IN_C_TRIGGER}, /* ObjectSampler */
 	{Object::LINK_NONE, 0, 0}, /* ObjectStepSeq */
     }
 };

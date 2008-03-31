@@ -32,14 +32,20 @@ void ObjectControlMixer::doUpdate(const Object* caller, int caller_port_type, in
     ControlBuffer* buf = getOutput<ControlBuffer>(LINK_CONTROL, OUT_C_OUTPUT);
     const ControlBuffer* in = NULL;
     int j;
-
+    bool input = false;
+    
     init(buf->getData(), getInfo().block_size);
     
     for (j = 0; j < m_numchan; ++j)
 	if ((in = getInput<ControlBuffer>(LINK_CONTROL, j))) {
 	    EnvelopeSimple env = getInEnvelope(LINK_CONTROL, j);
 	    mix(buf->getData(), in->getData(), env, getInfo().block_size);
+	    input = true;
 	}
+
+    if (!input)
+	memset(buf->getData(), 0, sizeof(Sample) * getInfo().block_size);
+
 }
 
 } /* namespace psynth */

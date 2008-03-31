@@ -250,7 +250,7 @@ void ElementProperties::addParameter(ElemGuiParam* e)
     Window *window;
     window = dynamic_cast<Window*>(wmgr.createWindow("DefaultGUISheet"));
     window->setPosition(UVector2(UDim(0, 0), UDim(0, m_y_offset)));
-    window->setSize(UVector2(UDim(1, -10), UDim(1, - m_y_offset)));
+    window->setSize(UVector2(UDim(1, -10), UDim(0, 20)));
     m_y_offset += 25;
 
     getWindow()->setHeight(UDim(0, 40 + m_y_offset));

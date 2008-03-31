@@ -33,7 +33,8 @@ void ObjectAudioMixer::doUpdate(const Object* caller, int caller_port_type, int 
     const AudioBuffer* in = NULL;
     const ControlBuffer* ampl = getInput<ControlBuffer>(LINK_CONTROL, IN_C_AMPLITUDE);
     int i, j;
-
+    bool input = false;
+    
     for (i = 0; i < getInfo().num_channels; ++i) {
 	init(buf->getChannel(i), getInfo().block_size);
 
@@ -49,7 +50,11 @@ void ObjectAudioMixer::doUpdate(const Object* caller, int caller_port_type, int 
 		    mix(buf->getChannel(i), in->getChannel(i), ampl->getData(),
 			env, ctrl_env, getInfo().block_size);
 		}
+		input = true;
 	    }
+
+	if (!input)
+	    memset(buf->getChannel(i), 0, sizeof(Sample) * getInfo().block_size);
     }
 }
 

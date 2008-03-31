@@ -30,8 +30,10 @@
 
 using namespace std;
 
+#define TIME_STRETCH_MIN_SAMPLES 4096
+#define SMALL_BLOCK_SIZE 64
+#define BIG_BLOCK_SIZE   1024
 
-#define SAMPLER_BLOCK_SIZE  16
 //#define SAMPLER_BLOCK_SIZE  getInfo().block_size
 #define SCALER_TRAINER_SIZE 1024
 
@@ -54,7 +56,8 @@ ObjectSampler::ObjectSampler(const AudioInfo& info):
     m_param_ampl(0.75f),
     m_param_rate(1.0f),
     m_param_tempo(1.0f),
-    m_param_pitch(1.0f)
+    m_param_pitch(1.0f),
+    m_restart(false)
 {
     addParam("file", ObjParam::STRING, &m_param_file,
 	     MakeDelegate(this, &ObjectSampler::onFileChange));
@@ -85,87 +88,157 @@ void ObjectSampler::onFileChange(ObjParam& par)
 
     if (m_fetcher.isOpen())
 	m_fetcher.close();
-
+    
     m_fetcher.open(val.c_str());
     m_inbuf.setInfo(m_fetcher.getInfo(), getInfo().block_size);
     m_scaler.setChannels(m_fetcher.getInfo().num_channels);
-    m_scaler.setSampleRate(m_fetcher.getInfo().sample_rate);
+    //m_scaler.setSampleRate(m_fetcher.getInfo().sample_rate);
 
+    cout << "info.sample_rate:" << m_fetcher.getInfo().sample_rate << endl;
+    cout << "info.block_size:" << m_fetcher.getInfo().block_size << endl;
+    cout << "info.num_channels:" << m_fetcher.getInfo().num_channels << endl;
+    
     m_update_lock.unlock();
 }
 
 void ObjectSampler::doUpdate(const Object* caller, int caller_port_type, int caller_port)
 {
     AudioBuffer* out = getOutput<AudioBuffer>(Object::LINK_AUDIO, OUT_A_OUTPUT);
-    const ControlBuffer* rate = getInput<ControlBuffer>(Object::LINK_CONTROL, IN_C_RATE);
-    const Sample* rate_buf = NULL;
+    const ControlBuffer* trig = getInput<ControlBuffer>(Object::LINK_CONTROL, IN_C_TRIGGER);
+    const Sample* trig_buf = trig ? trig->getData() : 0;
+    EnvelopeSimple trig_env =  getInEnvelope(LINK_CONTROL, IN_C_TRIGGER);
 
-    if (rate)
-	rate_buf = rate->getData();
+    /* Read the data. */
+    size_t start = 0;
+    size_t end = getInfo().block_size;
+    
+    while(start < getInfo().block_size) {
+	if (m_restart) {
+	    if (trig_buf && trig_buf[start] != 0.0f) {
+		restart();
+		m_restart = false;
+	    }
+	}
+	
+	if (trig)
+	    end = trig->findHill(start);
+
+	read(*out, start, end);
+	
+	float env_val = trig_env.update(end - start);
+	if (env_val == 1.0f && trig_buf && trig_buf[end - 1] == 0.0f)
+	    m_restart = true;
+	    
+	start = end;
+    } 
+    
+    /* Set amplitude. */
+    Sample* buf = out->getData()[0];
+    int count = getInfo().block_size * getInfo().num_channels;
+    while(count--)
+	*buf++ *= m_param_ampl;
+
+    /* Apply trigger envelope. */
+    if (trig_buf) {
+	for (int i = 0; i < getInfo().num_channels; ++i) {
+	    buf = out->getChannel(i);
+	    int n_samp = getInfo().block_size;
+	    trig_buf = trig->getData();
+	    trig_env = getInEnvelope(LINK_CONTROL, IN_C_TRIGGER);
+
+	    while (n_samp--) {
+		float env_val = trig_env.update();
+		*buf = *buf * ((1.0f - env_val) + (env_val * *trig_buf));
+		++buf;
+		++trig_buf;
+	    }
+	}
+    }
+    
+}
+
+void ObjectSampler::restart()
+{
+    m_fetcher.forceSeek(0);
+    m_scaler.clear();
+}
+
+void ObjectSampler::read(AudioBuffer& buf, int start, int end)
+{
+    const ControlBuffer* rate = getInput<ControlBuffer>(Object::LINK_CONTROL, IN_C_RATE);
+    const Sample* rate_buf = rate ? rate->getData() : 0;
     
     float base_factor =
 	(float) m_fetcher.getInfo().sample_rate / getInfo().sample_rate * m_param_rate;
 
     int must_read;
     int nread;
-    float factor = base_factor;
-    bool backwards;
+    float factor;
 
+    bool backwards = false;;
+    bool high_latency = false;
+    
     m_update_lock.lock();
     m_scaler.setTempo(m_param_tempo);
     m_scaler.setPitch(m_param_pitch);
     m_update_lock.unlock();
-    
+
+    if (m_param_tempo != 1.0f ||
+	m_param_pitch != 1.0f)
+	high_latency = true;
+
+    if (base_factor < 0) {
+	backwards = true;
+	base_factor = -base_factor;
+    }
+    factor = base_factor;
+
     if (m_fetcher.isOpen()) {
-	Sample inter_buffer[getInfo().block_size * max(getInfo().num_channels,
-						       m_inbuf.getInfo().num_channels)];
-	while(m_scaler.availible() < getInfo().block_size) {
+	while(m_scaler.availible() < (high_latency ?
+				      TIME_STRETCH_MIN_SAMPLES :
+				      end - start)) {
 	    if (rate)
 		factor = base_factor + base_factor * rate_buf[(int) m_ctrl_pos];
-	    else
-		factor = base_factor;
 	    
-	    if (factor < 0) {
-		backwards = true;
-		factor = -factor;
-	    } else
-		backwards = false;
-
 	    if (backwards != m_fetcher.getBackwards())
 		m_fetcher.setBackwards(backwards);
 	    
 	    if (factor < 0.2)
 		factor = 0.2;
+
+	    must_read = high_latency ? getInfo().block_size : SMALL_BLOCK_SIZE;
 	    if (factor * m_param_tempo < 1.0)
-		must_read = SAMPLER_BLOCK_SIZE * factor * m_param_tempo;
+		must_read = (float)must_read * factor * m_param_tempo;
 	    else
-		must_read = SAMPLER_BLOCK_SIZE;
-
+		must_read = must_read;
+	   
 	    m_update_lock.lock();
-
 	    nread = m_fetcher.read(m_inbuf, must_read);
+	    
+	    if (nread) {
+		m_ctrl_pos += (float) nread / (factor * m_param_tempo);
+		if (m_ctrl_pos >= getInfo().block_size)
+		    m_ctrl_pos = phase(m_ctrl_pos) + ((int) m_ctrl_pos % getInfo().block_size);
 
-	    m_ctrl_pos += (float) nread / factor;
-	    if (m_ctrl_pos >= getInfo().block_size)
-		m_ctrl_pos = phase(m_ctrl_pos) + ((int) m_ctrl_pos % getInfo().block_size);
+		int old_availible = m_scaler.availible();
 
-	    m_inbuf.interleave(inter_buffer, nread);
-	    m_scaler.setRate(factor);
-	    m_scaler.update(inter_buffer, nread);
+		Sample inter_buffer[nread * m_inbuf.getInfo().num_channels];
+		m_inbuf.interleave(inter_buffer, nread);
+		m_scaler.setRate(factor);
+		m_scaler.update(inter_buffer, nread);
+	    }
 	    
 	    m_update_lock.unlock();
 	}
 
-	m_scaler.receive(inter_buffer, getInfo().block_size);
-	out->deinterleave(inter_buffer, getInfo().block_size, m_scaler.getChannels());
+	Sample inter_buffer[(end - start) * m_inbuf.getInfo().num_channels];
+	m_update_lock.lock();
+	m_scaler.receive(inter_buffer, end - start);
+	m_update_lock.unlock();
+	buf.deinterleave(inter_buffer, start, end, m_scaler.getChannels());
     } else {
-	out->zero();
+	buf.zero();
     }
-
-    Sample* buf = out->getData()[0];
-    int count = getInfo().block_size * getInfo().num_channels;
-    while(count--)
-	*buf++ *= m_param_ampl; 
 }
 
 void ObjectSampler::doAdvance()

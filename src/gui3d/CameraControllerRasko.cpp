@@ -130,7 +130,7 @@ bool CameraControllerRasko::mouseMoved(const OIS::MouseEvent& e)
 	m_yangle += Degree(e.state.Y.rel * 0.5);
 		
 	if (m_yangle >= Degree(89.0)) m_yangle = Degree(89.0);
-	else if (m_yangle < Degree(0.0)) m_yangle = 0.0;
+	else if (m_yangle < Degree(0)) m_yangle = Degree(0);
 		
 	m_zxdist = m_dist * cos(m_yangle.valueRadians());
 		
@@ -152,7 +152,7 @@ bool CameraControllerRasko::mouseMoved(const OIS::MouseEvent& e)
     if (e.state.Z.rel != 0) {
 	const Vector3* corners = m_camera->getWorldSpaceCorners();
 	Real h = (corners[0] - corners[3]).length();
-	Real min_dist = h/Math::Tan(m_yangle);
+	Real min_dist = 1;//h/Math::Tan(m_yangle);
 	m_dist += e.state.Z.rel * 0.01;
 	if (m_dist < min_dist)
 	    m_dist = min_dist;
@@ -189,7 +189,7 @@ bool CameraControllerRasko::mousePressed(const OIS::MouseEvent &e, OIS::MouseBut
     case OIS::MB_Middle:
 	m_mousecenter = true;
 	break;
-    case OIS::MB_Button3: /* OIS is buggy, this does not work! */
+    case OIS::MB_Button3:
 	m_dist += 1.0;
 	recalculate();
 	break; 

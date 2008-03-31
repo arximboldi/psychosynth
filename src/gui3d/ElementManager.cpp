@@ -84,7 +84,9 @@ Element* ElementManager::createElement(TableObject& obj)
 void ElementManager::addElement(psynth::TableObjectCreator& creator)
 {
     m_must_own++;
-    creator.create(*m_table);
+    if (!m_adding.isNull())
+	m_adding.deleteMe();
+    m_adding = creator.create(*m_table);
     m_must_own--;
 }
 
@@ -287,6 +289,9 @@ bool ElementManager::mousePressed(const OIS::MouseEvent &e, OIS::MouseButtonID i
 {
     Vector2 pos;
     bool ret = false;
+
+    if (!m_adding.isNull())
+	m_adding = TableObject();
     
     if (getTablePointer(pos)) {
 	for (ElemMapIter it = m_elems.begin(); it != m_elems.end(); ++it)
