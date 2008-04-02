@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) Juan Pedro Bolivar Puente 2007                          *
+ *   Copyright (C) Juan Pedro Bolivar Puente 2008                          *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -20,45 +20,11 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "common/Config.h"
-
-using namespace std;
+#include "common/RingBuffer.h"
 
 namespace psynth
 {
 
-void ConfSubject::notifyConfChange(ConfNode& source)
-{
-    for (list<ConfListener*>::iterator i = m_list.begin();
-	 i != m_list.end();
-	 ++i)
-	(*i)->handleConfChange(source);
 
-    for (list<ConfEvent>::iterator i = m_change_del.begin();
-	 i != m_change_del.end();
-	 ++i)
-	(*i)(source);    
-}
-
-void ConfSubject::notifyConfNudge(ConfNode& source)
-{
-    for (list<ConfListener*>::iterator i = m_list.begin();
-	 i != m_list.end();
-	 ++i)
-	(*i)->handleConfNudge(source);
-
-    for (list<ConfEvent>::iterator i = m_nudge_del.begin();
-	 i != m_nudge_del.end();
-	 ++i)
-	(*i)(source);    
-}
-
-void ConfSubject::notifyConfNewChild(ConfNode& child)
-{
-    for (list<ConfListener*>::iterator i = m_list.begin();
-	 i != m_list.end();
-	 ++i)
-	(*i)->handleConfNewChild(child);
-}
 
 } /* namespace psynth */

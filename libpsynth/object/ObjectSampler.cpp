@@ -25,6 +25,7 @@
 #include "common/AudioBuffer.h"
 #include "common/Mutex.h"
 #include "common/Misc.h"
+#include "common/FileManager.h"
 #include "object/KnownObjects.h"
 #include "object/ObjectSampler.h"
 
@@ -81,22 +82,29 @@ ObjectSampler::~ObjectSampler()
 void ObjectSampler::onFileChange(ObjParam& par)
 {
     std::string val;
+    std::string path;
     par.get(val);
 
     cout << "OPENING FILE: " << val << endl;
+    path = FileManager::instance().getPath("psychosynth/samples").find(val);
+    //path = val;
+    
     m_update_lock.lock();
 
     if (m_fetcher.isOpen())
 	m_fetcher.close();
     
-    m_fetcher.open(val.c_str());
-    m_inbuf.setInfo(m_fetcher.getInfo(), getInfo().block_size);
-    m_scaler.setChannels(m_fetcher.getInfo().num_channels);
-    //m_scaler.setSampleRate(m_fetcher.getInfo().sample_rate);
+    m_fetcher.open(path.c_str());
 
-    cout << "info.sample_rate:" << m_fetcher.getInfo().sample_rate << endl;
-    cout << "info.block_size:" << m_fetcher.getInfo().block_size << endl;
-    cout << "info.num_channels:" << m_fetcher.getInfo().num_channels << endl;
+    if (m_fetcher.isOpen()) {
+	m_inbuf.setInfo(m_fetcher.getInfo(), getInfo().block_size);
+	m_scaler.setChannels(m_fetcher.getInfo().num_channels);
+	//m_scaler.setSampleRate(m_fetcher.getInfo().sample_rate);
+
+	cout << "info.sample_rate:" << m_fetcher.getInfo().sample_rate << endl;
+	cout << "info.block_size:" << m_fetcher.getInfo().block_size << endl;
+	cout << "info.num_channels:" << m_fetcher.getInfo().num_channels << endl;
+    }
     
     m_update_lock.unlock();
 }
@@ -111,26 +119,29 @@ void ObjectSampler::doUpdate(const Object* caller, int caller_port_type, int cal
     /* Read the data. */
     size_t start = 0;
     size_t end = getInfo().block_size;
-    
-    while(start < getInfo().block_size) {
-	if (m_restart) {
-	    if (trig_buf && trig_buf[start] != 0.0f) {
-		restart();
-		m_restart = false;
-	    }
-	}
-	
-	if (trig)
-	    end = trig->findHill(start);
 
-	read(*out, start, end);
+    if (m_fetcher.isOpen()) {
+	while(start < getInfo().block_size) {
+	    if (m_restart) {
+		if (trig_buf && trig_buf[start] != 0.0f) {
+		    restart();
+		    m_restart = false;
+		}
+	    }
 	
-	float env_val = trig_env.update(end - start);
-	if (env_val == 1.0f && trig_buf && trig_buf[end - 1] == 0.0f)
-	    m_restart = true;
+	    if (trig)
+		end = trig->findHill(start);
+
+	    read(*out, start, end);
+	
+	    float env_val = trig_env.update(end - start);
+	    if (env_val == 1.0f && trig_buf && trig_buf[end - 1] == 0.0f)
+		m_restart = true;
 	    
-	start = end;
-    } 
+	    start = end;
+	} 
+    } else
+	out->zero();
     
     /* Set amplitude. */
     Sample* buf = out->getData()[0];
@@ -193,52 +204,48 @@ void ObjectSampler::read(AudioBuffer& buf, int start, int end)
     }
     factor = base_factor;
 
-    if (m_fetcher.isOpen()) {
-	while(m_scaler.availible() < (high_latency ?
-				      TIME_STRETCH_MIN_SAMPLES :
-				      end - start)) {
-	    if (rate)
-		factor = base_factor + base_factor * rate_buf[(int) m_ctrl_pos];
+    while(m_scaler.availible() < (high_latency ?
+				  TIME_STRETCH_MIN_SAMPLES :
+				  end - start)) {
+	if (rate)
+	    factor = base_factor + base_factor * rate_buf[(int) m_ctrl_pos];
 	    
-	    if (backwards != m_fetcher.getBackwards())
-		m_fetcher.setBackwards(backwards);
+	if (backwards != m_fetcher.getBackwards())
+	    m_fetcher.setBackwards(backwards);
 	    
-	    if (factor < 0.2)
-		factor = 0.2;
+	if (factor < 0.2)
+	    factor = 0.2;
 
-	    must_read = high_latency ? getInfo().block_size : SMALL_BLOCK_SIZE;
-	    if (factor * m_param_tempo < 1.0)
-		must_read = (float)must_read * factor * m_param_tempo;
-	    else
-		must_read = must_read;
+	must_read = high_latency ? getInfo().block_size : SMALL_BLOCK_SIZE;
+	if (factor * m_param_tempo < 1.0)
+	    must_read = (float)must_read * factor * m_param_tempo;
+	else
+	    must_read = must_read;
 	   
-	    m_update_lock.lock();
-	    nread = m_fetcher.read(m_inbuf, must_read);
-	    
-	    if (nread) {
-		m_ctrl_pos += (float) nread / (factor * m_param_tempo);
-		if (m_ctrl_pos >= getInfo().block_size)
-		    m_ctrl_pos = phase(m_ctrl_pos) + ((int) m_ctrl_pos % getInfo().block_size);
-
-		int old_availible = m_scaler.availible();
-
-		Sample inter_buffer[nread * m_inbuf.getInfo().num_channels];
-		m_inbuf.interleave(inter_buffer, nread);
-		m_scaler.setRate(factor);
-		m_scaler.update(inter_buffer, nread);
-	    }
-	    
-	    m_update_lock.unlock();
-	}
-
-	Sample inter_buffer[(end - start) * m_inbuf.getInfo().num_channels];
 	m_update_lock.lock();
-	m_scaler.receive(inter_buffer, end - start);
+	nread = m_fetcher.read(m_inbuf, must_read);
+	    
+	if (nread) {
+	    m_ctrl_pos += (float) nread / (factor * m_param_tempo);
+	    if (m_ctrl_pos >= getInfo().block_size)
+		m_ctrl_pos = phase(m_ctrl_pos) + ((int) m_ctrl_pos % getInfo().block_size);
+
+	    int old_availible = m_scaler.availible();
+
+	    Sample inter_buffer[nread * m_inbuf.getInfo().num_channels];
+	    m_inbuf.interleave(inter_buffer, nread);
+	    m_scaler.setRate(factor);
+	    m_scaler.update(inter_buffer, nread);
+	}
+	    
 	m_update_lock.unlock();
-	buf.deinterleave(inter_buffer, start, end, m_scaler.getChannels());
-    } else {
-	buf.zero();
     }
+
+    Sample inter_buffer[(end - start) * m_inbuf.getInfo().num_channels];
+    m_update_lock.lock();
+    m_scaler.receive(inter_buffer, end - start);
+    m_update_lock.unlock();
+    buf.deinterleave(inter_buffer, start, end, m_scaler.getChannels());
 }
 
 void ObjectSampler::doAdvance()

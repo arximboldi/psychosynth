@@ -46,6 +46,7 @@ nobase_libpsynthinc_HEADERS = \
 	psynth/DefaultsOss.h \
 	psynth/DefaultsAlsa.h \
 	psynth/OutputDirector.h \
+	psynth/FileManagerDirector.h \
 	psynth/PsychosynthApp.h \
 	common/ArgParser.h \
 	common/Deleter.h \
@@ -69,6 +70,9 @@ nobase_libpsynthinc_HEADERS = \
 	common/Timer.h \
 	common/Vector2D.h\
 	common/Scaler.h\
+	common/FileFinder.h\
+	common/FileManager.h\
+	common/Tree.h\
 	table/Table.h \
 	table/Patcher.h\
 	table/PatcherDynamic.h \
@@ -106,6 +110,7 @@ nobase_libpsynthinc_HEADERS = \
 libpsynth_la_SOURCES = \
 	psynth/Director.cpp \
 	psynth/PsychosynthApp.cpp \
+	psynth/FileManagerDirector.cpp \
 	common/ArgParser.cpp \
 	common/Error.cpp \
 	common/AudioBuffer.cpp \
@@ -118,6 +123,8 @@ libpsynth_la_SOURCES = \
 	common/Logger.cpp \
 	common/Config.cpp \
 	common/Timer.cpp \
+	common/FileFinder.cpp\
+	common/FileManager.cpp\
 	table/Table.cpp \
 	table/Patcher.cpp \
 	table/PatcherDynamic.cpp \

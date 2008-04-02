@@ -1,4 +1,4 @@
-/**************************************************************************
+/***************************************************************************
  *                                                                         *
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
@@ -105,7 +105,7 @@ char* ftoa( double f, double sigfigs)
     return strdup(a);
 }
 
-string str_dirname(string str)
+string dirnameStr(string str)
 {
     string::iterator end = str.end();
     string::iterator beg;

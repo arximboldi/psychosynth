@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) Juan Pedro Bolivar Puente 2007                          *
+ *   Copyright (C) Juan Pedro Bolivar Puente 2008                          *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -20,45 +20,60 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "common/Config.h"
+#include "version.h"
+#include "common/FileManager.h"
+#include "psynth/FileManagerDirector.h"
 
 using namespace std;
 
 namespace psynth
 {
 
-void ConfSubject::notifyConfChange(ConfNode& source)
+bool FileManagerDirector::onConfNudge(ConfNode& node)
 {
-    for (list<ConfListener*>::iterator i = m_list.begin();
-	 i != m_list.end();
-	 ++i)
-	(*i)->handleConfChange(source);
-
-    for (list<ConfEvent>::iterator i = m_change_del.begin();
-	 i != m_change_del.end();
-	 ++i)
-	(*i)(source);    
+    FileManager& mgr = FileManager::instance().getChild("psychosynth").getChild(node.getName());
+    string val;
+    
+    mgr.clear();
+    for (ConfNode::ChildIter it = node.begin(); it != node.end(); ++it) {
+	(*it)->get(val);
+	mgr.addPath(val);
+    }
+    
+    return true;
 }
 
-void ConfSubject::notifyConfNudge(ConfNode& source)
+void FileManagerDirector::registerConfig()
 {
-    for (list<ConfListener*>::iterator i = m_list.begin();
-	 i != m_list.end();
-	 ++i)
-	(*i)->handleConfNudge(source);
-
-    for (list<ConfEvent>::iterator i = m_nudge_del.begin();
-	 i != m_nudge_del.end();
-	 ++i)
-	(*i)(source);    
+    m_conf->getChild("samples").addNudgeEvent(MakeDelegate(this, &FileManagerDirector::onConfNudge));
+    m_conf->getChild("samples").nudge();
 }
 
-void ConfSubject::notifyConfNewChild(ConfNode& child)
+void FileManagerDirector::unregisterConfig()
 {
-    for (list<ConfListener*>::iterator i = m_list.begin();
-	 i != m_list.end();
-	 ++i)
-	(*i)->handleConfNewChild(child);
+    m_conf->getChild("samples").deleteNudgeEvent(MakeDelegate(this, &FileManagerDirector::onConfNudge));
+}
+
+void FileManagerDirector::start(ConfNode& conf,
+				const std::string& home_path)
+{
+    m_conf = &conf;
+    m_home_path = home_path;
+    
+    registerConfig();
+    defaults();
+}
+
+void FileManagerDirector::stop()
+{
+    unregisterConfig();
+    m_conf = 0;
+}
+
+void FileManagerDirector::defaults()
+{
+    m_conf->getChild("samples").getChild("path0").def(string(PSYNTH_DATA_DIR) + "/samples");
+    m_conf->getChild("samples").getChild("path1").def(m_home_path + "/samples");
 }
 
 } /* namespace psynth */

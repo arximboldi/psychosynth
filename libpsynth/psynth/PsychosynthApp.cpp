@@ -131,7 +131,8 @@ void PsychosynthApp::printBaseOptions(ostream& out)
 
 void PsychosynthApp::setupSynth()
 {
-    m_director.start(Config::instance().getChild("psychosynth"));
+    m_director.start(Config::instance().getChild("psychosynth"),
+		     getConfigPath());
 }
     
 void PsychosynthApp::closeSynth()

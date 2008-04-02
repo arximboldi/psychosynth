@@ -33,7 +33,6 @@ class FileReader
 {
     bool m_isopen;
     AudioInfo m_info;
-    int m_bufsize;
     
 protected:
     void setIsOpen(bool isopen) {
@@ -46,7 +45,8 @@ protected:
     
 public:
     FileReader() :
-	m_isopen(false) {}
+	m_isopen(false),
+	m_info(0,0,0) {}
     
     virtual ~FileReader() {};
     

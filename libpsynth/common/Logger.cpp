@@ -35,24 +35,6 @@ Log::~Log()
     }
 }
 
-Log& Log::getPath(std::string path)
-{
-    string base;
-    for (size_t i = 0; i != path.size(); ++i)
-	if (path[i] == '/') {
-	    base.assign(path, 0, i);
-	    while(path[++i] == '/');
-	    path.erase(0, i);
-	    break;
-	}
-
-    if (base.empty()) {
-	return getChild(path);
-    }
-
-    return getChild(base).getPath(path);
-}
-
 void Log::log(Log& log, int level, const string& msg)
 {
     for (list<LogSink*>::iterator it = m_dumpers.begin();
@@ -60,8 +42,8 @@ void Log::log(Log& log, int level, const string& msg)
 	(*it)->dump(log, level, msg);
     }
 
-    if (m_parent)
-	m_parent->log(log, level, msg);
+    if (getParent())
+	getParent()->log(log, level, msg);
 }
 
 } /* namespace psynth */

@@ -1,9 +1,9 @@
-/***************************************************************************
+/**************************************************************************
  *                                                                         *
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) Juan Pedro Bolivar Puente 2007                          *
+ *   Copyright (C) Juan Pedro Bolivar Puente 2008                          *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -20,45 +20,52 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "common/Config.h"
+#ifndef PSYNTH_FILEMANAGER_H
+#define PSYNTH_FILEMANAGER_H
 
-using namespace std;
+#include <libpsynth/common/FileFinder.h>
+#include <libpsynth/common/Tree.h>
+#include <libpsynth/common/Singleton.h>
 
 namespace psynth
 {
 
-void ConfSubject::notifyConfChange(ConfNode& source)
+class FileManager : public FileFinder,
+		    public TreeNode<std::string, FileManager>,
+		    public Singleton<FileManager>
 {
-    for (list<ConfListener*>::iterator i = m_list.begin();
-	 i != m_list.end();
-	 ++i)
-	(*i)->handleConfChange(source);
+    friend class Singleton<FileManager>;
+    friend class TreeNode<std::string, FileManager>;
 
-    for (list<ConfEvent>::iterator i = m_change_del.begin();
-	 i != m_change_del.end();
-	 ++i)
-	(*i)(source);    
-}
+    /* TODO: Fix the tre node class so it does not require constructor or destructor
+     * calling on foreign classes. */
+    
+    /** Hidden constructor. */
+    FileManager() {}
 
-void ConfSubject::notifyConfNudge(ConfNode& source)
+    /** Hidden destructor. */
+    ~FileManager() {}
+    
+public:    
+    template<class StringPredicate>
+    void findIfAll(StringPredicate pred,
+		   std::list<std::string>& res) const;
+
+    std::string findAll(const std::string& file) const;
+};
+
+
+template<class StringPredicate>
+void FileManager::findIfAll(StringPredicate pred,
+			    std::list<std::string>& res) const
 {
-    for (list<ConfListener*>::iterator i = m_list.begin();
-	 i != m_list.end();
-	 ++i)
-	(*i)->handleConfNudge(source);
+    ConstChildIter it;
 
-    for (list<ConfEvent>::iterator i = m_nudge_del.begin();
-	 i != m_nudge_del.end();
-	 ++i)
-	(*i)(source);    
-}
-
-void ConfSubject::notifyConfNewChild(ConfNode& child)
-{
-    for (list<ConfListener*>::iterator i = m_list.begin();
-	 i != m_list.end();
-	 ++i)
-	(*i)->handleConfNewChild(child);
+    res = findIf(pred, res);
+    for (it = begin(); it != end(); ++it)
+	(*it)->findIfAll(pred, res);
 }
 
 } /* namespace psynth */
+
+#endif /* PSYNTH_FILEMANAGER_H */

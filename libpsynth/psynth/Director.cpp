@@ -105,10 +105,13 @@ void Director::unregisterConfig()
 #endif
 }
 
-void Director::start(ConfNode& conf)
+void Director::start(ConfNode& conf, const std::string& home_path)
 {
     m_config = &conf;
 
+    m_filemgr.start(conf.getChild("file_manager"),
+		    home_path);
+    
     /* A bit dirty... */
     for (ODFMap::iterator i = m_outdir.begin(); i != m_outdir.end(); ++i) {
 	OutputDirector* od = i->second->createOutputDirector();
@@ -134,6 +137,8 @@ void Director::stop()
     
     stopOutput();
     delete m_table;
+
+    m_filemgr.stop();
     
     m_table = NULL;
     m_output = NULL;

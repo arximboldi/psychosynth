@@ -62,6 +62,8 @@ Object::Object(const AudioInfo& info, int type,
     m_in_sockets[LINK_CONTROL].resize(n_in_control, InSocketManual(LINK_CONTROL));
     m_in_envelope[LINK_AUDIO].resize(n_in_audio);
     m_in_envelope[LINK_CONTROL].resize(n_in_control);
+    m_out_stable_value[LINK_AUDIO].resize(n_out_audio, 0.0f);
+    m_out_stable_value[LINK_CONTROL].resize(n_out_control, 0.0f);
     
     setEnvelopesDeltas();
 }
@@ -228,6 +230,16 @@ void Object::InSocket::updateInput(const Object* caller, int caller_port_type, i
     }
 }
 
+void Object::blendBuffer(Sample* buf, int n_elem,
+			 Sample stable_value, EnvelopeSimple env)
+{
+    while(n_elem--) {
+	float env_val = env.update();
+	*buf = (*buf * env_val) + (stable_value * (1 - env_val));
+	*buf++;
+    }
+}
+
 void Object::updateEnvelopes()
 {
     int i, j;
@@ -240,15 +252,13 @@ void Object::updateEnvelopes()
 
     /* Apply envelopes to output (for soft muting) */
     for (i = 0; i < m_outdata_audio.size(); ++i)
-	for (j = 0; j < m_audioinfo.num_channels; ++j) {
-	    EnvelopeSimple env = m_out_envelope;
-	    env.update(m_outdata_audio[i][j], m_audioinfo.block_size);
-	}
+	for (j = 0; j < m_audioinfo.num_channels; ++j)
+	    blendBuffer(m_outdata_audio[i][j], m_audioinfo.block_size,
+			m_out_stable_value[LINK_AUDIO][i], m_out_envelope);
     
-    for (i = 0; i < m_outdata_control.size(); ++i) {
-	EnvelopeSimple env = m_out_envelope;
-	env.update(m_outdata_control[i].getData(), m_audioinfo.block_size);
-    }
+    for (i = 0; i < m_outdata_control.size(); ++i)
+	blendBuffer(m_outdata_control[i].getData(), m_audioinfo.block_size,
+		    m_out_stable_value[LINK_CONTROL][i], m_out_envelope);
 
     m_out_envelope.update(m_audioinfo.block_size);
 }

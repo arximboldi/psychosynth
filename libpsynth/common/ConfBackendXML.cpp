@@ -213,7 +213,7 @@ void ConfBackendXML::expandChilds(xmlTextWriterPtr writer, ConfNode& node)
     ConfNode::ChildIter i;
 
     for (i = node.begin(); i != node.end(); ++i)
-	expand(writer, *i);
+	expand(writer, **i);
 }
 
 void ConfBackendXML::expand(xmlTextWriterPtr writer, ConfNode& node)

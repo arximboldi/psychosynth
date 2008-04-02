@@ -27,6 +27,7 @@
 #include <map>
 #include <iostream>
 
+#include <libpsynth/common/Tree.h>
 #include <libpsynth/common/Misc.h>
 #include <libpsynth/common/Singleton.h>
 #include <libpsynth/common/MapIterator.h>
@@ -221,7 +222,8 @@ public:
  * some childs identifyed by its name crating a whole hierarchy that allows
  * a better organization of the values and the information.
  */
-class ConfNode : public ConfSubject
+class ConfNode : public ConfSubject,
+		 public TreeNode<std::string, ConfNode>
 {
     class ConfElement
     {
@@ -331,67 +333,32 @@ class ConfNode : public ConfSubject
 	    }   
 	}
     };
-    
-    std::map<std::string, ConfNode> m_childs;
-    ConfNode* m_parent;
-    std::string m_name;
-    bool m_isinit;
 
     ConfElement m_element;
     ConfBackend* m_backend;
-   
+
+    void onInit() {
+	m_backend = 0;
+	if (getParent())
+	    m_backend = getParent()->m_backend;
+    }
+
+    void onNewChild(ConfNode& new_child) {
+	notifyConfNewChild(new_child);
+    }
+    
 public:
-    /**
-     * Iterator to check the childs of this node.
-     */
-    typedef MapIterator<std::string, ConfNode> ChildIter;
-
-    /** Constuctor. */
+    /** Constructor */
     ConfNode() :
-	m_parent(NULL), m_isinit(false), m_backend(NULL)
-	{};
-
-    /** Destructor */
+	m_backend(0)
+	{}
+    
+    /** Destructor. */
     ~ConfNode() {
-	if ((!m_parent || m_parent->m_backend != m_backend)
-	    && m_backend)
+	if (!getParent() || getParent()->m_backend != m_backend)
 	    delete m_backend;
     }
-
-    /**
-     * Initializes by setting the name and the parent of the config node.
-     * @param name The name of the config node.
-     * @param parent The paren of this config node.
-     */
-    void init(const std::string& name, ConfNode* parent) {
-	m_isinit = true;
-	m_name = name;
-	m_parent = parent;
-	if (m_parent)
-	    m_backend = m_parent->m_backend;
-    }
-
-    /**
-     * Returns whether this node has been initialized.
-     */
-    bool isInit() const {
-	return m_isinit;
-    }
-
-    /**
-     * Returns an iterator to the first child of this node.
-     */
-    ChildIter begin() {
-	return m_childs.begin();
-    }
-
-    /**
-     * Returns an iterator to the end of this node childs.
-     */
-    ChildIter end() {
-	return m_childs.end();
-    }
-
+    
     /**
      * Sets the value of the node. The node type is set to @a T, unless
      * @a T is not a valid type in which case nothing happends.
@@ -447,51 +414,6 @@ public:
     void defType(ConfType type) {
 	if (m_element.unset())
 	    m_element.toType(type);
-    }
-
-    /**
-     * Returns a reference to the child of this node mathing a name. The child
-     * is created if it does not exist yet.
-     * @param name The name of the child.
-     */
-    ConfNode& getChild(const std::string& name) {
-	if (!m_childs[name].isInit()) {
-	    m_childs[name].init(name, this);
-	}
-	
-	return m_childs[name];
-    }
-
-    /**
-     * Returns a reference to the child matching a path. The path is constructed
-     * by separating consecutive childs by / like paths in filenames. Any
-     * node in the path that does not exist yet is created.
-     */
-    ConfNode& getPath(std::string name);
-
-    /**
-     * Returns a pointer to the parent of this node or @c null if this is a root
-     * node.
-     */
-    ConfNode* getParent() const {
-	return m_parent;
-    }
-
-    /**
-     * Returns the path of this node from the root to the node.
-     */
-    std::string getPathName() const {
-	if (m_parent)
-	    return m_parent->getPathName() + "/" + m_name;
-	else
-	    return m_name;
-    }
-
-    /**
-     * Returns the name of this node.
-     */
-    const std::string& getName() const {
-	return m_name;
     }
 
     /**

@@ -103,7 +103,7 @@ bool ObjectManager::deleteObject(int id)
 
 void ObjectManager::deleteObject(Iterator it)
 {
-    Object* obj = it->second;
+    Object* obj = *it;
 /*    
     detachObject(it); 
 */

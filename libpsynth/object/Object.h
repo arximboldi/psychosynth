@@ -181,6 +181,7 @@ private:
     std::vector<ControlBuffer> m_outdata_control;
 
     std::vector<OutSocket> m_out_sockets[LINK_TYPES];
+    std::vector<Sample> m_out_stable_value[LINK_TYPES];
     std::vector<InSocketManual> m_in_sockets[LINK_TYPES];
     std::vector<EnvelopeSimple> m_in_envelope[LINK_TYPES];
     EnvelopeSimple m_out_envelope;
@@ -205,6 +206,8 @@ private:
     
     Mutex m_paramlock;
 
+    void blendBuffer(Sample* buf, int n_elem,
+		     Sample stable_value, EnvelopeSimple env);
     void updateParamsOut();
     void updateInputs();
     void updateInSockets();
@@ -232,6 +235,10 @@ protected:
 	}
 	
 	return NULL;
+    }
+
+    void setOutputStableValue(int sock_type, int sock_num, Sample value) {
+	m_out_stable_value[sock_type][sock_num] = value;
     }
     
     virtual void doUpdate(const Object* caller, int caller_port_type, int caller_port) = 0;

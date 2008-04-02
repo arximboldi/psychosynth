@@ -27,6 +27,7 @@
 #include <libpsynth/common/Misc.h>
 #include <libpsynth/table/Table.h>
 #include <libpsynth/psynth/OutputDirector.h>
+#include <libpsynth/psynth/FileManagerDirector.h>
 
 namespace psynth
 {
@@ -37,6 +38,7 @@ class Director : public NoCopy
     ODFMap m_outdir;
 
     std::string m_old_output;
+    FileManagerDirector m_filemgr;
     OutputDirector* m_output;
     Table* m_table;
 
@@ -65,7 +67,7 @@ public:
     ~Director();
     
     void attachOutputDirectorFactory(OutputDirectorFactory* fact);
-    void start(ConfNode& conf);
+    void start(ConfNode& conf, const std::string& home_path);
     void stop();
     
     Table* getTable() {

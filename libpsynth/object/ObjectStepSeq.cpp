@@ -62,6 +62,7 @@ ObjectStepSeq::ObjectStepSeq(const AudioInfo& info) :
 	addParam(string("step") + itoa(i, 10), ObjParam::INT, &m_param_step[i]);
     }
 
+    setOutputStableValue(LINK_CONTROL, OUT_C_OUTPUT, 1.0f);
     initEnvelopeValues();
 
     if (m_param_step[m_cur_step])

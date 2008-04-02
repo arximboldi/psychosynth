@@ -87,9 +87,12 @@ void FileReaderFetcher::open(const char* file)
     m_reader->open(file);
 
     setIsOpen(m_reader->isOpen());
-    setInfo(m_reader->getInfo());   
-    m_tmp_buffer.setInfo(getInfo(), m_threshold);
-    m_buffer.setAudioInfo(getInfo(), m_buffer_size);
+    setInfo(m_reader->getInfo());
+
+    if (m_reader->isOpen()) {
+	m_tmp_buffer.setInfo(getInfo(), m_threshold);
+	m_buffer.setAudioInfo(getInfo(), m_buffer_size);
+    }
     
     m_reader_lock.unlock();
     m_cond.broadcast();
@@ -203,8 +206,8 @@ void FileReaderFetcher::run()
 
 	/* Wait until more data is needed. */
 	m_buffer_lock.lock();
-	while((!m_finished && m_buffer.availible(m_read_ptr) > m_threshold) ||
-	      !isOpen())
+	while(!m_finished &&
+	      (m_buffer.availible(m_read_ptr) > m_threshold || !isOpen()))
 	    m_cond.wait(m_buffer_lock);
 	m_buffer_lock.unlock();
 	

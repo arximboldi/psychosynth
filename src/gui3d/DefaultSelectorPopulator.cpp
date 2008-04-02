@@ -25,6 +25,7 @@
 #include <dirent.h>
 
 #include <libpsynth/common/Misc.h>
+#include <libpsynth/common/FileManager.h>
 #include <libpsynth/table/TableObjectCreator.h>
 
 #include <libpsynth/object/ObjectMixer.h>
@@ -39,32 +40,6 @@
 
 using namespace psynth;
 using namespace std;
-
-static int getFileList(const std::string& folder,
-		       std::list<std::string>& res)
-{
-    struct dirent **namelist;
-    std::string curr;
-    int n;
-    
-    n = scandir(folder.c_str(), &namelist, 0, alphasort);
-    
-    if (n >= 0) {
-	while(n--) {
-	    curr = folder + namelist[n]->d_name;
-
-	    if ((strcmp(namelist[n]->d_name, ".") != 0) &&
-		(strcmp(namelist[n]->d_name, "..") != 0)) {
-		res.push_back(curr);
-	    }
-	    
-	    free(namelist[n]);
-       	}
-       	free(namelist);
-    }
-    
-    return n;
-}
 
 void DefaultSelectorPopulator::populate(const std::string& data_path,
 					SelectorWindow* sel)
@@ -156,19 +131,22 @@ void DefaultSelectorPopulator::populate(const std::string& data_path,
     creat.setName("sampler");
     
     list<string> files;
-    getFileList(data_path + "samples/", files);
+    list<string> valid_ext;
+
+    valid_ext.push_back("au");
+    valid_ext.push_back("wav");
+    valid_ext.push_back("ogg");
+    valid_ext.push_back("aiff");
+    
+    FileManager::instance()
+	.getPath("psychosynth/samples")
+	.findIf(MakeHasExtension(valid_ext.begin(), valid_ext.end()), files);
 
     for (list<string>::iterator it = files.begin();
 	 it != files.end(); ++it) {
-	const char* ext = getExtension(it->c_str());
-	if (!strcmp_i(ext, "wav") ||
-	    !strcmp_i(ext, "aiff") ||
-	    !strcmp_i(ext, "au") ||
-	    !strcmp_i(ext, "ogg")) {
-	    creat.setParam("file", *it);
-	    //cout << "set_param: " << *it << endl;
-	    cat->addButton(basename(it->c_str()), creat);
-	}
+	creat.setParam("file", string(basename(it->c_str())));
+	cout << basename(it->c_str()) << endl;
+	cat->addButton(string(basename(it->c_str())), creat);
     }
     
 }

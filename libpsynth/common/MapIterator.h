@@ -58,11 +58,39 @@ public:
     }
 
     /**
+     * Indirection operator, returns a pointer to the referred value.
+     */
+    Data* operator->() {
+	return &std::map<Key, Data>::iterator::operator*().second;
+    }
+
+    /**
      * Const indirection operator, returns a constant reference to the
      * referred value.
      */
     const Data& operator*() const {
 	return std::map<Key, Data>::iterator::operator*().second;
+    }
+
+    /**
+     * Indirection operator, returns a pointer to the referred value const value.
+     */
+    const Data* operator->() const {
+	return &std::map<Key, Data>::iterator::operator*().second;
+    }
+
+    /**
+     * Preincrement operator.
+     */
+    MapIterator<Key, Data> operator++() {
+	return std::map<Key, Data>::iterator::operator++();
+    }
+
+    /**
+     * Postincrement operator.
+     */
+    MapIterator<Key, Data> operator++(int) {
+	return std::map<Key, Data>::iterator::operator++(0);
     }
 };
 
@@ -71,6 +99,8 @@ public:
  * opearator* behaviour, which now returns a pointer to the contained value
  * hidding the user the value key. Just a @c const version of @c MapIterator
  * to hold constant data.
+ *
+ * @todo Implement -> operator.
  */
 template <typename Key, typename Data>
 class MapConstIterator : public std::map<Key, Data>::const_iterator

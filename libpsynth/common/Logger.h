@@ -29,6 +29,7 @@
 
 #include <libpsynth/common/Singleton.h>
 #include <libpsynth/common/Misc.h>
+#include <libpsynth/common/Tree.h>
 
 namespace psynth
 {
@@ -42,6 +43,7 @@ class Log;
 class LogSink
 {
 public:
+    
     /**
      * Deliver a message to the user.
      * @param log The log node that originated the message.
@@ -57,13 +59,10 @@ public:
  * propagated by all the log parents so, for example, you can set up your sinks
  * the root node if you want to listen for all messages. 
  */
-class Log
+class Log : public TreeNode<std::string, Log>
 {
     std::map<std::string, Log> m_childs;
     std::list<LogSink*> m_dumpers;
-    Log* m_parent;
-    std::string m_name;
-    bool m_isinit;
     
 public:
     /**
@@ -96,36 +95,10 @@ public:
     };
 
     /** Constructor. */
-    Log() :
-	m_parent(NULL), m_isinit(false) {}
-
+    Log() {}
+    
     /** Destructor. */
     ~Log();
-
-    /**
-     * Initializes the log node by setting the log name and parent.
-     * @param name The log node name.
-     * @param parent Its parent.
-     */
-    void init(const std::string& name, Log* parent) {
-	m_name = name;
-	m_parent = parent;
-	m_isinit = true;
-    }
-
-    /**
-     * Returns whether the node has already been initialized. 
-     */
-    bool isInit() {
-	return m_isinit;
-    }
-
-    /**
-     * Returns the name of this log node.
-     */
-    const std::string& getName() const {
-	return m_name;
-    }
 
     /**
      * Attachs a sink to this node.
@@ -144,30 +117,6 @@ public:
     }
 
     /**
-     * Returns a pointer to the parent log of this node.
-     */
-    const Log* getParent() const {
-	return m_parent;
-    }
-
-    /**
-     * Returns a reference to the child of this node matching that name, or creates
-     * it if does not exist.
-     */
-    Log& getChild(const std::string& name) {
-	if (!m_childs[name].isInit())
-	    m_childs[name].init(name, this);
-	return m_childs[name];
-    };
-
-    /**
-     * Returns a pointer to the parent log of this node, const version.
-     */
-    Log* getParent() {
-	return m_parent;
-    }
-
-    /**
      * Logs a message in a child of this node and all its parents.
      * @param child The child in which we want to log the message.
      * @param level The relevance of this message.
@@ -175,16 +124,6 @@ public:
      */
     void log(const std::string& child, int level, const std::string& msg) {
 	getChild(child).log(level, msg);
-    }
-
-    /**
-     * Returns the name of the full path from this log node to the root node.
-     */
-    std::string getPathName() {
-	if (m_parent)
-	    return m_parent->getPathName() + "/" + m_name; 
-	else
-	    return m_name;
     }
 
     /**
@@ -204,12 +143,6 @@ public:
      * @param msg The message to log.
      */
     void log(Log& log, int level, const std::string& msg);
-
-    /**
-     * Returns a reference to the child matching a given path. Note
-     * that any non-existing nodes in the path are created.
-     */
-    Log& getPath(std::string path);
 };
 
 /**
