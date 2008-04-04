@@ -96,6 +96,9 @@ class Element : public psynth::TableObjectListener
     bool m_selected;
     bool m_moving;
 
+    int m_modifier_1;
+    int m_modifier_2;
+    
     ElementProperties m_gui_prop;
 
     void objectMoved(psynth::TableObject& pos,
@@ -116,6 +119,14 @@ public:
     void setGhost(bool ghost);
     void setSelected(bool selected);
     void setPosition(const Ogre::Vector2& pos);
+
+    void setFirstModifier(int val) {
+	m_modifier_1 = val;
+    }
+
+    void setSecondModifier(int val) {
+	m_modifier_2 = val;
+    }
     
     bool pointerClicked(const Ogre::Vector2& pos, OIS::MouseButtonID id);
     bool pointerReleased(const Ogre::Vector2& pos, OIS::MouseButtonID id);

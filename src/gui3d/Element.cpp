@@ -50,6 +50,8 @@ Element::Element(TableObject& obj, Ogre::SceneManager* scene) :
     m_ghost(true),
     m_selected(false),
     m_moving(false),
+    m_modifier_1(0),
+    m_modifier_2(0),
     m_gui_prop(obj)
 {
     m_base = new FlatRing(string("EB") + itoa(m_obj.getID(),10),
@@ -166,14 +168,22 @@ bool Element::pointerClicked(const Ogre::Vector2& pos, OIS::MouseButtonID id)
     case OIS::MB_Left:
 	if (m_ghost && m_owned) {
 	    m_obj.activate();
-	    return true;
-	} else if ((pos-m_pos).squaredLength() < RADIOUS) {
 	    setSelected(true);
+	    ret = true;
+	} else if ((pos-m_pos).squaredLength() < RADIOUS) {
+	    if (m_modifier_1)
+		setSelected(!m_selected);
+	    else
+		setSelected(true);
+	    ret = true;
+	} else if (!m_modifier_1 && !m_modifier_2)
+	    setSelected(false);
+
+	if (m_selected) {
 	    m_moving = true;
 	    m_click_diff = pos - m_pos;
-	    return true;
-	} else
-	    setSelected(false);
+	}
+	
 	break;
     default:
 	break;
@@ -221,6 +231,16 @@ bool Element::keyPressed(const OIS::KeyEvent& e)
 	if (m_selected)
 	    m_gui_prop.toggle();
 	break;
+
+    case OIS::KC_LCONTROL:
+    case OIS::KC_RCONTROL:
+	m_modifier_1++;
+	break;
+
+    case OIS::KC_LSHIFT:
+    case OIS::KC_RSHIFT:
+	m_modifier_2++;
+	break;
 	
     default:
 	break;
@@ -231,6 +251,21 @@ bool Element::keyPressed(const OIS::KeyEvent& e)
 
 bool Element::keyReleased(const OIS::KeyEvent& e)
 {
+    switch(e.key) {
+    case OIS::KC_LCONTROL:
+    case OIS::KC_RCONTROL:
+	m_modifier_1--;
+	break;
+
+    case OIS::KC_LSHIFT:
+    case OIS::KC_RSHIFT:
+	m_modifier_2--;
+	break;
+	
+    default:
+	break;
+    }
+    
     return false;
 }
 

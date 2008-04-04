@@ -367,42 +367,8 @@ void Psychosynth3D::setupMenus()
 {
     SelectorWindow* selector = new SelectorWindow(m_elemmgr);
     
-    DefaultSelectorPopulator populator;
-
-    populator.populate(getDataPath(), selector);
-    
-    /*
-    cat = selector->addCategory("Wave");
-    cat->addButton("Sine", ELEM_OSC_SINE);
-    cat->addButton("Square", ELEM_OSC_SQUARE);
-    cat->addButton("Sawtooth", ELEM_OSC_SAWTOOTH);
-    cat->addButton("Triangle", ELEM_OSC_TRIANGLE);
-    cat->addButton("Moogsaw", ELEM_OSC_MOOGSAW);
-    cat->addButton("Exp", ELEM_OSC_EXP);
-    
-    cat = selector->addCategory("LFO");
-    cat->addButton("Sine", ELEM_LFO_SINE);
-    cat->addButton("Square", ELEM_LFO_SQUARE);
-    cat->addButton("Sawtooth", ELEM_LFO_SAWTOOTH);
-    cat->addButton("Triangle", ELEM_LFO_TRIANGLE);
-    cat->addButton("Moogsaw", ELEM_LFO_MOOGSAW);
-    cat->addButton("Exp", ELEM_LFO_EXP);
-    
-    cat = selector->addCategory("Filter");
-    cat->addButton("Lowpass", ELEM_FILTER_LOWPASS);
-    cat->addButton("Highpass", ELEM_FILTER_HIGHPASS);
-    cat->addButton("Bandpass CSG", ELEM_FILTER_BANDPASS_CSG);
-    cat->addButton("Bandpass CZPG", ELEM_FILTER_BANDPASS_CZPG);
-    cat->addButton("Notch", ELEM_FILTER_NOTCH);
-    cat->addButton("Moog", ELEM_FILTER_MOOG);
-    
-    cat = selector->addCategory("Mix");
-    cat->addButton("Mixer", ELEM_MIXER);
-    cat->addButton("Ring Mod.", ELEM_RINGMOD);
-    cat->addButton("Ctrl. Mixer", ELEM_CTRLMIXER);
-    cat->addButton("Ctrl. Ring Mod.", ELEM_CTRLRINGMOD);
-    */
-    
+    m_populator.populate(selector);
+      
     m_windowlist = new WindowList();
     
     m_windowlist->addWindow("SelectorWindowButton.imageset",

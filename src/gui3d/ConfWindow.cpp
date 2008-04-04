@@ -29,6 +29,145 @@ using namespace std;
 #define CW_WIDTH  300
 #define CW_HEIGHT 250
 
+#define PW_WIDTH  400
+#define PW_HEIGHT 200
+
+bool PathConfWindow::onGeneric(const CEGUI::EventArgs &e)
+{
+    return true;
+}
+
+bool PathConfWindow::onDelete(const CEGUI::EventArgs &e)
+{
+    ItemEntry* item = m_listbox->getFirstSelectedItem();
+    if (item)
+	m_listbox->removeItem(item);
+}
+
+bool PathConfWindow::onAdd(const CEGUI::EventArgs &e)
+{
+    WindowManager& wmgr = WindowManager::getSingleton();
+    
+    ItemEntry* item = static_cast<ItemEntry*>(wmgr.createWindow("TaharezLook/ListboxItem"));
+    item->setText(m_editbox->getText());
+    item->setWantsMultiClickEvents(false);
+    item->subscribeEvent(ItemEntry::EventMouseButtonDown,
+			 Event::Subscriber(&PathConfWindow::onGeneric, this));
+    
+    m_listbox->addItem(item);
+}
+
+bool PathConfWindow::onChange(const CEGUI::EventArgs &e)
+{
+    ItemEntry* item = m_listbox->getFirstSelectedItem();
+    if (item)
+	item->setText(m_editbox->getText());
+}
+
+bool PathConfWindow::onApply(const CEGUI::EventArgs &e)
+{
+    m_conf.clearChilds();
+
+    for (int i = 0; i < m_listbox->getItemCount(); ++i) {
+	string val = m_listbox->getItemFromIndex(i)->getText().c_str();
+	m_conf.getChild(string("path") + itoa(i, 10)).set(val);
+    }
+    
+    m_conf.nudge();
+}
+
+bool PathConfWindow::onSelection(const CEGUI::EventArgs &e)
+{
+    ItemEntry* item = m_listbox->getFirstSelectedItem();
+    if (item)
+	m_editbox->setText(item->getText());
+    return true;
+}
+
+void PathConfWindow::populate()
+{
+    WindowManager& wmgr = WindowManager::getSingleton();
+    
+    ItemEntry* item;
+    std::string val;
+    
+    for (ConfNode::ChildIter iter = m_conf.begin(); iter != m_conf.end(); ++iter) {
+	(*iter)->get(val);
+	item = static_cast<ItemEntry*>(wmgr.createWindow("TaharezLook/ListboxItem"));
+	item->setText(val);
+	item->setWantsMultiClickEvents(false);
+	item->subscribeEvent(ItemEntry::EventMouseButtonDown,
+			     Event::Subscriber(&PathConfWindow::onGeneric, this));
+	
+	m_listbox->addItem(item);
+    }
+}
+
+CEGUI::FrameWindow* PathConfWindow::createWindow()
+{
+    WindowManager& wmgr = WindowManager::getSingleton();
+    
+    FrameWindow* window = dynamic_cast<FrameWindow*>
+	(wmgr.createWindow("TaharezLook/FrameWindow"));
+    window->setSize(UVector2(UDim(0, PW_WIDTH), UDim(0, PW_HEIGHT)));
+    window->setPosition(UVector2(UDim(0.5, -PW_WIDTH/2.0), UDim(0.5, -PW_HEIGHT/2.0)));
+
+    m_editbox = static_cast<Editbox*>(wmgr.createWindow("TaharezLook/Editbox"));
+    window->addChildWindow(m_editbox);
+    m_editbox->setPosition(UVector2(UDim(0, 15), UDim(0, 33)));
+    m_editbox->setSize(UVector2(UDim(1, -135), UDim(0, 20)));
+    
+    m_listbox = static_cast<ItemListbox*>(wmgr.createWindow("TaharezLook/ItemListbox"));
+    window->addChildWindow(m_listbox);
+    m_listbox->setPosition(UVector2(UDim(0, 15), UDim(0, 63)));
+    m_listbox->setSize(UVector2(UDim(1, -135), UDim(1, -78)));
+    m_listbox->subscribeEvent(ItemListbox::EventSelectionChanged,
+			      Event::Subscriber(&PathConfWindow::onSelection, this));
+
+    Window* but = wmgr.createWindow("TaharezLook/Button");
+    window->addChildWindow(but);
+    but->setText("Add");
+    but->setPosition(UVector2(UDim(1, -110), UDim(0, 33)));
+    but->setSize(UVector2(UDim(0, 95), UDim(0, 20)));
+    but->setWantsMultiClickEvents(false);
+    but->subscribeEvent(PushButton::EventMouseClick,
+			Event::Subscriber(&PathConfWindow::onAdd, this));
+
+    but = wmgr.createWindow("TaharezLook/Button");
+    window->addChildWindow(but);
+    but->setText("Change");
+    but->setPosition(UVector2(UDim(1, -110), UDim(0, 63)));
+    but->setSize(UVector2(UDim(0, 95), UDim(0, 20)));
+    but->setWantsMultiClickEvents(false);
+    but->subscribeEvent(PushButton::EventMouseClick,
+			Event::Subscriber(&PathConfWindow::onChange, this));
+
+    but = wmgr.createWindow("TaharezLook/Button");
+    window->addChildWindow(but);
+    but->setText("Delete");
+    but->setPosition(UVector2(UDim(1, -110), UDim(0, 93)));
+    but->setSize(UVector2(UDim(0, 95), UDim(0, 20)));
+    but->setWantsMultiClickEvents(false);
+    but->subscribeEvent(PushButton::EventMouseClick,
+			Event::Subscriber(&PathConfWindow::onDelete, this));
+
+    but = wmgr.createWindow("TaharezLook/Button");
+    window->addChildWindow(but);
+    but->setText("Apply");
+    but->setPosition(UVector2(UDim(1, -110), UDim(0, 123)));
+    but->setSize(UVector2(UDim(0, 95), UDim(0, 20)));
+    but->setWantsMultiClickEvents(false);
+    but->subscribeEvent(PushButton::EventMouseClick,
+			Event::Subscriber(&PathConfWindow::onApply, this));
+
+    populate();
+#if 0
+ 
+#endif
+
+    return window;
+}
+
 Window* OutputConfWindowSimple::createWindow(psynth::ConfNode& node)
 {
     m_node = &node;
@@ -51,7 +190,7 @@ Window* OutputConfWindowSimple::createWindow(psynth::ConfNode& node)
     string str_val;
     node.getPath(m_conf_path).get(str_val);
 /*
-    cout << "new device val ("<< node.getPath(m_conf_path).getPathName() << ": " << str_val << endl;
+  cout << "new device val ("<< node.getPath(m_conf_path).getPathName() << ": " << str_val << endl;
 */
     m_value = static_cast<Editbox*>(wmgr.createWindow("TaharezLook/Editbox"));
     window->addChildWindow(m_value);
@@ -187,18 +326,18 @@ CEGUI::Window* ConfWindow::createAudioSettingsWindow()
     }
     
 /*
-    label = wmgr.createWindow("TaharezLook/StaticText");
-    st->addChildWindow(label);
-    label->setProperty("FrameEnabled", "false");
-    label->setProperty("BackgroundEnabled", "false");
-    label->setPosition(UVector2(UDim(0, 6), UDim(0, 30)));
-    label->setSize(UVector2(UDim(0.5, -9), UDim(0, 20)));
-    label->setText("Device:");
+  label = wmgr.createWindow("TaharezLook/StaticText");
+  st->addChildWindow(label);
+  label->setProperty("FrameEnabled", "false");
+  label->setProperty("BackgroundEnabled", "false");
+  label->setPosition(UVector2(UDim(0, 6), UDim(0, 30)));
+  label->setSize(UVector2(UDim(0.5, -9), UDim(0, 20)));
+  label->setText("Device:");
     
-    m_bufsize = static_cast<Editbox*>(wmgr.createWindow("TaharezLook/Editbox"));
-    st->addChildWindow(m_bufsize);
-    m_bufsize->setPosition(UVector2(UDim(0.5, 3), UDim(0, 30)));
-    m_bufsize->setSize(UVector2(UDim(0.5, -9), UDim(0, 20)));
+  m_bufsize = static_cast<Editbox*>(wmgr.createWindow("TaharezLook/Editbox"));
+  st->addChildWindow(m_bufsize);
+  m_bufsize->setPosition(UVector2(UDim(0.5, 3), UDim(0, 30)));
+  m_bufsize->setSize(UVector2(UDim(0.5, -9), UDim(0, 20)));
 */
 
     Window* but = wmgr.createWindow("TaharezLook/Button");
@@ -301,9 +440,57 @@ CEGUI::Window* ConfWindow::createVideoSettingsWindow()
     m_fps->setPageSize(1);
     m_fps->setScrollPosition(int_val-20);
     m_fps->subscribeEvent(Scrollbar::EventScrollPositionChanged, 
-			Event::Subscriber(&ConfWindow::onFpsChange, this));
+			  Event::Subscriber(&ConfWindow::onFpsChange, this));
     
     return window;
+}
+
+CEGUI::Window* ConfWindow::createPathsSettingsWindow()
+{
+    WindowManager& wmgr = WindowManager::getSingleton();
+    
+    Window* window = wmgr.createWindow("DefaultGUISheet");
+
+    window->setText("Paths");
+    window->setPosition(UVector2(UDim(0, 0), UDim(0, 0)));
+    window->setSize(UVector2(UDim(1, 0), UDim(1, 0)));
+
+    Window* st = wmgr.createWindow("TaharezLook/StaticText");
+    window->addChildWindow(st);
+    st->setPosition(UVector2(UDim(0,10), UDim(0,10)));
+    st->setSize(UVector2(UDim(1,-20), UDim(0,32)));
+    st->setProperty("FrameEnabled", "true");
+    st->setProperty("VertFormatting", "TopAligned");
+
+    Window* label = wmgr.createWindow("TaharezLook/StaticText");
+    st->addChildWindow(label);
+    label->setProperty("FrameEnabled", "false");
+    label->setProperty("BackgroundEnabled", "false");
+    label->setPosition(UVector2(UDim(0, 6), UDim(0, 6)));
+    label->setSize(UVector2(UDim(0.5, -9), UDim(0, 20)));
+    label->setText("Samples:");
+    
+    Window* but = wmgr.createWindow("TaharezLook/Button");
+    st->addChildWindow(but);
+    but->setText("Edit");
+    but->setPosition(UVector2(UDim(1, -80), UDim(0, 6)));
+    but->setSize(UVector2(UDim(0, 74), UDim(0, 20)));
+    but->setWantsMultiClickEvents(false);
+    but->subscribeEvent(PushButton::EventMouseClick,
+			Event::Subscriber(&ConfWindow::onSamplesPathsPress, this));
+    
+    return window;
+}
+
+bool ConfWindow::onSamplesPathsPress(const CEGUI::EventArgs &e)
+{
+    m_samples_win.setActive(true);
+    return true;
+}
+
+bool ConfWindow::onGeneric(const CEGUI::EventArgs &e)
+{
+    return true;
 }
 
 bool ConfWindow::onOutputChange(const CEGUI::EventArgs &e)
@@ -328,6 +515,7 @@ bool ConfWindow::onOutputChange(const CEGUI::EventArgs &e)
     
     return true;
 }
+
 
 bool ConfWindow::onAudioApplyPress(const CEGUI::EventArgs &e)
 {
@@ -391,14 +579,16 @@ CEGUI::FrameWindow* ConfWindow::createWindow()
     window->addChildWindow(container);
     container->addChildWindow(createAudioSettingsWindow());
     container->addChildWindow(createVideoSettingsWindow());
+    container->addChildWindow(createPathsSettingsWindow());
 
     return window;
 }
 
 ConfWindow::ConfWindow(psynth::ConfNode& gui_conf,
-	       psynth::ConfNode& psynth_conf) :
-	m_gui_conf(gui_conf),
-	m_psynth_conf(psynth_conf)
+		       psynth::ConfNode& psynth_conf) :
+    m_samples_win(psynth_conf.getPath("file_manager/samples")),
+    m_gui_conf(gui_conf),
+    m_psynth_conf(psynth_conf)
 {
 #ifdef PSYNTH_HAVE_ALSA
     attachOutputConfWindowFactory(new OutputConfWindowFactoryAlsa);

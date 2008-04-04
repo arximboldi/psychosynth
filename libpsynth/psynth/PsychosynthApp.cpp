@@ -52,8 +52,10 @@ void PsychosynthApp::generatePaths()
 #else
     char* home_dir = getenv("HOME");
     m_cfg_dir = std::string(home_dir) + "/.psychosynth/";
-    if (access(m_cfg_dir.c_str(), F_OK) < 0)
+    if (access(m_cfg_dir.c_str(), F_OK) < 0) {
 	mkdir(m_cfg_dir.c_str(), S_IRWXU|S_IRWXG|S_IROTH|S_IXOTH);
+	mkdir((m_cfg_dir + "samples").c_str(), S_IRWXU|S_IRWXG|S_IROTH|S_IXOTH);
+    }
 #endif
 }
 

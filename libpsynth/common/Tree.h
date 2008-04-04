@@ -42,6 +42,7 @@ class TreeNode
     bool m_isinit;
 
     virtual void onNewChild(NodeType& node) {}
+    virtual void onRemoveChild(NodeType& node) {}
     virtual void onInit() {}
     
     /**
@@ -131,6 +132,28 @@ public:
 	return *m_childs[name];
     }
 
+    /**
+     * Deletes a child of this node.
+     * @return An iterator to the next child.
+     */
+    ChildIter removeChild(ChildIter& iter) {
+	ChildIter next = iter;
+	next++;
+	onRemoveChild(**iter);
+	delete *iter;
+	m_childs.erase(iter);
+	return next;
+    }
+
+    /**
+     * Removes all childs.
+     */
+    void clearChilds() {
+	ChildIter iter = begin();
+	while(iter != end())
+	    iter = removeChild(iter);
+    }
+    
     /**
      * Returns a pointer to the parent of this node or @c null if this is a root
      * node.

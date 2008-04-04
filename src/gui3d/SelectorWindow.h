@@ -79,7 +79,8 @@ public:
 	CEGUI::Window* getWindow() {
 	    return m_window;
 	};
-		
+
+	void clearButtons();
 	void addButton(const std::string& name, const psynth::TableObjectCreator& objcre);
     };
 	

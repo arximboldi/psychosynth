@@ -41,9 +41,50 @@
 using namespace psynth;
 using namespace std;
 
-void DefaultSelectorPopulator::populate(const std::string& data_path,
-					SelectorWindow* sel)
+bool DefaultSelectorPopulator::onSamplesConfNudge(psynth::ConfNode& conf)
 {
+    SelectorWindow::Category* cat = m_selector->findCategory("Samples");
+
+    if (cat) {
+	cat->clearButtons();
+	populateSamples(cat);
+    }
+    
+    return true;
+}
+
+void DefaultSelectorPopulator::populateSamples(SelectorWindow::Category* cat)
+{
+    TableObjectCreator creat;
+    
+    creat.setName("sampler");
+    
+    list<string> files;
+    list<string> valid_ext;
+
+    valid_ext.push_back("au");
+    valid_ext.push_back("wav");
+    valid_ext.push_back("ogg");
+    valid_ext.push_back("aiff");
+    
+    FileManager::instance()
+	.getPath("psychosynth/samples")
+	.findIf(MakeHasExtension(valid_ext.begin(), valid_ext.end()), files);
+
+    for (list<string>::iterator it = files.begin();
+	 it != files.end(); ++it) {
+	creat.setParam("file", string(basename(it->c_str())));
+	cat->addButton(string(basename(it->c_str())), creat);
+    }
+}
+
+void DefaultSelectorPopulator::populate(SelectorWindow* sel)
+{
+    m_selector = sel;
+    Config::instance()
+	.getPath("psychosynth/file_manager/samples")
+	.addNudgeEvent(MakeDelegate(this, &DefaultSelectorPopulator::onSamplesConfNudge));
+    
     SelectorWindow::Category* cat = NULL;
     TableObjectCreator creat;
 
@@ -126,27 +167,6 @@ void DefaultSelectorPopulator::populate(const std::string& data_path,
     creat.setParam("shape", (int) ObjectStepSeq::SHAPE_BWSAWTOOTH);
     cat->addButton("Step BW Saw", creat);
     
-    creat.clear();
     cat = sel->addCategory("Samples");
-    creat.setName("sampler");
-    
-    list<string> files;
-    list<string> valid_ext;
-
-    valid_ext.push_back("au");
-    valid_ext.push_back("wav");
-    valid_ext.push_back("ogg");
-    valid_ext.push_back("aiff");
-    
-    FileManager::instance()
-	.getPath("psychosynth/samples")
-	.findIf(MakeHasExtension(valid_ext.begin(), valid_ext.end()), files);
-
-    for (list<string>::iterator it = files.begin();
-	 it != files.end(); ++it) {
-	creat.setParam("file", string(basename(it->c_str())));
-	cout << basename(it->c_str()) << endl;
-	cat->addButton(string(basename(it->c_str())), creat);
-    }
-    
+    populateSamples(cat);
 }

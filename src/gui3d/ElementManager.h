@@ -53,6 +53,8 @@ class ElementManager : public OIS::MouseListener,
     int m_elemcount;
 
     int m_must_own;
+    int m_modifier_1;
+    int m_modifier_2;
     
     Ogre::Camera* m_camera;
     Ogre::SceneManager* m_scene;

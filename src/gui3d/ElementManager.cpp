@@ -42,6 +42,8 @@ ElementManager::ElementManager(Table* table, Ogre::SceneManager* scene,
     m_elems(),
     m_elemcount(0),
     m_must_own(0),
+    m_modifier_1(0),
+    m_modifier_2(0),
     m_camera(camera),
     m_scene(scene),
     m_rayquery(scene->createRayQuery(Ogre::Ray()))
@@ -331,6 +333,21 @@ bool ElementManager::keyPressed(const OIS::KeyEvent &e)
 	if((*it++).second->keyPressed(e))
 	    ret = true;    
 
+    switch(e.key) {
+    case OIS::KC_LCONTROL:
+    case OIS::KC_RCONTROL:
+	m_modifier_1++;
+	break;
+
+    case OIS::KC_LSHIFT:
+    case OIS::KC_RSHIFT:
+	m_modifier_2++;
+	break;
+	
+    default:
+	break;
+    }
+           
     return ret;
 }
 
@@ -341,6 +358,21 @@ bool ElementManager::keyReleased(const OIS::KeyEvent &e)
     for (ElemMapIter it = m_elems.begin(); it != m_elems.end();)
 	if((*it++).second->keyReleased(e))
 	    ret = true;    
+
+    switch(e.key) {
+    case OIS::KC_LCONTROL:
+    case OIS::KC_RCONTROL:
+	m_modifier_1--;
+	break;
+
+    case OIS::KC_LSHIFT:
+    case OIS::KC_RSHIFT:
+	m_modifier_2--;
+	break;
+	
+    default:
+	break;
+    }
     
     return ret;
 }
@@ -350,6 +382,9 @@ void ElementManager::handleAddObject(TableObject& obj)
     Element* elem = createElement(obj);
 
     if (elem != NULL) {
+	elem->setFirstModifier(m_modifier_1);
+	elem->setSecondModifier(m_modifier_2);
+	
 	if (m_must_own)
 	    elem->setOwned(true);
 	

@@ -52,6 +52,7 @@ class EnvelopeMultiValues
 public:
 
     EnvelopeMultiValues() :
+	m_sustain(0),
 	m_factor(1.0f)
 	{}
     
@@ -60,6 +61,10 @@ public:
 
     void setFactor(float factor) {
 	m_factor = factor;
+    }
+
+    void setSustain(int sustain) {
+	m_sustain = sustain;
     }
     
     void set(const std::vector<EnvPoint>& p, int sustain) {

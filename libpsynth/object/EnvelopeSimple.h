@@ -33,6 +33,7 @@ namespace psynth
  */
 class EnvelopeSimple : public Envelope
 {
+public:
     float m_rise_dt;
     float m_fall_dt;
     float m_curr_dt;

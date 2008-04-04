@@ -61,4 +61,12 @@ void ConfSubject::notifyConfNewChild(ConfNode& child)
 	(*i)->handleConfNewChild(child);
 }
 
+void ConfSubject::notifyConfRemoveChild(ConfNode& child)
+{
+    for (list<ConfListener*>::iterator i = m_list.begin();
+	 i != m_list.end();
+	 ++i)
+	(*i)->handleConfRemoveChild(child);
+}
+
 } /* namespace psynth */

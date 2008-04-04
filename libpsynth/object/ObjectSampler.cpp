@@ -85,9 +85,7 @@ void ObjectSampler::onFileChange(ObjParam& par)
     std::string path;
     par.get(val);
 
-    cout << "OPENING FILE: " << val << endl;
     path = FileManager::instance().getPath("psychosynth/samples").find(val);
-    //path = val;
     
     m_update_lock.lock();
 
@@ -100,10 +98,6 @@ void ObjectSampler::onFileChange(ObjParam& par)
 	m_inbuf.setInfo(m_fetcher.getInfo(), getInfo().block_size);
 	m_scaler.setChannels(m_fetcher.getInfo().num_channels);
 	//m_scaler.setSampleRate(m_fetcher.getInfo().sample_rate);
-
-	cout << "info.sample_rate:" << m_fetcher.getInfo().sample_rate << endl;
-	cout << "info.block_size:" << m_fetcher.getInfo().block_size << endl;
-	cout << "info.num_channels:" << m_fetcher.getInfo().num_channels << endl;
     }
     
     m_update_lock.unlock();
@@ -224,7 +218,7 @@ void ObjectSampler::read(AudioBuffer& buf, int start, int end)
 	   
 	m_update_lock.lock();
 	nread = m_fetcher.read(m_inbuf, must_read);
-	    
+
 	if (nread) {
 	    m_ctrl_pos += (float) nread / (factor * m_param_tempo);
 	    if (m_ctrl_pos >= getInfo().block_size)
@@ -234,10 +228,14 @@ void ObjectSampler::read(AudioBuffer& buf, int start, int end)
 
 	    Sample inter_buffer[nread * m_inbuf.getInfo().num_channels];
 	    m_inbuf.interleave(inter_buffer, nread);
+
 	    m_scaler.setRate(factor);
+	    
 	    m_scaler.update(inter_buffer, nread);
 	}
-	    
+
+
+	
 	m_update_lock.unlock();
     }
 

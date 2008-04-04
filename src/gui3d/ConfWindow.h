@@ -101,8 +101,33 @@ public:
 };
 #endif /* PSYNTH_HAVE_JACK */
 
+class PathConfWindow : public ToggableWindow
+{
+    CEGUI::ItemListbox* m_listbox;
+    CEGUI::Editbox* m_editbox;
+    
+    psynth::ConfNode& m_conf;
+    
+    bool onGeneric(const CEGUI::EventArgs &e);
+    bool onDelete(const CEGUI::EventArgs &e);
+    bool onAdd(const CEGUI::EventArgs &e);
+    bool onChange(const CEGUI::EventArgs &e);
+    bool onApply(const CEGUI::EventArgs &e);
+    bool onSelection(const CEGUI::EventArgs &e);
+    void populate();
+    CEGUI::FrameWindow* createWindow();
+    
+public:
+    PathConfWindow(psynth::ConfNode& conf_node) :
+	m_conf(conf_node)
+	{}  
+};
+
 class ConfWindow : public ToggableWindow
 {
+    /* File manager config. */
+    PathConfWindow m_samples_win;
+    
     /* The output thing is boring.*/
     typedef std::map<std::string, OutputConfWindowFactory*> OCWFMap;
     OCWFMap m_map;
@@ -130,12 +155,15 @@ class ConfWindow : public ToggableWindow
     void stopOutputConfWindow();
     CEGUI::Window* createAudioSettingsWindow();
     CEGUI::Window* createVideoSettingsWindow();
+    CEGUI::Window* createPathsSettingsWindow();
 
+    bool onGeneric(const CEGUI::EventArgs &e);
     bool onAudioApplyPress(const CEGUI::EventArgs &e);
     bool onOutputChange(const CEGUI::EventArgs &e);
     bool onFpsChange(const CEGUI::EventArgs &e);
     bool onWindowApplyPress(const CEGUI::EventArgs &e);
-
+    bool onSamplesPathsPress(const CEGUI::EventArgs &e);
+    
     void attachOutputConfWindowFactory(OutputConfWindowFactory* f) {
 	m_map.insert(std::make_pair(std::string(f->getName()), f));
     }

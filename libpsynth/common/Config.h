@@ -82,6 +82,12 @@ public:
      * @param child The child that has been added.
      */
     virtual bool handleConfNewChild(ConfNode& child) = 0;
+
+    /**
+     * A child has been added to this node.
+     * @param child The child that has been added.
+     */
+    virtual bool handleConfRemoveChild(ConfNode& child) = 0;
 };
 
 
@@ -169,6 +175,12 @@ public:
      * @param child The created child.
      */
     void notifyConfNewChild(ConfNode& child);
+
+    /**
+     * Rises a new child creation event.
+     * @param child The created child.
+     */
+    void notifyConfRemoveChild(ConfNode& child);
 };
 
 /**
@@ -345,6 +357,10 @@ class ConfNode : public ConfSubject,
 
     void onNewChild(ConfNode& new_child) {
 	notifyConfNewChild(new_child);
+    }
+
+    void onRemoveChild(ConfNode& new_child) {
+	notifyConfRemoveChild(new_child);
     }
     
 public:

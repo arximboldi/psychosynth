@@ -72,7 +72,7 @@ CameraControllerRasko::CameraControllerRasko(Ogre::Camera* camera, TaskManager* 
     m_mouseright(false),
     m_mousecenter(false),
     m_moving(false),
-    m_modifier(false),
+    m_modifier(0),
     m_aimpoint(0.0,0.0,0.0),
     m_xangle(0.0),
     m_yangle(Math::PI/4),
@@ -234,17 +234,19 @@ bool CameraControllerRasko::mouseReleased(const OIS::MouseEvent &e, OIS::MouseBu
 
 bool CameraControllerRasko::keyPressed(const OIS::KeyEvent &e)
 {
-    if (e.key == OIS::KC_LCONTROL)
-	m_modifier = true;
+    if (e.key == OIS::KC_LMENU ||
+	e.key == OIS::KC_RMENU)
+	m_modifier++;
     
     return false;
 }
 
 bool CameraControllerRasko::keyReleased(const OIS::KeyEvent &e)
 {
-    if (e.key == OIS::KC_LCONTROL)
-	m_modifier = false;
-
+    if (e.key == OIS::KC_LMENU ||
+	e.key == OIS::KC_RMENU)
+	m_modifier--;
+    
     return false;
 }
 

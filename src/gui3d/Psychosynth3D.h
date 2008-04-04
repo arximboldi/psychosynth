@@ -35,6 +35,7 @@
 #include <libpsynth/net/OSCServer.h>
 #endif
 
+#include "gui3d/DefaultSelectorPopulator.h"
 #include "gui3d/InputManager.h"
 #include "gui3d/CeguiInjecter.h"
 #include "gui3d/TaskManager.h"
@@ -53,7 +54,8 @@ class Psychosynth3D : public psynth::PsychosynthApp,
 	
     CEGUI::System*            m_gui;
     CEGUI::OgreCEGUIRenderer* m_ceguirender;
-	
+
+    DefaultSelectorPopulator m_populator;
     InputManager*     m_inputmgr;
     CeguiInjecter*    m_guiinput;
     TaskManager*      m_taskmgr;

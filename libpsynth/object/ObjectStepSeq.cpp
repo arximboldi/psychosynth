@@ -87,7 +87,7 @@ void ObjectStepSeq::doUpdate(const Object* caller,
 	if (bpm)
 	    updateEnvelopeFactor(*bpm++);
 	*output++ = m_env.update();
-
+	
 	if (m_env.finished()) {
 	    m_cur_step = (m_cur_step + 1) % m_param_num_steps;
 	    m_env.press();

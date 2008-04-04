@@ -91,6 +91,18 @@ SelectorWindow::Category::~Category()
     //delete m_window;
 }
 
+void SelectorWindow::Category::clearButtons()
+{
+    list<Button*>::iterator it;
+    for (it = m_buts.begin(); it != m_buts.end(); ++it) {
+	m_window->removeChildWindow((*it)->getWindow());
+	delete *it;
+    }
+    
+    m_buts.clear();
+    m_nbut = 0;
+}
+
 void SelectorWindow::Category::addButton(const std::string& name,
 					 const psynth::TableObjectCreator& objcre)
 {

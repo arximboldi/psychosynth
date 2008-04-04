@@ -49,7 +49,7 @@ class CameraControllerRasko : public CameraController {
     bool m_mouseright;
     bool m_mousecenter;
     bool m_moving;
-    bool m_modifier;
+    int m_modifier;
     Ogre::Vector3 m_aimpoint;
     Ogre::Vector3 m_last_tpos;
     Ogre::Radian m_xangle;

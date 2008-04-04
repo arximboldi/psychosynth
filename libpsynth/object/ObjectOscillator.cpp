@@ -111,10 +111,9 @@ void ObjectOscillator::updateOsc(Sample* out)
 	int n_samp = getInfo().block_size;
 	const Sample* trig = trig_buf->getData();
 	trig_env = getInEnvelope(LINK_CONTROL, IN_C_TRIGGER);
-
 	while (n_samp--) {
 	    float env_val = trig_env.update();
-	    *out = *out * ((1.0f - env_val) + (env_val * *trig)); 	    
+	    *out = *out * ((1.0f - env_val) + (env_val * *trig));
 	    ++out;
 	    ++trig;
 	}

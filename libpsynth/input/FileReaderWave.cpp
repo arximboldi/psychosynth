@@ -45,9 +45,6 @@ void FileReaderWave::open(const char* file)
 	info.num_channels = sfinfo.channels;
 	info.block_size   = sfinfo.frames;
 	setInfo(info);
-    
-	cout << "channels: " << info.num_channels << endl;
-	cout << "sample_rate: " << info.sample_rate << endl;
 		
 	setIsOpen(true);
     }

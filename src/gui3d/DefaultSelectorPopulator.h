@@ -23,13 +23,18 @@
 #ifndef DEFAULTSELECTORPOPULATOR_H
 #define DEFAULTSELECTORPOPULATOR_H
 
-class SelectorWindow;
+#include <libpsynth/common/Config.h>
+#include "gui3d/SelectorWindow.h"
 
 class DefaultSelectorPopulator
 {
+    SelectorWindow* m_selector;
+
+    void populateSamples(SelectorWindow::Category* cat);
+    
+    bool onSamplesConfNudge(psynth::ConfNode& conf);
 public:
-    void populate(const std::string& data_path,
-		  SelectorWindow* sel);
+    void populate(SelectorWindow* sel);
 };
 
 #endif /* DEFAULTSELECTORPOPULATOR_H */
