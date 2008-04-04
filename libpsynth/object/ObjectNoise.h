@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) Juan Pedro Bolivar Puente 2007                          *
+ *   Copyright (C) Juan Pedro Bolivar Puente 2008                          *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -20,80 +20,72 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef PSYNTH_OBJECTFILTER_H
-#define PSYNTH_OBJECTFILTER_H
-
-#include <vector>
+#ifndef PSYNTH_OBJECTNOISE_H
+#define PSYNTH_OBJECTNOISE_H
 
 #include <libpsynth/object/Object.h>
-#include <libpsynth/object/Filter.h>
-#include <libpsynth/object/ObjectFactory.h>
 
 namespace psynth
 {
 
-class ObjectFilter : public Object
-{
+class ObjectNoise : public Object
+{		
 public:	
     enum InAudioSocketID {
-	IN_A_INPUT,
 	N_IN_A_SOCKETS
     };
 	
     enum InControlSocketID {
-	IN_C_CUTOFF,
-	IN_C_EMPHASIS,
+	IN_C_AMPLITUDE,
+	IN_C_TRIGGER,
 	N_IN_C_SOCKETS
     };
-	
-    enum OutAudioSocketID {
-	OUT_A_OUTPUT,
-	N_OUT_A_SOCKETS
-    };
-	
-    enum OutControlSocketID {
-	N_OUT_C_SOCKETS
-    };
 
-    enum FilterType {
-	FILTER_LOWPASS       = FilterValues::LOWPASS,
-	FILTER_HIGHPASS      = FilterValues::HIPASS,
-	FILTER_BANDPASS_CSG  = FilterValues::BANDPASS_CSG,
-	FILTER_BANDPASS_CZPG = FilterValues::BANDPASS_CZPG,
-	FILTER_NOTCH         = FilterValues::NOTCH,
-	FILTER_MOOG          = FilterValues::MOOG,
-	N_FILTER_TYPES,
+    enum Type {
+	NOISE_WHITE,
+	NOISE_PINK,
+	N_TYPES
     };
-
+    
     enum ParamID {
 	PARAM_TYPE = Object::N_COMMON_PARAMS,
-	PARAM_CUTOFF,
-	PARAM_RESONANCE,
+	PARAM_AMPLITUDE,
 	N_PARAM
     };
 
-    static const float DEFAULT_CUTOFF    = 660.0f;
-    static const float DEFAULT_RESONANCE = 0.5f;
+    static const float DEFAULT_AMPL = 0.3f;
+    
+protected:
+    Sample updatePink();
+    Sample updateWhite();
+    void updateNoise(Sample* buf);
     
 private:
-    int m_param_type;
-    float m_param_cutoff;
-    float m_param_resonance;
-
-    FilterValues m_filter_values;
-    std::vector<Filter> m_filter;
+    /* Pink noise factors. */
+    Sample m_b0;
+    Sample m_b1;
+    Sample m_b2;
+    Sample m_b3;
+    Sample m_b4;
+    Sample m_b5;
+    Sample m_b6;
     
-    void doUpdate(const Object* caller, int caller_port_type, int caller_port);
-    void doAdvance() {}
-    void onInfoChange() {}
+
+    int   m_param_type;
+    float m_param_ampl;
+    //bool  m_restart;
     
 public:
-    ObjectFilter(const AudioInfo& prop, int mode = FILTER_LOWPASS);
-    ~ObjectFilter();
+    ObjectNoise(const AudioInfo& prop,
+		int obj_type,
+		const std::string& name,
+		int n_audio_out,
+		int n_control_out);
+    
+    ~ObjectNoise();
 };
-
-PSYNTH_DECLARE_OBJECT_FACTORY(ObjectFilter, "filter");
 
 } /* namespace psynth */
 
-#endif /* PSYNTH_OBJECTFILTER_H */
+#endif /* PSYNTH_OBJECTNOISE_H */
+

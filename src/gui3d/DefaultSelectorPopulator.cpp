@@ -34,7 +34,8 @@
 #include <libpsynth/object/ObjectFilter.h>
 #include <libpsynth/object/ObjectSampler.h>
 #include <libpsynth/object/ObjectStepSeq.h>
-
+#include <libpsynth/object/ObjectNoise.h>
+#include <libpsynth/object/ObjectStepSeq.h>
 #include "gui3d/SelectorWindow.h"
 #include "gui3d/DefaultSelectorPopulator.h"
 
@@ -88,7 +89,7 @@ void DefaultSelectorPopulator::populate(SelectorWindow* sel)
     SelectorWindow::Category* cat = NULL;
     TableObjectCreator creat;
 
-    cat = sel->addCategory("Oscillator");
+    cat = sel->addCategory("Generator");
     creat.setName("oscillator");
     
     creat.setParam("wave", (int) ObjectOscillator::OSC_SINE);
@@ -105,7 +106,14 @@ void DefaultSelectorPopulator::populate(SelectorWindow* sel)
     cat->addButton("Exponential", creat);
 
     creat.clear();
-    cat = sel->addCategory("LFO");
+    creat.setName("audio_noise");
+    creat.setParam("type", (int) ObjectNoise::NOISE_PINK);
+    cat->addButton("Pink Noise", creat);
+    creat.setParam("type", (int) ObjectNoise::NOISE_WHITE);
+    cat->addButton("White Noise", creat);
+    
+    creat.clear();
+    cat = sel->addCategory("Control");
     creat.setName("lfo");
     creat.setParam("frequency", 1.0f);
     
@@ -122,6 +130,13 @@ void DefaultSelectorPopulator::populate(SelectorWindow* sel)
     creat.setParam("wave", (int) ObjectOscillator::OSC_EXP);
     cat->addButton("Exponential", creat);
 
+    creat.clear();
+    creat.setName("control_noise");
+    creat.setParam("type", (int) ObjectNoise::NOISE_PINK);
+    cat->addButton("Pink Noise", creat);
+    creat.setParam("type", (int) ObjectNoise::NOISE_WHITE);
+    cat->addButton("White Noise", creat);
+    
     creat.clear();
     cat = sel->addCategory("Filter");
     creat.setName("filter");

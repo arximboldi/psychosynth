@@ -33,6 +33,8 @@
 #include "object/ObjectFilter.h"
 #include "object/ObjectSampler.h"
 #include "object/ObjectStepSeq.h"
+#include "object/ObjectAudioNoise.h"
+#include "object/ObjectControlNoise.h"
 
 using namespace std;
 
@@ -126,6 +128,8 @@ void Table::registerDefaultObjectFactory()
     registerObjectFactory(getObjectFilterFactory());
     registerObjectFactory(getObjectSamplerFactory());
     registerObjectFactory(getObjectStepSeqFactory());
+    registerObjectFactory(getObjectAudioNoiseFactory());
+    registerObjectFactory(getObjectControlNoiseFactory());
 }
 
 Table::~Table()

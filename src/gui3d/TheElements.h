@@ -74,4 +74,18 @@ public:
 		   Ogre::SceneManager* m_scene);
 };
 
+class ElementAudioNoise : public Element
+{
+public:
+    ElementAudioNoise(psynth::TableObject& obj,
+		      Ogre::SceneManager* m_scene);
+};
+
+class ElementControlNoise : public Element
+{
+public:
+    ElementControlNoise(psynth::TableObject& obj,
+			Ogre::SceneManager* m_scene);
+};
+
 #endif /* THEELEMENTS_H */

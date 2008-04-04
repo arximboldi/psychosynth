@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) 2007 Juan Pedro Bolivar Puente                          *
+ *   Copyright (C) Juan Pedro Bolivar Puente 2008                          *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -20,27 +20,25 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef PSYNTH_KNOWNOBJECTS_H
-#define PSYNTH_KNOWNOBJECTS_H
+#include "object/ObjectAudioNoise.h"
+
+using namespace std;
 
 namespace psynth
 {
 
-enum KnownObjectType
+PSYNTH_DEFINE_OBJECT_FACTORY(ObjectAudioNoise);
+
+void ObjectAudioNoise::doUpdate(const Object* caller, int caller_port_type, int caller_port)
 {
-    OBJ_OUTPUT = 0,
-    OBJ_MIXER,
-    OBJ_CONTROLMIXER,
-    OBJ_OSCILLATOR,
-    OBJ_LFO,
-    OBJ_FILTER,
-    OBJ_SAMPLER,
-    OBJ_STEPSEQ,
-    OBJ_AUDIONOISE,
-    OBJ_CONTROLNOISE,
-    N_OBJECTS
-};
+    AudioBuffer*  buf = getOutput<AudioBuffer>(LINK_AUDIO, OUT_A_OUTPUT);
+    Sample*       out = buf->getChannel(0);
+
+    updateNoise(out);
+    
+    /* Copy on the other channels. */
+    for (size_t i = 1; i < (size_t)getAudioInfo().num_channels; i++)
+	memcpy((*buf)[i], (*buf)[0], sizeof(Sample) * getAudioInfo().block_size);
+}
 
 } /* namespace psynth */
-
-#endif /* PSYNTH_KNOWNOBJECTS_H */

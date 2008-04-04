@@ -89,6 +89,11 @@ nobase_libpsynthinc_HEADERS = \
 	object/ObjectFilter.h \
 	object/ObjectSampler.h \
 	object/ObjectStepSeq.h \
+	object/ObjectNoise.h \
+	object/ObjectAudioNoise.h \
+	object/ObjectControlNoise.h \
+	object/ObjectEcho.h \
+	object/ObjectDelay.h \
 	object/Filter.h \
 	object/WaveTable.h \
 	object/Oscillator.h \
@@ -141,6 +146,11 @@ libpsynth_la_SOURCES = \
 	object/ObjectFilter.cpp \
 	object/ObjectSampler.cpp \
 	object/ObjectStepSeq.cpp \
+	object/ObjectNoise.cpp \
+	object/ObjectAudioNoise.cpp \
+	object/ObjectControlNoise.cpp \
+	object/ObjectEcho.cpp \
+	object/ObjectDelay.cpp \
 	object/Filter.cpp \
 	object/WaveTable.cpp \
 	object/Oscillator.cpp\

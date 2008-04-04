@@ -124,7 +124,7 @@ void ObjectStepSeq::initEnvelopeValues()
 
 void ObjectStepSeq::createShape()
 {
-    switch(m_param_shape) {
+    switch (m_param_shape) {
     case SHAPE_SQUARE:
 	m_hi_env_vals.resize(5);
 	break;
@@ -145,7 +145,7 @@ void ObjectStepSeq::createShape()
 
 void ObjectStepSeq::updateShape()
 {
-    switch(m_param_shape) {
+    switch (m_param_shape) {
     case SHAPE_SQUARE:
 	m_hi_env_vals[1] = EnvPoint(m_param_slope * m_param_high, 1.0f);
 	m_hi_env_vals[2] = EnvPoint(m_param_high - m_param_slope * m_param_high, 1.0f);

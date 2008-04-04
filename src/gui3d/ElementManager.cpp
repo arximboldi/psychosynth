@@ -78,6 +78,10 @@ Element* ElementManager::createElement(TableObject& obj)
 	return new ElementSampler(obj, m_scene);
     case OBJ_STEPSEQ:
 	return new ElementStepSeq(obj, m_scene);
+    case OBJ_AUDIONOISE:
+	return new ElementAudioNoise(obj, m_scene);
+    case OBJ_CONTROLNOISE:
+	return new ElementControlNoise(obj, m_scene);
     default:
 	return NULL;
     }

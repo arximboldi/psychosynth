@@ -32,6 +32,7 @@
 #include <libpsynth/object/ObjectFilter.h>
 #include <libpsynth/object/ObjectSampler.h>
 #include <libpsynth/object/ObjectStepSeq.h>
+#include <libpsynth/object/ObjectNoise.h>
 
 using namespace std;
 using namespace Ogre;
@@ -314,3 +315,58 @@ ElementStepSeq::ElementStepSeq(TableObject& obj,
 					"Hold"));
 }
 
+ElementAudioNoise::ElementAudioNoise(TableObject& obj,
+				     Ogre::SceneManager* m_scene) :
+    Element(obj, m_scene)
+{
+    static const char* mesh_names[ObjectNoise::N_TYPES] =
+	{"audio_noise_white.mesh", "audio_noise_pink.mesh"};
+
+    static const char* type_names[ObjectOscillator::N_OSC_TYPES] =
+	{"White", "Pink"};
+    
+    addComponent(new ElemMultiMainComponent(
+		     ObjectNoise::PARAM_AMPLITUDE,
+		     0.0f, 1.0f,
+		     ObjectNoise::PARAM_TYPE,
+		     mesh_names));
+        
+    getGUIProperties().addParameter(new ElemGuiParamMulti(
+					ObjectNoise::PARAM_TYPE,
+					ObjectNoise::N_TYPES,
+					type_names,
+					"Type"));
+
+    getGUIProperties().addParameter(new ElemGuiParamFloat(
+					ObjectNoise::PARAM_AMPLITUDE,
+					0.0f, 1.0f,
+					"Amplitude"));
+}
+
+ElementControlNoise::ElementControlNoise(TableObject& obj,
+				     Ogre::SceneManager* m_scene) :
+    Element(obj, m_scene)
+{
+    static const char* mesh_names[ObjectNoise::N_TYPES] =
+	{"control_noise_white.mesh", "control_noise_pink.mesh"};
+
+    static const char* type_names[ObjectOscillator::N_OSC_TYPES] =
+	{"White", "Pink"};
+    
+    addComponent(new ElemMultiMainComponent(
+		     ObjectNoise::PARAM_AMPLITUDE,
+		     0.0f, 1.0f,
+		     ObjectNoise::PARAM_TYPE,
+		     mesh_names));
+        
+    getGUIProperties().addParameter(new ElemGuiParamMulti(
+					ObjectNoise::PARAM_TYPE,
+					ObjectNoise::N_TYPES,
+					type_names,
+					"Type"));
+
+    getGUIProperties().addParameter(new ElemGuiParamFloat(
+					ObjectNoise::PARAM_AMPLITUDE,
+					0.0f, 1.0f,
+					"Amplitude"));
+}

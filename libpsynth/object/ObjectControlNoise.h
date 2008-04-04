@@ -20,80 +20,42 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef PSYNTH_OBJECTFILTER_H
-#define PSYNTH_OBJECTFILTER_H
+#ifndef PSYNTH_OBJECTCONTROLNOISE_H
+#define PSYNTH_OBJECTCONTROLNOISE_H
 
-#include <vector>
-
-#include <libpsynth/object/Object.h>
-#include <libpsynth/object/Filter.h>
+#include <libpsynth/object/ObjectNoise.h>
+#include <libpsynth/object/KnownObjects.h>
 #include <libpsynth/object/ObjectFactory.h>
 
 namespace psynth
 {
 
-class ObjectFilter : public Object
+class ObjectControlNoise : public ObjectNoise
 {
 public:	
-    enum InAudioSocketID {
-	IN_A_INPUT,
-	N_IN_A_SOCKETS
-    };
-	
-    enum InControlSocketID {
-	IN_C_CUTOFF,
-	IN_C_EMPHASIS,
-	N_IN_C_SOCKETS
-    };
-	
-    enum OutAudioSocketID {
-	OUT_A_OUTPUT,
-	N_OUT_A_SOCKETS
-    };
-	
     enum OutControlSocketID {
+	OUT_C_OUTPUT,
 	N_OUT_C_SOCKETS
     };
 
-    enum FilterType {
-	FILTER_LOWPASS       = FilterValues::LOWPASS,
-	FILTER_HIGHPASS      = FilterValues::HIPASS,
-	FILTER_BANDPASS_CSG  = FilterValues::BANDPASS_CSG,
-	FILTER_BANDPASS_CZPG = FilterValues::BANDPASS_CZPG,
-	FILTER_NOTCH         = FilterValues::NOTCH,
-	FILTER_MOOG          = FilterValues::MOOG,
-	N_FILTER_TYPES,
-    };
-
-    enum ParamID {
-	PARAM_TYPE = Object::N_COMMON_PARAMS,
-	PARAM_CUTOFF,
-	PARAM_RESONANCE,
-	N_PARAM
-    };
-
-    static const float DEFAULT_CUTOFF    = 660.0f;
-    static const float DEFAULT_RESONANCE = 0.5f;
-    
 private:
-    int m_param_type;
-    float m_param_cutoff;
-    float m_param_resonance;
-
-    FilterValues m_filter_values;
-    std::vector<Filter> m_filter;
-    
     void doUpdate(const Object* caller, int caller_port_type, int caller_port);
     void doAdvance() {}
     void onInfoChange() {}
     
 public:
-    ObjectFilter(const AudioInfo& prop, int mode = FILTER_LOWPASS);
-    ~ObjectFilter();
+    ObjectControlNoise(const AudioInfo& prop) :
+	ObjectNoise(prop,
+			 OBJ_CONTROLNOISE,
+			 "control_noise",
+			 0,
+			 N_OUT_C_SOCKETS)
+	{};
 };
 
-PSYNTH_DECLARE_OBJECT_FACTORY(ObjectFilter, "filter");
+PSYNTH_DECLARE_OBJECT_FACTORY(ObjectControlNoise, "control_noise");
 
 } /* namespace psynth */
 
-#endif /* PSYNTH_OBJECTFILTER_H */
+#endif /* PSYNTH_OBJECTCONTROLNOISE_H */
+
