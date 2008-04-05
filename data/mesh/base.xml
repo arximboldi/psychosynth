@@ -1,6 +1,6 @@
 <mesh>
 	<submeshes>
-			<submesh material="echo_image" usesharedvertices="false">
+			<submesh material="delay_image" usesharedvertices="false">
 			<faces count="4">
 				<face v1="0" v2="1" v3="2"/>
 				<face v1="3" v2="4" v3="5"/>
@@ -72,7 +72,7 @@
 				</vertexbuffer>
 			</geometry>
 		</submesh>
-		<submesh material="echo" usesharedvertices="false">
+		<submesh material="delay" usesharedvertices="false">
 			<faces count="12">
 				<face v1="0" v2="1" v3="2"/>
 				<face v1="3" v2="4" v3="5"/>

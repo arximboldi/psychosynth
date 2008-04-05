@@ -39,6 +39,7 @@ enum KnownObjectType
     OBJ_AUDIONOISE,
     OBJ_CONTROLNOISE,
     OBJ_ECHO,
+    OBJ_DELAY,
     N_OBJECTS
 };
 

@@ -24,6 +24,7 @@
 #include <string>
 #include <dirent.h>
 
+#include <libpsynth/version.h>
 #include <libpsynth/common/Misc.h>
 #include <libpsynth/common/FileManager.h>
 #include <libpsynth/table/TableObjectCreator.h>
@@ -63,10 +64,14 @@ void DefaultSelectorPopulator::populateSamples(SelectorWindow::Category* cat)
     list<string> files;
     list<string> valid_ext;
 
+#ifdef PSYNTH_HAVE_PCM
     valid_ext.push_back("au");
     valid_ext.push_back("wav");
-    valid_ext.push_back("ogg");
     valid_ext.push_back("aiff");
+#endif
+#ifdef PSYNTH_HACE_OGG    
+    valid_ext.push_back("ogg");
+#endif
     
     FileManager::instance()
 	.getPath("psychosynth/samples")
@@ -155,9 +160,12 @@ void DefaultSelectorPopulator::populate(SelectorWindow* sel)
     cat->addButton("Moog", creat);
 
     creat.clear();
-    cat = sel->addCategory("FX");
+    cat = sel->addCategory("Effects");
     creat.setName("echo");
     cat->addButton("Echo", creat);
+
+    creat.setName("delay");
+    cat->addButton("Delay", creat);
     
     creat.clear();
     cat = sel->addCategory("Mixers");

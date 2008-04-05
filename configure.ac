@@ -130,22 +130,22 @@ fi
 #  Samplerate
 # ----------------------------------------------------------------------
 
-AC_ARG_ENABLE([samplerate],
-    AC_HELP_STRING([--disable-samplerate], [Disable optional Samplerate support]),
-        [samplerate=$enableval], [samplerate=auto])
-
-if test "x${samplerate}" != xno ; then
-    PKG_CHECK_MODULES(SAMPLERATE, [ samplerate ],
-        [
-            HAVE_SAMPLERATE=yes
-            AC_DEFINE([HAVE_SAMPLERATE], 1, [Have Samplerate?])
-        ],
-        [
-            HAVE_SAMPLERATE=no
-        ])
-else
-    HAVE_SAMPLERATE=disabled
-fi
+#AC_ARG_ENABLE([samplerate],
+#    AC_HELP_STRING([--disable-samplerate], [Disable optional Samplerate support]),
+#        [samplerate=$enableval], [samplerate=auto])
+#
+#if test "x${samplerate}" != xno ; then
+#    PKG_CHECK_MODULES(SAMPLERATE, [ samplerate ],
+#        [
+#            HAVE_SAMPLERATE=yes
+#            AC_DEFINE([HAVE_SAMPLERATE], 1, [Have Samplerate?])
+#        ],
+#        [
+#            HAVE_SAMPLERATE=no
+#        ])
+#else
+#    HAVE_SAMPLERATE=disabled
+#fi
 
 #  OGG Vorbis
 # ----------------------------------------------------------------------
@@ -388,7 +388,6 @@ AC_MSG_RESULT([
 * 
 *      OSC support: ............. $HAVE_LIBLO
 *      XML config support: ...... $HAVE_LIBXML
-*      Samplerate support: ...... $HAVE_SAMPLERATE
 *      SoundTouch support: ...... $HAVE_SOUNDTOUCH
 *      PCM support: ............. $HAVE_SNDFILE
 *      OGG support: ............. $HAVE_VORBIS

@@ -34,6 +34,7 @@
 #include "object/ObjectAudioNoise.h"
 #include "object/ObjectControlNoise.h"
 #include "object/ObjectEcho.h"
+#include "object/ObjectDelay.h"
 
 using namespace std;
 
@@ -68,7 +69,8 @@ const PatcherData PATCHER_TABLE[N_OBJECTS][N_OBJECTS] =
 	{Object::LINK_NONE, 0, 0}, /* ObjectStepSeq */
 	{Object::LINK_NONE, 0, 0}, /* ObjectAudioNoise */	
 	{Object::LINK_NONE, 0, 0}, /* ObjectControlNoise */
-	{Object::LINK_NONE, 0, 0} /* ObjectEcho */
+	{Object::LINK_NONE, 0, 0}, /* ObjectEcho */
+	{Object::LINK_NONE, 0, 0} /* ObjectDelay */
     },
 
     /* ObjectAudioMixer */
@@ -83,7 +85,8 @@ const PatcherData PATCHER_TABLE[N_OBJECTS][N_OBJECTS] =
 	{Object::LINK_NONE, 0, 0}, /* ObjectStepSeq */
 	{Object::LINK_NONE, 0, 0}, /* ObjectAudioNoise */
 	{Object::LINK_NONE, 0, 0}, /* ObjectControlNoise */
-	{Object::LINK_AUDIO, ObjectAudioMixer::OUT_A_OUTPUT, ObjectEcho::IN_A_INPUT} /* ObjectEcho */
+	{Object::LINK_AUDIO, ObjectAudioMixer::OUT_A_OUTPUT, ObjectEcho::IN_A_INPUT}, /* ObjectEcho */
+	{Object::LINK_AUDIO, ObjectAudioMixer::OUT_A_OUTPUT, ObjectDelay::IN_A_INPUT} /* ObjectDelay */
     },
 
     /* ObjectControlMixer */
@@ -99,7 +102,8 @@ const PatcherData PATCHER_TABLE[N_OBJECTS][N_OBJECTS] =
 	{Object::LINK_CONTROL, ObjectControlMixer::OUT_C_OUTPUT, ObjectStepSeq::IN_C_BPM}, /* ObjectStepSeq */
 	{Object::LINK_CONTROL, ObjectControlMixer::OUT_C_OUTPUT, ObjectAudioNoise::IN_C_AMPLITUDE}, /* ObjectAudioNoise */
 	{Object::LINK_CONTROL, ObjectControlMixer::OUT_C_OUTPUT, ObjectControlNoise::IN_C_AMPLITUDE}, /* ObjectControlNoise */
-	{Object::LINK_CONTROL, ObjectControlMixer::OUT_C_OUTPUT, ObjectEcho::IN_C_FEEDBACK} /* ObjectEcho */
+	{Object::LINK_CONTROL, ObjectControlMixer::OUT_C_OUTPUT, ObjectEcho::IN_C_FEEDBACK}, /* ObjectEcho */
+	{Object::LINK_CONTROL, ObjectControlMixer::OUT_C_OUTPUT, ObjectEcho::IN_C_DELAY} /* ObjectDelay */
     },
     
     /* ObjectAudioOscillator */
@@ -115,6 +119,7 @@ const PatcherData PATCHER_TABLE[N_OBJECTS][N_OBJECTS] =
 	{Object::LINK_NONE, 0, 0}, /* ObjectAudioNoise */
 	{Object::LINK_NONE, 0, 0}, /* ObjectControlNoise */
 	{Object::LINK_AUDIO, ObjectAudioOscillator::OUT_A_OUTPUT, ObjectEcho::IN_A_INPUT}, /* ObjectEcho */
+	{Object::LINK_AUDIO, ObjectAudioOscillator::OUT_A_OUTPUT, ObjectDelay::IN_A_INPUT}, /* ObjectDelay */
     },
 
     /* ObjectLFO */
@@ -129,7 +134,8 @@ const PatcherData PATCHER_TABLE[N_OBJECTS][N_OBJECTS] =
 	{Object::LINK_CONTROL, ObjectLFO::OUT_C_OUTPUT, ObjectStepSeq::IN_C_BPM}, /* ObjectStepSeq */
 	{Object::LINK_CONTROL, ObjectLFO::OUT_C_OUTPUT, ObjectAudioNoise::IN_C_AMPLITUDE}, /* ObjectAudioNoise */
 	{Object::LINK_CONTROL, ObjectLFO::OUT_C_OUTPUT, ObjectControlNoise::IN_C_AMPLITUDE}, /* ObjectControlNoise */
-	{Object::LINK_CONTROL, ObjectLFO::OUT_C_OUTPUT, ObjectEcho::IN_C_FEEDBACK} /* ObjectEcho */
+	{Object::LINK_CONTROL, ObjectLFO::OUT_C_OUTPUT, ObjectEcho::IN_C_FEEDBACK}, /* ObjectEcho */
+	{Object::LINK_CONTROL, ObjectLFO::OUT_C_OUTPUT, ObjectDelay::IN_C_DELAY}, /* ObjectDelay */
     },
 
     /* ObjectFilter */
@@ -144,7 +150,8 @@ const PatcherData PATCHER_TABLE[N_OBJECTS][N_OBJECTS] =
 	{Object::LINK_NONE, 0, 0}, /* ObjectStepSeq */
 	{Object::LINK_NONE, 0, 0}, /* ObjectAudioNoise */
 	{Object::LINK_NONE, 0, 0}, /* ObjectControlNoise */
-	{Object::LINK_AUDIO, ObjectFilter::OUT_A_OUTPUT, ObjectEcho::IN_A_INPUT} /* ObjectEcho */
+	{Object::LINK_AUDIO, ObjectFilter::OUT_A_OUTPUT, ObjectEcho::IN_A_INPUT}, /* ObjectEcho */
+	{Object::LINK_AUDIO, ObjectFilter::OUT_A_OUTPUT, ObjectDelay::IN_A_INPUT} /* ObjectDelay */
     },
 
     /* ObjectSampler */
@@ -160,6 +167,7 @@ const PatcherData PATCHER_TABLE[N_OBJECTS][N_OBJECTS] =
 	{Object::LINK_NONE, 0, 0}, /* ObjectAudioNoise */
 	{Object::LINK_NONE, 0, 0}, /* ObjectControlNoise */
 	{Object::LINK_AUDIO, ObjectSampler::OUT_A_OUTPUT, ObjectEcho::IN_A_INPUT}, /* ObjectEcho */
+	{Object::LINK_AUDIO, ObjectSampler::OUT_A_OUTPUT, ObjectDelay::IN_A_INPUT}, /* ObjectDelay */
     },
 
     /* ObjectStepSeq */
@@ -174,7 +182,8 @@ const PatcherData PATCHER_TABLE[N_OBJECTS][N_OBJECTS] =
 	{Object::LINK_NONE, 0, 0}, /* ObjectStepSeq */
 	{Object::LINK_CONTROL, ObjectStepSeq::OUT_C_OUTPUT, ObjectNoise::IN_C_TRIGGER}, /* ObjectAudioNoise */
 	{Object::LINK_CONTROL, ObjectStepSeq::OUT_C_OUTPUT, ObjectNoise::IN_C_TRIGGER}, /* ObjectControlNoise */
-	{Object::LINK_NONE, 0, 0} /* ObjectEcho */
+	{Object::LINK_NONE, 0, 0}, /* ObjectEcho */
+	{Object::LINK_NONE, 0, 0} /* ObjectDelay */
     },
 
     /* ObjectAudioNoise */
@@ -190,6 +199,7 @@ const PatcherData PATCHER_TABLE[N_OBJECTS][N_OBJECTS] =
 	{Object::LINK_NONE, 0, 0}, /* ObjectAudioNoise */
 	{Object::LINK_NONE, 0, 0}, /* ObjectControlNoise */
 	{Object::LINK_AUDIO, ObjectAudioNoise::OUT_A_OUTPUT, ObjectEcho::IN_A_INPUT}, /* ObjectEcho */
+	{Object::LINK_AUDIO, ObjectAudioNoise::OUT_A_OUTPUT, ObjectDelay::IN_A_INPUT}, /* ObjectDelay */
     },
 
     /* ObjectControlNoise */
@@ -204,10 +214,11 @@ const PatcherData PATCHER_TABLE[N_OBJECTS][N_OBJECTS] =
 	{Object::LINK_CONTROL, ObjectControlNoise::OUT_C_OUTPUT, ObjectStepSeq::IN_C_BPM}, /* ObjectStepSeq */
 	{Object::LINK_CONTROL, ObjectControlNoise::OUT_C_OUTPUT, ObjectAudioNoise::IN_C_AMPLITUDE}, /* ObjectAudioNoise */
 	{Object::LINK_CONTROL, ObjectControlNoise::OUT_C_OUTPUT, ObjectControlNoise::IN_C_AMPLITUDE}, /* ObjectControlNoise */
-	{Object::LINK_CONTROL, ObjectControlNoise::OUT_C_OUTPUT, ObjectEcho::IN_C_FEEDBACK} /* ObjectEcho */
+	{Object::LINK_CONTROL, ObjectControlNoise::OUT_C_OUTPUT, ObjectEcho::IN_C_FEEDBACK}, /* ObjectEcho */
+	{Object::LINK_CONTROL, ObjectControlNoise::OUT_C_OUTPUT, ObjectDelay::IN_C_DELAY} /* ObjectDelay */
     },
 
-    /* ObjectFilter */
+    /* ObjectEcho */
     {
 	{Object::LINK_NONE, 0, 0}, /* ObjectOutput */
 	{Object::LINK_AUDIO, ObjectEcho::OUT_A_OUTPUT, PATCHER_ANY}, /* ObjectAudioMixer */
@@ -220,6 +231,23 @@ const PatcherData PATCHER_TABLE[N_OBJECTS][N_OBJECTS] =
 	{Object::LINK_NONE, 0, 0}, /* ObjectAudioNoise */
 	{Object::LINK_NONE, 0, 0}, /* ObjectControlNoise */
 	{Object::LINK_AUDIO, ObjectEcho::OUT_A_OUTPUT, ObjectEcho::IN_A_INPUT}, /* ObjectEcho */
+	{Object::LINK_AUDIO, ObjectEcho::OUT_A_OUTPUT, ObjectDelay::IN_A_INPUT}, /* ObjectDelay */
+    },
+
+    /* ObjectDelay */
+    {
+	{Object::LINK_NONE, 0, 0}, /* ObjectOutput */
+	{Object::LINK_AUDIO, ObjectDelay::OUT_A_OUTPUT, PATCHER_ANY}, /* ObjectAudioMixer */
+	{Object::LINK_NONE, 0, 0}, /* ObjectControlMixer */
+	{Object::LINK_NONE, 0, 0}, /* ObjectAudioOscillator */
+	{Object::LINK_NONE, 0, 0}, /* ObjectLFO */
+	{Object::LINK_AUDIO, ObjectDelay::OUT_A_OUTPUT, ObjectFilter::IN_A_INPUT}, /* ObjectFilter */
+	{Object::LINK_NONE, 0, 0}, /* ObjectSampler */
+	{Object::LINK_NONE, 0, 0}, /* ObjectStepSeq */
+	{Object::LINK_NONE, 0, 0}, /* ObjectAudioNoise */
+	{Object::LINK_NONE, 0, 0}, /* ObjectControlNoise */
+	{Object::LINK_AUDIO, ObjectDelay::OUT_A_OUTPUT, ObjectEcho::IN_A_INPUT}, /* ObjectEcho */
+	{Object::LINK_AUDIO, ObjectDelay::OUT_A_OUTPUT, ObjectDelay::IN_A_INPUT}, /* ObjectDelay */
     }
 };
 

@@ -34,6 +34,7 @@
 #include <libpsynth/object/ObjectStepSeq.h>
 #include <libpsynth/object/ObjectNoise.h>
 #include <libpsynth/object/ObjectEcho.h>
+#include <libpsynth/object/ObjectDelay.h>
 
 using namespace std;
 using namespace Ogre;
@@ -397,4 +398,31 @@ ElementEcho::ElementEcho(TableObject& obj,
 					ObjectEcho::PARAM_FEEDBACK,
 					0.0f, 1.0f,
 					"Feedback"));
+}
+
+ElementDelay::ElementDelay(TableObject& obj,
+		       Ogre::SceneManager* m_scene) :
+    Element(obj, m_scene)
+{	    
+    static const char* mesh_name = "delay.mesh";
+    
+    addComponent(new ElemMainComponent(
+		     string(mesh_name), 
+		     ObjectDelay::PARAM_DELAY,
+		     0.0f, 0.01f));
+    
+    addComponent(new ElemSecondComponent(
+		     ObjectDelay::PARAM_DEPTH,
+		     0.0f, 1.0f));
+
+
+    getGUIProperties().addParameter(new ElemGuiParamFloat(
+					ObjectDelay::PARAM_DELAY,
+					0.0f, 0.01f,
+					"Delay"));
+    
+    getGUIProperties().addParameter(new ElemGuiParamFloat(
+					ObjectDelay::PARAM_DEPTH,
+					0.0f, 1.0f,
+					"Depth"));
 }

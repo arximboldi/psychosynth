@@ -95,4 +95,11 @@ public:
 		Ogre::SceneManager* m_scene);
 };
 
+class ElementDelay : public Element
+{
+public:
+    ElementDelay(psynth::TableObject& obj,
+		 Ogre::SceneManager* m_scene);
+};
+
 #endif /* THEELEMENTS_H */

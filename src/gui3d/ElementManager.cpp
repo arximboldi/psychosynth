@@ -84,6 +84,8 @@ Element* ElementManager::createElement(TableObject& obj)
 	return new ElementControlNoise(obj, m_scene);
     case OBJ_ECHO:
 	return new ElementEcho(obj, m_scene);
+    case OBJ_DELAY:
+	return new ElementDelay(obj, m_scene);
     default:
 	return NULL;
     }

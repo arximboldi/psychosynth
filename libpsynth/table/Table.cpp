@@ -36,6 +36,7 @@
 #include "object/ObjectAudioNoise.h"
 #include "object/ObjectControlNoise.h"
 #include "object/ObjectEcho.h"
+#include "object/ObjectDelay.h"
 
 using namespace std;
 
@@ -132,6 +133,7 @@ void Table::registerDefaultObjectFactory()
     registerObjectFactory(getObjectAudioNoiseFactory());
     registerObjectFactory(getObjectControlNoiseFactory());
     registerObjectFactory(getObjectEchoFactory());
+    registerObjectFactory(getObjectDelayFactory());
 }
 
 Table::~Table()
