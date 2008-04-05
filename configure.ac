@@ -24,7 +24,7 @@
 AC_INIT(configure.ac)
 
 AM_CONFIG_HEADER(config.h)
-AM_INIT_AUTOMAKE(psychosynth, 0.0.2-svn)
+AM_INIT_AUTOMAKE(psychosynth, 0.1)
 
 AC_LANG_CPLUSPLUS
 AC_PROG_CXX
@@ -263,6 +263,21 @@ fi
 # ======================================================================
 
 BUILD_PSYNTH=$HAVE_LIBLO
+
+#  psynth global
+# ======================================================================
+
+if test "x$HAVE_SOUNDTOUCH" == xno; then
+AC_MSG_ERROR([
+
+***
+*** You need libSoundTouch to compile the program.
+*** Install it and run this script again.
+***
+])
+psynth_config_ok=no
+fi
+
 
 #  Directories
 # ======================================================================

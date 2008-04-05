@@ -24,6 +24,6 @@
 #define PSYNTH_DEFAULTS_JACK_H
 
 #define DEFAULT_JACK_NAME      "jack"
-#define DEFAULT_JACK_SERVER    ""
+#define DEFAULT_JACK_SERVER    "psychosynth"
 
 #endif /* PSYNTH_DEFAULTS_JACK_H */

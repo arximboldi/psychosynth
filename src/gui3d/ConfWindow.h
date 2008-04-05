@@ -96,7 +96,7 @@ public:
     }
     
     OutputConfWindow* createOutputConfWindow() {
-	return new OutputConfWindowSimple("server", "Server:");
+	return new OutputConfWindowSimple("server", "Name:");
     }
 };
 #endif /* PSYNTH_HAVE_JACK */

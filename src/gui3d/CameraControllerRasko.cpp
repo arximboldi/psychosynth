@@ -234,8 +234,8 @@ bool CameraControllerRasko::mouseReleased(const OIS::MouseEvent &e, OIS::MouseBu
 
 bool CameraControllerRasko::keyPressed(const OIS::KeyEvent &e)
 {
-    if (e.key == OIS::KC_LMENU ||
-	e.key == OIS::KC_RMENU)
+    if (e.key == OIS::KC_LSHIFT ||
+	e.key == OIS::KC_RSHIFT)
 	m_modifier++;
     
     return false;
@@ -243,8 +243,8 @@ bool CameraControllerRasko::keyPressed(const OIS::KeyEvent &e)
 
 bool CameraControllerRasko::keyReleased(const OIS::KeyEvent &e)
 {
-    if (e.key == OIS::KC_LMENU ||
-	e.key == OIS::KC_RMENU)
+    if (e.key == OIS::KC_LSHIFT ||
+	e.key == OIS::KC_RSHIFT)
 	m_modifier--;
     
     return false;

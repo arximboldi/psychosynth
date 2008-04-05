@@ -92,13 +92,11 @@ int ObjectEcho::doUpdateChannel(int chan)
 	in_val = in_buf ? *in_buf++ * in_env.update() : 0;
 	val = tmp_buf[pos];
 
-	//*out_buf++ = val;
-	
+	//*out_buf++ = val;	
 	if (fb_buf)
 	    val = in_val - val * (m_param_feedback + m_param_feedback * *fb_buf++);
 	else
 	    val = in_val - val * m_param_feedback;
-
 	*out_buf++ = val;
 
 	/* Low pass filter. */

@@ -80,6 +80,7 @@ SelectorWindow::Category::Category(const std::string& name, ElementManager* mgr)
     m_window->setPosition( UVector2(UDim(0, BUT_XGAP),    UDim(0, BUT_YGAP)) );
     m_window->setSize    ( UVector2(UDim(1, -2*BUT_XGAP), UDim(1, -2*BUT_YGAP)) );
     m_window->setText    (name);
+    m_window->setWantsMultiClickEvents(false);
 }
 
 SelectorWindow::Category::~Category()
@@ -124,7 +125,7 @@ CEGUI::FrameWindow* SelectorWindow::createWindow()
     //window->setPosition( UVector2(UDim(0, 10), UDim(0, 10)) );
     //window->setSize    ( UVector2(UDim(1, -20),UDim(0, 100)) );
     window->setPosition( UVector2(UDim(0, 10), UDim(0, 10)) );
-    window->setSize    ( UVector2(UDim(0, 480),UDim(0, 140)) );
+    window->setSize    ( UVector2(UDim(1, -20),UDim(0, 134)) );
     window->setText("Object Selector");
 	
     m_container = wmgr.createWindow("TaharezLook/TabControl", "container_selector");

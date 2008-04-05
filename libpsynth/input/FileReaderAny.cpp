@@ -55,7 +55,6 @@ void FileReaderAny::open(const char* file)
 	    m_the_reader = new FileReaderOgg;
 #endif
 
-	cout << "opening file " << file <<  "\n with ext: " << ext << endl; 
 	if (m_the_reader) {
 	    m_the_reader->open(file);
 	    if (m_the_reader->isOpen()) {

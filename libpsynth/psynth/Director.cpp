@@ -168,9 +168,9 @@ bool Director::onConfigNudge(ConfNode& node)
 
     m_table->setInfo(m_info);
 
-    Output::State old_state;
-    old_state = m_output->getOutput()->getState();
     if (m_output && out == m_old_output) {    
+	Output::State old_state;
+	old_state = m_output->getOutput()->getState();
 	m_output->getOutput()->gotoState(Output::NOTINIT);
 	m_output->getOutput()->setInfo(m_info);
 	m_output->getOutput()->gotoState(old_state);

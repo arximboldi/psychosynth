@@ -52,7 +52,7 @@ class EnvelopeMultiValues
 public:
 
     EnvelopeMultiValues() :
-	m_sustain(0),
+	m_sustain(1),
 	m_factor(1.0f)
 	{}
     
@@ -106,7 +106,7 @@ class EnvelopeMulti : public Envelope
      
 public:
     EnvelopeMulti(EnvelopeMultiValues* val) :
-	m_val(NULL),
+	m_val(val),
 	m_cur_point(0),
 	m_time(0.0f),
 	m_pressed(false)

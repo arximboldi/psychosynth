@@ -100,7 +100,7 @@ nobase_libpsynthinc_HEADERS = \
 	object/KnownObjects.h \
 	object/ObjParam.h\
 	object/EnvelopeSimple.h\
-	object/EnvelopeMulti.h
+	object/EnvelopeMulti.h\
 	object/Envelope.h\
 	object/Watch.h\
 	object/WatchViewer.h\
@@ -109,7 +109,7 @@ nobase_libpsynthinc_HEADERS = \
 	output/Output.h\
 	input/FileReader.h\
 	input/FileReaderAny.h\
-	input/FileReaderFetcher.cpp\
+	input/FileReaderFetcher.h\
 	version.h
 
 libpsynth_la_SOURCES = \

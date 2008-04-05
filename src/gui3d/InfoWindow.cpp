@@ -31,10 +31,32 @@ using namespace std;
 #define IW_WIDTH   400
 #define IW_HEIGHT  400
 
+static const char* HELP_TEXT =
+    "To place objects in the table click on the blue button in the lower menu. "
+    "Then click on the object you want to put and click again once you have decided "
+    "where to add the object."
+    "\n\nObjects will connect to eachother automatically, based on their distance and "
+    "kind of input or output."
+    "\n\nThere are two main signal kinds, control and audio. Audio signals are shown in green "
+    "and control signals in yellow."
+    "\n\nYou can change the object parameters by clicking the right mouse button and rotating "
+    "around the object when it is selected."
+    "\n\nMost objects have other parameters that "
+    "you can modify by clicking on the sliders and toggles that are shown around the object. "
+    "Some objects have even more hidden parameters, but you can edit them directly by "
+    "pressing the 'e' key while the object is selected."
+    "\n\nYou can move around the table by clicking outside an object and dragging it. "
+    "To center your view at one point of the table press the 'shift' key and click on it. "
+    "Use the mouse wheel to change your zoom level and the right mouse button to "
+    "rotate around."
+    "\n\nTo select groups of objects click on them while the 'ctrl' or the 'shift' key is pressed, "
+    "with the difference being that with the control click you can unselect an object by clicking again"
+    "on it.";
+
 static const char* ABOUT_TEXT =
     "Psychosynth is an interactive free software sound synthesis system.\n\n"
     "For further information and reporting bugs or suggestions please visit our webpage.\n\n"
-    "Webpage: http://www.suicidesoft.com/psychosynth\n\n"
+    "Webpage: http://www.psychosynth.com\n\n"
     "Compilation options:\n";
 
 static const char* COMPILE_OPTIONS_TEXT =
@@ -87,8 +109,10 @@ static const char* CREDITS_TEXT =
 
 static const char* CREDITS_LIST_TEXT =
     "[ Project leader ]\n"
-    "Juan Pedro Bolivar Puente\n"
-    "<jpboli@correo.ugr.es>\n";
+    "Juan Pedro Bolivar Puente (Raskolnikov)\n"
+    "<jpboli@correo.ugr.es>\n\n"
+    "[ Loops and samples ]\n"
+    "Nacho Castrillo Velasco (Shaker)";
 
 static const char* LICENSE_TEXT =
     "This program is free software: you can redistribute it and/or modify \
@@ -161,6 +185,21 @@ CEGUI::FrameWindow* InfoWindow::createWindow()
     about_mle->setSize(UVector2(UDim(1, -20), UDim(1, -160)));
     about_mle->setReadOnly(true);
     about_mle->setText(COMPILE_OPTIONS_TEXT);
+
+    /*
+     * Help section.
+     */
+    Window* help = wmgr.createWindow("DefaultGUISheet");
+    help->setText("Help");
+    help->setPosition(UVector2(UDim(0, 0), UDim(0, 0)));
+    help->setSize(UVector2(UDim(1, 0), UDim(1, 0)));
+
+    Window* help_mle  = wmgr.createWindow("TaharezLook/StaticText");
+    help_mle->setPosition(UVector2(UDim(0, 10), UDim(0, 10)));
+    help_mle->setSize(UVector2(UDim(1, -20), UDim(1, -20)));
+    help_mle->setText(HELP_TEXT);
+    help_mle->setProperty("VertScrollbar", "True");
+    help_mle->setProperty("HorzFormatting", "WordWrapLeftAligned");
     
     /*
      * Credits section.
@@ -202,12 +241,15 @@ CEGUI::FrameWindow* InfoWindow::createWindow()
     about->addChildWindow(about_st);
     about->addChildWindow(about_mle);
 
+    help->addChildWindow(help_mle);
+    
     credits->addChildWindow(credits_st);
     credits->addChildWindow(credits_mle);
 
     license->addChildWindow(license_mle);
     
     container->addChildWindow(about);
+    container->addChildWindow(help);
     container->addChildWindow(credits);
     container->addChildWindow(license);
     
