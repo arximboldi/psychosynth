@@ -38,6 +38,7 @@ enum KnownObjectType
     OBJ_STEPSEQ,
     OBJ_AUDIONOISE,
     OBJ_CONTROLNOISE,
+    OBJ_ECHO,
     N_OBJECTS
 };
 

@@ -35,6 +35,7 @@
 #include "object/ObjectStepSeq.h"
 #include "object/ObjectAudioNoise.h"
 #include "object/ObjectControlNoise.h"
+#include "object/ObjectEcho.h"
 
 using namespace std;
 
@@ -130,6 +131,7 @@ void Table::registerDefaultObjectFactory()
     registerObjectFactory(getObjectStepSeqFactory());
     registerObjectFactory(getObjectAudioNoiseFactory());
     registerObjectFactory(getObjectControlNoiseFactory());
+    registerObjectFactory(getObjectEchoFactory());
 }
 
 Table::~Table()
@@ -162,6 +164,7 @@ TableObject Table::findObject(int id)
 	return TableObject(*i, this);
 }
 
+#if 0
 TableObject Table::addObject(int type)
 {
     Object* obj;
@@ -197,6 +200,7 @@ TableObject Table::addObject(int type)
     notifyAddObject(tobj);
     return tobj;
 }
+#endif
 
 TableObject Table::addObject(const std::string& name)
 {

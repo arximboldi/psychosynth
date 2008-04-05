@@ -77,7 +77,7 @@ public:
      * @param size The size of the AudioBuffer.
      */
     AudioBuffer(const AudioInfo& info, int size) : 
-	m_info(info.sample_rate, size) {
+	m_info(info.sample_rate, size, info.num_channels) {
 	allocate();
     }
 

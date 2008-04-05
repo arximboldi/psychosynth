@@ -82,6 +82,8 @@ Element* ElementManager::createElement(TableObject& obj)
 	return new ElementAudioNoise(obj, m_scene);
     case OBJ_CONTROLNOISE:
 	return new ElementControlNoise(obj, m_scene);
+    case OBJ_ECHO:
+	return new ElementEcho(obj, m_scene);
     default:
 	return NULL;
     }

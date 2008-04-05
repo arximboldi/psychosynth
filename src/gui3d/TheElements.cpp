@@ -33,6 +33,7 @@
 #include <libpsynth/object/ObjectSampler.h>
 #include <libpsynth/object/ObjectStepSeq.h>
 #include <libpsynth/object/ObjectNoise.h>
+#include <libpsynth/object/ObjectEcho.h>
 
 using namespace std;
 using namespace Ogre;
@@ -369,4 +370,31 @@ ElementControlNoise::ElementControlNoise(TableObject& obj,
 					ObjectNoise::PARAM_AMPLITUDE,
 					0.0f, 1.0f,
 					"Amplitude"));
+}
+
+ElementEcho::ElementEcho(TableObject& obj,
+		       Ogre::SceneManager* m_scene) :
+    Element(obj, m_scene)
+{	    
+    static const char* mesh_name = "echo.mesh";
+    
+    addComponent(new ElemMainComponent(
+		     string(mesh_name), 
+		     ObjectEcho::PARAM_DELAY,
+		     0.0f, 1.0f));
+    
+    addComponent(new ElemSecondComponent(
+		     ObjectEcho::PARAM_FEEDBACK,
+		     0.0f, 1.0f));
+
+
+    getGUIProperties().addParameter(new ElemGuiParamFloat(
+					ObjectEcho::PARAM_DELAY,
+					0.0f, 1.0f,
+					"Delay"));
+    
+    getGUIProperties().addParameter(new ElemGuiParamFloat(
+					ObjectEcho::PARAM_FEEDBACK,
+					0.0f, 1.0f,
+					"Feedback"));
 }

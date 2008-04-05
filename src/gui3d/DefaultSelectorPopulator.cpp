@@ -155,6 +155,11 @@ void DefaultSelectorPopulator::populate(SelectorWindow* sel)
     cat->addButton("Moog", creat);
 
     creat.clear();
+    cat = sel->addCategory("FX");
+    creat.setName("echo");
+    cat->addButton("Echo", creat);
+    
+    creat.clear();
     cat = sel->addCategory("Mixers");
     creat.setName("audio_mixer");
 

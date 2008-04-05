@@ -88,4 +88,11 @@ public:
 			Ogre::SceneManager* m_scene);
 };
 
+class ElementEcho : public Element
+{
+public:
+    ElementEcho(psynth::TableObject& obj,
+		Ogre::SceneManager* m_scene);
+};
+
 #endif /* THEELEMENTS_H */
