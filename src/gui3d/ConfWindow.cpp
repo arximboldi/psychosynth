@@ -130,7 +130,7 @@ CEGUI::FrameWindow* PathConfWindow::createWindow()
     but->setPosition(UVector2(UDim(1, -110), UDim(0, 33)));
     but->setSize(UVector2(UDim(0, 95), UDim(0, 20)));
     but->setWantsMultiClickEvents(false);
-    but->subscribeEvent(PushButton::EventMouseClick,
+    but->subscribeEvent(PushButton::EventClicked,
 			Event::Subscriber(&PathConfWindow::onAdd, this));
 
     but = wmgr.createWindow("TaharezLook/Button");
@@ -139,7 +139,7 @@ CEGUI::FrameWindow* PathConfWindow::createWindow()
     but->setPosition(UVector2(UDim(1, -110), UDim(0, 63)));
     but->setSize(UVector2(UDim(0, 95), UDim(0, 20)));
     but->setWantsMultiClickEvents(false);
-    but->subscribeEvent(PushButton::EventMouseClick,
+    but->subscribeEvent(PushButton::EventClicked,
 			Event::Subscriber(&PathConfWindow::onChange, this));
 
     but = wmgr.createWindow("TaharezLook/Button");
@@ -148,16 +148,16 @@ CEGUI::FrameWindow* PathConfWindow::createWindow()
     but->setPosition(UVector2(UDim(1, -110), UDim(0, 93)));
     but->setSize(UVector2(UDim(0, 95), UDim(0, 20)));
     but->setWantsMultiClickEvents(false);
-    but->subscribeEvent(PushButton::EventMouseClick,
+    but->subscribeEvent(PushButton::EventClicked,
 			Event::Subscriber(&PathConfWindow::onDelete, this));
 
     but = wmgr.createWindow("TaharezLook/Button");
     window->addChildWindow(but);
-    but->setText("Apply");
+    but->setText("Refresh");
     but->setPosition(UVector2(UDim(1, -110), UDim(0, 123)));
     but->setSize(UVector2(UDim(0, 95), UDim(0, 20)));
     but->setWantsMultiClickEvents(false);
-    but->subscribeEvent(PushButton::EventMouseClick,
+    but->subscribeEvent(PushButton::EventClicked,
 			Event::Subscriber(&PathConfWindow::onApply, this));
 
     populate();
@@ -475,8 +475,8 @@ CEGUI::Window* ConfWindow::createPathsSettingsWindow()
     but->setText("Edit");
     but->setPosition(UVector2(UDim(1, -80), UDim(0, 6)));
     but->setSize(UVector2(UDim(0, 74), UDim(0, 20)));
-    but->setWantsMultiClickEvents(false);
-    but->subscribeEvent(PushButton::EventMouseClick,
+    //but->setWantsMultiClickEvents(false);
+    but->subscribeEvent(PushButton::EventClicked,
 			Event::Subscriber(&ConfWindow::onSamplesPathsPress, this));
     
     return window;

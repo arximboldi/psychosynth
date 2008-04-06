@@ -344,12 +344,14 @@ bool ElementManager::keyPressed(const OIS::KeyEvent &e)
     switch(e.key) {
     case OIS::KC_LCONTROL:
     case OIS::KC_RCONTROL:
-	m_modifier_1++;
+	//m_modifier_1++;
+	m_modifier_1 = 1;
 	break;
 
     case OIS::KC_LSHIFT:
     case OIS::KC_RSHIFT:
-	m_modifier_2++;
+	//m_modifier_2++;
+	m_modifier_2 = 1;
 	break;
 	
     default:
@@ -370,12 +372,14 @@ bool ElementManager::keyReleased(const OIS::KeyEvent &e)
     switch(e.key) {
     case OIS::KC_LCONTROL:
     case OIS::KC_RCONTROL:
-	m_modifier_1--;
+	//m_modifier_1--;
+	m_modifier_1 = 0;
 	break;
 
     case OIS::KC_LSHIFT:
     case OIS::KC_RSHIFT:
-	m_modifier_2--;
+	//m_modifier_2--;
+	m_modifier_2 = 0;
 	break;
 	
     default:

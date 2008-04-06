@@ -267,6 +267,7 @@ void Psychosynth3D::setupGui()
 						 false, 3000, m_scene);
 
     m_gui = new CEGUI::System(m_ceguirender);
+
     CEGUI::Logger::getSingleton().setLogFilename(getConfigPath() + "/psynth3d_CEGUI.log");
     CEGUI::SchemeManager::getSingleton().loadScheme("TaharezLook.scheme");
     m_gui->setDefaultMouseCursor("TaharezLook", "MouseArrow");
@@ -281,6 +282,9 @@ void Psychosynth3D::setupGui()
     m_guiinput = new CeguiInjecter(); 
     m_inputmgr->addMouseListener(m_guiinput);
     m_inputmgr->addKeyListener(m_guiinput);
+
+    m_gui->setMultiClickTimeout(0.0f);
+    m_gui->setMultiClickToleranceAreaSize(CEGUI::Size(0.0f, 0.0f));
 }
 
 #ifdef PSYNTH_HAVE_OSC

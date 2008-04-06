@@ -236,7 +236,8 @@ bool CameraControllerRasko::keyPressed(const OIS::KeyEvent &e)
 {
     if (e.key == OIS::KC_LSHIFT ||
 	e.key == OIS::KC_RSHIFT)
-	m_modifier++;
+	//m_modifier++;
+	m_modifier = 1;
     
     return false;
 }
@@ -245,7 +246,8 @@ bool CameraControllerRasko::keyReleased(const OIS::KeyEvent &e)
 {
     if (e.key == OIS::KC_LSHIFT ||
 	e.key == OIS::KC_RSHIFT)
-	m_modifier--;
+	//m_modifier--;
+	m_modifier = 0;
     
     return false;
 }

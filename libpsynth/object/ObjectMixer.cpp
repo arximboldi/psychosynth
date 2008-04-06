@@ -42,7 +42,7 @@ ObjectMixer::ObjectMixer(const AudioInfo& info,
 	   num_audio_out,
 	   num_ctrl_out),
     m_numchan(num_in),
-    m_param_ampl(0.5f),
+    m_param_ampl(1.0f),
     m_param_mixop(MIX_SUM)
 {
     addParam("amplitude", ObjParam::FLOAT, &m_param_ampl);

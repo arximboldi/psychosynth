@@ -114,6 +114,9 @@ Table::Table(const AudioInfo& info) :
 {
     m_output = new ObjectOutput(m_info);
     m_mixer = new ObjectAudioMixer(m_info, MIXER_CHANNELS);
+
+    m_mixer->param("amplitude").set(0.5f);
+
     m_objmgr.attachObject(m_output, OUTPUT_ID);
     m_objmgr.attachObject(m_mixer, MIXER_ID);
 

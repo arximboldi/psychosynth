@@ -50,7 +50,7 @@ static const char* HELP_TEXT =
     "Use the mouse wheel to change your zoom level and the right mouse button to "
     "rotate around."
     "\n\nTo select groups of objects click on them while the 'ctrl' or the 'shift' key is pressed, "
-    "with the difference being that with the control click you can unselect an object by clicking again"
+    "with the difference being that with the control click you can unselect an object by clicking again "
     "on it.";
 
 static const char* ABOUT_TEXT =
@@ -108,11 +108,12 @@ static const char* CREDITS_TEXT =
     "This program was done with care and effort by everyone listed bellow. We hope you liked it :-)";
 
 static const char* CREDITS_LIST_TEXT =
-    "[ Project leader ]\n"
+    "-= Main developer =-\n"
     "Juan Pedro Bolivar Puente (Raskolnikov)\n"
-    "<jpboli@correo.ugr.es>\n\n"
-    "[ Loops and samples ]\n"
-    "Nacho Castrillo Velasco (Shaker)";
+    "<raskolnikov@es.gnu.org>\n\n"
+    "-= Loops and samples =-\n"
+    "Shaker08\n"
+    "<http://www.myspace.com/shaker08>";
 
 static const char* LICENSE_TEXT =
     "This program is free software: you can redistribute it and/or modify \
@@ -135,11 +136,11 @@ CEGUI::FrameWindow* InfoWindow::createWindow()
     
     FrameWindow* window = dynamic_cast<FrameWindow*>
 	(wmgr.createWindow("TaharezLook/FrameWindow"));
-	
+    
     window->setPosition(UVector2(UDim(0.5, -IW_WIDTH/2), UDim(0.5, -IW_HEIGHT/2)));
     window->setSize    (UVector2(UDim(0, IW_WIDTH),UDim(0, IW_HEIGHT)));
     window->setText("Info");
-
+    
     Imageset* logoimg =
 	ImagesetManager::getSingleton().createImageset("Logo.imageset");
     Window* logo = wmgr.createWindow("TaharezLook/StaticImage");
