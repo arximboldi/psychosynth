@@ -69,7 +69,7 @@ void DefaultSelectorPopulator::populateSamples(SelectorWindow::Category* cat)
     valid_ext.push_back("wav");
     valid_ext.push_back("aiff");
 #endif
-#ifdef PSYNTH_HACE_OGG    
+#ifdef PSYNTH_HAVE_OGG    
     valid_ext.push_back("ogg");
 #endif
     

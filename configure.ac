@@ -24,7 +24,7 @@
 AC_INIT(configure.ac)
 
 AM_CONFIG_HEADER(config.h)
-AM_INIT_AUTOMAKE(psychosynth, 0.1)
+AM_INIT_AUTOMAKE(psychosynth, 0.1.1)
 
 AC_LANG_CPLUSPLUS
 AC_PROG_CXX

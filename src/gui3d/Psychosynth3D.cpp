@@ -284,7 +284,7 @@ void Psychosynth3D::setupGui()
     m_inputmgr->addKeyListener(m_guiinput);
 
     m_gui->setMultiClickTimeout(0.0f);
-    m_gui->setMultiClickToleranceAreaSize(CEGUI::Size(0.0f, 0.0f));
+    //m_gui->setMultiClickToleranceAreaSize(CEGUI::Size(0.0f, 0.0f));
 }
 
 #ifdef PSYNTH_HAVE_OSC
