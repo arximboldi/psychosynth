@@ -47,6 +47,7 @@ class Psychosynth3D : public psynth::PsychosynthApp,
 		      public Ogre::FrameListener
 {
     Ogre::Root*          m_ogre;
+    Ogre::RenderSystem*   m_render;
     Ogre::RenderWindow*  m_window;
     Ogre::SceneManager*  m_scene;
     Ogre::Camera*        m_camera;

@@ -468,6 +468,8 @@ bool Psychosynth3D::onConfigChange(psynth::ConfNode& conf)
     m_window->setFullscreen(sc_fullscreen,
 			    sc_width,
 			    sc_height);
+    //m_ogre->reinitialise();
+    
     return true;
 }
 

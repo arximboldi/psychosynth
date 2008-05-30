@@ -76,7 +76,7 @@ public:
     /**
      * Updates the timer.
      */
-    void update();	
+    void update();
 
     /**
      * Returns the milliseconds elapsed between the last call to

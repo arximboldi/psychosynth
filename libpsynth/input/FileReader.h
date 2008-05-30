@@ -67,7 +67,7 @@ public:
 	return read(buf, buf.size());
     }
 };
-    
+
 } /* namespace psynth */
 
 #endif /* PSYNTH_FILEREADER_H */
