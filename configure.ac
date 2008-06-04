@@ -115,7 +115,7 @@ AC_ARG_ENABLE([soundtouch],
         [soundtouch=$enableval], [soundtouch=auto])
 
 if test "x${soundtouch}" != xno ; then
-    PKG_CHECK_MODULES(SOUNDTOUCH, [ libSoundTouch ],
+    PKG_CHECK_MODULES(SOUNDTOUCH, [ soundtouch-1.0 ],
         [
             HAVE_SOUNDTOUCH=yes
             AC_DEFINE([HAVE_SOUNDTOUCH], 1, [Have Soundtouch?])
@@ -296,7 +296,7 @@ XE_EXPAND_VARIABLE(bindir, PACKAGE_BIN_DIR)
 XE_EXPAND_VARIABLE(libdir, PACKAGE_LIB_DIR)
 
 # Uncomment only for development purposes
-# PACKAGE_DATA_DIR="./data"
+PACKAGE_DATA_DIR="./data"
 
 AC_SUBST(PACKAGE_DATA_DIR)
 AC_SUBST(PACKAGE_BIN_DIR)

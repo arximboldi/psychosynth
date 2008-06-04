@@ -153,6 +153,10 @@ public:
     FilterValues* getValues() {
 	return m_coef;
     }
+
+    /*void setValues(FilterValues* coef) {
+	m_coef = coef;
+	}*/
     
     Sample update(Sample x);
 };

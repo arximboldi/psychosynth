@@ -96,6 +96,8 @@ void DefaultSelectorPopulator::populate(SelectorWindow* sel)
 
     cat = sel->addCategory("Generator");
     creat.setName("oscillator");
+    creat.setParam("frequency", (float) 110.0f);
+    creat.setParam("amplitude", (float) 0.3f);
     
     creat.setParam("wave", (int) ObjectOscillator::OSC_SINE);
     cat->addButton("Sine", creat);
@@ -121,6 +123,7 @@ void DefaultSelectorPopulator::populate(SelectorWindow* sel)
     cat = sel->addCategory("Control");
     creat.setName("lfo");
     creat.setParam("frequency", 1.0f);
+    creat.setParam("amplitude", 0.7f);
     
     creat.setParam("wave", (int) ObjectOscillator::OSC_SINE);
     cat->addButton("Sine", creat);
@@ -145,7 +148,8 @@ void DefaultSelectorPopulator::populate(SelectorWindow* sel)
     creat.clear();
     cat = sel->addCategory("Filter");
     creat.setName("filter");
-    
+    creat.setParam("resonance", (float) 0.8f);
+	
     creat.setParam("type", (int) ObjectFilter::FILTER_LOWPASS);
     cat->addButton("Low-pass", creat);
     creat.setParam("type", (int) ObjectFilter::FILTER_HIGHPASS);

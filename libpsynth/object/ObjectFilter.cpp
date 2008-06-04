@@ -50,7 +50,11 @@ ObjectFilter::ObjectFilter(const AudioInfo& prop, int mode) :
     addParam("type", ObjParam::INT, &m_param_type);
     addParam("cutoff", ObjParam::FLOAT, &m_param_cutoff);
     addParam("resonance", ObjParam::FLOAT, &m_param_resonance);
+
+    //for (int i = 0; i < prop.num_channels; ++i)
 }
+
+/* TODO cambiar el numero de canales. */
 
 ObjectFilter::~ObjectFilter()
 {
@@ -75,13 +79,12 @@ void ObjectFilter::doUpdate(const Object* caller, int caller_port_type, int call
 	    Sample* outbuf = output->getChannel(i);
 	    const Sample* inbuf = input->getChannel(i);
 	    Filter& filter = m_filter[i];
-	    EnvelopeSimple env = getInEnvelope(LINK_AUDIO, i);
+	    EnvelopeSimple env = getInEnvelope(LINK_AUDIO, IN_A_INPUT);
 	    if (!cutoff)
 		for (size_t j = 0; j < output->size(); ++j)
 		    *outbuf++ = filter.update(*inbuf++ * env.update());
 	    else {
-		EnvelopeSimple mod_env = getInEnvelope(LINK_CONTROL,
-						       IN_C_CUTOFF);
+		EnvelopeSimple mod_env = getInEnvelope(LINK_CONTROL, IN_C_CUTOFF);
 		const Sample* cutoff_buf = cutoff->getData();
 		
 		for (size_t j = 0; j < output->size(); ++j) {

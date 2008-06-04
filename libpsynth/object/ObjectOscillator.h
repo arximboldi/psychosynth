@@ -72,8 +72,8 @@ public:
 	N_PARAM
     };
 
-    static const float DEFAULT_FREQ = 220.0f;
-    static const float DEFAULT_AMPL = 0.5f;
+    static const float DEFAULT_FREQ = 110.0f;
+    static const float DEFAULT_AMPL = 0.4f;
     
 protected:
     Oscillator m_oscillator;
