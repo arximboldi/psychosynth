@@ -124,12 +124,10 @@ int FileReaderFetcher::read(AudioBuffer& buf, int n_samples)
     int n_read;
     
     m_buffer_lock.lock();
-
     while (m_buffer.availible(m_read_ptr) == 0)
 	m_cond.wait(m_buffer_lock);
 	
     n_read = min(n_samples, m_buffer.availible(m_read_ptr));
-
     if (n_read) {
 	m_buffer.read(m_read_ptr, buf, n_samples);
     
@@ -139,7 +137,8 @@ int FileReaderFetcher::read(AudioBuffer& buf, int n_samples)
 
 	if (m_backwards)
 	    buf.reverse(n_read);
-    }
+    } else
+      m_buffer_lock.unlock();
 
     return n_read;
 }

@@ -113,6 +113,7 @@ bool OutputAlsa::open()
 	
 	snd_pcm_hw_params_malloc (&alsa_hwparams);
 	snd_pcm_hw_params_any (alsa_pcm, alsa_hwparams);
+
 	snd_pcm_hw_params_set_access (alsa_pcm, alsa_hwparams, SND_PCM_ACCESS_RW_INTERLEAVED);
 		
 	alsa_format = SND_PCM_FORMAT_S16;
@@ -120,8 +121,13 @@ bool OutputAlsa::open()
 	snd_pcm_hw_params_set_format (alsa_pcm, alsa_hwparams, alsa_format);
 	snd_pcm_hw_params_set_rate_near (alsa_pcm, alsa_hwparams, &uirate, &dir);
 	snd_pcm_hw_params_set_channels (alsa_pcm, alsa_hwparams, getInfo().num_channels);
+
+	/* FIXME */
+	snd_pcm_hw_params_set_periods(alsa_pcm, alsa_hwparams, 2, 0);
+	snd_pcm_hw_params_set_buffer_size (alsa_pcm, alsa_hwparams, getInfo().block_size);
+
 	snd_pcm_hw_params (alsa_pcm, alsa_hwparams);
-	snd_pcm_prepare (alsa_pcm);
+	//snd_pcm_prepare (alsa_pcm);
 		
 	snd_pcm_sw_params_malloc (&alsa_swparams);
 	snd_pcm_sw_params_set_avail_min(alsa_pcm, alsa_swparams, getInfo().block_size);

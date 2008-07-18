@@ -25,8 +25,8 @@
 
 #include <cmath>
 
-#define ENV_RISE_SECONDS  0.05f
-#define ENV_FALL_SECONDS  0.05f
+#define ENV_RISE_SECONDS  0.004f
+#define ENV_FALL_SECONDS  0.004f
 #define ENV_DELTA(srate, sec)  (1/((sec)*(srate)))
 
 using namespace std;
@@ -51,7 +51,7 @@ Object::Object(const AudioInfo& info, int type,
     m_param_mute(false),
     m_updated(false),
     m_single_update(single_update)
-{   
+{
     addParam("position", ObjParam::VECTOR2F, &m_param_position);
     addParam("radious", ObjParam::FLOAT, &m_param_radious);
     addParam("mute", ObjParam::INT, &m_param_mute);

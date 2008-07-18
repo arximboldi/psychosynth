@@ -22,6 +22,7 @@
 
 #include <iostream>
 
+#include <cmath>
 #include <fcntl.h>
 #include <sys/soundcard.h>
 #include <sys/stat.h>
@@ -100,7 +101,12 @@ bool OutputOss::open()
 		
 	m_format = AFMT_S16_LE;
 	m_stereo = getInfo().num_channels == 2 ? 1 : 0;
-		
+
+	
+	//int tmp = (0x0004 << 16) | ((int) log2(getInfo().block_size));
+	int tmp = (0x0004 << 16) | ((int) log2(4096));
+	
+	ioctl (m_fd, SNDCTL_DSP_SETFRAGMENT, &tmp);
 	ioctl(m_fd, SNDCTL_DSP_SETFMT, &m_format);
 	ioctl(m_fd, SNDCTL_DSP_STEREO, &m_stereo);
 	ioctl(m_fd, SNDCTL_DSP_SPEED,  &getInfo().sample_rate);

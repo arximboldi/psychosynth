@@ -55,7 +55,7 @@ AC_ARG_ENABLE([liblo],
         [liblo=$enableval], [liblo=auto])
 
 if test "x${liblo}" != xno ; then
-    PKG_CHECK_MODULES(LIBLO, [ liblo >= 0.24 ],
+    PKG_CHECK_MODULES(LIBLO, [ liblo >= 0.23 ],
         [
             HAVE_LIBLO=yes
             AC_DEFINE([HAVE_LIBLO], 1, [Have Liblo?])
