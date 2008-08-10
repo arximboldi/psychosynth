@@ -20,6 +20,8 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <cstring>
+#include <cstdlib>
 #include <config.h>
 
 #include <libpsynth/version.h>

@@ -20,6 +20,7 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <algorithm>
 #include "object/ObjectAudioMixer.h"
 
 namespace psynth

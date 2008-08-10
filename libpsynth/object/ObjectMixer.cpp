@@ -20,6 +20,7 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <algorithm>
 #include "object/KnownObjects.h"
 #include "object/ObjectMixer.h"
 

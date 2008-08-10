@@ -20,6 +20,7 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <algorithm>
 #include "common/Misc.h"
 #include "object/KnownObjects.h"
 #include "object/EnvelopeMulti.h"

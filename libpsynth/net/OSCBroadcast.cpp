@@ -20,6 +20,7 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <cstring>
 #include <iostream>
 
 #include "net/OSCBroadcast.h"

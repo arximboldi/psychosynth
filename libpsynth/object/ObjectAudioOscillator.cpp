@@ -20,6 +20,7 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <algorithm>
 #include "object/ObjectAudioOscillator.h"
 
 using namespace std;

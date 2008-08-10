@@ -20,6 +20,7 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <algorithm>
 #include "table/Table.h"
 #include "output/OutputAlsa.h"
 #include "output/OutputOss.h"

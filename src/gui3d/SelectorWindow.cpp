@@ -20,6 +20,7 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <algorithm>
 #include "gui3d/SelectorWindow.h"
 
 using namespace std;

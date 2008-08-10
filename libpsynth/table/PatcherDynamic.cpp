@@ -20,6 +20,7 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <algorithm>
 #include "table/PatcherDynamic.h"
 
 #include "object/Object.h"

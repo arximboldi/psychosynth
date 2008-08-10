@@ -20,6 +20,7 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <algorithm>
 #include "table/TableObjectCreator.h"
 #include "table/Table.h"
 

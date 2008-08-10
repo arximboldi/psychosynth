@@ -20,6 +20,7 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <algorithm>
 #include "object/ObjectControlNoise.h"
 
 using namespace std;

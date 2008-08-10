@@ -20,6 +20,7 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <algorithm>
 #include "object/ObjectControlMixer.h"
 
 namespace psynth

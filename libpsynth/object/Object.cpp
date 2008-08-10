@@ -20,6 +20,7 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <algorithm>
 #include "common/Deleter.h"
 #include "object/Object.h"
 

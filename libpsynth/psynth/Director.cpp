@@ -20,6 +20,8 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <cstring>
+#include <algorithm>
 #include "psynth/Director.h"
 #include "psynth/Defaults.h"
 #include "table/PatcherDynamic.h"

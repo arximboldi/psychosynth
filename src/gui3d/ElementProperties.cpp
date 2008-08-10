@@ -20,6 +20,7 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <algorithm>
 #include "gui3d/ElementProperties.h"
 
 #define ELEMENT_EDITOR_WIDTH  200.0f

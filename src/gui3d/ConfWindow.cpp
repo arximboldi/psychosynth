@@ -20,6 +20,8 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <cstring>
+#include <cstdlib>
 #include "gui3d/ConfWindow.h"
 
 using namespace psynth;

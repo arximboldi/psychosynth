@@ -20,6 +20,8 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <cstring>
+#include <cstdlib>
 #include "common/FileFinder.h"
 #include "common/Misc.h"
 

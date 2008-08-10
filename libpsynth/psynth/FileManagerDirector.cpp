@@ -20,6 +20,8 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <cstring>
+#include <cstdlib>
 #include "version.h"
 #include "common/FileManager.h"
 #include "psynth/FileManagerDirector.h"

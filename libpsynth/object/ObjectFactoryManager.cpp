@@ -20,6 +20,7 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <algorithm>
 #include "object/ObjectFactoryManager.h"
 
 using namespace std;

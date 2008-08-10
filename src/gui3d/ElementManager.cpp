@@ -20,6 +20,7 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <algorithm>
 #include <CEGUI/CEGUI.h>
 
 #include "gui3d/ElementManager.h"

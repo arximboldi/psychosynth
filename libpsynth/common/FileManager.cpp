@@ -20,6 +20,8 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <cstring>
+#include <cstdlib>
 #include "common/FileManager.h"
 
 namespace psynth

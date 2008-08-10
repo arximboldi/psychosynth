@@ -20,6 +20,8 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <algorithm>
+#include <climits>
 #include "object/ObjectNoise.h"
 
 namespace psynth

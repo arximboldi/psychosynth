@@ -20,6 +20,7 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <algorithm>
 #include "net/OSCController.h"
 #include "net/OSCProtocol.h"
 

@@ -20,6 +20,7 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <algorithm>
 #include <config.h>
 
 #include <libpsynth/net/OSCClient.h>

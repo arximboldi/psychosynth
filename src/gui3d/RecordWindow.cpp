@@ -20,6 +20,7 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <algorithm>
 #include <string>
 
 #include "gui3d/RecordWindow.h"

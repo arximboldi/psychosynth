@@ -20,6 +20,8 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <cstring>
+#include <algorithm>
 #include <libpsynth/version.h>
 #include <sys/stat.h>
 

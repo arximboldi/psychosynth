@@ -20,6 +20,9 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <cstring>
+#include <algorithm>
+#include <cstdio>
 #include "net/OSCServer.h"
 #include "net/OSCProtocol.h"
 

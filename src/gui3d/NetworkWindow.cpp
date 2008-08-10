@@ -20,6 +20,7 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <algorithm>
 #include "gui3d/NetworkWindow.h"
 #include <libpsynth/common/Misc.h>
 

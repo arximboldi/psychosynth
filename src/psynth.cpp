@@ -20,6 +20,8 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <cstring>
+#include <algorithm>
 #include "cli/PsychosynthCli.h"
 
 int main(int argc, const char *argv[])
