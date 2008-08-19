@@ -1,0 +1,122 @@
+/**************************************************************************
+ *                                                                         *
+ *   PSYCHOSYNTH                                                           *
+ *   ===========                                                           *
+ *                                                                         *
+ *   Copyright (C) 2007 Juan Pedro Bolivar Puente                          *
+ *                                                                         *
+ *   This program is free software: you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation, either version 3 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ *   This program is distributed in the hope that it will be useful,       *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ *   GNU General Public License for more details.                          *
+ *                                                                         *
+ *   You should have received a copy of the GNU General Public License     *
+ *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
+ *                                                                         *
+ ***************************************************************************/
+
+#ifndef PSYNTH_MISC_H
+#define PSYNTH_MISC_H
+
+#include <string>
+
+namespace psynth
+{
+
+/**
+ * Inherit from this class if you want to forbid the copying of objects of
+ * your class.
+ */
+class no_copy
+{
+protected:
+    /**
+     * Forbids the creation of instances of NoCopy but allows instances of
+     * its derivated..
+     */
+    no_copy () {}
+
+private:
+    /**
+     * Private copy constructor.
+     */
+    no_copy (const no_copy&);
+
+    /**
+     * Private assignment operator.
+     */
+    no_copy& operator= (const no_copy&);
+};
+
+/**
+ * Returns the fractional part of a number.
+ * @param x The number to get its floating point part.
+ */
+inline float phase (float x)
+{
+    return x - (x >= 0.0f ?
+		static_cast<int>(x) :
+		static_cast<int>(x) - 1);
+}
+
+/**
+ * Returns the linear interpolation between to values.
+ * @param val The center value to interpolate.
+ * @param next The next value to interpolate.
+ * @param delta The percentage between the two values.
+ */
+template <class T>
+inline T linear_interp (T val, T next, T delta)
+{
+    return val + delta * (next - val); 
+}
+
+/**
+ * Returns a the string representation of an integer. The returned value
+ * must not be freed by the user because it is statically defined in the
+ * function and so new calls invalidates old returned value and it is not
+ * thread safe.
+ * @param val The value to represent as a string.
+ * @param base The numerical base in which we want to represent the number.
+ */
+char* itoa (int val, int base);
+
+/**
+ * Returns a the string representation of a floating point. The returned
+ * value must not be freed by the user because it is statically defined in the
+ * function and so new calls invalidates old returned value and it is not
+ * thread safe.
+ * @param f The value to convert to string.
+ * @param sigfigs The number of significant 
+ */
+char* ftoa (double f, double sigfigs);
+
+/**
+ * Compares two strings without being case sensible.
+ * @return @c -1 if @a a is less than @b b. @c 1 If @a a is greater than @c b.
+ * And @c 0 if @a a equals @a b.
+ */
+int strcmp_i (const char* a, const char* b);
+
+/**
+ * String implementation of @c dirname. Returns everything that is before the
+ * last dash in the string.
+ * @param str The string where to extract the dirname.
+ */
+std::string dirname_str (std::string str);
+
+/**
+ * Returns a pointer to the begining of the extension part of a file name
+ * string, defined as the first character after the last dot in the string
+ * or the begining of the string if no dot is in it.
+ */
+const char* get_extension (const char* file);
+
+} /* namespace psynth */
+
+#endif /* PSYNTH_MISC_H */
