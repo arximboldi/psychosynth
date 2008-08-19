@@ -29,7 +29,7 @@ using namespace std;
 namespace psynth
 {
 
-ObjectMixer::ObjectMixer(const AudioInfo& info,
+ObjectMixer::ObjectMixer(const audio_info& info,
 			 int obj_type,
 			 const std::string& name,
 			 int num_audio_out,
@@ -50,7 +50,7 @@ ObjectMixer::ObjectMixer(const AudioInfo& info,
     addParam("mixop", ObjParam::INT, &m_param_mixop);
 }
 
-void ObjectMixer::mix(Sample* dest, const Sample* src, size_t n_samples)
+void ObjectMixer::mix(sample* dest, const sample* src, size_t n_samples)
 {
     if (m_param_mixop == MIX_SUM)
 	while(n_samples--)
@@ -60,8 +60,8 @@ void ObjectMixer::mix(Sample* dest, const Sample* src, size_t n_samples)
 	    *dest++ *= *src++ * m_param_ampl;
 }
   
-void ObjectMixer::mix(Sample* dest, const Sample* src,
-		      const Sample* ampl, size_t n_samples)
+void ObjectMixer::mix(sample* dest, const sample* src,
+		      const sample* ampl, size_t n_samples)
 {
     if (m_param_mixop == MIX_SUM)
 	while(n_samples--)
@@ -71,7 +71,7 @@ void ObjectMixer::mix(Sample* dest, const Sample* src,
 	    *dest++ *= *src++ * (m_param_ampl + m_param_ampl * *ampl++);
 }
 
-void ObjectMixer::mix(Sample* dest, const Sample* src,
+void ObjectMixer::mix(sample* dest, const sample* src,
 		      EnvelopeSimple& env, size_t n_samples)
 {
     if (m_param_mixop == MIX_SUM)
@@ -82,8 +82,8 @@ void ObjectMixer::mix(Sample* dest, const Sample* src,
 	    *dest++ *= *src++ * m_param_ampl * env.update();
 }
   
-void ObjectMixer::mix(Sample* dest, const Sample* src,
-		      const Sample* ampl,
+void ObjectMixer::mix(sample* dest, const sample* src,
+		      const sample* ampl,
 		      EnvelopeSimple& env,
 		      EnvelopeSimple& ctrl_env,
 		      size_t n_samples)
@@ -98,7 +98,7 @@ void ObjectMixer::mix(Sample* dest, const Sample* src,
 		*src++ * (m_param_ampl + m_param_ampl * *ampl++ * ctrl_env.update()) * env.update();
 }
 
-void ObjectMixer::init(Sample* dest, size_t n_samples)
+void ObjectMixer::init(sample* dest, size_t n_samples)
 {
     float def_val = (m_param_mixop == MIX_SUM ? 0.0 : 1.0);
     

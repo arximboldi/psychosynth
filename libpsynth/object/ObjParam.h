@@ -23,7 +23,7 @@
 #ifndef PSYNTH_OBJPARAM
 #define PSYNTH_OBJPARAM
 
-#include <libpsynth/common/Mutex.h>
+#include <libpsynth/common/mutex.h>
 #include <string>
 
 namespace psynth
@@ -40,7 +40,7 @@ public:
 private:
     friend class Object;
 	
-    Mutex m_lock;
+    mutex m_lock;
     std::string m_name;
     int m_id;
     int m_type;

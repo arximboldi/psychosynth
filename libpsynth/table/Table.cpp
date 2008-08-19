@@ -24,7 +24,7 @@
 #include "table/Table.h"
 #include "output/OutputAlsa.h"
 #include "output/OutputOss.h"
-#include "common/Error.h"
+#include "common/error.h"
 
 #include "object/ObjectOutput.h"
 #include "object/ObjectAudioMixer.h"
@@ -108,7 +108,7 @@ void TableSubject::notifyLinkDeleted(const TablePatcherEvent& ev)
 	(*i++)->handleLinkDeleted(ev);
 }
 
-Table::Table(const AudioInfo& info) :
+Table::Table(const audio_info& info) :
     m_info(info),
     m_patcher(NULL),
     m_last_id(MIN_USER_ID)

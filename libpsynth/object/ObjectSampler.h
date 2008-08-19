@@ -23,12 +23,11 @@
 #ifndef PSYNTH_OBJECTSAMPLER_H
 #define PSYNTH_OBJECTSAMPLER_H
 
-#include <libpsynth/common/RingAudioBuffer.h>
 #include <libpsynth/object/Object.h>
 #include <libpsynth/input/FileReaderAny.h>
 #include <libpsynth/input/FileReaderFetcher.h>
 #include <libpsynth/object/ObjectFactory.h>
-#include <libpsynth/common/ScalerST.h>
+#include <libpsynth/common/scaler_st.h>
 
 namespace psynth
 {
@@ -69,8 +68,8 @@ public:
 private:
     FileReaderAny m_reader;
     FileReaderFetcher m_fetcher;
-    AudioBuffer m_inbuf;
-    ScalerST m_scaler;
+    audio_buffer m_inbuf;
+    scaler_st m_scaler;
     float m_ctrl_pos;
     
     float m_param_ampl;
@@ -82,10 +81,10 @@ private:
     
     std::string m_param_file;
     
-    Mutex m_update_lock;
+    mutex m_update_lock;
     
     void onFileChange(ObjParam& par);
-    void read(AudioBuffer& buf, int start, int end);
+    void read(audio_buffer& buf, int start, int end);
     void restart();
     
     void doUpdate(const Object* caller, int caller_port_type, int caller_port);
@@ -93,7 +92,7 @@ private:
     void onInfoChange();
     
 public:
-    ObjectSampler(const AudioInfo& info);
+    ObjectSampler(const audio_info& info);
     ~ObjectSampler();
 };
 

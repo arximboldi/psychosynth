@@ -23,7 +23,7 @@
 #ifndef PSYNTH_FILTER_H
 #define PSYNTH_FILTER_H
 
-#include <libpsynth/common/AudioInfo.h>
+#include <libpsynth/common/audio_info.h>
 #include <cmath>
 
 namespace psynth
@@ -84,12 +84,12 @@ class Filter
     /*
       in/out history
     */
-    Sample m_ou1, m_ou2, m_in1, m_in2;
+    sample m_ou1, m_ou2, m_in1, m_in2;
     
     /*
       in/out history for moog-filter
     */
-    Sample m_y1, m_y2, m_y3, m_y4, m_oldx, m_oldy1, m_oldy2, m_oldy3;
+    sample m_y1, m_y2, m_y3, m_y4, m_oldx, m_oldy1, m_oldy2, m_oldy3;
 public:
     Filter(FilterValues* coef = 0) :
 	m_coef(coef), m_local_coef(false),
@@ -158,7 +158,7 @@ public:
 	m_coef = coef;
 	}*/
     
-    Sample update(Sample x);
+    sample update(sample x);
 };
 
 } /* namespace psynth */

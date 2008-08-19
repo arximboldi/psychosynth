@@ -70,7 +70,7 @@ private:
     int m_max_delay_pos;
     int m_pos;
     
-    AudioBuffer m_buffer;
+    audio_buffer m_buffer;
 
     int doUpdateChannel(int chan);
     void doUpdate(const Object* caller, int caller_port_type, int caller_port);
@@ -78,7 +78,7 @@ private:
     void doAdvance() {}
     
 public:
-    ObjectDelay(const AudioInfo& prop);
+    ObjectDelay(const audio_info& prop);
     ~ObjectDelay();
 };
 

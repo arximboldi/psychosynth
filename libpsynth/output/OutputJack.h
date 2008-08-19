@@ -60,8 +60,8 @@ class OutputJack : public Output
     
 public:
     OutputJack();
-    OutputJack(const AudioInfo& info);
-    OutputJack(const AudioInfo& info, const std::string& server_name);
+    OutputJack(const audio_info& info);
+    OutputJack(const audio_info& info, const std::string& server_name);
     ~OutputJack();
 
     bool setServer(const std::string& server) {
@@ -79,7 +79,7 @@ public:
     
     bool open();
     bool close();
-    bool put(const AudioBuffer& buf, size_t nframes);
+    bool put(const audio_buffer& buf, size_t nframes);
     bool start();
     bool stop();
 };

@@ -117,7 +117,7 @@ void ObjectManager::deleteObject(Iterator it)
 	m_delete_list.push_back(obj);
 }
 
-void ObjectManager::setInfo(const AudioInfo& info)
+void ObjectManager::setInfo(const audio_info& info)
 {
     m_update_lock.lock();
 

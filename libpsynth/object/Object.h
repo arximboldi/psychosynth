@@ -28,12 +28,13 @@
 #include <cmath>
 #include <set>
 #include <iostream>
+#include <algorithm>
 
-#include <libpsynth/common/ControlBuffer.h>
-#include <libpsynth/common/AudioBuffer.h>
-#include <libpsynth/common/Mutex.h>
-#include <libpsynth/common/Vector2D.h>
-#include <libpsynth/common/Deleter.h>
+#include <libpsynth/common/sample_buffer.h>
+#include <libpsynth/common/audio_buffer.h>
+#include <libpsynth/common/mutex.h>
+#include <libpsynth/common/vector_2d.h>
+#include <libpsynth/common/deleter.h>
 
 #include <libpsynth/object/ObjParam.h>
 #include <libpsynth/object/EnvelopeSimple.h>
@@ -138,7 +139,7 @@ public:
 	
     public:
 	virtual ~InSocket() {
-	    for_each(m_watchs.begin(), m_watchs.end(), Deleter<Watch*>());
+	    for_each(m_watchs.begin(), m_watchs.end(), deleter<Watch*>());
 	}
 	
 	virtual Object* getSourceObject() const {
@@ -149,7 +150,7 @@ public:
 	    return m_srcport;
 	}
     };
-
+    
     class InSocketManual : public InSocket
     {
 	friend class Object;
@@ -175,13 +176,13 @@ public:
     };
 
 private:
-    AudioInfo m_audioinfo;
+    audio_info m_audioinfo;
 
-    std::vector<AudioBuffer> m_outdata_audio;
-    std::vector<ControlBuffer> m_outdata_control;
+    std::vector<audio_buffer> m_outdata_audio;
+    std::vector<sample_buffer> m_outdata_control;
 
     std::vector<OutSocket> m_out_sockets[LINK_TYPES];
-    std::vector<Sample> m_out_stable_value[LINK_TYPES];
+    std::vector<sample> m_out_stable_value[LINK_TYPES];
     std::vector<InSocketManual> m_in_sockets[LINK_TYPES];
     std::vector<EnvelopeSimple> m_in_envelope[LINK_TYPES];
     EnvelopeSimple m_out_envelope;
@@ -194,7 +195,7 @@ private:
     int m_type;
     std::string m_name;
     
-    Vector2f m_param_position;
+    vector_2f m_param_position;
     float m_param_radious;
     int m_param_mute;
     
@@ -204,10 +205,10 @@ private:
     bool m_updated;
     bool m_single_update;
     
-    Mutex m_paramlock;
+    mutex m_paramlock;
 
-    void blendBuffer(Sample* buf, int n_elem,
-		     Sample stable_value, EnvelopeSimple env);
+    void blendBuffer(sample* buf, int n_elem,
+		     sample stable_value, EnvelopeSimple env);
     void updateParamsOut();
     void updateInputs();
     void updateInSockets();
@@ -237,7 +238,7 @@ protected:
 	return NULL;
     }
 
-    void setOutputStableValue(int sock_type, int sock_num, Sample value) {
+    void setOutputStableValue(int sock_type, int sock_num, sample value) {
 	m_out_stable_value[sock_type][sock_num] = value;
     }
     
@@ -254,7 +255,7 @@ protected:
     }
 
 public:
-    Object(const AudioInfo& prop, int type,
+    Object(const audio_info& prop, int type,
 	   const std::string& name,
 	   int inaudiosocks, int incontrolsocks,
 	   int outaudiosocks, int outcontrolsocks,
@@ -292,15 +293,15 @@ public:
 	doAdvance();
     }
 	
-    const AudioInfo& getAudioInfo() const {
+    const audio_info& getaudio_info() const {
 	return m_audioinfo;
     }
 
-    const AudioInfo& getInfo() const {
+    const audio_info& getInfo() const {
 	return m_audioinfo;
     }
 
-    void setInfo(const AudioInfo& info);
+    void setInfo(const audio_info& info);
 
     void attachWatch(int type, int in_socket, Watch* watch) {
 	watch->setInfo(m_audioinfo);
@@ -356,38 +357,38 @@ public:
     int getNumInput(int type) const {
 	return m_in_sockets[type].size();
     }
-
+    
     int getId() const {
 	return m_id;
-    };
+    }
 	
     void setId(int id) {
 	m_id = id;
-    };
+    }
         
     float distanceTo(const Object &obj) const {
 	return m_param_position.distance(obj.m_param_position);
-    };
+    }
 	
     float sqrDistanceTo(const Object &obj) const {
-	return m_param_position.sqrDistance(obj.m_param_position);
-    };
+	return m_param_position.sqr_distance(obj.m_param_position);
+    }
 
     float distanceToCenter() const {
 	return m_param_position.length();
-    };
+    }
 	
     float sqrDistanceToCenter() const {
-	return m_param_position.sqrLength();
-    };
+	return m_param_position.sqr_length();
+    }
     
-    float distanceTo(const Vector2f& obj) const {
+    float distanceTo(const vector_2f& obj) const {
 	return m_param_position.distance(obj);
-    };
+    }
 	
-    float sqrDistanceTo(const Vector2f &obj) const {
-	return m_param_position.sqrDistance(obj);
-    };
+    float sqrDistanceTo(const vector_2f &obj) const {
+	return m_param_position.sqr_distance(obj);
+    }
 };
 
 } /* namespace psynth */

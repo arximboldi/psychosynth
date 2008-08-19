@@ -30,22 +30,22 @@ PSYNTH_DEFINE_OBJECT_FACTORY(ObjectControlMixer);
 
 void ObjectControlMixer::doUpdate(const Object* caller, int caller_port_type, int caller_port)
 {
-    ControlBuffer* buf = getOutput<ControlBuffer>(LINK_CONTROL, OUT_C_OUTPUT);
-    const ControlBuffer* in = NULL;
+    sample_buffer* buf = getOutput<sample_buffer >(LINK_CONTROL, OUT_C_OUTPUT);
+    const sample_buffer* in = NULL;
     int j;
     bool input = false;
     
-    init(buf->getData(), getInfo().block_size);
+    init (buf->get_data(), getInfo().block_size);
     
     for (j = 0; j < m_numchan; ++j)
-	if ((in = getInput<ControlBuffer>(LINK_CONTROL, j))) {
+	if ((in = getInput<sample_buffer>(LINK_CONTROL, j))) {
 	    EnvelopeSimple env = getInEnvelope(LINK_CONTROL, j);
-	    mix(buf->getData(), in->getData(), env, getInfo().block_size);
+	    mix(buf->get_data(), in->get_data(), env, getInfo().block_size);
 	    input = true;
 	}
 
     if (!input)
-	memset(buf->getData(), 0, sizeof(Sample) * getInfo().block_size);
+	memset(buf->get_data(), 0, sizeof(sample) * getInfo().block_size);
 
 }
 

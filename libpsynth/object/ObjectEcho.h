@@ -73,9 +73,9 @@ private:
     float m_param_hidamp;
     int m_pos;
 
-    std::vector<Sample> m_old_val;
+    std::vector<sample> m_old_val;
     
-    AudioBuffer m_buffer;
+    audio_buffer m_buffer;
 
     int doUpdateChannel(int chan);
     void doUpdate(const Object* caller, int caller_port_type, int caller_port);
@@ -83,7 +83,7 @@ private:
     void doAdvance() {}
     
 public:
-    ObjectEcho(const AudioInfo& prop);
+    ObjectEcho(const audio_info& prop);
     ~ObjectEcho();
 };
 

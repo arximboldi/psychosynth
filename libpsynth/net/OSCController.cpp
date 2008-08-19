@@ -149,7 +149,7 @@ void OSCController::handleSetParamObject(TableObject& obj, int param_id)
 	    break;
 	}
 	case ObjParam::VECTOR2F: {
-	    Vector2f val;
+	    vector_2f val;
 	    obj.getParam(param_id, val);
 	    lo_message_add_float(msg, val.x);
 	    lo_message_add_float(msg, val.y);
@@ -262,7 +262,7 @@ int OSCController::_param_cb(const char* path, const char* types,
 		break;
 	    case ObjParam::VECTOR2F:
 		m_table->setParamObject(obj, param_id,
-					Vector2f(argv[3]->f, argv[4]->f));
+					vector_2f(argv[3]->f, argv[4]->f));
 		break;
 	    default:
 		break;

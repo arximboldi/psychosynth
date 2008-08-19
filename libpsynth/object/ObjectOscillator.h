@@ -79,7 +79,7 @@ protected:
     Oscillator m_oscillator;
 
     void updateOscParams();
-    void updateOsc(Sample* out);
+    void updateOsc(sample* out);
     
 private:
     int   m_param_wave;
@@ -89,7 +89,7 @@ private:
     bool  m_restart;
     
 public:
-    ObjectOscillator(const AudioInfo& prop,
+    ObjectOscillator(const audio_info& prop,
 		     int obj_type,
 		     const std::string& name,
 		     int n_audio_out,

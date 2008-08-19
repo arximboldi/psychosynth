@@ -59,7 +59,7 @@ class ConnectionWave : public Ogre::ManualObject
     
     void build(const Ogre::Vector2& src,
 	       const Ogre::Vector2& dest,
-	       const psynth::Sample* samples, int n_samples);
+	       const psynth::sample* samples, int n_samples);
 public:
     ConnectionWave(const std::string &id,
 		     const Ogre::ColourValue& colour,
@@ -68,7 +68,7 @@ public:
     
     void update(const Ogre::Vector2& src,
 		const Ogre::Vector2& dest,
-		const psynth::Sample* samples, int n_samples);
+		const psynth::sample* samples, int n_samples);
 
     void setColour(Ogre::ColourValue colour) {
 	m_colour = colour;

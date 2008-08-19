@@ -24,13 +24,13 @@
 #define CONFWINDOW_H
 
 #include <libpsynth/version.h>
-#include <libpsynth/common/Config.h>
+#include <libpsynth/common/config.h>
 #include "gui3d/ToggableWindow.h"
 
 class OutputConfWindow
 {
 public:
-    virtual CEGUI::Window* createWindow(psynth::ConfNode& node) = 0;
+    virtual CEGUI::Window* createWindow(psynth::conf_node& node) = 0;
     virtual void apply() = 0;
 };
 
@@ -39,17 +39,17 @@ class OutputConfWindowSimple : public OutputConfWindow
     std::string m_conf_path;
     std::string m_name;
     CEGUI::Editbox* m_value;
-    psynth::ConfNode* m_node;
+    psynth::conf_node* m_node;
     
 public:
     OutputConfWindowSimple(const std::string& cp,
 			   const std::string& name) :
 	m_conf_path(cp), m_name(name) {}
 
-    CEGUI::Window* createWindow(psynth::ConfNode& node);
+    CEGUI::Window* createWindow(psynth::conf_node& node);
 
     void apply() {
-	m_node->getPath(m_conf_path).set(m_value->getText().c_str());
+	m_node->get_path(m_conf_path).set(m_value->getText().c_str());
     };
 };
 
@@ -106,7 +106,7 @@ class PathConfWindow : public ToggableWindow
     CEGUI::ItemListbox* m_listbox;
     CEGUI::Editbox* m_editbox;
     
-    psynth::ConfNode& m_conf;
+    psynth::conf_node& m_conf;
     
     bool onGeneric(const CEGUI::EventArgs &e);
     bool onDelete(const CEGUI::EventArgs &e);
@@ -118,7 +118,7 @@ class PathConfWindow : public ToggableWindow
     CEGUI::FrameWindow* createWindow();
     
 public:
-    PathConfWindow(psynth::ConfNode& conf_node) :
+    PathConfWindow(psynth::conf_node& conf_node) :
 	m_conf(conf_node)
 	{}  
 };
@@ -134,8 +134,8 @@ class ConfWindow : public ToggableWindow
     OutputConfWindow* m_out_win;
     CEGUI::Window* m_out_cegui_win;
     
-    psynth::ConfNode& m_gui_conf;
-    psynth::ConfNode& m_psynth_conf;
+    psynth::conf_node& m_gui_conf;
+    psynth::conf_node& m_psynth_conf;
     
     
     /* Video options */
@@ -169,8 +169,8 @@ class ConfWindow : public ToggableWindow
     }
     
 public:
-    ConfWindow(psynth::ConfNode& gui_conf,
-	       psynth::ConfNode& psynth_conf);
+    ConfWindow(psynth::conf_node& gui_conf,
+	       psynth::conf_node& psynth_conf);
 
     ~ConfWindow();
     

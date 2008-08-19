@@ -32,8 +32,8 @@ PSYNTH_DEFINE_OBJECT_FACTORY(ObjectControlNoise);
 
 void ObjectControlNoise::doUpdate(const Object* caller, int caller_port_type, int caller_port)
 {
-    ControlBuffer*       buf = getOutput<ControlBuffer>(LINK_CONTROL, OUT_C_OUTPUT);
-    Sample*       out = buf->getData();
+    sample_buffer* buf = getOutput<sample_buffer>(LINK_CONTROL, OUT_C_OUTPUT);
+    sample* out = buf->get_data();
 
     updateNoise(out);
 }

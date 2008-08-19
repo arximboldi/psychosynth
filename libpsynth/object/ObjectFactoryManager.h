@@ -36,7 +36,7 @@ class ObjectFactoryManager
     
 public:
     void registerFactory(ObjectFactory& of);
-    Object* create(const std::string& name, const AudioInfo& info);
+    Object* create(const std::string& name, const audio_info& info);
 };
 
 } /* namespace psynth */

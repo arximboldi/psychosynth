@@ -39,7 +39,7 @@ class OutputDirectorOss : public OutputDirector
 	    stop();
     }
     
-    bool onDeviceChange(ConfNode& conf) {
+    bool onDeviceChange(conf_node& conf) {
 	std::string device;
 	Output::State old_state;
 	
@@ -53,11 +53,11 @@ class OutputDirectorOss : public OutputDirector
 	return false;
     }
     
-    virtual Output* doStart(ConfNode& conf) {
+    virtual Output* doStart(conf_node& conf) {
 	std::string device;
 	
-	conf.getChild("out_device").get(device);
-	conf.getChild("out_device").addChangeEvent(MakeDelegate(this, &OutputDirectorOss::onDeviceChange));
+	conf.get_child ("out_device").get(device);
+	conf.get_child ("out_device").add_change_event(MakeDelegate(this, &OutputDirectorOss::onDeviceChange));
 
 	m_output = new OutputOss;
 	m_output->setDevice(device);
@@ -65,15 +65,15 @@ class OutputDirectorOss : public OutputDirector
 	return m_output;
     };
 
-    virtual void doStop(ConfNode& conf) {
-	conf.getChild("out_device").deleteChangeEvent(MakeDelegate(this, &OutputDirectorOss::onDeviceChange));
+    virtual void doStop(conf_node& conf) {
+	conf.get_child ("out_device").delete_change_event(MakeDelegate(this, &OutputDirectorOss::onDeviceChange));
 	delete m_output;
 	m_output = NULL;
     }
 
 public:
-    void defaults(ConfNode& conf) {
-	conf.getChild("out_device").def(DEFAULT_OSS_OUT_DEVICE);
+    void defaults(conf_node& conf) {
+	conf.get_child ("out_device").def(DEFAULT_OSS_OUT_DEVICE);
     }
 
     OutputDirectorOss() :

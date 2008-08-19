@@ -25,7 +25,7 @@
 #include "gui3d/Element.h"
 #include "gui3d/QueryFlags.h"
 
-#include <libpsynth/common/Misc.h>
+#include <libpsynth/common/misc.h>
 
 #define ROTATION_FACTOR     100.0f
 
@@ -65,7 +65,7 @@ Element::Element(TableObject& obj, Ogre::SceneManager* scene) :
     
     m_node->attachObject(m_base);
 
-    Vector2f v;
+    vector_2f v;
     obj.getParam(psynth::Object::PARAM_POSITION, v);
     m_pos.x = v.x;
     m_pos.y = v.y;
@@ -109,7 +109,7 @@ void Element::setTarget(const TableObject& obj)
     if (!m_target.isNull()) {
 	m_target.addListener(this);
 
-	Vector2f v;
+	vector_2f v;
 	m_target.getParam(psynth::Object::PARAM_POSITION, v);
 	m_aimpoint.x = v.x;
 	m_aimpoint.y = v.y;
@@ -131,7 +131,7 @@ void Element::clearTarget(const TableObject& obj)
 
 void Element::setPosition(const Ogre::Vector2& pos)
 {
-    Vector2f dest;
+    vector_2f dest;
     dest.x = pos.x;
     dest.y = pos.y;
     m_obj.setParam(psynth::Object::PARAM_POSITION, dest);
@@ -273,7 +273,7 @@ bool Element::keyReleased(const OIS::KeyEvent& e)
     return false;
 }
 
-void Element::objectMoved(TableObject& obj, Vector2f& dest)
+void Element::objectMoved(TableObject& obj, vector_2f& dest)
 {
     if (obj == m_obj) {
 	m_pos.x = dest.x;
@@ -313,7 +313,7 @@ void Element::handleSetParamObject(TableObject& obj, int param_id)
 {
     if (obj == m_obj) {
 	if (param_id == Object::PARAM_POSITION) {
-	    Vector2f dest;
+	    vector_2f dest;
 	    obj.getParam(param_id, dest);
 	    objectMoved(obj, dest);
 	}
@@ -322,7 +322,7 @@ void Element::handleSetParamObject(TableObject& obj, int param_id)
 	    (*it)->handleParamChange(obj, param_id);
     } else if (obj == m_target) {
 	if (param_id == Object::PARAM_POSITION) {
-	    Vector2f dest;
+	    vector_2f dest;
 	    obj.getParam(param_id, dest);
 	    objectMoved(obj, dest);
 	}

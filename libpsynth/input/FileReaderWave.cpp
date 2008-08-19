@@ -21,7 +21,7 @@
  ***************************************************************************/
 
 #include "input/FileReaderWave.h"
-#include "common/Logger.h"
+#include "common/logger.h"
 
 using namespace std;
 
@@ -36,11 +36,11 @@ void FileReaderWave::open(const char* file)
 	m_file = sf_open(file, SFM_READ, &sfinfo);
     
 	if (m_file == NULL) {
-	    Logger::instance().log("wave", Log::ERROR, string("Could not open file: ") + file);
+	    logger::instance() ("wave", log::ERROR, string("Could not open file: ") + file);
 	    return;
 	}
 
-	AudioInfo info;
+	audio_info info;
 	info.sample_rate  = sfinfo.samplerate;
 	info.num_channels = sfinfo.channels;
 	info.block_size   = sfinfo.frames;
@@ -55,7 +55,7 @@ void FileReaderWave::seek(size_t pos)
     sf_seek(m_file, pos, SEEK_SET);
 }
 
-int FileReaderWave::read(AudioBuffer& outbuf, int n_samples)
+int FileReaderWave::read(audio_buffer& outbuf, int n_samples)
 {
     int n_read;
 

@@ -20,7 +20,7 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "common/Logger.h"
+#include "common/logger.h"
 #include "input/FileReaderOgg.h"
 
 using namespace std;
@@ -33,11 +33,11 @@ void FileReaderOgg::open(const char* file)
     if (!isOpen()) {
 	/* const_cast cause vorbis code sucks a little bit... */
 	if (ov_fopen(const_cast<char*>(file), &m_file)) {
-	    Logger::instance().log("ogg", Log::ERROR, string("Could not open file: ") + file);
+	    logger::instance() ("ogg", log::ERROR, string("Could not open file: ") + file);
 	    return;
 	}
 
-	AudioInfo info;
+	audio_info info;
 	vorbis_info* oi;
 	oi = ov_info(&m_file, -1);
 	info.num_channels = oi->channels;
@@ -54,10 +54,10 @@ void FileReaderOgg::seek(size_t pos)
     if (ov_seekable(&m_file))
 	ov_pcm_seek(&m_file, pos); //*getInfo().num_channels);
     else
-	Logger::instance().log("ogg", Log::ERROR, "Stream not seekable.");
+	logger::instance() ("ogg", log::ERROR, "Stream not seekable.");
 }
 
-int FileReaderOgg::read(AudioBuffer& buf, int n_samples)
+int FileReaderOgg::read(audio_buffer& buf, int n_samples)
 {
     float** pcm;
     int bitstream;
@@ -69,14 +69,15 @@ int FileReaderOgg::read(AudioBuffer& buf, int n_samples)
 	
 	if (n_read) {
 	    int n_chan = min(getInfo().num_channels,
-			     buf.getInfo().num_channels);
+			     buf.get_info().num_channels);
 	
 	    int i;
 	
 	    for (i = 0; i < n_chan; ++i)
-		memcpy(buf.getData()[i] + index, pcm[i], sizeof(float) * n_read);
-	    for (; i < buf.getInfo().num_channels; ++i)
-		memcpy(buf.getData()[i] + index, pcm[i-n_chan], sizeof(float) * n_read);
+		memcpy(buf.get_data()[i] + index, pcm[i], sizeof(float) * n_read);
+
+	    for (; i < buf.get_info().num_channels; ++i)
+		memcpy(buf.get_data()[i] + index, pcm[i-n_chan], sizeof(float) * n_read);
 
 	    index += n_read;
 	    n_samples -= n_read;

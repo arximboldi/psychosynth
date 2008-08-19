@@ -23,8 +23,8 @@
 #ifndef PSYNTH_DIRECTOR_H
 #define PSYNTH_DIRECTOR_H
 
-#include <libpsynth/common/Config.h>
-#include <libpsynth/common/Misc.h>
+#include <libpsynth/common/config.h>
+#include <libpsynth/common/misc.h>
 #include <libpsynth/table/Table.h>
 #include <libpsynth/psynth/OutputDirector.h>
 #include <libpsynth/psynth/FileManagerDirector.h>
@@ -32,7 +32,7 @@
 namespace psynth
 {
 
-class Director : public NoCopy
+class Director : public no_copy
 {
     typedef std::map<std::string, OutputDirectorFactory*> ODFMap;
     ODFMap m_outdir;
@@ -42,15 +42,15 @@ class Director : public NoCopy
     OutputDirector* m_output;
     Table* m_table;
 
-    ConfNode* m_config;
-    AudioInfo m_info;
+    conf_node* m_config;
+    audio_info m_info;
 
-    bool onConfigNudge(ConfNode& node);
+    bool onConfigNudge(conf_node& node);
 #if 0
-    bool onSampleRateChange(ConfNode& node);
-    bool onBlockSizeChange(ConfNode& node);
-    bool onNumChannelsChange(ConfNode& node);
-    bool onOutputChange(ConfNode& node);
+    bool onSampleRateChange(conf_node& node);
+    bool onBlockSizeChange(conf_node& node);
+    bool onNumChannelsChange(conf_node& node);
+    bool onOutputChange(conf_node& node);
 #endif
     
     void registerConfig();
@@ -67,7 +67,7 @@ public:
     ~Director();
     
     void attachOutputDirectorFactory(OutputDirectorFactory* fact);
-    void start(ConfNode& conf, const std::string& home_path);
+    void start(conf_node& conf, const std::string& home_path);
     void stop();
     
     Table* getTable() {

@@ -27,7 +27,8 @@
 #include <libpsynth/net/OSCServer.h>
 #include <libpsynth/net/OSCClientLogger.h>
 #include <libpsynth/net/OSCServerLogger.h>
-#include <libpsynth/common/Timer.h>
+#include <libpsynth/common/timer.h>
+#include <libpsynth/common/arg_parser.h>
 
 #include "cli/PsychosynthCli.h"
 
@@ -60,14 +61,14 @@ void PsychosynthCli::printVersion()
     cout << "PsychosynthCli " << VERSION << endl;
 }
 
-void PsychosynthCli::prepare(psynth::ArgParser& arg_parser)
+void PsychosynthCli::prepare(psynth::arg_parser& ap)
 {
     init();
     
-    arg_parser.add('S', "server", &m_run_server);
-    arg_parser.add('C', "client", &m_host);
-    arg_parser.add('p', "port", &m_server_port);
-    arg_parser.add('P', "client-port", &m_client_port);
+    ap.add('S', "server", &m_run_server);
+    ap.add('C', "client", &m_host);
+    ap.add('p', "port", &m_server_port);
+    ap.add('P', "client-port", &m_client_port);
 }
 
 int PsychosynthCli::execute()
@@ -98,30 +99,30 @@ void PsychosynthCli::init()
 
 int PsychosynthCli::runClient()
 {
-    Timer timer;
+    timer timer;
     OSCClient client;
     OSCClientLogger logger;
     lo_address add;
     int ret_val = 0;
     
-    add = lo_address_new(m_host.c_str(), m_server_port.c_str());
+    add = lo_address_new (m_host.c_str(), m_server_port.c_str());
 
-    client.setTable(getTable());
-    client.activate();
+    client.setTable (getTable());
+    client.activate ();
     
-    client.addListener(&logger);
-    client.connect(add, m_client_port.c_str());
+    client.addListener (&logger);
+    client.connect (add, m_client_port.c_str());
     
     timer.update();
-    while(ret_val == 0) {
+    while (ret_val == 0) {
 	timer.update();
 	
-	while(client.receive(TIME_OUT));
-	client.update(timer.deltaticks());
+	while (client.receive (TIME_OUT));
+	client.update (timer.delta_ticks());
 
-	getTable()->update();
+	getTable ()->update ();
 	
-	if (client.getState() == OSCClient::IDLE)
+	if (client.getState () == OSCClient::IDLE)
 	    ret_val = -1;
     }
 
@@ -130,7 +131,7 @@ int PsychosynthCli::runClient()
 
 int PsychosynthCli::runServer()
 {
-    Timer timer;
+    timer timer;
     OSCServer server;
     OSCServerLogger logger;
     int ret_val = 0;
@@ -142,11 +143,11 @@ int PsychosynthCli::runServer()
     server.activate();
     
     timer.update();
-    while(ret_val == 0) {
+    while (ret_val == 0) {
 	timer.update();
 
-	while(server.receive(TIME_OUT));
-	server.update(timer.deltaticks());
+	while (server.receive(TIME_OUT));
+	server.update (timer.delta_ticks ());
 
 	getTable()->update();
 	

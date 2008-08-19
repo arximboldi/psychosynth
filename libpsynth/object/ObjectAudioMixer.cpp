@@ -30,32 +30,36 @@ PSYNTH_DEFINE_OBJECT_FACTORY(ObjectAudioMixer);
 
 void ObjectAudioMixer::doUpdate(const Object* caller, int caller_port_type, int caller_port)
 {
-    AudioBuffer* buf = getOutput<AudioBuffer>(LINK_AUDIO, OUT_A_OUTPUT);
-    const AudioBuffer* in = NULL;
-    const ControlBuffer* ampl = getInput<ControlBuffer>(LINK_CONTROL, IN_C_AMPLITUDE);
+    audio_buffer* buf = getOutput<audio_buffer>(LINK_AUDIO, OUT_A_OUTPUT);
+    const audio_buffer* in = NULL;
+    const sample_buffer * ampl = getInput<sample_buffer >(LINK_CONTROL, IN_C_AMPLITUDE);
     int i, j;
     bool input = false;
     
     for (i = 0; i < getInfo().num_channels; ++i) {
-	init(buf->getChannel(i), getInfo().block_size);
+	init(buf->get_channel(i), getInfo().block_size);
 
 	for (j = 0; j < m_numchan; ++j)
-	    if ((in = getInput<AudioBuffer>(LINK_AUDIO, j))) {
+	    if ((in = getInput<audio_buffer>(LINK_AUDIO, j))) {
 		EnvelopeSimple env = getInEnvelope(LINK_AUDIO, j);
+
 		if (!ampl)
-		    mix(buf->getChannel(i), in->getChannel(i),
+		    mix(buf->get_channel(i), in->get_channel(i),
 			env, getInfo().block_size);
 		else {
 		    EnvelopeSimple ctrl_env = getInEnvelope(LINK_CONTROL,
 							    IN_C_AMPLITUDE);
-		    mix(buf->getChannel(i), in->getChannel(i), ampl->getData(),
+		    mix(buf->get_channel(i),
+			in->get_channel(i),
+			ampl->get_data(),
 			env, ctrl_env, getInfo().block_size);
 		}
 		input = true;
 	    }
 
 	if (!input)
-	    memset(buf->getChannel(i), 0, sizeof(Sample) * getInfo().block_size);
+	    memset(buf->get_channel(i), 0,
+		   sizeof(sample) * getInfo().block_size);
     }
 }
 

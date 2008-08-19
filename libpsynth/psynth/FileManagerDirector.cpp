@@ -23,7 +23,7 @@
 #include <cstring>
 #include <cstdlib>
 #include "version.h"
-#include "common/FileManager.h"
+#include "common/file_manager.h"
 #include "psynth/FileManagerDirector.h"
 
 using namespace std;
@@ -31,15 +31,19 @@ using namespace std;
 namespace psynth
 {
 
-bool FileManagerDirector::onConfNudge(ConfNode& node)
+bool FileManagerDirector::onConfNudge(conf_node& node)
 {
-    FileManager& mgr = FileManager::instance().getChild("psychosynth").getChild(node.getName());
+    file_manager& mgr =
+	file_manager::instance()
+	.get_child ("psychosynth")
+	.get_child (node.get_name());
+    
     string val;
     
     mgr.clear();
-    for (ConfNode::ChildIter it = node.begin(); it != node.end(); ++it) {
+    for (conf_node::iterator it = node.begin(); it != node.end(); ++it) {
 	(*it)->get(val);
-	mgr.addPath(val);
+	mgr.add_path(val);
     }
     
     return true;
@@ -47,16 +51,18 @@ bool FileManagerDirector::onConfNudge(ConfNode& node)
 
 void FileManagerDirector::registerConfig()
 {
-    m_conf->getChild("samples").addNudgeEvent(MakeDelegate(this, &FileManagerDirector::onConfNudge));
-    m_conf->getChild("samples").nudge();
+    m_conf->get_child ("samples")
+	.add_nudge_event (MakeDelegate(this, &FileManagerDirector::onConfNudge));
+    m_conf->get_child ("samples").nudge();
 }
 
 void FileManagerDirector::unregisterConfig()
 {
-    m_conf->getChild("samples").deleteNudgeEvent(MakeDelegate(this, &FileManagerDirector::onConfNudge));
+    m_conf->get_child ("samples")
+	.delete_nudge_event (MakeDelegate(this, &FileManagerDirector::onConfNudge));
 }
 
-void FileManagerDirector::start(ConfNode& conf,
+void FileManagerDirector::start(conf_node& conf,
 				const std::string& home_path)
 {
     m_conf = &conf;
@@ -74,8 +80,8 @@ void FileManagerDirector::stop()
 
 void FileManagerDirector::defaults()
 {
-    m_conf->getChild("samples").getChild("path0").def(string(PSYNTH_DATA_DIR) + "/samples");
-    m_conf->getChild("samples").getChild("path1").def(m_home_path + "/samples");
+    m_conf->get_child ("samples").get_child ("path0").def(string(PSYNTH_DATA_DIR) + "/samples");
+    m_conf->get_child ("samples").get_child ("path1").def(m_home_path + "/samples");
 }
 
 } /* namespace psynth */

@@ -56,19 +56,19 @@ public:
     static const float DEFAULT_AMPL = 0.3f;
     
 protected:
-    Sample updatePink();
-    Sample updateWhite();
-    void updateNoise(Sample* buf);
+    sample updatePink();
+    sample updateWhite();
+    void updateNoise(sample* buf);
     
 private:
     /* Pink noise factors. */
-    Sample m_b0;
-    Sample m_b1;
-    Sample m_b2;
-    Sample m_b3;
-    Sample m_b4;
-    Sample m_b5;
-    Sample m_b6;
+    sample m_b0;
+    sample m_b1;
+    sample m_b2;
+    sample m_b3;
+    sample m_b4;
+    sample m_b5;
+    sample m_b6;
     
 
     int   m_param_type;
@@ -76,7 +76,7 @@ private:
     //bool  m_restart;
     
 public:
-    ObjectNoise(const AudioInfo& prop,
+    ObjectNoise(const audio_info& prop,
 		int obj_type,
 		const std::string& name,
 		int n_audio_out,

@@ -34,7 +34,7 @@ void ObjectFactoryManager::registerFactory(ObjectFactory& of)
 }
 
 Object* ObjectFactoryManager::create(const std::string& name,
-				     const AudioInfo& info)
+				     const audio_info& info)
 {
     ObjectFactoryMap::iterator it = m_objfact.find(name);
 

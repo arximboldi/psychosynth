@@ -29,7 +29,7 @@
 #include <sys/ioctl.h>
 #include <unistd.h>
 
-#include "common/Logger.h"
+#include "common/logger.h"
 #include "output/OutputOss.h"
 
 using namespace std;
@@ -44,7 +44,7 @@ OutputOss::OutputOss() :
 {
 }
 
-OutputOss::OutputOss(const AudioInfo& info, const std::string& device) : 
+OutputOss::OutputOss(const audio_info& info, const std::string& device) : 
     Output(info),
     m_buf(NULL),
     m_device(device),
@@ -72,8 +72,8 @@ bool OutputOss::start()
 	m_thread.start();
 	return true;
     } else {
-	Logger::instance().log("oss", Log::ERROR,
-			       "Output thread already started or OSS subsystem not initialized.");
+	logger::instance() ("oss", log::ERROR,
+			    "Output thread already started or OSS subsystem not initialized.");
 	return false;
     }
 }
@@ -85,8 +85,8 @@ bool OutputOss::stop()
 	m_thread.join();
 	return true;
     } else {
-	Logger::instance().log("oss", Log::ERROR,
-			       "Output thread not running.");
+	logger::instance() ("oss", log::ERROR,
+			    "Output thread not running.");
 	return false;
     }
 }
@@ -95,7 +95,7 @@ bool OutputOss::open()
 {
     if (getState() == NOTINIT) {
 	if ((m_fd = ::open(m_device.c_str(), O_WRONLY, 0)) < 0) {
-	    Logger::instance().log("oss", Log::ERROR, "Could not open OSS device.");
+	    logger::instance() ("oss", log::ERROR, "Could not open OSS device.");
 	    return false;
 	}
 		
@@ -116,17 +116,17 @@ bool OutputOss::open()
 	setState(IDLE);
 	return true;
     } else {
-	Logger::instance().log("oss", Log::ERROR, "Device already initialized.");
+	logger::instance() ("oss", log::ERROR, "Device already initialized.");
 	return false;
     }
 }
 
-bool OutputOss::put(const AudioBuffer& in_buf, size_t nframes)
+bool OutputOss::put(const audio_buffer& in_buf, size_t nframes)
 {  
     bool ret = true;
 	
-    if (in_buf.getInfo().num_channels != getInfo().num_channels 
-	|| in_buf.getInfo().sample_rate != getInfo().sample_rate) {
+    if (in_buf.get_info().num_channels != getInfo().num_channels ||
+	in_buf.get_info().sample_rate != getInfo().sample_rate) {
 	/* TODO: Adapt the audio signal to fit our requeriments. */
 	return false;
     }
@@ -138,14 +138,14 @@ bool OutputOss::put(const AudioBuffer& in_buf, size_t nframes)
 	    if ((int)nframes < copyframes)
 		copyframes = nframes;
 			
-	    in_buf.interleaveS16(m_buf, copyframes);
+	    in_buf.interleave_s16(m_buf, copyframes);
 			
 	    write(m_fd, m_buf, copyframes * (getInfo().num_channels) * sizeof(short int));
 	    nframes -= copyframes;
 	}
 		
     } else {
-	Logger::instance().log("oss", Log::ERROR, "Cannot write to uninitialized device.");
+	logger::instance() ("oss", log::ERROR, "Cannot write to uninitialized device.");
 	ret = false;
     }
 	
@@ -163,7 +163,7 @@ bool OutputOss::close()
 	setState(NOTINIT);
 	return true;
     } else {
-	Logger::instance().log("oss", Log::ERROR, "Cannot close uninitialized device.");
+	logger::instance() ("oss", log::ERROR, "Cannot close uninitialized device.");
 	return false;
     }
 }

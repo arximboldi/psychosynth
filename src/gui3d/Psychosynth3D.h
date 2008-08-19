@@ -28,7 +28,7 @@
 #include <OgreCEGUIRenderer.h>
 
 #include <libpsynth/version.h>
-#include <libpsynth/common/Timer.h>
+#include <libpsynth/common/timer.h>
 #include <libpsynth/psynth/PsychosynthApp.h>
 #ifdef PSYNTH_HAVE_OSC
 #include <libpsynth/net/OSCClient.h>
@@ -63,7 +63,7 @@ class Psychosynth3D : public psynth::PsychosynthApp,
     ElementManager*   m_elemmgr;
     WindowList*       m_windowlist;
     CameraController* m_camctrl;
-    psynth::Timer m_timer;
+    psynth::timer m_timer;
 
 #ifdef PSYNTH_HAVE_OSC
     psynth::OSCClient* m_oscclient;
@@ -72,8 +72,8 @@ class Psychosynth3D : public psynth::PsychosynthApp,
     
     bool must_quit;
 
-    void setupSettings(psynth::ConfNode& conf);
-    void setupOgre(psynth::ConfNode& conf);
+    void setupSettings(psynth::conf_node& conf);
+    void setupOgre(psynth::conf_node& conf);
     void setupInput();
     void setupGui();
 #ifdef PSYNTH_HAVE_OSC
@@ -94,14 +94,14 @@ class Psychosynth3D : public psynth::PsychosynthApp,
     void printHelp();
     void printVersion();
 
-    bool onConfigChange(psynth::ConfNode& conf);
-    bool onFpsChange(psynth::ConfNode& conf);
+    bool onConfigChange(psynth::conf_node& conf);
+    bool onFpsChange(psynth::conf_node& conf);
 
 public:
     Psychosynth3D();
     ~Psychosynth3D();
 
-    void prepare(psynth::ArgParser& args);
+    void prepare(psynth::arg_parser& args);
     int execute();
        	
     bool frameStarted(const Ogre::FrameEvent& evt);

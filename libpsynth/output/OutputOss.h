@@ -26,12 +26,13 @@
 #include <pthread.h>
 
 #include <libpsynth/output/Output.h>
-#include <libpsynth/common/Thread.h>
+#include <libpsynth/common/thread.h>
 
 namespace psynth
 {
 
-class OutputOss : public Output, Runnable
+class OutputOss : public Output,
+		  public runnable
 {
     int m_fd;
     int m_format;
@@ -39,11 +40,11 @@ class OutputOss : public Output, Runnable
     short int* m_buf;
     std::string m_device;
 	
-    Thread m_thread;
+    thread m_thread;
     
 public:
     OutputOss();
-    OutputOss(const AudioInfo& info, const std::string& device);
+    OutputOss(const audio_info& info, const std::string& device);
     ~OutputOss();
 
     bool setDevice(const std::string& device) {
@@ -61,7 +62,7 @@ public:
     
     bool open();
     bool close();
-    bool put(const AudioBuffer& buf, size_t nframes);
+    bool put(const audio_buffer& buf, size_t nframes);
     void run();
     bool start();
     bool stop();

@@ -24,7 +24,7 @@
 #define TASKMANAGER_H
 
 #include <list>
-#include <libpsynth/common/Singleton.h>
+#include <libpsynth/common/singleton.h>
 
 class TaskManager;
 
@@ -81,9 +81,9 @@ public:
     virtual void update(int ms) = 0;
 };
 
-class TaskManager : public psynth::Singleton<TaskManager>
+class TaskManager : public psynth::singleton<TaskManager>
 {
-    friend class psynth::Singleton<TaskManager>;
+    friend class psynth::singleton<TaskManager>;
     
     typedef std::list<Task*> TaskList;
     typedef std::list<Task*>::iterator TaskIter;

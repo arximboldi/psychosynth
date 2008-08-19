@@ -21,7 +21,7 @@
  ***************************************************************************/
 
 #include "version.h"
-#include "common/Misc.h"
+#include "common/misc.h"
 #include "input/FileReaderAny.h"
 
 #ifdef PSYNTH_HAVE_PCM
@@ -40,7 +40,7 @@ namespace psynth
 void FileReaderAny::open(const char* file)
 {
     if (!isOpen()) {
-	const char* ext = getExtension(file);
+	const char* ext = get_extension(file);
 
 	m_the_reader = NULL;
 	if (0) {}

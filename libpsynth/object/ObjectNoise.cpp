@@ -27,7 +27,7 @@
 namespace psynth
 {
 
-ObjectNoise::ObjectNoise(const AudioInfo& prop,
+ObjectNoise::ObjectNoise(const audio_info& prop,
 			 int obj_type,
 			 const std::string& name,
 			 int n_audio_out,
@@ -57,17 +57,17 @@ ObjectNoise::~ObjectNoise()
 {
 }
 
-void ObjectNoise::updateNoise(Sample* buf)
+void ObjectNoise::updateNoise(sample* buf)
 {
-    const ControlBuffer* ampl_buf = getInput<ControlBuffer>(LINK_CONTROL, IN_C_AMPLITUDE);
-    const ControlBuffer* trig_buf = getInput<ControlBuffer>(LINK_CONTROL, IN_C_TRIGGER);
+    const sample_buffer* ampl_buf = getInput<sample_buffer>(LINK_CONTROL, IN_C_AMPLITUDE);
+    const sample_buffer* trig_buf = getInput<sample_buffer>(LINK_CONTROL, IN_C_TRIGGER);
     EnvelopeSimple mod_env = getInEnvelope(LINK_CONTROL, IN_C_AMPLITUDE);
     EnvelopeSimple trig_env =  getInEnvelope(LINK_CONTROL, IN_C_TRIGGER);
     
-    const Sample* ampl = ampl_buf ? ampl_buf->getData() : NULL;
+    const sample* ampl = ampl_buf ? ampl_buf->get_data() : NULL;
 
     int n_samp = getInfo().block_size;
-    Sample* out = buf;
+    sample* out = buf;
     if (m_param_type == NOISE_PINK)
 	if (ampl)
 	    while (n_samp--)
@@ -87,8 +87,8 @@ void ObjectNoise::updateNoise(Sample* buf)
     if (trig_buf) {
 	n_samp = getInfo().block_size;
 	out = buf;
-	const Sample* trig = trig_buf->getData();
-	trig_env = getInEnvelope(LINK_CONTROL, IN_C_TRIGGER);
+	const sample* trig = trig_buf->get_data();
+	trig_env = getInEnvelope (LINK_CONTROL, IN_C_TRIGGER);
 	while (n_samp--) {
 	    float env_val = trig_env.update();
 	    *out = *out * ((1.0f - env_val) + (env_val * *trig));
@@ -98,10 +98,10 @@ void ObjectNoise::updateNoise(Sample* buf)
     }
 }
 
-Sample ObjectNoise::updatePink()
+sample ObjectNoise::updatePink()
 {
-    Sample white;
-    Sample pink;
+    sample white;
+    sample pink;
     
     white = updateWhite() * 0.2;
 		
@@ -117,7 +117,7 @@ Sample ObjectNoise::updatePink()
     return pink;
 }
 
-Sample ObjectNoise::updateWhite()
+sample ObjectNoise::updateWhite()
 {
     return 1.0f - ((rand() % INT_MAX) / (float)INT_MAX * 2.0);
 }   

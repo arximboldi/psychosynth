@@ -25,7 +25,7 @@
 
 #include <cmath>
 
-#include <libpsynth/common/AudioBuffer.h>
+#include <libpsynth/common/audio_buffer.h>
 #include <libpsynth/object/WaveTable.h>
 
 namespace psynth
@@ -64,7 +64,7 @@ private:
     static WaveTable TABLE[WAVE_TYPES];
     static bool m_table_init;
 
-    AudioInfo m_info;
+    audio_info m_info;
     WaveType m_type;
     ModType m_mod;
     float m_x;
@@ -74,15 +74,15 @@ private:
 
     void initializeTables();
 
-    void updateFM(Sample* out_buf, const Sample* mod_buf,
+    void updateFM(sample* out_buf, const sample* mod_buf,
 		  EnvelopeSimple& mod_env, size_t n_frames);
-    void updateAM(Sample* out_buf, const Sample* mod_buf,
+    void updateAM(sample* out_buf, const sample* mod_buf,
 		  EnvelopeSimple& mod_env, size_t n_frames);
-    void updatePM(Sample* out_buf, const Sample* mod_buf,
+    void updatePM(sample* out_buf, const sample* mod_buf,
 		  EnvelopeSimple& mod_env, size_t n_frames);    
 
 public:
-    Oscillator(const AudioInfo& info,
+    Oscillator(const audio_info& info,
 	       float freq = 220.0f,
 	       float ampl = 1.0f,
 	       float phase = 0.0f,
@@ -104,15 +104,15 @@ public:
 	m_x = 0.0f;
     }
     
-    static Sample computeSine(float x) {
+    static sample computeSine(float x) {
 	return sin(x * 2 * M_PI);
     }
     
-    static Sample computeSquare(float x) {
+    static sample computeSquare(float x) {
 	return phase(x) > 0.5f ? -1.0 : 1.0;
     }
     
-    static Sample computeTriangle(float x) {
+    static sample computeTriangle(float x) {
 	float p = phase(x);
 	if(p <= 0.25f)
 	    return p * 4.0f;
@@ -121,25 +121,25 @@ public:
 	return p * 4.0f - 4.0f;
     }
     
-    static Sample computeSawtooth(float x) {
+    static sample computeSawtooth(float x) {
 	return -1.0f + phase(x) * 2.0f;
     }
     
-    static Sample computeMoogsaw(float x) {
+    static sample computeMoogsaw(float x) {
 	float p = phase(x);
 	if(p < 0.5f )
 	    return -1.0f + p * 4.0f;
 	return 1.0f - 2.0f * p;
     }
     
-    static Sample computeExp(float x) {
+    static sample computeExp(float x) {
 	float p = phase(x);
 	if(p > 0.5f)
 	    p = 1.0f - p;
 	return -1.0f + 8.0f * p * p;
     }
 
-    void setInfo(const AudioInfo& info) {
+    void setInfo(const audio_info& info) {
 	m_info = info;
     }
 
@@ -165,9 +165,9 @@ public:
 	m_wave_table = wave_table;
     }
 
-    void update(Sample* out_buf, size_t n_frames);
+    void update(sample* out_buf, size_t n_frames);
         
-    void update(Sample* out_buf, const Sample* mod_buf,
+    void update(sample* out_buf, const sample* mod_buf,
 		EnvelopeSimple& mod_env, size_t n_frames) {
 	switch(m_mod) {
 	case AM:
@@ -184,7 +184,7 @@ public:
 	}
     };
     
-    Sample computeSample(float x) {
+    sample computeSample(float x) {
 	if (m_wave_table)
 	    return TABLE[m_type].get(x);
 	else

@@ -23,7 +23,7 @@
 #include <iostream>
 
 #include "object/ObjParam.h"
-#include "common/Vector2D.h"
+#include "common/vector_2d.h"
 
 using namespace std;
 
@@ -45,7 +45,7 @@ void ObjParam::updateIn()
 	    *static_cast<std::string*>(m_dest) = *static_cast<std::string*>(m_src);
 	    break;
 	case VECTOR2F:
-	    *static_cast<Vector2f*>(m_dest) = *static_cast<Vector2f*>(m_src);
+	    *static_cast<vector_2f*>(m_dest) = *static_cast<vector_2f*>(m_src);
 	    break;
 	default: break;
 	};
@@ -68,7 +68,7 @@ void ObjParam::updateOut()
 	    *static_cast<std::string*>(m_src) = *static_cast<std::string*>(m_dest);
 	    break;
 	case VECTOR2F:
-	    *static_cast<Vector2f*>(m_src) = *static_cast<Vector2f*>(m_dest);
+	    *static_cast<vector_2f*>(m_src) = *static_cast<vector_2f*>(m_dest);
 	    break;
 	default: break;
     };
@@ -88,7 +88,7 @@ void ObjParam::clear()
 	delete static_cast<std::string*>(m_src);
 	break;
     case VECTOR2F:
-	delete static_cast<Vector2f*>(m_src);
+	delete static_cast<vector_2f*>(m_src);
 	break;
     default: break;
     }
@@ -131,8 +131,8 @@ void ObjParam::configure(int id, std::string name,
 	    *static_cast<string*>(m_src) = *static_cast<string*>(m_dest);
 	    break;
 	case VECTOR2F:
-	    m_src = new Vector2f;
-	    *static_cast<Vector2f*>(m_src) = *static_cast<Vector2f*>(m_dest);
+	    m_src = new vector_2f;
+	    *static_cast<vector_2f*>(m_src) = *static_cast<vector_2f*>(m_dest);
 	    break;
 	default: break;
 	}

@@ -27,7 +27,7 @@
 #include <map>
 #include <iostream>
 
-#include <libpsynth/common/AudioInfo.h>
+#include <libpsynth/common/audio_info.h>
 #include <libpsynth/table/Patcher.h>
 #include <libpsynth/object/Object.h>
 #include <libpsynth/object/ObjectOutput.h>
@@ -238,7 +238,7 @@ public:
 class Table : public TableSubject,
 	      public PatcherListener
 {    
-    AudioInfo m_info;
+    audio_info m_info;
     ObjectManager m_objmgr;
     Patcher* m_patcher;
     ObjectOutput* m_output;
@@ -256,16 +256,16 @@ public:
 	MIN_USER_ID = 1024
     };
     
-    Table(const AudioInfo& info);
+    Table(const audio_info& info);
     ~Table();
 
     void clear();
     
-    const AudioInfo& getInfo() const {
+    const audio_info& getInfo() const {
 	return m_info;
     };
 
-    void setInfo(const AudioInfo& info) {
+    void setInfo(const audio_info& info) {
 	if (m_info != info)
 	    m_objmgr.setInfo(info);
     }

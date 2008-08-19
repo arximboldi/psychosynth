@@ -48,31 +48,31 @@ nobase_libpsynthinc_HEADERS = \
 	psynth/OutputDirector.h \
 	psynth/FileManagerDirector.h \
 	psynth/PsychosynthApp.h \
-	common/ArgParser.h \
-	common/Deleter.h \
-	common/Error.h \
-	common/Singleton.h \
-	common/Thread.h \
-	common/Mutex.h \
-	common/AudioBuffer.h \
-	common/ControlBuffer.h\
+	common/arg_parser.h \
+	common/deleter.h \
+	common/error.h \
+	common/singleton.h \
+	common/thread.h \
+	common/mutex.h \
+	common/audio_buffer.h \
+	common/sample_buffer.h\
 	common/FastDelegate.h\
 	common/FastDelegateBind.h\
-	common/RingBuffer.h\
-	common/RingAudioBuffer.h \
-	common/RingControlBuffer.h \
-	common/AudioInfo.h \
-        common/MapIterator.h \
-	common/Misc.h \
-	common/Logger.h \
-	common/Config.h \
-	common/OptionConf.h \
-	common/Timer.h \
-	common/Vector2D.h\
-	common/Scaler.h\
-	common/FileFinder.h\
-	common/FileManager.h\
-	common/Tree.h\
+	common/ring_buffer.h\
+	common/ring_audio_buffer.h \
+	common/ring_sample_buffer.h \
+	common/audio_info.h \
+        common/map_iterator.h \
+	common/misc.h \
+	common/logger.h \
+	common/config.h \
+	common/option_conf.h \
+	common/timer.h \
+	common/vector_2d.h\
+	common/scaler.h\
+	common/file_finder.h\
+	common/file_manager.h\
+	common/tree.h\
 	table/Table.h \
 	table/Patcher.h\
 	table/PatcherDynamic.h \
@@ -116,20 +116,19 @@ libpsynth_la_SOURCES = \
 	psynth/Director.cpp \
 	psynth/PsychosynthApp.cpp \
 	psynth/FileManagerDirector.cpp \
-	common/ArgParser.cpp \
-	common/Error.cpp \
-	common/AudioBuffer.cpp \
-	common/ControlBuffer.cpp \
-	common/RingBuffer.cpp \
-	common/RingAudioBuffer.cpp \
-	common/RingControlBuffer.cpp \
-	common/Mutex.cpp \
-	common/Misc.cpp \
-	common/Logger.cpp \
-	common/Config.cpp \
-	common/Timer.cpp \
-	common/FileFinder.cpp\
-	common/FileManager.cpp\
+	common/arg_parser.cpp \
+	common/audio_buffer.cpp \
+	common/sample_buffer.cpp \
+	common/ring_buffer.cpp \
+	common/ring_audio_buffer.cpp \
+	common/ring_sample_buffer.cpp \
+	common/mutex.cpp \
+	common/misc.cpp \
+	common/logger.cpp \
+	common/config.cpp \
+	common/timer.cpp \
+	common/file_finder.cpp\
+	common/file_manager.cpp\
 	table/Table.cpp \
 	table/Patcher.cpp \
 	table/PatcherDynamic.cpp \
@@ -164,27 +163,27 @@ if HAVE_SAMPLERATE
 libpsynth_la_CXXFLAGS += $(SAMPLERATE_CFLAGS)
 libpsynth_la_LIBADD += $(SAMPLERATE_LIBS)
 libpsynth_la_SOURCES += \
-	common/ScalerSRC.cpp
+	common/scaler_src.cpp
 nobase_libpsynthinc_HEADERS += \
-	common/ScalerSRC.h
+	common/scaler_src.h
 endif
 
 if HAVE_SOUNDTOUCH
 libpsynth_la_CXXFLAGS += $(SOUNDTOUCH_CFLAGS)
 libpsynth_la_LIBADD += $(SOUNDTOUCH_LIBS)
 libpsynth_la_SOURCES += \
-	common/ScalerST.cpp
+	common/scaler_st.cpp
 nobase_libpsynthinc_HEADERS += \
-	common/ScalerST.h
+	common/scaler_st.h
 endif
 
 if HAVE_LIBXML
 libpsynth_la_CXXFLAGS += $(LIBXML_CFLAGS)
 libpsynth_la_LIBADD += $(LIBXML_LIBS)
 libpsynth_la_SOURCES += \
-	common/ConfBackendXML.cpp
+	common/conf_backend_xml.cpp
 nobase_libpsynthinc_HEADERS += \
-	common/ConfBackendXML.h
+	common/conf_backend_xml.h
 endif
 
 if HAVE_LIBLO

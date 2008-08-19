@@ -20,7 +20,7 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <libpsynth/common/Misc.h>
+#include <libpsynth/common/misc.h>
 #include "gui3d/ElemTogglerComponent.h"
 #include "gui3d/OgreMisc.h"
 

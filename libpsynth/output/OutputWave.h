@@ -38,8 +38,8 @@ class OutputWave : public Output
     std::string m_file_name;
     
 public:
-    OutputWave(const AudioInfo& info);
-    OutputWave(const AudioInfo& info, const std::string& fname);
+    OutputWave(const audio_info& info);
+    OutputWave(const audio_info& info, const std::string& fname);
 
     ~OutputWave();
 
@@ -49,7 +49,7 @@ public:
     
     bool open();
     bool close();
-    bool put(const AudioBuffer& buf, size_t nframes);
+    bool put(const audio_buffer& buf, size_t nframes);
     bool start();
     bool stop();
 };

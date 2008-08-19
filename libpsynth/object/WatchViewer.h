@@ -23,9 +23,9 @@
 #ifndef PSYNTH_WATCHVIEWER
 #define PSYNTH_WATCHVIEWER
 
-#include <libpsynth/common/Mutex.h>
-#include <libpsynth/common/RingAudioBuffer.h>
-#include <libpsynth/common/RingControlBuffer.h>
+#include <libpsynth/common/mutex.h>
+#include <libpsynth/common/ring_audio_buffer.h>
+#include <libpsynth/common/ring_sample_buffer.h>
 #include <libpsynth/object/Watch.h>
 
 namespace psynth
@@ -41,7 +41,7 @@ protected:
     float m_secs;
     float m_factor;
     bool m_updated;
-    Mutex m_lock;
+    mutex m_lock;
     
 public:
     WatchViewer(int points, float secs) :
@@ -56,14 +56,14 @@ public:
 	    m_buffer.zero();
 	}
     
-    virtual void setInfo(const AudioInfo& info) {
+    virtual void setInfo(const audio_info& info) {
 	m_factor = (float) info.sample_rate / ((float) m_points / m_secs);
 	m_ring.zero();
     }
 
     virtual void update(const BufferType& buf) {
 	m_lock.lock();
-	m_ring.writeFastResample(buf, m_factor);
+	m_ring.write_fast_resample(buf, m_factor);
 	//m_ring.write(buf);
 	m_updated = false;
 	m_lock.unlock();
@@ -72,7 +72,7 @@ public:
     const BufferType& getBuffer() {
 	if (!m_updated) {
 	    m_lock.lock();
-	    typename RingBufferType::ReadPtr ptr = m_ring.begin();
+	    typename RingBufferType::read_ptr ptr = m_ring.begin();
 	    m_ring.read(ptr, m_buffer);
 	    bool m_updated = true;
 	    m_lock.unlock();
@@ -81,19 +81,19 @@ public:
     }
 };
 
-typedef WatchViewer<ControlBuffer, RingControlBuffer> WatchViewControl;
+typedef WatchViewer<sample_buffer, ring_sample_buffer> WatchViewControl;
 
-class WatchViewAudio : public WatchViewer<AudioBuffer, RingAudioBuffer>
+class WatchViewAudio : public WatchViewer<audio_buffer, ring_audio_buffer>
 {
 public:
     WatchViewAudio(int points, float secs) :
-	WatchViewer<AudioBuffer,RingAudioBuffer>(points, secs) {}
+	WatchViewer<audio_buffer,ring_audio_buffer>(points, secs) {}
     
-    virtual void setInfo(const AudioInfo& newinfo) {
-	AudioInfo info = newinfo;
+    virtual void setInfo(const audio_info& newinfo) {
+	audio_info info = newinfo;
 	info.block_size = m_points;
-	m_ring.setAudioInfo(info);
-	m_buffer.setInfo(info);
+	m_ring.set_info   (info);
+	m_buffer.set_info (info);
 	m_ring.zero();
 	m_factor = (float) info.sample_rate / ((float) m_points / m_secs);
     }

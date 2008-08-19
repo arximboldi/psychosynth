@@ -44,7 +44,7 @@ private:
     void onInfoChange() {}
     
 public:
-    ObjectControlNoise(const AudioInfo& prop) :
+    ObjectControlNoise(const audio_info& prop) :
 	ObjectNoise(prop,
 			 OBJ_CONTROLNOISE,
 			 "control_noise",

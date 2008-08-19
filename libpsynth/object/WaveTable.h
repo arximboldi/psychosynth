@@ -24,8 +24,9 @@
 #define PSYNTH_WAVETABLE_H
 
 #include <cmath>
-#include <libpsynth/common/AudioBuffer.h>
-#include <libpsynth/common/Misc.h>
+
+#include <libpsynth/common/audio_buffer.h>
+#include <libpsynth/common/misc.h>
 
 namespace psynth
 {
@@ -33,10 +34,10 @@ namespace psynth
 class WaveTable
 {
 public:
-    typedef Sample(*wave_func_t)(float);
+    typedef sample(*wave_func_t)(float);
     
 private:
-    Sample* m_table;
+    sample* m_table;
     size_t m_size;
     
 public:
@@ -44,19 +45,19 @@ public:
 
     WaveTable(size_t size) :
 	m_size(size) {
-	m_table = new Sample[size];
+	m_table = new sample[size];
     }
 
     WaveTable(size_t size, wave_func_t func) :
 	m_size(size) {
-	m_table = new Sample[size];
+	m_table = new sample[size];
 	fill(func);
     }
     
     WaveTable(const WaveTable& wave) :
 	m_size(wave.m_size) {
-	m_table = new Sample[m_size];
-	memcpy(m_table, wave.m_table, sizeof(Sample) * m_size);
+	m_table = new sample[m_size];
+	memcpy(m_table, wave.m_table, sizeof(sample) * m_size);
     }
     
     ~WaveTable() {
@@ -68,20 +69,20 @@ public:
 	    if (wave.m_size != m_size) {
 		delete m_table;
 		m_size = wave.m_size;
-		m_table = new Sample[m_size];
+		m_table = new sample[m_size];
 	    }
 	    
-	    memcpy(m_table, wave.m_table, sizeof(Sample) * m_size);
+	    memcpy(m_table, wave.m_table, sizeof(sample) * m_size);
 	}
 	return *this;
     }
     
-    Sample get(float x) const {
+    sample get(float x) const {
 	float  findex = (m_size - 1) * phase(x);
 	size_t index  = findex;
 	float alpha = findex - index;
 	
-	Sample out = m_table[index];
+	sample out = m_table[index];
 	out += alpha * (m_table[index + 1 >= m_size ? 0 : index + 1] - out);
 
 	return out;
@@ -91,7 +92,7 @@ public:
 	if (m_size != new_size) {
 	    m_size = new_size;
 	    delete [] m_table;
-	    m_table = new Sample[new_size];
+	    m_table = new sample[new_size];
 	}
 	fill(func);
     }

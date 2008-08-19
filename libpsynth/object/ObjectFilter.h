@@ -88,7 +88,7 @@ private:
     void onInfoChange() {}
     
 public:
-    ObjectFilter(const AudioInfo& prop, int mode = FILTER_LOWPASS);
+    ObjectFilter(const audio_info& prop, int mode = FILTER_LOWPASS);
     ~ObjectFilter();
 };
 

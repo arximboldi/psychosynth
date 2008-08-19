@@ -47,7 +47,7 @@ public:
 	m_the_reader->seek(pos);
     }
     
-    virtual int read(AudioBuffer& buf, int n_samples) {
+    virtual int read(audio_buffer& buf, int n_samples) {
 	return m_the_reader->read(buf, n_samples);
     }
     

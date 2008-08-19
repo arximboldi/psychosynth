@@ -32,10 +32,10 @@ PSYNTH_DEFINE_OBJECT_FACTORY(ObjectLFO);
 
 void ObjectLFO::doUpdate(const Object* caller, int caller_port_type, int caller_port)
 {
-    ControlBuffer*       buf = getOutput<ControlBuffer>(LINK_CONTROL, OUT_C_OUTPUT);
-    Sample*       out = buf->getData();
+    sample_buffer* buf = getOutput<sample_buffer>(LINK_CONTROL, OUT_C_OUTPUT);
+    sample* out = buf->get_data();
 
-    updateOsc(out);
+    updateOsc (out);
 }
 
 } /* namespace psynth */

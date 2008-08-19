@@ -23,6 +23,7 @@
 #ifndef PSYNTH_OSCCLIENTLOGGER_H
 #define PSYNTH_OSCCLIENTLOGGER_H
 
+#include <libpsynth/common/logger.h>
 #include <libpsynth/net/OSCClient.h>
 
 namespace psynth
@@ -32,26 +33,26 @@ class OSCClientLogger : public OSCClientListener
 {
 public:
     virtual bool handleClientConnect(OSCClient* client) {
-	Logger::instance().log("oscclient", Log::INFO, "Connecting...");
+	logger::instance() ("oscclient", log::INFO, "Connecting...");
 	return false;
     }
     
     virtual bool handleClientDisconnect(OSCClient* client, OSCClientError err) {
 	switch(err) {
 	case CE_NONE:
-	    Logger::instance().log("oscclient", Log::INFO, "Disconnected.");
+	    logger::instance() ("oscclient", log::INFO, "Disconnected.");
 	    break;
 
 	case CE_PORT_BINDING:
-	    Logger::instance().log("oscclient", Log::ERROR, "Could not bind port.");
+	    logger::instance() ("oscclient", log::ERROR, "Could not bind port.");
 	    break;
 
 	case CE_SERVER_DROP:
-	    Logger::instance().log("oscclient", Log::ERROR, "Connection dropped by server.");
+	    logger::instance() ("oscclient", log::ERROR, "Connection dropped by server.");
 	    break;
 
 	case CE_SERVER_TIMEOUT:
-	    Logger::instance().log("oscclient", Log::ERROR, "Connection timeout");
+	    logger::instance() ("oscclient", log::ERROR, "Connection timeout");
 	    break;
 
 	default:
@@ -61,7 +62,7 @@ public:
     }
     
     virtual bool handleClientAccept(OSCClient* client) {
-	Logger::instance().log("oscclient", Log::INFO, "Accepted.");
+	logger::instance() ("oscclient", log::INFO, "Accepted.");
 	return false;
     }
 };

@@ -23,15 +23,15 @@
 #ifndef GUILOGSINK_H
 #define GUILOGSINK_H
 
-#include <libpsynth/common/Logger.h>
+#include <libpsynth/common/logger.h>
 #include <CEGUI/CEGUI.h>
 
-class GuiLogSink : public psynth::LogSink
+class GuiLogSink : public psynth::log_sink
 {
     CEGUI::Window* m_window;
     std::string m_buffer;
 
-    void dump(psynth::Log& log, int level, const std::string& msg);
+    void dump (psynth::log& l, int level, const std::string& msg);
     
 public:
     GuiLogSink(CEGUI::Window* win = NULL) :

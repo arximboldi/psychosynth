@@ -20,7 +20,7 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "common/Logger.h"
+#include "common/logger.h"
 #include "output/OutputWave.h"
 
 using namespace std;
@@ -28,13 +28,13 @@ using namespace std;
 namespace psynth
 {
 
-OutputWave::OutputWave(const AudioInfo& info) :
+OutputWave::OutputWave(const audio_info& info) :
     Output(info),
     m_file_name("")
 {
 }
 
-OutputWave::OutputWave(const AudioInfo& info, const std::string& fname) :
+OutputWave::OutputWave(const audio_info& info, const std::string& fname) :
     Output(info),
     m_file_name(fname)
 {
@@ -59,8 +59,8 @@ bool OutputWave::open()
 	m_file = sf_open (m_file_name.c_str(), SFM_WRITE, &sfinfo);
 
 	if (m_file == NULL) {
-	    Logger::instance().log("wave", Log::ERROR,
-				   string("Could not open file ") + m_file_name);
+	    logger::instance() ("wave", log::ERROR,
+				string("Could not open file ") + m_file_name);
 	    return false;
 	}
 	
@@ -81,12 +81,12 @@ bool OutputWave::close()
     return false;
 }
 
-bool OutputWave::put(const AudioBuffer& in_buf, size_t nframes)
+bool OutputWave::put(const audio_buffer& in_buf, size_t nframes)
 {
     bool ret = false;
     
     if (getState() != NOTINIT) {
-	float buf [nframes * in_buf.getInfo().num_channels];
+	float buf [nframes * in_buf.get_info().num_channels];
 
 	in_buf.interleave(buf, nframes);
 	sf_writef_float(m_file, buf, nframes);

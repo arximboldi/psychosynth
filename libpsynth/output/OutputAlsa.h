@@ -28,12 +28,13 @@
 #include <pthread.h>
 
 #include <libpsynth/output/Output.h>
-#include <libpsynth/common/Thread.h>
+#include <libpsynth/common/thread.h>
 
 namespace psynth
 {
 
-class OutputAlsa : public Output, Runnable
+class OutputAlsa : public Output,
+		   public runnable
 {
     snd_pcm_t *alsa_pcm;
     snd_pcm_hw_params_t *alsa_hwparams;
@@ -41,11 +42,11 @@ class OutputAlsa : public Output, Runnable
     snd_pcm_format_t alsa_format;
     short int* m_buf;
     std::string alsa_device;
-    Thread alsa_thread;
+    thread alsa_thread;
     
 public:
     OutputAlsa();
-    OutputAlsa(const AudioInfo& info, const std::string& device);
+    OutputAlsa(const audio_info& info, const std::string& device);
     ~OutputAlsa();
 
     bool setDevice(const std::string& device) {
@@ -64,7 +65,7 @@ public:
     void run();
     bool open();
     bool close();
-    bool put(const AudioBuffer& buf, size_t nframes);
+    bool put(const audio_buffer& buf, size_t nframes);
     bool start();
     bool stop();
 };

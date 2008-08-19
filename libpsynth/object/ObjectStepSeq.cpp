@@ -21,7 +21,7 @@
  ***************************************************************************/
 
 #include <algorithm>
-#include "common/Misc.h"
+#include "common/misc.h"
 #include "object/KnownObjects.h"
 #include "object/EnvelopeMulti.h"
 #include "object/ObjectStepSeq.h"
@@ -33,7 +33,7 @@ namespace psynth
 
 PSYNTH_DEFINE_OBJECT_FACTORY(ObjectStepSeq);
 
-ObjectStepSeq::ObjectStepSeq(const AudioInfo& info) :
+ObjectStepSeq::ObjectStepSeq(const audio_info& info) :
     Object(info,
 	   OBJ_STEPSEQ,
 	   "stepseq",
@@ -76,10 +76,10 @@ void ObjectStepSeq::doUpdate(const Object* caller,
 			     int caller_port_type,
 			     int caller_port)
 {
-    ControlBuffer* outbuf = getOutput<ControlBuffer>(LINK_CONTROL, OUT_C_OUTPUT);
-    Sample* output = outbuf->getData();
-    const ControlBuffer* bpmbuf = getInput<ControlBuffer>(LINK_CONTROL, IN_C_BPM);
-    const Sample* bpm = bpmbuf ? bpmbuf->getData() : 0;
+    sample_buffer* outbuf = getOutput<sample_buffer>(LINK_CONTROL, OUT_C_OUTPUT);
+    sample* output = outbuf->get_data();
+    const sample_buffer* bpmbuf = getInput<sample_buffer>(LINK_CONTROL, IN_C_BPM);
+    const sample* bpm = bpmbuf ? bpmbuf->get_data() : 0;
     int i;
 
     updateEnvelopeValues();
@@ -89,14 +89,14 @@ void ObjectStepSeq::doUpdate(const Object* caller,
 	    updateEnvelopeFactor(*bpm++);
 	*output++ = m_env.update();
 	
-	if (m_env.finished()) {
+	if (m_env.finished ()) {
 	    m_cur_step = (m_cur_step + 1) % m_param_num_steps;
 	    m_env.press();
 	    m_env.release();
 	    if (m_param_step[m_cur_step])
-		m_env.setValues(&m_hi_env_vals);
+		m_env.setValues (&m_hi_env_vals);
 	    else
-		m_env.setValues(&m_lo_env_vals);
+		m_env.setValues (&m_lo_env_vals);
 	}
     }
 

@@ -26,16 +26,16 @@
 namespace psynth
 {
 
-class ControlBuffer;
-class AudioBuffer;
-class AudioInfo;
+class sample_buffer;
+class audio_buffer;
+class audio_info;
 
 class Watch
 {
 public:
-    virtual void setInfo(const AudioInfo& info) {}
-    virtual void update(const ControlBuffer& buf) {}
-    virtual void update(const AudioBuffer& buf) {}
+    virtual void setInfo(const audio_info& info) {}
+    virtual void update(const sample_buffer& buf) {}
+    virtual void update(const audio_buffer& buf) {}
 };
 
 } /* namespace psynth */

@@ -35,7 +35,7 @@ class PsychosynthCli : public psynth::PsychosynthApp
     
     void printHelp();
     void printVersion();
-    void prepare(psynth::ArgParser& arg_parser);
+    void prepare(psynth::arg_parser& arg_parser);
     void init();
     
     int execute();

@@ -20,8 +20,8 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "common/Misc.h"
-#include "common/Logger.h"
+#include "common/misc.h"
+#include "common/logger.h"
 #include "output/OutputJack.h"
 
 using namespace std;
@@ -33,13 +33,13 @@ OutputJack::OutputJack()
 {
 }
 
-OutputJack::OutputJack(const AudioInfo& info) :
+OutputJack::OutputJack(const audio_info& info) :
     Output(info),
     m_out_ports(info.num_channels)
 {
 }
 
-OutputJack::OutputJack(const AudioInfo& info, const std::string& server_name) :
+OutputJack::OutputJack(const audio_info& info, const std::string& server_name) :
     Output(info),
     m_out_ports(info.num_channels),
     m_serv_name(server_name)
@@ -60,9 +60,9 @@ bool OutputJack::open()
 
 	m_client = jack_client_new(m_serv_name.c_str());
 	if (!m_client) {
-	    Logger::instance().log("jack", Log::ERROR,
-				   "Could not connect to jackd, maybe it's not running"
-				   "or the client name is duplicated.");
+	    logger::instance() ("jack", log::ERROR,
+				"Could not connect to jackd, maybe it's not running"
+				"or the client name is duplicated.");
 	    return false;
 	}
 
@@ -72,9 +72,9 @@ bool OutputJack::open()
 	
 	m_actual_rate = jack_get_sample_rate(m_client);
 	if (m_actual_rate != (size_t)getInfo().sample_rate) {
-	    Logger::instance().log("jack", Log::WARNING,
-				   "Jackd sample rate and application sample rate mismatch."
-				   "Better sound quality is achieved if both are the same.");
+	    logger::instance() ("jack", log::WARNING,
+				"Jackd sample rate and application sample rate mismatch."
+				"Better sound quality is achieved if both are the same.");
 	}
 
 	if (getInfo().num_channels != m_out_ports.size())
@@ -108,13 +108,13 @@ bool OutputJack::close()
     return true;
 }
 
-bool OutputJack::put(const AudioBuffer& in_buf, size_t nframes)
+bool OutputJack::put(const audio_buffer& in_buf, size_t nframes)
 {
-    if (in_buf.getInfo().num_channels != getInfo().num_channels 
-	|| in_buf.getInfo().sample_rate != getInfo().sample_rate) {
-	Logger::instance().log("jack", Log::WARNING,
-			       "Cant send data to the device:"
-			       "data and output system properties missmatch.");
+    if (in_buf.get_info().num_channels != getInfo().num_channels ||
+	in_buf.get_info().sample_rate != getInfo().sample_rate) {
+	logger::instance() ("jack", log::WARNING,
+			    "Cant send data to the device:"
+			    "data and output system properties missmatch.");
 	
 	return false;
     }
@@ -135,7 +135,7 @@ void OutputJack::connectPorts()
     ports = jack_get_ports(m_client, NULL, NULL, JackPortIsPhysical|JackPortIsInput);
 
     if (!ports) {
-	Logger::instance().log("jack", Log::WARNING, "There are no phisical output ports.");
+	logger::instance() ("jack", log::WARNING, "There are no phisical output ports.");
 	return;
     }
 

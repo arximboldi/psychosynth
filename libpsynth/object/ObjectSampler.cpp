@@ -21,11 +21,10 @@
  ***************************************************************************/
 
 #include "input/FileReaderAny.h"
-#include "common/RingAudioBuffer.h"
-#include "common/AudioBuffer.h"
-#include "common/Mutex.h"
-#include "common/Misc.h"
-#include "common/FileManager.h"
+#include "common/audio_buffer.h"
+#include "common/mutex.h"
+#include "common/misc.h"
+#include "common/file_manager.h"
 #include "object/KnownObjects.h"
 #include "object/ObjectSampler.h"
 
@@ -43,7 +42,7 @@ namespace psynth
 
 PSYNTH_DEFINE_OBJECT_FACTORY(ObjectSampler);
 
-ObjectSampler::ObjectSampler(const AudioInfo& info): 
+ObjectSampler::ObjectSampler(const audio_info& info): 
     Object(info,
 	   OBJ_SAMPLER,
 	   "sampler",
@@ -67,9 +66,9 @@ ObjectSampler::ObjectSampler(const AudioInfo& info):
     addParam("tempo", ObjParam::FLOAT, &m_param_tempo);
     addParam("pitch", ObjParam::FLOAT, &m_param_pitch);
 
-    m_scaler.setChannels(info.num_channels);
-    m_scaler.setRate(1.0);
-    m_scaler.setSampleRate(info.sample_rate);
+    m_scaler.set_channels (info.num_channels);
+    m_scaler.set_rate (1.0);
+    m_scaler.set_sample_rate (info.sample_rate);
 
     m_fetcher.start();
 }
@@ -85,7 +84,7 @@ void ObjectSampler::onFileChange(ObjParam& par)
     std::string path;
     par.get(val);
 
-    path = FileManager::instance().getPath("psychosynth/samples").find(val);
+    path = file_manager::instance().get_path("psychosynth/samples").find(val);
     
     m_update_lock.lock();
 
@@ -95,8 +94,8 @@ void ObjectSampler::onFileChange(ObjParam& par)
     m_fetcher.open(path.c_str());
 
     if (m_fetcher.isOpen()) {
-	m_inbuf.setInfo(m_fetcher.getInfo(), getInfo().block_size);
-	m_scaler.setChannels(m_fetcher.getInfo().num_channels);
+	m_inbuf.set_info (m_fetcher.getInfo(), getInfo().block_size);
+	m_scaler.set_channels (m_fetcher.getInfo().num_channels);
 	//m_scaler.setSampleRate(m_fetcher.getInfo().sample_rate);
     }
     
@@ -105,9 +104,9 @@ void ObjectSampler::onFileChange(ObjParam& par)
 
 void ObjectSampler::doUpdate(const Object* caller, int caller_port_type, int caller_port)
 {
-    AudioBuffer* out = getOutput<AudioBuffer>(Object::LINK_AUDIO, OUT_A_OUTPUT);
-    const ControlBuffer* trig = getInput<ControlBuffer>(Object::LINK_CONTROL, IN_C_TRIGGER);
-    const Sample* trig_buf = trig ? trig->getData() : 0;
+    audio_buffer* out = getOutput<audio_buffer>(Object::LINK_AUDIO, OUT_A_OUTPUT);
+    const sample_buffer* trig = getInput<sample_buffer>(Object::LINK_CONTROL, IN_C_TRIGGER);
+    const sample* trig_buf = trig ? trig->get_data() : 0;
     EnvelopeSimple trig_env =  getInEnvelope(LINK_CONTROL, IN_C_TRIGGER);
 
     /* Read the data. */
@@ -115,7 +114,7 @@ void ObjectSampler::doUpdate(const Object* caller, int caller_port_type, int cal
     size_t end = getInfo().block_size;
 
     if (m_fetcher.isOpen()) {
-	while(start < getInfo().block_size) {
+	while (start < getInfo().block_size) {
 	    if (m_restart) {
 		if (trig_buf && trig_buf[start] != 0.0f) {
 		    restart();
@@ -124,7 +123,7 @@ void ObjectSampler::doUpdate(const Object* caller, int caller_port_type, int cal
 	    }
 	
 	    if (trig)
-		end = trig->findHill(start);
+		end = trig->find_hill (start);
 
 	    read(*out, start, end);
 	
@@ -138,7 +137,7 @@ void ObjectSampler::doUpdate(const Object* caller, int caller_port_type, int cal
 	out->zero();
     
     /* Set amplitude. */
-    Sample* buf = out->getData()[0];
+    sample* buf = out->get_data()[0];
     int count = getInfo().block_size * getInfo().num_channels;
     while(count--)
 	*buf++ *= m_param_ampl;
@@ -146,9 +145,9 @@ void ObjectSampler::doUpdate(const Object* caller, int caller_port_type, int cal
     /* Apply trigger envelope. */
     if (trig_buf) {
 	for (int i = 0; i < getInfo().num_channels; ++i) {
-	    buf = out->getChannel(i);
+	    buf = out->get_channel(i);
 	    int n_samp = getInfo().block_size;
-	    trig_buf = trig->getData();
+	    trig_buf = trig->get_data();
 	    trig_env = getInEnvelope(LINK_CONTROL, IN_C_TRIGGER);
 
 	    while (n_samp--) {
@@ -168,10 +167,10 @@ void ObjectSampler::restart()
     m_scaler.clear();
 }
 
-void ObjectSampler::read(AudioBuffer& buf, int start, int end)
+void ObjectSampler::read(audio_buffer& buf, int start, int end)
 {
-    const ControlBuffer* rate = getInput<ControlBuffer>(Object::LINK_CONTROL, IN_C_RATE);
-    const Sample* rate_buf = rate ? rate->getData() : 0;
+    const sample_buffer* rate = getInput<sample_buffer>(Object::LINK_CONTROL, IN_C_RATE);
+    const sample* rate_buf = rate ? rate->get_data() : 0;
     
     float base_factor =
 	(float) m_fetcher.getInfo().sample_rate / getInfo().sample_rate * m_param_rate;
@@ -183,10 +182,10 @@ void ObjectSampler::read(AudioBuffer& buf, int start, int end)
     bool backwards = false;;
     bool high_latency = false;
     
-    m_update_lock.lock();
-    m_scaler.setTempo(m_param_tempo);
-    m_scaler.setPitch(m_param_pitch);
-    m_update_lock.unlock();
+    m_update_lock.lock ();
+    m_scaler.set_tempo (m_param_tempo);
+    m_scaler.set_pitch (m_param_pitch);
+    m_update_lock.unlock ();
 
     if (m_param_tempo != 1.0f ||
 	m_param_pitch != 1.0f)
@@ -226,10 +225,10 @@ void ObjectSampler::read(AudioBuffer& buf, int start, int end)
 
 	    int old_availible = m_scaler.availible();
 
-	    Sample inter_buffer[nread * m_inbuf.getInfo().num_channels];
+	    sample inter_buffer[nread * m_inbuf.get_info().num_channels];
 	    m_inbuf.interleave(inter_buffer, nread);
 
-	    m_scaler.setRate(factor);
+	    m_scaler.set_rate(factor);
 	    
 	    m_scaler.update(inter_buffer, nread);
 	}
@@ -239,11 +238,11 @@ void ObjectSampler::read(AudioBuffer& buf, int start, int end)
 	m_update_lock.unlock();
     }
 
-    Sample inter_buffer[(end - start) * m_inbuf.getInfo().num_channels];
+    sample inter_buffer[(end - start) * m_inbuf.get_info().num_channels];
     m_update_lock.lock();
     m_scaler.receive(inter_buffer, end - start);
     m_update_lock.unlock();
-    buf.deinterleave(inter_buffer, start, end, m_scaler.getChannels());
+    buf.deinterleave (inter_buffer, start, end, m_scaler.get_channels());
 }
 
 void ObjectSampler::doAdvance()
@@ -252,7 +251,7 @@ void ObjectSampler::doAdvance()
 
 void ObjectSampler::onInfoChange()
 {
-    m_scaler.setChannels(getInfo().num_channels);
+    m_scaler.set_channels (getInfo().num_channels);
 }
 
 } /* namespace psynth */

@@ -23,7 +23,7 @@
 #ifndef DEFAULTSELECTORPOPULATOR_H
 #define DEFAULTSELECTORPOPULATOR_H
 
-#include <libpsynth/common/Config.h>
+#include <libpsynth/common/config.h>
 #include "gui3d/SelectorWindow.h"
 
 class DefaultSelectorPopulator
@@ -32,7 +32,7 @@ class DefaultSelectorPopulator
 
     void populateSamples(SelectorWindow::Category* cat);
     
-    bool onSamplesConfNudge(psynth::ConfNode& conf);
+    bool onSamplesConfNudge(psynth::conf_node& conf);
 public:
     void populate(SelectorWindow* sel);
 };

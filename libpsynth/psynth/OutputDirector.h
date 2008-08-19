@@ -23,7 +23,7 @@
 #ifndef PSYNTH_OUTPUT_DIRECTOR_H
 #define PSYNTH_OUTPUT_DIRECTOR_H
 
-#include <libpsynth/common/Config.h>
+#include <libpsynth/common/config.h>
 
 namespace psynth
 {
@@ -32,14 +32,14 @@ class Output;
 
 class OutputDirector
 {
-    ConfNode* m_conf;
+    conf_node* m_conf;
     Output* m_output;
     
-    virtual Output* doStart(ConfNode& conf) = 0;
-    virtual void doStop(ConfNode& conf) = 0;
+    virtual Output* doStart (conf_node& conf) = 0;
+    virtual void doStop (conf_node& conf) = 0;
 
 public:
-    virtual void defaults(ConfNode& conf) = 0;
+    virtual void defaults (conf_node& conf) = 0;
     
     OutputDirector() :
 	m_conf(NULL),
@@ -48,7 +48,7 @@ public:
     
     virtual ~OutputDirector() {}
 
-    void start(ConfNode& conf) {
+    void start (conf_node& conf) {
 	m_conf = &conf;
 	m_output = doStart(conf);
     }

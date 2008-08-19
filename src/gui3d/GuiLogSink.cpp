@@ -25,11 +25,11 @@
 using namespace std;
 using namespace CEGUI;
 
-void GuiLogSink::dump(psynth::Log& log, int level, const string& msg)
+void GuiLogSink::dump (psynth::log& l, int level, const string& msg)
 {
     m_buffer += msg;
     m_buffer += "\n";
     if (m_window)
-	m_window->setText(m_buffer);
+	m_window->setText (m_buffer);
 }
 

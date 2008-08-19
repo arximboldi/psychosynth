@@ -29,7 +29,7 @@
 class T ## Factory : public ObjectFactory\
 {\
 public:\
-    Object* create(const AudioInfo& info)\
+    Object* create(const audio_info& info)\
     {\
         return new T (info);\
     }\
@@ -59,7 +59,7 @@ class ObjectFactory
 public:
 
     virtual const char* getName() = 0;
-    virtual Object* create(const AudioInfo& m_info) = 0;
+    virtual Object* create(const audio_info& m_info) = 0;
     virtual void destroy(Object*) = 0;
 };
 

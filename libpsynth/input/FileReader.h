@@ -23,8 +23,8 @@
 #ifndef PSYNTH_FILEREADER_H
 #define PSYNTH_FILEREADER_H
 
-#include <libpsynth/common/AudioInfo.h>
-#include <libpsynth/common/AudioBuffer.h>
+#include <libpsynth/common/audio_info.h>
+#include <libpsynth/common/audio_buffer.h>
 
 namespace psynth
 {
@@ -32,14 +32,14 @@ namespace psynth
 class FileReader
 {
     bool m_isopen;
-    AudioInfo m_info;
+    audio_info m_info;
     
 protected:
     void setIsOpen(bool isopen) {
 	m_isopen = isopen;
     };
 
-    void setInfo(const AudioInfo& info) {
+    void setInfo(const audio_info& info) {
 	m_info = info;
     }
     
@@ -54,16 +54,16 @@ public:
 	return m_isopen;
     }
 
-    const AudioInfo& getInfo() {
+    const audio_info& getInfo() {
 	return m_info;
     }
     
     virtual void open(const char* file) = 0;
     virtual void seek(size_t pos) = 0;
-    virtual int read(AudioBuffer& buf, int n_samples) = 0;
+    virtual int read(audio_buffer& buf, int n_samples) = 0;
     virtual void close() = 0;
     
-    int read(AudioBuffer& buf) {
+    int read(audio_buffer& buf) {
 	return read(buf, buf.size());
     }
 };

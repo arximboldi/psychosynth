@@ -56,26 +56,26 @@ public:
 protected:
     int m_numchan;
 
-    void mix(Sample* dest, const Sample* src, size_t n_samples);
+    void mix(sample* dest, const sample* src, size_t n_samples);
     
-    void mix(Sample* dest, const Sample* src,
-	     const Sample* ampl, size_t n_samples);
+    void mix(sample* dest, const sample* src,
+	     const sample* ampl, size_t n_samples);
 
-    void mix(Sample* dest, const Sample* src,
+    void mix(sample* dest, const sample* src,
 	     EnvelopeSimple& env, size_t n_samples);
 
-    void mix(Sample* dest, const Sample* src, const Sample* ampl,
+    void mix(sample* dest, const sample* src, const sample* ampl,
 	     EnvelopeSimple& env, EnvelopeSimple& ctrl_env,
 	     size_t n_samples);
     
-    void init(Sample* dest, size_t n_samples);
+    void init(sample* dest, size_t n_samples);
     
 private:
     float m_param_ampl;
     int m_param_mixop;    
     
 public:
-    ObjectMixer(const AudioInfo& info,
+    ObjectMixer(const audio_info& info,
 		int obj_type,
 		const std::string& name,
 		int num_audio_out,

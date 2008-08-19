@@ -94,7 +94,7 @@ ConnectionLine::~ConnectionLine()
 
 void ConnectionWave::build(const Ogre::Vector2& src,
 			   const Ogre::Vector2& dst,
-			   const Sample* samples, int n_samples)
+			   const sample* samples, int n_samples)
 {
     if (samples) {
 	int i;
@@ -147,7 +147,7 @@ ConnectionWave::ConnectionWave(const std::string& id,
 
 void ConnectionWave::update(const Ogre::Vector2& src,
 			    const Ogre::Vector2& dest,
-			    const Sample* samples, int n_samples)
+			    const sample* samples, int n_samples)
 {
     estimateVertexCount(2 * n_samples);
     beginUpdate(0);
@@ -165,7 +165,7 @@ Connection::Connection(Ogre::SceneManager* scene,
     m_scene(scene),
     m_link(ev)
 {
-    Vector2f v;
+    vector_2f v;
     
     ev.src.getParam(Object::PARAM_MUTE, m_is_muted);
   
@@ -224,7 +224,7 @@ Connection::~Connection()
 void Connection::handleSetParamObject(TableObject& obj, int id)
 {
     if (id == Object::PARAM_POSITION) {
-	Vector2f pos;
+	vector_2f pos;
 	obj.getParam(id, pos);
     
 	if (obj.getID() == m_link.src.getID()) {
@@ -276,12 +276,12 @@ bool Connection::pointerClicked(const Ogre::Vector2& pos, OIS::MouseButtonID id)
 
 void Connection::update()
 {
-    const Sample* buf;
+    const sample* buf;
 
     if (m_link.socket_type == Object::LINK_AUDIO)
-	buf = static_cast<WatchViewAudio*>(m_watch)->getBuffer().getData()[0];
+	buf = static_cast<WatchViewAudio*>(m_watch)->getBuffer().get_data()[0];
     else
-	buf = static_cast<WatchViewControl*>(m_watch)->getBuffer().getData();
+	buf = static_cast<WatchViewControl*>(m_watch)->getBuffer().get_data();
     
     //m_line->update(m_src, m_dest);
     m_wave->update(m_src, m_dest, buf, WAVE_POINTS);

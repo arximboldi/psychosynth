@@ -34,8 +34,8 @@ FileReaderFetcher::FileReaderFetcher(FileReader* reader,
     m_reader(reader),
     m_buffer_size(buffer_size),
     m_threshold(threshold),
-    m_tmp_buffer(AudioInfo(), m_threshold),
-    m_buffer(AudioInfo(), m_buffer_size),
+    m_tmp_buffer(audio_info(), m_threshold),
+    m_buffer(audio_info(), m_buffer_size),
     m_read_ptr(m_buffer.begin()),
     m_backwards(false),
     m_read_pos(0),
@@ -90,8 +90,8 @@ void FileReaderFetcher::open(const char* file)
     setInfo(m_reader->getInfo());
 
     if (m_reader->isOpen()) {
-	m_tmp_buffer.setInfo(getInfo(), m_threshold);
-	m_buffer.setAudioInfo(getInfo(), m_buffer_size);
+	m_tmp_buffer.set_info (getInfo(), m_threshold);
+	m_buffer.set_info     (getInfo(), m_buffer_size);
     }
     
     m_reader_lock.unlock();
@@ -119,7 +119,7 @@ void FileReaderFetcher::forceSeek(size_t pos)
     m_buffer_lock.unlock();
 }
 
-int FileReaderFetcher::read(AudioBuffer& buf, int n_samples)
+int FileReaderFetcher::read(audio_buffer& buf, int n_samples)
 {
     int n_read;
     

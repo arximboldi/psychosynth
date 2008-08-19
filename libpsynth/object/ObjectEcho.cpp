@@ -31,7 +31,7 @@ namespace psynth
 
 PSYNTH_DEFINE_OBJECT_FACTORY(ObjectEcho);
 
-ObjectEcho::ObjectEcho(const AudioInfo& prop) : 
+ObjectEcho::ObjectEcho(const audio_info& prop) : 
     Object(prop,
 	   OBJ_ECHO,
 	   "echo",
@@ -66,16 +66,17 @@ ObjectEcho::~ObjectEcho()
 
 int ObjectEcho::doUpdateChannel(int chan)
 {
-    const AudioBuffer* _input = getInput<AudioBuffer>(LINK_AUDIO, IN_A_INPUT);
-    const ControlBuffer* _delay = getInput<ControlBuffer>(LINK_CONTROL, IN_C_DELAY);
-    const ControlBuffer* _feedback = getInput<ControlBuffer>(LINK_CONTROL, IN_C_FEEDBACK);
-    AudioBuffer* _output = getOutput<AudioBuffer>(LINK_AUDIO, IN_A_INPUT);    
+    const audio_buffer* _input     = getInput<audio_buffer>(LINK_AUDIO, IN_A_INPUT);
+    const sample_buffer* _delay    = getInput<sample_buffer>(LINK_CONTROL, IN_C_DELAY);
+    const sample_buffer* _feedback = getInput<sample_buffer>(LINK_CONTROL, IN_C_FEEDBACK);
+    audio_buffer* _output          = getOutput<audio_buffer>(LINK_AUDIO, IN_A_INPUT);    
 
-    const Sample* in_buf = _input ? _input->getChannel(chan) : NULL;
-    const Sample* fb_buf = _feedback ? _feedback->getData() : NULL;
-    const Sample* del_buf = _delay ? _delay->getData() : NULL;
-    Sample* out_buf = _output->getChannel(chan);
-    Sample* tmp_buf = m_buffer.getChannel(chan);
+    const sample* in_buf  = _input    ? _input->get_channel(chan) : 0;
+    const sample* fb_buf  = _feedback ? _feedback->get_data()     : 0;
+    const sample* del_buf = _delay    ? _delay->get_data()        : 0;
+
+    sample* out_buf = _output->get_channel(chan);
+    sample* tmp_buf = m_buffer.get_channel(chan);
 
     EnvelopeSimple in_env = getInEnvelope(LINK_AUDIO, IN_A_INPUT);
     

@@ -25,11 +25,11 @@
 #include <config.h>
 
 #include <libpsynth/version.h>
-#include <libpsynth/common/Logger.h>
-#include <libpsynth/common/Misc.h>
-#include <libpsynth/common/OptionConf.h>
+#include <libpsynth/common/logger.h>
+#include <libpsynth/common/misc.h>
+#include <libpsynth/common/option_conf.h>
 #ifdef PSYNTH_HAVE_XML
-#include <libpsynth/common/ConfBackendXML.h>
+#include <libpsynth/common/conf_backend_xml.h>
 #endif
 
 #include "gui3d/Psychosynth3D.h"
@@ -96,61 +96,61 @@ void Psychosynth3D::printVersion()
     cout << "Psychosynth3D " << VERSION << endl;	
 }
 
-void Psychosynth3D::prepare(psynth::ArgParser& arg_parser)
+void Psychosynth3D::prepare(psynth::arg_parser& arg_parser)
 {
-    ConfNode& conf = Config::instance().getChild("psynth3d");
+    conf_node& conf = config::instance().get_child ("psynth3d");
     
-    arg_parser.add('W', "width", new OptionConf<int>(conf.getChild("screen_width")));
-    arg_parser.add('H', "height", new OptionConf<int>(conf.getChild("screen_height")));
-    arg_parser.add('f', "fullscreen", new OptionConfValue<int>(1, conf.getChild("fullscreen")));
-    arg_parser.add('w', "window", new OptionConfValue<int>(0, conf.getChild("fullscreen")));
-    arg_parser.add('F', "fps", new OptionConf<int>(conf.getChild("fps")));
+    arg_parser.add('W', "width", new option_conf<int>(conf.get_child ("screen_width")));
+    arg_parser.add('H', "height", new option_conf<int>(conf.get_child ("screen_height")));
+    arg_parser.add('f', "fullscreen", new option_conf_value<int>(1, conf.get_child ("fullscreen")));
+    arg_parser.add('w', "window", new option_conf_value<int>(0, conf.get_child ("fullscreen")));
+    arg_parser.add('F', "fps", new option_conf<int>(conf.get_child ("fps")));
 }
 
 int Psychosynth3D::execute()
 {
-    Logger::instance().log("gui", psynth::Log::INFO, "Loading settings.");
+    logger::instance() ("gui", psynth::log::INFO, "Loading settings.");
      
-    ConfNode& conf = Config::instance().getChild("psynth3d");
+    conf_node& conf = config::instance().get_child ("psynth3d");
     setupSettings(conf);
     
-    Logger::instance().log("gui", psynth::Log::INFO, "Initializing Ogre.");
+    logger::instance() ("gui", psynth::log::INFO, "Initializing Ogre.");
     setupOgre(conf);
-    Logger::instance().log("gui", psynth::Log::INFO, "Initializing OIS.");
+    logger::instance() ("gui", psynth::log::INFO, "Initializing OIS.");
     setupInput();
-    Logger::instance().log("gui", psynth::Log::INFO, "Initializing synthesizer.");
+    logger::instance() ("gui", psynth::log::INFO, "Initializing synthesizer.");
     setupSynth();
 #ifdef PSYNTH_HAVE_OSC
-    Logger::instance().log("gui", psynth::Log::INFO, "Initializing networking.");
+    logger::instance() ("gui", psynth::log::INFO, "Initializing networking.");
     setupNet();
 #endif
-    Logger::instance().log("gui", psynth::Log::INFO, "Initializing scene.");
+    logger::instance() ("gui", psynth::log::INFO, "Initializing scene.");
     setupTable();
-    Logger::instance().log("gui", psynth::Log::INFO, "Initializing CEGUI.");
+    logger::instance() ("gui", psynth::log::INFO, "Initializing CEGUI.");
     setupGui();
-    Logger::instance().log("gui", psynth::Log::INFO, "Initializing GUI elements.");
+    logger::instance() ("gui", psynth::log::INFO, "Initializing GUI elements.");
     setupMenus();
 		
     m_ogre->startRendering();
 
-    Logger::instance().log("gui", psynth::Log::INFO, "Closing GUI elements.");
+    logger::instance() ("gui", psynth::log::INFO, "Closing GUI elements.");
     closeMenus();
-    Logger::instance().log("gui", psynth::Log::INFO, "Closing CEGUI.");
+    logger::instance() ("gui", psynth::log::INFO, "Closing CEGUI.");
     closeGui();
 #ifdef PSYNTH_HAVE_OSC
-    Logger::instance().log("gui", psynth::Log::INFO, "Closing networking.");
+    logger::instance() ("gui", psynth::log::INFO, "Closing networking.");
     closeNet();
 #endif
-    Logger::instance().log("gui", psynth::Log::INFO, "Closing scene.");
+    logger::instance() ("gui", psynth::log::INFO, "Closing scene.");
     closeTable();
-    Logger::instance().log("gui", psynth::Log::INFO, "Closing synthesizer.");
+    logger::instance() ("gui", psynth::log::INFO, "Closing synthesizer.");
     closeSynth();
-    Logger::instance().log("gui", psynth::Log::INFO, "Closing OIS.");
+    logger::instance() ("gui", psynth::log::INFO, "Closing OIS.");
     closeInput();
-    Logger::instance().log("gui", psynth::Log::INFO, "Closing Ogre.");
+    logger::instance() ("gui", psynth::log::INFO, "Closing Ogre.");
     closeOgre();
 
-    Logger::instance().log("gui", psynth::Log::INFO, "Storing settings.");
+    logger::instance() ("gui", psynth::log::INFO, "Storing settings.");
     conf.save();
     
     return 0;
@@ -158,50 +158,50 @@ int Psychosynth3D::execute()
 
 bool Psychosynth3D::frameStarted(const Ogre::FrameEvent& evt)
 {
-    m_timer.update();
-    m_inputmgr->capture();
-    m_taskmgr->update(m_timer.deltaticks());
-    getTable()->update();
-    m_elemmgr->update();
+    m_timer.update ();
+    m_inputmgr->capture ();
+    m_taskmgr->update (m_timer.delta_ticks ());
+    getTable ()->update ();
+    m_elemmgr->update ();
 
 #ifdef PSYNTH_HAVE_OSC
-    while(m_oscclient->receive());
-    m_oscclient->update(m_timer.deltaticks());
+    while(m_oscclient->receive ());
+    m_oscclient->update (m_timer.delta_ticks ());
     while(m_oscserver->receive());
-    m_oscserver->update(m_timer.deltaticks());
+    m_oscserver->update (m_timer.delta_ticks());
 #endif
     
     return !must_quit;
 }
 
-void Psychosynth3D::setupSettings(ConfNode& conf)
+void Psychosynth3D::setupSettings(conf_node& conf)
 {
 #ifdef PSYNTH_HAVE_XML
-    conf.attachBackend(new ConfBackendXML(getConfigPath() + "psynth3d.xml"));
+    conf.attach_backend (new conf_backend_xml (getConfigPath() + "psynth3d.xml"));
 #endif
-    conf.defLoad();
+    conf.def_load();
 
-    conf.getChild("screen_width").def(DEFAULT_SCREEN_WIDTH);
-    conf.getChild("screen_height").def(DEFAULT_SCREEN_HEIGHT);
-    conf.getChild("fullscreen").def(DEFAULT_FULLSCREEN);
-    conf.getChild("fps").def(DEFAULT_FPS);
+    conf.get_child ("screen_width").def(DEFAULT_SCREEN_WIDTH);
+    conf.get_child ("screen_height").def(DEFAULT_SCREEN_HEIGHT);
+    conf.get_child ("fullscreen").def(DEFAULT_FULLSCREEN);
+    conf.get_child ("fps").def(DEFAULT_FPS);
 
     /* Is it dangerous to have this set before the gui is initialized? */
-    conf.addNudgeEvent(MakeDelegate(this, &Psychosynth3D::onConfigChange));
-    conf.getChild("fps").addChangeEvent(MakeDelegate(this, &Psychosynth3D::onFpsChange));
+    conf.add_nudge_event (MakeDelegate(this, &Psychosynth3D::onConfigChange));
+    conf.get_child ("fps").add_change_event (MakeDelegate(this, &Psychosynth3D::onFpsChange));
 }
 
-void Psychosynth3D::setupOgre(psynth::ConfNode& conf)
+void Psychosynth3D::setupOgre(psynth::conf_node& conf)
 {
     int screen_width;
     int screen_height;
     int fullscreen;
     int fps;
 
-    conf.getChild("screen_width").get(screen_width);
-    conf.getChild("screen_height").get(screen_height);
-    conf.getChild("fullscreen").get(fullscreen);
-    conf.getChild("fps").get(fps);
+    conf.get_child ("screen_width").get(screen_width);
+    conf.get_child ("screen_height").get(screen_height);
+    conf.get_child ("fullscreen").get(fullscreen);
+    conf.get_child ("fps").get(fps);
     
     (new LogManager)->createLog(getConfigPath() + "/psynth3d_Ogre.log",
 				false, false, false);  
@@ -232,13 +232,13 @@ void Psychosynth3D::setupOgre(psynth::ConfNode& conf)
 	
     m_scene = m_ogre->createSceneManager(Ogre::ST_GENERIC, "main");
 
-    m_timer.forceFps(fps);
+    m_timer.force_fps(fps);
 }
 
 void Psychosynth3D::setupInput()
 {
     int fullscreen; /* I prefer not using the singleton here. */
-    Config::instance().getPath("psynth3d/fullscreen").get(fullscreen);
+    config::instance().get_path("psynth3d/fullscreen").get(fullscreen);
     
     OIS::ParamList pl;
     size_t window_hnd = 0;
@@ -400,8 +400,8 @@ void Psychosynth3D::setupMenus()
     m_windowlist->addWindow("ConfWindowButton.imageset",
 			    "ConfWindowButton.layout",
 			    "Configure the program settings.",
-			    new ConfWindow(Config::instance().getChild("psynth3d"),
-					   Config::instance().getChild("psychosynth")),
+			    new ConfWindow(config::instance().get_child ("psynth3d"),
+					   config::instance().get_child ("psychosynth")),
 			    OIS::KC_UNASSIGNED);
     m_windowlist->addWindow("InfoWindowButton.imageset",
 			    "InfoWindowButton.layout",
@@ -454,19 +454,19 @@ void Psychosynth3D::closeOgre()
     delete m_ogre;
 }
 
-bool Psychosynth3D::onConfigChange(psynth::ConfNode& conf)
+bool Psychosynth3D::onConfigChange(psynth::conf_node& conf)
 {
     int sc_width;
     int sc_height;
     int sc_fullscreen;
     int fps;
 
-    conf.getChild("screen_width").get(sc_width);
-    conf.getChild("screen_height").get(sc_height);
-    conf.getChild("fullscreen").get(sc_fullscreen);
-    conf.getChild("fps").get(fps);
+    conf.get_child ("screen_width").get(sc_width);
+    conf.get_child ("screen_height").get(sc_height);
+    conf.get_child ("fullscreen").get(sc_fullscreen);
+    conf.get_child ("fps").get(fps);
 
-    m_timer.forceFps(fps);
+    m_timer.force_fps(fps);
     m_window->setFullscreen(sc_fullscreen,
 			    sc_width,
 			    sc_height);
@@ -475,12 +475,12 @@ bool Psychosynth3D::onConfigChange(psynth::ConfNode& conf)
     return true;
 }
 
-bool Psychosynth3D::onFpsChange(psynth::ConfNode& conf)
+bool Psychosynth3D::onFpsChange(psynth::conf_node& conf)
 {
     int fps;
     
     conf.get(fps);
-    m_timer.forceFps(fps);
+    m_timer.force_fps(fps);
 
     return true;
 }

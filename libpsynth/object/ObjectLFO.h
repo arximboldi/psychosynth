@@ -44,7 +44,7 @@ private:
     void onInfoChange() {}
     
 public:
-    ObjectLFO(const AudioInfo& prop) :
+    ObjectLFO(const audio_info& prop) :
 	ObjectOscillator(prop,
 			 OBJ_LFO,
 			 "lfo",

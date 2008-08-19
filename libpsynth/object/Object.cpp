@@ -21,7 +21,7 @@
  ***************************************************************************/
 
 #include <algorithm>
-#include "common/Deleter.h"
+#include "common/deleter.h"
 #include "object/Object.h"
 
 #include <cmath>
@@ -35,14 +35,14 @@ using namespace std;
 namespace psynth
 {
 
-Object::Object(const AudioInfo& info, int type,
+Object::Object(const audio_info& info, int type,
 	       const std::string& name,
 	       int n_in_audio, int n_in_control,
 	       int n_out_audio, int n_out_control,
 	       bool single_update) :
     m_audioinfo(info),
-    m_outdata_audio(n_out_audio, AudioBuffer(info)),
-    m_outdata_control(n_out_control, ControlBuffer(info.block_size)),
+    m_outdata_audio(n_out_audio, audio_buffer(info)),
+    m_outdata_control(n_out_control, sample_buffer (info.block_size)),
     m_nparam(0),
     m_id(OBJ_NULL_ID),
     m_type(type),
@@ -71,7 +71,7 @@ Object::Object(const AudioInfo& info, int type,
 
 Object::~Object()
 {
-    for_each(m_params.begin(), m_params.end(), Deleter<ObjParam*>());
+    for_each(m_params.begin(), m_params.end(), deleter<ObjParam*>());
 //    cout << "Deleting object.\n";
 }
 
@@ -217,12 +217,12 @@ void Object::InSocket::updateInput(const Object* caller, int caller_port_type, i
 	m_srcobj->update(caller, caller_port_type, caller_port);
 
 	if (m_type == LINK_AUDIO) {
-	    const AudioBuffer* buf = m_srcobj->getOutput<AudioBuffer>(m_type, m_srcport);
+	    const audio_buffer* buf = m_srcobj->getOutput<audio_buffer>(m_type, m_srcport);
 	    if (buf)
 		for (list<Watch*>::iterator it = m_watchs.begin(); it != m_watchs.end(); ++it)
 		    (*it)->update(*buf);
 	} else {
-	    const ControlBuffer* buf = m_srcobj->getOutput<ControlBuffer>(m_type, m_srcport);
+	    const sample_buffer* buf = m_srcobj->getOutput<sample_buffer>(m_type, m_srcport);
 	    if (buf)
 		for (list<Watch*>::iterator it = m_watchs.begin(); it != m_watchs.end(); ++it) {
 		    (*it)->update(*buf);
@@ -231,8 +231,8 @@ void Object::InSocket::updateInput(const Object* caller, int caller_port_type, i
     }
 }
 
-void Object::blendBuffer(Sample* buf, int n_elem,
-			 Sample stable_value, EnvelopeSimple env)
+void Object::blendBuffer(sample* buf, int n_elem,
+			 sample stable_value, EnvelopeSimple env)
 {
     while(n_elem--) {
 	float env_val = env.update();
@@ -258,7 +258,7 @@ void Object::updateEnvelopes()
 			m_out_stable_value[LINK_AUDIO][i], m_out_envelope);
     
     for (i = 0; i < m_outdata_control.size(); ++i)
-	blendBuffer(m_outdata_control[i].getData(), m_audioinfo.block_size,
+	blendBuffer(m_outdata_control[i].get_data (), m_audioinfo.block_size,
 		    m_out_stable_value[LINK_CONTROL][i], m_out_envelope);
 
     m_out_envelope.update(m_audioinfo.block_size);
@@ -328,12 +328,12 @@ void Object::update(const Object* caller, int caller_port_type, int caller_port)
     }
 }
 
-void Object::setInfo(const AudioInfo& info)
+void Object::setInfo(const audio_info& info)
 {
     int i;
     
     for (i = 0; i < m_outdata_audio.size(); ++i)
-	m_outdata_audio[i].setInfo(info);
+	m_outdata_audio[i].set_info(info);
 
     if (m_audioinfo.block_size != info.block_size)
 	for (i = 0; i < m_outdata_control.size(); ++i)

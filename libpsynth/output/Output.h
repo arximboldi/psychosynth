@@ -23,8 +23,8 @@
 #ifndef PSYNTH_OUTPUT_H
 #define PSYNTH_OUTPUT_H
 
-#include <libpsynth/common/AudioBuffer.h>
-#include <libpsynth/common/Error.h>
+#include <libpsynth/common/audio_buffer.h>
+#include <libpsynth/common/error.h>
 
 namespace psynth
 {
@@ -55,7 +55,7 @@ public:
     typedef void(*callback_t)(int,void*);
 
 private:
-    AudioInfo m_info;
+    audio_info m_info;
     State m_state;
 	
     void* m_cbdata;
@@ -81,7 +81,7 @@ protected:
     
 public:
     
-    Output(AudioInfo info = AudioInfo(), void (*callback)(int,void*) = NULL, void* data = NULL) :
+    Output(audio_info info = audio_info(), void (*callback)(int,void*) = NULL, void* data = NULL) :
 	m_info(info),
 	m_state(NOTINIT),
 	m_cbdata(data),
@@ -90,17 +90,17 @@ public:
 
     virtual bool open() = 0;
     virtual bool close()  = 0;
-    virtual bool put(const AudioBuffer& buf, size_t nframes) = 0;
+    virtual bool put(const audio_buffer& buf, size_t nframes) = 0;
     virtual bool start() = 0;
     virtual bool stop() = 0;
 
     virtual ~Output() {};
     
-    bool put(const AudioBuffer& buf) {
+    bool put(const audio_buffer& buf) {
 	return put(buf, buf.size());
     }
     
-    bool setInfo(const AudioInfo& info) {
+    bool setInfo(const audio_info& info) {
 	if (m_state == NOTINIT) {
 	    m_info = info;
 	    return true;
@@ -121,7 +121,7 @@ public:
 	}
     }
 	
-    const AudioInfo& getInfo() const {
+    const audio_info& getInfo() const {
 	return m_info;
     }
 

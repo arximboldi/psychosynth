@@ -48,7 +48,7 @@ private:
     void onInfoChange() {}
     
 public:  
-    ObjectControlMixer(const AudioInfo& prop, int n_chan = 2) :
+    ObjectControlMixer(const audio_info& prop, int n_chan = 2) :
 	ObjectMixer(prop,
 		    OBJ_CONTROLMIXER,
 		    "control_mixer",

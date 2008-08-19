@@ -23,23 +23,23 @@
 #ifndef PSYNTH_FILEMANAGERDIRECTOR_H
 #define PSYNTH_FILEMANAGERDIRECTOR_H
 
-#include <libpsynth/common/Config.h>
-#include <libpsynth/common/FileManager.h>
+#include <libpsynth/common/config.h>
+#include <libpsynth/common/file_manager.h>
 
 namespace psynth
 {
 
 class FileManagerDirector
 {
-    ConfNode* m_conf;
+    conf_node* m_conf;
     std::string m_home_path;
     
-    bool onConfNudge(ConfNode& node);
+    bool onConfNudge(conf_node& node);
     void registerConfig();
     void unregisterConfig();
     
 public:
-    void start(ConfNode& conf,
+    void start(conf_node& conf,
 	       const std::string& home_path);
     void stop();
     void defaults();

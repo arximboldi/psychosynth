@@ -24,15 +24,15 @@
 #define PSYNTH_FILEREADERFETCHER_H
 
 #include <libpsynth/input/FileReader.h>
-#include <libpsynth/common/Thread.h>
-#include <libpsynth/common/Mutex.h>
-#include <libpsynth/common/RingAudioBuffer.h>
+#include <libpsynth/common/thread.h>
+#include <libpsynth/common/mutex.h>
+#include <libpsynth/common/ring_audio_buffer.h>
 
 namespace psynth
 {
 
 class FileReaderFetcher : public FileReader,
-			  public SelfThread
+			  public self_thread
 {
     /* High default values for lower number of seeks when reading backwards. */
     static const int DEFAULT_BUFFER_SIZE = 16384;
@@ -41,9 +41,9 @@ class FileReaderFetcher : public FileReader,
     FileReader* m_reader;
     int m_buffer_size;
     int m_threshold;
-    AudioBuffer m_tmp_buffer;
-    RingAudioBuffer m_buffer;
-    RingAudioBuffer::ReadPtr m_read_ptr;
+    audio_buffer m_tmp_buffer;
+    ring_audio_buffer m_buffer;
+    ring_audio_buffer::read_ptr m_read_ptr;
 
     bool m_backwards;
     int m_read_pos;
@@ -51,9 +51,9 @@ class FileReaderFetcher : public FileReader,
 
     bool m_finished;
     
-    Mutex m_reader_lock;
-    Mutex m_buffer_lock;
-    Condition m_cond;
+    mutex m_reader_lock;
+    mutex m_buffer_lock;
+    condition m_cond;
 
     void run();
     
@@ -79,7 +79,7 @@ public:
     void open(const char* file);
     void seek(size_t pos);
     void forceSeek(size_t pos);
-    int read(AudioBuffer& buf, int n_samples);
+    int read(audio_buffer& buf, int n_samples);
     void close();
     void finish();
 };

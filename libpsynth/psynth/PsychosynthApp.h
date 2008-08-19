@@ -23,14 +23,15 @@
 #ifndef PSYNTH_PSYCHOSYNTHAPP_H
 #define PSYNTH_PSYCHOSYNTHAPP_H
 
-#include <libpsynth/common/Misc.h>
+#include <libpsynth/common/misc.h>
 #include <libpsynth/psynth/Director.h>
-#include <libpsynth/common/ArgParser.h>
 
 namespace psynth
 {
 
-class PsychosynthApp : public NoCopy
+  class arg_parser;
+  
+class PsychosynthApp : public no_copy
 {
 public:
     enum ErrCode {
@@ -47,7 +48,7 @@ public:
     std::string getConfigPath();
     std::string getDataPath();
     
-    virtual void prepare(ArgParser& args) {}
+    virtual void prepare(arg_parser& args) {}
     virtual int execute() { return ERR_GENERIC; }
 
     virtual void printHelp() {}

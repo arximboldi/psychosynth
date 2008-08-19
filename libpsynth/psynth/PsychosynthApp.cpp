@@ -25,10 +25,11 @@
 #include <libpsynth/version.h>
 #include <sys/stat.h>
 
-#include "common/Logger.h"
-#include "common/OptionConf.h"
+#include "common/logger.h"
+#include "common/arg_parser.h"
+#include "common/option_conf.h"
 #ifdef PSYNTH_HAVE_XML
-#include "common/ConfBackendXML.h"
+#include "common/conf_backend_xml.h"
 #endif
 #ifdef PSYNTH_HAVE_ALSA
 #include "psynth/OutputDirectorAlsa.h"
@@ -63,30 +64,30 @@ void PsychosynthApp::generatePaths()
 
 bool PsychosynthApp::parseArgs(int argc, const char* argv[])
 {
-    ArgParser arg_parser;
-    ConfNode& conf = Config::instance().getChild("psychosynth");
+    arg_parser ap;
+    conf_node& conf = config::instance().get_child ("psychosynth");
     bool show_help = false;
     bool show_version = false;
     
-    arg_parser.add('h', "help", &show_help);
-    arg_parser.add('v', "version", &show_version);
-    arg_parser.add('s', "sample-rate", new OptionConf<int>(conf.getChild("sample_rate")));
-    arg_parser.add('b', "buffer-size", new OptionConf<int>(conf.getChild("block_size")));
-    arg_parser.add('c', "channels", new OptionConf<int>(conf.getChild("num_channels")));
-    arg_parser.add('o', "output", new OptionConf<string>(conf.getChild("output")));
+    ap.add('h', "help", &show_help);
+    ap.add('v', "version", &show_version);
+    ap.add('s', "sample-rate", new option_conf<int>(conf.get_child ("sample_rate")));
+    ap.add('b', "buffer-size", new option_conf<int>(conf.get_child ("block_size")));
+    ap.add('c', "channels", new option_conf<int>(conf.get_child ("num_channels")));
+    ap.add('o', "output", new option_conf<string>(conf.get_child ("output")));
 
 #ifdef PSYNTH_HAVE_ALSA
-    arg_parser.add(0, "alsa-device", new OptionConf<string>(conf.getPath("alsa/out_device")));
+    ap.add(0, "alsa-device", new option_conf<string>(conf.get_path ("alsa/out_device")));
 #endif
 #ifdef PSYNTH_HAVE_OSS
-    arg_parser.add(0, "oss-device", new OptionConf<string>(conf.getPath("oss/out_device")));
+    ap.add(0, "oss-device", new option_conf<string>(conf.get_path ("oss/out_device")));
 #endif
 #ifdef PSYNTH_HAVE_JACK
-    arg_parser.add(0, "jack-server", new OptionConf<string>(conf.getPath("jack/server")));
+    ap.add(0, "jack-server", new option_conf<string>(conf.get_path ("jack/server")));
 #endif
 
-    prepare(arg_parser);
-    arg_parser.parse(argc, argv);
+    prepare(ap);
+    ap.parse(argc, argv);
 
     if (show_help) {
 	printHelp();
@@ -135,7 +136,7 @@ void PsychosynthApp::printBaseOptions(ostream& out)
 
 void PsychosynthApp::setupSynth()
 {
-    m_director.start(Config::instance().getChild("psychosynth"),
+    m_director.start(config::instance().get_child ("psychosynth"),
 		     getConfigPath());
 }
     
@@ -148,8 +149,8 @@ int PsychosynthApp::run(int argc, const char* argv[])
 {   
     int ret_val;
  
-    ConfNode& conf = Config::instance().getChild("psychosynth");
-    Logger::instance().attachSink(new LogDefaultSink);
+    conf_node& conf = config::instance().get_child ("psychosynth");
+    logger::instance().attach_sink (new log_default_sink);
 
     if (!parseArgs(argc, argv))
 	return ERR_GENERIC;
@@ -157,9 +158,9 @@ int PsychosynthApp::run(int argc, const char* argv[])
     generatePaths();
     
 #ifdef PSYNTH_HAVE_XML
-    conf.attachBackend(new ConfBackendXML(getConfigPath() + "psychosynth.xml"));
+    conf.attach_backend(new conf_backend_xml(getConfigPath() + "psychosynth.xml"));
 #endif
-    conf.defLoad();
+    conf.def_load();
 
 #ifdef PSYNTH_HAVE_ALSA
     m_director.attachOutputDirectorFactory(new OutputDirectorAlsaFactory);
@@ -174,7 +175,7 @@ int PsychosynthApp::run(int argc, const char* argv[])
     ret_val = execute();
 
     if (ret_val == SUCCESS)
-	conf.save();
+	conf.save ();
     
     return ret_val;
 }

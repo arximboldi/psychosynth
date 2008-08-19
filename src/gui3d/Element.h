@@ -102,7 +102,7 @@ class Element : public psynth::TableObjectListener
     ElementProperties m_gui_prop;
 
     void objectMoved(psynth::TableObject& pos,
-		     psynth::Vector2f& dest);
+		     psynth::vector_2f& dest);
 
 public:
     static const Ogre::Real RADIOUS = 1.0f;

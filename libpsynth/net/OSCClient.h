@@ -23,7 +23,6 @@
 #ifndef PSYNTH_OSCCLIENT_H
 #define PSYNTH_OSCCLIENT_H
 
-#include <libpsynth/common/Logger.h>
 #include <libpsynth/net/OSCController.h>
 
 #define PSYNTH_DEFAULT_CLIENT_PORT      8192

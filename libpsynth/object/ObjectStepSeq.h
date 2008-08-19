@@ -134,7 +134,7 @@ private:
     void updateEnvelopeValues();
     void updateEnvelopeFactor(float mod);
 public:
-    ObjectStepSeq(const AudioInfo& info);   
+    ObjectStepSeq(const audio_info& info);   
 };
 
 PSYNTH_DECLARE_OBJECT_FACTORY(ObjectStepSeq, "stepseq");

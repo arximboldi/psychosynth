@@ -31,7 +31,7 @@ namespace psynth
 
 PSYNTH_DEFINE_OBJECT_FACTORY(ObjectFilter);
 
-ObjectFilter::ObjectFilter(const AudioInfo& prop, int mode) : 
+ObjectFilter::ObjectFilter(const audio_info& prop, int mode) : 
     Object(prop,
 	   OBJ_FILTER,
 	   "filter",
@@ -63,9 +63,9 @@ ObjectFilter::~ObjectFilter()
 
 void ObjectFilter::doUpdate(const Object* caller, int caller_port_type, int caller_por)
 {
-    const AudioBuffer* input = getInput<AudioBuffer>(LINK_AUDIO, IN_A_INPUT);
-    const ControlBuffer* cutoff = getInput<ControlBuffer>(LINK_CONTROL, IN_C_CUTOFF);
-    AudioBuffer* output = getOutput<AudioBuffer>(LINK_AUDIO, IN_A_INPUT);    
+    const audio_buffer* input = getInput<audio_buffer>(LINK_AUDIO, IN_A_INPUT);
+    const sample_buffer* cutoff = getInput<sample_buffer>(LINK_CONTROL, IN_C_CUTOFF);
+    audio_buffer* output = getOutput<audio_buffer>(LINK_AUDIO, IN_A_INPUT);    
 
     if (input) {
 	if (m_param_type != m_filter_values.getType() ||
@@ -74,24 +74,27 @@ void ObjectFilter::doUpdate(const Object* caller, int caller_port_type, int call
 	    m_filter_values.calculate((FilterValues::Type)m_param_type,
 				      m_param_cutoff,
 				      m_param_resonance,
-				      getAudioInfo().sample_rate);
+				      getaudio_info().sample_rate);
 	
-	for (int i = 0; i < getAudioInfo().num_channels; ++i) {
-	    Sample* outbuf = output->getChannel(i);
-	    const Sample* inbuf = input->getChannel(i);
+	for (int i = 0; i < getaudio_info().num_channels; ++i) {
+	    sample* outbuf = output->get_channel(i);
+	    const sample* inbuf = input->get_channel(i);
 	    Filter& filter = m_filter[i];
 	    EnvelopeSimple env = getInEnvelope(LINK_AUDIO, IN_A_INPUT);
 	    if (!cutoff)
 		for (size_t j = 0; j < output->size(); ++j)
 		    *outbuf++ = filter.update(*inbuf++ * env.update());
 	    else {
-		EnvelopeSimple mod_env = getInEnvelope(LINK_CONTROL, IN_C_CUTOFF);
-		const Sample* cutoff_buf = cutoff->getData();
+		EnvelopeSimple mod_env = getInEnvelope(LINK_CONTROL,
+						       IN_C_CUTOFF);
+		const sample* cutoff_buf = cutoff->get_data();
 		
 		for (size_t j = 0; j < output->size(); ++j) {
 		    /* FIXME: Slow */
 		    m_filter_values.calculate(m_param_cutoff
-					      + *cutoff_buf++ * m_param_cutoff * mod_env.update());
+					      + *cutoff_buf++
+					      * m_param_cutoff
+					      * mod_env.update());
 		    *outbuf++ = filter.update(*inbuf++ * env.update());
 		}
 	    }

@@ -46,17 +46,17 @@ ObjectOutput::~ObjectOutput()
 
 void ObjectOutput::onInfoChange()
 {
-    m_buffer.setAudioInfo(getInfo());
+    m_buffer.set_info (getInfo());
     for (std::list<Slot*>::iterator i = m_slots.begin(); i != m_slots.end(); ++i)
-	(*i)->m_buf.setInfo(getInfo());
+	(*i)->m_buf.set_info(getInfo());
     
 }
 
 void ObjectOutput::doUpdate(const Object* caller, int caller_port_type, int caller_port)
 {
-    const AudioBuffer* in;
+    const audio_buffer* in;
     
-    if ((in = getInput<AudioBuffer>(LINK_AUDIO, IN_A_INPUT))) {
+    if ((in = getInput<audio_buffer>(LINK_AUDIO, IN_A_INPUT))) {
 	//m_buflock.writeLock();
 	m_buffer.write(*in);
 	//m_buflock.unlock();
@@ -69,12 +69,12 @@ void ObjectOutput::doUpdate(const Object* caller, int caller_port_type, int call
 	//m_passive_lock.unlock();
     } else {
 	//m_buflock.writeLock();
-	m_buffer.write(AudioBuffer(getAudioInfo()));
+	m_buffer.write(audio_buffer(getaudio_info()));
 	//m_buflock.unlock();
     }
 }
 
-ObjectOutput::ObjectOutput(const AudioInfo& info) :
+ObjectOutput::ObjectOutput(const audio_info& info) :
     Object(info,
 	   OBJ_OUTPUT,
 	   "name",

@@ -25,8 +25,8 @@
 
 #include <list>
 
-#include <libpsynth/common/RingAudioBuffer.h>
-#include <libpsynth/common/Mutex.h>
+#include <libpsynth/common/ring_audio_buffer.h>
+#include <libpsynth/common/mutex.h>
 #include <libpsynth/object/Object.h>
 #include <libpsynth/output/Output.h>
 #include <libpsynth/object/ObjectFactory.h>
@@ -39,16 +39,17 @@ class ObjectManager;
 class ObjectOutput : public Object
 {
     struct Slot {
-	RingAudioBuffer::ReadPtr m_ptr;
+	ring_audio_buffer::read_ptr m_ptr;
 	Output* m_out;
 	ObjectOutput* m_parent;
-	AudioBuffer m_buf;
+	audio_buffer m_buf;
 	
-	Slot(Output* out, ObjectOutput* parent, RingAudioBuffer::ReadPtr ptr, const AudioInfo& info) :
-	    m_ptr(ptr),
-	    m_out(out),
-	    m_parent(parent),
-	    m_buf(info) {
+	Slot(Output* out, ObjectOutput* parent,
+	     ring_audio_buffer::read_ptr ptr, const audio_info& info)
+	    : m_ptr(ptr)
+	    , m_out(out)
+	    , m_parent(parent)
+	    , m_buf(info) {
 	    out->setCallback(&ObjectOutput::outputCallback, this);
 	}
 		
@@ -57,7 +58,7 @@ class ObjectOutput : public Object
 	}
     };
 	
-    RingAudioBuffer m_buffer;
+    ring_audio_buffer m_buffer;
     
     ObjectManager* m_manager;
     std::list<Slot*> m_slots;
@@ -99,7 +100,7 @@ public:
 	N_PARAM
     };
 	
-    ObjectOutput(const AudioInfo& info);
+    ObjectOutput(const audio_info& info);
 
     ~ObjectOutput();
 	
@@ -113,7 +114,7 @@ public:
 	
     void attachOutput(Output* out) {
 	//m_buflock.readLock();
-	m_slots.push_back(new Slot(out, this, m_buffer.end(), getAudioInfo()));
+	m_slots.push_back(new Slot(out, this, m_buffer.end(), getaudio_info()));
 	//m_buflock.unlock();
     };
     

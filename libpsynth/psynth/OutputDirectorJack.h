@@ -39,7 +39,7 @@ class OutputDirectorJack : public OutputDirector
 	    stop();
     }
     
-    bool onServerChange(ConfNode& conf) {
+    bool onServerChange(conf_node& conf) {
 	std::string server;
 	Output::State old_state;
 	
@@ -53,11 +53,11 @@ class OutputDirectorJack : public OutputDirector
 	return false;
     }
   
-    virtual Output* doStart(ConfNode& conf) {
+    virtual Output* doStart(conf_node& conf) {
 	std::string server;
 
-     	conf.getChild("server").get(server);
-	conf.getChild("server").addChangeEvent(MakeDelegate(this, &OutputDirectorJack::onServerChange));
+     	conf.get_child ("server").get(server);
+	conf.get_child ("server").add_change_event(MakeDelegate(this, &OutputDirectorJack::onServerChange));
 	
 	m_output = new OutputJack;
 
@@ -66,16 +66,16 @@ class OutputDirectorJack : public OutputDirector
 	return m_output;
     };
 
-    virtual void doStop(ConfNode& conf) {
-	conf.getChild("server").deleteChangeEvent(MakeDelegate(this, &OutputDirectorJack::onServerChange));
+    virtual void doStop(conf_node& conf) {
+	conf.get_child ("server").delete_change_event(MakeDelegate(this, &OutputDirectorJack::onServerChange));
 	
 	delete m_output;
 	m_output = NULL;
     }
 
 public:
-    void defaults(ConfNode& conf) {
-	conf.getChild("server").def(DEFAULT_JACK_SERVER);
+    void defaults(conf_node& conf) {
+	conf.get_child ("server").def(DEFAULT_JACK_SERVER);
     }
 
     OutputDirectorJack() :

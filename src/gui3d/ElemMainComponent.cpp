@@ -21,7 +21,7 @@
  ***************************************************************************/
 
 #include "gui3d/ElemMainComponent.h"
-#include <libpsynth/common/Misc.h>
+#include <libpsynth/common/misc.h>
 
 #define INDICATOR_MIN_ANGLE 175
 #define INDICATOR_RANGE_ANGLE 170

@@ -27,8 +27,8 @@
 #include <dirent.h>
 
 #include <libpsynth/version.h>
-#include <libpsynth/common/Misc.h>
-#include <libpsynth/common/FileManager.h>
+#include <libpsynth/common/misc.h>
+#include <libpsynth/common/file_manager.h>
 #include <libpsynth/table/TableObjectCreator.h>
 
 #include <libpsynth/object/ObjectMixer.h>
@@ -45,7 +45,7 @@
 using namespace psynth;
 using namespace std;
 
-bool DefaultSelectorPopulator::onSamplesConfNudge(psynth::ConfNode& conf)
+bool DefaultSelectorPopulator::onSamplesConfNudge(psynth::conf_node& conf)
 {
     SelectorWindow::Category* cat = m_selector->findCategory("Samples");
 
@@ -75,9 +75,9 @@ void DefaultSelectorPopulator::populateSamples(SelectorWindow::Category* cat)
     valid_ext.push_back("ogg");
 #endif
     
-    FileManager::instance()
-	.getPath("psychosynth/samples")
-	.findIf(MakeHasExtension(valid_ext.begin(), valid_ext.end()), files);
+    file_manager::instance()
+	.get_path ("psychosynth/samples")
+	.find_if (make_has_extension(valid_ext.begin(), valid_ext.end()), files);
 
     for (list<string>::iterator it = files.begin();
 	 it != files.end(); ++it) {
@@ -89,9 +89,9 @@ void DefaultSelectorPopulator::populateSamples(SelectorWindow::Category* cat)
 void DefaultSelectorPopulator::populate(SelectorWindow* sel)
 {
     m_selector = sel;
-    Config::instance()
-	.getPath("psychosynth/file_manager/samples")
-	.addNudgeEvent(MakeDelegate(this, &DefaultSelectorPopulator::onSamplesConfNudge));
+    config::instance()
+	.get_path ("psychosynth/file_manager/samples")
+	.add_nudge_event (MakeDelegate(this, &DefaultSelectorPopulator::onSamplesConfNudge));
     
     SelectorWindow::Category* cat = NULL;
     TableObjectCreator creat;

@@ -127,14 +127,14 @@ void FilterValues::calculate()
 #define m_p m_coef->m_p
 #define m_k m_coef->m_k
 
-Sample Filter::update(Sample _in0)
+sample Filter::update(sample _in0)
 {
-    Sample out;
+    sample out;
 
     switch(m_coef->m_type)
     {
     case FilterValues::MOOG: {
-	Sample x = _in0 - m_r*m_y4;
+	sample x = _in0 - m_r*m_y4;
 
 	// four cascaded onepole filters
 	// (bilinear transform)

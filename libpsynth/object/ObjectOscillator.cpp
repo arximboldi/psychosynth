@@ -31,7 +31,7 @@ using namespace std;
 namespace psynth
 {
 
-ObjectOscillator::ObjectOscillator(const AudioInfo& prop,
+ObjectOscillator::ObjectOscillator(const audio_info& prop,
 				   int obj_type,
 				   const std::string& name,
 				   int n_audio_out,
@@ -70,14 +70,14 @@ void ObjectOscillator::updateOscParams()
     m_oscillator.setModulator((Oscillator::ModType)m_param_mod);
 }
 
-void ObjectOscillator::updateOsc(Sample* out)
+void ObjectOscillator::updateOsc(sample* out)
 {
-    const ControlBuffer* pitch_buf = getInput<ControlBuffer>(LINK_CONTROL, IN_C_FREQUENCY);
-    const ControlBuffer* trig_buf = getInput<ControlBuffer>(LINK_CONTROL, IN_C_TRIGGER);
+    const sample_buffer * pitch_buf = getInput<sample_buffer >(LINK_CONTROL, IN_C_FREQUENCY);
+    const sample_buffer * trig_buf = getInput<sample_buffer >(LINK_CONTROL, IN_C_TRIGGER);
     EnvelopeSimple mod_env = getInEnvelope(LINK_CONTROL, IN_C_FREQUENCY);
     EnvelopeSimple trig_env =  getInEnvelope(LINK_CONTROL, IN_C_TRIGGER);
     
-    const Sample* mod = pitch_buf ? pitch_buf->getData() : NULL;
+    const sample* mod = pitch_buf ? pitch_buf->get_data() : NULL;
 
     updateOscParams();
 
@@ -87,21 +87,21 @@ void ObjectOscillator::updateOsc(Sample* out)
 
     while(start < getInfo().block_size) {
 	if (m_restart) {
-	    if (trig_buf && trig_buf->getData()[start] != 0.0f)
-		m_oscillator.restart();
+	    if (trig_buf && trig_buf->get_data () [start] != 0.0f)
+		m_oscillator.restart ();
 	    m_restart = false;
 	}
 	
 	if (trig_buf)
-	    end = trig_buf->findHill(start);
+	    end = trig_buf->find_hill (start);
 	
 	if (mod) {
-	    m_oscillator.update(out + start, mod, mod_env, end - start);
+	    m_oscillator.update (out + start, mod, mod_env, end - start);
 	} else
-	    m_oscillator.update(out + start, end - start);
+	    m_oscillator.update (out + start, end - start);
 
 	float env_val = trig_env.update(end - start);
-	if (env_val == 1.0f && trig_buf && trig_buf->getData()[end - 1] == 0.0f)
+	if (env_val == 1.0f && trig_buf && trig_buf->get_data () [end - 1] == 0.0f)
 	    m_restart = true;
 	    
 	start = end;
@@ -110,7 +110,7 @@ void ObjectOscillator::updateOsc(Sample* out)
     /* Modulate amplitude with trigger envelope. */
     if (trig_buf) {
 	int n_samp = getInfo().block_size;
-	const Sample* trig = trig_buf->getData();
+	const sample* trig = trig_buf->get_data ();
 	trig_env = getInEnvelope(LINK_CONTROL, IN_C_TRIGGER);
 	while (n_samp--) {
 	    float env_val = trig_env.update();

@@ -68,11 +68,11 @@ bool PathConfWindow::onChange(const CEGUI::EventArgs &e)
 
 bool PathConfWindow::onApply(const CEGUI::EventArgs &e)
 {
-    m_conf.clearChilds();
+    m_conf.clear_childs();
 
     for (int i = 0; i < m_listbox->getItemCount(); ++i) {
 	string val = m_listbox->getItemFromIndex(i)->getText().c_str();
-	m_conf.getChild(string("path") + itoa(i, 10)).set(val);
+	m_conf.get_child(string("path") + itoa(i, 10)).set(val);
     }
     
     m_conf.nudge();
@@ -93,7 +93,7 @@ void PathConfWindow::populate()
     ItemEntry* item;
     std::string val;
     
-    for (ConfNode::ChildIter iter = m_conf.begin(); iter != m_conf.end(); ++iter) {
+    for (conf_node::iterator iter = m_conf.begin(); iter != m_conf.end(); ++iter) {
 	(*iter)->get(val);
 	item = static_cast<ItemEntry*>(wmgr.createWindow("TaharezLook/ListboxItem"));
 	item->setText(val);
@@ -170,7 +170,7 @@ CEGUI::FrameWindow* PathConfWindow::createWindow()
     return window;
 }
 
-Window* OutputConfWindowSimple::createWindow(psynth::ConfNode& node)
+Window* OutputConfWindowSimple::createWindow(psynth::conf_node& node)
 {
     m_node = &node;
     
@@ -190,10 +190,12 @@ Window* OutputConfWindowSimple::createWindow(psynth::ConfNode& node)
     label->setText(m_name);
 
     string str_val;
-    node.getPath(m_conf_path).get(str_val);
+    node.get_path(m_conf_path).get(str_val);
+
 /*
   cout << "new device val ("<< node.getPath(m_conf_path).getPathName() << ": " << str_val << endl;
 */
+
     m_value = static_cast<Editbox*>(wmgr.createWindow("TaharezLook/Editbox"));
     window->addChildWindow(m_value);
     m_value->setText(str_val);
@@ -210,7 +212,7 @@ void ConfWindow::startOutputConfWindow(const std::string& out)
 
     if (i != m_map.end()) {
 	m_out_win = i->second->createOutputConfWindow();
-	m_out_cegui_win = m_out_win->createWindow(m_psynth_conf.getChild(out));
+	m_out_cegui_win = m_out_win->createWindow(m_psynth_conf.get_child (out));
     }
 }
 
@@ -246,7 +248,7 @@ CEGUI::Window* ConfWindow::createAudioSettingsWindow()
     label->setText("Sample rate:");
 
     int int_val;
-    m_psynth_conf.getChild("sample_rate").get(int_val);
+    m_psynth_conf.get_child ("sample_rate").get(int_val);
     m_srate = static_cast<Editbox*>(wmgr.createWindow("TaharezLook/Editbox"));
     st->addChildWindow(m_srate);
     m_srate->setPosition(UVector2(UDim(0.5, 3), UDim(0, 6)));
@@ -262,7 +264,7 @@ CEGUI::Window* ConfWindow::createAudioSettingsWindow()
     label->setSize(UVector2(UDim(0.5, -9), UDim(0, 20)));
     label->setText("Buffer size:");
 
-    m_psynth_conf.getChild("block_size").get(int_val);
+    m_psynth_conf.get_child ("block_size").get(int_val);
     m_bufsize = static_cast<Editbox*>(wmgr.createWindow("TaharezLook/Editbox"));
     st->addChildWindow(m_bufsize);
     m_bufsize->setPosition(UVector2(UDim(0.5, 3), UDim(0, 30)));
@@ -278,7 +280,7 @@ CEGUI::Window* ConfWindow::createAudioSettingsWindow()
     label->setSize(UVector2(UDim(0.5, -9), UDim(0, 20)));
     label->setText("Channels:");
 
-    m_psynth_conf.getChild("num_channels").get(int_val);
+    m_psynth_conf.get_child ("num_channels").get(int_val);
     m_channels = static_cast<Editbox*>(wmgr.createWindow("TaharezLook/Editbox"));
     st->addChildWindow(m_channels);
     m_channels->setPosition(UVector2(UDim(0.5, 3), UDim(0, 54)));
@@ -302,7 +304,7 @@ CEGUI::Window* ConfWindow::createAudioSettingsWindow()
     label->setText("Output:");
 
     string str_val;
-    m_psynth_conf.getChild("output").get(str_val);
+    m_psynth_conf.get_child ("output").get(str_val);
     m_output = dynamic_cast<Combobox*>(wmgr.createWindow("TaharezLook/Combobox"));
     m_output->setPosition(UVector2(UDim(0.5, 3), UDim(0, 6)));
     m_output->setSize(UVector2(UDim(0.5, -9), UDim(0, 90)));
@@ -381,7 +383,7 @@ CEGUI::Window* ConfWindow::createVideoSettingsWindow()
     label->setText("Width:");
 
     int int_val;
-    m_gui_conf.getChild("screen_width").get(int_val);
+    m_gui_conf.get_child ("screen_width").get(int_val);
     m_sc_width = static_cast<Editbox*>(wmgr.createWindow("TaharezLook/Editbox"));
     st->addChildWindow(m_sc_width);
     m_sc_width->setPosition(UVector2(UDim(0, 6), UDim(0, 25)));
@@ -397,7 +399,7 @@ CEGUI::Window* ConfWindow::createVideoSettingsWindow()
     label->setSize(UVector2(UDim(0.5, -9), UDim(0, 20)));
     label->setText("Height:");
 
-    m_gui_conf.getChild("screen_height").get(int_val);
+    m_gui_conf.get_child ("screen_height").get(int_val);
     m_sc_height = static_cast<Editbox*>(wmgr.createWindow("TaharezLook/Editbox"));
     st->addChildWindow(m_sc_height);
     m_sc_height->setPosition(UVector2(UDim(0.5, 3), UDim(0, 25)));
@@ -405,7 +407,7 @@ CEGUI::Window* ConfWindow::createVideoSettingsWindow()
     m_sc_height->setValidationString("\\d*");
     m_sc_height->setText(itoa(int_val, 10));
 
-    m_gui_conf.getChild("fullscreen").get(int_val);
+    m_gui_conf.get_child ("fullscreen").get(int_val);
     m_fullscreen = static_cast<Checkbox*>(wmgr.createWindow("TaharezLook/Checkbox"));
     st->addChildWindow(m_fullscreen);
     m_fullscreen->setText("Fullscreen");
@@ -423,7 +425,7 @@ CEGUI::Window* ConfWindow::createVideoSettingsWindow()
     but->subscribeEvent(PushButton::EventClicked, 
 			Event::Subscriber(&ConfWindow::onWindowApplyPress, this));
 
-    m_gui_conf.getChild("fps").get(int_val);
+    m_gui_conf.get_child ("fps").get(int_val);
     m_fpslabel = wmgr.createWindow("TaharezLook/StaticText");
     window->addChildWindow(m_fpslabel);
     m_fpslabel->setProperty("FrameEnabled", "false");
@@ -498,7 +500,7 @@ bool ConfWindow::onGeneric(const CEGUI::EventArgs &e)
 bool ConfWindow::onOutputChange(const CEGUI::EventArgs &e)
 {
     string new_val = m_output->getText().c_str();
-    m_psynth_conf.getChild("output").set(new_val);
+    m_psynth_conf.get_child ("output").set(new_val);
 
     Window* st = NULL;
     if (m_out_cegui_win) {
@@ -526,10 +528,10 @@ bool ConfWindow::onAudioApplyPress(const CEGUI::EventArgs &e)
     int nc = atoi(m_channels->getText().c_str());
     string out = m_output->getText().c_str();
     
-    m_psynth_conf.getChild("sample_rate").set(sr);
-    m_psynth_conf.getChild("block_size").set(bs);
-    m_psynth_conf.getChild("num_channels").set(nc);
-    m_psynth_conf.getChild("output").set(out);
+    m_psynth_conf.get_child ("sample_rate").set(sr);
+    m_psynth_conf.get_child ("block_size").set(bs);
+    m_psynth_conf.get_child ("num_channels").set(nc);
+    m_psynth_conf.get_child ("output").set(out);
     if (m_out_win)
 	m_out_win->apply();
     
@@ -542,7 +544,7 @@ bool ConfWindow::onFpsChange(const CEGUI::EventArgs &e)
 {
     int val = m_fps->getScrollPosition() + 20;
     
-    m_gui_conf.getChild("fps").set(val);
+    m_gui_conf.get_child ("fps").set(val);
     m_fpslabel->setText(CEGUI::String("FPS: ") + itoa(val, 10));
     
     return true;
@@ -554,9 +556,9 @@ bool ConfWindow::onWindowApplyPress(const CEGUI::EventArgs &e)
     int sh = atoi(m_sc_height->getText().c_str());
     int fs = m_fullscreen->isSelected();
 
-    m_gui_conf.getChild("screen_width").set(sw);
-    m_gui_conf.getChild("screen_height").set(sh);
-    m_gui_conf.getChild("fullscreen").set(fs);
+    m_gui_conf.get_child ("screen_width").set(sw);
+    m_gui_conf.get_child ("screen_height").set(sh);
+    m_gui_conf.get_child ("fullscreen").set(fs);
 
     m_gui_conf.nudge();
     
@@ -586,9 +588,9 @@ CEGUI::FrameWindow* ConfWindow::createWindow()
     return window;
 }
 
-ConfWindow::ConfWindow(psynth::ConfNode& gui_conf,
-		       psynth::ConfNode& psynth_conf) :
-    m_samples_win(psynth_conf.getPath("file_manager/samples")),
+ConfWindow::ConfWindow(psynth::conf_node& gui_conf,
+		       psynth::conf_node& psynth_conf) :
+    m_samples_win(psynth_conf.get_path ("file_manager/samples")),
     m_gui_conf(gui_conf),
     m_psynth_conf(psynth_conf)
 {

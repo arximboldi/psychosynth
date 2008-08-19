@@ -28,10 +28,9 @@
 #include "gui3d/TheElements.h"
 #include "gui3d/QueryFlags.h"
 
-#include <libpsynth/common/Logger.h>
+#include <libpsynth/common/logger.h>
 
 #include <libpsynth/object/KnownObjects.h>
-
 
 using namespace std;
 using namespace Ogre;

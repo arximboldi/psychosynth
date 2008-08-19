@@ -31,7 +31,7 @@ namespace psynth
 
 PSYNTH_DEFINE_OBJECT_FACTORY(ObjectDelay);
 
-ObjectDelay::ObjectDelay(const AudioInfo& prop) : 
+ObjectDelay::ObjectDelay(const audio_info& prop) : 
     Object(prop,
 	   OBJ_DELAY,
 	   "delay",
@@ -64,16 +64,16 @@ ObjectDelay::~ObjectDelay()
 
 int ObjectDelay::doUpdateChannel(int chan)
 {
-    const AudioBuffer* _input = getInput<AudioBuffer>(LINK_AUDIO, IN_A_INPUT);
-    const ControlBuffer* _delay = getInput<ControlBuffer>(LINK_CONTROL, IN_C_DELAY);
-    const ControlBuffer* _depth = getInput<ControlBuffer>(LINK_CONTROL, IN_C_DEPTH);
-    AudioBuffer* _output = getOutput<AudioBuffer>(LINK_AUDIO, IN_A_INPUT);    
+    const audio_buffer* _input = getInput<audio_buffer>(LINK_AUDIO, IN_A_INPUT);
+    const sample_buffer* _delay = getInput<sample_buffer>(LINK_CONTROL, IN_C_DELAY);
+    const sample_buffer* _depth = getInput<sample_buffer>(LINK_CONTROL, IN_C_DEPTH);
+    audio_buffer* _output = getOutput<audio_buffer>(LINK_AUDIO, IN_A_INPUT);    
 
-    const Sample* in_buf = _input ? _input->getChannel(chan) : NULL;
-    const Sample* dep_buf = _depth ? _depth->getData() : NULL;
-    const Sample* del_buf = _delay ? _delay->getData() : NULL;
-    Sample* out_buf = _output->getChannel(chan);
-    Sample* tmp_buf = m_buffer.getChannel(chan);
+    const sample* in_buf = _input ? _input->get_channel(chan) : 0;
+    const sample* dep_buf = _depth ? _depth->get_data() : 0;
+    const sample* del_buf = _delay ? _delay->get_data() : 0;
+    sample* out_buf = _output->get_channel(chan);
+    sample* tmp_buf = m_buffer.get_channel(chan);
 
     EnvelopeSimple in_env = getInEnvelope(LINK_AUDIO, IN_A_INPUT);
     

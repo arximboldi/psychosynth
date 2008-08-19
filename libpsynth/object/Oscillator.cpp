@@ -44,7 +44,7 @@ void Oscillator::initializeTables()
     m_table_init = true;
 }
 
-void Oscillator::update(Sample* out_buf, size_t n_frames)
+void Oscillator::update(sample* out_buf, size_t n_frames)
 {
     float speed = m_freq / m_info.sample_rate;
     for (size_t i = 0; i < n_frames; ++i) {
@@ -55,7 +55,7 @@ void Oscillator::update(Sample* out_buf, size_t n_frames)
     m_x = phase(m_x);
 }
 
-void Oscillator::updateFM(Sample* out_buf, const Sample* mod_buf,
+void Oscillator::updateFM(sample* out_buf, const sample* mod_buf,
 			  EnvelopeSimple& mod_env, size_t n_frames)
 {
     for (size_t i = 0; i < n_frames; ++i) {
@@ -66,7 +66,7 @@ void Oscillator::updateFM(Sample* out_buf, const Sample* mod_buf,
     m_x = phase(m_x);
 }
 
-void Oscillator::updatePM(Sample* out_buf, const Sample* mod_buf,
+void Oscillator::updatePM(sample* out_buf, const sample* mod_buf,
 			  EnvelopeSimple& mod_env, size_t n_frames)
 {
     float speed = m_freq / m_info.sample_rate;
@@ -78,7 +78,7 @@ void Oscillator::updatePM(Sample* out_buf, const Sample* mod_buf,
     m_x = phase(m_x);
 }
 
-void Oscillator::updateAM(Sample* out_buf, const Sample* mod_buf,
+void Oscillator::updateAM(sample* out_buf, const sample* mod_buf,
 			  EnvelopeSimple& mod_env, size_t n_frames)
 {
     float speed = m_freq / m_info.sample_rate;
