@@ -20,58 +20,85 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef PSYNTH_PSYCHOSYNTHAPP_H
-#define PSYNTH_PSYCHOSYNTHAPP_H
+#ifndef PSYNTH_OUTPUT_DIRECTOR_ALSA_H
+#define PSYNTH_OUTPUT_DIRECTOR_ALSA_H
 
-#include <libpsynth/common/misc.h>
-#include <libpsynth/psynth/Director.h>
+#include <libpsynth/psynth/defaults_alsa.h>
+#include <libpsynth/psynth/output_director.h>
+#include <libpsynth/output/OutputAlsa.h>
 
 namespace psynth
 {
 
-  class arg_parser;
-  
-class PsychosynthApp : public no_copy
+class output_director_alsa : public output_director
+{
+    OutputAlsa* m_output;
+
+    ~output_director_alsa() {
+	if (m_output)
+	    stop();
+    }
+    
+    bool on_device_change (conf_node& conf) {
+	std::string device;
+	Output::State old_state;
+	
+	conf.get(device);
+	
+	old_state = m_output->getState();
+	m_output->gotoState(Output::NOTINIT);
+	m_output->setDevice(device);
+	m_output->gotoState(old_state);
+
+	return false;
+    }
+    
+    virtual Output* do_start (conf_node& conf) {
+	std::string device;
+	
+	conf.get_child ("out_device").get(device);
+	conf.get_child ("out_device").add_change_event(
+	    MakeDelegate(this, &output_director_alsa::on_device_change)
+	    );
+
+	m_output = new OutputAlsa;
+	m_output->setDevice(device);
+
+	return m_output;
+    };
+
+    virtual void do_stop (conf_node& conf) {
+	conf.get_child ("out_device").delete_change_event(
+	    MakeDelegate(this, &output_director_alsa::on_device_change)
+	    );
+	
+	if (m_output) {
+	    delete m_output;
+	    m_output = NULL;
+	}
+    }
+
+public:
+    void defaults (conf_node& conf) {
+	conf.get_child ("out_device").def(DEFAULT_ALSA_OUT_DEVICE);
+    }
+    
+    output_director_alsa () :
+	m_output(NULL) {}
+};
+
+class output_director_alsa_factory : public output_director_factory
 {
 public:
-    enum ErrCode {
-	ERR_GENERIC = -1,
-	SUCCESS = 0
-    };
+    virtual const char* get_name() {
+	return DEFAULT_ALSA_NAME;
+    }
     
-    Director m_director;
-    std::string m_cfg_dir;
-
-    void generatePaths();
-    bool parseArgs(int argc, const char* argv[]);
-    
-    std::string getConfigPath();
-    std::string getDataPath();
-    
-    virtual void prepare(arg_parser& args) {}
-    virtual int execute() { return ERR_GENERIC; }
-
-    virtual void printHelp() {}
-    virtual void printVersion() {}
-
-protected:
-    void printBaseOptions(std::ostream& out);
-    
-public:
-    Table* getTable() {
-	return m_director.getTable();
-    };
-    
-    Output* getOutput() {
-	return m_director.getOutput();
-    };
-    
-    int run(int argc, const char* argv[]);
-
-    void setupSynth();
-    void closeSynth();
+    virtual output_director* create_output_director() {
+	return new output_director_alsa;
+    }
 };
 
 } /* namespace psynth */
 
-#endif /* PSYNTH_PSYCHOSYNTHAPP_H */
+#endif /* PSYNTH_OUTPUT_DIRECTOR_ALSA_H */

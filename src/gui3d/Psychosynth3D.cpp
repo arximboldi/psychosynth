@@ -71,7 +71,7 @@ Psychosynth3D::~Psychosynth3D()
 {
 }
 
-void Psychosynth3D::printHelp()
+void Psychosynth3D::print_help ()
 {
     cout <<
 	"Psychosynth3D (c) 2007-2008 Juan Pedro Bolívar Puente\n"
@@ -80,7 +80,7 @@ void Psychosynth3D::printHelp()
 	"  psynth3d [options]\n"
 	"\n"
 	"Base options:\n";
-    printBaseOptions(cout);
+    print_base_options (cout);
     cout <<
 	"\n"
 	"GUI options:\n"
@@ -91,12 +91,12 @@ void Psychosynth3D::printHelp()
 	"  -F, --fps <value>     Set the frames per second to render.\n";
 }
 
-void Psychosynth3D::printVersion()
+void Psychosynth3D::print_version ()
 {
     cout << "Psychosynth3D " << VERSION << endl;	
 }
 
-void Psychosynth3D::prepare(psynth::arg_parser& arg_parser)
+void Psychosynth3D::prepare (psynth::arg_parser& arg_parser)
 {
     conf_node& conf = config::instance().get_child ("psynth3d");
     
@@ -119,7 +119,7 @@ int Psychosynth3D::execute()
     logger::instance() ("gui", psynth::log::INFO, "Initializing OIS.");
     setupInput();
     logger::instance() ("gui", psynth::log::INFO, "Initializing synthesizer.");
-    setupSynth();
+    setup_synth();
 #ifdef PSYNTH_HAVE_OSC
     logger::instance() ("gui", psynth::log::INFO, "Initializing networking.");
     setupNet();
@@ -144,7 +144,7 @@ int Psychosynth3D::execute()
     logger::instance() ("gui", psynth::log::INFO, "Closing scene.");
     closeTable();
     logger::instance() ("gui", psynth::log::INFO, "Closing synthesizer.");
-    closeSynth();
+    close_synth();
     logger::instance() ("gui", psynth::log::INFO, "Closing OIS.");
     closeInput();
     logger::instance() ("gui", psynth::log::INFO, "Closing Ogre.");
@@ -161,7 +161,7 @@ bool Psychosynth3D::frameStarted(const Ogre::FrameEvent& evt)
     m_timer.update ();
     m_inputmgr->capture ();
     m_taskmgr->update (m_timer.delta_ticks ());
-    getTable ()->update ();
+    get_table ()->update ();
     m_elemmgr->update ();
 
 #ifdef PSYNTH_HAVE_OSC
@@ -177,7 +177,7 @@ bool Psychosynth3D::frameStarted(const Ogre::FrameEvent& evt)
 void Psychosynth3D::setupSettings(conf_node& conf)
 {
 #ifdef PSYNTH_HAVE_XML
-    conf.attach_backend (new conf_backend_xml (getConfigPath() + "psynth3d.xml"));
+    conf.attach_backend (new conf_backend_xml (get_config_path() + "psynth3d.xml"));
 #endif
     conf.def_load();
 
@@ -203,17 +203,17 @@ void Psychosynth3D::setupOgre(psynth::conf_node& conf)
     conf.get_child ("fullscreen").get(fullscreen);
     conf.get_child ("fps").get(fps);
     
-    (new LogManager)->createLog(getConfigPath() + "/psynth3d_Ogre.log",
+    (new LogManager)->createLog(get_config_path() + "/psynth3d_Ogre.log",
 				false, false, false);  
-    m_ogre = new Root(getDataPath() + "/plugins.cfg",
-		      getDataPath() + "/ogre.cfg");
+    m_ogre = new Root(get_data_path() + "/plugins.cfg",
+		      get_data_path() + "/ogre.cfg");
         
     ResourceGroupManager& res_mgr = ResourceGroupManager::getSingleton();
-    res_mgr.addResourceLocation(getDataPath(), "FileSystem", "General");
-    res_mgr.addResourceLocation(getDataPath() + "/mesh", "FileSystem", "General");
-    res_mgr.addResourceLocation(getDataPath() + "/texture", "FileSystem", "General");
-    res_mgr.addResourceLocation(getDataPath() + "/material", "FileSystem", "General");
-    res_mgr.addResourceLocation(getDataPath() + "/gui", "FileSystem", "GUI");
+    res_mgr.addResourceLocation(get_data_path (), "FileSystem", "General");
+    res_mgr.addResourceLocation(get_data_path () + "/mesh", "FileSystem", "General");
+    res_mgr.addResourceLocation(get_data_path () + "/texture", "FileSystem", "General");
+    res_mgr.addResourceLocation(get_data_path () + "/material", "FileSystem", "General");
+    res_mgr.addResourceLocation(get_data_path () + "/gui", "FileSystem", "GUI");
 
     if (!m_ogre->restoreConfig() && !m_ogre->showConfigDialog())
 	m_ogre->setRenderSystem( *(m_ogre->getAvailableRenderers()->begin()) );
@@ -270,7 +270,7 @@ void Psychosynth3D::setupGui()
 
     m_gui = new CEGUI::System(m_ceguirender);
 
-    CEGUI::Logger::getSingleton().setLogFilename(getConfigPath() + "/psynth3d_CEGUI.log");
+    CEGUI::Logger::getSingleton().setLogFilename(get_config_path () + "/psynth3d_CEGUI.log");
     CEGUI::SchemeManager::getSingleton().loadScheme("TaharezLook.scheme");
     m_gui->setDefaultMouseCursor("TaharezLook", "MouseArrow");
     m_gui->setDefaultFont(CEGUI::FontManager::getSingleton().
@@ -295,8 +295,8 @@ void Psychosynth3D::setupNet()
     m_oscclient = new OSCClient();
     m_oscserver = new OSCServer();
 
-    m_oscclient->setTable(getTable());
-    m_oscserver->setTable(getTable());
+    m_oscclient->setTable (get_table());
+    m_oscserver->setTable (get_table());
 }
 #endif
 
@@ -357,7 +357,7 @@ void Psychosynth3D::setupTable()
     node->setPosition(Vector3(0,0.001,0));
 
     m_taskmgr = &TaskManager::instance();
-    m_elemmgr = new ElementManager(getTable(), m_scene, m_camera);
+    m_elemmgr = new ElementManager (get_table(), m_scene, m_camera);
     m_camctrl = new CameraControllerRasko(m_camera, m_taskmgr);
 
     m_inputmgr->addMouseListener(m_camctrl);
@@ -365,8 +365,8 @@ void Psychosynth3D::setupTable()
     m_inputmgr->addKeyListener(m_camctrl);
     m_inputmgr->addKeyListener(m_elemmgr);
 
-    getTable()->addTableListener(m_elemmgr);
-    getTable()->addTablePatcherListener(m_elemmgr);
+    get_table()->addTableListener(m_elemmgr);
+    get_table()->addTablePatcherListener(m_elemmgr);
 }
 
 void Psychosynth3D::setupMenus()
@@ -386,7 +386,7 @@ void Psychosynth3D::setupMenus()
     m_windowlist->addWindow("RecordWindowButton.imageset",
 			    "RecordWindowButton.layout",
 			    "Record the playing sound.",
-			    new RecordWindow(getTable()),
+			    new RecordWindow (get_table ()),
 			    OIS::KC_UNASSIGNED);
 #endif
 #ifdef PSYNTH_HAVE_OSC

@@ -29,7 +29,7 @@
 
 #include <libpsynth/version.h>
 #include <libpsynth/common/timer.h>
-#include <libpsynth/psynth/PsychosynthApp.h>
+#include <libpsynth/psynth/psynth_app.h>
 #ifdef PSYNTH_HAVE_OSC
 #include <libpsynth/net/OSCClient.h>
 #include <libpsynth/net/OSCServer.h>
@@ -43,7 +43,7 @@
 #include "gui3d/WindowList.h"
 #include "gui3d/CameraControllerRasko.h"
 
-class Psychosynth3D : public psynth::PsychosynthApp,
+class Psychosynth3D : public psynth::psynth_app,
 		      public Ogre::FrameListener
 {
     Ogre::Root*          m_ogre;
@@ -91,8 +91,8 @@ class Psychosynth3D : public psynth::PsychosynthApp,
     void closeInput();
     void closeOgre();
 
-    void printHelp();
-    void printVersion();
+    void print_help();
+    void print_version();
 
     bool onConfigChange(psynth::conf_node& conf);
     bool onFpsChange(psynth::conf_node& conf);
@@ -101,8 +101,8 @@ public:
     Psychosynth3D();
     ~Psychosynth3D();
 
-    void prepare(psynth::arg_parser& args);
-    int execute();
+    void prepare (psynth::arg_parser& args);
+    int execute ();
        	
     bool frameStarted(const Ogre::FrameEvent& evt);
 };

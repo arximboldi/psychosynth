@@ -37,7 +37,7 @@ using namespace psynth;
 
 #define TIME_OUT 20
 
-void PsychosynthCli::printHelp()
+void PsychosynthCli::print_help()
 {
     cout <<
 	"PsychosynthCli (c) 2007-2008 Juan Pedro Bolívar Puente\n"
@@ -46,7 +46,7 @@ void PsychosynthCli::printHelp()
 	"  psynth [options]\n"
 	"\n"
 	"Base options:\n";
-    printBaseOptions(cout);
+    print_base_options (cout);
     cout <<
 	"\n"
 	"OSC options:\n"
@@ -56,40 +56,40 @@ void PsychosynthCli::printHelp()
 	"  -P, --client-port     Use this client port instead of the default.\n";
 }
 
-void PsychosynthCli::printVersion()
+void PsychosynthCli::print_version()
 {
     cout << "PsychosynthCli " << VERSION << endl;
 }
 
-void PsychosynthCli::prepare(psynth::arg_parser& ap)
+void PsychosynthCli::prepare (psynth::arg_parser& ap)
 {
-    init();
+    init ();
     
-    ap.add('S', "server", &m_run_server);
-    ap.add('C', "client", &m_host);
-    ap.add('p', "port", &m_server_port);
-    ap.add('P', "client-port", &m_client_port);
+    ap.add ('S', "server", &m_run_server);
+    ap.add ('C', "client", &m_host);
+    ap.add ('p', "port", &m_server_port);
+    ap.add ('P', "client-port", &m_client_port);
 }
 
-int PsychosynthCli::execute()
+int PsychosynthCli::execute ()
 {
     int ret_val = -1;
     
     if (m_host.empty() && !m_run_server)
 	cout << "Not enough parameters. Use -h or --help." << endl;
     else {
-	setupSynth();
+	setup_synth ();
 	if (m_run_server)
 	    ret_val = runServer();
 	else if (!m_host.empty())
 	    ret_val = runClient();
-	closeSynth();
+	close_synth ();
     }
     
     return ret_val;
 }
 
-void PsychosynthCli::init()
+void PsychosynthCli::init ()
 {
     m_run_server = false;
     m_client_port = PSYNTH_DEFAULT_CLIENT_PORT_STR;
@@ -107,7 +107,7 @@ int PsychosynthCli::runClient()
     
     add = lo_address_new (m_host.c_str(), m_server_port.c_str());
 
-    client.setTable (getTable());
+    client.setTable (get_table());
     client.activate ();
     
     client.addListener (&logger);
@@ -120,7 +120,7 @@ int PsychosynthCli::runClient()
 	while (client.receive (TIME_OUT));
 	client.update (timer.delta_ticks());
 
-	getTable ()->update ();
+	get_table ()->update ();
 	
 	if (client.getState () == OSCClient::IDLE)
 	    ret_val = -1;
@@ -139,7 +139,7 @@ int PsychosynthCli::runServer()
     server.addListener(&logger);
     server.listen(m_server_port.c_str());
 
-    server.setTable(getTable());
+    server.setTable (get_table ());
     server.activate();
     
     timer.update();
@@ -149,7 +149,7 @@ int PsychosynthCli::runServer()
 	while (server.receive(TIME_OUT));
 	server.update (timer.delta_ticks ());
 
-	getTable()->update();
+	get_table ()->update ();
 	
 	if (server.getState() == OSCServer::IDLE)
 	    ret_val = -1;

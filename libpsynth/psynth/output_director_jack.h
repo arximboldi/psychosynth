@@ -23,23 +23,23 @@
 #ifndef PSYNTH_OUTPUT_DIRECTOR_JACK_H
 #define PSYNTH_OUTPUT_DIRECTOR_JACK_H
 
-#include <libpsynth/psynth/DefaultsJack.h>
-#include <libpsynth/psynth/OutputDirector.h>
+#include <libpsynth/psynth/defaults_jack.h>
+#include <libpsynth/psynth/output_director.h>
 #include <libpsynth/output/OutputJack.h>
 
 namespace psynth
 {
 
-class OutputDirectorJack : public OutputDirector
+class output_director_jack : public output_director
 {
     OutputJack* m_output;
 
-    ~OutputDirectorJack() {
+    ~output_director_jack() {
 	if (m_output)
 	    stop();
     }
     
-    bool onServerChange(conf_node& conf) {
+    bool on_server_change (conf_node& conf) {
 	std::string server;
 	Output::State old_state;
 	
@@ -53,11 +53,11 @@ class OutputDirectorJack : public OutputDirector
 	return false;
     }
   
-    virtual Output* doStart(conf_node& conf) {
+    virtual Output* do_start (conf_node& conf) {
 	std::string server;
 
      	conf.get_child ("server").get(server);
-	conf.get_child ("server").add_change_event(MakeDelegate(this, &OutputDirectorJack::onServerChange));
+	conf.get_child ("server").add_change_event(MakeDelegate(this, &output_director_jack::on_server_change));
 	
 	m_output = new OutputJack;
 
@@ -66,31 +66,31 @@ class OutputDirectorJack : public OutputDirector
 	return m_output;
     };
 
-    virtual void doStop(conf_node& conf) {
-	conf.get_child ("server").delete_change_event(MakeDelegate(this, &OutputDirectorJack::onServerChange));
+    virtual void do_stop (conf_node& conf) {
+	conf.get_child ("server").delete_change_event(MakeDelegate(this, &output_director_jack::on_server_change));
 	
 	delete m_output;
 	m_output = NULL;
     }
 
 public:
-    void defaults(conf_node& conf) {
+    void defaults (conf_node& conf) {
 	conf.get_child ("server").def(DEFAULT_JACK_SERVER);
     }
 
-    OutputDirectorJack() :
+    output_director_jack () :
 	m_output(NULL) {}
 };
 
-class OutputDirectorJackFactory : public OutputDirectorFactory
+class output_director_jack_factory : public output_director_factory
 {
 public:
-    virtual const char* getName() {
+    virtual const char* get_name () {
 	return DEFAULT_JACK_NAME;
     }
     
-    virtual OutputDirector* createOutputDirector() {
-	return new OutputDirectorJack;
+    virtual output_director* create_output_director () {
+	return new output_director_jack;
     }
 };
 

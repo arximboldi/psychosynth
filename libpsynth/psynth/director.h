@@ -20,78 +20,70 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef PSYNTH_OUTPUT_DIRECTOR_OSS_H
-#define PSYNTH_OUTPUT_DIRECTOR_OSS_H
+#ifndef PSYNTH_DIRECTOR_H
+#define PSYNTH_DIRECTOR_H
 
-#include <libpsynth/psynth/DefaultsOss.h>
-#include <libpsynth/psynth/OutputDirector.h>
-#include <libpsynth/output/OutputOss.h>
+#include <libpsynth/common/config.h>
+#include <libpsynth/common/misc.h>
+#include <libpsynth/table/Table.h>
+#include <libpsynth/psynth/output_director.h>
+#include <libpsynth/psynth/file_manager_director.h>
 
 namespace psynth
 {
 
-class OutputDirectorOss : public OutputDirector
+class director : public no_copy
 {
-    OutputOss* m_output;
+    typedef std::map<std::string, output_director_factory*> odf_map;
+    odf_map m_outdir;
 
-    ~OutputDirectorOss() {
+    std::string m_old_output;
+    file_manager_director m_filemgr;
+    output_director* m_output;
+    Table* m_table;
+
+    conf_node* m_config;
+    audio_info m_info;
+
+    bool on_config_nudge(conf_node& node);
+    
+#if 0
+    bool on_sample_rate_change(conf_node& node);
+    bool on_block_size_change(conf_node& node);
+    bool on_num_channels_change(conf_node& node);
+    bool on_output_change(conf_node& node);
+#endif
+    
+    void register_config();
+    void unregister_config();
+    
+    void start_output();
+    void stop_output();
+    void update_info();
+
+public:
+    director()
+	: m_output(NULL)
+	, m_table(NULL) {}
+
+    ~director();
+    
+    void attach_output_director_factory (output_director_factory* fact);
+    void start (conf_node& conf, const std::string& home_path);
+    void stop ();
+    
+    Table* get_table () {
+	return m_table;
+    }
+
+    Output* get_output() {
 	if (m_output)
-	    stop();
-    }
-    
-    bool onDeviceChange(conf_node& conf) {
-	std::string device;
-	Output::State old_state;
-	
-	conf.get(device);
-	
-	old_state = m_output->getState();
-	m_output->gotoState(Output::NOTINIT);
-	m_output->setDevice(device);
-	m_output->gotoState(old_state);
-
-	return false;
-    }
-    
-    virtual Output* doStart(conf_node& conf) {
-	std::string device;
-	
-	conf.get_child ("out_device").get(device);
-	conf.get_child ("out_device").add_change_event(MakeDelegate(this, &OutputDirectorOss::onDeviceChange));
-
-	m_output = new OutputOss;
-	m_output->setDevice(device);
-
-	return m_output;
-    };
-
-    virtual void doStop(conf_node& conf) {
-	conf.get_child ("out_device").delete_change_event(MakeDelegate(this, &OutputDirectorOss::onDeviceChange));
-	delete m_output;
-	m_output = NULL;
-    }
-
-public:
-    void defaults(conf_node& conf) {
-	conf.get_child ("out_device").def(DEFAULT_OSS_OUT_DEVICE);
-    }
-
-    OutputDirectorOss() :
-	m_output(NULL) {}
-};
-
-class OutputDirectorOssFactory : public OutputDirectorFactory
-{
-public:
-    virtual const char* getName() {
-	return DEFAULT_OSS_NAME;
-    }
-    
-    virtual OutputDirector* createOutputDirector() {
-	return new OutputDirectorOss;
+	    return m_output->get_output ();
+	return NULL;
     }
 };
 
 } /* namespace psynth */
 
-#endif /* PSYNTH_OUTPUT_DIRECTOR_OSS_H */
+#endif /* PSYNTH_DIRECTOR_H */
+

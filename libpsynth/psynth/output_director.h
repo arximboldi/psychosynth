@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) Juan Pedro Bolivar Puente 2008                          *
+ *   Copyright (C) Juan Pedro Bolivar Puente 2007, 2008                    *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -20,32 +20,57 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef PSYNTH_FILEMANAGERDIRECTOR_H
-#define PSYNTH_FILEMANAGERDIRECTOR_H
+#ifndef PSYNTH_OUTPUT_DIRECTOR_H
+#define PSYNTH_OUTPUT_DIRECTOR_H
 
 #include <libpsynth/common/config.h>
-#include <libpsynth/common/file_manager.h>
 
 namespace psynth
 {
 
-class FileManagerDirector
+class Output;
+
+class output_director
 {
     conf_node* m_conf;
-    std::string m_home_path;
+    Output* m_output;
     
-    bool onConfNudge(conf_node& node);
-    void registerConfig();
-    void unregisterConfig();
-    
+    virtual Output* do_start (conf_node& conf) = 0;
+    virtual void do_stop (conf_node& conf) = 0;
+
 public:
-    void start(conf_node& conf,
-	       const std::string& home_path);
-    void stop();
-    void defaults();
+    virtual void defaults (conf_node& conf) = 0;
+    
+    output_director ()
+	: m_conf(NULL)
+	, m_output(NULL)
+	{}
+    
+    virtual ~output_director () {}
+
+    void start (conf_node& conf) {
+	m_conf = &conf;
+	m_output = do_start (conf);
+    }
+
+    void stop () {
+	do_stop (*m_conf);
+	m_output = 0;
+    }
+    
+    Output* get_output() const {
+	return m_output;
+    }
+};
+
+class output_director_factory
+{
+public:
+    virtual ~output_director_factory () {}
+    virtual const char* get_name () = 0;
+    virtual output_director* create_output_director () = 0;
 };
 
 } /* namespace psynth */
 
-
-#endif /* PSYNTH_FILEMANAGERDIRECTOR_H */
+#endif /* PSYNTH_OUTPUT_DIRECTOR_H */

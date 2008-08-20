@@ -22,8 +22,8 @@
 
 #include <cstring>
 #include <algorithm>
-#include "psynth/Director.h"
-#include "psynth/Defaults.h"
+#include "psynth/director.h"
+#include "psynth/defaults.h"
 #include "table/PatcherDynamic.h"
 
 using namespace std;
@@ -31,22 +31,22 @@ using namespace std;
 namespace psynth
 {
 
-Director::~Director()
+director::~director ()
 {
-    for (ODFMap::iterator i = m_outdir.begin(); i != m_outdir.end(); ++i)
+    for (odf_map::iterator i = m_outdir.begin(); i != m_outdir.end(); ++i)
 	delete i->second;
 }
 
-void Director::attachOutputDirectorFactory(OutputDirectorFactory* fact)
+void director::attach_output_director_factory (output_director_factory* fact)
 {
-    m_outdir[fact->getName()] = fact;
+    m_outdir[ fact->get_name () ] = fact;
 }
 
-void Director::stopOutput()
+void director::stop_output ()
 {
     if (m_output) {
-	m_output->getOutput()->close();
-	m_table->detachOutput(m_output->getOutput());
+	m_output->get_output()->close();
+	m_table->detachOutput(m_output->get_output());
 	
 	m_output->stop();   
 	
@@ -55,22 +55,22 @@ void Director::stopOutput()
     }
 }
 
-void Director::startOutput()
+void director::start_output ()
 {
     std::string out_name;
 
     m_config->get_child ("output").get(out_name);
     
-    ODFMap::iterator i = m_outdir.find(out_name);
+    odf_map::iterator i = m_outdir.find(out_name);
     if (i != m_outdir.end()) {
-	m_output = i->second->createOutputDirector();
-	m_output->start(m_config->get_child (i->second->getName()));
+	m_output = i->second->create_output_director();
+	m_output->start(m_config->get_child (i->second->get_name()));
 
-	m_table->attachOutput(m_output->getOutput());
+	m_table->attachOutput(m_output->get_output());
 
-	m_output->getOutput()->setInfo(m_info);
-	m_output->getOutput()->open();
-	m_output->getOutput()->start();
+	m_output->get_output()->setInfo(m_info);
+	m_output->get_output()->open();
+	m_output->get_output()->start();
     } else {
 	m_config->get_child ("output").set(DEFAULT_OUTPUT);
     }
@@ -78,36 +78,36 @@ void Director::startOutput()
     m_old_output = out_name;
 }
 
-void Director::registerConfig()
+void director::register_config()
 {
     m_config->get_child ("sample_rate") .def(DEFAULT_SAMPLE_RATE);
     m_config->get_child ("block_size")  .def(DEFAULT_BLOCK_SIZE);
     m_config->get_child ("num_channels").def(DEFAULT_NUM_CHANNELS);
     m_config->get_child ("output")      .def(DEFAULT_OUTPUT);
 
-    m_config->add_nudge_event (MakeDelegate(this, &Director::onConfigNudge));
+    m_config->add_nudge_event (MakeDelegate(this, &director::on_config_nudge));
 
 #if 0
-    m_config->get_child ("sample_rate").addChangeEvent(MakeDelegate(this, &Director::onSampleRateChange));
-    m_config->get_child ("block_size").addChangeEvent(MakeDelegate(this, &Director::onBlockSizeChange));
-    m_config->get_child ("num_channels").addChangeEvent(MakeDelegate(this, &Director::onNumChannelsChange));
-    m_config->get_child ("output").addChangeEvent(MakeDelegate(this, &Director::onOutputChange));
+    m_config->get_child ("sample_rate").addChangeEvent(MakeDelegate(this, &director::on_sample_rate_change));
+    m_config->get_child ("block_size").addChangeEvent(MakeDelegate(this, &director::on_block_Size_change));
+    m_config->get_child ("num_channels").addChangeEvent(MakeDelegate(this, &director::on_num_channels_change));
+    m_config->get_child ("output").addChangeEvent(MakeDelegate(this, &director::on_output_change));
 #endif
 }
 
-void Director::unregisterConfig()
+void director::unregister_config()
 {
-    m_config->delete_nudge_event (MakeDelegate(this, &Director::onConfigNudge));
+    m_config->delete_nudge_event (MakeDelegate(this, &director::on_config_nudge));
 
 #if 0
-    m_config->get_child ("sample_rate").deleteChangeEvent(MakeDelegate(this, &Director::onSampleRateChange));
-    m_config->get_child ("block_size").deleteChangeEvent(MakeDelegate(this, &Director::onBlockSizeChange));
-    m_config->get_child ("num_channels").deleteChangeEvent(MakeDelegate(this, &Director::onNumChannelsChange));
-    m_config->get_child ("output").deleteChangeEvent(MakeDelegate(this, &Director::onOutputChange));    
+    m_config->get_child ("sample_rate").deleteChangeEvent(MakeDelegate(this, &director::on_sample_rate_change));
+    m_config->get_child ("block_size").deleteChangeEvent(MakeDelegate(this, &director::on_block_Size_change));
+    m_config->get_child ("num_channels").deleteChangeEvent(MakeDelegate(this, &director::on_num_channels_change));
+    m_config->get_child ("output").deleteChangeEvent(MakeDelegate(this, &director::on_output_change));    
 #endif
 }
 
-void Director::start (conf_node& conf, const std::string& home_path)
+void director::start (conf_node& conf, const std::string& home_path)
 {
     m_config = &conf;
 
@@ -115,13 +115,13 @@ void Director::start (conf_node& conf, const std::string& home_path)
 		    home_path);
     
     /* A bit dirty... */
-    for (ODFMap::iterator i = m_outdir.begin(); i != m_outdir.end(); ++i) {
-	OutputDirector* od = i->second->createOutputDirector();
+    for (odf_map::iterator i = m_outdir.begin(); i != m_outdir.end(); ++i) {
+	output_director* od = i->second->create_output_director();
 	od->defaults(m_config->get_child (i->first));
 	delete od;
     }
     
-    registerConfig();
+    register_config();
 
     conf.get_child ("sample_rate").get(m_info.sample_rate);
     conf.get_child ("num_channels").get(m_info.num_channels);
@@ -130,14 +130,14 @@ void Director::start (conf_node& conf, const std::string& home_path)
     m_table = new Table(m_info);
     m_table->attachPatcher(new PatcherDynamic); /* FIXME: */
     
-    startOutput();
+    start_output ();
 }
 
-void Director::stop()
+void director::stop()
 {
-    unregisterConfig();
+    unregister_config();
     
-    stopOutput();
+    stop_output ();
     delete m_table;
 
     m_filemgr.stop();
@@ -147,19 +147,19 @@ void Director::stop()
     m_config = NULL;
 }
 
-void Director::updateInfo()
+void director::update_info ()
 {
     m_table->setInfo(m_info);
 
     Output::State old_state;
-    old_state = m_output->getOutput()->getState();
+    old_state = m_output->get_output()->getState();
     
-    m_output->getOutput()->gotoState(Output::NOTINIT);
-    m_output->getOutput()->setInfo(m_info);
-    m_output->getOutput()->gotoState(old_state);
+    m_output->get_output()->gotoState(Output::NOTINIT);
+    m_output->get_output()->setInfo(m_info);
+    m_output->get_output()->gotoState(old_state);
 }
 
-bool Director::onConfigNudge(conf_node& node)
+bool director::on_config_nudge(conf_node& node)
 {
     string out;
     
@@ -172,48 +172,48 @@ bool Director::onConfigNudge(conf_node& node)
 
     if (m_output && out == m_old_output) {    
 	Output::State old_state;
-	old_state = m_output->getOutput()->getState();
-	m_output->getOutput()->gotoState(Output::NOTINIT);
-	m_output->getOutput()->setInfo(m_info);
-	m_output->getOutput()->gotoState(old_state);
+	old_state = m_output->get_output()->getState();
+	m_output->get_output()->gotoState(Output::NOTINIT);
+	m_output->get_output()->setInfo(m_info);
+	m_output->get_output()->gotoState(old_state);
     } else {
-	stopOutput();
-	startOutput();
+	stop_output ();
+	start_output ();
     }
     
     return false;
 }
 
 #if 0
-bool Director::onSampleRateChange(conf_node& node)
+bool director::on_sample_rate_change(conf_node& node)
 {
     cout << "SAMPLE_RATE_CHANGE!\n";
     node.get(m_info.sample_rate);
-    updateInfo();
+    update_info ();
     
     return false;
 }
 
-bool Director::onBlockSizeChange(conf_node& node)
+bool director::on_block_Size_change (conf_node& node)
 {
     node.get(m_info.block_size);
-    updateInfo();
+    update_info ();
     
     return false;
 }
 
-bool Director::onNumChannelsChange(conf_node& node)
+bool director::on_num_channels_change (conf_node& node)
 {
     node.get(m_info.num_channels);
-    updateInfo();
+    update_info ();
     
     return false;
 }
 
-bool Director::onOutputChange(conf_node& node)
+bool director::on_output_change (conf_node& node)
 {
-    stopOutput();
-    startOutput();
+    stop_output ();
+    start_output ();
     return false;
 }
 #endif

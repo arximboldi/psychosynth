@@ -32,23 +32,23 @@
 #include "common/conf_backend_xml.h"
 #endif
 #ifdef PSYNTH_HAVE_ALSA
-#include "psynth/OutputDirectorAlsa.h"
+#include "psynth/output_director_alsa.h"
 #endif
 #ifdef PSYNTH_HAVE_OSS
-#include "psynth/OutputDirectorOss.h"
+#include "psynth/output_director_oss.h"
 #endif
 #ifdef PSYNTH_HAVE_JACK
-#include "psynth/OutputDirectorJack.h"
+#include "psynth/output_director_jack.h"
 #endif
 
-#include "psynth/PsychosynthApp.h"
+#include "psynth/psynth_app.h"
 
 using namespace std;
 
 namespace psynth
 {
 
-void PsychosynthApp::generatePaths()
+void psynth_app::generate_paths ()
 {
 #ifdef WIN32
     m_cfg_dir = "./";
@@ -62,7 +62,7 @@ void PsychosynthApp::generatePaths()
 #endif
 }
 
-bool PsychosynthApp::parseArgs(int argc, const char* argv[])
+bool psynth_app::parse_args (int argc, const char* argv[])
 {
     arg_parser ap;
     conf_node& conf = config::instance().get_child ("psychosynth");
@@ -86,33 +86,33 @@ bool PsychosynthApp::parseArgs(int argc, const char* argv[])
     ap.add(0, "jack-server", new option_conf<string>(conf.get_path ("jack/server")));
 #endif
 
-    prepare(ap);
-    ap.parse(argc, argv);
+    prepare (ap);
+    ap.parse (argc, argv);
 
     if (show_help) {
-	printHelp();
+	print_help ();
 	return false;
     }
 
     if (show_version) {
-	printVersion();
+	print_version ();
 	return false;
     }
 
     return true;
 }
 
-std::string PsychosynthApp::getConfigPath()
+std::string psynth_app::get_config_path ()
 {
     return m_cfg_dir;
 }
 
-std::string PsychosynthApp::getDataPath()
+std::string psynth_app::get_data_path ()
 {
-    return string(PSYNTH_DATA_DIR) + "/";
+    return string (PSYNTH_DATA_DIR) + "/";
 }
 
-void PsychosynthApp::printBaseOptions(ostream& out)
+void psynth_app::print_base_options (ostream& out)
 {
     out <<
 	"  -h, --help                 Display this information.\n"
@@ -134,42 +134,42 @@ void PsychosynthApp::printBaseOptions(ostream& out)
 	;
 }
 
-void PsychosynthApp::setupSynth()
+void psynth_app::setup_synth()
 {
-    m_director.start(config::instance().get_child ("psychosynth"),
-		     getConfigPath());
+    m_director.start (config::instance ().get_child ("psychosynth"),
+		      get_config_path ());
 }
     
-void PsychosynthApp::closeSynth()
+void psynth_app::close_synth ()
 {
     m_director.stop();
 }
 
-int PsychosynthApp::run(int argc, const char* argv[])
+int psynth_app::run (int argc, const char* argv[])
 {   
     int ret_val;
  
     conf_node& conf = config::instance().get_child ("psychosynth");
     logger::instance().attach_sink (new log_default_sink);
 
-    if (!parseArgs(argc, argv))
+    if (!parse_args (argc, argv))
 	return ERR_GENERIC;
 
-    generatePaths();
+    generate_paths();
     
 #ifdef PSYNTH_HAVE_XML
-    conf.attach_backend(new conf_backend_xml(getConfigPath() + "psychosynth.xml"));
+    conf.attach_backend(new conf_backend_xml(get_config_path () + "psychosynth.xml"));
 #endif
     conf.def_load();
 
 #ifdef PSYNTH_HAVE_ALSA
-    m_director.attachOutputDirectorFactory(new OutputDirectorAlsaFactory);
+    m_director.attach_output_director_factory(new output_director_alsa_factory);
 #endif
 #ifdef PSYNTH_HAVE_OSS
-    m_director.attachOutputDirectorFactory(new OutputDirectorOssFactory);
+    m_director.attach_output_director_factory(new output_director_oss_factory);
 #endif
 #ifdef PSYNTH_HAVE_JACK
-    m_director.attachOutputDirectorFactory(new OutputDirectorJackFactory);
+    m_director.attach_output_director_factory(new output_director_jack_factory);
 #endif
     
     ret_val = execute();

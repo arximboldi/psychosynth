@@ -23,18 +23,18 @@
 #ifndef PSYCHOSYNTHCLI_H
 #define PSYCHOSYNTHCLI_H
 
-#include <libpsynth/psynth/PsychosynthApp.h>
+#include <libpsynth/psynth/psynth_app.h>
 #include <libpsynth/version.h>
 
-class PsychosynthCli : public psynth::PsychosynthApp
+class PsychosynthCli : public psynth::psynth_app
 {
     bool m_run_server;
     std::string m_client_port;
     std::string m_server_port;
     std::string m_host;
     
-    void printHelp();
-    void printVersion();
+    void print_help ();
+    void print_version ();
     void prepare(psynth::arg_parser& arg_parser);
     void init();
     

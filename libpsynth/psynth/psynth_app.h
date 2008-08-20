@@ -20,68 +20,58 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef PSYNTH_DIRECTOR_H
-#define PSYNTH_DIRECTOR_H
+#ifndef PSYNTH_PSYCHOSYNTHAPP_H
+#define PSYNTH_PSYCHOSYNTHAPP_H
 
-#include <libpsynth/common/config.h>
 #include <libpsynth/common/misc.h>
-#include <libpsynth/table/Table.h>
-#include <libpsynth/psynth/OutputDirector.h>
-#include <libpsynth/psynth/FileManagerDirector.h>
+#include <libpsynth/psynth/director.h>
 
 namespace psynth
 {
 
-class Director : public no_copy
+class arg_parser;
+
+class psynth_app : public no_copy
 {
-    typedef std::map<std::string, OutputDirectorFactory*> ODFMap;
-    ODFMap m_outdir;
-
-    std::string m_old_output;
-    FileManagerDirector m_filemgr;
-    OutputDirector* m_output;
-    Table* m_table;
-
-    conf_node* m_config;
-    audio_info m_info;
-
-    bool onConfigNudge(conf_node& node);
-#if 0
-    bool onSampleRateChange(conf_node& node);
-    bool onBlockSizeChange(conf_node& node);
-    bool onNumChannelsChange(conf_node& node);
-    bool onOutputChange(conf_node& node);
-#endif
-    
-    void registerConfig();
-    void unregisterConfig();
-    
-    void startOutput();
-    void stopOutput();
-    void updateInfo();
-
 public:
-    Director() :
-	m_output(NULL), m_table(NULL) {}
-
-    ~Director();
+    enum err_code {
+	ERR_GENERIC = -1,
+	SUCCESS = 0
+    };
     
-    void attachOutputDirectorFactory(OutputDirectorFactory* fact);
-    void start(conf_node& conf, const std::string& home_path);
-    void stop();
-    
-    Table* getTable() {
-	return m_table;
-    }
+    director m_director;
+    std::string m_cfg_dir;
 
-    Output* getOutput() {
-	if (m_output)
-	    return m_output->getOutput();
-	return NULL;
-    }
+    void generate_paths ();
+    bool parse_args (int argc, const char* argv[]);
+    
+    std::string get_config_path();
+    std::string get_data_path();
+    
+    virtual void prepare (arg_parser& args) {}
+    virtual int execute () { return ERR_GENERIC; }
+
+    virtual void print_help () {}
+    virtual void print_version () {}
+
+protected:
+    void print_base_options (std::ostream& out);
+    
+public:
+    Table* get_table () {
+	return m_director.get_table ();
+    };
+    
+    Output* get_output () {
+	return m_director.get_output ();
+    };
+    
+    int run(int argc, const char* argv[]);
+
+    void setup_synth ();
+    void close_synth ();
 };
 
 } /* namespace psynth */
 
-#endif /* PSYNTH_DIRECTOR_H */
-
+#endif /* PSYNTH_PSYCHOSYNTHAPP_H */

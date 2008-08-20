@@ -24,14 +24,14 @@
 #include <cstdlib>
 #include "version.h"
 #include "common/file_manager.h"
-#include "psynth/FileManagerDirector.h"
+#include "psynth/file_manager_director.h"
 
 using namespace std;
 
 namespace psynth
 {
 
-bool FileManagerDirector::onConfNudge(conf_node& node)
+bool file_manager_director::on_conf_nudge (conf_node& node)
 {
     file_manager& mgr =
 	file_manager::instance()
@@ -49,36 +49,36 @@ bool FileManagerDirector::onConfNudge(conf_node& node)
     return true;
 }
 
-void FileManagerDirector::registerConfig()
+void file_manager_director::register_config ()
 {
     m_conf->get_child ("samples")
-	.add_nudge_event (MakeDelegate(this, &FileManagerDirector::onConfNudge));
+	.add_nudge_event (MakeDelegate(this, &file_manager_director::on_conf_nudge));
     m_conf->get_child ("samples").nudge();
 }
 
-void FileManagerDirector::unregisterConfig()
+void file_manager_director::unregister_config()
 {
     m_conf->get_child ("samples")
-	.delete_nudge_event (MakeDelegate(this, &FileManagerDirector::onConfNudge));
+	.delete_nudge_event (MakeDelegate(this, &file_manager_director::on_conf_nudge));
 }
 
-void FileManagerDirector::start(conf_node& conf,
-				const std::string& home_path)
+void file_manager_director::start (conf_node& conf,
+				   const std::string& home_path)
 {
     m_conf = &conf;
     m_home_path = home_path;
     
-    registerConfig();
+    register_config ();
     defaults();
 }
 
-void FileManagerDirector::stop()
+void file_manager_director::stop ()
 {
-    unregisterConfig();
+    unregister_config ();
     m_conf = 0;
 }
 
-void FileManagerDirector::defaults()
+void file_manager_director::defaults ()
 {
     m_conf->get_child ("samples").get_child ("path0").def(string(PSYNTH_DATA_DIR) + "/samples");
     m_conf->get_child ("samples").get_child ("path1").def(m_home_path + "/samples");

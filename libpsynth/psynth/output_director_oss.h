@@ -20,26 +20,26 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef PSYNTH_OUTPUT_DIRECTOR_ALSA_H
-#define PSYNTH_OUTPUT_DIRECTOR_ALSA_H
+#ifndef PSYNTH_OUTPUT_DIRECTOR_OSS_H
+#define PSYNTH_OUTPUT_DIRECTOR_OSS_H
 
-#include <libpsynth/psynth/DefaultsAlsa.h>
-#include <libpsynth/psynth/OutputDirector.h>
-#include <libpsynth/output/OutputAlsa.h>
+#include <libpsynth/psynth/defaults_oss.h>
+#include <libpsynth/psynth/output_director.h>
+#include <libpsynth/output/OutputOss.h>
 
 namespace psynth
 {
 
-class OutputDirectorAlsa : public OutputDirector
+class output_director_oss : public output_director
 {
-    OutputAlsa* m_output;
+    OutputOss* m_output;
 
-    ~OutputDirectorAlsa() {
+    ~output_director_oss() {
 	if (m_output)
 	    stop();
     }
     
-    bool onDeviceChange(conf_node& conf) {
+    bool on_device_change(conf_node& conf) {
 	std::string device;
 	Output::State old_state;
 	
@@ -53,47 +53,47 @@ class OutputDirectorAlsa : public OutputDirector
 	return false;
     }
     
-    virtual Output* doStart(conf_node& conf) {
+    virtual Output* do_start(conf_node& conf) {
 	std::string device;
 	
 	conf.get_child ("out_device").get(device);
-	conf.get_child ("out_device").add_change_event(MakeDelegate(this, &OutputDirectorAlsa::onDeviceChange));
+	conf.get_child ("out_device").add_change_event(
+	    MakeDelegate(this, &output_director_oss::on_device_change));
 
-	m_output = new OutputAlsa;
+	m_output = new OutputOss;
 	m_output->setDevice(device);
 
 	return m_output;
     };
 
-    virtual void doStop(conf_node& conf) {
-	conf.get_child ("out_device").delete_change_event(MakeDelegate(this, &OutputDirectorAlsa::onDeviceChange));
-	if (m_output) {
-	    delete m_output;
-	    m_output = NULL;
-	}
+    virtual void do_stop(conf_node& conf) {
+	conf.get_child ("out_device").delete_change_event(
+	    MakeDelegate(this, &output_director_oss::on_device_change));
+	delete m_output;
+	m_output = NULL;
     }
 
 public:
     void defaults(conf_node& conf) {
-	conf.get_child ("out_device").def(DEFAULT_ALSA_OUT_DEVICE);
+	conf.get_child ("out_device").def(DEFAULT_OSS_OUT_DEVICE);
     }
-    
-    OutputDirectorAlsa() :
+
+    output_director_oss() :
 	m_output(NULL) {}
 };
 
-class OutputDirectorAlsaFactory : public OutputDirectorFactory
+class output_director_oss_factory : public output_director_factory
 {
 public:
-    virtual const char* getName() {
-	return DEFAULT_ALSA_NAME;
+    virtual const char* get_name() {
+	return DEFAULT_OSS_NAME;
     }
     
-    virtual OutputDirector* createOutputDirector() {
-	return new OutputDirectorAlsa;
+    virtual output_director* create_output_director() {
+	return new output_director_oss;
     }
 };
 
 } /* namespace psynth */
 
-#endif /* PSYNTH_OUTPUT_DIRECTOR_ALSA_H */
+#endif /* PSYNTH_OUTPUT_DIRECTOR_OSS_H */

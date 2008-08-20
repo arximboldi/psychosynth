@@ -40,14 +40,11 @@ libpsynth_la_LIBADD =
 libpsynthincdir = @PACKAGE_INCLUDE_DIR@
 
 nobase_libpsynthinc_HEADERS = \
-	psynth/Director.h \
-	psynth/Defaults.h \
-	psynth/DefaultsJack.h \
-	psynth/DefaultsOss.h \
-	psynth/DefaultsAlsa.h \
-	psynth/OutputDirector.h \
-	psynth/FileManagerDirector.h \
-	psynth/PsychosynthApp.h \
+	psynth/director.h \
+	psynth/defaults.h \
+	psynth/output_director.h \
+	psynth/file_manager_director.h \
+	psynth/psynth_app.h \
 	common/arg_parser.h \
 	common/deleter.h \
 	common/error.h \
@@ -113,9 +110,9 @@ nobase_libpsynthinc_HEADERS = \
 	version.h
 
 libpsynth_la_SOURCES = \
-	psynth/Director.cpp \
-	psynth/PsychosynthApp.cpp \
-	psynth/FileManagerDirector.cpp \
+	psynth/director.cpp \
+	psynth/psynth_app.cpp \
+	psynth/file_manager_director.cpp \
 	common/arg_parser.cpp \
 	common/audio_buffer.cpp \
 	common/sample_buffer.cpp \
@@ -209,8 +206,8 @@ if HAVE_ALSA
 libpsynth_la_CXXFLAGS += $(ALSA_CFLAGS)
 libpsynth_la_LIBADD += $(ALSA_LIBS)
 nobase_libpsynthinc_HEADERS += \
-	psynth/DefaultsAlsa.h \
-	psynth/OutputDirectorAlsa.h \
+	psynth/defaults_alsa.h \
+	psynth/output_director_alsa.h \
 	output/OutputAlsa.h	
 libpsynth_la_SOURCES += \
 	output/OutputAlsa.cpp
@@ -218,8 +215,8 @@ endif
 
 if HAVE_OSS
 nobase_libpsynthinc_HEADERS += \
-	psynth/DefaultsOss.h \
-	psynth/OutputDirectorOss.h \
+	psynth/defaults_oss.h \
+	psynth/output_director_oss.h \
 	output/OutputOss.h
 libpsynth_la_SOURCES += \
 	output/OutputOss.cpp
@@ -229,8 +226,8 @@ if HAVE_JACK
 libpsynth_la_CXXFLAGS += $(JACK_CFLAGS)
 libpsynth_la_LDFLAGS += $(JACK_LIBS)
 nobase_libpsynthinc_HEADERS += \
-	psynth/DefaultsJack.h \
-	psynth/OutputDirectorJack.h \
+	psynth/defaults_jack.h \
+	psynth/output_director_jack.h \
 	output/OutputJack.h
 libpsynth_la_SOURCES += \
 	output/OutputJack.cpp
