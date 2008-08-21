@@ -31,8 +31,8 @@
 #include <libpsynth/common/timer.h>
 #include <libpsynth/psynth/psynth_app.h>
 #ifdef PSYNTH_HAVE_OSC
-#include <libpsynth/net/OSCClient.h>
-#include <libpsynth/net/OSCServer.h>
+#include <libpsynth/net/osc_client.h>
+#include <libpsynth/net/osc_server.h>
 #endif
 
 #include "gui3d/DefaultSelectorPopulator.h"
@@ -66,8 +66,8 @@ class Psychosynth3D : public psynth::psynth_app,
     psynth::timer m_timer;
 
 #ifdef PSYNTH_HAVE_OSC
-    psynth::OSCClient* m_oscclient;
-    psynth::OSCServer* m_oscserver;
+    psynth::osc_client* m_oscclient;
+    psynth::osc_server* m_oscserver;
 #endif
     
     bool must_quit;

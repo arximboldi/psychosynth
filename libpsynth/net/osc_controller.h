@@ -26,15 +26,15 @@
 #include <map>
 
 #include <libpsynth/table/Table.h>
-#include <libpsynth/net/OSCMisc.h>
-#include <libpsynth/net/OSCBroadcast.h>
+#include <libpsynth/net/osc_misc.h>
+#include <libpsynth/net/osc_broadcast.h>
 
 namespace psynth
 {
 
-class OSCController : public TableListener,
-		      public TableObjectListener,
-		      public OSCBroadcast
+class osc_controller : public TableListener,
+		       public TableObjectListener,
+		       public osc_broadcast
 {
     std::map<std::pair<int,int>, int> m_local_id;
     std::map<int, std::pair<int,int> > m_net_id;
@@ -44,62 +44,62 @@ class OSCController : public TableListener,
     bool m_activated;
     bool m_broadcast;
     
-    LO_HANDLER(OSCController, add);
-    LO_HANDLER(OSCController, delete);
-    LO_HANDLER(OSCController, param);
-    LO_HANDLER(OSCController, activate);
-    LO_HANDLER(OSCController, deactivate);
+    LO_HANDLER (osc_controller, add);
+    LO_HANDLER (osc_controller, delete);
+    LO_HANDLER (osc_controller, param);
+    LO_HANDLER (osc_controller, activate);
+    LO_HANDLER (osc_controller, deactivate);
 
-    void addToTable(Table* table) {
+    void add_to_table (Table* table) {
 	table->addTableListener(this);
 	table->addTableObjectListener(this);
     }
 
-    void deleteFromTable(Table* table) {
+    void delete_from_table(Table* table) {
 	table->deleteTableListener(this);
 	table->deleteTableObjectListener(this);
     }
     
 public:
-    OSCController(bool broadcast = false);
-    ~OSCController();
+    osc_controller (bool broadcast = false);
+    ~osc_controller ();
 
-    void setID(int id) {
+    void set_id (int id) {
 	m_id = id;
     }
 
-    void setTable(Table* table) {
+    void set_table (Table* table) {
 	deactivate();
 	m_table = table;
     }
 
-    Table* getTable() {
+    Table* get_table () {
 	return m_table;
     }
 
-    void activate() {
+    void activate () {
 	if (!m_activated && m_table) {
 	    m_activated = true;
-	    addToTable(m_table);
+	    add_to_table (m_table);
 	}
     }
 
-    void deactivate() {
+    void deactivate () {
 	if (m_activated && m_table) {
 	    m_activated = false;
-	    deleteFromTable(m_table);
+	    delete_from_table (m_table);
 	}
     }
 
-    void clear() {
+    void clear () {
 	deactivate();
 	m_local_id.clear();
 	m_net_id.clear();
 	m_skip = 0;
-	OSCBroadcast::clear();
+	osc_broadcast::clear();
     }
 
-    void addMethods(lo_server s);
+    void add_methods (lo_server s);
     
     void handleAddObject(TableObject& obj);
     void handleDeleteObject(TableObject& obj);

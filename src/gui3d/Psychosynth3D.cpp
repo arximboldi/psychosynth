@@ -292,11 +292,11 @@ void Psychosynth3D::setupGui()
 #ifdef PSYNTH_HAVE_OSC
 void Psychosynth3D::setupNet()
 {
-    m_oscclient = new OSCClient();
-    m_oscserver = new OSCServer();
+    m_oscclient = new osc_client();
+    m_oscserver = new osc_server();
 
-    m_oscclient->setTable (get_table());
-    m_oscserver->setTable (get_table());
+    m_oscclient->set_table (get_table());
+    m_oscserver->set_table (get_table());
 }
 #endif
 

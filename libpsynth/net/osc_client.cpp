@@ -21,61 +21,61 @@
  ***************************************************************************/
 
 #include <algorithm>
-#include "net/OSCClient.h"
-#include "net/OSCProtocol.h"
+#include "net/osc_client.h"
+#include "net/osc_protocol.h"
 
-const int MAX_ALIVE_DELAY = 20000;
-const int MIN_ALIVE_DELAY = 1000;
+static const int MAX_ALIVE_DELAY = 20000;
+static const int MIN_ALIVE_DELAY = 1000;
 
 using namespace std;
 
 namespace psynth
 {
 
-void OSCClientSubject::notifyClientConnect(OSCClient* param)
+void osc_client_subject::notify_client_connect (osc_client* param)
 {
-    for (list<OSCClientListener*>::iterator it = m_list.begin();
+    for (list<osc_client_listener*>::iterator it = m_list.begin();
 	 it != m_list.end(); ++it)
-	(*it)->handleClientConnect(param);
+	(*it)->handle_client_connect (param);
 }
 
-void OSCClientSubject::notifyClientAccept(OSCClient* param)
+void osc_client_subject::notify_client_accept (osc_client* param)
 {
-    for (list<OSCClientListener*>::iterator it = m_list.begin();
+    for (list<osc_client_listener*>::iterator it = m_list.begin();
 	 it != m_list.end(); ++it)
-	(*it)->handleClientAccept(param);
+	(*it)->handle_client_accept (param);
 }
 
-void OSCClientSubject::notifyClientDisconnect(OSCClient* param, OSCClientError err)
+void osc_client_subject::notify_client_disconnect (osc_client* param, osc_client_error err)
 {
-    for (list<OSCClientListener*>::iterator it = m_list.begin();
+    for (list<osc_client_listener*>::iterator it = m_list.begin();
 	 it != m_list.end(); ++it)
-	(*it)->handleClientDisconnect(param, err);
+	(*it)->handle_client_disconnect(param, err);
 }
 
-OSCClient::OSCClient() :
-    OSCController(false),
+osc_client::osc_client() :
+    osc_controller(false),
     m_server(NULL),
     m_state(IDLE),
     m_count_next(0)
 {
 }
 
-OSCClient::~OSCClient()
+osc_client::~osc_client()
 {
     if (m_state != IDLE)
 	disconnect();
 }
 
-void OSCClient::connect(lo_address target, const char* local_port)
+void osc_client::connect(lo_address target, const char* local_port)
 {
     if (m_state == IDLE) {
-	notifyClientConnect(this);
+	notify_client_connect(this);
 	
 	m_server = lo_server_new_with_proto(local_port, LO_UDP, NULL);
 
 	if (!m_server) {
-	    notifyClientDisconnect(this, CE_PORT_BINDING);
+	    notify_client_disconnect(this, CE_PORT_BINDING);
 	    return;
 	}
 	
@@ -83,11 +83,11 @@ void OSCClient::connect(lo_address target, const char* local_port)
 	m_last_alive_sent = 0;
 	m_count_next = 1;
 	
-	addMethods();
-	setSender(m_server);
+	add_methods ();
+	set_sender (m_server);
 	
 	lo_message msg = lo_message_new();
-	lo_send_message_from(target, m_server, MSG_CONNECT, msg);
+	lo_send_message_from(target, m_server, PSYNTH_OSC_MSG_CONNECT, msg);
 	lo_message_free(msg);
 
 	lo_address_free(target);
@@ -96,26 +96,26 @@ void OSCClient::connect(lo_address target, const char* local_port)
     }
 }
 
-void OSCClient::close()
+void osc_client::close()
 {
     lo_server_free(m_server);
     clear();
     m_state = IDLE;
 }
 
-void OSCClient::disconnect()
+void osc_client::disconnect()
 {
     if (m_state != IDLE) {
 	lo_message msg = lo_message_new();
-	broadcastMessage(MSG_DISCONNECT, msg);
+	broadcast_message (PSYNTH_OSC_MSG_DISCONNECT, msg);
 	lo_message_free(msg);
 	
-	close();
-	notifyClientDisconnect(this, CE_NONE);
+	close ();
+	notify_client_disconnect(this, CE_NONE);
     }
 }
 
-int OSCClient::receive(int time_out)
+int osc_client::receive(int time_out)
 {
     int n_recv = 0;
 
@@ -129,7 +129,7 @@ int OSCClient::receive(int time_out)
     return n_recv;
 }
 
-int OSCClient::update(int msec)
+int osc_client::update(int msec)
 {    
     if (m_state != IDLE) {	
 	if (!m_count_next) {
@@ -140,37 +140,37 @@ int OSCClient::update(int msec)
 
 	if (m_last_alive_sent > MIN_ALIVE_DELAY) {
 	    lo_message msg = lo_message_new();
-	    broadcastMessage(MSG_ALIVE, msg);
+	    broadcast_message(PSYNTH_OSC_MSG_ALIVE, msg);
 	    lo_message_free(msg);
 	    m_last_alive_sent = 0;
 	}
 
 	if (m_last_alive_recv > MAX_ALIVE_DELAY) {
-	    notifyClientDisconnect(this, CE_SERVER_TIMEOUT);
+	    notify_client_disconnect(this, CE_SERVER_TIMEOUT);
 	    close();
 	}
 	
 	if (m_state == CLOSING) {
 	    close();
-	    notifyClientDisconnect(this, CE_SERVER_DROP);
+	    notify_client_disconnect(this, CE_SERVER_DROP);
 	}
     }
 
     return m_state;
 }
 
-void OSCClient::addMethods()
+void osc_client::add_methods()
 {
     /*
       lo_server_add_method(m_server, NULL, NULL, &lo_generic_handler, NULL);
     */
     
-    lo_server_add_method(m_server, MSG_DROP, "", &drop_cb, this);
-    lo_server_add_method(m_server, MSG_ACCEPT, "i", &accept_cb, this);
-    lo_server_add_method(m_server, MSG_ALIVE, "", &alive_cb, this);
+    lo_server_add_method(m_server, PSYNTH_OSC_MSG_DROP, "", &drop_cb, this);
+    lo_server_add_method(m_server, PSYNTH_OSC_MSG_ACCEPT, "i", &accept_cb, this);
+    lo_server_add_method(m_server, PSYNTH_OSC_MSG_ALIVE, "", &alive_cb, this);
 }
 
-int OSCClient::_drop_cb(const char* path, const char* types,
+int osc_client::_drop_cb(const char* path, const char* types,
 			lo_arg** argv, int argc, lo_message msg)
 {
     m_state = CLOSING;
@@ -178,16 +178,16 @@ int OSCClient::_drop_cb(const char* path, const char* types,
     return 0;
 }
 
-int OSCClient::_accept_cb(const char* path, const char* types,
+int osc_client::_accept_cb(const char* path, const char* types,
 			  lo_arg** argv, int argc, lo_message msg)
 {
     if (m_state == PENDING) {
 	m_id = argv[0]->i;
-	setID(m_id);
+	set_id (m_id);
 
-	getTable()->clear();
+	get_table()->clear();
 	
-	OSCController::addMethods(m_server);
+	osc_controller::add_methods(m_server);
 	activate();
 
 	/* FIXME: Make sure that the accept message came from our desired target. */
@@ -195,20 +195,20 @@ int OSCClient::_accept_cb(const char* path, const char* types,
 	lo_address addcpy = lo_address_new(lo_address_get_hostname(add),
 					   lo_address_get_port(add));
     
-	addDestiny(addcpy);
+	add_target(addcpy);
 
 	lo_message msg = lo_message_new();
-	broadcastMessage(MSG_GET_STATE, msg);
+	broadcast_message (PSYNTH_OSC_MSG_GET_STATE, msg);
 	lo_message_free(msg);
 	
 	m_state = CONNECTED;
-	notifyClientAccept(this);
+	notify_client_accept(this);
     }
     
     return 0;
 }
 
-int OSCClient::_alive_cb(const char* path, const char* types,
+int osc_client::_alive_cb(const char* path, const char* types,
 			 lo_arg** argv, int argc, lo_message msg)
 {
     m_last_alive_recv = 0;    

@@ -23,20 +23,20 @@
 #ifndef NETWORKWINDOW_H
 #define NETWORKWINDOW_H
 
-#include <libpsynth/net/OSCClient.h>
-#include <libpsynth/net/OSCServer.h>
-#include <libpsynth/net/OSCClientLogger.h>
-#include <libpsynth/net/OSCServerLogger.h>
+#include <libpsynth/net/osc_client.h>
+#include <libpsynth/net/osc_server.h>
+#include <libpsynth/net/osc_client_logger.h>
+#include <libpsynth/net/osc_server_logger.h>
 
 #include "gui3d/GuiLogSink.h"
 #include "gui3d/ToggableWindow.h"
 
-class ClientTab : public psynth::OSCClientListener
+class ClientTab : public psynth::osc_client_listener
 {
     GuiLogSink m_logsink;
-    psynth::OSCClientLogger m_logger;
+    psynth::osc_client_logger m_logger;
     
-    psynth::OSCClient* m_client;
+    psynth::osc_client* m_client;
     bool m_connected;
 
     CEGUI::Window* m_button;
@@ -46,15 +46,15 @@ class ClientTab : public psynth::OSCClientListener
     CEGUI::Spinner* m_rport;
     CEGUI::Editbox* m_host;
     
-    bool handleClientAccept(psynth::OSCClient* client) { return false; }
-    bool handleClientConnect(psynth::OSCClient* client);
-    bool handleClientDisconnect(psynth::OSCClient* client,
-				psynth::OSCClientError err);
+    bool handle_client_accept(psynth::osc_client* client) { return false; }
+    bool handle_client_connect(psynth::osc_client* client);
+    bool handle_client_disconnect(psynth::osc_client* client,
+				  psynth::osc_client_error err);
 
     void setConnected(bool con);
 
 public:
-    ClientTab(psynth::OSCClient* client);
+    ClientTab(psynth::osc_client* client);
     ~ClientTab();
     
     CEGUI::Window* createWindow();    
@@ -65,11 +65,11 @@ public:
     }
 };
 
-class ServerTab : public psynth::OSCServerListener
+class ServerTab : public psynth::osc_server_listener
 {
     GuiLogSink m_logsink;
-    psynth::OSCServerLogger m_logger;
-    psynth::OSCServer* m_server;
+    psynth::osc_server_logger m_logger;
+    psynth::osc_server* m_server;
     bool m_listening;
 
     CEGUI::Window* m_button;
@@ -77,21 +77,21 @@ class ServerTab : public psynth::OSCServerListener
     CEGUI::Window* m_ext_disable;
     CEGUI::Spinner* m_lport;
 
-    bool handleServerStartListening(psynth::OSCServer* server);
-    bool handleServerStopListening(psynth::OSCServer* server,
-				   psynth::OSCServerError err);
-    bool handleServerClientConnect(psynth::OSCServer* server,
+    bool handle_server_start_listening(psynth::osc_server* server);
+    bool handle_server_stop_listening(psynth::osc_server* server,
+				   psynth::osc_server_error err);
+    bool handle_server_client_connect(psynth::osc_server* server,
 				   int client_id) { return false; };
-    bool handleServerClientDisconnect(psynth::OSCServer* server,
+    bool handle_server_client_disconnect(psynth::osc_server* server,
 				      int client_id,
-				      psynth::OSCServerClientError err) { return false; };
-    bool handleServerClientTimeout(psynth::OSCServer* server,
+				      psynth::osc_server_client_error err) { return false; };
+    bool handle_server_client_timeout(psynth::osc_server* server,
 				   int client_id) { return false; };
 
     void setListening(bool listening);
     
 public:
-    ServerTab(psynth::OSCServer* server);
+    ServerTab(psynth::osc_server* server);
     ~ServerTab();
     CEGUI::Window* createWindow();
     
@@ -110,7 +110,7 @@ class NetworkWindow : public ToggableWindow
     virtual CEGUI::FrameWindow* createWindow();
 public:
 
-    NetworkWindow(psynth::OSCClient* client, psynth::OSCServer* server);
+    NetworkWindow(psynth::osc_client* client, psynth::osc_server* server);
     ~NetworkWindow();
 };
 

@@ -20,62 +20,79 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef PSYNTH_OSCMISC_H
-#define PSYNTH_OSCMISC_H
+#ifndef PSYNTH_OSCBROADCAST_H
+#define PSYNTH_OSCBROADCAST_H
 
+#include <list>
 #include <lo/lo.h>
+
+#include <libpsynth/net/osc_misc.h>
 
 namespace psynth
 {
 
-#define LO_HANDLER_ARGS const char* path, const char* types,\
-	lo_arg** argv, int argc, lo_message msg
-
-#define LO_HANDLER(clax,name)			\
-int _##name##_cb (LO_HANDLER_ARGS);\
-inline static int name##_cb(LO_HANDLER_ARGS, void* osc_listener)\
-{ return ((clax*)osc_listener)->_##name##_cb(path, types, argv, argc, msg); }
-
-
-inline bool lo_address_equals(lo_address a, lo_address b)
+/*
+class first_equals
 {
-    return strcmp(lo_address_get_hostname(a), lo_address_get_hostname(b)) == 0
-	&& strcmp(lo_address_get_port(a), lo_address_get_port(b)) == 0;
-    // FIXME: && lo_address_get_protocol(a) == lo_address_get_protocol(b);
-}
+    T m_ref;
+public:
+    first_equals(const T& r) : m_ref(r) {};
 
-inline int lo_address_cmp(lo_address a, lo_address b)
+    template<class U>
+    bool operator() (const std::pair<T,U>& p) {
+	return p.first == m_ref;
+    }
+};
+*/
+
+class lo_address_equals_func
 {
-    int res;
+    lo_address m_ref;
+    
+public:
+    lo_address_equals_func(lo_address ref) : m_ref(ref) {}
 
-    res = strcmp(lo_address_get_hostname(a), lo_address_get_hostname(b));
-    if (!res) {
-	res = strcmp(lo_address_get_port(a), lo_address_get_port(b));
+    bool operator() (lo_address param) {
+	return lo_address_equals(m_ref, param);
+    }
+};
+
+class osc_broadcast
+{
+    std::list<lo_address> m_dest;
+    lo_server m_sender;
+    
+public:
+    osc_broadcast()
+	: m_sender(NULL)
+	{}
+    
+    ~osc_broadcast() {
+	clear();
     }
 
-    return res;
-}
-
-inline int lo_generic_handler(const char *path, const char *types, lo_arg **argv,
-			      int argc, lo_message msg, void *user_data)
-{
-    int i;
-
-    printf("--- OSC Message ---\n");
-    printf("from host: %s\n", lo_address_get_hostname(lo_message_get_source(msg)));
-    printf("from port: %s\n", lo_address_get_port(lo_message_get_source(msg)));
-    printf("path: <%s>\n", path);
-    for (i=0; i<argc; i++) {
-	printf("arg %d '%c' ", i, types[i]);
-	lo_arg_pp((lo_type)types[i], argv[i]);
-	printf("\n");
+    void set_sender(lo_server s) {
+	m_sender = s;
     }
-    printf("\n");
-    fflush(stdout);
+    
+    void add_target (lo_address dest) {
+	m_dest.push_back(dest);
+    }
+    
+    void delete_target (lo_address dest);
+    /*{
+      m_dest.remove_if(lo_address_equals_func(dest));
+    }*/
 
-    return 1;
-}
+    void clear ();
+    
+    bool is_target (lo_address dest);
+    
+    void broadcast_message (const char* path, lo_message msg);
+
+    void broadcast_message_from (const char* path, lo_message msg, lo_address from);
+};
 
 } /* namespace psynth */
 
-#endif /* PSYNTH_OSCMISC_H */
+#endif /* PSYNTH_OSCBROADCAST_H */

@@ -21,15 +21,15 @@
  ***************************************************************************/
 
 #include <algorithm>
-#include "net/OSCController.h"
-#include "net/OSCProtocol.h"
+#include "net/osc_controller.h"
+#include "net/osc_protocol.h"
 
 using namespace std;
 
 namespace psynth
 {
 
-OSCController::OSCController(bool broadcast) :
+osc_controller::osc_controller(bool broadcast) :
     m_table(NULL),
     m_skip(0),
     m_id(0),
@@ -38,11 +38,11 @@ OSCController::OSCController(bool broadcast) :
 {
 }
 
-OSCController::~OSCController()
+osc_controller::~osc_controller()
 {
 }
     
-void OSCController::handleAddObject(TableObject& obj)
+void osc_controller::handleAddObject(TableObject& obj)
 {
     if (!m_skip) {
 	int local_id(obj.getID());
@@ -57,13 +57,13 @@ void OSCController::handleAddObject(TableObject& obj)
 	lo_message_add_int32(msg, net_id.second);
 	lo_message_add_string(msg, obj.getName().c_str());
 
-	broadcastMessage(MSG_ADD, msg);
+	broadcast_message(PSYNTH_OSC_MSG_ADD, msg);
 
 	lo_message_free(msg);
     }
 }
 
-void OSCController::handleDeleteObject(TableObject& obj)
+void osc_controller::handleDeleteObject(TableObject& obj)
 {
     if (!m_skip) {
 	int local_id(obj.getID());
@@ -74,7 +74,7 @@ void OSCController::handleDeleteObject(TableObject& obj)
 	lo_message_add_int32(msg, net_id.first);
 	lo_message_add_int32(msg, net_id.second);
 
-	broadcastMessage(MSG_DELETE, msg);
+	broadcast_message(PSYNTH_OSC_MSG_DELETE, msg);
 
 	lo_message_free(msg);
 
@@ -83,7 +83,7 @@ void OSCController::handleDeleteObject(TableObject& obj)
     }
 }
 
-void OSCController::handleActivateObject(TableObject& obj)
+void osc_controller::handleActivateObject(TableObject& obj)
 {
     if (!m_skip) {
 	int local_id(obj.getID());
@@ -94,13 +94,13 @@ void OSCController::handleActivateObject(TableObject& obj)
 	lo_message_add_int32(msg, net_id.first);
 	lo_message_add_int32(msg, net_id.second);
 
-	broadcastMessage(MSG_ACTIVATE, msg);
+	broadcast_message(PSYNTH_OSC_MSG_ACTIVATE, msg);
 
 	lo_message_free(msg);
     }
 }
 
-void OSCController::handleDeactivateObject(TableObject& obj)
+void osc_controller::handleDeactivateObject(TableObject& obj)
 {
     if (!m_skip) {
 	int local_id(obj.getID());
@@ -111,13 +111,13 @@ void OSCController::handleDeactivateObject(TableObject& obj)
 	lo_message_add_int32(msg, net_id.first);
 	lo_message_add_int32(msg, net_id.second);
 
-	broadcastMessage(MSG_DEACTIVATE, msg);
+	broadcast_message(PSYNTH_OSC_MSG_DEACTIVATE, msg);
 
 	lo_message_free(msg);
     }
 }
 
-void OSCController::handleSetParamObject(TableObject& obj, int param_id)
+void osc_controller::handleSetParamObject(TableObject& obj, int param_id)
 {
     if (!m_skip) {
 	int local_id(obj.getID());
@@ -159,25 +159,25 @@ void OSCController::handleSetParamObject(TableObject& obj, int param_id)
 	    break;
 	}
 	
-	broadcastMessage(MSG_PARAM, msg);
+	broadcast_message(PSYNTH_OSC_MSG_PARAM, msg);
 
 	lo_message_free(msg);
     }
 }
 
-void OSCController::addMethods(lo_server s)
+void osc_controller::add_methods (lo_server s)
 {
-    lo_server_add_method (s, MSG_ADD, "iis", &add_cb, this);
-    lo_server_add_method (s, MSG_DELETE, "ii", &delete_cb, this);
-    lo_server_add_method (s, MSG_PARAM, NULL, &param_cb, this);
-    lo_server_add_method (s, MSG_ACTIVATE, "ii", &activate_cb, this);
-    lo_server_add_method (s, MSG_DEACTIVATE, "ii", &deactivate_cb, this);
+    lo_server_add_method (s, PSYNTH_OSC_MSG_ADD, "iis", &add_cb, this);
+    lo_server_add_method (s, PSYNTH_OSC_MSG_DELETE, "ii", &delete_cb, this);
+    lo_server_add_method (s, PSYNTH_OSC_MSG_PARAM, NULL, &param_cb, this);
+    lo_server_add_method (s, PSYNTH_OSC_MSG_ACTIVATE, "ii", &activate_cb, this);
+    lo_server_add_method (s, PSYNTH_OSC_MSG_DEACTIVATE, "ii", &deactivate_cb, this);
 }
 
-int OSCController::_add_cb(const char* path, const char* types,
+int osc_controller::_add_cb(const char* path, const char* types,
 			   lo_arg** argv, int argc, lo_message msg)
 {
-    if (isDestiny(lo_message_get_source(msg))) {
+    if (is_target(lo_message_get_source(msg))) {
 	pair<int,int> net_id(argv[0]->i, argv[1]->i);
 
 	m_skip++;
@@ -194,7 +194,7 @@ int OSCController::_add_cb(const char* path, const char* types,
 		lo_message_add_int32(newmsg, argv[0]->i);
 		lo_message_add_int32(newmsg, argv[1]->i);
 		lo_message_add_string(newmsg, &argv[2]->s);
-		broadcastMessageFrom(MSG_ADD, newmsg, lo_message_get_source(msg));
+		broadcast_message_from(PSYNTH_OSC_MSG_ADD, newmsg, lo_message_get_source(msg));
 		lo_message_free(newmsg);
 	    }
 	}
@@ -203,10 +203,10 @@ int OSCController::_add_cb(const char* path, const char* types,
     return 0;
 }
 
-int OSCController::_delete_cb(const char* path, const char* types,
+int osc_controller::_delete_cb(const char* path, const char* types,
 			      lo_arg** argv, int argc, lo_message msg)
 {
-    if (isDestiny(lo_message_get_source(msg))) {
+    if (is_target(lo_message_get_source(msg))) {
 	pair<int,int> net_id(argv[0]->i, argv[1]->i);
 
 	map<pair<int,int>, int>::iterator it = m_local_id.find(net_id);
@@ -226,7 +226,7 @@ int OSCController::_delete_cb(const char* path, const char* types,
 		lo_message newmsg = lo_message_new();
 		lo_message_add_int32(newmsg, argv[0]->i);
 		lo_message_add_int32(newmsg, argv[1]->i);
-		broadcastMessageFrom(MSG_DELETE, newmsg, lo_message_get_source(msg));
+		broadcast_message_from(PSYNTH_OSC_MSG_DELETE, newmsg, lo_message_get_source(msg));
 		lo_message_free(newmsg);
 	    }
 	}
@@ -235,10 +235,10 @@ int OSCController::_delete_cb(const char* path, const char* types,
     return 0;
 }
 
-int OSCController::_param_cb(const char* path, const char* types,
+int osc_controller::_param_cb(const char* path, const char* types,
 			     lo_arg** argv, int argc, lo_message msg)
 {
-    if (isDestiny(lo_message_get_source(msg))) {
+    if (is_target(lo_message_get_source(msg))) {
 	pair<int,int> net_id(argv[0]->i, argv[1]->i);
 
 	map<pair<int,int>, int>::iterator it = m_local_id.find(net_id);
@@ -293,7 +293,7 @@ int OSCController::_param_cb(const char* path, const char* types,
 		    break;
 		}
 		
-		broadcastMessageFrom(MSG_PARAM, newmsg, lo_message_get_source(msg));
+		broadcast_message_from(PSYNTH_OSC_MSG_PARAM, newmsg, lo_message_get_source(msg));
 		lo_message_free(newmsg);
 	    }
 	}
@@ -302,10 +302,10 @@ int OSCController::_param_cb(const char* path, const char* types,
     return 0;
 }
 
-int OSCController::_activate_cb(const char* path, const char* types,
+int osc_controller::_activate_cb(const char* path, const char* types,
 				lo_arg** argv, int argc, lo_message msg)
 {
-    if (isDestiny(lo_message_get_source(msg))) {
+    if (is_target(lo_message_get_source(msg))) {
 	pair<int,int> net_id(argv[0]->i, argv[1]->i);
 
 	map<pair<int,int>, int>::iterator it = m_local_id.find(net_id);
@@ -322,7 +322,7 @@ int OSCController::_activate_cb(const char* path, const char* types,
 		lo_message newmsg = lo_message_new();
 		lo_message_add_int32(newmsg, argv[0]->i);
 		lo_message_add_int32(newmsg, argv[1]->i);
-		broadcastMessageFrom(MSG_ACTIVATE, newmsg, lo_message_get_source(msg));
+		broadcast_message_from(PSYNTH_OSC_MSG_ACTIVATE, newmsg, lo_message_get_source(msg));
 		lo_message_free(newmsg);
 	    }
 	}
@@ -331,10 +331,10 @@ int OSCController::_activate_cb(const char* path, const char* types,
     return 0;
 }
 
-int OSCController::_deactivate_cb(const char* path, const char* types,
+int osc_controller::_deactivate_cb(const char* path, const char* types,
 				  lo_arg** argv, int argc, lo_message msg)
 {
-    if (isDestiny(lo_message_get_source(msg))) {
+    if (is_target (lo_message_get_source(msg))) {
 	pair<int,int> net_id(argv[0]->i, argv[1]->i);
 
 	map<pair<int,int>, int>::iterator it = m_local_id.find(net_id);
@@ -351,7 +351,7 @@ int OSCController::_deactivate_cb(const char* path, const char* types,
 		lo_message newmsg = lo_message_new();
 		lo_message_add_int32(newmsg, argv[0]->i);
 		lo_message_add_int32(newmsg, argv[1]->i);
-		broadcastMessageFrom(MSG_DEACTIVATE, newmsg, lo_message_get_source(msg));
+		broadcast_message_from(PSYNTH_OSC_MSG_DEACTIVATE, newmsg, lo_message_get_source(msg));
 		lo_message_free(newmsg);
 	    }
 	}

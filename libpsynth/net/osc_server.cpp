@@ -23,89 +23,90 @@
 #include <cstring>
 #include <algorithm>
 #include <cstdio>
-#include "net/OSCServer.h"
-#include "net/OSCProtocol.h"
+#include "net/osc_server.h"
+#include "net/osc_protocol.h"
 
-const int MAX_ALIVE_DELAY = 10000;
-const int MIN_ALIVE_DELAY = 1000;
+static const int MAX_ALIVE_DELAY = 10000;
+static const int MIN_ALIVE_DELAY = 1000;
 
 using namespace std;
 
 namespace psynth
 {
 
-void OSCServerSubject::notifyServerClientDisconnect(OSCServer* server, int c_id,
-						    OSCServerClientError cause)
+void osc_server_subject::notify_server_client_disconnect (osc_server* server, int c_id,
+							  osc_server_client_error cause)
 {
-    for (list<OSCServerListener*>::iterator it = m_list.begin();
+    for (list<osc_server_listener*>::iterator it = m_list.begin();
 	 it != m_list.end(); ++it)
-	(*it)->handleServerClientDisconnect(server, c_id, cause);
+	(*it)->handle_server_client_disconnect (server, c_id, cause);
 }
 
-void OSCServerSubject::notifyServerClientConnect(OSCServer* server, int c_id)
+void osc_server_subject::notify_server_client_connect (osc_server* server, int c_id)
 {
-    for (list<OSCServerListener*>::iterator it = m_list.begin();
+    for (list<osc_server_listener*>::iterator it = m_list.begin();
 	 it != m_list.end(); ++it)
-	(*it)->handleServerClientConnect(server, c_id);
+	(*it)->handle_server_client_connect (server, c_id);
 }
 
-void OSCServerSubject::notifyServerStartListening(OSCServer* server)
+void osc_server_subject::notify_server_start_listening (osc_server* server)
 {
-    for (list<OSCServerListener*>::iterator it = m_list.begin();
+    for (list<osc_server_listener*>::iterator it = m_list.begin();
 	 it != m_list.end(); ++it)
-	(*it)->handleServerStartListening(server);
+	(*it)->handle_server_start_listening (server);
 }
 
-void OSCServerSubject::notifyServerStopListening(OSCServer* server, OSCServerError err)
+void osc_server_subject::notify_server_stop_listening (osc_server* server,
+						       osc_server_error err)
 {
-    for (list<OSCServerListener*>::iterator it = m_list.begin();
+    for (list<osc_server_listener*>::iterator it = m_list.begin();
 	 it != m_list.end(); ++it)
-	(*it)->handleServerStopListening(server, err);
+	(*it)->handle_server_stop_listening(server, err);
 }
 
-OSCServer::OSCServer() :
-    OSCController(true),
+osc_server::osc_server() :
+    osc_controller(true),
     m_server(NULL),
     m_state(IDLE)
 {
 }
 
-OSCServer::~OSCServer()
+osc_server::~osc_server()
 {
     if (m_state != IDLE)
 	stop();
 }
 
-void OSCServer::addMethods()
+void osc_server::add_methods ()
 {
     /*
       lo_server_add_method(m_server, NULL, NULL, &lo_generic_handler, NULL);
     */
     
-    lo_server_add_method(m_server, MSG_ALIVE, "", &alive_cb, this);
-    lo_server_add_method(m_server, MSG_CONNECT, "", &connect_cb, this);
-    lo_server_add_method(m_server, MSG_GET_STATE, "", &get_state_cb, this);
-    lo_server_add_method(m_server, MSG_DISCONNECT, "", &disconnect_cb, this);
+    lo_server_add_method(m_server, PSYNTH_OSC_MSG_ALIVE, "", &alive_cb, this);
+    lo_server_add_method(m_server, PSYNTH_OSC_MSG_CONNECT, "", &connect_cb, this);
+    lo_server_add_method(m_server, PSYNTH_OSC_MSG_GET_STATE, "", &get_state_cb, this);
+    lo_server_add_method(m_server, PSYNTH_OSC_MSG_DISCONNECT, "", &disconnect_cb, this);
 }
 
-void OSCServer::listen(const char* port)
+void osc_server::listen(const char* port)
 {
     if (m_state == IDLE) {
-	notifyServerStartListening(this);
+	notify_server_start_listening (this);
 
 	m_server = lo_server_new_with_proto(port, LO_UDP, NULL);
 	
 	if (!m_server) {
-	    notifyServerStopListening(this, SE_PORT_BINDING);
+	    notify_server_stop_listening (this, SE_PORT_BINDING);
 	    return;
 	}
 
-	setID(SERVER_ID);
+	set_id (SERVER_ID);
 	m_nextid = SERVER_ID + 1;
 
-	addMethods();
-	OSCController::addMethods(m_server);
-	setSender(m_server);
+	add_methods ();
+	osc_controller::add_methods (m_server);
+	set_sender (m_server);
 
 	activate();
 	
@@ -113,19 +114,19 @@ void OSCServer::listen(const char* port)
     }
 }
 
-void OSCServer::stop()
+void osc_server::stop()
 {
     if (m_state != IDLE) {
 	lo_message msg = lo_message_new();
-	broadcastMessage(MSG_DROP, msg);
+	broadcast_message (PSYNTH_OSC_MSG_DROP, msg);
 	lo_message_free(msg);
 
 	close();
-	notifyServerStopListening(this, SE_NONE);
+	notify_server_stop_listening(this, SE_NONE);
     }
 }
 
-void OSCServer::close()
+void osc_server::close()
 {
     lo_server_free(m_server);
     clear();
@@ -133,7 +134,7 @@ void OSCServer::close()
     m_state = IDLE;
 }
 
-int OSCServer::receive(int time_out)
+int osc_server::receive(int time_out)
 {
     int n_recv = 0;
     
@@ -147,12 +148,12 @@ int OSCServer::receive(int time_out)
     return n_recv;
 }
 
-int OSCServer::update(int msec)
+int osc_server::update(int msec)
 {    
     if (m_state != IDLE) {
-	for (SlotMap::iterator it = m_slots.begin();
+	for (slot_map::iterator it = m_slots.begin();
 	     it != m_slots.end();) {
-	    Slot& cl = it->second;
+	    slot& cl = it->second;
 	    lo_address addr = it->first;
 
 	    cl.last_alive_recv += msec;
@@ -161,18 +162,18 @@ int OSCServer::update(int msec)
 	    if (cl.last_alive_recv > MAX_ALIVE_DELAY) {
 		lo_message msg = lo_message_new();
 		lo_send_message_from(it->first, m_server,
-				     MSG_DROP, msg);
+				     PSYNTH_OSC_MSG_DROP, msg);
 		lo_message_free(msg);
 	       
-		notifyServerClientDisconnect(this, cl.id, SCE_CLIENT_TIMEOUT);
+		notify_server_client_disconnect(this, cl.id, SCE_CLIENT_TIMEOUT);
 		
 		m_slots.erase(it++);
-		deleteDestiny(addr);
+		delete_target(addr);
 	    } else {
 		if (cl.last_alive_sent > MIN_ALIVE_DELAY) {
 		    lo_message msg = lo_message_new();
 		    lo_send_message_from(it->first, m_server,
-					 MSG_ALIVE, msg);
+					 PSYNTH_OSC_MSG_ALIVE, msg);
 		    lo_message_free(msg);
 		
 		    cl.last_alive_sent = 0;
@@ -185,10 +186,10 @@ int OSCServer::update(int msec)
     return m_state;
 }
 
-int OSCServer::_alive_cb(const char* path, const char* types,
+int osc_server::_alive_cb(const char* path, const char* types,
 			 lo_arg** argv, int argc, lo_message msg)
 {
-    SlotMap::iterator iter;
+    slot_map::iterator iter;
 
     iter = m_slots.find(lo_message_get_source(msg));
     if (iter != m_slots.end())
@@ -197,20 +198,20 @@ int OSCServer::_alive_cb(const char* path, const char* types,
     return 0;
 }
 
-int OSCServer::_connect_cb(const char* path, const char* types,
+int osc_server::_connect_cb(const char* path, const char* types,
 			   lo_arg** argv, int argc, lo_message msg)
 {
     lo_address add = lo_message_get_source(msg);
     int id;
     
-    if (!isDestiny(add)) {
+    if (!is_target(add)) {
 	id = m_nextid++;
 	
 	lo_address addcpy = lo_address_new(lo_address_get_hostname(add),
 					   lo_address_get_port(add));
 	
-	addDestiny(addcpy);
-	m_slots[addcpy] = Slot(id);
+	add_target(addcpy);
+	m_slots[addcpy] = slot (id);
     } else {
 	id = m_slots[add].id;
 	m_slots[add].last_alive_recv = 0;
@@ -219,33 +220,33 @@ int OSCServer::_connect_cb(const char* path, const char* types,
     
     lo_message resp = lo_message_new();
     lo_message_add_int32(resp, id);
-    lo_send_message_from(add, m_server, MSG_ACCEPT, resp);
+    lo_send_message_from(add, m_server, PSYNTH_OSC_MSG_ACCEPT, resp);
     
     return 0;
 }
 
-int OSCServer::_get_state_cb(const char* path, const char* types,
+int osc_server::_get_state_cb(const char* path, const char* types,
 			     lo_arg** argv, int argc, lo_message msg)
 {
     lo_address add = lo_message_get_source(msg);
-    if (isDestiny(add)) {
+    if (is_target(add)) {
 	/* TODO */
     }
     
     return 0;
 }
 
-int OSCServer::_disconnect_cb(const char* path, const char* types,
+int osc_server::_disconnect_cb(const char* path, const char* types,
 			      lo_arg** argv, int argc, lo_message msg)
 {
     
     lo_address add = lo_message_get_source(msg);
 
-    if (isDestiny(add)) {
-	notifyServerClientDisconnect(this, m_slots[add].id, SCE_NONE);
+    if (is_target(add)) {
+	notify_server_client_disconnect(this, m_slots[add].id, SCE_NONE);
 	
 	m_slots.erase(add);
-	deleteDestiny(add);
+	delete_target(add);
     }
     
     return 0;

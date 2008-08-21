@@ -25,8 +25,8 @@
 
 #include <list>
 
-#include <libpsynth/net/OSCMisc.h>
-#include <libpsynth/net/OSCController.h>
+#include <libpsynth/net/osc_misc.h>
+#include <libpsynth/net/osc_controller.h>
 
 #define PSYNTH_DEFAULT_SERVER_PORT     8191
 #define PSYNTH_DEFAULT_SERVER_PORT_STR "8191"
@@ -34,69 +34,69 @@
 namespace psynth
 {
 
-class OSCServer;
+class osc_server;
 
-enum OSCServerClientError {
+enum osc_server_client_error {
     SCE_NONE = 0,
     SCE_CLIENT_TIMEOUT
 };
 
-enum OSCServerError {
+enum osc_server_error {
     SE_NONE = 0,
     SE_PORT_BINDING
 };
 
-class OSCServerListener
+class osc_server_listener
 {
     
 public:
-    virtual ~OSCServerListener() {}
-    virtual bool handleServerStartListening(OSCServer* server) = 0;
-    virtual bool handleServerStopListening(OSCServer* server, OSCServerError err) = 0;
-    virtual bool handleServerClientConnect(OSCServer* server, int client_id) = 0;
-    virtual bool handleServerClientDisconnect(OSCServer* server, int client_id,
-					OSCServerClientError cause) = 0;
+    virtual ~osc_server_listener() {}
+    virtual bool handle_server_start_listening (osc_server* server) = 0;
+    virtual bool handle_server_stop_listening (osc_server* server, osc_server_error err) = 0;
+    virtual bool handle_server_client_connect (osc_server* server, int client_id) = 0;
+    virtual bool handle_server_client_disconnect (osc_server* server, int client_id,
+						  osc_server_client_error cause) = 0;
 };
 
-class OSCServerSubject
+class osc_server_subject
 {
-    std::list<OSCServerListener*> m_list;
+    std::list<osc_server_listener*> m_list;
 
 protected:
-    void notifyServerStartListening(OSCServer* server);
-    void notifyServerStopListening(OSCServer* server, OSCServerError err);
-    void notifyServerClientDisconnect(OSCServer* server, int client_id,
-				OSCServerClientError cause);
-    void notifyServerClientConnect(OSCServer* server, int client_id);
+    void notify_server_start_listening (osc_server* server);
+    void notify_server_stop_listening (osc_server* server, osc_server_error err);
+    void notify_server_client_disconnect (osc_server* server, int client_id,
+					  osc_server_client_error cause);
+    void notify_server_client_connect (osc_server* server, int client_id);
     
 public:
-    void addListener(OSCServerListener* l) {
+    void add_listener (osc_server_listener* l) {
 	m_list.push_back(l);
     }
 
-    void deleteListener(OSCServerListener* l) {
+    void delete_listener (osc_server_listener* l) {
 	m_list.remove(l);
     }
 };
 
-class OSCServer : public OSCController,
-		  public OSCServerSubject
+class osc_server : public osc_controller,
+		   public osc_server_subject
 {
 public:
-    enum State {
+    enum state {
 	IDLE,
 	LISTENING
     };
-    
+
 private:
     const static int SERVER_ID = 0;
 
-    struct Slot {
+    struct slot {
 	int id;
 	int last_alive_recv;
 	int last_alive_sent;
 	
-	Slot(int id = 0) :
+	slot(int id = 0) :
 	    id(id), last_alive_recv(0), last_alive_sent(0) {};
     };
 
@@ -106,40 +106,41 @@ private:
 	}
     };
 
-    typedef std::map<lo_address, Slot, lo_address_lt_func> SlotMap; 
-    SlotMap m_slots;
+    typedef std::map<lo_address, slot, lo_address_lt_func> slot_map; 
+    slot_map m_slots;
     
     lo_server m_server;
     bool m_listening;
     int m_nextid;
-    State m_state;
+    state m_state;
     
-    LO_HANDLER(OSCServer, alive);
-    LO_HANDLER(OSCServer, connect);
-    LO_HANDLER(OSCServer, get_state);
-    LO_HANDLER(OSCServer, disconnect);
+    LO_HANDLER (osc_server, alive);
+    LO_HANDLER (osc_server, connect);
+    LO_HANDLER (osc_server, get_state);
+    LO_HANDLER (osc_server, disconnect);
 
-    void addMethods();
+    void add_methods ();
+    
 public:
     
-    OSCServer();
-    ~OSCServer();
+    osc_server();
+    ~osc_server();
 
-    bool isListening() {
+    bool is_listening () {
 	return m_listening;
     };
 
-    State getState() {
+    state get_state () {
 	return m_state;
     }
     
-    void listen(const char* port);
-    void stop();
-    void close();
+    void listen (const char* port);
+    void stop ();
+    void close ();
 
     /* time_out < 0 for blocking operation. */
-    int receive(int time_out = 0);
-    int update(int msec);
+    int receive (int time_out = 0);
+    int update (int msec);
 };
 
 } /* namespace psynth */

@@ -32,20 +32,20 @@ const char* DEFAULT_HOST = "localhost";
 const int NW_HEIGHT = 300;
 const int NW_WIDTH  = 300;
 
-ClientTab::ClientTab(OSCClient* client) :
+ClientTab::ClientTab(osc_client* client) :
     m_client(client),
     m_connected(false)
 {
-    m_client->addListener(this);
-    m_client->addListener(&m_logger);
+    m_client->add_listener(this);
+    m_client->add_listener(&m_logger);
     
     psynth::logger::instance().get_child ("oscclient").attach_sink (&m_logsink);
 }
 
 ClientTab::~ClientTab()
 {
-    m_client->deleteListener(this);
-    m_client->deleteListener(&m_logger);
+    m_client->delete_listener(this);
+    m_client->delete_listener(&m_logger);
  
     psynth::logger::instance().get_child ("oscclient").dattach_sink (&m_logsink);
     m_logsink.setWindow(NULL);
@@ -155,24 +155,24 @@ bool ClientTab::onButtonClick(const CEGUI::EventArgs &e)
     return true;
 }
 
-bool ClientTab::handleClientConnect(OSCClient* client)
+bool ClientTab::handle_client_connect(osc_client* client)
 {
     setConnected(true);
     return false;
 }
 
-bool ClientTab::handleClientDisconnect(OSCClient* client, OSCClientError err)
+bool ClientTab::handle_client_disconnect(osc_client* client, osc_client_error err)
 {
     setConnected(false);
     return false;
 }
 
-ServerTab::ServerTab(OSCServer* server) :
+ServerTab::ServerTab(osc_server* server) :
     m_server(server),
     m_listening(false)
 {
-    m_server->addListener(this);
-    m_server->addListener(&m_logger);
+    m_server->add_listener(this);
+    m_server->add_listener(&m_logger);
  
     psynth::logger::instance().get_child ("oscserver").attach_sink (&m_logsink);
 }
@@ -180,8 +180,8 @@ ServerTab::ServerTab(OSCServer* server) :
 ServerTab::~ServerTab()
 {
     
-    m_server->deleteListener(this);
-    m_server->deleteListener(&m_logger);
+    m_server->delete_listener(this);
+    m_server->delete_listener(&m_logger);
     
     psynth::logger::instance().get_child ("oscserver").dattach_sink (&m_logsink);
     m_logsink.setWindow(NULL);
@@ -252,13 +252,13 @@ void ServerTab::setListening(bool lis)
     }
 }
 
-bool ServerTab::handleServerStartListening(OSCServer* server)
+bool ServerTab::handle_server_start_listening(osc_server* server)
 {
     setListening(true);
     return false;
 }
 
-bool ServerTab::handleServerStopListening(OSCServer* server, OSCServerError err)
+bool ServerTab::handle_server_stop_listening(osc_server* server, osc_server_error err)
 {
     setListening(false);
     return false;
@@ -274,7 +274,7 @@ bool ServerTab::onButtonClick(const CEGUI::EventArgs &e)
     return true;
 }
 
-NetworkWindow::NetworkWindow(OSCClient* client, OSCServer* server) :
+NetworkWindow::NetworkWindow(osc_client* client, osc_server* server) :
     m_client_tab(new ClientTab(client)),
     m_server_tab(new ServerTab(server))
 {

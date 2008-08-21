@@ -187,19 +187,19 @@ if HAVE_LIBLO
 libpsynth_la_CXXFLAGS += $(LIBLO_CFLAGS)
 libpsynth_la_LIBADD += $(LIBLO_LIBS)
 nobase_libpsynthinc_HEADERS += \
-	net/OSCBroadcast.h\
-	net/OSCServer.h \
-	net/OSCClient.h \
-	net/OSCServerLogger.h \
-	net/OSCClientLogger.h \
-	net/OSCController.h \
-	net/OSCMisc.h \
-	net/OSCProtocol.h
+	net/osc_broadcast.h\
+	net/osc_server.h \
+	net/osc_client.h \
+	net/osc_server_logger.h \
+	net/osc_client_logger.h \
+	net/osc_controller.h \
+	net/osc_misc.h \
+	net/osc_protocol.h
 libpsynth_la_SOURCES += \
-	net/OSCBroadcast.cpp \
-	net/OSCController.cpp \
-	net/OSCServer.cpp \
-	net/OSCClient.cpp
+	net/osc_broadcast.cpp \
+	net/osc_controller.cpp \
+	net/osc_server.cpp \
+	net/osc_client.cpp
 endif
 
 if HAVE_ALSA

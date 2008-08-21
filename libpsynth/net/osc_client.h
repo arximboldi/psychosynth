@@ -23,7 +23,7 @@
 #ifndef PSYNTH_OSCCLIENT_H
 #define PSYNTH_OSCCLIENT_H
 
-#include <libpsynth/net/OSCController.h>
+#include <libpsynth/net/osc_controller.h>
 
 #define PSYNTH_DEFAULT_CLIENT_PORT      8192
 #define PSYNTH_DEFAULT_CLIENT_PORT_STR "8192"
@@ -31,74 +31,77 @@
 namespace psynth
 {
 
-class OSCClient;
+class osc_client;
 
-enum OSCClientError {
+enum osc_client_error {
     CE_NONE = 0,
     CE_PORT_BINDING,
     CE_SERVER_TIMEOUT,
     CE_SERVER_DROP
 };
 
-class OSCClientListener
+class osc_client_listener
 {
 public:
-    virtual ~OSCClientListener() {}
+    virtual ~osc_client_listener() {}
     
-    virtual bool handleClientConnect(OSCClient* client) = 0;
-    virtual bool handleClientDisconnect(OSCClient* client, OSCClientError err) = 0;
-    virtual bool handleClientAccept(OSCClient* client) = 0;
+    virtual bool handle_client_connect(osc_client* client) = 0;
+    virtual bool handle_client_disconnect(osc_client* client, osc_client_error err) = 0;
+    virtual bool handle_client_accept(osc_client* client) = 0;
 };
 
-class OSCClientSubject
+class osc_client_subject
 {
-    std::list<OSCClientListener*> m_list;
+    std::list<osc_client_listener*> m_list;
 
 protected:
-    void notifyClientConnect(OSCClient* param);
-    void notifyClientDisconnect(OSCClient* param, OSCClientError err);
-    void notifyClientAccept(OSCClient* param);
+    void notify_client_connect(osc_client* param);
+    void notify_client_disconnect(osc_client* param, osc_client_error err);
+    void notify_client_accept(osc_client* param);
     
 public:
-    void addListener(OSCClientListener* l) {
+    void add_listener(osc_client_listener* l) {
 	m_list.push_back(l);
     };
     
-    void deleteListener(OSCClientListener* l) {
+    void delete_listener(osc_client_listener* l) {
 	m_list.remove(l);
     };
 };
 
-class OSCClient : public OSCController,
-		  public OSCClientSubject
+class osc_client : public osc_controller,
+		  public osc_client_subject
 {
-    lo_address m_target;
-    lo_server m_server;
-    int m_id;
-    int m_state;
-    int m_last_alive_recv;
-    int m_last_alive_sent;
-    int m_count_next;
-    
-    LO_HANDLER(OSCClient, alive);
-    LO_HANDLER(OSCClient, drop);
-    LO_HANDLER(OSCClient, accept);
-
-    void addMethods();
-    void close();
-    
 public:
-    enum State {
+    enum state {
 	IDLE,
 	PENDING,
 	CONNECTED,
 	CLOSING
     };
-    
-    OSCClient();
-    ~OSCClient();
 
-    int getState() {
+private:
+    lo_address m_target;
+    lo_server m_server;
+    int m_id;
+    state m_state;
+    int m_last_alive_recv;
+    int m_last_alive_sent;
+    int m_count_next;
+    
+    LO_HANDLER(osc_client, alive);
+    LO_HANDLER(osc_client, drop);
+    LO_HANDLER(osc_client, accept);
+
+    void add_methods();
+    void close();
+    
+public:
+    
+    osc_client();
+    ~osc_client();
+
+    state get_state() {
 	return m_state;
     }
     

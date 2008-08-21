@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) 2007 Juan Pedro Bolivar Puente                          *
+ *   Copyright (C) Juan Pedro Bolivar Puente 2007                          *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -20,78 +20,53 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef PSYNTH_OSCBROADCAST_H
-#define PSYNTH_OSCBROADCAST_H
+#ifndef PSYNTH_OSCCLIENTLOGGER_H
+#define PSYNTH_OSCCLIENTLOGGER_H
 
-#include <list>
-#include <lo/lo.h>
-
-#include <libpsynth/net/OSCMisc.h>
+#include <libpsynth/common/logger.h>
+#include <libpsynth/net/osc_client.h>
 
 namespace psynth
 {
 
-/*
-template<class T>
-class first_equals
+class osc_client_logger : public osc_client_listener
 {
-    T m_ref;
 public:
-    first_equals(const T& r) : m_ref(r) {};
-
-    template<class U>
-    bool operator() (const std::pair<T,U>& p) {
-	return p.first == m_ref;
-    }
-};
-*/
-
-class lo_address_equals_func
-{
-    lo_address m_ref;
-    
-public:
-    lo_address_equals_func(lo_address ref) : m_ref(ref) {}
-
-    bool operator() (lo_address param) {
-	return lo_address_equals(m_ref, param);
-    }
-};
-
-class OSCBroadcast
-{
-    std::list<lo_address> m_dest;
-    lo_server m_sender;
-    
-public:
-    OSCBroadcast() :
-	m_sender(NULL) {}
-    
-    ~OSCBroadcast() {
-	clear();
-    }
-
-    void setSender(lo_server s) {
-	m_sender = s;
+    virtual bool handle_client_connect (osc_client* client) {
+	logger::instance() ("oscclient", log::INFO, "Connecting...");
+	return false;
     }
     
-    void addDestiny(lo_address dest) {
-	m_dest.push_back(dest);
+    virtual bool handle_client_disconnect(osc_client* client, osc_client_error err) {
+	switch(err) {
+	case CE_NONE:
+	    logger::instance() ("oscclient", log::INFO, "Disconnected.");
+	    break;
+
+	case CE_PORT_BINDING:
+	    logger::instance() ("oscclient", log::ERROR, "Could not bind port.");
+	    break;
+
+	case CE_SERVER_DROP:
+	    logger::instance() ("oscclient", log::ERROR, "Connection dropped by server.");
+	    break;
+
+	case CE_SERVER_TIMEOUT:
+	    logger::instance() ("oscclient", log::ERROR, "Connection timeout");
+	    break;
+
+	default:
+	    break;
+	}
+	return false;
     }
     
-    void deleteDestiny(lo_address dest); /*{
-	//m_dest.remove_if(lo_address_equals_func(dest));
-	}*/
-
-    void clear();
-    
-    bool isDestiny(lo_address dest);
-    
-    void broadcastMessage(const char* path, lo_message msg);
-
-    void broadcastMessageFrom(const char* path, lo_message msg, lo_address from);
+    virtual bool handle_client_accept (osc_client* client) {
+	logger::instance() ("oscclient", log::INFO, "Accepted.");
+	return false;
+    }
 };
 
 } /* namespace psynth */
 
-#endif /* PSYNTH_OSCBROADCAST_H */
+#endif /* PSYNTH_OSCCLIENTLOGGER_H */

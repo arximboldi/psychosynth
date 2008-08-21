@@ -20,78 +20,64 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <cstring>
-#include <iostream>
+#ifndef PSYNTH_OSCSERVERLOGGER_H
+#define PSYNTH_OSCSERVERLOGGER_H
 
-#include "net/OSCBroadcast.h"
-#include "net/OSCMisc.h"
-
-using namespace std;
+#include <libpsynth/net/osc_server.h>
 
 namespace psynth
 {
 
-void OSCBroadcast::clear()
+class osc_server_logger : public osc_server_listener
 {
-    for (list<lo_address>::iterator it = m_dest.begin();
-	 it != m_dest.end(); ++it)
-	lo_address_free(*it);
-    
-    m_dest.clear();
-    m_sender = NULL;
-}
-
-void OSCBroadcast::deleteDestiny(lo_address add)
-{
-   for (list<lo_address>::iterator it = m_dest.begin();
-	 it != m_dest.end();)
-       if (lo_address_equals(*it, add)) {
-	   lo_address_free(*it);
-	   m_dest.erase(it++);
-       }
-       else
-	   ++it;
-}
-
-bool OSCBroadcast::isDestiny(lo_address adr)
-{
-    for (list<lo_address>::iterator it = m_dest.begin();
-	 it != m_dest.end(); ++it)
-	if (lo_address_equals(*it, adr))
-	    return true;
-	    
-    return false;
-}
-
-void OSCBroadcast::broadcastMessage(const char* path, lo_message msg)
-{
-    if (m_sender)
-	for (list<lo_address>::iterator it = m_dest.begin();
-	     it != m_dest.end(); ++it)
-	    lo_send_message_from(*it, m_sender, path, msg);
-    else
-	for (list<lo_address>::iterator it = m_dest.begin();
-	     it != m_dest.end(); ++it)
-	    lo_send_message(*it, path, msg);
-}
-
-void OSCBroadcast::broadcastMessageFrom(const char* path, lo_message msg, lo_address source)
-{
-    if (m_sender) {
-	for (list<lo_address>::iterator it = m_dest.begin();
-	     it != m_dest.end(); ++it)
-	    if (!lo_address_equals(*it, source)) {
-		lo_send_message_from(*it, m_sender, path, msg);
-		cout << "yeoo!!\n";
-	    }
-	    else
-		cout << "yeah!!\n";
-    } else {
-	for (list<lo_address>::iterator it = m_dest.begin();
-	     it != m_dest.end(); ++it)
-	    if (!lo_address_equals(*it, source))
-		lo_send_message(*it, path, msg);
+public:
+    virtual bool handle_server_start_listening (osc_server* server) {
+	logger::instance() ("oscserver", log::INFO, "Server listening.");
+	return false;
     }
-}
+    
+    virtual bool handle_server_stop_listening(osc_server* server,
+					   osc_server_error err) {
+	switch(err) {
+	case SE_NONE:
+	    logger::instance() ("oscserver", log::INFO, "Server no longer listening.");
+	    break;
+	    
+	case SE_PORT_BINDING:
+	    logger::instance() ("oscserver", log::INFO, "Could not bind port.");
+	    break;
+
+	default:
+	    break;
+	}
+
+	return false;
+    }
+    
+    virtual bool handle_server_client_connect(osc_server* server, int client_id) {
+	logger::instance() ("oscserver", log::INFO, "Client connected.");
+	return false;
+    }
+    
+    virtual bool handle_server_client_disconnect(osc_server* server, int client_id,
+					      osc_server_client_error cause) {
+	switch(cause) {
+	case SCE_NONE:
+	    logger::instance() ("oscserver", log::INFO, "Client disconnected.");
+	    break;
+
+	case SCE_CLIENT_TIMEOUT:
+	    logger::instance() ("oscserver", log::INFO, "Client timeout.");
+	    break;
+	    
+	default:
+	    break;
+	}
+	
+	return false;
+    }
+};
 
 } /* namespace psynth */
+
+#endif /* PSYNTH_OSCSERVERLOGGER_H */

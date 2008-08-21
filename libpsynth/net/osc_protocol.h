@@ -24,18 +24,18 @@
 #define PSYNTH_OSCPROTOCOL_H
 
 /* Server-Client connection abstraction. */
-#define MSG_ACCEPT      "/ps/accept"
-#define MSG_CONNECT     "/ps/connect"
-#define MSG_ALIVE       "/ps/alive"
-#define MSG_DISCONNECT  "/ps/disconnect"
-#define MSG_DROP        "/ps/drop"
-#define MSG_GET_STATE   "/ps/get_state"
+#define PSYNTH_OSC_MSG_ACCEPT      "/ps/accept"
+#define PSYNTH_OSC_MSG_CONNECT     "/ps/connect"
+#define PSYNTH_OSC_MSG_ALIVE       "/ps/alive"
+#define PSYNTH_OSC_MSG_DISCONNECT  "/ps/disconnect"
+#define PSYNTH_OSC_MSG_DROP        "/ps/drop"
+#define PSYNTH_OSC_MSG_GET_STATE   "/ps/get_state"
 
-/* Table constrolling. */
-#define MSG_PARAM        "/ps/param"
-#define MSG_ACTIVATE     "/ps/activate"
-#define MSG_DEACTIVATE   "/ps/deactivate"
-#define MSG_ADD          "/ps/add"
-#define MSG_DELETE       "/ps/delete"
+/* World constrolling. */
+#define PSYNTH_OSC_MSG_PARAM       "/ps/param"
+#define PSYNTH_OSC_MSG_ACTIVATE    "/ps/activate"
+#define PSYNTH_OSC_MSG_DEACTIVATE  "/ps/deactivate"
+#define PSYNTH_OSC_MSG_ADD         "/ps/add"
+#define PSYNTH_OSC_MSG_DELETE      "/ps/delete"
 
 #endif /* PSYNTH_OSCPROTOCOL_H */

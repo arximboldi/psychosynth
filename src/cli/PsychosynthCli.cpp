@@ -23,10 +23,10 @@
 #include <algorithm>
 #include <config.h>
 
-#include <libpsynth/net/OSCClient.h>
-#include <libpsynth/net/OSCServer.h>
-#include <libpsynth/net/OSCClientLogger.h>
-#include <libpsynth/net/OSCServerLogger.h>
+#include <libpsynth/net/osc_client.h>
+#include <libpsynth/net/osc_server.h>
+#include <libpsynth/net/osc_client_logger.h>
+#include <libpsynth/net/osc_server_logger.h>
 #include <libpsynth/common/timer.h>
 #include <libpsynth/common/arg_parser.h>
 
@@ -100,17 +100,17 @@ void PsychosynthCli::init ()
 int PsychosynthCli::runClient()
 {
     timer timer;
-    OSCClient client;
-    OSCClientLogger logger;
+    osc_client client;
+    osc_client_logger logger;
     lo_address add;
     int ret_val = 0;
     
     add = lo_address_new (m_host.c_str(), m_server_port.c_str());
 
-    client.setTable (get_table());
+    client.set_table (get_table());
     client.activate ();
     
-    client.addListener (&logger);
+    client.add_listener (&logger);
     client.connect (add, m_client_port.c_str());
     
     timer.update();
@@ -122,7 +122,7 @@ int PsychosynthCli::runClient()
 
 	get_table ()->update ();
 	
-	if (client.getState () == OSCClient::IDLE)
+	if (client.get_state () == osc_client::IDLE)
 	    ret_val = -1;
     }
 
@@ -132,26 +132,26 @@ int PsychosynthCli::runClient()
 int PsychosynthCli::runServer()
 {
     timer timer;
-    OSCServer server;
-    OSCServerLogger logger;
+    osc_server server;
+    osc_server_logger logger;
     int ret_val = 0;
     
-    server.addListener(&logger);
-    server.listen(m_server_port.c_str());
+    server.add_listener (&logger);
+    server.listen (m_server_port.c_str());
 
-    server.setTable (get_table ());
+    server.set_table (get_table ());
     server.activate();
     
     timer.update();
     while (ret_val == 0) {
-	timer.update();
+	timer.update ();
 
-	while (server.receive(TIME_OUT));
+	while (server.receive (TIME_OUT));
 	server.update (timer.delta_ticks ());
 
 	get_table ()->update ();
 	
-	if (server.getState() == OSCServer::IDLE)
+	if (server.get_state () == osc_server::IDLE)
 	    ret_val = -1;
     }
 
