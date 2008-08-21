@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) Juan Pedro Bolivar Puente 2008                          *
+ *   Copyright (C) Juan Pedro Bolivar Puente 2007                          *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -20,48 +20,43 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef PSYNTH_FILEREADERANY
-#define PSYNTH_FILEREADERANY
+#ifndef PSYNTH_OUTPUTWAVE_H
+#define PSYNTH_OUTPUTWAVE_H
 
-#include <libpsynth/input/FileReader.h>
+#include <string>
+
+#include <audiofile.h>
+#include <libpsynth/output/output.h>
 
 namespace psynth
 {
 
-class FileReaderAny : public FileReader
+class output_wave : public output
 {
-    FileReader* m_the_reader;
+    AFfilehandle m_af_file;
+    AFfilesetup m_af_setup;
 
+    short int* m_buf;
+    
+    std::string m_file_name;
+    
 public:
-    FileReaderAny() :
-	m_the_reader(NULL) {}
+    output_wave (const audio_info& info);
+    output_wave (const audio_info& info, const std::string& fname);
 
-    ~FileReaderAny() {
-	if (isOpen())
-	    close();
-    }
-    
-    virtual void open(const char* file);
+    ~output_wave();
 
-    virtual void seek(size_t pos) {
-	m_the_reader->seek(pos);
+    void set_file_name (const std::string& fname) {
+	m_file_name = fname;
     }
     
-    virtual int read(audio_buffer& buf, int n_samples) {
-	return m_the_reader->read(buf, n_samples);
-    }
-    
-    virtual void close() {
-	if (isOpen()) {
-	    m_the_reader->close();
-	    delete m_the_reader;
-	    m_the_reader = NULL;
-	    setIsOpen(false);
-	}
-    }
-    
+    bool open ();
+    bool close ();
+    bool put (const audio_buffer& buf, size_t nframes);
+    bool start ();
+    bool stop ();
 };
 
-} /* PSYNTH_FILEREADERANY */
+} /* namespace psynth */
 
-#endif /* PSYNTH_FILEREADERANY */
+#endif /* PSYNTH_OUTPUTWAVE_H */

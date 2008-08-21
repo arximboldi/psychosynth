@@ -76,7 +76,7 @@ public:
 	return m_table;
     }
 
-    Output* get_output() {
+    output* get_output() {
 	if (m_output)
 	    return m_output->get_output ();
 	return NULL;

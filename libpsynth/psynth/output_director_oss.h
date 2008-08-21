@@ -25,14 +25,14 @@
 
 #include <libpsynth/psynth/defaults_oss.h>
 #include <libpsynth/psynth/output_director.h>
-#include <libpsynth/output/OutputOss.h>
+#include <libpsynth/output/output_oss.h>
 
 namespace psynth
 {
 
 class output_director_oss : public output_director
 {
-    OutputOss* m_output;
+    output_oss* m_output;
 
     ~output_director_oss() {
 	if (m_output)
@@ -41,27 +41,27 @@ class output_director_oss : public output_director
     
     bool on_device_change(conf_node& conf) {
 	std::string device;
-	Output::State old_state;
+	output::state old_state;
 	
 	conf.get(device);
 	
-	old_state = m_output->getState();
-	m_output->gotoState(Output::NOTINIT);
-	m_output->setDevice(device);
-	m_output->gotoState(old_state);
+	old_state = m_output->get_state();
+	m_output->goto_state(output::NOTINIT);
+	m_output->set_device(device);
+	m_output->goto_state(old_state);
 
 	return false;
     }
     
-    virtual Output* do_start(conf_node& conf) {
+    virtual output* do_start(conf_node& conf) {
 	std::string device;
 	
 	conf.get_child ("out_device").get(device);
 	conf.get_child ("out_device").add_change_event(
 	    MakeDelegate(this, &output_director_oss::on_device_change));
 
-	m_output = new OutputOss;
-	m_output->setDevice(device);
+	m_output = new output_oss;
+	m_output->set_device(device);
 
 	return m_output;
     };

@@ -103,10 +103,10 @@ nobase_libpsynthinc_HEADERS = \
 	object/WatchViewer.h\
 	object/ObjectFactory.h\
 	object/ObjectFactoryManager.h\
-	output/Output.h\
-	input/FileReader.h\
-	input/FileReaderAny.h\
-	input/FileReaderFetcher.h\
+	output/output.h\
+	input/file_reader.h\
+	input/file_reader_any.h\
+	input/file_reader_fetcher.h\
 	version.h
 
 libpsynth_la_SOURCES = \
@@ -153,8 +153,8 @@ libpsynth_la_SOURCES = \
 	object/ObjParam.cpp\
 	object/ObjectFactoryManager.cpp\
 	object/EnvelopeMulti.cpp\
-	input/FileReaderAny.cpp\
-	input/FileReaderFetcher.cpp
+	input/file_reader_any.cpp\
+	input/file_reader_fetcher.cpp
 
 if HAVE_SAMPLERATE
 libpsynth_la_CXXFLAGS += $(SAMPLERATE_CFLAGS)
@@ -208,18 +208,18 @@ libpsynth_la_LIBADD += $(ALSA_LIBS)
 nobase_libpsynthinc_HEADERS += \
 	psynth/defaults_alsa.h \
 	psynth/output_director_alsa.h \
-	output/OutputAlsa.h	
+	output/output_alsa.h	
 libpsynth_la_SOURCES += \
-	output/OutputAlsa.cpp
+	output/output_alsa.cpp
 endif
 
 if HAVE_OSS
 nobase_libpsynthinc_HEADERS += \
 	psynth/defaults_oss.h \
 	psynth/output_director_oss.h \
-	output/OutputOss.h
+	output/output_oss.h
 libpsynth_la_SOURCES += \
-	output/OutputOss.cpp
+	output/output_oss.cpp
 endif
 
 if HAVE_JACK
@@ -228,29 +228,29 @@ libpsynth_la_LDFLAGS += $(JACK_LIBS)
 nobase_libpsynthinc_HEADERS += \
 	psynth/defaults_jack.h \
 	psynth/output_director_jack.h \
-	output/OutputJack.h
+	output/output_jack.h
 libpsynth_la_SOURCES += \
-	output/OutputJack.cpp
+	output/output_jack.cpp
 endif
 
 if HAVE_SNDFILE
 libpsynth_la_CXXFLAGS += $(SNDFILE_CFLAGS)
 libpsynth_la_LIBADD += $(SNDFILE_LIBS)
 nobase_libpsynthinc_HEADERS += \
-	output/OutputWave.h\
-	input/FileReaderWave.h
+	output/output_wave.h\
+	input/file_reader_wave.h
 libpsynth_la_SOURCES += \
-	output/OutputWave.cpp\
-	input/FileReaderWave.cpp
+	output/output_wave.cpp\
+	input/file_reader_wave.cpp
 endif
 
 if HAVE_VORBIS
 libpsynth_la_CXXFLAGS += $(VORBIS_CFLAGS)
 libpsynth_la_LIBADD += $(VORBIS_LIBS)
 nobase_libpsynthinc_HEADERS += \
-	input/FileReaderOgg.h
+	input/file_reader_ogg.h
 libpsynth_la_SOURCES += \
-	input/FileReaderOgg.cpp
+	input/file_reader_ogg.cpp
 endif
 
 libpsynth_la_SOURCES += $(nobase_libpsynthinc_HEADERS)

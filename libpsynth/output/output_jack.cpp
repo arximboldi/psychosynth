@@ -22,39 +22,39 @@
 
 #include "common/misc.h"
 #include "common/logger.h"
-#include "output/OutputJack.h"
+#include "output/output_jack.h"
 
 using namespace std;
 
 namespace psynth
 {
 
-OutputJack::OutputJack()
+output_jack::output_jack()
 {
 }
 
-OutputJack::OutputJack(const audio_info& info) :
-    Output(info),
-    m_out_ports(info.num_channels)
+output_jack::output_jack(const audio_info& info)
+    : output(info)
+    , m_out_ports(info.num_channels)
 {
 }
 
-OutputJack::OutputJack(const audio_info& info, const std::string& server_name) :
-    Output(info),
-    m_out_ports(info.num_channels),
-    m_serv_name(server_name)
+output_jack::output_jack(const audio_info& info, const std::string& server_name)
+    : output(info)
+    , m_out_ports(info.num_channels)
+    , m_serv_name(server_name)
 {
 }
 
-OutputJack::~OutputJack()
+output_jack::~output_jack()
 {
-    if (getState() != NOTINIT)
+    if (get_state() != NOTINIT)
 	close();
 }
 
-bool OutputJack::open()
+bool output_jack::open()
 {
-    if (getState() == NOTINIT) {
+    if (get_state() == NOTINIT) {
 	if (m_serv_name.empty())
 	    m_serv_name = string();
 
@@ -66,19 +66,19 @@ bool OutputJack::open()
 	    return false;
 	}
 
-	jack_set_process_callback(m_client, &OutputJack::jack_process_cb, this);
-	jack_set_sample_rate_callback(m_client, &OutputJack::jack_sample_rate_cb, this);
-	jack_on_shutdown(m_client, &OutputJack::jack_shutdown_cb, this);
+	jack_set_process_callback(m_client, &output_jack::jack_process_cb, this);
+	jack_set_sample_rate_callback(m_client, &output_jack::jack_sample_rate_cb, this);
+	jack_on_shutdown(m_client, &output_jack::jack_shutdown_cb, this);
 	
 	m_actual_rate = jack_get_sample_rate(m_client);
-	if (m_actual_rate != (size_t)getInfo().sample_rate) {
+	if (m_actual_rate != (size_t)get_info ().sample_rate) {
 	    logger::instance() ("jack", log::WARNING,
 				"Jackd sample rate and application sample rate mismatch."
 				"Better sound quality is achieved if both are the same.");
 	}
 
-	if (getInfo().num_channels != m_out_ports.size())
-	    m_out_ports.resize(getInfo().num_channels);
+	if (get_info ().num_channels != m_out_ports.size())
+	    m_out_ports.resize(get_info ().num_channels);
 	
 	for (size_t i = 0; i < m_out_ports.size(); ++i)
 	    m_out_ports[i] = jack_port_register(m_client,
@@ -87,7 +87,7 @@ bool OutputJack::open()
 						JackPortIsOutput,
 						0);
 
-	setState(IDLE);
+	set_state(IDLE);
 
 	return true;
     }
@@ -95,23 +95,23 @@ bool OutputJack::open()
     return false;
 }
 
-bool OutputJack::close()
+bool output_jack::close()
 {
-    if (getState() == RUNNING)
+    if (get_state() == RUNNING)
 	stop();
     
-    if (getState() != NOTINIT) {
+    if (get_state() != NOTINIT) {
 	jack_client_close(m_client);
-	setState(NOTINIT);
+	set_state(NOTINIT);
     }
 
     return true;
 }
 
-bool OutputJack::put(const audio_buffer& in_buf, size_t nframes)
+bool output_jack::put(const audio_buffer& in_buf, size_t nframes)
 {
-    if (in_buf.get_info().num_channels != getInfo().num_channels ||
-	in_buf.get_info().sample_rate != getInfo().sample_rate) {
+    if (in_buf.get_info().num_channels != get_info ().num_channels ||
+	in_buf.get_info().sample_rate != get_info ().sample_rate) {
 	logger::instance() ("jack", log::WARNING,
 			    "Cant send data to the device:"
 			    "data and output system properties missmatch.");
@@ -128,57 +128,57 @@ bool OutputJack::put(const audio_buffer& in_buf, size_t nframes)
     return true;
 }
 
-void OutputJack::connectPorts()
+void output_jack::connect_ports()
 {
     const char** ports;
 
-    ports = jack_get_ports(m_client, NULL, NULL, JackPortIsPhysical|JackPortIsInput);
+    ports = jack_get_ports (m_client, NULL, NULL, JackPortIsPhysical|JackPortIsInput);
 
     if (!ports) {
-	logger::instance() ("jack", log::WARNING, "There are no phisical output ports.");
+	logger::instance () ("jack", log::WARNING, "There are no phisical output ports.");
 	return;
     }
 
     for (size_t i = 0; i < m_out_ports.size() && ports[i]; ++i)
-	jack_connect(m_client, jack_port_name(m_out_ports[i]), ports[i]);
+	jack_connect (m_client, jack_port_name(m_out_ports[i]), ports[i]);
 
     free(ports);
 }
 
-bool OutputJack::start()
+bool output_jack::start()
 {
-    if (getState() == IDLE) {
-	jack_activate(m_client);
-	connectPorts();
+    if (get_state() == IDLE) {
+	jack_activate (m_client);
+	connect_ports ();
 	return true;
     }
     
     return false;
 }
 
-bool OutputJack::stop()
+bool output_jack::stop()
 {
-    if (getState() == RUNNING) {
-	jack_deactivate(m_client);
+    if (get_state() == RUNNING) {
+	jack_deactivate (m_client);
 	return true;
     }
 
     return false;
 }
 
-void OutputJack::jackProcess(jack_nframes_t nframes)
+void output_jack::jack_process (jack_nframes_t nframes)
 {
-    process(nframes);
+    process (nframes);
 }
 
-void OutputJack::jackSampleRate(jack_nframes_t new_rate)
+void output_jack::jack_sample_rate (jack_nframes_t new_rate)
 {
     m_actual_rate = new_rate;
 }
 
-void OutputJack::jackShutDown()
+void output_jack::jack_shutdown ()
 {
-    setState(NOTINIT);
+    set_state (NOTINIT);
 }
 
 } /* namespace psynth */

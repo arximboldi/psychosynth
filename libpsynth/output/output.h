@@ -36,27 +36,27 @@ enum {
     OUT_TYPES,
 };
 
-class OutputProcessor
+class output_processor
 {
 public:
-    virtual void processOutput(int n_frames) = 0;
+    virtual void process_output (int n_frames) = 0;
 };
 
-class Output
+class output
 {
 public:
-    enum State {
+    enum state {
 	NOTINIT,
 	IDLE,
 	RUNNING,
 	N_STATES
     };
     
-    typedef void(*callback_t)(int,void*);
+    typedef void (* callback_t) (int,void*);
 
 private:
     audio_info m_info;
-    State m_state;
+    state m_state;
 	
     void* m_cbdata;
     callback_t m_callback;
@@ -67,40 +67,42 @@ protected:
 	    m_callback(n_frames, m_cbdata);
     }
 
-    void setState(State state) {
+    void set_state(state state) {
 	m_state = state;
     }
     
-    callback_t getCallback() {
+    callback_t get_callback() {
 	return m_callback;
     }
 
-    void* getCallbackData() {
+    void* get_callback_data() {
 	return m_cbdata;
     }
     
 public:
     
-    Output(audio_info info = audio_info(), void (*callback)(int,void*) = NULL, void* data = NULL) :
-	m_info(info),
-	m_state(NOTINIT),
-	m_cbdata(data),
-	m_callback(callback)
+    output (audio_info info = audio_info(),
+	    void (*callback)(int,void*) = NULL,
+	    void* data = NULL)
+	: m_info(info)
+	, m_state(NOTINIT)
+	, m_cbdata(data)
+	, m_callback(callback)
 	{}
 
-    virtual bool open() = 0;
-    virtual bool close()  = 0;
-    virtual bool put(const audio_buffer& buf, size_t nframes) = 0;
-    virtual bool start() = 0;
-    virtual bool stop() = 0;
+    virtual bool open () = 0;
+    virtual bool close ()  = 0;
+    virtual bool put (const audio_buffer& buf, size_t nframes) = 0;
+    virtual bool start () = 0;
+    virtual bool stop () = 0;
 
-    virtual ~Output() {};
+    virtual ~output() {};
     
-    bool put(const audio_buffer& buf) {
+    bool put (const audio_buffer& buf) {
 	return put(buf, buf.size());
     }
     
-    bool setInfo(const audio_info& info) {
+    bool set_info (const audio_info& info) {
 	if (m_state == NOTINIT) {
 	    m_info = info;
 	    return true;
@@ -110,7 +112,7 @@ public:
 	}
     }
 	
-    bool setCallback(callback_t callback, void* data) {
+    bool set_callback (callback_t callback, void* data) {
 	if (m_state == NOTINIT) {
 	    m_cbdata = data;
 	    m_callback = callback;
@@ -121,22 +123,22 @@ public:
 	}
     }
 	
-    const audio_info& getInfo() const {
+    const audio_info& get_info () const {
 	return m_info;
     }
 
     /* maybe-TODO: A StepMachine class for this kind of things? */
-    State getState() const {
+    state get_state () const {
 	return m_state;
     }
 
-    bool gotoState(State target) {
+    bool goto_state (state target) {
 	if (target > m_state) {
 	    switch(m_state) {
 	    case NOTINIT:
-		return open() && gotoState(target);
+		return open () && goto_state (target);
 	    case IDLE:
-		return start() && gotoState(target);
+		return start () && goto_state (target);
 	    default:
 		break;
 	    }
@@ -145,9 +147,9 @@ public:
 	if (target < m_state) {
 	    switch(m_state) {
 	    case IDLE:
-		return close() && gotoState(target);
+		return close () && goto_state (target);
 	    case RUNNING:
-		return stop() && gotoState(target);
+		return stop () && goto_state (target);
 	    default:
 		break;
 	    }

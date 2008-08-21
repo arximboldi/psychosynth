@@ -20,54 +20,31 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef PSYNTH_FILEREADER_H
-#define PSYNTH_FILEREADER_H
+#ifndef PSYNTH_FILEREADERWAVE_H
+#define PSYNTH_FILEREADERWAVE_H
 
-#include <libpsynth/common/audio_info.h>
-#include <libpsynth/common/audio_buffer.h>
+#include <sndfile.h>
+#include <libpsynth/input/file_reader.h>
 
 namespace psynth
 {
 
-class FileReader
+class file_reader_wave : public file_reader
 {
-    bool m_isopen;
-    audio_info m_info;
-    
-protected:
-    void setIsOpen(bool isopen) {
-	m_isopen = isopen;
-    };
-
-    void setInfo(const audio_info& info) {
-	m_info = info;
-    }
+    SNDFILE* m_file;
     
 public:
-    FileReader() :
-	m_isopen(false),
-	m_info(0,0,0) {}
-    
-    virtual ~FileReader() {};
-    
-    bool isOpen() {
-	return m_isopen;
-    }
-
-    const audio_info& getInfo() {
-	return m_info;
+    ~file_reader_wave() {
+	if (is_open())
+	    close();
     }
     
-    virtual void open(const char* file) = 0;
-    virtual void seek(size_t pos) = 0;
-    virtual int read(audio_buffer& buf, int n_samples) = 0;
-    virtual void close() = 0;
-    
-    int read(audio_buffer& buf) {
-	return read(buf, buf.size());
-    }
+    void open(const char* file);
+    void seek(size_t pos);
+    int read(audio_buffer& buf, int n_samples);
+    void close();
 };
 
 } /* namespace psynth */
 
-#endif /* PSYNTH_FILEREADER_H */
+#endif /* PSYNTH_FILEREADERWAVE_H */

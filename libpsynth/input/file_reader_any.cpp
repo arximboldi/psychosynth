@@ -20,71 +20,53 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef PSYNTH_FILEREADERFETCHER_H
-#define PSYNTH_FILEREADERFETCHER_H
+#include "version.h"
+#include "common/misc.h"
+#include "input/file_reader_any.h"
 
-#include <libpsynth/input/FileReader.h>
-#include <libpsynth/common/thread.h>
-#include <libpsynth/common/mutex.h>
-#include <libpsynth/common/ring_audio_buffer.h>
+#ifdef PSYNTH_HAVE_PCM
+#include "input/file_reader_wave.h"
+#endif
+#ifdef PSYNTH_HAVE_OGG
+#include "input/file_reader_ogg.h"
+#endif
 
+#include <iostream>
+
+using namespace std;
 namespace psynth
 {
 
-class FileReaderFetcher : public FileReader,
-			  public self_thread
+void file_reader_any::open (const char* file)
 {
-    /* High default values for lower number of seeks when reading backwards. */
-    static const int DEFAULT_BUFFER_SIZE = 16384;
-    static const int DEFAULT_THRESHOLD  = 4096; 
+    if (!is_open()) {
+	const char* ext = get_extension (file);
 
-    FileReader* m_reader;
-    int m_buffer_size;
-    int m_threshold;
-    audio_buffer m_tmp_buffer;
-    ring_audio_buffer m_buffer;
-    ring_audio_buffer::read_ptr m_read_ptr;
+	m_the_reader = NULL;
+	
+	if (0) {}
+#ifdef PSYNTH_HAVE_PCM
+	else if (!strcmp_i("wav", ext) ||
+		 !strcmp_i("aiff", ext) ||
+		 !strcmp_i("au", ext))
+	    m_the_reader = new file_reader_wave;
+#endif
+#ifdef PSYNTH_HAVE_OGG
+	else if (!strcmp_i("ogg", ext))
+	    m_the_reader = new file_reader_ogg;
+#endif
 
-    bool m_backwards;
-    int m_read_pos;
-    int m_new_read_pos;
-
-    bool m_finished;
-    
-    mutex m_reader_lock;
-    mutex m_buffer_lock;
-    condition m_cond;
-
-    void run();
-    
-public:
-    FileReaderFetcher(FileReader* reader = NULL,
-		      int buffer_size = DEFAULT_BUFFER_SIZE,
-		      int threshold  = DEFAULT_THRESHOLD);
-
-    void setFileReader(FileReader* reader) {
-	m_reader = reader;
+	if (m_the_reader) {
+	    m_the_reader->open (file);
+	    if (m_the_reader->is_open()) {
+		set_is_open (true);
+		set_info (m_the_reader->get_info());
+	    } else {
+		delete m_the_reader;
+		m_the_reader = NULL;
+	    }
+	}
     }
-
-    FileReader* getFileReader() {
-	return m_reader;
-    }
-
-    bool getBackwards() const {
-	return m_backwards;
-    }
-    
-    void setBackwards(bool backwards);
-    
-    void open(const char* file);
-    void seek(size_t pos);
-    void forceSeek(size_t pos);
-    int read(audio_buffer& buf, int n_samples);
-    void close();
-    void finish();
-};
+}
 
 } /* namespace psynth */
-
-#endif /* PSYNTH_FILEREADERFETCHER_H */
-

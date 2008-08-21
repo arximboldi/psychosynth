@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) Juan Pedro Bolivar Puente 2007                          *
+ *   Copyright (C) 2007 by Juan Pedro Bolivar Puente                       *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -20,43 +20,56 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef PSYNTH_OUTPUTWAVE_H
-#define PSYNTH_OUTPUTWAVE_H
+#ifndef PSYNTH_OUTPUTALSA_H
+#define PSYNTH_OUTPUTALSA_H
 
-#include <string>
+#define ALSA_PCM_NEW_HW_PARAMS_API
+#include <alsa/asoundlib.h>
+#include <pthread.h>
 
-#include <audiofile.h>
-#include <libpsynth/output/Output.h>
+#include <libpsynth/output/output.h>
+#include <libpsynth/common/thread.h>
 
 namespace psynth
 {
 
-class OutputWave : public Output
+class output_alsa : public output,
+		    public runnable
 {
-    AFfilehandle m_af_file;
-    AFfilesetup m_af_setup;
-
+    snd_pcm_t *alsa_pcm;
+    snd_pcm_hw_params_t *alsa_hwparams;
+    snd_pcm_sw_params_t *alsa_swparams;
+    snd_pcm_format_t alsa_format;
     short int* m_buf;
-    
-    std::string m_file_name;
+    std::string alsa_device;
+    thread alsa_thread;
     
 public:
-    OutputWave(const AudioInfo& info);
-    OutputWave(const AudioInfo& info, const std::string& fname);
+    output_alsa ();
+    output_alsa (const audio_info& info, const std::string& device);
+    ~output_alsa ();
 
-    ~OutputWave();
-
-    void setFileName(const std::string& fname) {
-	m_file_name = fname;
+    bool set_device (const std::string& device) {
+	if (get_state () == NOTINIT) {
+	    alsa_device = device;
+	    return true;
+	}
+	
+	return false;
     }
-    
+
+    const std::string& get_device () const {
+	return alsa_device;
+    }
+	
+    void run();
     bool open();
     bool close();
-    bool put(const AudioBuffer& buf, size_t nframes);
+    bool put (const audio_buffer& buf, size_t nframes);
     bool start();
     bool stop();
 };
 
 } /* namespace psynth */
 
-#endif /* PSYNTH_OUTPUTWAVE_H */
+#endif /* PSYNTH_OUTPUTALSA_H */

@@ -24,8 +24,8 @@
 #define PSYNTH_OBJECTSAMPLER_H
 
 #include <libpsynth/object/Object.h>
-#include <libpsynth/input/FileReaderAny.h>
-#include <libpsynth/input/FileReaderFetcher.h>
+#include <libpsynth/input/file_reader_any.h>
+#include <libpsynth/input/file_reader_fetcher.h>
 #include <libpsynth/object/ObjectFactory.h>
 #include <libpsynth/common/scaler_st.h>
 
@@ -66,8 +66,8 @@ public:
     };
     
 private:
-    FileReaderAny m_reader;
-    FileReaderFetcher m_fetcher;
+    file_reader_any m_reader;
+    file_reader_fetcher m_fetcher;
     audio_buffer m_inbuf;
     scaler_st m_scaler;
     float m_ctrl_pos;

@@ -20,56 +20,54 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef PSYNTH_OUTPUTALSA_H
-#define PSYNTH_OUTPUTALSA_H
+#ifndef PSYNTH_OUTPUTOSS_H
+#define PSYNTH_OUTPUTOSS_H
 
-#define ALSA_PCM_NEW_HW_PARAMS_API
-#include <alsa/asoundlib.h>
 #include <pthread.h>
 
-#include <libpsynth/output/Output.h>
+#include <libpsynth/output/output.h>
 #include <libpsynth/common/thread.h>
 
 namespace psynth
 {
 
-class OutputAlsa : public Output,
+class output_oss : public output,
 		   public runnable
 {
-    snd_pcm_t *alsa_pcm;
-    snd_pcm_hw_params_t *alsa_hwparams;
-    snd_pcm_sw_params_t *alsa_swparams;
-    snd_pcm_format_t alsa_format;
+    int m_fd;
+    int m_format;
+    int m_stereo;
     short int* m_buf;
-    std::string alsa_device;
-    thread alsa_thread;
+    std::string m_device;
+	
+    thread m_thread;
     
 public:
-    OutputAlsa();
-    OutputAlsa(const audio_info& info, const std::string& device);
-    ~OutputAlsa();
+    output_oss ();
+    output_oss (const audio_info& info, const std::string& device);
+    ~output_oss ();
 
-    bool setDevice(const std::string& device) {
-	if (getState() == NOTINIT) {
-	    alsa_device = device;
+    bool set_device (const std::string& device) {
+	if (get_state () == NOTINIT) {
+	    m_device = device;
 	    return true;
 	}
 	
 	return false;
     }
 
-    const std::string& getDevice() const {
-	return alsa_device;
+    const std::string& get_device() const {
+	return m_device;
     }
-	
-    void run();
-    bool open();
-    bool close();
-    bool put(const audio_buffer& buf, size_t nframes);
-    bool start();
-    bool stop();
+    
+    bool open ();
+    bool close ();
+    bool put (const audio_buffer& buf, size_t nframes);
+    void run ();
+    bool start ();
+    bool stop ();
 };
 
 } /* namespace psynth */
 
-#endif /* PSYNTH_OUTPUTALSA_H */
+#endif /* OUTPUTOSS_H */

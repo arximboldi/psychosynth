@@ -28,7 +28,7 @@
 #include <libpsynth/common/ring_audio_buffer.h>
 #include <libpsynth/common/mutex.h>
 #include <libpsynth/object/Object.h>
-#include <libpsynth/output/Output.h>
+#include <libpsynth/output/output.h>
 #include <libpsynth/object/ObjectFactory.h>
 
 namespace psynth
@@ -40,17 +40,17 @@ class ObjectOutput : public Object
 {
     struct Slot {
 	ring_audio_buffer::read_ptr m_ptr;
-	Output* m_out;
+	output* m_out;
 	ObjectOutput* m_parent;
 	audio_buffer m_buf;
 	
-	Slot(Output* out, ObjectOutput* parent,
+	Slot(output* out, ObjectOutput* parent,
 	     ring_audio_buffer::read_ptr ptr, const audio_info& info)
 	    : m_ptr(ptr)
 	    , m_out(out)
 	    , m_parent(parent)
 	    , m_buf(info) {
-	    out->setCallback(&ObjectOutput::outputCallback, this);
+	    out->set_callback (&ObjectOutput::outputCallback, this);
 	}
 		
 	~Slot() {
@@ -62,7 +62,7 @@ class ObjectOutput : public Object
     
     ObjectManager* m_manager;
     std::list<Slot*> m_slots;
-    std::list<Output*> m_passive_slots;
+    std::list<output*> m_passive_slots;
 
     /*
       RWLock m_buflock;
@@ -72,7 +72,7 @@ class ObjectOutput : public Object
     
     static void outputCallback(int nframes, void* arg);
     
-    void output(Slot& slot, size_t nframes);
+    void doOutput (Slot& slot, size_t nframes);
 	
     void doUpdate(const Object* caller, int caller_port_type, int caller_port);
     void doAdvance() {}
@@ -112,16 +112,16 @@ public:
 	return true;
     }
 	
-    void attachOutput(Output* out) {
+    void attachOutput (output* out) {
 	//m_buflock.readLock();
 	m_slots.push_back(new Slot(out, this, m_buffer.end(), getaudio_info()));
 	//m_buflock.unlock();
     };
     
-    void detachOutput(Output* out) {
+    void detachOutput (output* out) {
 	for (std::list<Slot*>::iterator i = m_slots.begin(); i != m_slots.end();) {
 	    if ((*i)->m_out == out) {
-		(*i)->m_out->setCallback(NULL, NULL); /* This should take threading into account. */
+		(*i)->m_out->set_callback (NULL, NULL); /* This should take threading into account. */
 		(*i)->m_out = NULL;
 		delete *i;
 		m_slots.erase(i++);
@@ -130,13 +130,13 @@ public:
 	}
     };
 
-    void attachPassiveOutput(Output* out) {
+    void attachPassiveOutput(output* out) {
 	//m_passive_lock.lock();
 	m_passive_slots.push_back(out);
 	//m_passive_lock.unlock();
     };
 
-    void detachPassiveOutput(Output* out) {
+    void detachPassiveOutput(output* out) {
 	//m_passive_lock.lock();
 	m_passive_slots.remove(out);
 	//m_passive_lock.unlock();

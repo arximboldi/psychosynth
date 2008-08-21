@@ -20,7 +20,6 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "input/FileReaderAny.h"
 #include "common/audio_buffer.h"
 #include "common/mutex.h"
 #include "common/misc.h"
@@ -88,15 +87,15 @@ void ObjectSampler::onFileChange(ObjParam& par)
     
     m_update_lock.lock();
 
-    if (m_fetcher.isOpen())
+    if (m_fetcher.is_open ())
 	m_fetcher.close();
     
     m_fetcher.open(path.c_str());
 
-    if (m_fetcher.isOpen()) {
-	m_inbuf.set_info (m_fetcher.getInfo(), getInfo().block_size);
-	m_scaler.set_channels (m_fetcher.getInfo().num_channels);
-	//m_scaler.setSampleRate(m_fetcher.getInfo().sample_rate);
+    if (m_fetcher.is_open()) {
+	m_inbuf.set_info (m_fetcher.get_info(), getInfo().block_size);
+	m_scaler.set_channels (m_fetcher.get_info().num_channels);
+	//m_scaler.setSampleRate(m_fetcher.get_info().sample_rate);
     }
     
     m_update_lock.unlock();
@@ -113,7 +112,7 @@ void ObjectSampler::doUpdate(const Object* caller, int caller_port_type, int cal
     size_t start = 0;
     size_t end = getInfo().block_size;
 
-    if (m_fetcher.isOpen()) {
+    if (m_fetcher.is_open()) {
 	while (start < getInfo().block_size) {
 	    if (m_restart) {
 		if (trig_buf && trig_buf[start] != 0.0f) {
@@ -163,7 +162,7 @@ void ObjectSampler::doUpdate(const Object* caller, int caller_port_type, int cal
 
 void ObjectSampler::restart()
 {
-    m_fetcher.forceSeek(0);
+    m_fetcher.force_seek(0);
     m_scaler.clear();
 }
 
@@ -173,7 +172,7 @@ void ObjectSampler::read(audio_buffer& buf, int start, int end)
     const sample* rate_buf = rate ? rate->get_data() : 0;
     
     float base_factor =
-	(float) m_fetcher.getInfo().sample_rate / getInfo().sample_rate * m_param_rate;
+	(float) m_fetcher.get_info().sample_rate / getInfo().sample_rate * m_param_rate;
 
     int must_read;
     int nread;
@@ -203,8 +202,8 @@ void ObjectSampler::read(audio_buffer& buf, int start, int end)
 	if (rate)
 	    factor = base_factor + base_factor * rate_buf[(int) m_ctrl_pos];
 	    
-	if (backwards != m_fetcher.getBackwards())
-	    m_fetcher.setBackwards(backwards);
+	if (backwards != m_fetcher.get_backwards())
+	    m_fetcher.set_backwards (backwards);
 	    
 	if (factor < 0.2)
 	    factor = 0.2;

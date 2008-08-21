@@ -20,35 +20,40 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef PSYNTH_FILEREADEROGG
-#define PSYNTH_FILEREADEROGG
+#ifndef PSYNTH_OUTPUTWAVE_H
+#define PSYNTH_OUTPUTWAVE_H
 
-#include <libpsynth/input/FileReader.h>
-#include <vorbis/vorbisfile.h>
+#include <string>
+
+#include <sndfile.h>
+#include <libpsynth/output/output.h>
 
 namespace psynth
 {
 
-class FileReaderOgg : public FileReader
+class output_wave : public output
 {
-    OggVorbis_File m_file;
-    int m_bitstream;
+    SNDFILE* m_file;
+    
+    std::string m_file_name;
     
 public:
-    FileReaderOgg() :
-	m_bitstream(0) {}
+    output_wave(const audio_info& info);
+    output_wave(const audio_info& info, const std::string& fname);
 
-    ~FileReaderOgg() {
-	if (isOpen())
-	    close();
+    ~output_wave();
+
+    void set_file_name (const std::string& fname) {
+	m_file_name = fname;
     }
     
-    void open(const char* file);
-    void seek(size_t pos);
-    int read(audio_buffer& buf, int n_samples);
-    void close();
+    bool open();
+    bool close();
+    bool put(const audio_buffer& buf, size_t nframes);
+    bool start();
+    bool stop();
 };
-    
+
 } /* namespace psynth */
 
-#endif /* PSYNTH_FILEREADEROGG */
+#endif /* PSYNTH_OUTPUTWAVE_H */

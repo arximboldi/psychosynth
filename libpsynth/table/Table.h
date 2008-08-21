@@ -34,7 +34,6 @@
 #include <libpsynth/object/ObjectAudioMixer.h>
 #include <libpsynth/object/ObjectManager.h>
 #include <libpsynth/object/ObjectFactoryManager.h>
-#include <libpsynth/output/Output.h>
 
 namespace psynth
 {
@@ -302,19 +301,19 @@ public:
 
     void deactivateObject(TableObject& obj);
 
-    void attachOutput(Output* out) {
+    void attachOutput(output* out) {
 	m_output->attachOutput(out);
     };
 
-    void attachPassiveOutput(Output* out) {
+    void attachPassiveOutput(output* out) {
 	m_output->attachPassiveOutput(out);
     };
     
-    void detachOutput(Output* out) {
+    void detachOutput(output* out) {
 	m_output->detachOutput(out);
     };
 
-    void detachPassiveOutput(Output* out) {
+    void detachPassiveOutput(output* out) {
 	m_output->detachPassiveOutput(out);
     };
 

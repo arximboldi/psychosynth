@@ -74,7 +74,7 @@ bool RecordWindow::onClick(const CEGUI::EventArgs &e)
 {
     if (!m_recording) {
 	std::string fname = m_file->getText().c_str();
-	m_output.setFileName(fname);
+	m_output.set_file_name (fname);
 	if (m_output.open()) {
 	    m_table->attachPassiveOutput(&m_output);
 	    m_button->setText("Stop");

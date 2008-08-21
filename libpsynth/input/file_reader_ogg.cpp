@@ -20,31 +20,81 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef PSYNTH_FILEREADERWAVE_H
-#define PSYNTH_FILEREADERWAVE_H
+#include "common/logger.h"
+#include "input/file_reader_ogg.h"
 
-#include <sndfile.h>
-#include <libpsynth/input/FileReader.h>
+using namespace std;
 
 namespace psynth
 {
 
-class FileReaderWave : public FileReader
+void file_reader_ogg::open(const char* file)
 {
-    SNDFILE* m_file;
-    
-public:
-    ~FileReaderWave() {
-	if (isOpen())
-	    close();
+    if (!is_open()) {
+	/* const_cast cause vorbis code sucks a little bit... */
+	if (ov_fopen(const_cast<char*>(file), &m_file)) {
+	    logger::instance() ("ogg", log::ERROR, string("Could not open file: ") + file);
+	    return;
+	}
+
+	audio_info info;
+	vorbis_info* oi;
+	oi = ov_info(&m_file, -1);
+	info.num_channels = oi->channels;
+	info.sample_rate = oi->rate;
+	info.block_size = ov_pcm_total(&m_file, -1);
+	set_info (info);
+
+	set_is_open(true);
+    }
+}
+
+void file_reader_ogg::seek(size_t pos)
+{
+    if (ov_seekable (&m_file))
+	ov_pcm_seek (&m_file, pos); //*getInfo().num_channels);
+    else
+	logger::instance() ("ogg", log::ERROR, "Stream not seekable.");
+}
+
+int file_reader_ogg::read(audio_buffer& buf, int n_samples)
+{
+    float** pcm;
+    int bitstream;
+    int n_read;
+    int index = 0;
+	
+    while(n_samples > 0) {
+	n_read = ov_read_float(&m_file, &pcm, n_samples, &bitstream);
+	
+	if (n_read) {
+	    int n_chan = min(get_info().num_channels,
+			     buf.get_info().num_channels);
+	
+	    int i;
+	
+	    for (i = 0; i < n_chan; ++i)
+		memcpy(buf.get_data()[i] + index, pcm[i], sizeof(float) * n_read);
+
+	    for (; i < buf.get_info().num_channels; ++i)
+		memcpy(buf.get_data()[i] + index, pcm[i-n_chan], sizeof(float) * n_read);
+
+	    index += n_read;
+	    n_samples -= n_read;
+	} else {
+	    n_samples = 0;
+	}
     }
     
-    void open(const char* file);
-    void seek(size_t pos);
-    int read(audio_buffer& buf, int n_samples);
-    void close();
-};
+    return index;
+}
+
+void file_reader_ogg::close()
+{
+    if (is_open ()) {
+	ov_clear (&m_file);
+	set_is_open( false);
+    }
+}
 
 } /* namespace psynth */
-
-#endif /* PSYNTH_FILEREADERWAVE_H */

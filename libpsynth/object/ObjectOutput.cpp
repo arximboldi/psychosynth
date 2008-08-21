@@ -38,7 +38,7 @@ ObjectOutput::~ObjectOutput()
     for (std::list<Slot*>::iterator i = m_slots.begin(); i != m_slots.end(); ++i)
 	delete *i;
 
-    for (list<Output*>::iterator it = m_passive_slots.begin();
+    for (list<output*>::iterator it = m_passive_slots.begin();
 	 it != m_passive_slots.end();
 	 ++it)
 	delete *it;
@@ -62,7 +62,7 @@ void ObjectOutput::doUpdate(const Object* caller, int caller_port_type, int call
 	//m_buflock.unlock();
 	
 	//m_passive_lock.lock();
-	for (list<Output*>::iterator it = m_passive_slots.begin();
+	for (list<output*>::iterator it = m_passive_slots.begin();
 	     it != m_passive_slots.end();
 	     ++it)
 	    (*it)->put(*in);
@@ -91,7 +91,7 @@ void ObjectOutput::outputCallback(int nframes, void* arg)
 {
     Slot* slot = static_cast<Slot*>(arg);
 	
-    slot->m_parent->output(*slot, nframes);
+    slot->m_parent->doOutput(*slot, nframes);
 }
 
 /*
@@ -99,7 +99,7 @@ void ObjectOutput::outputCallback(int nframes, void* arg)
   Hay que pensarse bien como sincronizar esto. Aunque no lo necesitamos
   aún.
 */
-void ObjectOutput::output(Slot& slot, size_t nframes)
+void ObjectOutput::doOutput(Slot& slot, size_t nframes)
 {
     if (nframes > slot.m_buf.size()) {
 	slot.m_buf.resize(nframes);

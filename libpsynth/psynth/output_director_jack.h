@@ -25,14 +25,14 @@
 
 #include <libpsynth/psynth/defaults_jack.h>
 #include <libpsynth/psynth/output_director.h>
-#include <libpsynth/output/OutputJack.h>
+#include <libpsynth/output/output_jack.h>
 
 namespace psynth
 {
 
 class output_director_jack : public output_director
 {
-    OutputJack* m_output;
+    output_jack* m_output;
 
     ~output_director_jack() {
 	if (m_output)
@@ -41,27 +41,27 @@ class output_director_jack : public output_director
     
     bool on_server_change (conf_node& conf) {
 	std::string server;
-	Output::State old_state;
+	output::state old_state;
 	
 	conf.get(server);
 	
-	old_state = m_output->getState();
-	m_output->gotoState(Output::NOTINIT);
-	m_output->setServer(server);
-	m_output->gotoState(old_state);
+	old_state = m_output->get_state();
+	m_output->goto_state(output::NOTINIT);
+	m_output->set_server(server);
+	m_output->goto_state(old_state);
 
 	return false;
     }
   
-    virtual Output* do_start (conf_node& conf) {
+    virtual output* do_start (conf_node& conf) {
 	std::string server;
 
      	conf.get_child ("server").get(server);
 	conf.get_child ("server").add_change_event(MakeDelegate(this, &output_director_jack::on_server_change));
 	
-	m_output = new OutputJack;
+	m_output = new output_jack;
 
-	m_output->setServer(server);
+	m_output->set_server(server);
 
 	return m_output;
     };

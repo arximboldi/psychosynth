@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) Juan Pedro Bolivar Puente 2007                          *
+ *   Copyright (C) 2007 by Juan Pedro Bolivar Puente                       *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -20,40 +20,70 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef PSYNTH_OUTPUTWAVE_H
-#define PSYNTH_OUTPUTWAVE_H
+#ifndef PSYNTH_OUTPUTJACK_H
+#define PSYNTH_OUTPUTJACK_H
 
-#include <string>
+#include <vector>
+#include <jack/jack.h>
 
-#include <sndfile.h>
-#include <libpsynth/output/Output.h>
+#include <libpsynth/output/output.h>
 
 namespace psynth
 {
 
-class OutputWave : public Output
-{
-    SNDFILE* m_file;
+class output_jack : public output
+{   
+    static int jack_process_cb(jack_nframes_t nframes, void* jack_client) {
+	static_cast<output_jack*>(jack_client)->jack_process(nframes);
+	return 0;
+    }
+
+    static int jack_sample_rate_cb(jack_nframes_t nframes, void* jack_client) {
+	static_cast<output_jack*>(jack_client)->jack_sample_rate(nframes);
+	return 0;
+    }
+
+    static void jack_shutdown_cb(void* jack_client) {
+	static_cast<output_jack*>(jack_client)->jack_shutdown();
+    }
+
+    void jack_process (jack_nframes_t nframes);
+    void jack_sample_rate (jack_nframes_t nframes);
+    void jack_shutdown ();
+
+    void connect_ports ();
     
-    std::string m_file_name;
+    std::vector<jack_port_t*> m_out_ports;
+    jack_client_t* m_client;
+    std::string m_serv_name;
+    size_t m_actual_rate;
     
 public:
-    OutputWave(const audio_info& info);
-    OutputWave(const audio_info& info, const std::string& fname);
+    output_jack();
+    output_jack(const audio_info& info);
+    output_jack(const audio_info& info, const std::string& server_name);
+    ~output_jack();
 
-    ~OutputWave();
+    bool set_server (const std::string& server) {
+	if (get_state () == NOTINIT) {
+	    m_serv_name = server;
+	    return true;
+	}
+	
+	return false;
+    }
 
-    void setFileName(const std::string& fname) {
-	m_file_name = fname;
+    const std::string& get_server () const {
+	return m_serv_name;
     }
     
-    bool open();
-    bool close();
-    bool put(const audio_buffer& buf, size_t nframes);
-    bool start();
-    bool stop();
+    bool open ();
+    bool close ();
+    bool put (const audio_buffer& buf, size_t nframes);
+    bool start ();
+    bool stop ();
 };
 
 } /* namespace psynth */
 
-#endif /* PSYNTH_OUTPUTWAVE_H */
+#endif /* PSYNTH_OUTPUTJACK_H */

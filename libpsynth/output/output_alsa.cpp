@@ -23,7 +23,7 @@
 #include <iostream>
 #include <pthread.h>
 
-#include "output/OutputAlsa.h"
+#include "output/output_alsa.h"
 #include "common/logger.h"
 
 using namespace std;
@@ -31,30 +31,30 @@ using namespace std;
 namespace psynth
 {
 
-OutputAlsa::OutputAlsa() :
-    alsa_thread(*this)
+output_alsa::output_alsa()
+    : alsa_thread(*this)
 {
 }
 
-OutputAlsa::OutputAlsa(const audio_info& info, const std::string& device) :
-    Output(info),
-    alsa_device(device),
-    alsa_thread(*this)
+output_alsa::output_alsa(const audio_info& info, const std::string& device)
+    : output(info)
+    , alsa_device(device)
+    , alsa_thread(*this)
 {
 }
 
-OutputAlsa::~OutputAlsa()
+output_alsa::~output_alsa()
 {
-    if (getState() != NOTINIT)
+    if (get_state () != NOTINIT)
 	close();
 }
 
-void OutputAlsa::run()
+void output_alsa::run()
 {
     snd_pcm_sframes_t nframes;
 	
-    while (getState() == RUNNING) {
-	//ut << "out_state " << out_state << '\n';
+    while (get_state () == RUNNING) {
+	// cout << "out_state " << out_state << '\n';
 	snd_pcm_wait (alsa_pcm, 1000);  
 
 	if ((nframes = snd_pcm_avail_update (alsa_pcm)) < 0) {
@@ -63,16 +63,16 @@ void OutputAlsa::run()
 	    else
 		logger::instance() ("alsa", log::WARNING, "Unknown snd_pcm_avail_update() return value.");
 	} else {
-//	    cout << "processing " << nframes << endl; 
-	    process(getInfo().block_size); //getInfo().block_size);
+	    // cout << "processing " << nframes << endl; 
+	    process(get_info ().block_size); //get_info ().block_size);
 	}
     }
 }
 
-bool OutputAlsa::start()
+bool output_alsa::start()
 {
-    if (getState() == IDLE) {
-	setState(RUNNING);
+    if (get_state () == IDLE) {
+	set_state (RUNNING);
 	alsa_thread.start();
 	return true;
     } else {
@@ -81,10 +81,10 @@ bool OutputAlsa::start()
     }
 }
 
-bool OutputAlsa::stop()
+bool output_alsa::stop()
 {
-    if (getState() == RUNNING) {
-	setState(IDLE);
+    if (get_state () == RUNNING) {
+	set_state (IDLE);
 	alsa_thread.join();
 	return true;
     } else {
@@ -93,16 +93,16 @@ bool OutputAlsa::stop()
     }
 }
 
-bool OutputAlsa::open()
+bool output_alsa::open()
 {
     int err;
     int dir = 0;
-    unsigned int uirate = getInfo().sample_rate;
+    unsigned int uirate = get_info ().sample_rate;
 	
-    if (getState() == NOTINIT) {
-	cout << "sample_rate " << getInfo().sample_rate << endl;
-	cout << "block_size " << getInfo().block_size << endl;
-	cout << "num_channels " << getInfo().num_channels << endl;
+    if (get_state () == NOTINIT) {
+	cout << "sample_rate " << get_info ().sample_rate << endl;
+	cout << "block_size " << get_info ().block_size << endl;
+	cout << "num_channels " << get_info ().num_channels << endl;
 	
 	if ((err = snd_pcm_open (&alsa_pcm, alsa_device.c_str(), SND_PCM_STREAM_PLAYBACK, 0)) < 0) {
 	    logger::instance() ("alsa", log::WARNING,
@@ -120,17 +120,17 @@ bool OutputAlsa::open()
 
 	snd_pcm_hw_params_set_format (alsa_pcm, alsa_hwparams, alsa_format);
 	snd_pcm_hw_params_set_rate_near (alsa_pcm, alsa_hwparams, &uirate, &dir);
-	snd_pcm_hw_params_set_channels (alsa_pcm, alsa_hwparams, getInfo().num_channels);
+	snd_pcm_hw_params_set_channels (alsa_pcm, alsa_hwparams, get_info ().num_channels);
 
 	/* FIXME */
 	snd_pcm_hw_params_set_periods(alsa_pcm, alsa_hwparams, 2, 0);
-	snd_pcm_hw_params_set_buffer_size (alsa_pcm, alsa_hwparams, getInfo().block_size);
+	snd_pcm_hw_params_set_buffer_size (alsa_pcm, alsa_hwparams, get_info ().block_size);
 
 	snd_pcm_hw_params (alsa_pcm, alsa_hwparams);
 	//snd_pcm_prepare (alsa_pcm);
 		
 	snd_pcm_sw_params_malloc (&alsa_swparams);
-	snd_pcm_sw_params_set_avail_min(alsa_pcm, alsa_swparams, getInfo().block_size);
+	snd_pcm_sw_params_set_avail_min(alsa_pcm, alsa_swparams, get_info ().block_size);
 	snd_pcm_sw_params_set_start_threshold (alsa_pcm, alsa_swparams, 0U);
 	snd_pcm_sw_params (alsa_pcm, alsa_swparams);
 
@@ -139,9 +139,9 @@ bool OutputAlsa::open()
 				string("Could not prepare device. (")
 				+ snd_strerror(err) + ")");	    
 	} else {
-	    m_buf = new short int[getInfo().block_size * getInfo().num_channels * sizeof(short int)];
+	    m_buf = new short int[get_info ().block_size * get_info ().num_channels * sizeof(short int)];
 	    
-	    setState(IDLE);
+	    set_state (IDLE);
 	}
 	
 	return true;
@@ -151,22 +151,22 @@ bool OutputAlsa::open()
     }
 }
 
-bool OutputAlsa::put(const audio_buffer& in_buf, size_t nframes)
+bool output_alsa::put(const audio_buffer& in_buf, size_t nframes)
 {
     int err;
     bool ret = true;
 
     //cout << "writting: " << nframes << endl;
-    if (in_buf.get_info().num_channels != getInfo().num_channels ||
-	in_buf.get_info().sample_rate != getInfo().sample_rate) {
+    if (in_buf.get_info().num_channels != get_info ().num_channels ||
+	in_buf.get_info().sample_rate != get_info ().sample_rate) {
 	/* TODO: Adapt the audio signal to fit our requeriments. */
 	logger::instance() ("alsa", log::WARNING,
 			    "Cant send data to the device: data and output system properties missmatch.");
 	return false;
     }
 
-    if (getState() != NOTINIT) {
-	size_t copyframes = getInfo().block_size;
+    if (get_state () != NOTINIT) {
+	size_t copyframes = get_info ().block_size;
 		
 	while (nframes > 0) {
 	    if (nframes < copyframes)
@@ -195,16 +195,16 @@ bool OutputAlsa::put(const audio_buffer& in_buf, size_t nframes)
     return ret;
 }
 
-bool OutputAlsa::close()
+bool output_alsa::close()
 {
-    if (getState() != NOTINIT) {
-	if (getState() == RUNNING)
+    if (get_state () != NOTINIT) {
+	if (get_state () == RUNNING)
 	    stop();
 	
 	snd_pcm_close(alsa_pcm);
 	snd_pcm_hw_params_free(alsa_hwparams);
 	snd_pcm_sw_params_free(alsa_swparams);
-	setState(NOTINIT);
+	set_state (NOTINIT);
 
 	delete [] m_buf;
 	return true;

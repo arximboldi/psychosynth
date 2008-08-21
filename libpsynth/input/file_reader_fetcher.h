@@ -20,81 +20,71 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "common/logger.h"
-#include "input/FileReaderOgg.h"
+#ifndef PSYNTH_FILEREADERFETCHER_H
+#define PSYNTH_FILEREADERFETCHER_H
 
-using namespace std;
+#include <libpsynth/input/file_reader.h>
+#include <libpsynth/common/thread.h>
+#include <libpsynth/common/mutex.h>
+#include <libpsynth/common/ring_audio_buffer.h>
 
 namespace psynth
 {
 
-void FileReaderOgg::open(const char* file)
+class file_reader_fetcher : public file_reader,
+			    public self_thread
 {
-    if (!isOpen()) {
-	/* const_cast cause vorbis code sucks a little bit... */
-	if (ov_fopen(const_cast<char*>(file), &m_file)) {
-	    logger::instance() ("ogg", log::ERROR, string("Could not open file: ") + file);
-	    return;
-	}
+    /* High default values for lower number of seeks when reading backwards. */
+    static const int DEFAULT_BUFFER_SIZE = 16384;
+    static const int DEFAULT_THRESHOLD  = 4096; 
 
-	audio_info info;
-	vorbis_info* oi;
-	oi = ov_info(&m_file, -1);
-	info.num_channels = oi->channels;
-	info.sample_rate = oi->rate;
-	info.block_size = ov_pcm_total(&m_file, -1);
-	setInfo(info);
+    file_reader* m_reader;
+    int m_buffer_size;
+    int m_threshold;
+    audio_buffer m_tmp_buffer;
+    ring_audio_buffer m_buffer;
+    ring_audio_buffer::read_ptr m_read_ptr;
 
-	setIsOpen(true);
+    bool m_backwards;
+    int m_read_pos;
+    int m_new_read_pos;
+
+    bool m_finished;
+    
+    mutex m_reader_lock;
+    mutex m_buffer_lock;
+    condition m_cond;
+
+    void run();
+    
+public:
+    file_reader_fetcher (file_reader* reader = NULL,
+			int buffer_size = DEFAULT_BUFFER_SIZE,
+			int threshold  = DEFAULT_THRESHOLD);
+
+    void set_file_reader (file_reader* reader) {
+	m_reader = reader;
     }
-}
 
-void FileReaderOgg::seek(size_t pos)
-{
-    if (ov_seekable(&m_file))
-	ov_pcm_seek(&m_file, pos); //*getInfo().num_channels);
-    else
-	logger::instance() ("ogg", log::ERROR, "Stream not seekable.");
-}
+    file_reader* get_file_reader () {
+	return m_reader;
+    }
 
-int FileReaderOgg::read(audio_buffer& buf, int n_samples)
-{
-    float** pcm;
-    int bitstream;
-    int n_read;
-    int index = 0;
-	
-    while(n_samples > 0) {
-	n_read = ov_read_float(&m_file, &pcm, n_samples, &bitstream);
-	
-	if (n_read) {
-	    int n_chan = min(getInfo().num_channels,
-			     buf.get_info().num_channels);
-	
-	    int i;
-	
-	    for (i = 0; i < n_chan; ++i)
-		memcpy(buf.get_data()[i] + index, pcm[i], sizeof(float) * n_read);
-
-	    for (; i < buf.get_info().num_channels; ++i)
-		memcpy(buf.get_data()[i] + index, pcm[i-n_chan], sizeof(float) * n_read);
-
-	    index += n_read;
-	    n_samples -= n_read;
-	} else {
-	    n_samples = 0;
-	}
+    bool get_backwards () const {
+	return m_backwards;
     }
     
-    return index;
-}
-
-void FileReaderOgg::close()
-{
-    if (isOpen()) {
-	ov_clear(&m_file);
-	setIsOpen(false);
-    }
-}
+    void set_backwards (bool backwards);
+    
+    void open( const char* file);
+    void seek (size_t pos);
+    void force_seek (size_t pos);
+    int read (audio_buffer& buf, int n_samples);
+    void close ();
+    void finish ();
+};
 
 } /* namespace psynth */
+
+#endif /* PSYNTH_FILEREADERFETCHER_H */
+

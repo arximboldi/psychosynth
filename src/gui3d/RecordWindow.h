@@ -24,14 +24,14 @@
 #define RECORDWINDOW_H
 
 #include <libpsynth/table/Table.h>
-#include <libpsynth/output/OutputWave.h>
+#include <libpsynth/output/output_wave.h>
 
 #include "gui3d/ToggableWindow.h"
 
 class RecordWindow : public ToggableWindow
 {
     psynth::Table* m_table;
-    psynth::OutputWave m_output;
+    psynth::output_wave m_output;
 
     CEGUI::Window* m_button;
     CEGUI::Editbox* m_file;
@@ -43,7 +43,7 @@ class RecordWindow : public ToggableWindow
 public:
     RecordWindow(psynth::Table* table) :
 	m_table(table),
-	m_output(table->getInfo()),
+	m_output(table->getInfo ()),
 	m_recording(false)
 	{};
 

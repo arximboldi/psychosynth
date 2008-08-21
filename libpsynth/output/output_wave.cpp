@@ -21,39 +21,39 @@
  ***************************************************************************/
 
 #include "common/logger.h"
-#include "output/OutputWave.h"
+#include "output/output_wave.h"
 
 using namespace std;
 
 namespace psynth
 {
 
-OutputWave::OutputWave(const audio_info& info) :
-    Output(info),
-    m_file_name("")
+output_wave::output_wave(const audio_info& info)
+    : output(info)
+    , m_file_name("")
 {
 }
 
-OutputWave::OutputWave(const audio_info& info, const std::string& fname) :
-    Output(info),
-    m_file_name(fname)
+output_wave::output_wave(const audio_info& info, const std::string& fname)
+    : output(info)
+    , m_file_name(fname)
 {
 }
 
-OutputWave::~OutputWave()
+output_wave::~output_wave()
 {
-    if (getState() != NOTINIT)
+    if (get_state () != NOTINIT)
 	close();
 }
 
-bool OutputWave::open()
+bool output_wave::open()
 {
-    if (getState() == NOTINIT) {
+    if (get_state () == NOTINIT) {
 	SF_INFO sfinfo;
 
 	sfinfo.frames	  = 0;
-	sfinfo.channels	  = getInfo().num_channels;
-	sfinfo.samplerate = getInfo().sample_rate;
+	sfinfo.channels	  = get_info ().num_channels;
+	sfinfo.samplerate = get_info ().sample_rate;
 	sfinfo.format	  = (SF_FORMAT_AU | SF_FORMAT_PCM_24);
 
 	m_file = sf_open (m_file_name.c_str(), SFM_WRITE, &sfinfo);
@@ -64,28 +64,28 @@ bool OutputWave::open()
 	    return false;
 	}
 	
-	setState(IDLE);
+	set_state(IDLE);
     }
 
     return true;
 }
 
-bool OutputWave::close()
+bool output_wave::close()
 {
-    if (getState() != NOTINIT) {
+    if (get_state () != NOTINIT) {
 	sf_close(m_file);
-	setState(NOTINIT);
+	set_state(NOTINIT);
 	return true;
     }
 
     return false;
 }
 
-bool OutputWave::put(const audio_buffer& in_buf, size_t nframes)
+bool output_wave::put(const audio_buffer& in_buf, size_t nframes)
 {
     bool ret = false;
     
-    if (getState() != NOTINIT) {
+    if (get_state () != NOTINIT) {
 	float buf [nframes * in_buf.get_info().num_channels];
 
 	in_buf.interleave(buf, nframes);
@@ -95,13 +95,13 @@ bool OutputWave::put(const audio_buffer& in_buf, size_t nframes)
     return ret;
 }
 
-bool OutputWave::start()
+bool output_wave::start()
 {
     /* This kind of device does no processing. */
     return false;
 }
 
-bool OutputWave::stop()
+bool output_wave::stop()
 {
     /* This kind of device does no processing. */
     return false;

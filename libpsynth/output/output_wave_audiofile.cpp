@@ -20,59 +20,59 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "common/Logger.h"
-#include "output/OutputWave.h"
+#include "common/logger.h"
+#include "output/output_wave.h"
 
 using namespace std;
 
 namespace psynth
 {
 
-OutputWave::OutputWave(const AudioInfo& info) :
-    Output(info),
-    m_file_name("")
+output_wave::output_wave(const audio_info& info)
+    : output (info)
+    , m_file_name ("")
 {
 }
 
-OutputWave::OutputWave(const AudioInfo& info, const std::string& fname) :
-    Output(info),
-    m_file_name(fname)
+output_wave::output_wave(const audio_info& info, const std::string& fname)
+    : output (info)
+    , m_file_name (fname)
 {
 }
 
-OutputWave::~OutputWave()
+output_wave::~output_wave()
 {
     if (getState() != NOTINIT)
 	close();
 }
 
-bool OutputWave::open()
+bool output_wave::open()
 {
     if (getState() == NOTINIT) {
 	m_af_setup = afNewFileSetup();
 	afInitFileFormat(m_af_setup, AF_FILE_WAVE);
 	afInitByteOrder(m_af_setup, AF_DEFAULT_TRACK, AF_BYTEORDER_LITTLEENDIAN);
-	afInitChannels(m_af_setup, AF_DEFAULT_TRACK, getInfo().num_channels);
-	afInitRate(m_af_setup, AF_DEFAULT_TRACK, getInfo().sample_rate);
+	afInitChannels(m_af_setup, AF_DEFAULT_TRACK, get_info ().num_channels);
+	afInitRate(m_af_setup, AF_DEFAULT_TRACK, get_info ().sample_rate);
 	afInitSampleFormat(m_af_setup, AF_DEFAULT_TRACK, AF_SAMPFMT_TWOSCOMP, 16);
 
 	m_af_file = afOpenFile(m_file_name.c_str(), "w", m_af_setup);
 
 	if (m_af_file == NULL) {
-	    Logger::instance().log("wav_out", Log::ERROR, "Could not open file.");
+	    logger::instance() ("wav_out", log::ERROR, "Could not open file.");
 
 	    afFreeFileSetup(m_af_setup);
 	    return false;
 	}
 
-	m_buf = new short int[getInfo().block_size * getInfo().num_channels];
+	m_buf = new short int[get_info ().block_size * get_info ().num_channels];
 	setState(IDLE);
     }
 
     return true;
 }
 
-bool OutputWave::close()
+bool output_wave::close()
 {
     if (getState() != NOTINIT) {
 	afCloseFile(m_af_file);
@@ -85,19 +85,19 @@ bool OutputWave::close()
     return false;
 }
 
-bool OutputWave::put(const AudioBuffer& in_buf, size_t nframes)
+bool output_wave::put(const audio_buffer& in_buf, size_t nframes)
 {
     bool ret = false;
     
     if (getState() != NOTINIT) {
-	size_t copyframes = getInfo().block_size;
+	size_t copyframes = get_info ().block_size;
 
 	ret = true;
 	while (nframes > 0) {
 	    if (nframes < copyframes)
 		copyframes = nframes;
 
-	    in_buf.interleaveS16(m_buf, copyframes);
+	    in_buf.interleave_s16 (m_buf, copyframes);
 	    afWriteFrames(m_af_file, AF_DEFAULT_TRACK, m_buf, copyframes);
 
 	    nframes -= copyframes;
@@ -107,13 +107,13 @@ bool OutputWave::put(const AudioBuffer& in_buf, size_t nframes)
     return ret;
 }
 
-bool OutputWave::start()
+bool output_wave::start()
 {
     /* This kind of device does no processing. */
     return false;
 }
 
-bool OutputWave::stop()
+bool output_wave::stop()
 {
     /* This kind of device does no processing. */
     return false;

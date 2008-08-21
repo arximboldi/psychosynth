@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) Juan Pedro Bolivar Puente 2008                          *
+ *   Copyright (C) Juan Pedro Bolivar Puente 2007                          *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -20,61 +20,35 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "input/FileReaderWave.h"
-#include "common/logger.h"
+#ifndef PSYNTH_FILEREADEROGG
+#define PSYNTH_FILEREADEROGG
 
-using namespace std;
+#include <libpsynth/input/file_reader.h>
+#include <vorbis/vorbisfile.h>
 
 namespace psynth
 {
 
-void FileReaderWave::open(const char* file)
+class file_reader_ogg : public file_reader
 {
-    if (!isOpen()) {
-	SF_INFO sfinfo;
-	
-	m_file = sf_open(file, SFM_READ, &sfinfo);
+    OggVorbis_File m_file;
+    int m_bitstream;
     
-	if (m_file == NULL) {
-	    logger::instance() ("wave", log::ERROR, string("Could not open file: ") + file);
-	    return;
-	}
+public:
+    file_reader_ogg () :
+	m_bitstream (0) {}
 
-	audio_info info;
-	info.sample_rate  = sfinfo.samplerate;
-	info.num_channels = sfinfo.channels;
-	info.block_size   = sfinfo.frames;
-	setInfo(info);
-		
-	setIsOpen(true);
+    ~file_reader_ogg () {
+	if (is_open ())
+	    close ();
     }
-}
-
-void FileReaderWave::seek(size_t pos)
-{
-    sf_seek(m_file, pos, SEEK_SET);
-}
-
-int FileReaderWave::read(audio_buffer& outbuf, int n_samples)
-{
-    int n_read;
-
-    float buf [n_samples * getInfo().num_channels];
     
-    n_read = sf_readf_float(m_file, buf, n_samples);
-
-    if (n_read)
-	outbuf.deinterleave(buf, n_read, getInfo().num_channels);
+    void open (const char* file);
+    void seek (size_t pos);
+    int read (audio_buffer& buf, int n_samples);
+    void close ();
+};
     
-    return n_read;
-}
-
-void FileReaderWave::close()
-{
-    if (isOpen()) {
-	sf_close(m_file);
-	setIsOpen(false);
-    }
-}
-
 } /* namespace psynth */
+
+#endif /* PSYNTH_FILEREADEROGG */

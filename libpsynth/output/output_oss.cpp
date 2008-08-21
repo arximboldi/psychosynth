@@ -30,45 +30,44 @@
 #include <unistd.h>
 
 #include "common/logger.h"
-#include "output/OutputOss.h"
+#include "output/output_oss.h"
 
 using namespace std;
 
 namespace psynth
 {
 
-OutputOss::OutputOss() :
-    m_buf(NULL),
-    m_thread(*
-	     this)
+output_oss::output_oss()
+    : m_buf(NULL)
+    , m_thread(*this)
 {
 }
 
-OutputOss::OutputOss(const audio_info& info, const std::string& device) : 
-    Output(info),
-    m_buf(NULL),
-    m_device(device),
-    m_thread(*this)
+output_oss::output_oss(const audio_info& info, const std::string& device)
+    : output(info)
+    , m_buf(NULL)
+    , m_device(device)
+    , m_thread(*this)
 {
 }
 
-OutputOss::~OutputOss()
+output_oss::~output_oss()
 {
-    if (getState() != NOTINIT)
+    if (get_state () != NOTINIT)
 	close();
 }
 
-void OutputOss::run()
+void output_oss::run()
 {
-    while(getState() == RUNNING) {
-	process(getInfo().block_size);
+    while(get_state () == RUNNING) {
+	process(get_info ().block_size);
     }
 }
 
-bool OutputOss::start()
+bool output_oss::start()
 {
-    if (getState() == IDLE) {
-	setState(RUNNING);
+    if (get_state () == IDLE) {
+	set_state (RUNNING);
 	m_thread.start();
 	return true;
     } else {
@@ -78,10 +77,10 @@ bool OutputOss::start()
     }
 }
 
-bool OutputOss::stop()
+bool output_oss::stop()
 {
-    if (getState() == RUNNING) {
-	setState(IDLE);
+    if (get_state () == RUNNING) {
+	set_state (IDLE);
 	m_thread.join();
 	return true;
     } else {
@@ -91,29 +90,29 @@ bool OutputOss::stop()
     }
 }
 
-bool OutputOss::open()
+bool output_oss::open()
 {
-    if (getState() == NOTINIT) {
+    if (get_state () == NOTINIT) {
 	if ((m_fd = ::open(m_device.c_str(), O_WRONLY, 0)) < 0) {
 	    logger::instance() ("oss", log::ERROR, "Could not open OSS device.");
 	    return false;
 	}
 		
 	m_format = AFMT_S16_LE;
-	m_stereo = getInfo().num_channels == 2 ? 1 : 0;
+	m_stereo = get_info ().num_channels == 2 ? 1 : 0;
 
 	
-	//int tmp = (0x0004 << 16) | ((int) log2(getInfo().block_size));
+	//int tmp = (0x0004 << 16) | ((int) log2(get_info ().block_size));
 	int tmp = (0x0004 << 16) | ((int) log2(4096));
 	
 	ioctl (m_fd, SNDCTL_DSP_SETFRAGMENT, &tmp);
 	ioctl(m_fd, SNDCTL_DSP_SETFMT, &m_format);
 	ioctl(m_fd, SNDCTL_DSP_STEREO, &m_stereo);
-	ioctl(m_fd, SNDCTL_DSP_SPEED,  &getInfo().sample_rate);
+	ioctl(m_fd, SNDCTL_DSP_SPEED,  &get_info ().sample_rate);
 		
-	m_buf = new short int[getInfo().block_size * getInfo().num_channels * sizeof(short int)];
+	m_buf = new short int[get_info ().block_size * get_info ().num_channels * sizeof(short int)];
 		
-	setState(IDLE);
+	set_state (IDLE);
 	return true;
     } else {
 	logger::instance() ("oss", log::ERROR, "Device already initialized.");
@@ -121,18 +120,18 @@ bool OutputOss::open()
     }
 }
 
-bool OutputOss::put(const audio_buffer& in_buf, size_t nframes)
+bool output_oss::put(const audio_buffer& in_buf, size_t nframes)
 {  
     bool ret = true;
 	
-    if (in_buf.get_info().num_channels != getInfo().num_channels ||
-	in_buf.get_info().sample_rate != getInfo().sample_rate) {
+    if (in_buf.get_info().num_channels != get_info ().num_channels ||
+	in_buf.get_info().sample_rate != get_info ().sample_rate) {
 	/* TODO: Adapt the audio signal to fit our requeriments. */
 	return false;
     }
 
-    if (getState() != NOTINIT) {
-	int copyframes = getInfo().block_size;
+    if (get_state () != NOTINIT) {
+	int copyframes = get_info ().block_size;
 
 	while (nframes > 0) {
 	    if ((int)nframes < copyframes)
@@ -140,7 +139,7 @@ bool OutputOss::put(const audio_buffer& in_buf, size_t nframes)
 			
 	    in_buf.interleave_s16(m_buf, copyframes);
 			
-	    write(m_fd, m_buf, copyframes * (getInfo().num_channels) * sizeof(short int));
+	    write(m_fd, m_buf, copyframes * (get_info ().num_channels) * sizeof(short int));
 	    nframes -= copyframes;
 	}
 		
@@ -152,15 +151,15 @@ bool OutputOss::put(const audio_buffer& in_buf, size_t nframes)
     return ret;	
 }
 
-bool OutputOss::close()
+bool output_oss::close()
 {
-    if (getState() != NOTINIT) {
-	if (getState() == RUNNING)
+    if (get_state () != NOTINIT) {
+	if (get_state () == RUNNING)
 	    stop();
 	delete [] m_buf;
 	m_buf = NULL;
 	::close(m_fd);
-	setState(NOTINIT);
+	set_state (NOTINIT);
 	return true;
     } else {
 	logger::instance() ("oss", log::ERROR, "Cannot close uninitialized device.");

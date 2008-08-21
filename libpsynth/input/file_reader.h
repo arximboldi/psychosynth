@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) 2007 by Juan Pedro Bolivar Puente                       *
+ *   Copyright (C) Juan Pedro Bolivar Puente 2008                          *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -20,70 +20,55 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef PSYNTH_OUTPUTJACK_H
-#define PSYNTH_OUTPUTJACK_H
+#ifndef PSYNTH_FILEREADER_H
+#define PSYNTH_FILEREADER_H
 
-#include <vector>
-#include <jack/jack.h>
-
-#include <libpsynth/output/Output.h>
+#include <libpsynth/common/audio_info.h>
+#include <libpsynth/common/audio_buffer.h>
 
 namespace psynth
 {
 
-class OutputJack : public Output
-{   
-    static int jack_process_cb(jack_nframes_t nframes, void* jack_client) {
-	static_cast<OutputJack*>(jack_client)->jackProcess(nframes);
-	return 0;
-    }
-
-    static int jack_sample_rate_cb(jack_nframes_t nframes, void* jack_client) {
-	static_cast<OutputJack*>(jack_client)->jackSampleRate(nframes);
-	return 0;
-    }
-
-    static void jack_shutdown_cb(void* jack_client) {
-	static_cast<OutputJack*>(jack_client)->jackShutDown();
-    }
-
-    void jackProcess(jack_nframes_t nframes);
-    void jackSampleRate(jack_nframes_t nframes);
-    void jackShutDown();
-
-    void connectPorts();
+class file_reader
+{
+    bool m_isopen;
+    audio_info m_info;
     
-    std::vector<jack_port_t*> m_out_ports;
-    jack_client_t* m_client;
-    std::string m_serv_name;
-    size_t m_actual_rate;
+protected:
+    void set_is_open (bool isopen) {
+	m_isopen = isopen;
+    };
+
+    void set_info(const audio_info& info) {
+	m_info = info;
+    }
     
 public:
-    OutputJack();
-    OutputJack(const audio_info& info);
-    OutputJack(const audio_info& info, const std::string& server_name);
-    ~OutputJack();
-
-    bool setServer(const std::string& server) {
-	if (getState() == NOTINIT) {
-	    m_serv_name = server;
-	    return true;
-	}
-	
-	return false;
+    file_reader()
+	: m_isopen(false)
+	, m_info(0,0,0)
+	{}
+    
+    virtual ~file_reader() {};
+    
+    bool is_open () {
+	return m_isopen;
     }
 
-    const std::string& getServer() const {
-	return m_serv_name;
+    const audio_info& get_info () {
+	return m_info;
     }
     
-    bool open();
-    bool close();
-    bool put(const audio_buffer& buf, size_t nframes);
-    bool start();
-    bool stop();
+    virtual void open (const char* file) = 0;
+    virtual void seek (size_t pos) = 0;
+    virtual int read (audio_buffer& buf, int n_samples) = 0;
+    virtual void close () = 0;
+    
+    int read (audio_buffer& buf) {
+	return read(buf, buf.size());
+    }
 };
 
 } /* namespace psynth */
 
-#endif /* PSYNTH_OUTPUTJACK_H */
+#endif /* PSYNTH_FILEREADER_H */

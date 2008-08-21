@@ -21,16 +21,16 @@
  ***************************************************************************/
 
 #include <iostream>
-#include "input/FileReaderFetcher.h"
+#include "input/file_reader_fetcher.h"
 
 using namespace std;
 
 namespace psynth
 {
 
-FileReaderFetcher::FileReaderFetcher(FileReader* reader,
-				     int buffer_size,
-				     int threshold) :
+file_reader_fetcher::file_reader_fetcher(file_reader* reader,
+					 int buffer_size,
+					 int threshold) :
     m_reader(reader),
     m_buffer_size(buffer_size),
     m_threshold(threshold),
@@ -44,7 +44,7 @@ FileReaderFetcher::FileReaderFetcher(FileReader* reader,
 {
 }
 
-void FileReaderFetcher::setBackwards(bool backwards)
+void file_reader_fetcher::set_backwards (bool backwards)
 {
     int old_avail;
     int new_avail;
@@ -67,11 +67,11 @@ void FileReaderFetcher::setBackwards(bool backwards)
 	if (m_backwards) {
 	    m_new_read_pos -= diff_avail;
 	    if (m_new_read_pos < 0)
-		m_new_read_pos += getInfo().block_size;
+		m_new_read_pos += get_info().block_size;
 	} else {
 	    m_new_read_pos += diff_avail;
-	    if (m_new_read_pos >= getInfo().block_size)
-		m_new_read_pos -= getInfo().block_size;
+	    if (m_new_read_pos >= get_info().block_size)
+		m_new_read_pos -= get_info().block_size;
 	}
 	
 	m_buffer_lock.unlock();
@@ -79,19 +79,19 @@ void FileReaderFetcher::setBackwards(bool backwards)
     }
 }
 
-void FileReaderFetcher::open(const char* file)
+void file_reader_fetcher::open(const char* file)
 {
     m_buffer_lock.lock();
     m_reader_lock.lock();
     
     m_reader->open(file);
 
-    setIsOpen(m_reader->isOpen());
-    setInfo(m_reader->getInfo());
+    set_is_open (m_reader->is_open ());
+    set_info (m_reader->get_info ());
 
-    if (m_reader->isOpen()) {
-	m_tmp_buffer.set_info (getInfo(), m_threshold);
-	m_buffer.set_info     (getInfo(), m_buffer_size);
+    if (m_reader->is_open()) {
+	m_tmp_buffer.set_info (get_info(), m_threshold);
+	m_buffer.set_info     (get_info(), m_buffer_size);
     }
     
     m_reader_lock.unlock();
@@ -99,12 +99,12 @@ void FileReaderFetcher::open(const char* file)
     m_buffer_lock.unlock();
 }
 
-void FileReaderFetcher::seek(size_t pos)
+void file_reader_fetcher::seek (size_t pos)
 {
     m_new_read_pos = pos;
 }
 
-void FileReaderFetcher::forceSeek(size_t pos)
+void file_reader_fetcher::force_seek (size_t pos)
 {
     m_buffer_lock.lock();
     m_reader_lock.lock();
@@ -119,7 +119,7 @@ void FileReaderFetcher::forceSeek(size_t pos)
     m_buffer_lock.unlock();
 }
 
-int FileReaderFetcher::read(audio_buffer& buf, int n_samples)
+int file_reader_fetcher::read (audio_buffer& buf, int n_samples)
 {
     int n_read;
     
@@ -138,30 +138,30 @@ int FileReaderFetcher::read(audio_buffer& buf, int n_samples)
 	if (m_backwards)
 	    buf.reverse(n_read);
     } else
-      m_buffer_lock.unlock();
+	m_buffer_lock.unlock();
 
     return n_read;
 }
 
-void FileReaderFetcher::close()
+void file_reader_fetcher::close ()
 {
-    m_reader_lock.lock();
+    m_reader_lock.lock ();
 
-    m_reader->close();
-    setIsOpen(m_reader->isOpen());
+    m_reader->close ();
+    set_is_open (m_reader->is_open ());
 
-    m_reader_lock.unlock();
+    m_reader_lock.unlock ();
 }
 
-void FileReaderFetcher::run()
+void file_reader_fetcher::run ()
 {
     int n_read;
     int must_read;
     do {
 	/* Read the data. */
 	n_read = 0;
-	m_reader_lock.lock();
-	if (m_reader->isOpen()) {
+	m_reader_lock.lock ();
+	if (m_reader->is_open ()) {
 	    must_read = m_threshold;
 
 	    /* Do we have to seek? */
@@ -175,7 +175,7 @@ void FileReaderFetcher::run()
 	    /* Backwards reading needs seeking. */
 	    if (m_backwards) {
 		if (m_read_pos == 0)
-		    m_read_pos = getInfo().block_size - must_read;
+		    m_read_pos = get_info().block_size - must_read;
 		else if (must_read > m_read_pos) {
 		    must_read = m_read_pos;
 		    m_read_pos = 0;
@@ -206,14 +206,14 @@ void FileReaderFetcher::run()
 	/* Wait until more data is needed. */
 	m_buffer_lock.lock();
 	while(!m_finished &&
-	      (m_buffer.availible(m_read_ptr) > m_threshold || !isOpen()))
+	      (m_buffer.availible(m_read_ptr) > m_threshold || !is_open()))
 	    m_cond.wait(m_buffer_lock);
 	m_buffer_lock.unlock();
 	
     } while (!m_finished);
 }
 
-void FileReaderFetcher::finish()
+void file_reader_fetcher::finish ()
 {
     m_finished = true;
     m_cond.broadcast();

@@ -28,14 +28,14 @@
 namespace psynth
 {
 
-class Output;
+class output;
 
 class output_director
 {
     conf_node* m_conf;
-    Output* m_output;
+    output* m_output;
     
-    virtual Output* do_start (conf_node& conf) = 0;
+    virtual output* do_start (conf_node& conf) = 0;
     virtual void do_stop (conf_node& conf) = 0;
 
 public:
@@ -58,7 +58,7 @@ public:
 	m_output = 0;
     }
     
-    Output* get_output() const {
+    output* get_output() const {
 	return m_output;
     }
 };

@@ -68,7 +68,7 @@ void director::start_output ()
 
 	m_table->attachOutput(m_output->get_output());
 
-	m_output->get_output()->setInfo(m_info);
+	m_output->get_output()->set_info(m_info);
 	m_output->get_output()->open();
 	m_output->get_output()->start();
     } else {
@@ -151,12 +151,12 @@ void director::update_info ()
 {
     m_table->setInfo(m_info);
 
-    Output::State old_state;
-    old_state = m_output->get_output()->getState();
+    output::state old_state;
+    old_state = m_output->get_output()->get_state();
     
-    m_output->get_output()->gotoState(Output::NOTINIT);
-    m_output->get_output()->setInfo(m_info);
-    m_output->get_output()->gotoState(old_state);
+    m_output->get_output()->goto_state (output::NOTINIT);
+    m_output->get_output()->set_info(m_info);
+    m_output->get_output()->goto_state (old_state);
 }
 
 bool director::on_config_nudge(conf_node& node)
@@ -171,11 +171,11 @@ bool director::on_config_nudge(conf_node& node)
     m_table->setInfo(m_info);
 
     if (m_output && out == m_old_output) {    
-	Output::State old_state;
-	old_state = m_output->get_output()->getState();
-	m_output->get_output()->gotoState(Output::NOTINIT);
-	m_output->get_output()->setInfo(m_info);
-	m_output->get_output()->gotoState(old_state);
+	output::state old_state;
+	old_state = m_output->get_output()->get_state();
+	m_output->get_output()->goto_state (output::NOTINIT);
+	m_output->get_output()->set_info (m_info);
+	m_output->get_output()->goto_state (old_state);
     } else {
 	stop_output ();
 	start_output ();

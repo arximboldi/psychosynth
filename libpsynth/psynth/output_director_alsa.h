@@ -25,14 +25,14 @@
 
 #include <libpsynth/psynth/defaults_alsa.h>
 #include <libpsynth/psynth/output_director.h>
-#include <libpsynth/output/OutputAlsa.h>
+#include <libpsynth/output/output_alsa.h>
 
 namespace psynth
 {
 
 class output_director_alsa : public output_director
 {
-    OutputAlsa* m_output;
+    output_alsa* m_output;
 
     ~output_director_alsa() {
 	if (m_output)
@@ -41,19 +41,19 @@ class output_director_alsa : public output_director
     
     bool on_device_change (conf_node& conf) {
 	std::string device;
-	Output::State old_state;
+	output::state old_state;
 	
 	conf.get(device);
 	
-	old_state = m_output->getState();
-	m_output->gotoState(Output::NOTINIT);
-	m_output->setDevice(device);
-	m_output->gotoState(old_state);
+	old_state = m_output->get_state();
+	m_output->goto_state(output::NOTINIT);
+	m_output->set_device(device);
+	m_output->goto_state(old_state);
 
 	return false;
     }
     
-    virtual Output* do_start (conf_node& conf) {
+    virtual output* do_start (conf_node& conf) {
 	std::string device;
 	
 	conf.get_child ("out_device").get(device);
@@ -61,8 +61,8 @@ class output_director_alsa : public output_director
 	    MakeDelegate(this, &output_director_alsa::on_device_change)
 	    );
 
-	m_output = new OutputAlsa;
-	m_output->setDevice(device);
+	m_output = new output_alsa;
+	m_output->set_device(device);
 
 	return m_output;
     };

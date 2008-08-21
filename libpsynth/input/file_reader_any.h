@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) 2007 by Juan Pedro Bolivar Puente                       *
+ *   Copyright (C) Juan Pedro Bolivar Puente 2008                          *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -20,54 +20,47 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef PSYNTH_OUTPUTOSS_H
-#define PSYNTH_OUTPUTOSS_H
+#ifndef PSYNTH_FILEREADERANY
+#define PSYNTH_FILEREADERANY
 
-#include <pthread.h>
-
-#include <libpsynth/output/Output.h>
-#include <libpsynth/common/thread.h>
+#include <libpsynth/input/file_reader.h>
 
 namespace psynth
 {
 
-class OutputOss : public Output,
-		  public runnable
+class file_reader_any : public file_reader
 {
-    int m_fd;
-    int m_format;
-    int m_stereo;
-    short int* m_buf;
-    std::string m_device;
-	
-    thread m_thread;
-    
+    file_reader* m_the_reader;
+
 public:
-    OutputOss();
-    OutputOss(const audio_info& info, const std::string& device);
-    ~OutputOss();
+    file_reader_any ()
+	: m_the_reader(NULL) {}
 
-    bool setDevice(const std::string& device) {
-	if (getState() == NOTINIT) {
-	    m_device = device;
-	    return true;
-	}
-	
-	return false;
-    }
-
-    const std::string& getDevice() const {
-	return m_device;
+    ~file_reader_any () {
+	if (is_open ())
+	    close ();
     }
     
-    bool open();
-    bool close();
-    bool put(const audio_buffer& buf, size_t nframes);
-    void run();
-    bool start();
-    bool stop();
+    virtual void open (const char* file);
+
+    virtual void seek (size_t pos) {
+	m_the_reader->seek (pos);
+    }
+    
+    virtual int read (audio_buffer& buf, int n_samples) {
+	return m_the_reader->read(buf, n_samples);
+    }
+    
+    virtual void close () {
+	if (is_open ()) {
+	    m_the_reader->close();
+	    delete m_the_reader;
+	    m_the_reader = NULL;
+	    set_is_open (false);
+	}
+    }
 };
 
-} /* namespace psynth */
+} /* PSYNTH_FILEREADERANY */
 
-#endif /* OUTPUTOSS_H */
+#endif /* PSYNTH_FILEREADERANY */

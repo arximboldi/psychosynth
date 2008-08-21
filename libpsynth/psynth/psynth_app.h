@@ -62,7 +62,7 @@ public:
 	return m_director.get_table ();
     };
     
-    Output* get_output () {
+    output* get_output () {
 	return m_director.get_output ();
     };
     
