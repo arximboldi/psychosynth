@@ -26,15 +26,14 @@
 #include "gui3d/ElemSecondComponent.h"
 #include "gui3d/ElemTogglerComponent.h"
 
-#include <libpsynth/object/ObjectMixer.h>
-#include <libpsynth/object/ObjectOscillator.h>
-#include <libpsynth/object/ObjectLFO.h>
-#include <libpsynth/object/ObjectFilter.h>
-#include <libpsynth/object/ObjectSampler.h>
-#include <libpsynth/object/ObjectStepSeq.h>
-#include <libpsynth/object/ObjectNoise.h>
-#include <libpsynth/object/ObjectEcho.h>
-#include <libpsynth/object/ObjectDelay.h>
+#include <libpsynth/node/node_mixer.h>
+#include <libpsynth/node/node_oscillator.h>
+#include <libpsynth/node/node_filter.h>
+#include <libpsynth/node/node_sampler.h>
+#include <libpsynth/node/node_step_seq.h>
+#include <libpsynth/node/node_noise.h>
+#include <libpsynth/node/node_echo.h>
+#include <libpsynth/node/node_delay.h>
 
 using namespace std;
 using namespace Ogre;
@@ -45,26 +44,26 @@ ElementMixer::ElementMixer(TableObject& obj,
     Element(obj, m_scene)
 {
 
-    static const char* mesh_names[ObjectMixer::N_MIXOPS] =
+    static const char* mesh_names[node_mixer::N_MIXOPS] =
 	{"mixer.mesh", "mixer_ring.mesh"};
 
-    static const char* mixop_names[ObjectMixer::N_MIXOPS] =
+    static const char* mixop_names[node_mixer::N_MIXOPS] =
 	{"Sum", "Product"};
 
     addComponent(new ElemMultiMainComponent(
-		     ObjectMixer::PARAM_AMPLITUDE,
+		     node_mixer::PARAM_AMPLITUDE,
 		     0.0f, 1.0f,
-		     ObjectMixer::PARAM_MIXOP,
+		     node_mixer::PARAM_MIXOP,
 		     mesh_names));
 	
     getGUIProperties().addParameter(new ElemGuiParamMulti(
-					ObjectMixer::PARAM_MIXOP,
-					ObjectMixer::N_MIXOPS,
+					node_mixer::PARAM_MIXOP,
+					node_mixer::N_MIXOPS,
 					mixop_names,
 					"Operation"));
     
     getGUIProperties().addParameter(new ElemGuiParamFloat(
-					ObjectMixer::PARAM_AMPLITUDE,
+					node_mixer::PARAM_AMPLITUDE,
 					0.0f, 1.0f,
 					"Amplitude"));
 }
@@ -74,26 +73,26 @@ ElementControlMixer::ElementControlMixer(TableObject& obj,
     Element(obj, m_scene)
 {
 
-    static const char* mesh_names[ObjectMixer::N_MIXOPS] =
+    static const char* mesh_names[node_mixer::N_MIXOPS] =
 	{"ctrl_mixer.mesh", "ctrl_mixer_ring.mesh"};
 
-    static const char* mixop_names[ObjectMixer::N_MIXOPS] =
+    static const char* mixop_names[node_mixer::N_MIXOPS] =
 	{"Sum", "Product"};
 
     addComponent(new ElemMultiMainComponent(
-		     ObjectMixer::PARAM_AMPLITUDE,
+		     node_mixer::PARAM_AMPLITUDE,
 		     0.0f, 1.0f,
-		     ObjectMixer::PARAM_MIXOP,
+		     node_mixer::PARAM_MIXOP,
 		     mesh_names));
 	
     getGUIProperties().addParameter(new ElemGuiParamMulti(
-					ObjectMixer::PARAM_MIXOP,
-					ObjectMixer::N_MIXOPS,
+					node_mixer::PARAM_MIXOP,
+					node_mixer::N_MIXOPS,
 					mixop_names,
 					"Operation"));
     
     getGUIProperties().addParameter(new ElemGuiParamFloat(
-					ObjectMixer::PARAM_AMPLITUDE,
+					node_mixer::PARAM_AMPLITUDE,
 					0.0f, 1.0f,
 					"Amplitude"));
 }
@@ -102,45 +101,45 @@ ElementOscillator::ElementOscillator(TableObject& obj,
 				     Ogre::SceneManager* m_scene) :
     Element(obj, m_scene)
 {
-    static const char* mesh_names[ObjectOscillator::N_OSC_TYPES] =
+    static const char* mesh_names[node_oscillator::N_OSC_TYPES] =
 	{"osc_sine.mesh", "osc_square.mesh", "osc_triangle.mesh",
 	 "osc_sawtooth.mesh", "osc_moogsaw.mesh", "osc_exp.mesh"};
 
-    static const char* wave_names[ObjectOscillator::N_OSC_TYPES] =
+    static const char* wave_names[node_oscillator::N_OSC_TYPES] =
 	{"Sine", "Square", "Triangle", "Sawtooth", "Moogsaw", "Exp."};
 
-    static const char* mod_names[ObjectOscillator::N_MOD_TYPES] =
+    static const char* mod_names[node_oscillator::N_MOD_TYPES] =
 	{"Frequency", "Amplitude", "Phase"};
     
     addComponent(new ElemMultiMainComponent(
-		     ObjectOscillator::PARAM_FREQUENCY,
+		     node_oscillator::PARAM_FREQUENCY,
 		     20.0f, 5000.0f,
-		     ObjectOscillator::PARAM_WAVE,
+		     node_oscillator::PARAM_WAVE,
 		     mesh_names));
     
     addComponent(new ElemSecondComponent(
-		     ObjectOscillator::PARAM_AMPLITUDE,
+		     node_oscillator::PARAM_AMPLITUDE,
 		     0.0f, 1.0f));
     
     getGUIProperties().addParameter(new ElemGuiParamMulti(
-					ObjectOscillator::PARAM_WAVE,
-					ObjectOscillator::N_OSC_TYPES,
+					node_oscillator::PARAM_WAVE,
+					node_oscillator::N_OSC_TYPES,
 					wave_names,
 					"Wave"));
 
     getGUIProperties().addParameter(new ElemGuiParamMulti(
-					ObjectOscillator::PARAM_MODULATOR,
-					ObjectOscillator::N_MOD_TYPES,
+					node_oscillator::PARAM_MODULATOR,
+					node_oscillator::N_MOD_TYPES,
 					mod_names,
 					"Modulator"));
     
     getGUIProperties().addParameter(new ElemGuiParamFloat(
-					ObjectOscillator::PARAM_FREQUENCY,
+					node_oscillator::PARAM_FREQUENCY,
 					20.0f, 5000.0f,
 					"Frequency"));
     
     getGUIProperties().addParameter(new ElemGuiParamFloat(
-					ObjectOscillator::PARAM_AMPLITUDE,
+					node_oscillator::PARAM_AMPLITUDE,
 					0.0f, 1.0f,
 					"Amplitude"));
 }
@@ -149,46 +148,46 @@ ElementLFO::ElementLFO(TableObject& obj,
 		       Ogre::SceneManager* m_scene) :
     Element(obj, m_scene)
 {
-    static const char* mesh_names[ObjectOscillator::N_OSC_TYPES] =
+    static const char* mesh_names[node_oscillator::N_OSC_TYPES] =
 	{"lfo_sine.mesh", "lfo_square.mesh", "lfo_triangle.mesh",
 	 "lfo_sawtooth.mesh", "lfo_moogsaw.mesh", "lfo_exp.mesh"};
 
-    static const char* wave_names[ObjectOscillator::N_OSC_TYPES] =
+    static const char* wave_names[node_oscillator::N_OSC_TYPES] =
 	{"Sine", "Square", "Triangle", "Sawtooth", "Moogsaw", "Exp."};
 
-    static const char* mod_names[ObjectOscillator::N_MOD_TYPES] =
+    static const char* mod_names[node_oscillator::N_MOD_TYPES] =
 	{"Frequency", "Amplitude", "Phase"};
     
     addComponent(new ElemMultiMainComponent(
-		     ObjectOscillator::PARAM_FREQUENCY,
+		     node_oscillator::PARAM_FREQUENCY,
 		     0.01f, 30.0f,
-		     ObjectOscillator::PARAM_WAVE,
+		     node_oscillator::PARAM_WAVE,
 		     mesh_names));
     
     addComponent(new ElemSecondComponent(
-		     ObjectOscillator::PARAM_AMPLITUDE,
+		     node_oscillator::PARAM_AMPLITUDE,
 		     0.0f, 1.0f));
 
     
     getGUIProperties().addParameter(new ElemGuiParamMulti(
-					ObjectOscillator::PARAM_WAVE,
-					ObjectOscillator::N_OSC_TYPES,
+					node_oscillator::PARAM_WAVE,
+					node_oscillator::N_OSC_TYPES,
 					wave_names,
 					"Wave"));
 
     getGUIProperties().addParameter(new ElemGuiParamMulti(
-					ObjectOscillator::PARAM_MODULATOR,
-					ObjectOscillator::N_MOD_TYPES,
+					node_oscillator::PARAM_MODULATOR,
+					node_oscillator::N_MOD_TYPES,
 					mod_names,
 					"Modulator"));
     
     getGUIProperties().addParameter(new ElemGuiParamFloat(
-					ObjectOscillator::PARAM_FREQUENCY,
+					node_oscillator::PARAM_FREQUENCY,
 					0.01f, 30.0f,
 					"Frequency"));
     
     getGUIProperties().addParameter(new ElemGuiParamFloat(
-					ObjectOscillator::PARAM_AMPLITUDE,
+					node_oscillator::PARAM_AMPLITUDE,
 					0.0f, 1.0f,
 					"Amplitude"));
 }
@@ -197,40 +196,40 @@ ElementFilter::ElementFilter(TableObject& obj,
 		       Ogre::SceneManager* m_scene) :
     Element(obj, m_scene)
 {	    
-    static const char* mesh_names[ObjectFilter::N_FILTER_TYPES] =
+    static const char* mesh_names[node_filter::N_FILTER_TYPES] =
 	{"filter_lowpass.mesh", "filter_highpass.mesh",
 	 "filter_bandpass.mesh", "filter_bandpass.mesh",
 	 "filter_notch.mesh", "filter_moog.mesh"};
 
-    static const char* filter_names[ObjectFilter::N_FILTER_TYPES] =
+    static const char* filter_names[node_filter::N_FILTER_TYPES] =
 	{"Lowpass", "Highpass",
 	 "Bandpass CSG", "Bandpass CZPG",
 	 "Notch", "Moog"};
     
     addComponent(new ElemMultiMainComponent(
-		     ObjectFilter::PARAM_CUTOFF,
+		     node_filter::PARAM_CUTOFF,
 		     20.0f, 5000.0f,
-		     ObjectFilter::PARAM_TYPE,
+		     node_filter::PARAM_TYPE,
 		     mesh_names));
     
     addComponent(new ElemSecondComponent(
-		     ObjectFilter::PARAM_RESONANCE,
+		     node_filter::PARAM_RESONANCE,
 		     0.0f, 1.0f));
 
     
     getGUIProperties().addParameter(new ElemGuiParamMulti(
-					ObjectFilter::PARAM_TYPE,
-					ObjectFilter::N_FILTER_TYPES,
+					node_filter::PARAM_TYPE,
+					node_filter::N_FILTER_TYPES,
 					filter_names,
 					"Filter"));
     
     getGUIProperties().addParameter(new ElemGuiParamFloat(
-					ObjectFilter::PARAM_CUTOFF,
+					node_filter::PARAM_CUTOFF,
 					20.0f, 5000.0f,
 					"Cut-off Freq."));
     
     getGUIProperties().addParameter(new ElemGuiParamFloat(
-					ObjectFilter::PARAM_RESONANCE,
+					node_filter::PARAM_RESONANCE,
 					0.0f, 1.0f,
 					"Resonance"));
 }
@@ -244,29 +243,29 @@ ElementSampler::ElementSampler(TableObject& obj,
     
     addComponent(new ElemMainComponent(
 		     string(mesh_name), 
-		     ObjectSampler::PARAM_RATE,
+		     node_sampler::PARAM_RATE,
 		     -3.0f, 3.0f));
     
     addComponent(new ElemSecondComponent(
-		     ObjectSampler::PARAM_AMPLITUDE,
+		     node_sampler::PARAM_AMPLITUDE,
 		     0.0f, 1.0f));
 
 
     getGUIProperties().addParameter(new ElemGuiParamFloat(
-					ObjectSampler::PARAM_AMPLITUDE,
+					node_sampler::PARAM_AMPLITUDE,
 					0.0f, 1.0f,
 					"Amplitude"));
     
     getGUIProperties().addParameter(new ElemGuiParamFloat(
-					ObjectSampler::PARAM_RATE,
+					node_sampler::PARAM_RATE,
 					-3.0f, 3.0f,
 					"Rate"));
     getGUIProperties().addParameter(new ElemGuiParamFloat(
-					ObjectSampler::PARAM_TEMPO,
+					node_sampler::PARAM_TEMPO,
 					0.2f, 3.0f,
 					"Tempo"));
     getGUIProperties().addParameter(new ElemGuiParamFloat(
-					ObjectSampler::PARAM_PITCH,
+					node_sampler::PARAM_PITCH,
 					0.2f, 3.0f,
 					"Pitch"));
 }
@@ -275,44 +274,44 @@ ElementStepSeq::ElementStepSeq(TableObject& obj,
 			       Ogre::SceneManager* m_scene) :
     Element(obj, m_scene)
 {
-    static const char* mesh_names[ObjectOscillator::N_OSC_TYPES] =
+    static const char* mesh_names[node_oscillator::N_OSC_TYPES] =
 	{"stepseq_square.mesh", "stepseq_triangle.mesh",
 	 "stepseq_sawtooth.mesh", "stepseq_bwsawtooth.mesh"};
 
-    static const char* shape_names[ObjectOscillator::N_OSC_TYPES] =
+    static const char* shape_names[node_oscillator::N_OSC_TYPES] =
 	{"Square", "Triangle", "FW Sawtooth", "BW Sawtooth"};
     
 
     addComponent(new ElemMultiMainComponent(
-		     ObjectStepSeq::PARAM_BPM,
+		     node_step_seq::PARAM_BPM,
 		     40.0f, 400.0f,
-		     ObjectStepSeq::PARAM_SHAPE,
+		     node_step_seq::PARAM_SHAPE,
 		     mesh_names));
     
     addComponent(new ElemSecondComponent(
-		     ObjectStepSeq::PARAM_HIGH,
+		     node_step_seq::PARAM_HIGH,
 		     0.1f, 1.0f));
 
     addComponent(new ElemTogglerComponent(
-		     ObjectStepSeq::PARAM_NUM_STEPS,
-		     ObjectStepSeq::PARAM_STEP_0,
-		     ObjectStepSeq::PARAM_CURRENT_STEP));
+		     node_step_seq::PARAM_NUM_STEPS,
+		     node_step_seq::PARAM_STEP_0,
+		     node_step_seq::PARAM_CURRENT_STEP));
 
     getGUIProperties().addParameter(new ElemGuiParamMulti(
-					ObjectStepSeq::PARAM_SHAPE,
-					ObjectStepSeq::N_SHAPES,
+					node_step_seq::PARAM_SHAPE,
+					node_step_seq::N_SHAPES,
 					shape_names,
 					"Shape"));
     getGUIProperties().addParameter(new ElemGuiParamInt(
-					ObjectStepSeq::PARAM_NUM_STEPS,
+					node_step_seq::PARAM_NUM_STEPS,
 					1, 32,
 					"Steps"));
     getGUIProperties().addParameter(new ElemGuiParamFloat(
-					ObjectStepSeq::PARAM_BPM,
+					node_step_seq::PARAM_BPM,
 					40.0f, 400.0f,
 					"BPM"));
     getGUIProperties().addParameter(new ElemGuiParamFloat(
-					ObjectStepSeq::PARAM_HIGH,
+					node_step_seq::PARAM_HIGH,
 					0.1f, 1.0f,
 					"Hold"));
 }
@@ -321,26 +320,26 @@ ElementAudioNoise::ElementAudioNoise(TableObject& obj,
 				     Ogre::SceneManager* m_scene) :
     Element(obj, m_scene)
 {
-    static const char* mesh_names[ObjectNoise::N_TYPES] =
+    static const char* mesh_names[node_noise::N_TYPES] =
 	{"audio_noise_white.mesh", "audio_noise_pink.mesh"};
 
-    static const char* type_names[ObjectOscillator::N_OSC_TYPES] =
+    static const char* type_names[node_oscillator::N_OSC_TYPES] =
 	{"White", "Pink"};
     
     addComponent(new ElemMultiMainComponent(
-		     ObjectNoise::PARAM_AMPLITUDE,
+		     node_noise::PARAM_AMPLITUDE,
 		     0.0f, 1.0f,
-		     ObjectNoise::PARAM_TYPE,
+		     node_noise::PARAM_TYPE,
 		     mesh_names));
         
     getGUIProperties().addParameter(new ElemGuiParamMulti(
-					ObjectNoise::PARAM_TYPE,
-					ObjectNoise::N_TYPES,
+					node_noise::PARAM_TYPE,
+					node_noise::N_TYPES,
 					type_names,
 					"Type"));
 
     getGUIProperties().addParameter(new ElemGuiParamFloat(
-					ObjectNoise::PARAM_AMPLITUDE,
+					node_noise::PARAM_AMPLITUDE,
 					0.0f, 1.0f,
 					"Amplitude"));
 }
@@ -349,26 +348,26 @@ ElementControlNoise::ElementControlNoise(TableObject& obj,
 				     Ogre::SceneManager* m_scene) :
     Element(obj, m_scene)
 {
-    static const char* mesh_names[ObjectNoise::N_TYPES] =
+    static const char* mesh_names[node_noise::N_TYPES] =
 	{"control_noise_white.mesh", "control_noise_pink.mesh"};
 
-    static const char* type_names[ObjectOscillator::N_OSC_TYPES] =
+    static const char* type_names[node_oscillator::N_OSC_TYPES] =
 	{"White", "Pink"};
     
     addComponent(new ElemMultiMainComponent(
-		     ObjectNoise::PARAM_AMPLITUDE,
+		     node_noise::PARAM_AMPLITUDE,
 		     0.0f, 1.0f,
-		     ObjectNoise::PARAM_TYPE,
+		     node_noise::PARAM_TYPE,
 		     mesh_names));
         
     getGUIProperties().addParameter(new ElemGuiParamMulti(
-					ObjectNoise::PARAM_TYPE,
-					ObjectNoise::N_TYPES,
+					node_noise::PARAM_TYPE,
+					node_noise::N_TYPES,
 					type_names,
 					"Type"));
 
     getGUIProperties().addParameter(new ElemGuiParamFloat(
-					ObjectNoise::PARAM_AMPLITUDE,
+					node_noise::PARAM_AMPLITUDE,
 					0.0f, 1.0f,
 					"Amplitude"));
 }
@@ -381,21 +380,21 @@ ElementEcho::ElementEcho(TableObject& obj,
     
     addComponent(new ElemMainComponent(
 		     string(mesh_name), 
-		     ObjectEcho::PARAM_DELAY,
+		     node_echo::PARAM_DELAY,
 		     0.0f, 1.0f));
     
     addComponent(new ElemSecondComponent(
-		     ObjectEcho::PARAM_FEEDBACK,
+		     node_echo::PARAM_FEEDBACK,
 		     0.0f, 1.0f));
 
 
     getGUIProperties().addParameter(new ElemGuiParamFloat(
-					ObjectEcho::PARAM_DELAY,
+					node_echo::PARAM_DELAY,
 					0.0f, 1.0f,
 					"Delay"));
     
     getGUIProperties().addParameter(new ElemGuiParamFloat(
-					ObjectEcho::PARAM_FEEDBACK,
+					node_echo::PARAM_FEEDBACK,
 					0.0f, 1.0f,
 					"Feedback"));
 }
@@ -408,21 +407,21 @@ ElementDelay::ElementDelay(TableObject& obj,
     
     addComponent(new ElemMainComponent(
 		     string(mesh_name), 
-		     ObjectDelay::PARAM_DELAY,
+		     node_delay::PARAM_DELAY,
 		     0.0f, 0.01f));
     
     addComponent(new ElemSecondComponent(
-		     ObjectDelay::PARAM_DEPTH,
+		     node_delay::PARAM_DEPTH,
 		     0.0f, 1.0f));
 
 
     getGUIProperties().addParameter(new ElemGuiParamFloat(
-					ObjectDelay::PARAM_DELAY,
+					node_delay::PARAM_DELAY,
 					0.0f, 0.01f,
 					"Delay"));
     
     getGUIProperties().addParameter(new ElemGuiParamFloat(
-					ObjectDelay::PARAM_DEPTH,
+					node_delay::PARAM_DEPTH,
 					0.0f, 1.0f,
 					"Depth"));
 }

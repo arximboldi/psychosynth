@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) 2007 by Juan Pedro Bolivar Puente                       *
+ *   Copyright (C) Juan Pedro Bolivar Puente 2007                          *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -20,73 +20,69 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef PSYNTH_PATCHER_H
-#define PSYNTH_PATCHER_H
-
-#include <map>
-#include <set>
+#ifndef PSYNTH_OBJECTMIXER_H
+#define PSYNTH_OBJECTMIXER_H
 
 #include <libpsynth/node/node.h>
 
 namespace psynth
 {
 
-struct PatcherEvent {
-    node* src;
-    node* dest;
-    int src_socket;
-    int dest_socket;
-    int socket_type;
-
-    PatcherEvent(node* s, node* d, int ss, int ds, int st):
-	src(s), dest(d), src_socket(ss), dest_socket(ds), socket_type(st) {};
-};
-
-class PatcherListener {
-public:
-    virtual ~PatcherListener() {};
-    virtual void handleLinkAdded(const PatcherEvent& ev) = 0;
-    virtual void handleLinkDeleted(const PatcherEvent& ev) = 0;
-};
-
-class PatcherSubject {
-    std::list<PatcherListener*> m_list;
-
-protected:
-    void notifyLinkAdded(const PatcherEvent& ev) {
-	for (std::list<PatcherListener*>::iterator it = m_list.begin();
-	     it != m_list.end(); )
-	    (*it++)->handleLinkAdded(ev);
-    };
-    
-    void notifyLinkDeleted(const PatcherEvent& ev) {
-	for (std::list<PatcherListener*>::iterator it = m_list.begin();
-	     it != m_list.end(); )
-	    (*it++)->handleLinkDeleted(ev);
-    };
-    
-public:
-    void addListener(PatcherListener* l) {
-	m_list.push_back(l);
-    };
-    
-    void deleteListener(PatcherListener* l) {
-	m_list.remove(l);
-    };
-};
-
-class Patcher : public PatcherSubject
+class node_mixer : public node
 {
 public:
-    virtual ~Patcher() {};
+       /*enum {
+      N_IN_A_SOCKETS
+      };*/
+	
+    enum in_control_socket_id {
+	IN_C_AMPLITUDE,
+	N_IN_C_SOCKETS
+    };
+
+    enum param_id {
+	PARAM_AMPLITUDE = node::N_COMMON_PARAMS,
+	PARAM_MIXOP,
+	N_PARAM
+    };
+
+    enum mix_op {
+	MIX_SUM,
+	MIX_PRODUCT,
+	N_MIXOPS
+    };
+
+
+protected:
+    int m_numchan;
+
+    void mix (sample* dest, const sample* src, size_t n_samples);
     
-    virtual bool addNode(node* obj) = 0;
-    virtual bool deleteNode(node* obj) = 0;
-    virtual void setParamNode(node* obj, int param) = 0;
-    virtual void update() = 0;
-    virtual void clear() = 0;
+    void mix (sample* dest, const sample* src,
+	     const sample* ampl, size_t n_samples);
+
+    void mix (sample* dest, const sample* src,
+	     envelope_simple& env, size_t n_samples);
+
+    void mix (sample* dest, const sample* src, const sample* ampl,
+	     envelope_simple& env, envelope_simple& ctrl_env,
+	     size_t n_samples);
+    
+    void init (sample* dest, size_t n_samples);
+    
+private:
+    float m_param_ampl;
+    int m_param_mixop;    
+    
+public:
+    node_mixer (const audio_info& info,
+		int obj_type,
+		const std::string& name,
+		int num_audio_out,
+		int num_ctrl_out,
+		int num_in = 2);
 };
 
 } /* namespace psynth */
 
-#endif /* PSYNTH_PATCHER_H */
+#endif /* PSYNTH_OBJECTMIXER_H */

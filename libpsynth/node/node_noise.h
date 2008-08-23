@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) 2007 by Juan Pedro Bolivar Puente                       *
+ *   Copyright (C) Juan Pedro Bolivar Puente 2008                          *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -20,73 +20,71 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef PSYNTH_PATCHER_H
-#define PSYNTH_PATCHER_H
-
-#include <map>
-#include <set>
+#ifndef PSYNTH_OBJECTNOISE_H
+#define PSYNTH_OBJECTNOISE_H
 
 #include <libpsynth/node/node.h>
 
 namespace psynth
 {
 
-struct PatcherEvent {
-    node* src;
-    node* dest;
-    int src_socket;
-    int dest_socket;
-    int socket_type;
+class node_noise : public node
+{		
+public:	
+    enum in_audio_socket_id {
+	N_IN_A_SOCKETS
+    };
+	
+    enum in_control_socket_id {
+	IN_C_AMPLITUDE,
+	IN_C_TRIGGER,
+	N_IN_C_SOCKETS
+    };
 
-    PatcherEvent(node* s, node* d, int ss, int ds, int st):
-	src(s), dest(d), src_socket(ss), dest_socket(ds), socket_type(st) {};
-};
+    enum type {
+	NOISE_WHITE,
+	NOISE_PINK,
+	N_TYPES
+    };
+    
+    enum param_id {
+	PARAM_TYPE = node::N_COMMON_PARAMS,
+	PARAM_AMPLITUDE,
+	N_PARAM
+    };
 
-class PatcherListener {
-public:
-    virtual ~PatcherListener() {};
-    virtual void handleLinkAdded(const PatcherEvent& ev) = 0;
-    virtual void handleLinkDeleted(const PatcherEvent& ev) = 0;
-};
-
-class PatcherSubject {
-    std::list<PatcherListener*> m_list;
-
+    static const float DEFAULT_AMPL = 0.3f;
+    
 protected:
-    void notifyLinkAdded(const PatcherEvent& ev) {
-	for (std::list<PatcherListener*>::iterator it = m_list.begin();
-	     it != m_list.end(); )
-	    (*it++)->handleLinkAdded(ev);
-    };
+    sample update_pink ();
+    sample update_white ();
+    void update_noise (sample* buf);
     
-    void notifyLinkDeleted(const PatcherEvent& ev) {
-	for (std::list<PatcherListener*>::iterator it = m_list.begin();
-	     it != m_list.end(); )
-	    (*it++)->handleLinkDeleted(ev);
-    };
-    
-public:
-    void addListener(PatcherListener* l) {
-	m_list.push_back(l);
-    };
-    
-    void deleteListener(PatcherListener* l) {
-	m_list.remove(l);
-    };
-};
+private:
+    /* Pink noise factors. */
+    sample m_b0;
+    sample m_b1;
+    sample m_b2;
+    sample m_b3;
+    sample m_b4;
+    sample m_b5;
+    sample m_b6;
 
-class Patcher : public PatcherSubject
-{
-public:
-    virtual ~Patcher() {};
+    int   m_param_type;
+    float m_param_ampl;
+    //bool  m_restart;
     
-    virtual bool addNode(node* obj) = 0;
-    virtual bool deleteNode(node* obj) = 0;
-    virtual void setParamNode(node* obj, int param) = 0;
-    virtual void update() = 0;
-    virtual void clear() = 0;
+public:
+    node_noise (const audio_info& prop,
+		int obj_type,
+		const std::string& name,
+		int n_audio_out,
+		int n_control_out);
+    
+    ~node_noise ();
 };
 
 } /* namespace psynth */
 
-#endif /* PSYNTH_PATCHER_H */
+#endif /* PSYNTH_OBJECTNOISE_H */
+

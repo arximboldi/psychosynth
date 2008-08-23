@@ -30,7 +30,7 @@
 
 #include <libpsynth/common/logger.h>
 
-#include <libpsynth/object/KnownObjects.h>
+#include <libpsynth/node/node_types.h>
 
 using namespace std;
 using namespace Ogre;
@@ -64,27 +64,27 @@ ElementManager::~ElementManager()
 Element* ElementManager::createElement(TableObject& obj)
 {
     switch (obj.getType()) {
-    case OBJ_OSCILLATOR:
+    case NODE_OSCILLATOR:
 	return new ElementOscillator(obj, m_scene);
-    case OBJ_LFO:
+    case NODE_LFO:
 	return new ElementLFO(obj, m_scene);
-    case OBJ_FILTER:
+    case NODE_FILTER:
 	return new ElementFilter(obj, m_scene);
-    case OBJ_MIXER:
+    case NODE_MIXER:
 	return new ElementMixer(obj, m_scene);
-    case OBJ_CONTROLMIXER:
+    case NODE_CONTROLMIXER:
 	return new ElementControlMixer(obj, m_scene);
-    case OBJ_SAMPLER:
+    case NODE_SAMPLER:
 	return new ElementSampler(obj, m_scene);
-    case OBJ_STEPSEQ:
+    case NODE_STEPSEQ:
 	return new ElementStepSeq(obj, m_scene);
-    case OBJ_AUDIONOISE:
+    case NODE_AUDIONOISE:
 	return new ElementAudioNoise(obj, m_scene);
-    case OBJ_CONTROLNOISE:
+    case NODE_CONTROLNOISE:
 	return new ElementControlNoise(obj, m_scene);
-    case OBJ_ECHO:
+    case NODE_ECHO:
 	return new ElementEcho(obj, m_scene);
-    case OBJ_DELAY:
+    case NODE_DELAY:
 	return new ElementDelay(obj, m_scene);
     default:
 	return NULL;
@@ -109,43 +109,43 @@ void ElementManager::addElement(int e_type)
     
     switch(e_type) {
     case ELEM_OSC_SINE:
-	obj = m_table->addObject(OBJ_OSCILLATOR);
+	obj = m_table->addObject(NODE_OSCILLATOR);
 	obj.setParam(ObjectOscillator::PARAM_WAVE,
 		     ObjectOscillator::OSC_SINE);
 	break;
 	
     case ELEM_OSC_SQUARE:
-	obj = m_table->addObject(OBJ_OSCILLATOR);
+	obj = m_table->addObject(NODE_OSCILLATOR);
 	obj.setParam(ObjectOscillator::PARAM_WAVE,
 		     ObjectOscillator::OSC_SQUARE);
 	break;
 	
     case ELEM_OSC_TRIANGLE:
-	obj = m_table->addObject(OBJ_OSCILLATOR);
+	obj = m_table->addObject(NODE_OSCILLATOR);
 	obj.setParam(ObjectOscillator::PARAM_WAVE,
 		     ObjectOscillator::OSC_TRIANGLE);
 	break;
 	
     case ELEM_OSC_SAWTOOTH:
-	obj = m_table->addObject(OBJ_OSCILLATOR);
+	obj = m_table->addObject(NODE_OSCILLATOR);
 	obj.setParam(ObjectOscillator::PARAM_WAVE,
 		     ObjectOscillator::OSC_SAWTOOTH);
 	break;
 
     case ELEM_OSC_MOOGSAW:
-	obj = m_table->addObject(OBJ_OSCILLATOR);
+	obj = m_table->addObject(NODE_OSCILLATOR);
 	obj.setParam(ObjectOscillator::PARAM_WAVE,
 		     ObjectOscillator::OSC_MOOGSAW);
 	break;
 
     case ELEM_OSC_EXP:
-	obj = m_table->addObject(OBJ_OSCILLATOR);
+	obj = m_table->addObject(NODE_OSCILLATOR);
 	obj.setParam(ObjectOscillator::PARAM_WAVE,
 		     ObjectOscillator::OSC_EXP);
 	break;
 	
     case ELEM_LFO_SINE:
-	obj = m_table->addObject(OBJ_LFO);
+	obj = m_table->addObject(NODE_LFO);
 	obj.setParam(ObjectOscillator::PARAM_WAVE,
 		     ObjectOscillator::OSC_SINE);
 	obj.setParam(ObjectOscillator::PARAM_FREQUENCY,
@@ -153,7 +153,7 @@ void ElementManager::addElement(int e_type)
 	break;
 	
     case ELEM_LFO_SQUARE:
-	obj = m_table->addObject(OBJ_LFO);
+	obj = m_table->addObject(NODE_LFO);
 	obj.setParam(ObjectOscillator::PARAM_WAVE,
 		     ObjectOscillator::OSC_SQUARE);
 	obj.setParam(ObjectOscillator::PARAM_FREQUENCY,
@@ -161,7 +161,7 @@ void ElementManager::addElement(int e_type)
 	break;
 	
     case ELEM_LFO_TRIANGLE:
-	obj = m_table->addObject(OBJ_LFO);
+	obj = m_table->addObject(NODE_LFO);
 	obj.setParam(ObjectOscillator::PARAM_WAVE,
 		     ObjectOscillator::OSC_TRIANGLE);
 	obj.setParam(ObjectOscillator::PARAM_FREQUENCY,
@@ -169,7 +169,7 @@ void ElementManager::addElement(int e_type)
 	break;
 	
     case ELEM_LFO_SAWTOOTH:
-	obj = m_table->addObject(OBJ_LFO);
+	obj = m_table->addObject(NODE_LFO);
 	obj.setParam(ObjectOscillator::PARAM_WAVE,
 		     ObjectOscillator::OSC_SAWTOOTH);
 	obj.setParam(ObjectOscillator::PARAM_FREQUENCY,
@@ -177,7 +177,7 @@ void ElementManager::addElement(int e_type)
 	break;
 
     case ELEM_LFO_MOOGSAW:
-	obj = m_table->addObject(OBJ_LFO);
+	obj = m_table->addObject(NODE_LFO);
 	obj.setParam(ObjectOscillator::PARAM_WAVE,
 		     ObjectOscillator::OSC_MOOGSAW);
 	obj.setParam(ObjectOscillator::PARAM_FREQUENCY,
@@ -185,7 +185,7 @@ void ElementManager::addElement(int e_type)
 	break;
 	
     case ELEM_LFO_EXP:
-	obj = m_table->addObject(OBJ_LFO);
+	obj = m_table->addObject(NODE_LFO);
 	obj.setParam(ObjectOscillator::PARAM_WAVE,
 		     ObjectOscillator::OSC_EXP);
 	obj.setParam(ObjectOscillator::PARAM_FREQUENCY,
@@ -193,61 +193,61 @@ void ElementManager::addElement(int e_type)
 	break;
 	
     case ELEM_FILTER_LOWPASS:
-	obj = m_table->addObject(OBJ_FILTER);
+	obj = m_table->addObject(NODE_FILTER);
 	obj.setParam(ObjectFilter::PARAM_TYPE,
 		     ObjectFilter::FILTER_LOWPASS);
 	break;
 
     case ELEM_FILTER_HIGHPASS:
-	obj = m_table->addObject(OBJ_FILTER);
+	obj = m_table->addObject(NODE_FILTER);
 	obj.setParam(ObjectFilter::PARAM_TYPE,
 		     ObjectFilter::FILTER_HIGHPASS);
 	break;
 
     case ELEM_FILTER_BANDPASS_CSG:
-	obj = m_table->addObject(OBJ_FILTER);
+	obj = m_table->addObject(NODE_FILTER);
 	obj.setParam(ObjectFilter::PARAM_TYPE,
 		     ObjectFilter::FILTER_BANDPASS_CSG);
 	break;
 
     case ELEM_FILTER_BANDPASS_CZPG:
-	obj = m_table->addObject(OBJ_FILTER);
+	obj = m_table->addObject(NODE_FILTER);
 	obj.setParam(ObjectFilter::PARAM_TYPE,
 		     ObjectFilter::FILTER_BANDPASS_CZPG);
 	break;
 
     case ELEM_FILTER_NOTCH:
-	obj = m_table->addObject(OBJ_FILTER);
+	obj = m_table->addObject(NODE_FILTER);
 	obj.setParam(ObjectFilter::PARAM_TYPE,
 		     ObjectFilter::FILTER_NOTCH);
 	break;
 
     case ELEM_FILTER_MOOG:
-	obj = m_table->addObject(OBJ_FILTER);
+	obj = m_table->addObject(NODE_FILTER);
 	obj.setParam(ObjectFilter::PARAM_TYPE,
 		     ObjectFilter::FILTER_MOOG);
 	break;
 	
     case ELEM_MIXER:
-	obj = m_table->addObject(OBJ_MIXER);
+	obj = m_table->addObject(NODE_MIXER);
 	obj.setParam(ObjectMixer::PARAM_MIXOP,
 		     ObjectMixer::MIX_SUM);
 	break;
 
     case ELEM_RINGMOD:
-	obj = m_table->addObject(OBJ_MIXER);
+	obj = m_table->addObject(NODE_MIXER);
 	obj.setParam(ObjectMixer::PARAM_MIXOP,
 		     ObjectMixer::MIX_PRODUCT);
 	break;
 
     case ELEM_CTRLMIXER:
-	obj = m_table->addObject(OBJ_CONTROLMIXER);
+	obj = m_table->addObject(NODE_CONTROLMIXER);
 	obj.setParam(ObjectMixer::PARAM_MIXOP,
 		     ObjectMixer::MIX_SUM);
 	break;
 
     case ELEM_CTRLRINGMOD:
-	obj = m_table->addObject(OBJ_CONTROLMIXER);
+	obj = m_table->addObject(NODE_CONTROLMIXER);
 	obj.setParam(ObjectMixer::PARAM_MIXOP,
 		     ObjectMixer::MIX_PRODUCT);
 	break;

@@ -20,7 +20,7 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <libpsynth/object/watch_viewer.h>
+#include <libpsynth/node/watch_viewer.h>
 
 #include "gui3d/Connection.h"
 

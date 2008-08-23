@@ -74,35 +74,35 @@ nobase_libpsynthinc_HEADERS = \
 	table/Patcher.h\
 	table/PatcherDynamic.h \
 	table/TableObjectCreator.h\
-	object/node.h \
-	object/ObjectOscillator.h \
-	object/node_manager.h \
-	object/ObjectOutput.h \
-	object/ObjectMixer.h \
-	object/ObjectAudioMixer.h \
-	object/ObjectControlMixer.h \
-	object/ObjectLFO.h \
-	object/ObjectAudioOscillator.h \
-	object/ObjectFilter.h \
-	object/ObjectSampler.h \
-	object/ObjectStepSeq.h \
-	object/ObjectNoise.h \
-	object/ObjectAudioNoise.h \
-	object/ObjectControlNoise.h \
-	object/ObjectEcho.h \
-	object/ObjectDelay.h \
-	object/filter.h \
-	object/wave_table.h \
-	object/oscillator.h \
-	object/KnownObjects.h \
-	object/node_param.h\
-	object/envelope_simple.h\
-	object/envelope_multi.h\
-	object/envelope.h\
-	object/watch.h\
-	object/watch_viewer.h\
-	object/node_factory.h\
-	object/node_factory_manager.h\
+	node/node.h \
+	node/node_manager.h \
+	node/node_output.h \
+	node/node_mixer.h \
+	node/node_audio_mixer.h \
+	node/node_control_mixer.h \
+	node/node_oscillator.h \
+	node/node_lfo.h \
+	node/node_audio_oscillator.h \
+	node/node_filter.h \
+	node/node_sampler.h \
+	node/node_step_seq.h \
+	node/node_noise.h \
+	node/node_audio_noise.h \
+	node/node_control_noise.h \
+	node/node_echo.h \
+	node/node_delay.h \
+	node/filter.h \
+	node/wave_table.h \
+	node/oscillator.h \
+	node/node_types.h \
+	node/node_param.h\
+	node/envelope_simple.h\
+	node/envelope_multi.h\
+	node/envelope.h\
+	node/watch.h\
+	node/watch_viewer.h\
+	node/node_factory.h\
+	node/node_factory_manager.h\
 	output/output.h\
 	input/file_reader.h\
 	input/file_reader_any.h\
@@ -130,29 +130,29 @@ libpsynth_la_SOURCES = \
 	table/Patcher.cpp \
 	table/PatcherDynamic.cpp \
 	table/TableObjectCreator.cpp\
-	object/node.cpp \
-	object/ObjectOscillator.cpp \
-	object/ObjectMixer.cpp \
-	object/ObjectAudioMixer.cpp \
-	object/ObjectControlMixer.cpp \
-	object/node_manager.cpp \
-	object/ObjectOutput.cpp \
-	object/ObjectLFO.cpp \
-	object/ObjectAudioOscillator.cpp \
-	object/ObjectFilter.cpp \
-	object/ObjectSampler.cpp \
-	object/ObjectStepSeq.cpp \
-	object/ObjectNoise.cpp \
-	object/ObjectAudioNoise.cpp \
-	object/ObjectControlNoise.cpp \
-	object/ObjectEcho.cpp \
-	object/ObjectDelay.cpp \
-	object/filter.cpp \
-	object/wave_table.cpp \
-	object/oscillator.cpp\
-	object/node_param.cpp \
-	object/node_factory_manager.cpp\
-	object/envelope_multi.cpp\
+	node/node.cpp \
+	node/node_mixer.cpp \
+	node/node_audio_mixer.cpp \
+	node/node_control_mixer.cpp \
+	node/node_manager.cpp \
+	node/node_output.cpp \
+	node/node_oscillator.cpp \
+	node/node_lfo.cpp \
+	node/node_audio_oscillator.cpp \
+	node/node_filter.cpp \
+	node/node_sampler.cpp \
+	node/node_step_seq.cpp \
+	node/node_noise.cpp \
+	node/node_audio_noise.cpp \
+	node/node_control_noise.cpp \
+	node/node_echo.cpp \
+	node/node_delay.cpp \
+	node/filter.cpp \
+	node/wave_table.cpp \
+	node/oscillator.cpp\
+	node/node_param.cpp \
+	node/node_factory_manager.cpp\
+	node/envelope_multi.cpp\
 	input/file_reader_any.cpp\
 	input/file_reader_fetcher.cpp
 

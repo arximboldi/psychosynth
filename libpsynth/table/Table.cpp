@@ -23,20 +23,19 @@
 #include <algorithm>
 
 #include "table/Table.h"
-#include "common/error.h"
 
-#include "object/ObjectOutput.h"
-#include "object/ObjectAudioMixer.h"
-#include "object/ObjectControlMixer.h"
-#include "object/ObjectAudioOscillator.h"
-#include "object/ObjectLFO.h"
-#include "object/ObjectFilter.h"
-#include "object/ObjectSampler.h"
-#include "object/ObjectStepSeq.h"
-#include "object/ObjectAudioNoise.h"
-#include "object/ObjectControlNoise.h"
-#include "object/ObjectEcho.h"
-#include "object/ObjectDelay.h"
+#include "node/node_output.h"
+#include "node/node_audio_mixer.h"
+#include "node/node_control_mixer.h"
+#include "node/node_audio_oscillator.h"
+#include "node/node_lfo.h"
+#include "node/node_filter.h"
+#include "node/node_sampler.h"
+#include "node/node_step_seq.h"
+#include "node/node_audio_noise.h"
+#include "node/node_control_noise.h"
+#include "node/node_echo.h"
+#include "node/node_delay.h"
 
 using namespace std;
 
@@ -112,8 +111,8 @@ Table::Table(const audio_info& info) :
     m_patcher(NULL),
     m_last_id(MIN_USER_ID)
 {
-    m_output = new ObjectOutput(m_info);
-    m_mixer = new ObjectAudioMixer(m_info, MIXER_CHANNELS);
+    m_output = new node_output(m_info);
+    m_mixer = new node_audio_mixer(m_info, MIXER_CHANNELS);
 
     m_mixer->param("amplitude").set(0.5f);
 
@@ -125,18 +124,18 @@ Table::Table(const audio_info& info) :
 
 void Table::registerDefaultObjectFactory()
 {
-    registerObjectFactory(get_ObjectAudioMixer_factory());
-    registerObjectFactory(get_ObjectControlMixer_factory());
-    registerObjectFactory(get_ObjectAudioOscillator_factory());
-    registerObjectFactory(get_ObjectLFO_factory());
-    registerObjectFactory(get_ObjectOutput_factory());
-    registerObjectFactory(get_ObjectFilter_factory());
-    registerObjectFactory(get_ObjectSampler_factory());
-    registerObjectFactory(get_ObjectStepSeq_factory());
-    registerObjectFactory(get_ObjectAudioNoise_factory());
-    registerObjectFactory(get_ObjectControlNoise_factory());
-    registerObjectFactory(get_ObjectEcho_factory());
-    registerObjectFactory(get_ObjectDelay_factory());
+    registerObjectFactory(get_node_audio_mixer_factory());
+    registerObjectFactory(get_node_control_mixer_factory());
+    registerObjectFactory(get_node_audio_oscillator_factory());
+    registerObjectFactory(get_node_lfo_factory());
+    registerObjectFactory(get_node_output_factory());
+    registerObjectFactory(get_node_filter_factory());
+    registerObjectFactory(get_node_sampler_factory());
+    registerObjectFactory(get_node_step_seq_factory());
+    registerObjectFactory(get_node_audio_noise_factory());
+    registerObjectFactory(get_node_control_noise_factory());
+    registerObjectFactory(get_node_echo_factory());
+    registerObjectFactory(get_node_delay_factory());
 }
 
 Table::~Table()
@@ -172,26 +171,26 @@ TableObject Table::findObject(int id)
 #if 0
 TableObject Table::addObject(int type)
 {
-    Object* obj;
+    node* nod;
 
     switch (type) {
     case OBJ_OSCILLATOR:
-	obj = new ObjectAudioOscillator(m_info);
+	obj = new node_audio_oscillator(m_info);
 	break;
     case OBJ_LFO:
-	obj = new ObjectLFO(m_info);
+	obj = new node_lfo(m_info);
 	break;
     case OBJ_FILTER:
-	obj = new ObjectFilter(m_info);
+	obj = new node_filter(m_info);
 	break;
     case OBJ_MIXER:
-	obj = new ObjectAudioMixer(m_info);
+	obj = new node_audio_mixer(m_info);
 	break;
     case OBJ_CONTROLMIXER:
-	obj = new ObjectControlMixer(m_info);
+	obj = new node_control_mixer (m_info);
 	break;
     case OBJ_SAMPLER:
-	obj = new ObjectSampler(m_info);
+	obj = new node_sampler(m_info);
 	break;
     default:
 	obj = NULL;

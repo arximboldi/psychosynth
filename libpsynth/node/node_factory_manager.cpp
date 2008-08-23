@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) 2007 by Juan Pedro Bolivar Puente                       *
+ *   Copyright (C) Juan Pedro Bolivar Puente 2008                          *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -20,73 +20,36 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef PSYNTH_PATCHER_H
-#define PSYNTH_PATCHER_H
+#include <algorithm>
+#include "node/node_factory_manager.h"
 
-#include <map>
-#include <set>
-
-#include <libpsynth/node/node.h>
+using namespace std;
 
 namespace psynth
 {
 
-struct PatcherEvent {
-    node* src;
-    node* dest;
-    int src_socket;
-    int dest_socket;
-    int socket_type;
-
-    PatcherEvent(node* s, node* d, int ss, int ds, int st):
-	src(s), dest(d), src_socket(ss), dest_socket(ds), socket_type(st) {};
-};
-
-class PatcherListener {
-public:
-    virtual ~PatcherListener() {};
-    virtual void handleLinkAdded(const PatcherEvent& ev) = 0;
-    virtual void handleLinkDeleted(const PatcherEvent& ev) = 0;
-};
-
-class PatcherSubject {
-    std::list<PatcherListener*> m_list;
-
-protected:
-    void notifyLinkAdded(const PatcherEvent& ev) {
-	for (std::list<PatcherListener*>::iterator it = m_list.begin();
-	     it != m_list.end(); )
-	    (*it++)->handleLinkAdded(ev);
-    };
-    
-    void notifyLinkDeleted(const PatcherEvent& ev) {
-	for (std::list<PatcherListener*>::iterator it = m_list.begin();
-	     it != m_list.end(); )
-	    (*it++)->handleLinkDeleted(ev);
-    };
-    
-public:
-    void addListener(PatcherListener* l) {
-	m_list.push_back(l);
-    };
-    
-    void deleteListener(PatcherListener* l) {
-	m_list.remove(l);
-    };
-};
-
-class Patcher : public PatcherSubject
+void node_factory_manager::register_factory (node_factory& of)
 {
-public:
-    virtual ~Patcher() {};
+    m_node_fact [of.get_name ()] = &of;
+}
+
+node* node_factory_manager::create (const std::string& name,
+				    const audio_info& info)
+{
+    node_factory_map::iterator it = m_node_fact.find (name);
+
+    /*
+    cout << " *** CREATING " << name << endl;
+    if (it != m_objfact.end())
+	cout << "*** SUCCESS!! \n";
+    else
+	cout << "*** ERROR!! \n";
+    */
     
-    virtual bool addNode(node* obj) = 0;
-    virtual bool deleteNode(node* obj) = 0;
-    virtual void setParamNode(node* obj, int param) = 0;
-    virtual void update() = 0;
-    virtual void clear() = 0;
-};
+    if (it != m_node_fact.end ())
+	return it->second->create (info);
+    
+    return NULL;
+}
 
 } /* namespace psynth */
-
-#endif /* PSYNTH_PATCHER_H */

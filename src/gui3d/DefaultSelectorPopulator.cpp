@@ -31,14 +31,11 @@
 #include <libpsynth/common/file_manager.h>
 #include <libpsynth/table/TableObjectCreator.h>
 
-#include <libpsynth/object/ObjectMixer.h>
-#include <libpsynth/object/ObjectOscillator.h>
-#include <libpsynth/object/ObjectLFO.h>
-#include <libpsynth/object/ObjectFilter.h>
-#include <libpsynth/object/ObjectSampler.h>
-#include <libpsynth/object/ObjectStepSeq.h>
-#include <libpsynth/object/ObjectNoise.h>
-#include <libpsynth/object/ObjectStepSeq.h>
+#include <libpsynth/node/node_mixer.h>
+#include <libpsynth/node/node_oscillator.h>
+#include <libpsynth/node/node_filter.h>
+#include <libpsynth/node/node_step_seq.h>
+#include <libpsynth/node/node_noise.h>
 #include "gui3d/SelectorWindow.h"
 #include "gui3d/DefaultSelectorPopulator.h"
 
@@ -101,24 +98,24 @@ void DefaultSelectorPopulator::populate(SelectorWindow* sel)
     creat.setParam("frequency", (float) 110.0f);
     creat.setParam("amplitude", (float) 0.3f);
     
-    creat.setParam("wave", (int) ObjectOscillator::OSC_SINE);
+    creat.setParam("wave", (int) node_oscillator::OSC_SINE);
     cat->addButton("Sine", creat);
-    creat.setParam("wave", (int) ObjectOscillator::OSC_SQUARE);
+    creat.setParam("wave", (int) node_oscillator::OSC_SQUARE);
     cat->addButton("Square", creat);
-    creat.setParam("wave", (int) ObjectOscillator::OSC_SAWTOOTH);
+    creat.setParam("wave", (int) node_oscillator::OSC_SAWTOOTH);
     cat->addButton("Sawtooth", creat);
-    creat.setParam("wave", (int) ObjectOscillator::OSC_TRIANGLE);
+    creat.setParam("wave", (int) node_oscillator::OSC_TRIANGLE);
     cat->addButton("Triangle", creat);
-    creat.setParam("wave", (int) ObjectOscillator::OSC_MOOGSAW);
+    creat.setParam("wave", (int) node_oscillator::OSC_MOOGSAW);
     cat->addButton("Moogsaw", creat);
-    creat.setParam("wave", (int) ObjectOscillator::OSC_EXP);
+    creat.setParam("wave", (int) node_oscillator::OSC_EXP);
     cat->addButton("Exponential", creat);
 
     creat.clear();
     creat.setName("audio_noise");
-    creat.setParam("type", (int) ObjectNoise::NOISE_PINK);
+    creat.setParam("type", (int) node_noise::NOISE_PINK);
     cat->addButton("Pink Noise", creat);
-    creat.setParam("type", (int) ObjectNoise::NOISE_WHITE);
+    creat.setParam("type", (int) node_noise::NOISE_WHITE);
     cat->addButton("White Noise", creat);
     
     creat.clear();
@@ -127,24 +124,24 @@ void DefaultSelectorPopulator::populate(SelectorWindow* sel)
     creat.setParam("frequency", 1.0f);
     creat.setParam("amplitude", 0.7f);
     
-    creat.setParam("wave", (int) ObjectOscillator::OSC_SINE);
+    creat.setParam("wave", (int) node_oscillator::OSC_SINE);
     cat->addButton("Sine", creat);
-    creat.setParam("wave", (int) ObjectOscillator::OSC_SQUARE);
+    creat.setParam("wave", (int) node_oscillator::OSC_SQUARE);
     cat->addButton("Square", creat);
-    creat.setParam("wave", (int) ObjectOscillator::OSC_SAWTOOTH);
+    creat.setParam("wave", (int) node_oscillator::OSC_SAWTOOTH);
     cat->addButton("Sawtooth", creat);
-    creat.setParam("wave", (int) ObjectOscillator::OSC_TRIANGLE);
+    creat.setParam("wave", (int) node_oscillator::OSC_TRIANGLE);
     cat->addButton("Triangle", creat);
-    creat.setParam("wave", (int) ObjectOscillator::OSC_MOOGSAW);
+    creat.setParam("wave", (int) node_oscillator::OSC_MOOGSAW);
     cat->addButton("Moogsaw", creat);
-    creat.setParam("wave", (int) ObjectOscillator::OSC_EXP);
+    creat.setParam("wave", (int) node_oscillator::OSC_EXP);
     cat->addButton("Exponential", creat);
 
     creat.clear();
     creat.setName("control_noise");
-    creat.setParam("type", (int) ObjectNoise::NOISE_PINK);
+    creat.setParam("type", (int) node_noise::NOISE_PINK);
     cat->addButton("Pink Noise", creat);
-    creat.setParam("type", (int) ObjectNoise::NOISE_WHITE);
+    creat.setParam("type", (int) node_noise::NOISE_WHITE);
     cat->addButton("White Noise", creat);
     
     creat.clear();
@@ -152,17 +149,17 @@ void DefaultSelectorPopulator::populate(SelectorWindow* sel)
     creat.setName("filter");
     creat.setParam("resonance", (float) 0.8f);
 	
-    creat.setParam("type", (int) ObjectFilter::FILTER_LOWPASS);
+    creat.setParam("type", (int) node_filter::FILTER_LOWPASS);
     cat->addButton("Low-pass", creat);
-    creat.setParam("type", (int) ObjectFilter::FILTER_HIGHPASS);
+    creat.setParam("type", (int) node_filter::FILTER_HIGHPASS);
     cat->addButton("Hi-pass", creat);
-    creat.setParam("type", (int) ObjectFilter::FILTER_BANDPASS_CSG);
+    creat.setParam("type", (int) node_filter::FILTER_BANDPASS_CSG);
     cat->addButton("Band-pass CSG", creat);
-    creat.setParam("type", (int) ObjectFilter::FILTER_BANDPASS_CZPG);
+    creat.setParam("type", (int) node_filter::FILTER_BANDPASS_CZPG);
     cat->addButton("Band-pass CZPG", creat);
-    creat.setParam("type", (int) ObjectFilter::FILTER_NOTCH);
+    creat.setParam("type", (int) node_filter::FILTER_NOTCH);
     cat->addButton("Notch", creat);
-    creat.setParam("type", (int) ObjectFilter::FILTER_MOOG);
+    creat.setParam("type", (int) node_filter::FILTER_MOOG);
     cat->addButton("Moog", creat);
 
     creat.clear();
@@ -177,28 +174,28 @@ void DefaultSelectorPopulator::populate(SelectorWindow* sel)
     cat = sel->addCategory("Mixers");
     creat.setName("audio_mixer");
 
-    creat.setParam("mixop", (int) ObjectMixer::MIX_SUM);
+    creat.setParam("mixop", (int) node_mixer::MIX_SUM);
     cat->addButton("Audio Sum", creat);
-    creat.setParam("mixop", (int) ObjectMixer::MIX_PRODUCT);
+    creat.setParam("mixop", (int) node_mixer::MIX_PRODUCT);
     cat->addButton("Audio Mul", creat);
 
     creat.setName("control_mixer");
 
-    creat.setParam("mixop", (int) ObjectMixer::MIX_SUM);
+    creat.setParam("mixop", (int) node_mixer::MIX_SUM);
     cat->addButton("Control Sum", creat);
-    creat.setParam("mixop", (int) ObjectMixer::MIX_PRODUCT);
+    creat.setParam("mixop", (int) node_mixer::MIX_PRODUCT);
     cat->addButton("Control Mul", creat);
 
     creat.clear();
     cat = sel->addCategory("Sequencing");
     creat.setName("stepseq");
-    creat.setParam("shape", (int) ObjectStepSeq::SHAPE_SQUARE);
+    creat.setParam("shape", (int) node_step_seq::SHAPE_SQUARE);
     cat->addButton("Step Square", creat);
-    creat.setParam("shape", (int) ObjectStepSeq::SHAPE_TRIANGLE);
+    creat.setParam("shape", (int) node_step_seq::SHAPE_TRIANGLE);
     cat->addButton("Step Triangle", creat);
-    creat.setParam("shape", (int) ObjectStepSeq::SHAPE_FWSAWTOOTH);
+    creat.setParam("shape", (int) node_step_seq::SHAPE_FWSAWTOOTH);
     cat->addButton("Step FW Saw", creat);
-    creat.setParam("shape", (int) ObjectStepSeq::SHAPE_BWSAWTOOTH);
+    creat.setParam("shape", (int) node_step_seq::SHAPE_BWSAWTOOTH);
     cat->addButton("Step BW Saw", creat);
     
     cat = sel->addCategory("Samples");

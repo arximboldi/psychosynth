@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) 2007 by Juan Pedro Bolivar Puente                       *
+ *   Copyright (C) Juan Pedro Bolivar Puente 2007                          *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -20,73 +20,84 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef PSYNTH_PATCHER_H
-#define PSYNTH_PATCHER_H
-
-#include <map>
-#include <set>
+#ifndef PSYNTH_OBJECTSAMPLER_H
+#define PSYNTH_OBJECTSAMPLER_H
 
 #include <libpsynth/node/node.h>
+#include <libpsynth/input/file_reader_any.h>
+#include <libpsynth/input/file_reader_fetcher.h>
+#include <libpsynth/node/node_factory.h>
+#include <libpsynth/common/scaler_st.h>
 
 namespace psynth
 {
 
-struct PatcherEvent {
-    node* src;
-    node* dest;
-    int src_socket;
-    int dest_socket;
-    int socket_type;
+class mutex;
 
-    PatcherEvent(node* s, node* d, int ss, int ds, int st):
-	src(s), dest(d), src_socket(ss), dest_socket(ds), socket_type(st) {};
-};
-
-class PatcherListener {
-public:
-    virtual ~PatcherListener() {};
-    virtual void handleLinkAdded(const PatcherEvent& ev) = 0;
-    virtual void handleLinkDeleted(const PatcherEvent& ev) = 0;
-};
-
-class PatcherSubject {
-    std::list<PatcherListener*> m_list;
-
-protected:
-    void notifyLinkAdded(const PatcherEvent& ev) {
-	for (std::list<PatcherListener*>::iterator it = m_list.begin();
-	     it != m_list.end(); )
-	    (*it++)->handleLinkAdded(ev);
-    };
-    
-    void notifyLinkDeleted(const PatcherEvent& ev) {
-	for (std::list<PatcherListener*>::iterator it = m_list.begin();
-	     it != m_list.end(); )
-	    (*it++)->handleLinkDeleted(ev);
-    };
-    
-public:
-    void addListener(PatcherListener* l) {
-	m_list.push_back(l);
-    };
-    
-    void deleteListener(PatcherListener* l) {
-	m_list.remove(l);
-    };
-};
-
-class Patcher : public PatcherSubject
+class node_sampler : public node
 {
 public:
-    virtual ~Patcher() {};
+    enum in_audio_socket_id {
+	N_IN_A_SOCKETS
+    };
+	
+    enum in_control_socket_id {
+	IN_C_RATE,
+	IN_C_TRIGGER,
+	N_IN_C_SOCKETS
+    };
+
+    enum param_id {
+	PARAM_FILE = node::N_COMMON_PARAMS,
+	PARAM_AMPLITUDE,
+	PARAM_RATE,
+	PARAM_TEMPO,
+	PARAM_PITCH,
+	N_PARAM
+    };
     
-    virtual bool addNode(node* obj) = 0;
-    virtual bool deleteNode(node* obj) = 0;
-    virtual void setParamNode(node* obj, int param) = 0;
-    virtual void update() = 0;
-    virtual void clear() = 0;
+    enum out_audio_socket_id {
+	OUT_A_OUTPUT,
+	N_OUT_A_SOCKETS
+    };
+
+    enum out_control_socket_id {
+	N_OUT_C_SOCKETS
+    };
+    
+private:
+    file_reader_any m_reader;
+    file_reader_fetcher m_fetcher;
+    audio_buffer m_inbuf;
+    scaler_st m_scaler;
+    float m_ctrl_pos;
+    
+    float m_param_ampl;
+    float m_param_rate;
+    float m_param_tempo;
+    float m_param_pitch;
+
+    bool m_restart;
+    
+    std::string m_param_file;
+    
+    mutex m_update_lock;
+    
+    void on_file_change (node_param& par);
+    void read (audio_buffer& buf, int start, int end);
+    void restart();
+    
+    void do_update (const node* caller, int caller_port_type, int caller_port);
+    void do_advance ();
+    void on_info_change ();
+    
+public:
+    node_sampler (const audio_info& info);
+    ~node_sampler ();
 };
+
+PSYNTH_DECLARE_NODE_FACTORY (node_sampler, "sampler");
 
 } /* namespace psynth */
 
-#endif /* PSYNTH_PATCHER_H */
+#endif /* PSYNTH_OBJECTSAMPLER_H */

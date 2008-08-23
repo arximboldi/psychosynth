@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) 2007 by Juan Pedro Bolivar Puente                       *
+ *   Copyright (C) 2007 Juan Pedro Bolivar Puente                          *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -20,73 +20,84 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef PSYNTH_PATCHER_H
-#define PSYNTH_PATCHER_H
+#ifndef PSYNTH_OBJECTOSCILLATOR_H
+#define PSYNTH_OBJECTOSCILLATOR_H
 
-#include <map>
-#include <set>
+#include <iostream>
+#include <cmath>
 
 #include <libpsynth/node/node.h>
+#include <libpsynth/node/node_types.h>
+#include <libpsynth/node/oscillator.h>
 
 namespace psynth
 {
 
-struct PatcherEvent {
-    node* src;
-    node* dest;
-    int src_socket;
-    int dest_socket;
-    int socket_type;
+class node_oscillator : public node
+{		
+public:	
+    enum in_audio_socket_id {
+	N_IN_A_SOCKETS
+    };
+	
+    enum in_control_socket_id {
+	IN_C_FREQUENCY,
+	IN_C_AMPLITUDE,
+	IN_C_TRIGGER,
+	N_IN_C_SOCKETS
+    };
 
-    PatcherEvent(node* s, node* d, int ss, int ds, int st):
-	src(s), dest(d), src_socket(ss), dest_socket(ds), socket_type(st) {};
-};
+    enum wave_type {
+	OSC_SINE     = oscillator::SINE,
+	OSC_SQUARE   = oscillator::SQUARE,
+	OSC_TRIANGLE = oscillator::TRIANGLE,
+	OSC_SAWTOOTH = oscillator::SAWTOOTH,
+	OSC_MOOGSAW  = oscillator::MOOGSAW,
+	OSC_EXP      = oscillator::EXP,
+	N_OSC_TYPES
+    };
 
-class PatcherListener {
-public:
-    virtual ~PatcherListener() {};
-    virtual void handleLinkAdded(const PatcherEvent& ev) = 0;
-    virtual void handleLinkDeleted(const PatcherEvent& ev) = 0;
-};
+    enum mod_type {
+	MOD_FM = oscillator::FM,
+	MOD_AM = oscillator::AM,
+	MOD_PM = oscillator::PM,
+	N_MOD_TYPES
+    };
+    
+    enum param_id {
+	PARAM_WAVE = node::N_COMMON_PARAMS,
+	PARAM_MODULATOR,
+	PARAM_FREQUENCY,
+	PARAM_AMPLITUDE,
+	N_PARAM
+    };
 
-class PatcherSubject {
-    std::list<PatcherListener*> m_list;
-
+    static const float DEFAULT_FREQ = 110.0f;
+    static const float DEFAULT_AMPL = 0.4f;
+    
 protected:
-    void notifyLinkAdded(const PatcherEvent& ev) {
-	for (std::list<PatcherListener*>::iterator it = m_list.begin();
-	     it != m_list.end(); )
-	    (*it++)->handleLinkAdded(ev);
-    };
-    
-    void notifyLinkDeleted(const PatcherEvent& ev) {
-	for (std::list<PatcherListener*>::iterator it = m_list.begin();
-	     it != m_list.end(); )
-	    (*it++)->handleLinkDeleted(ev);
-    };
-    
-public:
-    void addListener(PatcherListener* l) {
-	m_list.push_back(l);
-    };
-    
-    void deleteListener(PatcherListener* l) {
-	m_list.remove(l);
-    };
-};
+    oscillator m_oscillator;
 
-class Patcher : public PatcherSubject
-{
-public:
-    virtual ~Patcher() {};
+    void update_osc_params ();
+    void update_osc (sample* out);
     
-    virtual bool addNode(node* obj) = 0;
-    virtual bool deleteNode(node* obj) = 0;
-    virtual void setParamNode(node* obj, int param) = 0;
-    virtual void update() = 0;
-    virtual void clear() = 0;
+private:
+    int   m_param_wave;
+    int   m_param_mod;
+    float m_param_freq;
+    float m_param_ampl;
+    bool  m_restart;
+    
+public:
+    node_oscillator (const audio_info& prop,
+		     int obj_type,
+		     const std::string& name,
+		     int n_audio_out,
+		     int n_control_out);
+    
+    ~node_oscillator ();
 };
 
 } /* namespace psynth */
 
-#endif /* PSYNTH_PATCHER_H */
+#endif /* PSYNTH_OBJECTOSCILLATOR_H */

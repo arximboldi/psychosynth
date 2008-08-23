@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) 2007 by Juan Pedro Bolivar Puente                       *
+ *   Copyright (C) Juan Pedro Bolivar Puente 2008                          *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -20,73 +20,83 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef PSYNTH_PATCHER_H
-#define PSYNTH_PATCHER_H
+#ifndef PSYNTH_ENVELOPE_SIMPLE_H
+#define PSYNTH_ENVELOPE_SIMPLE_H
 
-#include <map>
-#include <set>
-
-#include <libpsynth/node/node.h>
+#include <libpsynth/node/envelope.h>
 
 namespace psynth
 {
 
-struct PatcherEvent {
-    node* src;
-    node* dest;
-    int src_socket;
-    int dest_socket;
-    int socket_type;
-
-    PatcherEvent(node* s, node* d, int ss, int ds, int st):
-	src(s), dest(d), src_socket(ss), dest_socket(ds), socket_type(st) {};
-};
-
-class PatcherListener {
-public:
-    virtual ~PatcherListener() {};
-    virtual void handleLinkAdded(const PatcherEvent& ev) = 0;
-    virtual void handleLinkDeleted(const PatcherEvent& ev) = 0;
-};
-
-class PatcherSubject {
-    std::list<PatcherListener*> m_list;
-
-protected:
-    void notifyLinkAdded(const PatcherEvent& ev) {
-	for (std::list<PatcherListener*>::iterator it = m_list.begin();
-	     it != m_list.end(); )
-	    (*it++)->handleLinkAdded(ev);
-    };
-    
-    void notifyLinkDeleted(const PatcherEvent& ev) {
-	for (std::list<PatcherListener*>::iterator it = m_list.begin();
-	     it != m_list.end(); )
-	    (*it++)->handleLinkDeleted(ev);
-    };
-    
-public:
-    void addListener(PatcherListener* l) {
-	m_list.push_back(l);
-    };
-    
-    void deleteListener(PatcherListener* l) {
-	m_list.remove(l);
-    };
-};
-
-class Patcher : public PatcherSubject
+/**
+ * Simplistic evenlope implementation with only two points.
+ */
+class envelope_simple : public envelope
 {
 public:
-    virtual ~Patcher() {};
+    float m_rise_dt;
+    float m_fall_dt;
+    float m_curr_dt;
+    float m_val;
     
-    virtual bool addNode(node* obj) = 0;
-    virtual bool deleteNode(node* obj) = 0;
-    virtual void setParamNode(node* obj, int param) = 0;
-    virtual void update() = 0;
-    virtual void clear() = 0;
+public:
+    envelope_simple () :
+	m_rise_dt(0.0f),
+	m_fall_dt(0.0f),
+	m_curr_dt(0.0f),
+	m_val(0.0f)
+	{}
+    
+    envelope_simple (float rise_dt, float fall_dt) :
+	m_rise_dt(rise_dt),
+	m_fall_dt(fall_dt),
+	m_curr_dt(0.0f),
+	m_val(0.0f)
+	{}
+
+    float set_deltas (float rise_dt, float fall_dt) {
+	m_rise_dt = rise_dt;
+	m_fall_dt = fall_dt;
+    }
+
+    void set (float value) {
+	m_val = value;
+    }
+    
+    float update () {
+	float val = m_val;
+	m_val = m_val + m_curr_dt;
+	if (m_val > 1.0f) m_val = 1.0;
+	else if (m_val < 0.0f) m_val = 0.0;
+	return val;
+    }
+
+    float update (float sample) {
+	float val = m_val;
+	m_val = m_val + m_curr_dt * sample;
+	if (m_val > 1.0f) m_val = 1.0;
+	else if (m_val < 0.0f) m_val = 0.0;
+	return val;
+    }
+
+    void update (float* samples, int n_samples) {
+	while(n_samples--)
+	    *samples++ *= update();
+    }
+
+    void press () {
+	m_curr_dt = m_rise_dt;
+    }
+
+    void release () {
+	m_curr_dt = m_fall_dt;
+    }
+
+    bool finished () {
+	return m_val <= 0.0f;
+    }
 };
 
 } /* namespace psynth */
 
-#endif /* PSYNTH_PATCHER_H */
+#endif /* PSYNTH_ENVELOPE_SIMPLE_H */

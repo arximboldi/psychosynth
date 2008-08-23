@@ -29,11 +29,11 @@
 
 #include <libpsynth/common/audio_info.h>
 #include <libpsynth/table/Patcher.h>
-#include <libpsynth/object/node.h>
-#include <libpsynth/object/ObjectOutput.h>
-#include <libpsynth/object/ObjectAudioMixer.h>
-#include <libpsynth/object/node_manager.h>
-#include <libpsynth/object/node_factory_manager.h>
+#include <libpsynth/node/node.h>
+#include <libpsynth/node/node_output.h>
+#include <libpsynth/node/node_audio_mixer.h>
+#include <libpsynth/node/node_manager.h>
+#include <libpsynth/node/node_factory_manager.h>
 
 namespace psynth
 {
@@ -240,8 +240,8 @@ class Table : public TableSubject,
     audio_info m_info;
     node_manager m_node_mgr;
     Patcher* m_patcher;
-    ObjectOutput* m_output;
-    ObjectAudioMixer* m_mixer;
+    node_output* m_output;
+    node_audio_mixer* m_mixer;
     int m_last_id;
     node_factory_manager m_objfact;
     
@@ -302,19 +302,19 @@ public:
     void deactivateObject(TableObject& obj);
 
     void attachOutput(output* out) {
-	m_output->attachOutput(out);
+	m_output->attach_output (out);
     };
 
     void attachPassiveOutput(output* out) {
-	m_output->attachPassiveOutput(out);
+	m_output->attach_passive_output (out);
     };
     
     void detachOutput(output* out) {
-	m_output->detachOutput(out);
+	m_output->detach_output (out);
     };
 
     void detachPassiveOutput(output* out) {
-	m_output->detachPassiveOutput(out);
+	m_output->detach_passive_output (out);
     };
 
     void attachPatcher(Patcher* pat);
