@@ -26,26 +26,27 @@
 namespace psynth
 {
 
-PSYNTH_DEFINE_OBJECT_FACTORY(ObjectControlMixer);
+PSYNTH_DEFINE_NODE_FACTORY(ObjectControlMixer);
 
-void ObjectControlMixer::doUpdate(const Object* caller, int caller_port_type, int caller_port)
+void ObjectControlMixer::do_update (const node* caller,
+				    int caller_port_type, int caller_port)
 {
-    sample_buffer* buf = getOutput<sample_buffer >(LINK_CONTROL, OUT_C_OUTPUT);
+    sample_buffer* buf = get_output<sample_buffer >(LINK_CONTROL, OUT_C_OUTPUT);
     const sample_buffer* in = NULL;
     int j;
     bool input = false;
     
-    init (buf->get_data(), getInfo().block_size);
+    init (buf->get_data(), get_info().block_size);
     
     for (j = 0; j < m_numchan; ++j)
-	if ((in = getInput<sample_buffer>(LINK_CONTROL, j))) {
-	    EnvelopeSimple env = getInEnvelope(LINK_CONTROL, j);
-	    mix(buf->get_data(), in->get_data(), env, getInfo().block_size);
+	if ((in = get_input <sample_buffer> (LINK_CONTROL, j))) {
+	    envelope_simple env = get_in_envelope (LINK_CONTROL, j);
+	    mix(buf->get_data(), in->get_data(), env, get_info().block_size);
 	    input = true;
 	}
 
     if (!input)
-	memset(buf->get_data(), 0, sizeof(sample) * getInfo().block_size);
+	memset(buf->get_data(), 0, sizeof(sample) * get_info().block_size);
 
 }
 

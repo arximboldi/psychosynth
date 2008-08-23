@@ -23,7 +23,7 @@
 #include <algorithm>
 #include "common/misc.h"
 #include "object/KnownObjects.h"
-#include "object/EnvelopeMulti.h"
+#include "object/envelope_multi.h"
 #include "object/ObjectStepSeq.h"
 
 using namespace std;
@@ -31,16 +31,16 @@ using namespace std;
 namespace psynth
 {
 
-PSYNTH_DEFINE_OBJECT_FACTORY(ObjectStepSeq);
+PSYNTH_DEFINE_NODE_FACTORY(ObjectStepSeq);
 
 ObjectStepSeq::ObjectStepSeq(const audio_info& info) :
-    Object(info,
-	   OBJ_STEPSEQ,
-	   "stepseq",
-	   N_IN_A_SOCKETS,
-	   N_IN_C_SOCKETS,
-	   N_OUT_A_SOCKETS,
-	   N_OUT_C_SOCKETS),
+    node (info,
+	  OBJ_STEPSEQ,
+	  "stepseq",
+	  N_IN_A_SOCKETS,
+	  N_IN_C_SOCKETS,
+	  N_OUT_A_SOCKETS,
+	  N_OUT_C_SOCKETS),
     m_param_bpm(DEFAULT_BPM),
     m_param_shape(SHAPE_SQUARE),
     m_param_high(DEFAULT_HIGH),
@@ -51,40 +51,40 @@ ObjectStepSeq::ObjectStepSeq(const audio_info& info) :
 {
     int i;
     
-    addParam("bpm", ObjParam::FLOAT, &m_param_bpm);
-    addParam("shape", ObjParam::INT, &m_param_shape);
-    addParam("high", ObjParam::FLOAT, &m_param_high);
-    addParam("slope", ObjParam::FLOAT, &m_param_slope);
-    addParam("current_step", ObjParam::INT, &m_cur_step);
-    addParam("num_steps", ObjParam::INT, &m_param_num_steps);
+    add_param ("bpm", node_param::FLOAT, &m_param_bpm);
+    add_param ("shape", node_param::INT, &m_param_shape);
+    add_param ("high", node_param::FLOAT, &m_param_high);
+    add_param ("slope", node_param::FLOAT, &m_param_slope);
+    add_param ("current_step", node_param::INT, &m_cur_step);
+    add_param ("num_steps", node_param::INT, &m_param_num_steps);
 	
     for (i = 0; i < MAX_STEPS; ++i) {
 	m_param_step[i] = DEFAULT_STEP;
-	addParam(string("step") + itoa(i, 10), ObjParam::INT, &m_param_step[i]);
+	add_param (string("step") + itoa(i, 10), node_param::INT, &m_param_step[i]);
     }
 
-    setOutputStableValue(LINK_CONTROL, OUT_C_OUTPUT, 1.0f);
+    set_output_stable_value (LINK_CONTROL, OUT_C_OUTPUT, 1.0f);
     initEnvelopeValues();
 
     if (m_param_step[m_cur_step])
-	m_env.setValues(&m_hi_env_vals);
+	m_env.set_values (&m_hi_env_vals);
     else
-	m_env.setValues(&m_lo_env_vals);
+	m_env.set_values (&m_lo_env_vals);
 }
 
-void ObjectStepSeq::doUpdate(const Object* caller,
-			     int caller_port_type,
-			     int caller_port)
+void ObjectStepSeq::do_update (const node* caller,
+			       int caller_port_type,
+			       int caller_port)
 {
-    sample_buffer* outbuf = getOutput<sample_buffer>(LINK_CONTROL, OUT_C_OUTPUT);
+    sample_buffer* outbuf = get_output<sample_buffer> (LINK_CONTROL, OUT_C_OUTPUT);
     sample* output = outbuf->get_data();
-    const sample_buffer* bpmbuf = getInput<sample_buffer>(LINK_CONTROL, IN_C_BPM);
+    const sample_buffer* bpmbuf = get_input<sample_buffer> (LINK_CONTROL, IN_C_BPM);
     const sample* bpm = bpmbuf ? bpmbuf->get_data() : 0;
     int i;
 
-    updateEnvelopeValues();
+    updateEnvelopeValues ();
     
-    for (i = 0; i < getInfo().block_size; ++i) {
+    for (i = 0; i < get_info ().block_size; ++i) {
 	if (bpm)
 	    updateEnvelopeFactor(*bpm++);
 	*output++ = m_env.update();
@@ -94,9 +94,9 @@ void ObjectStepSeq::doUpdate(const Object* caller,
 	    m_env.press();
 	    m_env.release();
 	    if (m_param_step[m_cur_step])
-		m_env.setValues (&m_hi_env_vals);
+		m_env.set_values (&m_hi_env_vals);
 	    else
-		m_env.setValues (&m_lo_env_vals);
+		m_env.set_values (&m_lo_env_vals);
 	}
     }
 
@@ -104,19 +104,20 @@ void ObjectStepSeq::doUpdate(const Object* caller,
     m_old_param_high = m_param_high;
 }
 
-void ObjectStepSeq::doAdvance()
+void ObjectStepSeq::do_advance()
 {
 }
 
-void ObjectStepSeq::onInfoChange()
+/* TODO */
+void ObjectStepSeq::on_info_change ()
 {
 }
 
 void ObjectStepSeq::initEnvelopeValues()
 {
     m_lo_env_vals.resize(2);
-    m_lo_env_vals[0] = EnvPoint(0.0f, 0.0f);
-    m_lo_env_vals[1] = EnvPoint(1.0f, 0.0f);
+    m_lo_env_vals[0] = env_point (0.0f, 0.0f);
+    m_lo_env_vals[1] = env_point (1.0f, 0.0f);
 
     createShape();
     
@@ -138,8 +139,8 @@ void ObjectStepSeq::createShape()
 	break;
     }
 
-    m_hi_env_vals[0] = EnvPoint(0.0f, 0.0f);
-    m_hi_env_vals[m_hi_env_vals.size()-1] = EnvPoint(1.0f, 0.0f);
+    m_hi_env_vals[0] = env_point (0.0f, 0.0f);
+    m_hi_env_vals[m_hi_env_vals.size()-1] = env_point (1.0f, 0.0f);
     
     updateShape();
 }
@@ -148,21 +149,21 @@ void ObjectStepSeq::updateShape()
 {
     switch (m_param_shape) {
     case SHAPE_SQUARE:
-	m_hi_env_vals[1] = EnvPoint(m_param_slope * m_param_high, 1.0f);
-	m_hi_env_vals[2] = EnvPoint(m_param_high - m_param_slope * m_param_high, 1.0f);
-	m_hi_env_vals[3] = EnvPoint(m_param_high, 0.0f);
+	m_hi_env_vals[1] = env_point (m_param_slope * m_param_high, 1.0f);
+	m_hi_env_vals[2] = env_point (m_param_high - m_param_slope * m_param_high, 1.0f);
+	m_hi_env_vals[3] = env_point (m_param_high, 0.0f);
 	break;
     case SHAPE_TRIANGLE:
-	m_hi_env_vals[1] = EnvPoint(m_param_high/2.0f, 1.0f);
-	m_hi_env_vals[2] = EnvPoint(m_param_high, 0.0f);
+	m_hi_env_vals[1] = env_point (m_param_high/2.0f, 1.0f);
+	m_hi_env_vals[2] = env_point (m_param_high, 0.0f);
 	break;
     case SHAPE_FWSAWTOOTH:
-	m_hi_env_vals[1] = EnvPoint(m_param_high - m_param_slope * m_param_high, 1.0f);
-	m_hi_env_vals[2] = EnvPoint(m_param_high, 0.0f);
+	m_hi_env_vals[1] = env_point (m_param_high - m_param_slope * m_param_high, 1.0f);
+	m_hi_env_vals[2] = env_point (m_param_high, 0.0f);
 	break;
     case SHAPE_BWSAWTOOTH:
-	m_hi_env_vals[1] = EnvPoint(m_param_slope * m_param_high, 1.0f);
-	m_hi_env_vals[2] = EnvPoint(m_param_high, 0.0f);
+	m_hi_env_vals[1] = env_point (m_param_slope * m_param_high, 1.0f);
+	m_hi_env_vals[2] = env_point (m_param_high, 0.0f);
 	break;
     default:
 	break;
@@ -178,7 +179,7 @@ void ObjectStepSeq::updateEnvelopeValues()
 
     if (m_param_high != m_old_param_high) {
 	updateShape();
-	m_env.setTime(m_env.getTime() * m_param_high/m_old_param_high);
+	m_env.set_time (m_env.get_time() * m_param_high/m_old_param_high);
     }
     
     updateEnvelopeFactor(0);
@@ -188,12 +189,12 @@ void ObjectStepSeq::updateEnvelopeFactor(float mod)
 {
     //cout << "m_param_bpm: " << m_param_bpm << endl;
     //cout << "mod: " << mod << endl;
-    //cout << "sample_rate: " << getInfo().sample_rate;
+    //cout << "sample_rate: " << get_info ().sample_rate;
     float factor =
 	(m_param_bpm + m_param_bpm * mod) /
-	(60.0f  * getInfo().sample_rate);
-    m_lo_env_vals.setFactor(factor);
-    m_hi_env_vals.setFactor(factor);
+	(60.0f  * get_info ().sample_rate);
+    m_lo_env_vals.set_factor (factor);
+    m_hi_env_vals.set_factor (factor);
 }
 
 }

@@ -36,13 +36,13 @@ ObjectOscillator::ObjectOscillator(const audio_info& prop,
 				   const std::string& name,
 				   int n_audio_out,
 				   int n_control_out) : 
-    Object(prop,
-	   obj_type,
-	   name,
-	   N_IN_A_SOCKETS,
-	   N_IN_C_SOCKETS,
-	   n_audio_out,
-	   n_control_out),
+    node (prop,
+	  obj_type,
+	  name,
+	  N_IN_A_SOCKETS,
+	  N_IN_C_SOCKETS,
+	  n_audio_out,
+	  n_control_out),
     m_oscillator(prop),
     m_param_wave(OSC_SINE),
     m_param_mod(MOD_FM),
@@ -50,10 +50,10 @@ ObjectOscillator::ObjectOscillator(const audio_info& prop,
     m_param_ampl(DEFAULT_AMPL),
     m_restart(false)
 {    
-    addParam("wave", ObjParam::INT, &m_param_wave);
-    addParam("modulator", ObjParam::INT, &m_param_mod);
-    addParam("frequency", ObjParam::FLOAT, &m_param_freq);
-    addParam("amplitude", ObjParam::FLOAT, &m_param_ampl);
+    add_param ("wave", node_param::INT, &m_param_wave);
+    add_param ("modulator", node_param::INT, &m_param_mod);
+    add_param ("frequency", node_param::FLOAT, &m_param_freq);
+    add_param ("amplitude", node_param::FLOAT, &m_param_ampl);
 
     updateOscParams();
 }
@@ -64,18 +64,18 @@ ObjectOscillator::~ObjectOscillator()
 
 void ObjectOscillator::updateOscParams()
 {
-    m_oscillator.setFrequency(m_param_freq);
-    m_oscillator.setAmplitude(m_param_ampl);
-    m_oscillator.setWave((Oscillator::WaveType)m_param_wave);
-    m_oscillator.setModulator((Oscillator::ModType)m_param_mod);
+    m_oscillator.set_frequency (m_param_freq);
+    m_oscillator.set_amplitude (m_param_ampl);
+    m_oscillator.set_wave ((oscillator::wave_type) m_param_wave);
+    m_oscillator.set_modulator ((oscillator::mod_type) m_param_mod);
 }
 
 void ObjectOscillator::updateOsc(sample* out)
 {
-    const sample_buffer * pitch_buf = getInput<sample_buffer >(LINK_CONTROL, IN_C_FREQUENCY);
-    const sample_buffer * trig_buf = getInput<sample_buffer >(LINK_CONTROL, IN_C_TRIGGER);
-    EnvelopeSimple mod_env = getInEnvelope(LINK_CONTROL, IN_C_FREQUENCY);
-    EnvelopeSimple trig_env =  getInEnvelope(LINK_CONTROL, IN_C_TRIGGER);
+    const sample_buffer * pitch_buf = get_input<sample_buffer> (LINK_CONTROL, IN_C_FREQUENCY);
+    const sample_buffer * trig_buf = get_input<sample_buffer> (LINK_CONTROL, IN_C_TRIGGER);
+    envelope_simple mod_env = get_in_envelope (LINK_CONTROL, IN_C_FREQUENCY);
+    envelope_simple trig_env =  get_in_envelope (LINK_CONTROL, IN_C_TRIGGER);
     
     const sample* mod = pitch_buf ? pitch_buf->get_data() : NULL;
 
@@ -83,9 +83,9 @@ void ObjectOscillator::updateOsc(sample* out)
 
     /* Fill the output. */
     size_t start = 0;
-    size_t end = getInfo().block_size;
+    size_t end = get_info ().block_size;
 
-    while(start < getInfo().block_size) {
+    while(start < get_info ().block_size) {
 	if (m_restart) {
 	    if (trig_buf && trig_buf->get_data () [start] != 0.0f)
 		m_oscillator.restart ();
@@ -109,9 +109,9 @@ void ObjectOscillator::updateOsc(sample* out)
 
     /* Modulate amplitude with trigger envelope. */
     if (trig_buf) {
-	int n_samp = getInfo().block_size;
+	int n_samp = get_info().block_size;
 	const sample* trig = trig_buf->get_data ();
-	trig_env = getInEnvelope(LINK_CONTROL, IN_C_TRIGGER);
+	trig_env = get_in_envelope(LINK_CONTROL, IN_C_TRIGGER);
 	while (n_samp--) {
 	    float env_val = trig_env.update();
 	    *out = *out * ((1.0f - env_val) + (env_val * *trig));

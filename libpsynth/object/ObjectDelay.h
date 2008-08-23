@@ -25,13 +25,13 @@
 
 #include <vector>
 
-#include <libpsynth/object/Object.h>
-#include <libpsynth/object/ObjectFactory.h>
+#include <libpsynth/object/node.h>
+#include <libpsynth/object/node_factory.h>
 
 namespace psynth
 {
 
-class ObjectDelay : public Object
+class ObjectDelay : public node
 {
 public:	
     enum InAudioSocketID {
@@ -55,7 +55,7 @@ public:
     };
 
     enum ParamID {
-	PARAM_DELAY = Object::N_COMMON_PARAMS,
+	PARAM_DELAY = node::N_COMMON_PARAMS,
 	PARAM_DEPTH,
 	N_PARAM
     };
@@ -73,16 +73,16 @@ private:
     audio_buffer m_buffer;
 
     int doUpdateChannel(int chan);
-    void doUpdate(const Object* caller, int caller_port_type, int caller_port);
-    void onInfoChange();
-    void doAdvance() {}
+    void do_update (const node* caller, int caller_port_type, int caller_port);
+    void on_info_change ();
+    void do_advance () {}
     
 public:
     ObjectDelay(const audio_info& prop);
     ~ObjectDelay();
 };
 
-PSYNTH_DECLARE_OBJECT_FACTORY(ObjectDelay, "delay");
+PSYNTH_DECLARE_NODE_FACTORY(ObjectDelay, "delay");
 
 } /* namespace psynth */
 

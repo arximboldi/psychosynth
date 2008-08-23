@@ -25,14 +25,14 @@
 
 #include <vector>
 
-#include <libpsynth/object/Object.h>
-#include <libpsynth/object/Filter.h>
-#include <libpsynth/object/ObjectFactory.h>
+#include <libpsynth/object/node.h>
+#include <libpsynth/object/filter.h>
+#include <libpsynth/object/node_factory.h>
 
 namespace psynth
 {
 
-class ObjectFilter : public Object
+class ObjectFilter : public node
 {
 public:	
     enum InAudioSocketID {
@@ -56,17 +56,17 @@ public:
     };
 
     enum FilterType {
-	FILTER_LOWPASS       = FilterValues::LOWPASS,
-	FILTER_HIGHPASS      = FilterValues::HIPASS,
-	FILTER_BANDPASS_CSG  = FilterValues::BANDPASS_CSG,
-	FILTER_BANDPASS_CZPG = FilterValues::BANDPASS_CZPG,
-	FILTER_NOTCH         = FilterValues::NOTCH,
-	FILTER_MOOG          = FilterValues::MOOG,
+	FILTER_LOWPASS       = filter_values::LOWPASS,
+	FILTER_HIGHPASS      = filter_values::HIPASS,
+	FILTER_BANDPASS_CSG  = filter_values::BANDPASS_CSG,
+	FILTER_BANDPASS_CZPG = filter_values::BANDPASS_CZPG,
+	FILTER_NOTCH         = filter_values::NOTCH,
+	FILTER_MOOG          = filter_values::MOOG,
 	N_FILTER_TYPES,
     };
 
     enum ParamID {
-	PARAM_TYPE = Object::N_COMMON_PARAMS,
+	PARAM_TYPE = node::N_COMMON_PARAMS,
 	PARAM_CUTOFF,
 	PARAM_RESONANCE,
 	N_PARAM
@@ -80,19 +80,19 @@ private:
     float m_param_cutoff;
     float m_param_resonance;
 
-    FilterValues m_filter_values;
-    std::vector<Filter> m_filter;
+    filter_values m_filter_values;
+    std::vector<filter> m_filter;
     
-    void doUpdate(const Object* caller, int caller_port_type, int caller_port);
-    void doAdvance() {}
-    void onInfoChange() {}
+    void do_update (const node* caller, int caller_port_type, int caller_port);
+    void do_advance () {}
+    void on_info_change () {}
     
 public:
     ObjectFilter(const audio_info& prop, int mode = FILTER_LOWPASS);
     ~ObjectFilter();
 };
 
-PSYNTH_DECLARE_OBJECT_FACTORY(ObjectFilter, "filter");
+PSYNTH_DECLARE_NODE_FACTORY(ObjectFilter, "filter");
 
 } /* namespace psynth */
 

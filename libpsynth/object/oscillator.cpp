@@ -21,69 +21,69 @@
  ***************************************************************************/
 
 #include <iostream>
-#include <object/Oscillator.h>
-#include <object/EnvelopeSimple.h>
+#include <object/oscillator.h>
+#include <object/envelope_simple.h>
 
 using namespace std;
 
 namespace psynth
 {
 
-bool Oscillator::m_table_init = false;
-WaveTable Oscillator::TABLE[Oscillator::WAVE_TYPES];
+bool oscillator::m_table_init = false;
+wave_table oscillator::TABLE [oscillator::WAVE_TYPES];
 
-void Oscillator::initializeTables()
+void oscillator::initialize_tables ()
 {
-    TABLE[SINE].fill(TABLE_SIZE, &computeSine);
-    TABLE[SQUARE].fill(TABLE_SIZE, &computeSquare);
-    TABLE[TRIANGLE].fill(TABLE_SIZE, &computeTriangle);
-    TABLE[SAWTOOTH].fill(TABLE_SIZE, &computeSawtooth);
-    TABLE[MOOGSAW].fill(TABLE_SIZE, &computeMoogsaw);
-    TABLE[EXP].fill(TABLE_SIZE, &computeExp);
+    TABLE[SINE].fill(TABLE_SIZE, &compute_sine);
+    TABLE[SQUARE].fill(TABLE_SIZE, &compute_square);
+    TABLE[TRIANGLE].fill(TABLE_SIZE, &compute_triangle);
+    TABLE[SAWTOOTH].fill(TABLE_SIZE, &compute_sawtooth);
+    TABLE[MOOGSAW].fill(TABLE_SIZE, &compute_moogsaw);
+    TABLE[EXP].fill(TABLE_SIZE, &compute_exp);
     
     m_table_init = true;
 }
 
-void Oscillator::update(sample* out_buf, size_t n_frames)
+void oscillator::update(sample* out_buf, size_t n_frames)
 {
     float speed = m_freq / m_info.sample_rate;
     for (size_t i = 0; i < n_frames; ++i) {
-	*out_buf++ = computeSample(m_x) * m_ampl;
+	*out_buf++ = compute_sample(m_x) * m_ampl;
 	m_x += speed;
     }
 
     m_x = phase(m_x);
 }
 
-void Oscillator::updateFM(sample* out_buf, const sample* mod_buf,
-			  EnvelopeSimple& mod_env, size_t n_frames)
+void oscillator::update_fm (sample* out_buf, const sample* mod_buf,
+			    envelope_simple& mod_env, size_t n_frames)
 {
     for (size_t i = 0; i < n_frames; ++i) {
-	*out_buf++ = computeSample(m_x) * m_ampl;
+	*out_buf++ = compute_sample(m_x) * m_ampl;
 	m_x += (m_freq + m_freq * *mod_buf++ * mod_env.update()) / m_info.sample_rate;
     }
 
     m_x = phase(m_x);
 }
 
-void Oscillator::updatePM(sample* out_buf, const sample* mod_buf,
-			  EnvelopeSimple& mod_env, size_t n_frames)
+void oscillator::update_pm (sample* out_buf, const sample* mod_buf,
+			    envelope_simple& mod_env, size_t n_frames)
 {
     float speed = m_freq / m_info.sample_rate;
     for (size_t i = 0; i < n_frames; ++i) {
-	*out_buf++ = computeSample(m_x + *mod_buf * mod_env.update()) * m_ampl;
+	*out_buf++ = compute_sample(m_x + *mod_buf * mod_env.update()) * m_ampl;
 	m_x += speed;
     }
 
     m_x = phase(m_x);
 }
 
-void Oscillator::updateAM(sample* out_buf, const sample* mod_buf,
-			  EnvelopeSimple& mod_env, size_t n_frames)
+void oscillator::update_am (sample* out_buf, const sample* mod_buf,
+			    envelope_simple& mod_env, size_t n_frames)
 {
     float speed = m_freq / m_info.sample_rate;
     for (size_t i = 0; i < n_frames; ++i) {
-	*out_buf++ = computeSample(m_x) * (m_ampl + m_ampl * *mod_buf++ * mod_env.update());
+	*out_buf++ = compute_sample(m_x) * (m_ampl + m_ampl * *mod_buf++ * mod_env.update());
 	m_x += speed;
     }
 

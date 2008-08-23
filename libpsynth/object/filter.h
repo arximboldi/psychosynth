@@ -29,12 +29,12 @@
 namespace psynth
 {
 
-class FilterValues
+class filter_values
 {
-    friend class Filter;
+    friend class filter;
     
 public:
-    enum Type {
+    enum type {
 	LOWPASS,
 	HIPASS,
 	BANDPASS_CSG,
@@ -47,39 +47,39 @@ private:
     float m_b0a0, m_b1a0, m_b2a0, m_a1a0, m_a2a0; // filter coeffs
     float m_r, m_p, m_k; // coeffs for moog-filter
 
-    Type m_type;
+    type m_type;
     float m_freq;
     float m_res;
     float m_srate;
     
 public:
-    FilterValues(Type type = LOWPASS,
-		 float freq = 220.0f,
-		 float res = 0.1f,
-		 float srate = 44100.0f) {
-	calculate(type, freq, res, srate);
+    filter_values (type type = LOWPASS,
+		   float freq = 220.0f,
+		   float res = 0.1f,
+		   float srate = 44100.0f) {
+	calculate (type, freq, res, srate);
     }
     
-    void calculate(Type type, float freq, float res, float srate);
-    void calculate(float freq);
-    void calculate();
+    void calculate (type type, float freq, float res, float srate);
+    void calculate (float freq);
+    void calculate ();
     
-    Type getType() {
+    type get_type () {
 	return m_type;
     };
 
-    float getFrequency() {
+    float get_frequency () {
 	return m_freq;
     }
 
-    float getResonance() {
+    float get_resonance () {
 	return m_res;
     }
 };
 
-class Filter
+class filter
 {
-    FilterValues* m_coef;
+    filter_values* m_coef;
     bool m_local_coef;
     /*
       in/out history
@@ -90,8 +90,9 @@ class Filter
       in/out history for moog-filter
     */
     sample m_y1, m_y2, m_y3, m_y4, m_oldx, m_oldy1, m_oldy2, m_oldy3;
+
 public:
-    Filter(FilterValues* coef = 0) :
+    filter(filter_values* coef = 0) :
 	m_coef(coef), m_local_coef(false),
 	m_ou1(0), m_ou2(0),
 	m_in1(0), m_in2(0),
@@ -100,12 +101,12 @@ public:
 	m_oldx(0),
 	m_oldy1(0), m_oldy2(0), m_oldy3(0) {
 	if (!m_coef) {
-	    m_coef = new FilterValues;
+	    m_coef = new filter_values;
 	    m_local_coef = true;
 	}
     }
 
-    Filter(const Filter& f) :
+    filter(const filter& f) :
 	m_coef(f.m_coef), m_local_coef(f.m_local_coef),
 	m_ou1(f.m_ou1), m_ou2(f.m_ou2),
 	m_in1(f.m_in1), m_in2(f.m_in2),
@@ -114,12 +115,12 @@ public:
 	m_oldx(f.m_oldx),
 	m_oldy1(f.m_oldy1), m_oldy2(f.m_oldy2), m_oldy3(f.m_oldy3) {
 	if (f.m_local_coef) {
-	    m_coef = new FilterValues;
+	    m_coef = new filter_values;
 	    *m_coef = *f.m_coef;
 	}
     }
 
-    Filter& operator= (const Filter& f) {
+    filter& operator= (const filter& f) {
 	if (this != &f) {
 	    m_coef = f.m_coef;
 	    m_local_coef = f.m_local_coef;
@@ -137,7 +138,7 @@ public:
 	    m_oldy3 = f.m_oldy3;
 
 	    if (f.m_local_coef) {
-		m_coef = new FilterValues;
+		m_coef = new filter_values;
 		*m_coef = *f.m_coef;
 	    }	    
 	}
@@ -145,20 +146,20 @@ public:
 	return *this;
     }
     
-    ~Filter() {
+    ~filter() {
 	if (m_local_coef)
 	    delete m_coef;
     }
     
-    FilterValues* getValues() {
+    filter_values* get_values () {
 	return m_coef;
     }
 
-    /*void setValues(FilterValues* coef) {
+    /*void set_values (filter_values* coef) {
 	m_coef = coef;
 	}*/
     
-    sample update(sample x);
+    sample update (sample x);
 };
 
 } /* namespace psynth */

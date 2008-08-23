@@ -23,12 +23,12 @@
 #ifndef PSYNTH_OBJECTMIXER_H
 #define PSYNTH_OBJECTMIXER_H
 
-#include <libpsynth/object/Object.h>
+#include <libpsynth/object/node.h>
 
 namespace psynth
 {
 
-class ObjectMixer : public Object
+class ObjectMixer : public node
 {
 public:
        /*enum {
@@ -41,7 +41,7 @@ public:
     };
 
     enum ParamID {
-	PARAM_AMPLITUDE = Object::N_COMMON_PARAMS,
+	PARAM_AMPLITUDE = node::N_COMMON_PARAMS,
 	PARAM_MIXOP,
 	N_PARAM
     };
@@ -62,10 +62,10 @@ protected:
 	     const sample* ampl, size_t n_samples);
 
     void mix(sample* dest, const sample* src,
-	     EnvelopeSimple& env, size_t n_samples);
+	     envelope_simple& env, size_t n_samples);
 
     void mix(sample* dest, const sample* src, const sample* ampl,
-	     EnvelopeSimple& env, EnvelopeSimple& ctrl_env,
+	     envelope_simple& env, envelope_simple& ctrl_env,
 	     size_t n_samples);
     
     void init(sample* dest, size_t n_samples);

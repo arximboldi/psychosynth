@@ -130,25 +130,25 @@ void osc_controller::handleSetParamObject(TableObject& obj, int param_id)
 	lo_message_add_int32(msg, param_id);
 
 	switch(obj.getParamType(param_id)) {
-	case ObjParam::INT: {
+	case node_param::INT: {
 	    int val;
 	    obj.getParam(param_id, val);
 	    lo_message_add_int32(msg, val);
 	    break;
 	}    
-	case ObjParam::FLOAT: {
+	case node_param::FLOAT: {
 	    float val;
 	    obj.getParam(param_id, val);
 	    lo_message_add_float(msg, val);
 	    break;
 	}  
-	case ObjParam::STRING: {
+	case node_param::STRING: {
 	    string val;
 	    obj.getParam(param_id, val);
 	    lo_message_add_string(msg, val.c_str());
 	    break;
 	}
-	case ObjParam::VECTOR2F: {
+	case node_param::VECTOR2F: {
 	    vector_2f val;
 	    obj.getParam(param_id, val);
 	    lo_message_add_float(msg, val.x);
@@ -251,16 +251,16 @@ int osc_controller::_param_cb(const char* path, const char* types,
 	    
 	    m_skip++;
 	    switch(obj.getParamType(param_id)) {
-	    case ObjParam::FLOAT:
+	    case node_param::FLOAT:
 		m_table->setParamObject(obj, param_id, argv[3]->f);
 		break;
-	    case ObjParam::INT:
+	    case node_param::INT:
 		m_table->setParamObject(obj, param_id, argv[3]->i);
 		break;
-	    case ObjParam::STRING:
+	    case node_param::STRING:
 		m_table->setParamObject(obj, param_id, string(&argv[3]->s));
 		break;
-	    case ObjParam::VECTOR2F:
+	    case node_param::VECTOR2F:
 		m_table->setParamObject(obj, param_id,
 					vector_2f(argv[3]->f, argv[4]->f));
 		break;
@@ -276,16 +276,16 @@ int osc_controller::_param_cb(const char* path, const char* types,
 		lo_message_add_int32(newmsg, argv[2]->i);
 		
 		switch(obj.getParamType(param_id)) {
-		case ObjParam::FLOAT:
+		case node_param::FLOAT:
 		    lo_message_add_float(newmsg, argv[3]->f);
 		    break;
-		case ObjParam::INT:
+		case node_param::INT:
 		    lo_message_add_int32(newmsg, argv[3]->i);
 		    break;
-		case ObjParam::STRING:
+		case node_param::STRING:
 		    lo_message_add_string(newmsg, &argv[3]->s);
 		    break;
-		case ObjParam::VECTOR2F:
+		case node_param::VECTOR2F:
 		    lo_message_add_float(newmsg, argv[3]->f);
 		    lo_message_add_float(newmsg, argv[4]->f);
 		    break;

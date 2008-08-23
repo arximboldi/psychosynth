@@ -22,7 +22,7 @@
 
 #include "object/KnownObjects.h"
 #include "object/ObjectOutput.h"
-#include "object/ObjectManager.h"
+#include "object/node_manager.h"
 
 const int SAFETY_FACTOR = 4;
 
@@ -31,7 +31,7 @@ using namespace std;
 namespace psynth
 {
 
-PSYNTH_DEFINE_OBJECT_FACTORY(ObjectOutput);
+PSYNTH_DEFINE_NODE_FACTORY(ObjectOutput);
 
 ObjectOutput::~ObjectOutput()
 {
@@ -44,19 +44,20 @@ ObjectOutput::~ObjectOutput()
 	delete *it;
 }
 
-void ObjectOutput::onInfoChange()
+void ObjectOutput::on_info_change ()
 {
-    m_buffer.set_info (getInfo());
+    m_buffer.set_info (get_info());
     for (std::list<Slot*>::iterator i = m_slots.begin(); i != m_slots.end(); ++i)
-	(*i)->m_buf.set_info(getInfo());
+	(*i)->m_buf.set_info (get_info());
     
 }
 
-void ObjectOutput::doUpdate(const Object* caller, int caller_port_type, int caller_port)
+void ObjectOutput::do_update (const node* caller,
+			      int caller_port_type, int caller_port)
 {
     const audio_buffer* in;
     
-    if ((in = getInput<audio_buffer>(LINK_AUDIO, IN_A_INPUT))) {
+    if ((in = get_input<audio_buffer>(LINK_AUDIO, IN_A_INPUT))) {
 	//m_buflock.writeLock();
 	m_buffer.write(*in);
 	//m_buflock.unlock();
@@ -69,19 +70,19 @@ void ObjectOutput::doUpdate(const Object* caller, int caller_port_type, int call
 	//m_passive_lock.unlock();
     } else {
 	//m_buflock.writeLock();
-	m_buffer.write(audio_buffer(getaudio_info()));
+	m_buffer.write(audio_buffer(get_info()));
 	//m_buflock.unlock();
     }
 }
 
 ObjectOutput::ObjectOutput(const audio_info& info) :
-    Object(info,
-	   OBJ_OUTPUT,
-	   "name",
-	   N_IN_A_SOCKETS, 
-	   N_IN_C_SOCKETS,
-	   N_OUT_A_SOCKETS,
-	   N_OUT_C_SOCKETS),
+    node (info,
+	  OBJ_OUTPUT,
+	  "name",
+	  N_IN_A_SOCKETS, 
+	  N_IN_C_SOCKETS,
+	  N_OUT_A_SOCKETS,
+	  N_OUT_C_SOCKETS),
     m_buffer(info, info.block_size * SAFETY_FACTOR),
     m_manager(NULL)
 {
@@ -115,7 +116,7 @@ void ObjectOutput::doOutput(Slot& slot, size_t nframes)
 	avail = m_buffer.availible(slot.m_ptr);
 	
 	while(avail < nframes) {
-	    m_manager->update();
+	    m_manager->update ();
 	    
 	    avail = m_buffer.availible(slot.m_ptr);
 	}

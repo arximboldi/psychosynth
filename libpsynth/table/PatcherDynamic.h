@@ -34,8 +34,8 @@ namespace psynth
 class PatcherDynamic : public Patcher
 {    
     struct Link {
-	Object* src;
-	Object* dest;
+	node* src;
+	node* dest;
 	float dist;
 	float dist_to_center;
 	int sock_type;
@@ -43,7 +43,7 @@ class PatcherDynamic : public Patcher
 	int in_sock;
 	int actual_in_sock;
 	
-	Link(Object* s, Object* d, float ds, float dc, int t, int os, int is) :
+	Link(node* s, node* d, float ds, float dc, int t, int os, int is) :
 	    src(s), dest(d), dist(ds), dist_to_center(dc),
 	    sock_type(t), out_sock(os), in_sock(is), actual_in_sock(-1)
 	    {}
@@ -54,13 +54,13 @@ class PatcherDynamic : public Patcher
     };
 
     struct Node {
-	Object* obj;
-	Object* dest;
+	node* obj;
+	node* dest;
 	bool out_used; /* We output to one object only */
 	int actual_sock_type;
 	int actual_in_sock; 
 
-	Node(Object* o = NULL) :
+	Node(node* o = NULL) :
 	    obj(o),
 	    dest(NULL),
 	    out_used(false),
@@ -89,9 +89,9 @@ public:
     PatcherDynamic();
     ~PatcherDynamic();
     
-    bool addObject(Object* obj);
-    bool deleteObject(Object* obj);
-    void setParamObject(Object* obj, int id);
+    bool addNode(node* obj);
+    bool deleteNode(node* obj);
+    void setParamNode(node* obj, int id);
     void update();
     void clear();
 };

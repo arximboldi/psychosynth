@@ -23,14 +23,14 @@
 #ifndef PSYNTH_OBJECTSTEPSEQ_H
 #define PSYNTH_OBJECTSTEPSEQ_H
 
-#include <libpsynth/object/Object.h>
-#include <libpsynth/object/ObjectFactory.h>
-#include <libpsynth/object/EnvelopeMulti.h>
+#include <libpsynth/object/node.h>
+#include <libpsynth/object/node_factory.h>
+#include <libpsynth/object/envelope_multi.h>
 
 namespace psynth
 {
 
-class ObjectStepSeq : public Object
+class ObjectStepSeq : public node
 {
 public:
     static const int MAX_STEPS = 32;
@@ -58,7 +58,7 @@ public:
     };
 
     enum ParamID {
-	PARAM_BPM = Object::N_COMMON_PARAMS,
+	PARAM_BPM = node::N_COMMON_PARAMS,
 	PARAM_SHAPE,
 	PARAM_HIGH,
 	PARAM_SLOPE,
@@ -109,9 +109,9 @@ public:
     };
     
 private:
-    void doUpdate(const Object* caller, int caller_port_type, int caller_port);
-    void doAdvance();
-    void onInfoChange();
+    void do_update (const node* caller, int caller_port_type, int caller_port);
+    void do_advance ();
+    void on_info_change ();
     void createShape();
     void updateShape();
     
@@ -125,9 +125,9 @@ private:
     float m_old_param_high;
     int m_old_param_shape;
     
-    EnvelopeMultiValues m_hi_env_vals;
-    EnvelopeMultiValues m_lo_env_vals;
-    EnvelopeMulti m_env;
+    envelope_multi_values m_hi_env_vals;
+    envelope_multi_values m_lo_env_vals;
+    envelope_multi m_env;
     int m_cur_step;
 
     void initEnvelopeValues();
@@ -137,7 +137,7 @@ public:
     ObjectStepSeq(const audio_info& info);   
 };
 
-PSYNTH_DECLARE_OBJECT_FACTORY(ObjectStepSeq, "stepseq");
+PSYNTH_DECLARE_NODE_FACTORY(ObjectStepSeq, "stepseq");
 
 } /* namespace psynth */
 

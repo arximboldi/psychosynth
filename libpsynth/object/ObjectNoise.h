@@ -23,12 +23,12 @@
 #ifndef PSYNTH_OBJECTNOISE_H
 #define PSYNTH_OBJECTNOISE_H
 
-#include <libpsynth/object/Object.h>
+#include <libpsynth/object/node.h>
 
 namespace psynth
 {
 
-class ObjectNoise : public Object
+class ObjectNoise : public node
 {		
 public:	
     enum InAudioSocketID {
@@ -48,7 +48,7 @@ public:
     };
     
     enum ParamID {
-	PARAM_TYPE = Object::N_COMMON_PARAMS,
+	PARAM_TYPE = node::N_COMMON_PARAMS,
 	PARAM_AMPLITUDE,
 	N_PARAM
     };

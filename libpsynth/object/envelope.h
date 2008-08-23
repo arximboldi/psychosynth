@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) Juan Pedro Bolivar Puente 2007                          *
+ *   Copyright (C) Juan Pedro Bolivar Puente 2008                          *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -20,19 +20,56 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <cmath>
-#include "object/WaveTable.h"
-
-using namespace std;
+#ifndef PSYNTH_ENVELOPE_H
+#define PSYNTH_ENVELOPE_H
 
 namespace psynth
 {
 
-void WaveTable::fill(wave_func_t func) {
-    for (size_t i = 0; i < m_size; ++i)
-	m_table[i] = func((float) i / (m_size));
-}
+/**
+ * Basic envelope interface.
+ */
+class envelope
+{
+public:
+
+    /**
+     * Updates the envelope for one sample.
+     * @return The value of the envelope.
+     */
+    virtual float update () = 0;
+
+    /**
+     * Updates the envelope for several samples.
+     * @param samples the number of samples to advance.
+     * @return The value of the envelope.
+     */
+    virtual float update (float samples) = 0;
+
+    /**
+     * Fills a buffer with samples from the envelope.
+     * @param samples The buffer to fill.
+     * @param n_samples The number of samples to fill.
+     */
+    virtual void update (float* samples, int n_samples) = 0;
+
+    /**
+     * Start the envelope effect.
+     */
+    virtual void press () = 0;
+
+    /**
+     * Start finishing the envelope.
+     */
+    virtual void release () = 0;
+
+    /**
+     * Returns wether the envelope has finished.
+     * @return @c true if the envelope has finished and @c false otherwise.
+     */
+    virtual bool finished () = 0;
+};
 
 } /* namespace psynth */
 
-
+#endif /* PSYNTH_ENVELOPE_H */

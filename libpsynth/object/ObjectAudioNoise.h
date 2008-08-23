@@ -25,7 +25,7 @@
 
 #include <libpsynth/object/ObjectNoise.h>
 #include <libpsynth/object/KnownObjects.h>
-#include <libpsynth/object/ObjectFactory.h>
+#include <libpsynth/object/node_factory.h>
 
 namespace psynth
 {
@@ -39,10 +39,10 @@ public:
     };
 
 private:
-    void doUpdate(const Object* caller, int caller_port_type, int caller_port);
-    void doAdvance() {}
-    void onInfoChange() {}
-    
+    void do_update (const node* caller, int caller_port_type, int caller_port);
+    void do_advance () {}
+    void on_info_change () {}
+
 public:
     ObjectAudioNoise(const audio_info& prop) :
 	ObjectNoise(prop,
@@ -53,7 +53,7 @@ public:
 	{};
 };
 
-PSYNTH_DECLARE_OBJECT_FACTORY(ObjectAudioNoise, "audio_noise");
+PSYNTH_DECLARE_NODE_FACTORY(ObjectAudioNoise, "audio_noise");
 
 } /* namespace psynth */
 

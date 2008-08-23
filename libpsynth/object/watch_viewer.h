@@ -20,105 +20,85 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef PSYNTH_OBJPARAM
-#define PSYNTH_OBJPARAM
+#ifndef PSYNTH_WATCH_VIEWER_H
+#define PSYNTH_WATCH_VIEWER_H
 
 #include <libpsynth/common/mutex.h>
-#include <string>
+#include <libpsynth/common/ring_audio_buffer.h>
+#include <libpsynth/common/ring_sample_buffer.h>
+#include <libpsynth/object/watch.h>
 
 namespace psynth
 {
 
-#include <libpsynth/common/FastDelegate.h>
-using namespace fastdelegate;
+template <class BufferType, class RingBufferType>
+class watch_viewer : public watch
+{
+protected:
+    RingBufferType m_ring;
+    BufferType m_buffer;
+    int m_points;
+    float m_secs;
+    float m_factor;
+    bool m_updated;
+    mutex m_lock;
+    
+public:
+    watch_viewer (int points, float secs) :
+	m_ring(points),
+	m_buffer(points),
+	m_points(points),
+	m_factor(1.0f),
+	m_secs(secs),
+	m_updated(false)
+	{
+	    m_ring.zero();
+	    m_buffer.zero();
+	}
+    
+    virtual void set_info (const audio_info& info) {
+	m_factor = (float) info.sample_rate / ((float) m_points / m_secs);
+	m_ring.zero();
+    }
 
-class ObjParam
+    virtual void update (const BufferType& buf) {
+	m_lock.lock();
+	m_ring.write_fast_resample(buf, m_factor);
+	//m_ring.write(buf);
+	m_updated = false;
+	m_lock.unlock();
+    }
+
+    const BufferType& get_buffer () {
+	if (!m_updated) {
+	    m_lock.lock();
+	    typename RingBufferType::read_ptr ptr = m_ring.begin();
+	    m_ring.read(ptr, m_buffer);
+	    bool m_updated = true;
+	    m_lock.unlock();
+	}
+	return m_buffer;
+    }
+};
+
+typedef watch_viewer<sample_buffer, ring_sample_buffer> watch_view_control;
+
+class watch_view_audio : public watch_viewer<audio_buffer, ring_audio_buffer>
 {
 public:
-    typedef FastDelegate1<ObjParam&, void> Event;
-
-private:
-    friend class Object;
-	
-    mutex m_lock;
-    std::string m_name;
-    int m_id;
-    int m_type;
-    bool m_changed;
-    Event m_event;
-    void* m_src;
-    void* m_dest;
+    watch_view_audio (int points, float secs) :
+	watch_viewer<audio_buffer, ring_audio_buffer> (points, secs) {}
     
-    void clear();
-    void configure(int id, std::string name, int type, void* dest);
-    void configure(int id, std::string name, int type, void* dest, Event ev);
-
-    void updateIn();
-    void updateOut();
-    
-public:
-    enum Type {
-	NONE = -1,
-	INT,       /* int */
-	FLOAT,     /* float */
-	STRING,    /* std::string */
-	VECTOR2F,  /* Vector2f */
-	TYPES
-    };
-
-    ObjParam() :
-	m_type(NONE),
-	m_changed(false),
-	m_src(NULL),
-	m_dest(NULL)
-	{}
-
-    ObjParam(const ObjParam& obj) :
-	m_type(NONE),
-	m_changed(false) {
-	configure(obj.m_id, obj.m_name, obj.m_type, obj.m_dest, obj.m_event);
-    }
-    
-    ~ObjParam() {
-	clear();
-    }
-
-    ObjParam& operator= (const ObjParam& obj) {
-	if (this != &obj)
-	    configure(obj.m_id, obj.m_name, obj.m_type, obj.m_dest, obj.m_event);
-
-	return *this;
-    }
-    
-    int getID() const {
-	return m_id;
-    }
-
-    const std::string& getName() const {
-	return m_name;
-    }
-	
-    int type() const {
-	return m_type;
-    };
-	
-    template <typename T>
-    void set(const T& d) {
-	m_lock.lock();
-	m_changed = true;
-	*static_cast<T*>(m_src) = d;
-	m_lock.unlock();
-	if (!m_event.empty()) m_event(*this);
-    }
-
-    template <typename T>
-    void get(T& d) const {
-	m_lock.lock();
-	d = *static_cast<T*>(m_src);
-	m_lock.unlock();
+    virtual void set_info (const audio_info& newinfo) {
+	audio_info info = newinfo;
+	info.block_size = m_points;
+	m_ring.set_info   (info);
+	m_buffer.set_info (info);
+	m_ring.zero();
+	m_factor = (float) info.sample_rate / ((float) m_points / m_secs);
     }
 };
 
 } /* namespace psynth */
 
-#endif /* PSYNTH_OBJPARAM */
+#endif /* PSYNTH_WATCHVIEWER */

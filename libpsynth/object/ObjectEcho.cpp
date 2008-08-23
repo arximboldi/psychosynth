@@ -29,16 +29,16 @@ using namespace std;
 namespace psynth
 {
 
-PSYNTH_DEFINE_OBJECT_FACTORY(ObjectEcho);
+PSYNTH_DEFINE_NODE_FACTORY(ObjectEcho);
 
 ObjectEcho::ObjectEcho(const audio_info& prop) : 
-    Object(prop,
-	   OBJ_ECHO,
-	   "echo",
-	   N_IN_A_SOCKETS,
-	   N_IN_C_SOCKETS,
-	   N_OUT_A_SOCKETS,
-	   N_OUT_C_SOCKETS),
+    node (prop,
+	  OBJ_ECHO,
+	  "echo",
+	  N_IN_A_SOCKETS,
+	  N_IN_C_SOCKETS,
+	  N_OUT_A_SOCKETS,
+	  N_OUT_C_SOCKETS),
     m_param_delay(DEFAULT_DELAY),
     m_old_param_delay(DEFAULT_DELAY),
     m_param_feedback(DEFAULT_FEEDBACK),
@@ -47,16 +47,16 @@ ObjectEcho::ObjectEcho(const audio_info& prop) :
     m_old_val(prop.num_channels, 0.0f),
     m_buffer(prop, prop.sample_rate * MAX_DELAY * 2.0f)
 {
-    addParam("delay", ObjParam::FLOAT, &m_param_delay);
-    addParam("feedback", ObjParam::FLOAT, &m_param_feedback);
+    add_param ("delay", node_param::FLOAT, &m_param_delay);
+    add_param ("feedback", node_param::FLOAT, &m_param_feedback);
 
     m_buffer.zero();
 }
 
-void ObjectEcho::onInfoChange()
+void ObjectEcho::on_info_change ()
 {
-    m_old_val.resize(getInfo().num_channels, 0.0f);
-    m_buffer.resize(getInfo().sample_rate * MAX_DELAY * 2.0f);
+    m_old_val.resize(get_info().num_channels, 0.0f);
+    m_buffer.resize(get_info().sample_rate * MAX_DELAY * 2.0f);
     m_buffer.zero();
 }
 
@@ -66,10 +66,10 @@ ObjectEcho::~ObjectEcho()
 
 int ObjectEcho::doUpdateChannel(int chan)
 {
-    const audio_buffer* _input     = getInput<audio_buffer>(LINK_AUDIO, IN_A_INPUT);
-    const sample_buffer* _delay    = getInput<sample_buffer>(LINK_CONTROL, IN_C_DELAY);
-    const sample_buffer* _feedback = getInput<sample_buffer>(LINK_CONTROL, IN_C_FEEDBACK);
-    audio_buffer* _output          = getOutput<audio_buffer>(LINK_AUDIO, IN_A_INPUT);    
+    const audio_buffer* _input     = get_input<audio_buffer>(LINK_AUDIO, IN_A_INPUT);
+    const sample_buffer* _delay    = get_input<sample_buffer>(LINK_CONTROL, IN_C_DELAY);
+    const sample_buffer* _feedback = get_input<sample_buffer>(LINK_CONTROL, IN_C_FEEDBACK);
+    audio_buffer* _output          = get_output<audio_buffer>(LINK_AUDIO, IN_A_INPUT);    
 
     const sample* in_buf  = _input    ? _input->get_channel(chan) : 0;
     const sample* fb_buf  = _feedback ? _feedback->get_data()     : 0;
@@ -78,7 +78,7 @@ int ObjectEcho::doUpdateChannel(int chan)
     sample* out_buf = _output->get_channel(chan);
     sample* tmp_buf = m_buffer.get_channel(chan);
 
-    EnvelopeSimple in_env = getInEnvelope(LINK_AUDIO, IN_A_INPUT);
+    envelope_simple in_env = get_in_envelope (LINK_AUDIO, IN_A_INPUT);
     
     float delay;
     float in_val;
@@ -86,8 +86,8 @@ int ObjectEcho::doUpdateChannel(int chan)
     int pos = m_pos;
     float val;
   
-    delay = m_param_delay * getInfo().sample_rate;
-    for (i = 0; i < getInfo().block_size; ++i) {
+    delay = m_param_delay * get_info ().sample_rate;
+    for (i = 0; i < get_info ().block_size; ++i) {
 	if (pos > delay)
 	    pos = 0;
 	
@@ -111,7 +111,8 @@ int ObjectEcho::doUpdateChannel(int chan)
     return pos;
 }
 
-void ObjectEcho::doUpdate(const Object* caller, int caller_port_type, int caller_por)
+void ObjectEcho::do_update (const node* caller,
+			    int caller_port_type, int caller_por)
 {
     if (m_param_delay != m_old_param_delay)
 	m_buffer.zero();
@@ -119,7 +120,7 @@ void ObjectEcho::doUpdate(const Object* caller, int caller_port_type, int caller
 
     int new_pos = m_pos;
  
-    for (int i = 0; i < getInfo().num_channels; ++i)
+    for (int i = 0; i < get_info ().num_channels; ++i)
 	new_pos = doUpdateChannel(i);
     
     m_pos = new_pos;

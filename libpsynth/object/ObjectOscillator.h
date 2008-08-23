@@ -26,14 +26,14 @@
 #include <iostream>
 #include <cmath>
 
-#include <libpsynth/object/Object.h>
+#include <libpsynth/object/node.h>
 #include <libpsynth/object/KnownObjects.h>
-#include <libpsynth/object/Oscillator.h>
+#include <libpsynth/object/oscillator.h>
 
 namespace psynth
 {
 
-class ObjectOscillator : public Object
+class ObjectOscillator : public node
 {		
 public:	
     enum InAudioSocketID {
@@ -48,24 +48,24 @@ public:
     };
 
     enum WaveType {
-	OSC_SINE     = Oscillator::SINE,
-	OSC_SQUARE   = Oscillator::SQUARE,
-	OSC_TRIANGLE = Oscillator::TRIANGLE,
-	OSC_SAWTOOTH = Oscillator::SAWTOOTH,
-	OSC_MOOGSAW  = Oscillator::MOOGSAW,
-	OSC_EXP      = Oscillator::EXP,
+	OSC_SINE     = oscillator::SINE,
+	OSC_SQUARE   = oscillator::SQUARE,
+	OSC_TRIANGLE = oscillator::TRIANGLE,
+	OSC_SAWTOOTH = oscillator::SAWTOOTH,
+	OSC_MOOGSAW  = oscillator::MOOGSAW,
+	OSC_EXP      = oscillator::EXP,
 	N_OSC_TYPES
     };
 
     enum ModType {
-	MOD_FM = Oscillator::FM,
-	MOD_AM = Oscillator::AM,
-	MOD_PM = Oscillator::PM,
+	MOD_FM = oscillator::FM,
+	MOD_AM = oscillator::AM,
+	MOD_PM = oscillator::PM,
 	N_MOD_TYPES
     };
     
     enum ParamID {
-	PARAM_WAVE = Object::N_COMMON_PARAMS,
+	PARAM_WAVE = node::N_COMMON_PARAMS,
 	PARAM_MODULATOR,
 	PARAM_FREQUENCY,
 	PARAM_AMPLITUDE,
@@ -76,7 +76,7 @@ public:
     static const float DEFAULT_AMPL = 0.4f;
     
 protected:
-    Oscillator m_oscillator;
+    oscillator m_oscillator;
 
     void updateOscParams();
     void updateOsc(sample* out);

@@ -20,83 +20,105 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef PSYNTH_ENVELOPESIMPLE_H
-#define PSYNTH_ENVELOPESIMPLE_H
+#ifndef PSYNTH_OBJPARAM
+#define PSYNTH_OBJPARAM
 
-#include <libpsynth/object/Envelope.h>
+#include <libpsynth/common/mutex.h>
+#include <string>
 
 namespace psynth
 {
 
-/**
- * Simplistic evenlope implementation with only two points.
- */
-class EnvelopeSimple : public Envelope
+#include <libpsynth/common/FastDelegate.h>
+using namespace fastdelegate;
+
+class node_param
 {
 public:
-    float m_rise_dt;
-    float m_fall_dt;
-    float m_curr_dt;
-    float m_val;
+    typedef FastDelegate1<node_param&, void> event;
+
+private:
+    friend class node;
+	
+    mutex m_lock;
+    std::string m_name;
+    int m_id;
+    int m_type;
+    bool m_changed;
+    event m_event;
+    void* m_src;
+    void* m_dest;
+    
+    void clear ();
+    void configure (int id, std::string name, int type, void* dest);
+    void configure (int id, std::string name, int type, void* dest, event ev);
+
+    void update_in ();
+    void update_out ();
     
 public:
-    EnvelopeSimple() :
-	m_rise_dt(0.0f),
-	m_fall_dt(0.0f),
-	m_curr_dt(0.0f),
-	m_val(0.0f)
+    enum type {
+	NONE = -1,
+	INT,       /* int */
+	FLOAT,     /* float */
+	STRING,    /* std::string */
+	VECTOR2F,  /* Vector2f */
+	TYPES
+    };
+
+    node_param () :
+	m_type(NONE),
+	m_changed(false),
+	m_src(NULL),
+	m_dest(NULL)
 	{}
-    
-    EnvelopeSimple(float rise_dt, float fall_dt) :
-	m_rise_dt(rise_dt),
-	m_fall_dt(fall_dt),
-	m_curr_dt(0.0f),
-	m_val(0.0f)
-	{}
 
-    float setDeltas(float rise_dt, float fall_dt) {
-	m_rise_dt = rise_dt;
-	m_fall_dt = fall_dt;
-    }
-
-    void set(float value) {
-	m_val = value;
+    node_param (const node_param& obj) :
+	m_type(NONE),
+	m_changed(false) {
+	configure(obj.m_id, obj.m_name, obj.m_type, obj.m_dest, obj.m_event);
     }
     
-    float update() {
-	float val = m_val;
-	m_val = m_val + m_curr_dt;
-	if (m_val > 1.0f) m_val = 1.0;
-	else if (m_val < 0.0f) m_val = 0.0;
-	return val;
+    ~node_param () {
+	clear();
     }
 
-    float update(float sample) {
-	float val = m_val;
-	m_val = m_val + m_curr_dt * sample;
-	if (m_val > 1.0f) m_val = 1.0;
-	else if (m_val < 0.0f) m_val = 0.0;
-	return val;
+    node_param& operator= (const node_param& obj) {
+	if (this != &obj)
+	    configure(obj.m_id, obj.m_name, obj.m_type, obj.m_dest, obj.m_event);
+
+	return *this;
+    }
+    
+    int get_id () const {
+	return m_id;
     }
 
-    void update(float* samples, int n_samples) {
-	while(n_samples--)
-	    *samples++ *= update();
+    const std::string& get_name () const {
+	return m_name;
+    }
+	
+    int type() const {
+	return m_type;
+    };
+	
+    template <typename T>
+    void set(const T& d) {
+	m_lock.lock();
+	m_changed = true;
+	*static_cast<T*>(m_src) = d;
+	m_lock.unlock();
+	if (!m_event.empty()) m_event(*this);
     }
 
-    void press() {
-	m_curr_dt = m_rise_dt;
-    }
-
-    void release() {
-	m_curr_dt = m_fall_dt;
-    }
-
-    bool finished() {
-	return m_val <= 0.0f;
+    template <typename T>
+    void get(T& d) const {
+	m_lock.lock();
+	d = *static_cast<T*>(m_src);
+	m_lock.unlock();
     }
 };
 
 } /* namespace psynth */
 
-#endif /* PSYNTH_ENVELOPESIMPLE_H */
+#endif /* PSYNTH_OBJPARAM */

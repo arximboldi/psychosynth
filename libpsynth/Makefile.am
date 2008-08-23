@@ -74,9 +74,9 @@ nobase_libpsynthinc_HEADERS = \
 	table/Patcher.h\
 	table/PatcherDynamic.h \
 	table/TableObjectCreator.h\
-	object/Object.h \
+	object/node.h \
 	object/ObjectOscillator.h \
-	object/ObjectManager.h \
+	object/node_manager.h \
 	object/ObjectOutput.h \
 	object/ObjectMixer.h \
 	object/ObjectAudioMixer.h \
@@ -91,18 +91,18 @@ nobase_libpsynthinc_HEADERS = \
 	object/ObjectControlNoise.h \
 	object/ObjectEcho.h \
 	object/ObjectDelay.h \
-	object/Filter.h \
-	object/WaveTable.h \
-	object/Oscillator.h \
+	object/filter.h \
+	object/wave_table.h \
+	object/oscillator.h \
 	object/KnownObjects.h \
-	object/ObjParam.h\
-	object/EnvelopeSimple.h\
-	object/EnvelopeMulti.h\
-	object/Envelope.h\
-	object/Watch.h\
-	object/WatchViewer.h\
-	object/ObjectFactory.h\
-	object/ObjectFactoryManager.h\
+	object/node_param.h\
+	object/envelope_simple.h\
+	object/envelope_multi.h\
+	object/envelope.h\
+	object/watch.h\
+	object/watch_viewer.h\
+	object/node_factory.h\
+	object/node_factory_manager.h\
 	output/output.h\
 	input/file_reader.h\
 	input/file_reader_any.h\
@@ -130,12 +130,12 @@ libpsynth_la_SOURCES = \
 	table/Patcher.cpp \
 	table/PatcherDynamic.cpp \
 	table/TableObjectCreator.cpp\
-	object/Object.cpp \
+	object/node.cpp \
 	object/ObjectOscillator.cpp \
 	object/ObjectMixer.cpp \
 	object/ObjectAudioMixer.cpp \
 	object/ObjectControlMixer.cpp \
-	object/ObjectManager.cpp \
+	object/node_manager.cpp \
 	object/ObjectOutput.cpp \
 	object/ObjectLFO.cpp \
 	object/ObjectAudioOscillator.cpp \
@@ -147,12 +147,12 @@ libpsynth_la_SOURCES = \
 	object/ObjectControlNoise.cpp \
 	object/ObjectEcho.cpp \
 	object/ObjectDelay.cpp \
-	object/Filter.cpp \
-	object/WaveTable.cpp \
-	object/Oscillator.cpp\
-	object/ObjParam.cpp\
-	object/ObjectFactoryManager.cpp\
-	object/EnvelopeMulti.cpp\
+	object/filter.cpp \
+	object/wave_table.cpp \
+	object/oscillator.cpp\
+	object/node_param.cpp \
+	object/node_factory_manager.cpp\
+	object/envelope_multi.cpp\
 	input/file_reader_any.cpp\
 	input/file_reader_fetcher.cpp
 

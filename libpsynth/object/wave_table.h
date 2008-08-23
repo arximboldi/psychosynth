@@ -20,80 +20,86 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef PSYNTH_OBJECTMANAGER_H
-#define PSYNTH_OBJECTMANAGER_H
+#ifndef PSYNTH_WAVETABLE_H
+#define PSYNTH_WAVETABLE_H
 
-#include <map>
+#include <cmath>
 
-#include <libpsynth/common/map_iterator.h>
-#include <libpsynth/object/ObjectManager.h>
-#include <libpsynth/object/ObjectOutput.h>
-#include <libpsynth/common/mutex.h>
+#include <libpsynth/common/audio_buffer.h>
+#include <libpsynth/common/misc.h>
 
 namespace psynth
 {
 
-class ObjectManager
+class wave_table
 {
-    std::map<int, Object*> m_objmap;
-    std::list<ObjectOutput*> m_outputs;
-    std::list<Object*> m_delete_list;
+public:
+    typedef sample(*wave_func_t)(float);
     
-    mutex m_update_lock;
+private:
+    sample* m_table;
+    size_t m_size;
     
 public:
-    typedef map_iterator<int, Object*> Iterator;
-    typedef map_const_iterator<int, Object*> ConstIterator;
+    wave_table () : m_table(NULL), m_size(0) {}
 
-    ObjectManager();
-    ~ObjectManager();
+    wave_table (size_t size) :
+	m_size(size) {
+	m_table = new sample[size];
+    }
+
+    wave_table (size_t size, wave_func_t func) :
+	m_size(size) {
+	m_table = new sample[size];
+	fill(func);
+    }
+    
+    wave_table (const wave_table& wave) :
+	m_size(wave.m_size) {
+	m_table = new sample[m_size];
+	memcpy(m_table, wave.m_table, sizeof(sample) * m_size);
+    }
+    
+    ~wave_table () {
+	delete [] m_table;
+    }
+
+    wave_table& operator= (const wave_table& wave) {
+	if (&wave != this) {
+	    if (wave.m_size != m_size) {
+		delete m_table;
+		m_size = wave.m_size;
+		m_table = new sample[m_size];
+	    }
+	    
+	    memcpy(m_table, wave.m_table, sizeof(sample) * m_size);
+	}
+	return *this;
+    }
+    
+    sample get (float x) const {
+	float  findex = (m_size - 1) * phase(x);
+	size_t index  = findex;
+	float alpha = findex - index;
 	
-    bool attachObject(Object* obj, int id);
-    bool detachObject(int id);
-    void detachObject(Iterator it);
-    bool deleteObject(int id);
-    void deleteObject(Iterator it);
+	sample out = m_table[index];
+	out += alpha * (m_table[index + 1 >= m_size ? 0 : index + 1] - out);
 
-    ConstIterator begin() const {
-	return m_objmap.begin();
-    }
-    
-    Iterator begin() {
-	return m_objmap.begin();
+	return out;
     }
 
-    ConstIterator end() const {
-	return m_objmap.end();
-    }
-    
-    Iterator end() {
-	return m_objmap.end();
-    }
-    
-    Iterator find(int id) {
-	return m_objmap.find(id);
+    void fill (size_t new_size, wave_func_t func) {
+	if (m_size != new_size) {
+	    m_size = new_size;
+	    delete [] m_table;
+	    m_table = new sample[new_size];
+	}
+	fill(func);
     }
 
-    ConstIterator find(int id) const {
-	return m_objmap.find(id);
-    }
-
-    void setInfo(const audio_info& info);
-
-    /**
-     * Makes a full new update of the objects. This means that it first resets
-     * the is-updated property of the objects and then calls update() on all
-     * the attached ObjectOutputs. The update is propagated via DFS. Some
-     * objects may not be updated if not conected to a subgraph containing an
-     * OutputObject.
-     *
-     * This function may be called by an OutputObject if a registered Output
-     * system calls for new data and not enought data is availible in its
-     * buffer.
-     */
-    void update();
+    void fill(wave_func_t func);
 };
 
 } /* namespace psynth */
 
-#endif /* PSYNTH_OBJECTMANAGER_H */
+#endif /* PSYNTH_WAVETABLE_H */

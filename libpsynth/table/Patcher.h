@@ -26,19 +26,19 @@
 #include <map>
 #include <set>
 
-#include <libpsynth/object/Object.h>
+#include <libpsynth/object/node.h>
 
 namespace psynth
 {
 
 struct PatcherEvent {
-    Object* src;
-    Object* dest;
+    node* src;
+    node* dest;
     int src_socket;
     int dest_socket;
     int socket_type;
 
-    PatcherEvent(Object* s, Object* d, int ss, int ds, int st):
+    PatcherEvent(node* s, node* d, int ss, int ds, int st):
 	src(s), dest(d), src_socket(ss), dest_socket(ds), socket_type(st) {};
 };
 
@@ -80,9 +80,9 @@ class Patcher : public PatcherSubject
 public:
     virtual ~Patcher() {};
     
-    virtual bool addObject(Object* obj) = 0;
-    virtual bool deleteObject(Object* obj) = 0;
-    virtual void setParamObject(Object* obj, int param) = 0;
+    virtual bool addNode(node* obj) = 0;
+    virtual bool deleteNode(node* obj) = 0;
+    virtual void setParamNode(node* obj, int param) = 0;
     virtual void update() = 0;
     virtual void clear() = 0;
 };

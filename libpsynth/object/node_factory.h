@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) Juan Pedro Bolivar Puente 2007                          *
+ *   Copyright (C) Juan Pedro Bolivar Puente 2008                          *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -20,41 +20,49 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef PSYNTH_OBJECTLFO_H
-#define PSYNTH_OBJECTLFO_H
+#ifndef PSYNTH_OBJECTFACTORY_H
+#define PSYNTH_OBJECTFACTORY_H
 
-#include <libpsynth/object/ObjectOscillator.h>
-#include <libpsynth/object/KnownObjects.h>
-#include <libpsynth/object/node_factory.h>
+#include <libpsynth/object/node.h>
+
+#define PSYNTH_DECLARE_NODE_FACTORY( T, name )\
+class T ## _factory : public node_factory\
+{\
+public:\
+    node* create (const audio_info& info)\
+    {\
+        return new T (info);\
+    }\
+    \
+    void destroy (node* obj)\
+    {\
+        delete obj;\
+    }\
+    const char* get_name () {\
+        return name;\
+    }\
+};\
+T ## _factory& get_ ## T ## _factory();
+
+#define PSYNTH_DEFINE_NODE_FACTORY( T )\
+T ## _factory& get_ ## T ## _factory ()\
+{\
+    static T ## _factory s_factory;\
+    return s_factory;\
+}
 
 namespace psynth
 {
 
-class ObjectLFO : public ObjectOscillator
+class node_factory
 {
-public:	
-    enum OutControlSocketID {
-	OUT_C_OUTPUT,
-	N_OUT_C_SOCKETS
-    };
-
-private:
-    void do_update (const node* caller, int caller_port_type, int caller_port);
-    void do_advance () {}
-    void on_info_change () {}
-    
 public:
-    ObjectLFO(const audio_info& prop) :
-	ObjectOscillator(prop,
-			 OBJ_LFO,
-			 "lfo",
-			 0,
-			 N_OUT_C_SOCKETS)
-	{};
-};
 
-PSYNTH_DECLARE_NODE_FACTORY(ObjectLFO, "lfo");
+    virtual const char* get_name () = 0;
+    virtual node* create (const audio_info& m_info) = 0;
+    virtual void destroy (node* nod) = 0;
+};
 
 } /* namespace psynth */
 
-#endif /* PSYNTH_OBJECTLFO_H */
+#endif /* PSYNTH_OBJECTFACTORY_H */

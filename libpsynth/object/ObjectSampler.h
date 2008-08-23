@@ -23,10 +23,10 @@
 #ifndef PSYNTH_OBJECTSAMPLER_H
 #define PSYNTH_OBJECTSAMPLER_H
 
-#include <libpsynth/object/Object.h>
+#include <libpsynth/object/node.h>
 #include <libpsynth/input/file_reader_any.h>
 #include <libpsynth/input/file_reader_fetcher.h>
-#include <libpsynth/object/ObjectFactory.h>
+#include <libpsynth/object/node_factory.h>
 #include <libpsynth/common/scaler_st.h>
 
 namespace psynth
@@ -34,7 +34,7 @@ namespace psynth
 
 class Mutex;
 
-class ObjectSampler : public Object
+class ObjectSampler : public node
 {
 public:
     enum InAudioSocketID {
@@ -48,7 +48,7 @@ public:
     };
 
     enum ParamID {
-	PARAM_FILE = Object::N_COMMON_PARAMS,
+	PARAM_FILE = node::N_COMMON_PARAMS,
 	PARAM_AMPLITUDE,
 	PARAM_RATE,
 	PARAM_TEMPO,
@@ -83,20 +83,20 @@ private:
     
     mutex m_update_lock;
     
-    void onFileChange(ObjParam& par);
+    void onFileChange(node_param& par);
     void read(audio_buffer& buf, int start, int end);
     void restart();
     
-    void doUpdate(const Object* caller, int caller_port_type, int caller_port);
-    void doAdvance();
-    void onInfoChange();
+    void do_update (const node* caller, int caller_port_type, int caller_port);
+    void do_advance ();
+    void on_info_change ();
     
 public:
     ObjectSampler(const audio_info& info);
     ~ObjectSampler();
 };
 
-PSYNTH_DECLARE_OBJECT_FACTORY(ObjectSampler, "sampler");
+PSYNTH_DECLARE_NODE_FACTORY(ObjectSampler, "sampler");
 
 } /* namespace psynth */
 

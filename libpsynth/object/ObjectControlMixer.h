@@ -25,7 +25,7 @@
 
 #include <libpsynth/object/KnownObjects.h>
 #include <libpsynth/object/ObjectMixer.h>
-#include <libpsynth/object/ObjectFactory.h>
+#include <libpsynth/object/node_factory.h>
 
 namespace psynth
 {
@@ -43,9 +43,9 @@ public:
     };
     
 private:
-    void doUpdate(const Object* caller, int caller_port_type, int caller_port);
-    void doAdvance() {}
-    void onInfoChange() {}
+    void do_update (const node* caller, int caller_port_type, int caller_port);
+    void do_advance () {}
+    void on_info_change () {}
     
 public:  
     ObjectControlMixer(const audio_info& prop, int n_chan = 2) :
@@ -58,7 +58,7 @@ public:
 	{}
 };
 
-PSYNTH_DECLARE_OBJECT_FACTORY(ObjectControlMixer, "control_mixer");
+PSYNTH_DECLARE_NODE_FACTORY(ObjectControlMixer, "control_mixer");
 
 } /* namespace psynth */
 

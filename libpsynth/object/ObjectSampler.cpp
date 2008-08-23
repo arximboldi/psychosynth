@@ -39,16 +39,16 @@ using namespace std;
 namespace psynth
 {
 
-PSYNTH_DEFINE_OBJECT_FACTORY(ObjectSampler);
+PSYNTH_DEFINE_NODE_FACTORY (ObjectSampler);
 
 ObjectSampler::ObjectSampler(const audio_info& info): 
-    Object(info,
-	   OBJ_SAMPLER,
-	   "sampler",
-	   N_IN_A_SOCKETS, 
-	   N_IN_C_SOCKETS,
-	   N_OUT_A_SOCKETS,
-	   N_OUT_C_SOCKETS),
+    node (info,
+	  OBJ_SAMPLER,
+	  "sampler",
+	  N_IN_A_SOCKETS, 
+	  N_IN_C_SOCKETS,
+	  N_OUT_A_SOCKETS,
+	  N_OUT_C_SOCKETS),
     m_fetcher(&m_reader),
     m_inbuf(info),
     m_ctrl_pos(0),
@@ -58,12 +58,12 @@ ObjectSampler::ObjectSampler(const audio_info& info):
     m_param_pitch(1.0f),
     m_restart(false)
 {
-    addParam("file", ObjParam::STRING, &m_param_file,
-	     MakeDelegate(this, &ObjectSampler::onFileChange));
-    addParam("amplitude", ObjParam::FLOAT, &m_param_ampl);
-    addParam("rate", ObjParam::FLOAT, &m_param_rate);
-    addParam("tempo", ObjParam::FLOAT, &m_param_tempo);
-    addParam("pitch", ObjParam::FLOAT, &m_param_pitch);
+    add_param ("file", node_param::STRING, &m_param_file,
+	       MakeDelegate(this, &ObjectSampler::onFileChange));
+    add_param ("amplitude", node_param::FLOAT, &m_param_ampl);
+    add_param ("rate", node_param::FLOAT, &m_param_rate);
+    add_param ("tempo", node_param::FLOAT, &m_param_tempo);
+    add_param ("pitch", node_param::FLOAT, &m_param_pitch);
 
     m_scaler.set_channels (info.num_channels);
     m_scaler.set_rate (1.0);
@@ -77,7 +77,7 @@ ObjectSampler::~ObjectSampler()
     m_fetcher.finish();
 }
 
-void ObjectSampler::onFileChange(ObjParam& par)
+void ObjectSampler::onFileChange (node_param& par)
 {
     std::string val;
     std::string path;
@@ -93,7 +93,7 @@ void ObjectSampler::onFileChange(ObjParam& par)
     m_fetcher.open(path.c_str());
 
     if (m_fetcher.is_open()) {
-	m_inbuf.set_info (m_fetcher.get_info(), getInfo().block_size);
+	m_inbuf.set_info (m_fetcher.get_info(), get_info ().block_size);
 	m_scaler.set_channels (m_fetcher.get_info().num_channels);
 	//m_scaler.setSampleRate(m_fetcher.get_info().sample_rate);
     }
@@ -101,19 +101,19 @@ void ObjectSampler::onFileChange(ObjParam& par)
     m_update_lock.unlock();
 }
 
-void ObjectSampler::doUpdate(const Object* caller, int caller_port_type, int caller_port)
+void ObjectSampler::do_update (const node* caller, int caller_port_type, int caller_port)
 {
-    audio_buffer* out = getOutput<audio_buffer>(Object::LINK_AUDIO, OUT_A_OUTPUT);
-    const sample_buffer* trig = getInput<sample_buffer>(Object::LINK_CONTROL, IN_C_TRIGGER);
+    audio_buffer* out = get_output<audio_buffer> (node::LINK_AUDIO, OUT_A_OUTPUT);
+    const sample_buffer* trig = get_input<sample_buffer> (node::LINK_CONTROL, IN_C_TRIGGER);
     const sample* trig_buf = trig ? trig->get_data() : 0;
-    EnvelopeSimple trig_env =  getInEnvelope(LINK_CONTROL, IN_C_TRIGGER);
+    envelope_simple trig_env =  get_in_envelope (LINK_CONTROL, IN_C_TRIGGER);
 
     /* Read the data. */
     size_t start = 0;
-    size_t end = getInfo().block_size;
+    size_t end = get_info ().block_size;
 
     if (m_fetcher.is_open()) {
-	while (start < getInfo().block_size) {
+	while (start < get_info ().block_size) {
 	    if (m_restart) {
 		if (trig_buf && trig_buf[start] != 0.0f) {
 		    restart();
@@ -137,17 +137,17 @@ void ObjectSampler::doUpdate(const Object* caller, int caller_port_type, int cal
     
     /* Set amplitude. */
     sample* buf = out->get_data()[0];
-    int count = getInfo().block_size * getInfo().num_channels;
+    int count = get_info ().block_size * get_info ().num_channels;
     while(count--)
 	*buf++ *= m_param_ampl;
 
     /* Apply trigger envelope. */
     if (trig_buf) {
-	for (int i = 0; i < getInfo().num_channels; ++i) {
+	for (int i = 0; i < get_info ().num_channels; ++i) {
 	    buf = out->get_channel(i);
-	    int n_samp = getInfo().block_size;
+	    int n_samp = get_info ().block_size;
 	    trig_buf = trig->get_data();
-	    trig_env = getInEnvelope(LINK_CONTROL, IN_C_TRIGGER);
+	    trig_env = get_in_envelope (LINK_CONTROL, IN_C_TRIGGER);
 
 	    while (n_samp--) {
 		float env_val = trig_env.update();
@@ -166,13 +166,13 @@ void ObjectSampler::restart()
     m_scaler.clear();
 }
 
-void ObjectSampler::read(audio_buffer& buf, int start, int end)
+void ObjectSampler::read (audio_buffer& buf, int start, int end)
 {
-    const sample_buffer* rate = getInput<sample_buffer>(Object::LINK_CONTROL, IN_C_RATE);
+    const sample_buffer* rate = get_input<sample_buffer> (node::LINK_CONTROL, IN_C_RATE);
     const sample* rate_buf = rate ? rate->get_data() : 0;
     
     float base_factor =
-	(float) m_fetcher.get_info().sample_rate / getInfo().sample_rate * m_param_rate;
+	(float) m_fetcher.get_info().sample_rate / get_info ().sample_rate * m_param_rate;
 
     int must_read;
     int nread;
@@ -208,7 +208,7 @@ void ObjectSampler::read(audio_buffer& buf, int start, int end)
 	if (factor < 0.2)
 	    factor = 0.2;
 
-	must_read = high_latency ? getInfo().block_size : SMALL_BLOCK_SIZE;
+	must_read = high_latency ? get_info ().block_size : SMALL_BLOCK_SIZE;
 	if (factor * m_param_tempo < 1.0)
 	    must_read = (float)must_read * factor * m_param_tempo;
 	else
@@ -219,8 +219,8 @@ void ObjectSampler::read(audio_buffer& buf, int start, int end)
 
 	if (nread) {
 	    m_ctrl_pos += (float) nread / (factor * m_param_tempo);
-	    if (m_ctrl_pos >= getInfo().block_size)
-		m_ctrl_pos = phase(m_ctrl_pos) + ((int) m_ctrl_pos % getInfo().block_size);
+	    if (m_ctrl_pos >= get_info ().block_size)
+		m_ctrl_pos = phase(m_ctrl_pos) + ((int) m_ctrl_pos % get_info ().block_size);
 
 	    int old_availible = m_scaler.availible();
 
@@ -244,13 +244,13 @@ void ObjectSampler::read(audio_buffer& buf, int start, int end)
     buf.deinterleave (inter_buffer, start, end, m_scaler.get_channels());
 }
 
-void ObjectSampler::doAdvance()
+void ObjectSampler::do_advance ()
 {
 }
 
-void ObjectSampler::onInfoChange()
+void ObjectSampler::on_info_change ()
 {
-    m_scaler.set_channels (getInfo().num_channels);
+    m_scaler.set_channels (get_info ().num_channels);
 }
 
 } /* namespace psynth */

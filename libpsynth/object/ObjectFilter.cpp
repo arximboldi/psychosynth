@@ -29,28 +29,28 @@ using namespace std;
 namespace psynth
 {
 
-PSYNTH_DEFINE_OBJECT_FACTORY(ObjectFilter);
+PSYNTH_DEFINE_NODE_FACTORY(ObjectFilter);
 
 ObjectFilter::ObjectFilter(const audio_info& prop, int mode) : 
-    Object(prop,
-	   OBJ_FILTER,
-	   "filter",
-	   N_IN_A_SOCKETS,
-	   N_IN_C_SOCKETS,
-	   N_OUT_A_SOCKETS,
-	   N_OUT_C_SOCKETS),
+    node (prop,
+	  OBJ_FILTER,
+	  "filter",
+	  N_IN_A_SOCKETS,
+	  N_IN_C_SOCKETS,
+	  N_OUT_A_SOCKETS,
+	  N_OUT_C_SOCKETS),
     m_param_type(mode),
     m_param_cutoff(DEFAULT_CUTOFF),
     m_param_resonance(DEFAULT_RESONANCE),
-    m_filter_values((FilterValues::Type)m_param_type,
+    m_filter_values((filter_values::type) m_param_type,
 		    m_param_cutoff,
 		    m_param_resonance,
 		    prop.sample_rate),
-    m_filter(prop.num_channels, Filter(&m_filter_values))
+    m_filter (prop.num_channels, filter (&m_filter_values))
 {
-    addParam("type", ObjParam::INT, &m_param_type);
-    addParam("cutoff", ObjParam::FLOAT, &m_param_cutoff);
-    addParam("resonance", ObjParam::FLOAT, &m_param_resonance);
+    add_param ("type", node_param::INT, &m_param_type);
+    add_param ("cutoff", node_param::FLOAT, &m_param_cutoff);
+    add_param ("resonance", node_param::FLOAT, &m_param_resonance);
 
     //for (int i = 0; i < prop.num_channels; ++i)
 }
@@ -61,32 +61,33 @@ ObjectFilter::~ObjectFilter()
 {
 }
 
-void ObjectFilter::doUpdate(const Object* caller, int caller_port_type, int caller_por)
+void ObjectFilter::do_update (const node* caller,
+			      int caller_port_type, int caller_por)
 {
-    const audio_buffer* input = getInput<audio_buffer>(LINK_AUDIO, IN_A_INPUT);
-    const sample_buffer* cutoff = getInput<sample_buffer>(LINK_CONTROL, IN_C_CUTOFF);
-    audio_buffer* output = getOutput<audio_buffer>(LINK_AUDIO, IN_A_INPUT);    
+    const audio_buffer* input = get_input<audio_buffer>(LINK_AUDIO, IN_A_INPUT);
+    const sample_buffer* cutoff = get_input<sample_buffer>(LINK_CONTROL, IN_C_CUTOFF);
+    audio_buffer* output = get_output<audio_buffer>(LINK_AUDIO, IN_A_INPUT);    
 
     if (input) {
-	if (m_param_type != m_filter_values.getType() ||
-	    m_param_cutoff != m_filter_values.getFrequency() ||
-	    m_param_resonance != m_filter_values.getResonance())
-	    m_filter_values.calculate((FilterValues::Type)m_param_type,
+	if (m_param_type != m_filter_values.get_type() ||
+	    m_param_cutoff != m_filter_values.get_frequency() ||
+	    m_param_resonance != m_filter_values.get_resonance())
+	    m_filter_values.calculate((filter_values::type) m_param_type,
 				      m_param_cutoff,
 				      m_param_resonance,
-				      getaudio_info().sample_rate);
+				      get_info().sample_rate);
 	
-	for (int i = 0; i < getaudio_info().num_channels; ++i) {
+	for (int i = 0; i < get_info().num_channels; ++i) {
 	    sample* outbuf = output->get_channel(i);
 	    const sample* inbuf = input->get_channel(i);
-	    Filter& filter = m_filter[i];
-	    EnvelopeSimple env = getInEnvelope(LINK_AUDIO, IN_A_INPUT);
+	    filter& filter = m_filter[i];
+	    envelope_simple env = get_in_envelope (LINK_AUDIO, IN_A_INPUT);
 	    if (!cutoff)
 		for (size_t j = 0; j < output->size(); ++j)
 		    *outbuf++ = filter.update(*inbuf++ * env.update());
 	    else {
-		EnvelopeSimple mod_env = getInEnvelope(LINK_CONTROL,
-						       IN_C_CUTOFF);
+		envelope_simple mod_env = get_in_envelope (LINK_CONTROL,
+							  IN_C_CUTOFF);
 		const sample* cutoff_buf = cutoff->get_data();
 		
 		for (size_t j = 0; j < output->size(); ++j) {

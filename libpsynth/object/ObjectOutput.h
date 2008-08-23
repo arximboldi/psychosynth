@@ -27,16 +27,16 @@
 
 #include <libpsynth/common/ring_audio_buffer.h>
 #include <libpsynth/common/mutex.h>
-#include <libpsynth/object/Object.h>
+#include <libpsynth/object/node.h>
 #include <libpsynth/output/output.h>
-#include <libpsynth/object/ObjectFactory.h>
+#include <libpsynth/object/node_factory.h>
 
 namespace psynth
 {
 
-class ObjectManager;
+class node_manager;
 
-class ObjectOutput : public Object
+class ObjectOutput : public node
 {
     struct Slot {
 	ring_audio_buffer::read_ptr m_ptr;
@@ -60,7 +60,7 @@ class ObjectOutput : public Object
 	
     ring_audio_buffer m_buffer;
     
-    ObjectManager* m_manager;
+    node_manager* m_manager;
     std::list<Slot*> m_slots;
     std::list<output*> m_passive_slots;
 
@@ -74,9 +74,9 @@ class ObjectOutput : public Object
     
     void doOutput (Slot& slot, size_t nframes);
 	
-    void doUpdate(const Object* caller, int caller_port_type, int caller_port);
-    void doAdvance() {}
-    void onInfoChange();
+    void do_update (const node* caller, int caller_port_type, int caller_port);
+    void do_advance () {}
+    void on_info_change ();
     
 public:
     enum InAudioSocketID {
@@ -104,7 +104,7 @@ public:
 
     ~ObjectOutput();
 	
-    bool setManager(ObjectManager* mgr) {
+    bool setManager(node_manager* mgr) {
 	if (m_manager != NULL && mgr != NULL) 
 	    return false; /* Already attached */
 		
@@ -114,7 +114,7 @@ public:
 	
     void attachOutput (output* out) {
 	//m_buflock.readLock();
-	m_slots.push_back(new Slot(out, this, m_buffer.end(), getaudio_info()));
+	m_slots.push_back(new Slot(out, this, m_buffer.end(), get_info()));
 	//m_buflock.unlock();
     };
     
@@ -130,20 +130,20 @@ public:
 	}
     };
 
-    void attachPassiveOutput(output* out) {
+    void attachPassiveOutput (output* out) {
 	//m_passive_lock.lock();
-	m_passive_slots.push_back(out);
+	m_passive_slots.push_back (out);
 	//m_passive_lock.unlock();
     };
 
-    void detachPassiveOutput(output* out) {
+    void detachPassiveOutput (output* out) {
 	//m_passive_lock.lock();
 	m_passive_slots.remove(out);
 	//m_passive_lock.unlock();
     };
 };
 
-PSYNTH_DECLARE_OBJECT_FACTORY(ObjectOutput, "output");
+PSYNTH_DECLARE_NODE_FACTORY(ObjectOutput, "output");
 
 } /* namespace psynth */
 

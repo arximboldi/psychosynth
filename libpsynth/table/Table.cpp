@@ -117,26 +117,26 @@ Table::Table(const audio_info& info) :
 
     m_mixer->param("amplitude").set(0.5f);
 
-    m_objmgr.attachObject(m_output, OUTPUT_ID);
-    m_objmgr.attachObject(m_mixer, MIXER_ID);
+    m_node_mgr.attach_node (m_output, OUTPUT_ID);
+    m_node_mgr.attach_node (m_mixer, MIXER_ID);
 
     registerDefaultObjectFactory();
 }
 
 void Table::registerDefaultObjectFactory()
 {
-    registerObjectFactory(getObjectAudioMixerFactory());
-    registerObjectFactory(getObjectControlMixerFactory());
-    registerObjectFactory(getObjectAudioOscillatorFactory());
-    registerObjectFactory(getObjectLFOFactory());
-    registerObjectFactory(getObjectOutputFactory());
-    registerObjectFactory(getObjectFilterFactory());
-    registerObjectFactory(getObjectSamplerFactory());
-    registerObjectFactory(getObjectStepSeqFactory());
-    registerObjectFactory(getObjectAudioNoiseFactory());
-    registerObjectFactory(getObjectControlNoiseFactory());
-    registerObjectFactory(getObjectEchoFactory());
-    registerObjectFactory(getObjectDelayFactory());
+    registerObjectFactory(get_ObjectAudioMixer_factory());
+    registerObjectFactory(get_ObjectControlMixer_factory());
+    registerObjectFactory(get_ObjectAudioOscillator_factory());
+    registerObjectFactory(get_ObjectLFO_factory());
+    registerObjectFactory(get_ObjectOutput_factory());
+    registerObjectFactory(get_ObjectFilter_factory());
+    registerObjectFactory(get_ObjectSampler_factory());
+    registerObjectFactory(get_ObjectStepSeq_factory());
+    registerObjectFactory(get_ObjectAudioNoise_factory());
+    registerObjectFactory(get_ObjectControlNoise_factory());
+    registerObjectFactory(get_ObjectEcho_factory());
+    registerObjectFactory(get_ObjectDelay_factory());
 }
 
 Table::~Table()
@@ -147,23 +147,23 @@ Table::~Table()
 void
 Table::clear()
 {
-    for (ObjectManager::Iterator it = m_objmgr.begin();
-	 it != m_objmgr.end();)
-	if ((*it)->getID() >= MIN_USER_ID) {
+    for (node_manager::iterator it = m_node_mgr.begin();
+	 it != m_node_mgr.end();)
+	if ((*it)->get_id () >= MIN_USER_ID) {
 	    if (m_patcher)
-		m_patcher->deleteObject(*it);
+		m_patcher->deleteNode(*it);
 	    TableObject obj(*it, this);
 	    notifyDeleteObject(obj);
-	    //m_objmgr.remove(it++);
-	    m_objmgr.deleteObject(it);
+	    //m_node_mgr.remove(it++);
+	    m_node_mgr.delete_node (it);
 	} else
 	    ++it;
 }
 
 TableObject Table::findObject(int id)
 {
-    ObjectManager::Iterator i = m_objmgr.find(id);
-    if (i == m_objmgr.end())
+    node_manager::iterator i = m_node_mgr.find (id);
+    if (i == m_node_mgr.end())
 	return TableObject(NULL, NULL);
     else
 	return TableObject(*i, this);
@@ -198,7 +198,7 @@ TableObject Table::addObject(int type)
 	return TableObject(NULL, NULL);
     }
     
-    if (!m_objmgr.attachObject(obj, m_last_id++))
+    if (!m_node_mgr.attachObject(obj, m_last_id++))
 	return TableObject(NULL, NULL);
 
     TableObject tobj(obj, this);
@@ -209,13 +209,13 @@ TableObject Table::addObject(int type)
 
 TableObject Table::addObject(const std::string& name)
 {
-    Object* obj;
+    node* obj;
     TableObject tobj;
 	
     obj = m_objfact.create(name, m_info);
 
     if (obj) {
-	if (!m_objmgr.attachObject(obj, m_last_id++))
+	if (!m_node_mgr.attach_node (obj, m_last_id++))
 	    return TableObject(NULL, NULL);
     
 	tobj = TableObject(obj, this);
@@ -228,42 +228,43 @@ TableObject Table::addObject(const std::string& name)
 void Table::deleteObject(TableObject& obj)
 {
     if (m_patcher)
-	m_patcher->deleteObject(obj.m_obj);
+	m_patcher->deleteNode(obj.m_obj);
     notifyDeleteObject(obj);
 /*
-  m_objmgr.detachObject(obj.m_obj->getID());
+  m_node_mgr.detachObject(obj.m_obj->get_id ());
   delete obj.m_obj;
 */
-    m_objmgr.deleteObject(obj.m_obj->getID());
+    m_node_mgr.delete_node (obj.m_obj->get_id ());
 }
 
 void Table::activateObject(TableObject& obj)
 {
-    obj.m_obj->updateParamsIn();
+    /* HACK */
+    obj.m_obj->update_params_in ();
      
     if (m_patcher)
-	m_patcher->addObject(obj.m_obj);
-    notifyActivateObject(obj);
+	m_patcher->addNode (obj.m_obj);
+    notifyActivateObject (obj);
 }
 
 void Table::deactivateObject(TableObject& obj)
 {
     if (m_patcher)
-	m_patcher->deleteObject(obj.m_obj);
+	m_patcher->deleteNode (obj.m_obj);
     notifyDeactivateObject(obj);
 }
 
 void Table::attachPatcher(Patcher* pat)
 {
-    dattachPatcher();
+    detachPatcher();
     m_patcher = pat;
     pat->addListener(this);
-    for (ObjectManager::Iterator it = m_objmgr.begin(); it != m_objmgr.end(); ++it)
-	m_patcher->addObject(*it);
+    for (node_manager::iterator it = m_node_mgr.begin(); it != m_node_mgr.end(); ++it)
+	m_patcher->addNode (*it);
     m_patcher->update();
 }
 
-void Table::dattachPatcher()
+void Table::detachPatcher()
 {
     if (m_patcher) {
 	m_patcher->deleteListener(this);

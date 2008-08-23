@@ -20,49 +20,25 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef PSYNTH_OBJECTFACTORY_H
-#define PSYNTH_OBJECTFACTORY_H
+#ifndef PSYNTH_NODE_FACTORY_MANAGER_H
+#define PSYNTH_NODE_FACTORY_MANAGER_H
 
-#include <libpsynth/object/Object.h>
-
-#define PSYNTH_DECLARE_OBJECT_FACTORY( T, name )\
-class T ## Factory : public ObjectFactory\
-{\
-public:\
-    Object* create(const audio_info& info)\
-    {\
-        return new T (info);\
-    }\
-    \
-    void destroy(Object* obj)\
-    {\
-        delete obj;\
-    }\
-    const char* getName() {\
-        return name;\
-    }\
-};\
-T ## Factory& get ## T ## Factory();
-
-#define PSYNTH_DEFINE_OBJECT_FACTORY( T )\
-T ## Factory& get ## T ## Factory()\
-{\
-    static T ## Factory s_factory;\
-    return s_factory;\
-}
+#include <map>
+#include <libpsynth/object/node_factory.h>
 
 namespace psynth
 {
 
-class ObjectFactory
+class node_factory_manager
 {
+    typedef std::map<std::string, node_factory*> node_factory_map;
+    node_factory_map m_node_fact;
+    
 public:
-
-    virtual const char* getName() = 0;
-    virtual Object* create(const audio_info& m_info) = 0;
-    virtual void destroy(Object*) = 0;
+    void register_factory (node_factory& of);
+    node* create (const std::string& name, const audio_info& info);
 };
 
 } /* namespace psynth */
 
-#endif /* PSYNTH_OBJECTFACTORY_H */
+#endif /* PSYNTH_OBJECTFACTORYMANAGER_H */

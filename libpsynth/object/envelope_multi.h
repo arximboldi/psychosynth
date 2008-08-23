@@ -20,71 +20,71 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef PSYNTH_ENVELOPEMULTI_H
-#define PSYNTH_ENVELOPEMULTI_H
+#ifndef PSYNTH_ENVELOPE_MULTI_H
+#define PSYNTH_ENVELOPE_MULTI_H
 
 #include <vector>
-#include <libpsynth/object/Envelope.h>
+#include <libpsynth/object/envelope.h>
 
 namespace psynth
 {
 
-struct EnvPoint
+struct env_point
 {
     float dt;
     float val;
 
-    EnvPoint() {};
-    EnvPoint(float _dt, float _val) :
-	dt(_dt),
-	val(_val)
+    env_point () {};
+    env_point (float _dt, float _val)
+	: dt(_dt)
+	, val(_val)
 	{}
 };
 
-class EnvelopeMultiValues
+class envelope_multi_values
 {
-    friend class EnvelopeMulti;
+    friend class envelope_multi;
     
-    std::vector<EnvPoint> m_points;
+    std::vector<env_point> m_points;
     int m_sustain;
     float m_factor;
     
 public:
 
-    EnvelopeMultiValues() :
+    envelope_multi_values() :
 	m_sustain(1),
 	m_factor(1.0f)
 	{}
     
-    void setASR(EnvPoint a, EnvPoint s, EnvPoint r);
-    void setADSR(EnvPoint a, EnvPoint d, EnvPoint s, EnvPoint r);
+    void set_asr (env_point a, env_point s, env_point r);
+    void set_adsr (env_point a, env_point d, env_point s, env_point r);
 
-    void setFactor(float factor) {
+    void set_factor (float factor) {
 	m_factor = factor;
     }
 
-    void setSustain(int sustain) {
+    void set_sustain (int sustain) {
 	m_sustain = sustain;
     }
     
-    void set(const std::vector<EnvPoint>& p, int sustain) {
+    void set (const std::vector<env_point>& p, int sustain) {
 	m_points = p;
 	m_sustain = sustain;
     }
     
-    EnvPoint& point(int index) {
+    env_point& point (int index) {
 	return m_points[index];
     }
 
-    const EnvPoint& point(int index) const {
+    const env_point& point (int index) const {
 	return m_points[index];
     }
 
-    EnvPoint& operator[](int index) {
+    env_point& operator[] (int index) {
 	return m_points[index];
     }
 
-    const EnvPoint& operator[](int index) const {
+    const env_point& operator[] (int index) const {
 	return m_points[index];
     }
 
@@ -92,69 +92,69 @@ public:
 	return m_points.size();
     }
 
-    void resize(size_t size) {
+    void resize (size_t size) {
 	m_points.resize(size);
     }
 };
 
-class EnvelopeMulti : public Envelope
+class envelope_multi : public envelope
 {
-    EnvelopeMultiValues* m_val;
+    envelope_multi_values* m_val;
     int m_cur_point;
     float m_time;
     bool m_pressed;
      
 public:
-    EnvelopeMulti(EnvelopeMultiValues* val) :
+    envelope_multi (envelope_multi_values* val) :
 	m_val(val),
 	m_cur_point(0),
 	m_time(0.0f),
 	m_pressed(false)
 	{}
 
-    void setValues(EnvelopeMultiValues* vals) {
+    void set_values (envelope_multi_values* vals) {
 	m_val = vals;
     }
 
-    EnvelopeMultiValues* getValues() {
+    envelope_multi_values* get_values () {
 	return m_val;
     }
 
-    float getTime() const {
+    float get_time () const {
 	return m_time;
     }
 
-    float setTime(float time) {
+    float set_time (float time) {
 	m_time = time;
     }
 
-    void restart() {
+    void restart () {
 	m_time = 0;
 	m_cur_point = 0;
     }
     
-    void press() {
+    void press () {
 	if (finished())
 	    restart();
 	m_pressed = true;
     }
 
-    void release() {
+    void release () {
 	m_pressed = false;
     }
 
-    float update() {
+    float update () {
 	return update(1.0f);
     }
     
-    float update(float sample);
+    float update (float sample);
     
-    void update(float* samples, int n_samples) {
-	while(n_samples--)
+    void update (float* samples, int n_samples) {
+	while (n_samples--)
 	    *samples++ = update();
     }
 
-    bool finished() {
+    bool finished () {
 	return m_cur_point >= m_val->size() - 1;
     }
     

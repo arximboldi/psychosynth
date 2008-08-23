@@ -25,7 +25,7 @@
 
 #include <libpsynth/object/ObjectOscillator.h>
 #include <libpsynth/object/KnownObjects.h>
-#include <libpsynth/object/ObjectFactory.h>
+#include <libpsynth/object/node_factory.h>
 
 namespace psynth
 {
@@ -39,9 +39,9 @@ public:
     };
 
 private:
-    void doUpdate(const Object* caller, int caller_port_type, int caller_port);
-    void doAdvance() {}
-    void onInfoChange() {}
+    void do_update (const node* caller, int caller_port_type, int caller_port);
+    void do_advance () {}
+    void on_info_change () {}
     
 public:
     ObjectAudioOscillator(const audio_info& prop) :
@@ -53,7 +53,7 @@ public:
 	{};
 };
 
-PSYNTH_DECLARE_OBJECT_FACTORY(ObjectAudioOscillator, "oscillator");
+PSYNTH_DECLARE_NODE_FACTORY(ObjectAudioOscillator, "oscillator");
 
 } /* namespace psynth */
 

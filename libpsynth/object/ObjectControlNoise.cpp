@@ -28,11 +28,12 @@ using namespace std;
 namespace psynth
 {
 
-PSYNTH_DEFINE_OBJECT_FACTORY(ObjectControlNoise);
+PSYNTH_DEFINE_NODE_FACTORY(ObjectControlNoise);
 
-void ObjectControlNoise::doUpdate(const Object* caller, int caller_port_type, int caller_port)
+void ObjectControlNoise::do_update (const node* caller,
+				    int caller_port_type, int caller_port)
 {
-    sample_buffer* buf = getOutput<sample_buffer>(LINK_CONTROL, OUT_C_OUTPUT);
+    sample_buffer* buf = get_output<sample_buffer> (LINK_CONTROL, OUT_C_OUTPUT);
     sample* out = buf->get_data();
 
     updateNoise(out);

@@ -22,7 +22,7 @@
 
 #include <iostream>
 
-#include "object/ObjParam.h"
+#include "object/node_param.h"
 #include "common/vector_2d.h"
 
 using namespace std;
@@ -30,7 +30,7 @@ using namespace std;
 namespace psynth
 {
 
-void ObjParam::updateIn()
+void node_param::update_in ()
 {
     m_lock.lock();
     if (m_changed) {
@@ -54,7 +54,7 @@ void ObjParam::updateIn()
     m_lock.unlock();
 }
 
-void ObjParam::updateOut()
+void node_param::update_out ()
 {
     m_lock.lock();
     switch(m_type) {
@@ -75,7 +75,7 @@ void ObjParam::updateOut()
     m_lock.unlock();
 }
 
-void ObjParam::clear()
+void node_param::clear ()
 {
     switch(m_type) {
     case INT:
@@ -94,16 +94,16 @@ void ObjParam::clear()
     }
 }
 
-void ObjParam::configure(int id, std::string name,
-			 int type, void* dest,
-			 ObjParam::Event ev)
+void node_param::configure (int id, std::string name,
+			    int type, void* dest,
+			    node_param::event ev)
 {
     m_event = ev;
     configure(id, name, type, dest);
 }
 
-void ObjParam::configure(int id, std::string name,
-			 int type, void* dest)
+void node_param::configure (int id, std::string name,
+			    int type, void* dest)
 {
     m_id = id;
     m_name = name;

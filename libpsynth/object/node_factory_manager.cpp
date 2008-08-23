@@ -21,22 +21,22 @@
  ***************************************************************************/
 
 #include <algorithm>
-#include "object/ObjectFactoryManager.h"
+#include "object/node_factory_manager.h"
 
 using namespace std;
 
 namespace psynth
 {
 
-void ObjectFactoryManager::registerFactory(ObjectFactory& of)
+void node_factory_manager::register_factory (node_factory& of)
 {
-    m_objfact[of.getName()] = &of;
+    m_node_fact [of.get_name ()] = &of;
 }
 
-Object* ObjectFactoryManager::create(const std::string& name,
-				     const audio_info& info)
+node* node_factory_manager::create (const std::string& name,
+				    const audio_info& info)
 {
-    ObjectFactoryMap::iterator it = m_objfact.find(name);
+    node_factory_map::iterator it = m_node_fact.find (name);
 
     /*
     cout << " *** CREATING " << name << endl;
@@ -46,8 +46,8 @@ Object* ObjectFactoryManager::create(const std::string& name,
 	cout << "*** ERROR!! \n";
     */
     
-    if (it != m_objfact.end())
-	return it->second->create(info);
+    if (it != m_node_fact.end ())
+	return it->second->create (info);
     
     return NULL;
 }

@@ -20,56 +20,73 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef PSYNTH_ENVELOPE_H
-#define PSYNTH_ENVELOPE_H
+#include <iostream>
+#include "object/envelope_multi.h"
 
 namespace psynth
 {
 
-/**
- * Basic envelope interface.
- */
-class Envelope
+using namespace std;
+
+void envelope_multi_values::set_asr (env_point a, env_point s, env_point r)
 {
-public:
+    m_points.resize(4);
+    m_points[0] = env_point (0, 0);
+    m_points[1] = a;
+    m_points[2] = s;
+    m_points[3] = r;
+    m_sustain = 2;
+}
 
-    /**
-     * Updates the envelope for one sample.
-     * @return The value of the envelope.
-     */
-    virtual float update() = 0;
+void envelope_multi_values::set_adsr (env_point a, env_point d, env_point s, env_point r)
+{
+    m_points.resize(5);
+    m_points[0] = env_point (0, 0);
+    m_points[1] = a;
+    m_points[2] = d;
+    m_points[3] = s;
+    m_points[4] = r;
+    m_sustain = 3;
+}
 
-    /**
-     * Updates the envelope for several samples.
-     * @param samples the number of samples to advance.
-     * @return The value of the envelope.
-     */
-    virtual float update(float samples) = 0;
+/*
+ * TODO: Implement sustain!
+ */
+float envelope_multi::update (float sample)
+{
+    float val;
 
-    /**
-     * Fills a buffer with samples from the envelope.
-     * @param samples The buffer to fill.
-     * @param n_samples The number of samples to fill.
-     */
-    virtual void update(float* samples, int n_samples) = 0;
+    //cout << "factor: " << m_val->m_factor << endl;
+    //cout << "prev m_time: " << m_time << endl; 
 
-    /**
-     * Start the envelope effect.
-     */
-    virtual void press() = 0;
+    m_time += sample * m_val->m_factor;
 
-    /**
-     * Start finishing the envelope.
-     */
-    virtual void release() = 0;
+    //cout << "then m_time: " << m_time << endl;
+    //cout << "prev m_cur_point: " << m_cur_point << endl;
 
-    /**
-     * Returns wether the envelope has finished.
-     * @return @c true if the envelope has finished and @c false otherwise.
-     */
-    virtual bool finished() = 0;
-};
+    while (m_cur_point < m_val->size()-1 &&
+	   m_val->point(m_cur_point+1).dt < m_time)
+	++m_cur_point;
+
+    //cout << "then m_cur_point: " << m_cur_point << endl;
+
+    if (m_cur_point < m_val->size() - 1)
+	//if (m_pressed && m_cur_point == m_val->m_sustain)
+	//    val = m_val->point(m_val->m_sustain).val;
+	//else
+	    val =
+		m_val->point(m_cur_point).val +
+		(m_val->point(m_cur_point+1).val - m_val->point(m_cur_point).val) /
+		(m_val->point(m_cur_point+1).dt - m_val->point(m_cur_point).dt) * 
+		(m_time - m_val->point(m_cur_point).dt);
+    else if (m_cur_point == m_val->size() - 1) {
+	val = m_val->point(m_val->size()-1).val;
+	m_time = 0.0f;
+    }
+
+    return val;
+}
+
+
 
 } /* namespace psynth */
-
-#endif /* PSYNTH_ENVELOPE_H */

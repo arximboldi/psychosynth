@@ -66,7 +66,7 @@ Element::Element(TableObject& obj, Ogre::SceneManager* scene) :
     m_node->attachObject(m_base);
 
     vector_2f v;
-    obj.getParam(psynth::Object::PARAM_POSITION, v);
+    obj.getParam(psynth::node::PARAM_POSITION, v);
     m_pos.x = v.x;
     m_pos.y = v.y;
     m_node->setPosition(Vector3(m_pos.x, Z_POS, m_pos.y));
@@ -110,7 +110,7 @@ void Element::setTarget(const TableObject& obj)
 	m_target.addListener(this);
 
 	vector_2f v;
-	m_target.getParam(psynth::Object::PARAM_POSITION, v);
+	m_target.getParam(psynth::node::PARAM_POSITION, v);
 	m_aimpoint.x = v.x;
 	m_aimpoint.y = v.y;
 	
@@ -134,7 +134,7 @@ void Element::setPosition(const Ogre::Vector2& pos)
     vector_2f dest;
     dest.x = pos.x;
     dest.y = pos.y;
-    m_obj.setParam(psynth::Object::PARAM_POSITION, dest);
+    m_obj.setParam(psynth::node::PARAM_POSITION, dest);
 }
 
 void Element::setGhost(bool ghost)
@@ -312,7 +312,7 @@ void Element::handleDeactivateObject(TableObject& obj)
 void Element::handleSetParamObject(TableObject& obj, int param_id)
 {
     if (obj == m_obj) {
-	if (param_id == Object::PARAM_POSITION) {
+	if (param_id == node::PARAM_POSITION) {
 	    vector_2f dest;
 	    obj.getParam(param_id, dest);
 	    objectMoved(obj, dest);
@@ -321,7 +321,7 @@ void Element::handleSetParamObject(TableObject& obj, int param_id)
 	for (ElemComponentIter it = m_comp.begin(); it != m_comp.end(); ++it)
 	    (*it)->handleParamChange(obj, param_id);
     } else if (obj == m_target) {
-	if (param_id == Object::PARAM_POSITION) {
+	if (param_id == node::PARAM_POSITION) {
 	    vector_2f dest;
 	    obj.getParam(param_id, dest);
 	    objectMoved(obj, dest);

@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) Juan Pedro Bolivar Puente 2008                          *
+ *   Copyright (C) Juan Pedro Bolivar Puente 2007                          *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -20,25 +20,19 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef PSYNTH_OBJECTFACTORYMANAGER_H
-#define PSYNTH_OBJECTFACTORYMANAGER_H
+#include <cmath>
+#include "object/wave_table.h"
 
-#include <map>
-#include <libpsynth/object/ObjectFactory.h>
+using namespace std;
 
 namespace psynth
 {
 
-class ObjectFactoryManager
-{
-    typedef std::map<std::string, ObjectFactory*> ObjectFactoryMap;
-    ObjectFactoryMap m_objfact;
-    
-public:
-    void registerFactory(ObjectFactory& of);
-    Object* create(const std::string& name, const audio_info& info);
-};
+void wave_table::fill (wave_func_t func) {
+    for (size_t i = 0; i < m_size; ++i)
+	m_table[i] = func((float) i / (m_size));
+}
 
 } /* namespace psynth */
 
-#endif /* PSYNTH_OBJECTFACTORYMANAGER_H */
+

@@ -20,39 +20,39 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "object/ObjectManager.h"
+#include "object/node_manager.h"
 
 using namespace std;
 
 namespace psynth
 {
 
-ObjectManager::ObjectManager() :
-    m_objmap(),
-    m_outputs()
+node_manager::node_manager ()
+    : m_node_map()
+    , m_outputs()
 {
 }
 
-ObjectManager::~ObjectManager()
+node_manager::~node_manager ()
 {
-    map<int, Object*>::iterator map_iter;
-    for (map_iter = m_objmap.begin(); map_iter != m_objmap.end(); ++map_iter)
+    map<int, node*>::iterator map_iter;
+    for (map_iter = m_node_map.begin(); map_iter != m_node_map.end(); ++map_iter)
 	delete (*map_iter).second;
 }
 
-bool ObjectManager::attachObject(Object* obj, int id)
+bool node_manager::attach_node (node* obj, int id)
 {
-    if (!m_objmap.insert(pair<int, Object*>(id, obj)).second)
+    if (!m_node_map.insert(pair<int, node*>(id, obj)).second)
 	return false;
 
-    obj->setID(id);
+    obj->set_id (id);
     
     ObjectOutput* out = dynamic_cast<ObjectOutput*>(obj);
 
     if (out != NULL) {
-	if (!out->setManager(this)) {
-	    m_objmap.erase(id);
-	    return false; /* Already attached to an ObjectManager!! */
+	if (!out->setManager (this)) {
+	    m_node_map.erase(id);
+	    return false; /* Already attached to an node_manager!! */
 	}
 		
 	m_outputs.push_back(out);
@@ -61,80 +61,80 @@ bool ObjectManager::attachObject(Object* obj, int id)
     return true;
 }
 
-bool ObjectManager::detachObject(int id)
+bool node_manager::detach_node(int id)
 {
-    map<int, Object*>::iterator iter;
-    iter = m_objmap.find(id);
+    map<int, node*>::iterator iter;
+    iter = m_node_map.find(id);
 	
-    if (iter == m_objmap.end())
+    if (iter == m_node_map.end())
 	return false;
 
-    detachObject(iter);
+    detach_node(iter);
     
     return true;
 }
 
-void ObjectManager::detachObject(Iterator it)
+void node_manager::detach_node (iterator it)
 {
-    map<int, Object*>::iterator& iter = it;
+    map<int, node*>::iterator& iter = it;
     
-    ObjectOutput* out = dynamic_cast<ObjectOutput*>((*iter).second);
-    if (out != NULL) {
+    ObjectOutput* out = dynamic_cast<ObjectOutput*> (iter->second);
+    if (out != 0) {
 	m_outputs.remove(out);
-	out->setManager(NULL);
+	out->setManager (0);
     }
 
-    (*iter).second->setID(OBJ_NULL_ID);
-    m_objmap.erase(iter);
+    iter->second->set_id (node::NULL_ID);
+    m_node_map.erase(iter);
 }
 
-bool ObjectManager::deleteObject(int id)
+bool node_manager::delete_node (int id)
 {
-    map<int, Object*>::iterator iter;
-    iter = m_objmap.find(id);
+    map<int, node*>::iterator iter;
+    iter = m_node_map.find(id);
     
-    if (iter == m_objmap.end())
+    if (iter == m_node_map.end())
 	return false;
 
-    deleteObject(iter);
+    delete_node(iter);
 
     return true;
 }
 
-void ObjectManager::deleteObject(Iterator it)
+void node_manager::delete_node(iterator it)
 {
-    Object* obj = *it;
+    node* obj = *it;
 /*    
-    detachObject(it); 
+    detach_node(it); 
 */
-    obj->clearConnections();
+    obj->clear_connections ();
 
-    if (!obj->hasConnections()) {
-	detachObject(it);
+    if (!obj->has_connections ()) {
+	detach_node (it);
 	delete obj;
     }
     else
 	m_delete_list.push_back(obj);
 }
 
-void ObjectManager::setInfo(const audio_info& info)
+void node_manager::set_info (const audio_info& info)
 {
     m_update_lock.lock();
 
-    map<int, Object*>::iterator map_iter;
-    for (map_iter = m_objmap.begin(); map_iter != m_objmap.end(); ++map_iter) {
-	map_iter->second->setInfo(info);
+    map<int, node*>::iterator map_iter;
+    for (map_iter = m_node_map.begin(); map_iter != m_node_map.end(); ++map_iter) {
+	map_iter->second->set_info (info);
     }
     
-    m_update_lock.unlock();
+    m_update_lock.unlock ();
 }
 
-void ObjectManager::update()
+void node_manager::update()
 {
     m_update_lock.lock();
     
-    map<int, Object*>::iterator map_iter;
-    for (map_iter = m_objmap.begin(); map_iter != m_objmap.end(); ++map_iter) {
+    map<int, node*>::iterator map_iter;
+    for (map_iter = m_node_map.begin(); map_iter != m_node_map.end(); ++map_iter) {
 	(*map_iter).second->advance();
     }
 	
@@ -143,10 +143,10 @@ void ObjectManager::update()
 	(*out_iter)->update(NULL, -1, -1);
     }
 
-    list<Object*>::iterator del_iter;
+    list<node*>::iterator del_iter;
     for (del_iter = m_delete_list.begin(); del_iter != m_delete_list.end();) {
-	if (!(*del_iter)->hasConnections()) {
-	    detachObject((*del_iter)->getID());
+	if (!(*del_iter)->has_connections ()) {
+	    detach_node((*del_iter)->get_id ());
 	    delete *del_iter;
 	    m_delete_list.erase(del_iter++);
 	} else

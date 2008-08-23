@@ -20,7 +20,7 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "object/Filter.h"
+#include "object/filter.h"
 
 namespace psynth
 {
@@ -32,7 +32,7 @@ namespace psynth
 #define tMax(a,b) ((a) > (b) ? (a) : (b))
 #define tLimit(x,a,b) ((x) < (a) ? (a) : ((x) > (b)? (b) : (x)))
 
-void FilterValues::calculate(float freq)
+void filter_values::calculate (float freq)
 {
     freq = tMax(freq, 0.01f);
     m_freq = freq;
@@ -40,7 +40,7 @@ void FilterValues::calculate(float freq)
     calculate();
 }
 
-void FilterValues::calculate(Type type, float freq, float res, float srate)
+void filter_values::calculate (type type, float freq, float res, float srate)
 {    
     /* Adapt the values to avoid strange noise */
     freq = tMax(freq, 0.01f);
@@ -54,7 +54,7 @@ void FilterValues::calculate(Type type, float freq, float res, float srate)
     calculate();
 }
 
-void FilterValues::calculate()
+void filter_values::calculate ()
 {   
     if(m_type == MOOG) {
 	// [0, 0.5]
@@ -127,13 +127,13 @@ void FilterValues::calculate()
 #define m_p m_coef->m_p
 #define m_k m_coef->m_k
 
-sample Filter::update(sample _in0)
+sample filter::update (sample _in0)
 {
     sample out;
 
     switch(m_coef->m_type)
     {
-    case FilterValues::MOOG: {
+    case filter_values::MOOG: {
 	sample x = _in0 - m_r*m_y4;
 
 	// four cascaded onepole filters

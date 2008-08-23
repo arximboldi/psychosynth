@@ -20,7 +20,7 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <libpsynth/object/WatchViewer.h>
+#include <libpsynth/object/watch_viewer.h>
 
 #include "gui3d/Connection.h"
 
@@ -167,13 +167,13 @@ Connection::Connection(Ogre::SceneManager* scene,
 {
     vector_2f v;
     
-    ev.src.getParam(Object::PARAM_MUTE, m_is_muted);
+    ev.src.getParam(node::PARAM_MUTE, m_is_muted);
   
-    ev.src.getParam(Object::PARAM_POSITION, v);
+    ev.src.getParam(node::PARAM_POSITION, v);
     m_src.x = v.x;
     m_src.y = v.y;
 
-    ev.dest.getParam(Object::PARAM_POSITION, v);
+    ev.dest.getParam(node::PARAM_POSITION, v);
     m_dest.x = v.x;
     m_dest.y = v.y;
     
@@ -187,7 +187,7 @@ Connection::Connection(Ogre::SceneManager* scene,
     m_wave = new ConnectionWave(m_node->getName() + "wave",
 				m_is_muted ?
 				WAVE_MUTE_COLOUR :
-				ev.socket_type == Object::LINK_AUDIO ?
+				ev.socket_type == node::LINK_AUDIO ?
 				WAVE_NORMAL_A_COLOUR :
 				WAVE_NORMAL_C_COLOUR,
 				m_src, m_dest);
@@ -198,12 +198,12 @@ Connection::Connection(Ogre::SceneManager* scene,
     m_link.src.addListener(this);
     m_link.dest.addListener(this);
 
-    if (ev.socket_type == Object::LINK_AUDIO)
-	m_watch = new WatchViewAudio(WAVE_POINTS,
-				     WAVE_A_SECS);
+    if (ev.socket_type == node::LINK_AUDIO)
+	m_watch = new watch_view_audio (WAVE_POINTS,
+					WAVE_A_SECS);
     else
-	m_watch = new WatchViewControl(WAVE_POINTS,
-				       WAVE_C_SECS);
+	m_watch = new watch_view_control (WAVE_POINTS,
+					  WAVE_C_SECS);
     m_link.dest.attachWatch(ev.socket_type, ev.dest_socket, m_watch);
 }
 
@@ -223,7 +223,7 @@ Connection::~Connection()
 
 void Connection::handleSetParamObject(TableObject& obj, int id)
 {
-    if (id == Object::PARAM_POSITION) {
+    if (id == node::PARAM_POSITION) {
 	vector_2f pos;
 	obj.getParam(id, pos);
     
@@ -238,7 +238,7 @@ void Connection::handleSetParamObject(TableObject& obj, int id)
 	m_line->update(m_src, m_dest);
     }
 
-    if (id == Object::PARAM_MUTE
+    if (id == node::PARAM_MUTE
 	&& obj == m_link.src) {
 	
 	obj.getParam(id, m_is_muted);
@@ -247,7 +247,7 @@ void Connection::handleSetParamObject(TableObject& obj, int id)
 	    m_wave->setColour(WAVE_MUTE_COLOUR);
 	} else {
 	    m_line->setColour(LINE_NORMAL_COLOUR);
-	    m_wave->setColour(m_link.socket_type == Object::LINK_AUDIO ?
+	    m_wave->setColour(m_link.socket_type == node::LINK_AUDIO ?
 			      WAVE_NORMAL_A_COLOUR :
 			      WAVE_NORMAL_C_COLOUR);
 	}
@@ -266,7 +266,7 @@ bool Connection::pointerClicked(const Ogre::Vector2& pos, OIS::MouseButtonID id)
 
     if (pointIsInPoly(pos, top_left, top_right, bot_right, bot_left)) {
 	m_is_muted = !m_is_muted;
-	m_link.src.setParam(Object::PARAM_MUTE, m_is_muted);
+	m_link.src.setParam(node::PARAM_MUTE, m_is_muted);
 
 	return true;
     }
@@ -278,10 +278,10 @@ void Connection::update()
 {
     const sample* buf;
 
-    if (m_link.socket_type == Object::LINK_AUDIO)
-	buf = static_cast<WatchViewAudio*>(m_watch)->getBuffer().get_data()[0];
+    if (m_link.socket_type == node::LINK_AUDIO)
+	buf = dynamic_cast<watch_view_audio*>(m_watch)->get_buffer().get_data()[0];
     else
-	buf = static_cast<WatchViewControl*>(m_watch)->getBuffer().get_data();
+	buf = dynamic_cast<watch_view_control*>(m_watch)->get_buffer().get_data();
     
     //m_line->update(m_src, m_dest);
     m_wave->update(m_src, m_dest, buf, WAVE_POINTS);

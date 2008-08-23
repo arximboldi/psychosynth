@@ -30,12 +30,12 @@ class sample_buffer;
 class audio_buffer;
 class audio_info;
 
-class Watch
+class watch
 {
 public:
-    virtual void setInfo(const audio_info& info) {}
-    virtual void update(const sample_buffer& buf) {}
-    virtual void update(const audio_buffer& buf) {}
+    virtual void set_info (const audio_info& info) {}
+    virtual void update (const sample_buffer& buf) {}
+    virtual void update (const audio_buffer& buf) {}
 };
 
 } /* namespace psynth */

@@ -83,7 +83,7 @@ class Connection : public psynth::TableObjectListener
     Ogre::SceneManager* m_scene;
     Ogre::SceneNode* m_node;
 
-    psynth::Watch* m_watch;
+    psynth::watch* m_watch;
     ConnectionLine* m_line;
     ConnectionWave* m_wave;
     

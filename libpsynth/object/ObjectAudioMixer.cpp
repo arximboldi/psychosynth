@@ -26,40 +26,42 @@
 namespace psynth
 {
 
-PSYNTH_DEFINE_OBJECT_FACTORY(ObjectAudioMixer);
+PSYNTH_DEFINE_NODE_FACTORY(ObjectAudioMixer);
 
-void ObjectAudioMixer::doUpdate(const Object* caller, int caller_port_type, int caller_port)
+void ObjectAudioMixer::do_update (const node* caller,
+				  int caller_port_type,
+				  int caller_port)
 {
-    audio_buffer* buf = getOutput<audio_buffer>(LINK_AUDIO, OUT_A_OUTPUT);
+    audio_buffer* buf = get_output<audio_buffer> (LINK_AUDIO, OUT_A_OUTPUT);
     const audio_buffer* in = NULL;
-    const sample_buffer * ampl = getInput<sample_buffer >(LINK_CONTROL, IN_C_AMPLITUDE);
+    const sample_buffer * ampl = get_input<sample_buffer> (LINK_CONTROL, IN_C_AMPLITUDE);
     int i, j;
     bool input = false;
     
-    for (i = 0; i < getInfo().num_channels; ++i) {
-	init(buf->get_channel(i), getInfo().block_size);
+    for (i = 0; i < get_info().num_channels; ++i) {
+	init(buf->get_channel(i), get_info().block_size);
 
 	for (j = 0; j < m_numchan; ++j)
-	    if ((in = getInput<audio_buffer>(LINK_AUDIO, j))) {
-		EnvelopeSimple env = getInEnvelope(LINK_AUDIO, j);
+	    if ((in = get_input <audio_buffer> (LINK_AUDIO, j))) {
+		envelope_simple env = get_in_envelope(LINK_AUDIO, j);
 
 		if (!ampl)
 		    mix(buf->get_channel(i), in->get_channel(i),
-			env, getInfo().block_size);
+			env, get_info().block_size);
 		else {
-		    EnvelopeSimple ctrl_env = getInEnvelope(LINK_CONTROL,
-							    IN_C_AMPLITUDE);
+		    envelope_simple ctrl_env = get_in_envelope(LINK_CONTROL,
+							      IN_C_AMPLITUDE);
 		    mix(buf->get_channel(i),
 			in->get_channel(i),
 			ampl->get_data(),
-			env, ctrl_env, getInfo().block_size);
+			env, ctrl_env, get_info ().block_size);
 		}
 		input = true;
 	    }
 
 	if (!input)
 	    memset(buf->get_channel(i), 0,
-		   sizeof(sample) * getInfo().block_size);
+		   sizeof(sample) * get_info ().block_size);
     }
 }
 

@@ -35,19 +35,19 @@ ObjectMixer::ObjectMixer(const audio_info& info,
 			 int num_audio_out,
 			 int num_ctrl_out,
 			 int num_in): 
-    Object(info,
-	   obj_type,
-	   name,
-	   num_audio_out ? num_in : 0, 
-	   num_ctrl_out  ? num_in : N_IN_C_SOCKETS,
-	   num_audio_out,
-	   num_ctrl_out),
+    node (info,
+	  obj_type,
+	  name,
+	  num_audio_out ? num_in : 0, 
+	  num_ctrl_out  ? num_in : N_IN_C_SOCKETS,
+	  num_audio_out,
+	  num_ctrl_out),
     m_numchan(num_in),
     m_param_ampl(1.0f),
     m_param_mixop(MIX_SUM)
 {
-    addParam("amplitude", ObjParam::FLOAT, &m_param_ampl);
-    addParam("mixop", ObjParam::INT, &m_param_mixop);
+    add_param ("amplitude", node_param::FLOAT, &m_param_ampl);
+    add_param ("mixop", node_param::INT, &m_param_mixop);
 }
 
 void ObjectMixer::mix(sample* dest, const sample* src, size_t n_samples)
@@ -72,7 +72,7 @@ void ObjectMixer::mix(sample* dest, const sample* src,
 }
 
 void ObjectMixer::mix(sample* dest, const sample* src,
-		      EnvelopeSimple& env, size_t n_samples)
+		      envelope_simple& env, size_t n_samples)
 {
     if (m_param_mixop == MIX_SUM)
 	while(n_samples--)
@@ -84,8 +84,8 @@ void ObjectMixer::mix(sample* dest, const sample* src,
   
 void ObjectMixer::mix(sample* dest, const sample* src,
 		      const sample* ampl,
-		      EnvelopeSimple& env,
-		      EnvelopeSimple& ctrl_env,
+		      envelope_simple& env,
+		      envelope_simple& ctrl_env,
 		      size_t n_samples)
 {
     if (m_param_mixop == MIX_SUM)

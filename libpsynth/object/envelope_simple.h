@@ -20,73 +20,83 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <iostream>
-#include "object/EnvelopeMulti.h"
+#ifndef PSYNTH_ENVELOPE_SIMPLE_H
+#define PSYNTH_ENVELOPE_SIMPLE_H
+
+#include <libpsynth/object/envelope.h>
 
 namespace psynth
 {
 
-using namespace std;
-
-void EnvelopeMultiValues::setASR(EnvPoint a, EnvPoint s, EnvPoint r)
-{
-    m_points.resize(4);
-    m_points[0] = EnvPoint(0, 0);
-    m_points[1] = a;
-    m_points[2] = s;
-    m_points[3] = r;
-    m_sustain = 2;
-}
-
-void EnvelopeMultiValues::setADSR(EnvPoint a, EnvPoint d, EnvPoint s, EnvPoint r)
-{
-    m_points.resize(5);
-    m_points[0] = EnvPoint(0, 0);
-    m_points[1] = a;
-    m_points[2] = d;
-    m_points[3] = s;
-    m_points[4] = r;
-    m_sustain = 3;
-}
-
-/*
- * TODO: Implement sustain!
+/**
+ * Simplistic evenlope implementation with only two points.
  */
-float EnvelopeMulti::update(float sample)
+class envelope_simple : public envelope
 {
-    float val;
+public:
+    float m_rise_dt;
+    float m_fall_dt;
+    float m_curr_dt;
+    float m_val;
+    
+public:
+    envelope_simple () :
+	m_rise_dt(0.0f),
+	m_fall_dt(0.0f),
+	m_curr_dt(0.0f),
+	m_val(0.0f)
+	{}
+    
+    envelope_simple (float rise_dt, float fall_dt) :
+	m_rise_dt(rise_dt),
+	m_fall_dt(fall_dt),
+	m_curr_dt(0.0f),
+	m_val(0.0f)
+	{}
 
-    //cout << "factor: " << m_val->m_factor << endl;
-    //cout << "prev m_time: " << m_time << endl; 
-
-    m_time += sample * m_val->m_factor;
-
-    //cout << "then m_time: " << m_time << endl;
-    //cout << "prev m_cur_point: " << m_cur_point << endl;
-
-    while (m_cur_point < m_val->size()-1 &&
-	   m_val->point(m_cur_point+1).dt < m_time)
-	++m_cur_point;
-
-    //cout << "then m_cur_point: " << m_cur_point << endl;
-
-    if (m_cur_point < m_val->size() - 1)
-	//if (m_pressed && m_cur_point == m_val->m_sustain)
-	//    val = m_val->point(m_val->m_sustain).val;
-	//else
-	    val =
-		m_val->point(m_cur_point).val +
-		(m_val->point(m_cur_point+1).val - m_val->point(m_cur_point).val) /
-		(m_val->point(m_cur_point+1).dt - m_val->point(m_cur_point).dt) * 
-		(m_time - m_val->point(m_cur_point).dt);
-    else if (m_cur_point == m_val->size() - 1) {
-	val = m_val->point(m_val->size()-1).val;
-	m_time = 0.0f;
+    float set_deltas (float rise_dt, float fall_dt) {
+	m_rise_dt = rise_dt;
+	m_fall_dt = fall_dt;
     }
 
-    return val;
-}
+    void set (float value) {
+	m_val = value;
+    }
+    
+    float update () {
+	float val = m_val;
+	m_val = m_val + m_curr_dt;
+	if (m_val > 1.0f) m_val = 1.0;
+	else if (m_val < 0.0f) m_val = 0.0;
+	return val;
+    }
 
+    float update (float sample) {
+	float val = m_val;
+	m_val = m_val + m_curr_dt * sample;
+	if (m_val > 1.0f) m_val = 1.0;
+	else if (m_val < 0.0f) m_val = 0.0;
+	return val;
+    }
 
+    void update (float* samples, int n_samples) {
+	while(n_samples--)
+	    *samples++ *= update();
+    }
+
+    void press () {
+	m_curr_dt = m_rise_dt;
+    }
+
+    void release () {
+	m_curr_dt = m_fall_dt;
+    }
+
+    bool finished () {
+	return m_val <= 0.0f;
+    }
+};
 
 } /* namespace psynth */
+
+#endif /* PSYNTH_ENVELOPE_SIMPLE_H */

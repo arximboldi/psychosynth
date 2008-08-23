@@ -29,31 +29,31 @@ using namespace std;
 namespace psynth
 {
 
-PSYNTH_DEFINE_OBJECT_FACTORY(ObjectDelay);
+PSYNTH_DEFINE_NODE_FACTORY(ObjectDelay);
 
 ObjectDelay::ObjectDelay(const audio_info& prop) : 
-    Object(prop,
-	   OBJ_DELAY,
-	   "delay",
-	   N_IN_A_SOCKETS,
-	   N_IN_C_SOCKETS,
-	   N_OUT_A_SOCKETS,
-	   N_OUT_C_SOCKETS),
+    node (prop,
+	  OBJ_DELAY,
+	  "delay",
+	  N_IN_A_SOCKETS,
+	  N_IN_C_SOCKETS,
+	  N_OUT_A_SOCKETS,
+	  N_OUT_C_SOCKETS),
     m_param_delay(DEFAULT_DELAY),
     m_param_depth(DEFAULT_DEPTH),
     m_pos(0),
     m_max_delay_pos(prop.sample_rate * MAX_DELAY * 2.0f),
     m_buffer(prop, m_max_delay_pos)
 {
-    addParam("delay", ObjParam::FLOAT, &m_param_delay);
-    addParam("depth", ObjParam::FLOAT, &m_param_depth);
+    add_param ("delay", node_param::FLOAT, &m_param_delay);
+    add_param ("depth", node_param::FLOAT, &m_param_depth);
 
     m_buffer.zero();
 }
 
-void ObjectDelay::onInfoChange()
+void ObjectDelay::on_info_change()
 {
-    m_max_delay_pos = getInfo().sample_rate * MAX_DELAY * 2.0f;
+    m_max_delay_pos = get_info().sample_rate * MAX_DELAY * 2.0f;
     m_buffer.resize(m_max_delay_pos);
     m_buffer.zero();
 }
@@ -64,10 +64,10 @@ ObjectDelay::~ObjectDelay()
 
 int ObjectDelay::doUpdateChannel(int chan)
 {
-    const audio_buffer* _input = getInput<audio_buffer>(LINK_AUDIO, IN_A_INPUT);
-    const sample_buffer* _delay = getInput<sample_buffer>(LINK_CONTROL, IN_C_DELAY);
-    const sample_buffer* _depth = getInput<sample_buffer>(LINK_CONTROL, IN_C_DEPTH);
-    audio_buffer* _output = getOutput<audio_buffer>(LINK_AUDIO, IN_A_INPUT);    
+    const audio_buffer* _input = get_input<audio_buffer>(LINK_AUDIO, IN_A_INPUT);
+    const sample_buffer* _delay = get_input<sample_buffer>(LINK_CONTROL, IN_C_DELAY);
+    const sample_buffer* _depth = get_input<sample_buffer>(LINK_CONTROL, IN_C_DEPTH);
+    audio_buffer* _output = get_output<audio_buffer>(LINK_AUDIO, IN_A_INPUT);    
 
     const sample* in_buf = _input ? _input->get_channel(chan) : 0;
     const sample* dep_buf = _depth ? _depth->get_data() : 0;
@@ -75,7 +75,7 @@ int ObjectDelay::doUpdateChannel(int chan)
     sample* out_buf = _output->get_channel(chan);
     sample* tmp_buf = m_buffer.get_channel(chan);
 
-    EnvelopeSimple in_env = getInEnvelope(LINK_AUDIO, IN_A_INPUT);
+    envelope_simple in_env = get_in_envelope (LINK_AUDIO, IN_A_INPUT);
     
     float delay, the_delay;
     int i;
@@ -84,8 +84,8 @@ int ObjectDelay::doUpdateChannel(int chan)
     float delayed_sample;
     float in_val;
     
-    delay = m_param_delay * getInfo().sample_rate;
-    for (i = 0; i < getInfo().block_size; ++i) {
+    delay = m_param_delay * get_info().sample_rate;
+    for (i = 0; i < get_info().block_size; ++i) {
 	if (in_buf)
 	    in_val = *in_buf++ * in_env.update();
 	else
@@ -115,17 +115,18 @@ int ObjectDelay::doUpdateChannel(int chan)
     return pos;
 }
 
-void ObjectDelay::doUpdate(const Object* caller, int caller_port_type, int caller_por)
+void ObjectDelay::do_update (const node* caller,
+			     int caller_port_type, int caller_por)
 {
     /*
-    if (m_param_delay != m_old_param_delay)
-	m_buffer.zero();
-    m_old_param_delay = m_param_delay;
+      if (m_param_delay != m_old_param_delay)
+      m_buffer.zero();
+      m_old_param_delay = m_param_delay;
     */
     
     int new_pos = m_pos;
  
-    for (int i = 0; i < getInfo().num_channels; ++i)
+    for (int i = 0; i < get_info().num_channels; ++i)
 	new_pos = doUpdateChannel(i);
     
     m_pos = new_pos;

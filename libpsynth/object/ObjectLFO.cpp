@@ -28,12 +28,13 @@ using namespace std;
 namespace psynth
 {
 
-PSYNTH_DEFINE_OBJECT_FACTORY(ObjectLFO);
+PSYNTH_DEFINE_NODE_FACTORY(ObjectLFO);
 
-void ObjectLFO::doUpdate(const Object* caller, int caller_port_type, int caller_port)
+void ObjectLFO::do_update (const node* caller,
+			   int caller_port_type, int caller_port)
 {
-    sample_buffer* buf = getOutput<sample_buffer>(LINK_CONTROL, OUT_C_OUTPUT);
-    sample* out = buf->get_data();
+    sample_buffer* buf = get_output <sample_buffer>(LINK_CONTROL, OUT_C_OUTPUT);
+    sample* out = buf->get_data ();
 
     updateOsc (out);
 }

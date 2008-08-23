@@ -32,13 +32,13 @@ ObjectNoise::ObjectNoise(const audio_info& prop,
 			 const std::string& name,
 			 int n_audio_out,
 			 int n_control_out) : 
-    Object(prop,
-	   obj_type,
-	   name,
-	   N_IN_A_SOCKETS,
-	   N_IN_C_SOCKETS,
-	   n_audio_out,
-	   n_control_out),
+    node (prop,
+	  obj_type,
+	  name,
+	  N_IN_A_SOCKETS,
+	  N_IN_C_SOCKETS,
+	  n_audio_out,
+	  n_control_out),
     m_param_type(NOISE_PINK),
     m_param_ampl(DEFAULT_AMPL),
     m_b0(0.0f),
@@ -49,8 +49,8 @@ ObjectNoise::ObjectNoise(const audio_info& prop,
     m_b5(0.0f),
     m_b6(0.0f)
 {    
-    addParam("type", ObjParam::INT, &m_param_type);
-    addParam("amplitude", ObjParam::FLOAT, &m_param_ampl);
+    add_param ("type", node_param::INT, &m_param_type);
+    add_param ("amplitude", node_param::FLOAT, &m_param_ampl);
 }
 
 ObjectNoise::~ObjectNoise()
@@ -59,14 +59,14 @@ ObjectNoise::~ObjectNoise()
 
 void ObjectNoise::updateNoise(sample* buf)
 {
-    const sample_buffer* ampl_buf = getInput<sample_buffer>(LINK_CONTROL, IN_C_AMPLITUDE);
-    const sample_buffer* trig_buf = getInput<sample_buffer>(LINK_CONTROL, IN_C_TRIGGER);
-    EnvelopeSimple mod_env = getInEnvelope(LINK_CONTROL, IN_C_AMPLITUDE);
-    EnvelopeSimple trig_env =  getInEnvelope(LINK_CONTROL, IN_C_TRIGGER);
+    const sample_buffer* ampl_buf = get_input <sample_buffer>(LINK_CONTROL, IN_C_AMPLITUDE);
+    const sample_buffer* trig_buf = get_input <sample_buffer>(LINK_CONTROL, IN_C_TRIGGER);
+    envelope_simple mod_env = get_in_envelope (LINK_CONTROL, IN_C_AMPLITUDE);
+    envelope_simple trig_env =  get_in_envelope (LINK_CONTROL, IN_C_TRIGGER);
     
     const sample* ampl = ampl_buf ? ampl_buf->get_data() : NULL;
 
-    int n_samp = getInfo().block_size;
+    int n_samp = get_info().block_size;
     sample* out = buf;
     if (m_param_type == NOISE_PINK)
 	if (ampl)
@@ -85,10 +85,10 @@ void ObjectNoise::updateNoise(sample* buf)
 	
     /* Modulate amplitude with trigger envelope. */
     if (trig_buf) {
-	n_samp = getInfo().block_size;
+	n_samp = get_info().block_size;
 	out = buf;
 	const sample* trig = trig_buf->get_data();
-	trig_env = getInEnvelope (LINK_CONTROL, IN_C_TRIGGER);
+	trig_env = get_in_envelope (LINK_CONTROL, IN_C_TRIGGER);
 	while (n_samp--) {
 	    float env_val = trig_env.update();
 	    *out = *out * ((1.0f - env_val) + (env_val * *trig));

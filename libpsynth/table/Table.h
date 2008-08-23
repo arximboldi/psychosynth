@@ -29,11 +29,11 @@
 
 #include <libpsynth/common/audio_info.h>
 #include <libpsynth/table/Patcher.h>
-#include <libpsynth/object/Object.h>
+#include <libpsynth/object/node.h>
 #include <libpsynth/object/ObjectOutput.h>
 #include <libpsynth/object/ObjectAudioMixer.h>
-#include <libpsynth/object/ObjectManager.h>
-#include <libpsynth/object/ObjectFactoryManager.h>
+#include <libpsynth/object/node_manager.h>
+#include <libpsynth/object/node_factory_manager.h>
 
 namespace psynth
 {
@@ -45,10 +45,10 @@ class TableObject
 {
     friend class Table;
     
-    Object* m_obj; /* Use ObjectManager::Iterator instead? */
+    node* m_obj; /* Use node_manager::Iterator instead? */
     Table* m_table;
 
-    TableObject(Object* obj, Table* table) :
+    TableObject(node* obj, Table* table) :
 	m_obj(obj), m_table(table) {};
 
 public:
@@ -63,15 +63,15 @@ public:
     };
 
     int getID() const {
-	return m_obj->getID();
+	return m_obj->get_id ();
     };
     
     int getType() const {
-	return m_obj->getType();
+	return m_obj->get_type ();
     };
 
     const std::string& getName() {
-	return m_obj->getName();
+	return m_obj->get_name ();
     };
     
     Table* getTable() {
@@ -94,20 +94,20 @@ public:
     template <typename T>
     inline void setParam(const std::string& name, const T& data);
 
-    void attachWatch(int type, int in_sock, Watch* watch) {
-	m_obj->attachWatch(type, in_sock, watch);
+    void attachWatch(int type, int in_sock, watch* watch) {
+	m_obj->attach_watch (type, in_sock, watch);
     }
 
-    void detachWatch(int type, int in_sock, Watch* watch) {
-	m_obj->detachWatch(type, in_sock, watch);
+    void detachWatch(int type, int in_sock, watch* watch) {
+	m_obj->detach_watch (type, in_sock, watch);
     }
     
     int getParamID(const std::string& name) const {
-	m_obj->param(name).getID();
+	m_obj->param(name).get_id ();
     }
 
     const std::string& getParamName(int id) const {
-	m_obj->param(id).getName();
+	m_obj->param(id).get_name ();
     }
     
     int getParamType(int id) const {
@@ -238,12 +238,12 @@ class Table : public TableSubject,
 	      public PatcherListener
 {    
     audio_info m_info;
-    ObjectManager m_objmgr;
+    node_manager m_node_mgr;
     Patcher* m_patcher;
     ObjectOutput* m_output;
     ObjectAudioMixer* m_mixer;
     int m_last_id;
-    ObjectFactoryManager m_objfact;
+    node_factory_manager m_objfact;
     
     static const int MIXER_CHANNELS = 16;
 
@@ -266,11 +266,11 @@ public:
 
     void setInfo(const audio_info& info) {
 	if (m_info != info)
-	    m_objmgr.setInfo(info);
+	    m_node_mgr.set_info (info);
     }
 
-    void registerObjectFactory(ObjectFactory& f) {
-	m_objfact.registerFactory(f);
+    void registerObjectFactory(node_factory& f) {
+	m_objfact.register_factory (f);
     }
     
     TableObject findObject(int id);
@@ -283,16 +283,16 @@ public:
 	obj.m_obj->param(id).set(data);
 	notifySetParamObject(obj, id);
 	if (m_patcher)
-	    m_patcher->setParamObject(obj.m_obj, id);
+	    m_patcher->setParamNode(obj.m_obj, id);
     }
 
     template <typename T>
     void setParamObject(TableObject& obj, const std::string& name, const T& data) {
-	ObjParam& param = obj.m_obj->param(name);
+	node_param& param = obj.m_obj->param(name);
 	param.set(data);
-	notifySetParamObject(obj, param.getID());
+	notifySetParamObject(obj, param.get_id());
 	if (m_patcher)
-	    m_patcher->setParamObject(obj.m_obj, param.getID());
+	    m_patcher->setParamNode(obj.m_obj, param.get_id());
     }
     
     void deleteObject(TableObject& obj);
@@ -319,7 +319,7 @@ public:
 
     void attachPatcher(Patcher* pat);
     
-    void dattachPatcher();
+    void detachPatcher();
     
     void update() {
 	if (m_patcher)
