@@ -65,7 +65,7 @@ void ElemGuiParamMulti::createGUI()
 			       Event::Subscriber(&ElemGuiParamMulti::onComboboxChange, this));
     
     int value;
-    getParent()->getObject().getParam(getParam(), value);
+    getParent()->getNode().get_param (getParam(), value);
     m_skip++;
     m_selector->setText(m_op_names[value]);
     m_skip--;
@@ -74,11 +74,11 @@ void ElemGuiParamMulti::createGUI()
     getParentWindow()->addChildWindow(m_selector);
 }
 
-void ElemGuiParamMulti::handleParamChange(TableObject& obj, int param)
+void ElemGuiParamMulti::handleParamChange(world_node& obj, int param)
 {
     int new_val;
 
-    obj.getParam(param, new_val);
+    obj.get_param (param, new_val);
 
     m_skip++;
     m_selector->setText(m_op_names[new_val]);
@@ -92,7 +92,7 @@ bool ElemGuiParamMulti::onComboboxChange(const CEGUI::EventArgs &e)
 	
 	for (int i = 0; i < m_nval; ++i)
 	    if (new_val == m_op_names[i]) {
-		getParent()->getObject().setParam(getParam(), i);
+		getParent()->getNode().set_param (getParam(), i);
 		break;
 	    }
     }
@@ -130,7 +130,7 @@ void ElemGuiParamFloat::createGUI()
 			      Event::Subscriber(&ElemGuiParamFloat::onSpinnerChange, this));
     
     float value;
-    getParent()->getObject().getParam(getParam(), value);
+    getParent()->getNode().get_param (getParam(), value);
     m_skip++;
     m_spinner->setCurrentValue(value);
     m_skip--;
@@ -139,11 +139,11 @@ void ElemGuiParamFloat::createGUI()
     getParentWindow()->addChildWindow(m_spinner);
 }
 
-void ElemGuiParamFloat::handleParamChange(TableObject& obj, int param)
+void ElemGuiParamFloat::handleParamChange(world_node& obj, int param)
 {
     float new_val;
 
-    obj.getParam(param, new_val);
+    obj.get_param (param, new_val);
     m_skip++;
     m_spinner->setCurrentValue(new_val);
     m_skip--;
@@ -153,7 +153,7 @@ bool ElemGuiParamFloat::onSpinnerChange(const CEGUI::EventArgs &e)
 {
     if (!m_skip) {
 	float new_val = m_spinner->getCurrentValue();
-	getParent()->getObject().setParam(getParam(), new_val);
+	getParent()->getNode().set_param (getParam(), new_val);
     }
     
     return true;
@@ -188,7 +188,7 @@ void ElemGuiParamInt::createGUI()
 			      Event::Subscriber(&ElemGuiParamInt::onSpinnerChange, this));
     
     int value;
-    getParent()->getObject().getParam(getParam(), value);
+    getParent()->getNode().get_param (getParam(), value);
     m_skip++;
     m_spinner->setCurrentValue(value);
     m_skip--;
@@ -197,11 +197,11 @@ void ElemGuiParamInt::createGUI()
     getParentWindow()->addChildWindow(m_spinner);
 }
 
-void ElemGuiParamInt::handleParamChange(TableObject& obj, int param)
+void ElemGuiParamInt::handleParamChange(world_node& obj, int param)
 {
     int new_val;
 
-    obj.getParam(param, new_val);
+    obj.get_param (param, new_val);
     m_skip++;
     m_spinner->setCurrentValue(new_val);
     m_skip--;
@@ -211,13 +211,13 @@ bool ElemGuiParamInt::onSpinnerChange(const CEGUI::EventArgs &e)
 {
     if (!m_skip) {
 	int new_val = m_spinner->getCurrentValue();
-	getParent()->getObject().setParam(getParam(), new_val);
+	getParent()->getNode().set_param (getParam(), new_val);
     }
     
     return true;
 }
 
-void ElementProperties::handleSetParamObject(TableObject& obj, int param_id)
+void ElementProperties::handle_set_param_node (world_node& obj, int param_id)
 {
     if (m_params.find(param_id) != m_params.end())
 	m_params[param_id]->handleParamChange(obj, param_id);

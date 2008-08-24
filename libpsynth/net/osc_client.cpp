@@ -185,7 +185,7 @@ int osc_client::_accept_cb(const char* path, const char* types,
 	m_id = argv[0]->i;
 	set_id (m_id);
 
-	get_table()->clear();
+	get_world()->clear();
 	
 	osc_controller::add_methods(m_server);
 	activate();

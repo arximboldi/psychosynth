@@ -39,7 +39,7 @@ using namespace std;
 using namespace Ogre;
 using namespace psynth;
 
-ElementMixer::ElementMixer(TableObject& obj,
+ElementMixer::ElementMixer(world_node& obj,
 			   Ogre::SceneManager* m_scene) :
     Element(obj, m_scene)
 {
@@ -68,7 +68,7 @@ ElementMixer::ElementMixer(TableObject& obj,
 					"Amplitude"));
 }
 
-ElementControlMixer::ElementControlMixer(TableObject& obj,
+ElementControlMixer::ElementControlMixer(world_node& obj,
 			   Ogre::SceneManager* m_scene) :
     Element(obj, m_scene)
 {
@@ -97,7 +97,7 @@ ElementControlMixer::ElementControlMixer(TableObject& obj,
 					"Amplitude"));
 }
 
-ElementOscillator::ElementOscillator(TableObject& obj,
+ElementOscillator::ElementOscillator(world_node& obj,
 				     Ogre::SceneManager* m_scene) :
     Element(obj, m_scene)
 {
@@ -144,7 +144,7 @@ ElementOscillator::ElementOscillator(TableObject& obj,
 					"Amplitude"));
 }
 
-ElementLFO::ElementLFO(TableObject& obj,
+ElementLFO::ElementLFO(world_node& obj,
 		       Ogre::SceneManager* m_scene) :
     Element(obj, m_scene)
 {
@@ -192,7 +192,7 @@ ElementLFO::ElementLFO(TableObject& obj,
 					"Amplitude"));
 }
 
-ElementFilter::ElementFilter(TableObject& obj,
+ElementFilter::ElementFilter(world_node& obj,
 		       Ogre::SceneManager* m_scene) :
     Element(obj, m_scene)
 {	    
@@ -235,7 +235,7 @@ ElementFilter::ElementFilter(TableObject& obj,
 }
 
 
-ElementSampler::ElementSampler(TableObject& obj,
+ElementSampler::ElementSampler(world_node& obj,
 		       Ogre::SceneManager* m_scene) :
     Element(obj, m_scene)
 {	    
@@ -270,7 +270,7 @@ ElementSampler::ElementSampler(TableObject& obj,
 					"Pitch"));
 }
 
-ElementStepSeq::ElementStepSeq(TableObject& obj,
+ElementStepSeq::ElementStepSeq(world_node& obj,
 			       Ogre::SceneManager* m_scene) :
     Element(obj, m_scene)
 {
@@ -316,7 +316,7 @@ ElementStepSeq::ElementStepSeq(TableObject& obj,
 					"Hold"));
 }
 
-ElementAudioNoise::ElementAudioNoise(TableObject& obj,
+ElementAudioNoise::ElementAudioNoise(world_node& obj,
 				     Ogre::SceneManager* m_scene) :
     Element(obj, m_scene)
 {
@@ -344,7 +344,7 @@ ElementAudioNoise::ElementAudioNoise(TableObject& obj,
 					"Amplitude"));
 }
 
-ElementControlNoise::ElementControlNoise(TableObject& obj,
+ElementControlNoise::ElementControlNoise(world_node& obj,
 				     Ogre::SceneManager* m_scene) :
     Element(obj, m_scene)
 {
@@ -372,7 +372,7 @@ ElementControlNoise::ElementControlNoise(TableObject& obj,
 					"Amplitude"));
 }
 
-ElementEcho::ElementEcho(TableObject& obj,
+ElementEcho::ElementEcho(world_node& obj,
 		       Ogre::SceneManager* m_scene) :
     Element(obj, m_scene)
 {	    
@@ -399,7 +399,7 @@ ElementEcho::ElementEcho(TableObject& obj,
 					"Feedback"));
 }
 
-ElementDelay::ElementDelay(TableObject& obj,
+ElementDelay::ElementDelay(world_node& obj,
 		       Ogre::SceneManager* m_scene) :
     Element(obj, m_scene)
 {	    

@@ -25,20 +25,20 @@
 
 #include <map>
 
-#include <libpsynth/table/Table.h>
+#include <libpsynth/world/world.h>
 #include <libpsynth/net/osc_misc.h>
 #include <libpsynth/net/osc_broadcast.h>
 
 namespace psynth
 {
 
-class osc_controller : public TableListener,
-		       public TableObjectListener,
+class osc_controller : public world_listener,
+		       public world_node_listener,
 		       public osc_broadcast
 {
     std::map<std::pair<int,int>, int> m_local_id;
     std::map<int, std::pair<int,int> > m_net_id;
-    Table* m_table;
+    world* m_world;
     int m_skip;
     int m_id;
     bool m_activated;
@@ -50,14 +50,14 @@ class osc_controller : public TableListener,
     LO_HANDLER (osc_controller, activate);
     LO_HANDLER (osc_controller, deactivate);
 
-    void add_to_table (Table* table) {
-	table->addTableListener(this);
-	table->addTableObjectListener(this);
+    void add_to_world (world* world) {
+	world->add_world_listener (this);
+	world->add_world_node_listener (this);
     }
 
-    void delete_from_table(Table* table) {
-	table->deleteTableListener(this);
-	table->deleteTableObjectListener(this);
+    void delete_from_world (world* world) {
+	world->delete_world_listener (this);
+	world->delete_world_node_listener (this);
     }
     
 public:
@@ -68,26 +68,26 @@ public:
 	m_id = id;
     }
 
-    void set_table (Table* table) {
-	deactivate();
-	m_table = table;
+    void set_world (world* world) {
+	deactivate ();
+	m_world = world;
     }
 
-    Table* get_table () {
-	return m_table;
+    world* get_world () {
+	return m_world;
     }
 
     void activate () {
-	if (!m_activated && m_table) {
+	if (!m_activated && m_world) {
 	    m_activated = true;
-	    add_to_table (m_table);
+	    add_to_world (m_world);
 	}
     }
 
     void deactivate () {
-	if (m_activated && m_table) {
+	if (m_activated && m_world) {
 	    m_activated = false;
-	    delete_from_table (m_table);
+	    delete_from_world (m_world);
 	}
     }
 
@@ -101,11 +101,11 @@ public:
 
     void add_methods (lo_server s);
     
-    void handleAddObject(TableObject& obj);
-    void handleDeleteObject(TableObject& obj);
-    void handleActivateObject(TableObject& obj);
-    void handleDeactivateObject(TableObject& obj);
-    void handleSetParamObject(TableObject& ob, int param_id);
+    void handle_add_node (world_node& obj);
+    void handle_delete_node (world_node& obj);
+    void handle_activate_node (world_node& obj);
+    void handle_deactivate_node (world_node& obj);
+    void handle_set_param_node (world_node& ob, int param_id);
 };
 
 } /* namespace psynth */

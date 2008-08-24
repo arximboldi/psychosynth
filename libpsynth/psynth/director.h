@@ -25,7 +25,7 @@
 
 #include <libpsynth/common/config.h>
 #include <libpsynth/common/misc.h>
-#include <libpsynth/table/Table.h>
+#include <libpsynth/world/world.h>
 #include <libpsynth/psynth/output_director.h>
 #include <libpsynth/psynth/file_manager_director.h>
 
@@ -40,7 +40,7 @@ class director : public no_copy
     std::string m_old_output;
     file_manager_director m_filemgr;
     output_director* m_output;
-    Table* m_table;
+    world* m_world;
 
     conf_node* m_config;
     audio_info m_info;
@@ -64,7 +64,7 @@ class director : public no_copy
 public:
     director()
 	: m_output(NULL)
-	, m_table(NULL) {}
+	, m_world(NULL) {}
 
     ~director();
     
@@ -72,8 +72,8 @@ public:
     void start (conf_node& conf, const std::string& home_path);
     void stop ();
     
-    Table* get_table () {
-	return m_table;
+    world* get_world () {
+	return m_world;
     }
 
     output* get_output() {

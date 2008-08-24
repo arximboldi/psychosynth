@@ -60,15 +60,15 @@ void ElemTogglerComponent::createToggles()
     float angle_width;
     float curr_angle;
     Toggle tog;
-    TableObject& obj = getParent()->getObject();
+    world_node& obj = getParent()->getObject();
 
-    obj.getParam(m_param_step, m_step);
-    obj.getParam(m_param_num, num_toggles);
+    obj.get_param(m_param_step, m_step);
+    obj.get_param(m_param_num, num_toggles);
     m_toggles.resize(num_toggles);
 
     angle_width = (360.0 / num_toggles) - TOGGLE_GAP; 
     for (int i = 0; i < num_toggles; ++i) {
-	obj.getParam(m_param_first + i, tog.second);
+	obj.get_param(m_param_first + i, tog.second);
 	
 	curr_angle = (360.0 / num_toggles) * i;
 	tog.first = new FlatRing(string("TOG") +
@@ -123,8 +123,8 @@ bool ElemTogglerComponent::handlePointerClick(Ogre::Vector2 pos, OIS::MouseButto
 	int index = new_angle / ((2.0 * Math::PI) / m_toggles.size());
 
 	m_toggles[index].second = !m_toggles[index].second;
-	getParent()->getObject().setParam(m_param_first + index,
-					  m_toggles[index].second);
+	getParent()->getObject().set_param(m_param_first + index,
+					   m_toggles[index].second);
     }
     return false;
 }
@@ -134,7 +134,7 @@ bool ElemTogglerComponent::handlePointerRelease(Ogre::Vector2 pos, OIS::MouseBut
     return false;
 }
 
-void ElemTogglerComponent::handleParamChange(TableObject& obj, int param_id)
+void ElemTogglerComponent::handleParamChange(world_node& obj, int param_id)
 {
     if (param_id == m_param_num) {
 	destroyToggles();
@@ -143,7 +143,7 @@ void ElemTogglerComponent::handleParamChange(TableObject& obj, int param_id)
 	       param_id <= m_param_first + m_toggles.size()) {
 	int index = param_id - m_param_first;
 	
-	obj.getParam(param_id, m_toggles[index].second);
+	obj.get_param(param_id, m_toggles[index].second);
 	if (m_step == index)
 	    updateCurrentStepColour(index);
 	else
@@ -155,7 +155,7 @@ void ElemTogglerComponent::update(int ms)
 {
     if (getParent()) {
 	int new_step;
-	getParent()->getObject().getParam(m_param_step, new_step);
+	getParent()->getObject().get_param(m_param_step, new_step);
 	if (new_step != m_step) {
 	    updateStepColour(m_step % m_toggles.size());
 	    m_step = new_step;

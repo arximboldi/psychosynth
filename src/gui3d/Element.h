@@ -26,7 +26,7 @@
 #include <OGRE/Ogre.h>
 #include <OIS/OIS.h>
 
-#include <libpsynth/table/Table.h>
+#include <libpsynth/world/world.h>
 
 #include "gui3d/FlatRing.h"
 #include "gui3d/ElementProperties.h"
@@ -42,7 +42,7 @@ class ElemComponent
 public:    
     virtual ~ElemComponent() {};
     virtual void init() = 0;
-    virtual void handleParamChange(psynth::TableObject& obj,
+    virtual void handleParamChange(psynth::world_node& obj,
 				   int id) = 0;
     virtual bool handlePointerMove(Ogre::Vector2 pos) = 0;
     virtual bool handlePointerClick(Ogre::Vector2 pos, OIS::MouseButtonID id) = 0;
@@ -67,18 +67,18 @@ public:
     };
 };
 
-class Element : public psynth::TableObjectListener
+class Element : public psynth::world_node_listener
 {
     typedef std::list<ElemComponent*>::iterator ElemComponentIter;
     std::list<ElemComponent*> m_comp;
 
     /*
-    std::list<Connection*> m_src_con;
-    std::list<Connection*> m_dest_con;
+      std::list<Connection*> m_src_con;
+      std::list<Connection*> m_dest_con;
     */
     
-    psynth::TableObject m_obj;
-    psynth::TableObject m_target;
+    psynth::world_node m_obj;
+    psynth::world_node m_target;
     
     Ogre::ColourValue   m_col_ghost;
     Ogre::ColourValue   m_col_selected;
@@ -101,21 +101,21 @@ class Element : public psynth::TableObjectListener
     
     ElementProperties m_gui_prop;
 
-    void objectMoved(psynth::TableObject& pos,
+    void objectMoved(psynth::world_node& pos,
 		     psynth::vector_2f& dest);
 
 public:
     static const Ogre::Real RADIOUS = 1.0f;
     static const Ogre::Real Z_POS = 0.001f;
     
-    Element(psynth::TableObject& obj, Ogre::SceneManager* scene);
+    Element(psynth::world_node& obj, Ogre::SceneManager* scene);
     
     virtual ~Element();
 
     void addComponent(ElemComponent* comp);
 
-    void setTarget(const psynth::TableObject& obj);
-    void clearTarget(const psynth::TableObject& obj);
+    void setTarget(const psynth::world_node& obj);
+    void clearTarget(const psynth::world_node& obj);
     void setGhost(bool ghost);
     void setSelected(bool selected);
     void setPosition(const Ogre::Vector2& pos);
@@ -134,10 +134,10 @@ public:
     bool keyPressed(const OIS::KeyEvent& e);
     bool keyReleased(const OIS::KeyEvent& e);
     
-    void handleActivateObject(psynth::TableObject& obj);
-    void handleDeactivateObject(psynth::TableObject& obj);
-    void handleSetParamObject(psynth::TableObject& ob,
-			      int param_id);
+    void handle_activate_node (psynth::world_node& obj);
+    void handle_deactivate_node (psynth::world_node& obj);
+    void handle_set_param_node (psynth::world_node& ob,
+				int param_id);
     
     bool isGhost() const {
 	return m_ghost;
@@ -163,7 +163,7 @@ public:
 	return m_scene;
     }
 
-    psynth::TableObject& getObject() {
+    psynth::world_node& getObject() {
 	return m_obj;
     }
 
@@ -171,21 +171,21 @@ public:
 	return m_gui_prop;
     }
     /*
-    void addSourceConnection(Connection* con) {
-	m_src_con.push_back(con);
-    };
+      void addSourceConnection(Connection* con) {
+      m_src_con.push_back(con);
+      };
 
-    void addDestinyConnection(Connection* con) {
-	m_dest_con.push_back(con);
-    };
+      void addDestinyConnection(Connection* con) {
+      m_dest_con.push_back(con);
+      };
 
-    void removeSourceConnection(Connection* con) {
-	m_src_con.remove(con);
-    }
+      void removeSourceConnection(Connection* con) {
+      m_src_con.remove(con);
+      }
 
-    void removeDestinyConnection(Connection* con) {
-	m_dest_con.remove(con);
-    }
+      void removeDestinyConnection(Connection* con) {
+      m_dest_con.remove(con);
+      }
     */
 };
 

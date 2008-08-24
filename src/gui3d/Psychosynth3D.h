@@ -80,9 +80,9 @@ class Psychosynth3D : public psynth::psynth_app,
     void setupNet();
 #endif
     void setupMenus();
-    void setupTable();
+    void setupWorld();
 
-    void closeTable();
+    void closeWorld();
     void closeMenus();
 #ifdef PSYNTH_HAVE_OSC
     void closeNet();

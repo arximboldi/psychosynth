@@ -26,7 +26,7 @@
 #include <map>
 
 #include "gui3d/ToggableWindow.h"
-#include <libpsynth/table/Table.h>
+#include <libpsynth/world/world.h>
 
 class ElementProperties;
 
@@ -46,7 +46,7 @@ public:
     virtual ~ElemGuiParam() {};
 
     virtual void createGUI() = 0;
-    virtual void handleParamChange(psynth::TableObject& obj,
+    virtual void handleParamChange(psynth::world_node& obj,
 				   int id) = 0;
 
     void init(ElementProperties* parent, CEGUI::Window* window) {
@@ -82,7 +82,7 @@ public:
 		      const std::string& name);
 
     void createGUI();
-    void handleParamChange(psynth::TableObject& obj,
+    void handleParamChange(psynth::world_node& obj,
 			   int param);
     bool onSpinnerChange(const CEGUI::EventArgs &e);
 };
@@ -101,7 +101,7 @@ public:
 		      const std::string& name);
 
     void createGUI();
-    void handleParamChange(psynth::TableObject& obj,
+    void handleParamChange(psynth::world_node& obj,
 			   int param);
     bool onSpinnerChange(const CEGUI::EventArgs &e);
 };
@@ -121,41 +121,40 @@ public:
 		      const std::string& name);
 
     void createGUI();
-    void handleParamChange(psynth::TableObject& obj,
+    void handleParamChange(psynth::world_node& obj,
 			   int param);
     bool onComboboxChange(const CEGUI::EventArgs &e);
 };
 
 class ElementProperties : public ToggableWindow,
-			  public psynth::TableObjectListener
+			  public psynth::world_node_listener
 {
-    std::map<int,
-	     ElemGuiParam*> m_params;
-    psynth::TableObject m_obj;
+    std::map<int, ElemGuiParam*> m_params;
+    psynth::world_node m_obj;
     
     CEGUI::Window* m_container;
     float m_y_offset;
     
-    CEGUI::FrameWindow* createWindow();
+    CEGUI::FrameWindow* createWindow ();
 
 public:
-    ElementProperties(const psynth::TableObject& obj) :
+    ElementProperties(const psynth::world_node& obj) :
 	m_obj(obj),
 	m_y_offset(0) {
-	m_obj.addListener(this);
+	m_obj.add_listener (this);
     };
 
     ~ElementProperties() {
-	m_obj.deleteListener(this);
+	m_obj.delete_listener (this);
     }
 
     void addParameter(ElemGuiParam* e);
-    void handleSetParamObject(psynth::TableObject& ob, int param_id);
+    void handle_set_param_node (psynth::world_node& ob, int param_id);
     
-    void handleActivateObject(psynth::TableObject& obj) {};
-    void handleDeactivateObject(psynth::TableObject& obj) {};
+    void handle_activate_node (psynth::world_node& obj) {};
+    void handle_deactivate_node (psynth::world_node& obj) {};
     
-    psynth::TableObject& getObject() {
+    psynth::world_node& getNode () {
 	return m_obj;
     }
 };

@@ -33,7 +33,7 @@ const float BUT_HEIGHT = 20;
 
 SelectorWindow::Category::Button::Button(const std::string& name, 
 					 ElementManager* mgr,
-					 const psynth::TableObjectCreator& objcre,
+					 const psynth::world_node_creator& objcre,
 					 int index) :
     m_mgr(mgr),
     m_index(index),
@@ -106,7 +106,7 @@ void SelectorWindow::Category::clearButtons()
 }
 
 void SelectorWindow::Category::addButton(const std::string& name,
-					 const psynth::TableObjectCreator& objcre)
+					 const psynth::world_node_creator& objcre)
 {
     Button* but = new Button(name, m_mgr, objcre, m_nbut++);
     m_buts.push_back(but);

@@ -54,7 +54,7 @@ public:
     bool handlePointerMove(Ogre::Vector2 pos);
     bool handlePointerClick(Ogre::Vector2 pos, OIS::MouseButtonID id);
     bool handlePointerRelease(Ogre::Vector2 pos, OIS::MouseButtonID id);
-    virtual void handleParamChange(psynth::TableObject& obj,
+    virtual void handleParamChange (psynth::world_node& obj,
 				   int id);
 };
 
@@ -68,7 +68,7 @@ public:
 			   int param_2,
 			   const char** names);
     
-    void handleParamChange(psynth::TableObject& obj,
+    void handleParamChange(psynth::world_node& obj,
 			   int id);
 };
 

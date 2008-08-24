@@ -28,77 +28,77 @@
 class ElementMixer : public Element
 {  
 public:
-    ElementMixer(psynth::TableObject& obj,
+    ElementMixer(psynth::world_node& obj,
 		 Ogre::SceneManager* m_scene);
 };
 
 class ElementControlMixer : public Element
 {  
 public:
-    ElementControlMixer(psynth::TableObject& obj,
+    ElementControlMixer(psynth::world_node& obj,
 			Ogre::SceneManager* m_scene);
 };
 
 class ElementOscillator : public Element
 {
 public:
-    ElementOscillator(psynth::TableObject& obj,
+    ElementOscillator(psynth::world_node& obj,
 		      Ogre::SceneManager* m_scene);
 };
 
 class ElementLFO : public Element
 {
 public:
-    ElementLFO(psynth::TableObject& obj,
+    ElementLFO(psynth::world_node& obj,
 	       Ogre::SceneManager* m_scene);
 };
 
 class ElementFilter : public Element
 {
 public:
-    ElementFilter(psynth::TableObject& obj,
+    ElementFilter(psynth::world_node& obj,
 		  Ogre::SceneManager* m_scene);
 };
 
 class ElementSampler : public Element
 {
 public:
-    ElementSampler(psynth::TableObject& obj,
+    ElementSampler(psynth::world_node& obj,
 		   Ogre::SceneManager* m_scene);
 };
 
 class ElementStepSeq : public Element
 {
 public:
-    ElementStepSeq(psynth::TableObject& obj,
+    ElementStepSeq(psynth::world_node& obj,
 		   Ogre::SceneManager* m_scene);
 };
 
 class ElementAudioNoise : public Element
 {
 public:
-    ElementAudioNoise(psynth::TableObject& obj,
+    ElementAudioNoise(psynth::world_node& obj,
 		      Ogre::SceneManager* m_scene);
 };
 
 class ElementControlNoise : public Element
 {
 public:
-    ElementControlNoise(psynth::TableObject& obj,
+    ElementControlNoise(psynth::world_node& obj,
 			Ogre::SceneManager* m_scene);
 };
 
 class ElementEcho : public Element
 {
 public:
-    ElementEcho(psynth::TableObject& obj,
+    ElementEcho(psynth::world_node& obj,
 		Ogre::SceneManager* m_scene);
 };
 
 class ElementDelay : public Element
 {
 public:
-    ElementDelay(psynth::TableObject& obj,
+    ElementDelay(psynth::world_node& obj,
 		 Ogre::SceneManager* m_scene);
 };
 

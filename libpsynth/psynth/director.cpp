@@ -24,7 +24,7 @@
 #include <algorithm>
 #include "psynth/director.h"
 #include "psynth/defaults.h"
-#include "table/PatcherDynamic.h"
+#include "world/patcher_dynamic.h"
 
 using namespace std;
 
@@ -46,7 +46,7 @@ void director::stop_output ()
 {
     if (m_output) {
 	m_output->get_output()->close();
-	m_table->detachOutput(m_output->get_output());
+	m_world->detach_output (m_output->get_output());
 	
 	m_output->stop();   
 	
@@ -64,9 +64,9 @@ void director::start_output ()
     odf_map::iterator i = m_outdir.find(out_name);
     if (i != m_outdir.end()) {
 	m_output = i->second->create_output_director();
-	m_output->start(m_config->get_child (i->second->get_name()));
+	m_output->start (m_config->get_child (i->second->get_name()));
 
-	m_table->attachOutput(m_output->get_output());
+	m_world->attach_output (m_output->get_output());
 
 	m_output->get_output()->set_info(m_info);
 	m_output->get_output()->open();
@@ -127,8 +127,8 @@ void director::start (conf_node& conf, const std::string& home_path)
     conf.get_child ("num_channels").get(m_info.num_channels);
     conf.get_child ("block_size").get(m_info.block_size);
 
-    m_table = new Table(m_info);
-    m_table->attachPatcher(new PatcherDynamic); /* FIXME: */
+    m_world = new world (m_info);
+    m_world->attach_patcher (new patcher_dynamic); /* FIXME: */
     
     start_output ();
 }
@@ -138,18 +138,18 @@ void director::stop()
     unregister_config();
     
     stop_output ();
-    delete m_table;
+    delete m_world;
 
     m_filemgr.stop();
     
-    m_table = NULL;
+    m_world = NULL;
     m_output = NULL;
     m_config = NULL;
 }
 
 void director::update_info ()
 {
-    m_table->setInfo(m_info);
+    m_world->set_info (m_info);
 
     output::state old_state;
     old_state = m_output->get_output()->get_state();
@@ -168,7 +168,7 @@ bool director::on_config_nudge(conf_node& node)
     node.get_child ("num_channels").get(m_info.num_channels);
     node.get_child ("output").get(out);
 
-    m_table->setInfo(m_info);
+    m_world->set_info (m_info);
 
     if (m_output && out == m_old_output) {    
 	output::state old_state;

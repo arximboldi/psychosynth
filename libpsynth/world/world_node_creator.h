@@ -20,101 +20,103 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef PSYNTH_TABLEOBJECTCREATOR_H
-#define PSYNTH_TABLEOBJECTCREATOR_H
+#ifndef PSYNTH_WORLD_NODE_CREATOR_H
+#define PSYNTH_WORLD_NODE_CREATOR_H
 
 #include <list>
 #include <string>
 #include <iostream>
-#include <libpsynth/table/Table.h>
+#include <libpsynth/world/world.h>
 
 namespace psynth
 {
 
-class ObjectFactoryManager;
-class AudioInfo;
-class Object;
+class node_factory_manager;
+class audio_info;
+class node;
 
-class TableObjectCreator
+class world_node_creator
 {
-    class ParamMakerBase
+    class param_maker_base
     {
     public:
-	virtual ~ParamMakerBase() {}
-	virtual void apply(TableObject& obj, const std::string& par) = 0;
-	virtual ParamMakerBase* clone() const = 0;
+	virtual ~param_maker_base () {}
+	virtual void apply (world_node& obj, const std::string& par) = 0;
+	virtual param_maker_base* clone () const = 0;
     };
 
     template <class T>
-    class ParamMaker : public ParamMakerBase
+    class param_maker : public param_maker_base
     {
 	T m_val;
+	
     public:
-	ParamMaker(const T& val) :
+	param_maker (const T& val) :
 	    m_val(val) {}
 	    
-	void apply(TableObject& obj, const std::string& par) {
-	    obj.setParam(par, m_val);
+	void apply (world_node & obj, const std::string& par) {
+	    obj.set_param (par, m_val);
 	}
 
-	void set(const T& val) {
+	void set (const T& val) {
 	    m_val = val;
 	}
 	
-	ParamMakerBase* clone() const {
-	    return new ParamMaker<T> (m_val);
+	param_maker_base* clone () const {
+	    return new param_maker <T> (m_val);
 	}
     };
 
-    typedef std::list<std::pair<std::string, ParamMakerBase*> > ParamMakerList;
+    typedef std::list<std::pair<std::string, param_maker_base*> > param_maker_list;
 
-    ParamMakerList m_param;
+    param_maker_list m_param;
     std::string m_name;
 
-    void destroy();
-    void copy(const TableObjectCreator& obj);
-    ParamMakerBase* find(const std::string& name);
+    void destroy ();
+    void copy (const world_node_creator& obj);
+    param_maker_base* find (const std::string& name);
     
 public:
-    TableObjectCreator() {}
+    world_node_creator () {}
 
-    TableObjectCreator(const TableObjectCreator& obj) {
-	copy(obj);
+    world_node_creator (const world_node_creator& obj) {
+	copy (obj);
     }
     
-    ~TableObjectCreator() {
-	destroy();
+    ~world_node_creator () {
+	destroy ();
     };
 
-    TableObjectCreator& operator= (const TableObjectCreator& obj) {
+    world_node_creator& operator= (const world_node_creator& obj) {
 	if (this != &obj) {
-	    destroy();
-	    copy(obj);
+	    destroy ();
+	    copy (obj);
 	}
 	return *this;
     }
     
-    TableObject create(Table& table);
+    world_node create (world& table);
 
-    void setName(const std::string& name) {
+    void set_name (const std::string& name) {
 	m_name = name;
     }
     
     template<class T>
-    void addParam(const std::string& name, const T& value) {
-	m_param.push_back(std::make_pair(std::string(name),
-					 (ParamMakerBase*) new ParamMaker<T>(value)));
+    void add_param (const std::string& name, const T& value) {
+	m_param.push_back (std::make_pair (std::string(name),
+					   (param_maker_base*)
+					   new param_maker<T>(value)));
     }
 
     template<class T>
-    void setParam(const std::string& name, const T& value) {
-	ParamMaker<T>* param = (ParamMaker<T>*) find(name);
+    void set_param (const std::string& name, const T& value) {
+	param_maker<T>* param = (param_maker<T>*) find(name);
 	if (param) param->set(value);
-	else addParam(name, value);
+	else add_param (name, value);
     };
 
-    void clear() {
-	destroy();
+    void clear () {
+	destroy ();
     }
 };
 

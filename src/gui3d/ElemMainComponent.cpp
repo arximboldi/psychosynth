@@ -61,7 +61,7 @@ void ElemMainComponent::setMesh(const std::string& mesh)
     }
 
     m_mesh_ent = getParent()->getScene()->createEntity(string("EE") +
-						       itoa(getParent()->getObject().getID(),10),
+						       itoa(getParent()->getObject().get_id (),10),
 						       mesh);
     m_ent_node->attachObject(m_mesh_ent);
     updateVisibility();
@@ -80,7 +80,7 @@ bool ElemMainComponent::handlePointerMove(Ogre::Vector2 pos)
 	if (value < m_min_val)
 	    value = m_min_val;
 
-	getParent()->getObject().setParam(m_param, value);
+	getParent()->getObject().set_param (m_param, value);
     }
 
     m_last_mouse_pos = pos;
@@ -108,7 +108,7 @@ bool ElemMainComponent::handlePointerRelease(Ogre::Vector2 pos, OIS::MouseButton
 
 void ElemMainComponent::init()
 {
-    getParent()->getObject().getParam(m_param, m_old_value);
+    getParent()->getObject().get_param (m_param, m_old_value);
 
     m_ent_node = getSceneNode()->createChildSceneNode();
 
@@ -132,11 +132,11 @@ void ElemMainComponent::init()
     getSceneNode()->attachObject(m_indicator_fill);
 }
 
-void ElemMainComponent::handleParamChange(TableObject& obj, int param_id)
+void ElemMainComponent::handleParamChange(world_node& obj, int param_id)
 {
     if (param_id == m_param) {
 	float new_val;
-	obj.getParam(m_param, new_val);
+	obj.get_param (m_param, new_val);
 
 	m_ent_node->yaw(Radian((new_val - m_old_value)/(m_max_val-m_min_val) * 2 * Math::PI));
 	m_indicator_fill->setEndAngle(Degree(INDICATOR_MIN_ANGLE +
@@ -157,11 +157,11 @@ ElemMultiMainComponent::ElemMultiMainComponent(int param_1,
 {
 }
 
-void ElemMultiMainComponent::handleParamChange(TableObject& obj, int param_id)
+void ElemMultiMainComponent::handleParamChange(world_node& obj, int param_id)
 {
     if (param_id == m_param) {
 	int val;
-	obj.getParam(param_id, val);
+	obj.get_param (param_id, val);
 
 	setMesh(m_names[val]);
     } else

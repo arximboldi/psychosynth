@@ -25,7 +25,7 @@
 
 #include <map>
 #include <list>
-#include <libpsynth/table/TableObjectCreator.h>
+#include <libpsynth/world/world_node_creator.h>
 
 #include "gui3d/ToggableWindow.h"
 #include "gui3d/ElementManager.h"
@@ -38,11 +38,11 @@ public:
 	    ElementManager* m_mgr;
 	    CEGUI::Window* m_window;
 	    int m_index;
-	    psynth::TableObjectCreator m_creator;
+	    psynth::world_node_creator m_creator;
 	    
 	public:
 	    Button(const std::string& name, ElementManager* m_mgr,
-		   const psynth::TableObjectCreator& objcre, int index);
+		   const psynth::world_node_creator& objcre, int index);
 			
 	    ~Button() {
 		//delete m_window;
@@ -81,7 +81,7 @@ public:
 	};
 
 	void clearButtons();
-	void addButton(const std::string& name, const psynth::TableObjectCreator& objcre);
+	void addButton(const std::string& name, const psynth::world_node_creator& objcre);
     };
 	
 private:	

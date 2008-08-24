@@ -125,7 +125,7 @@ int Psychosynth3D::execute()
     setupNet();
 #endif
     logger::instance() ("gui", psynth::log::INFO, "Initializing scene.");
-    setupTable();
+    setupWorld();
     logger::instance() ("gui", psynth::log::INFO, "Initializing CEGUI.");
     setupGui();
     logger::instance() ("gui", psynth::log::INFO, "Initializing GUI elements.");
@@ -142,7 +142,7 @@ int Psychosynth3D::execute()
     closeNet();
 #endif
     logger::instance() ("gui", psynth::log::INFO, "Closing scene.");
-    closeTable();
+    closeWorld();
     logger::instance() ("gui", psynth::log::INFO, "Closing synthesizer.");
     close_synth();
     logger::instance() ("gui", psynth::log::INFO, "Closing OIS.");
@@ -161,7 +161,7 @@ bool Psychosynth3D::frameStarted(const Ogre::FrameEvent& evt)
     m_timer.update ();
     m_inputmgr->capture ();
     m_taskmgr->update (m_timer.delta_ticks ());
-    get_table ()->update ();
+    get_world ()->update ();
     m_elemmgr->update ();
 
 #ifdef PSYNTH_HAVE_OSC
@@ -295,12 +295,12 @@ void Psychosynth3D::setupNet()
     m_oscclient = new osc_client();
     m_oscserver = new osc_server();
 
-    m_oscclient->set_table (get_table());
-    m_oscserver->set_table (get_table());
+    m_oscclient->set_world (get_world());
+    m_oscserver->set_world (get_world());
 }
 #endif
 
-void Psychosynth3D::setupTable()
+void Psychosynth3D::setupWorld()
 {
     m_scene->setAmbientLight(ColourValue(0, 0, 0));
     //m_scene->setShadowTechnique(SHADOWTYPE_STENCIL_ADDITIVE);
@@ -342,8 +342,8 @@ void Psychosynth3D::setupTable()
     light->setSpecularColour(1.0, 1.0, 0.3);
     light->setAttenuation(100, 1.5, 0, 0);
     
-    Entity *ent1 = m_scene->createEntity( "object1", "table.mesh" );
-    ent1->setQueryFlags(QFLAG_TABLE);
+    Entity *ent1 = m_scene->createEntity( "object1", "world.mesh" );
+    ent1->setQueryFlags(QFLAG_WORLD);
     SceneNode *node1 = m_scene->getRootSceneNode()->createChildSceneNode();
     //node1->setScale(Vector3(1.5, 1.5, 1.5));
     node1->attachObject(ent1);
@@ -357,7 +357,7 @@ void Psychosynth3D::setupTable()
     node->setPosition(Vector3(0,0.001,0));
 
     m_taskmgr = &TaskManager::instance();
-    m_elemmgr = new ElementManager (get_table(), m_scene, m_camera);
+    m_elemmgr = new ElementManager (get_world(), m_scene, m_camera);
     m_camctrl = new CameraControllerRasko(m_camera, m_taskmgr);
 
     m_inputmgr->addMouseListener(m_camctrl);
@@ -365,8 +365,8 @@ void Psychosynth3D::setupTable()
     m_inputmgr->addKeyListener(m_camctrl);
     m_inputmgr->addKeyListener(m_elemmgr);
 
-    get_table()->addTableListener(m_elemmgr);
-    get_table()->addTablePatcherListener(m_elemmgr);
+    get_world()->add_world_listener (m_elemmgr);
+    get_world()->add_world_patcher_listener (m_elemmgr);
 }
 
 void Psychosynth3D::setupMenus()
@@ -379,14 +379,14 @@ void Psychosynth3D::setupMenus()
     
     m_windowlist->addWindow("SelectorWindowButton.imageset",
 			    "SelectorWindowButton.layout",
-			    "Add objects to the table.",
+			    "Add objects to the world.",
 			    selector,
 			    OIS::KC_UNASSIGNED);
 #ifdef PSYNTH_HAVE_PCM
     m_windowlist->addWindow("RecordWindowButton.imageset",
 			    "RecordWindowButton.layout",
 			    "Record the playing sound.",
-			    new RecordWindow (get_table ()),
+			    new RecordWindow (get_world ()),
 			    OIS::KC_UNASSIGNED);
 #endif
 #ifdef PSYNTH_HAVE_OSC
@@ -417,7 +417,7 @@ void Psychosynth3D::setupMenus()
     m_inputmgr->addKeyListener(m_windowlist);
 }
 
-void Psychosynth3D::closeTable()
+void Psychosynth3D::closeWorld()
 {
     delete m_camctrl;
     delete m_elemmgr;

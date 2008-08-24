@@ -36,9 +36,9 @@ using namespace std;
 using namespace Ogre;
 using namespace psynth;
 
-ElementManager::ElementManager(Table* table, Ogre::SceneManager* scene,
+ElementManager::ElementManager(world* world, Ogre::SceneManager* scene,
 			       Ogre::Camera* camera) :
-    m_table(table),
+    m_world(world),
     m_elems(),
     m_elemcount(0),
     m_must_own(0),
@@ -61,9 +61,9 @@ ElementManager::~ElementManager()
     delete m_rayquery;
 }
 
-Element* ElementManager::createElement(TableObject& obj)
+Element* ElementManager::createElement(world_node& obj)
 {
-    switch (obj.getType()) {
+    switch (obj.get_type ()) {
     case NODE_OSCILLATOR:
 	return new ElementOscillator(obj, m_scene);
     case NODE_LFO:
@@ -91,61 +91,61 @@ Element* ElementManager::createElement(TableObject& obj)
     }
 }
 
-void ElementManager::addElement(psynth::TableObjectCreator& creator)
+void ElementManager::addElement(psynth::world_node_creator& creator)
 {
     m_must_own++;
-    if (!m_adding.isNull())
-	m_adding.deleteMe();
-    m_adding = creator.create(*m_table);
+    if (!m_adding.is_null ())
+	m_adding.delete_me ();
+    m_adding = creator.create(*m_world);
     m_must_own--;
 }
 
 /*
 void ElementManager::addElement(int e_type)
 {
-    TableObject obj;
+    world_node obj;
 
     m_must_own++;
     
     switch(e_type) {
     case ELEM_OSC_SINE:
-	obj = m_table->addObject(NODE_OSCILLATOR);
+	obj = m_world->addObject(NODE_OSCILLATOR);
 	obj.setParam(ObjectOscillator::PARAM_WAVE,
 		     ObjectOscillator::OSC_SINE);
 	break;
 	
     case ELEM_OSC_SQUARE:
-	obj = m_table->addObject(NODE_OSCILLATOR);
+	obj = m_world->addObject(NODE_OSCILLATOR);
 	obj.setParam(ObjectOscillator::PARAM_WAVE,
 		     ObjectOscillator::OSC_SQUARE);
 	break;
 	
     case ELEM_OSC_TRIANGLE:
-	obj = m_table->addObject(NODE_OSCILLATOR);
+	obj = m_world->addObject(NODE_OSCILLATOR);
 	obj.setParam(ObjectOscillator::PARAM_WAVE,
 		     ObjectOscillator::OSC_TRIANGLE);
 	break;
 	
     case ELEM_OSC_SAWTOOTH:
-	obj = m_table->addObject(NODE_OSCILLATOR);
+	obj = m_world->addObject(NODE_OSCILLATOR);
 	obj.setParam(ObjectOscillator::PARAM_WAVE,
 		     ObjectOscillator::OSC_SAWTOOTH);
 	break;
 
     case ELEM_OSC_MOOGSAW:
-	obj = m_table->addObject(NODE_OSCILLATOR);
+	obj = m_world->addObject(NODE_OSCILLATOR);
 	obj.setParam(ObjectOscillator::PARAM_WAVE,
 		     ObjectOscillator::OSC_MOOGSAW);
 	break;
 
     case ELEM_OSC_EXP:
-	obj = m_table->addObject(NODE_OSCILLATOR);
+	obj = m_world->addObject(NODE_OSCILLATOR);
 	obj.setParam(ObjectOscillator::PARAM_WAVE,
 		     ObjectOscillator::OSC_EXP);
 	break;
 	
     case ELEM_LFO_SINE:
-	obj = m_table->addObject(NODE_LFO);
+	obj = m_world->addObject(NODE_LFO);
 	obj.setParam(ObjectOscillator::PARAM_WAVE,
 		     ObjectOscillator::OSC_SINE);
 	obj.setParam(ObjectOscillator::PARAM_FREQUENCY,
@@ -153,7 +153,7 @@ void ElementManager::addElement(int e_type)
 	break;
 	
     case ELEM_LFO_SQUARE:
-	obj = m_table->addObject(NODE_LFO);
+	obj = m_world->addObject(NODE_LFO);
 	obj.setParam(ObjectOscillator::PARAM_WAVE,
 		     ObjectOscillator::OSC_SQUARE);
 	obj.setParam(ObjectOscillator::PARAM_FREQUENCY,
@@ -161,7 +161,7 @@ void ElementManager::addElement(int e_type)
 	break;
 	
     case ELEM_LFO_TRIANGLE:
-	obj = m_table->addObject(NODE_LFO);
+	obj = m_world->addObject(NODE_LFO);
 	obj.setParam(ObjectOscillator::PARAM_WAVE,
 		     ObjectOscillator::OSC_TRIANGLE);
 	obj.setParam(ObjectOscillator::PARAM_FREQUENCY,
@@ -169,7 +169,7 @@ void ElementManager::addElement(int e_type)
 	break;
 	
     case ELEM_LFO_SAWTOOTH:
-	obj = m_table->addObject(NODE_LFO);
+	obj = m_world->addObject(NODE_LFO);
 	obj.setParam(ObjectOscillator::PARAM_WAVE,
 		     ObjectOscillator::OSC_SAWTOOTH);
 	obj.setParam(ObjectOscillator::PARAM_FREQUENCY,
@@ -177,7 +177,7 @@ void ElementManager::addElement(int e_type)
 	break;
 
     case ELEM_LFO_MOOGSAW:
-	obj = m_table->addObject(NODE_LFO);
+	obj = m_world->addObject(NODE_LFO);
 	obj.setParam(ObjectOscillator::PARAM_WAVE,
 		     ObjectOscillator::OSC_MOOGSAW);
 	obj.setParam(ObjectOscillator::PARAM_FREQUENCY,
@@ -185,7 +185,7 @@ void ElementManager::addElement(int e_type)
 	break;
 	
     case ELEM_LFO_EXP:
-	obj = m_table->addObject(NODE_LFO);
+	obj = m_world->addObject(NODE_LFO);
 	obj.setParam(ObjectOscillator::PARAM_WAVE,
 		     ObjectOscillator::OSC_EXP);
 	obj.setParam(ObjectOscillator::PARAM_FREQUENCY,
@@ -193,61 +193,61 @@ void ElementManager::addElement(int e_type)
 	break;
 	
     case ELEM_FILTER_LOWPASS:
-	obj = m_table->addObject(NODE_FILTER);
+	obj = m_world->addObject(NODE_FILTER);
 	obj.setParam(ObjectFilter::PARAM_TYPE,
 		     ObjectFilter::FILTER_LOWPASS);
 	break;
 
     case ELEM_FILTER_HIGHPASS:
-	obj = m_table->addObject(NODE_FILTER);
+	obj = m_world->addObject(NODE_FILTER);
 	obj.setParam(ObjectFilter::PARAM_TYPE,
 		     ObjectFilter::FILTER_HIGHPASS);
 	break;
 
     case ELEM_FILTER_BANDPASS_CSG:
-	obj = m_table->addObject(NODE_FILTER);
+	obj = m_world->addObject(NODE_FILTER);
 	obj.setParam(ObjectFilter::PARAM_TYPE,
 		     ObjectFilter::FILTER_BANDPASS_CSG);
 	break;
 
     case ELEM_FILTER_BANDPASS_CZPG:
-	obj = m_table->addObject(NODE_FILTER);
+	obj = m_world->addObject(NODE_FILTER);
 	obj.setParam(ObjectFilter::PARAM_TYPE,
 		     ObjectFilter::FILTER_BANDPASS_CZPG);
 	break;
 
     case ELEM_FILTER_NOTCH:
-	obj = m_table->addObject(NODE_FILTER);
+	obj = m_world->addObject(NODE_FILTER);
 	obj.setParam(ObjectFilter::PARAM_TYPE,
 		     ObjectFilter::FILTER_NOTCH);
 	break;
 
     case ELEM_FILTER_MOOG:
-	obj = m_table->addObject(NODE_FILTER);
+	obj = m_world->addObject(NODE_FILTER);
 	obj.setParam(ObjectFilter::PARAM_TYPE,
 		     ObjectFilter::FILTER_MOOG);
 	break;
 	
     case ELEM_MIXER:
-	obj = m_table->addObject(NODE_MIXER);
+	obj = m_world->addObject(NODE_MIXER);
 	obj.setParam(ObjectMixer::PARAM_MIXOP,
 		     ObjectMixer::MIX_SUM);
 	break;
 
     case ELEM_RINGMOD:
-	obj = m_table->addObject(NODE_MIXER);
+	obj = m_world->addObject(NODE_MIXER);
 	obj.setParam(ObjectMixer::PARAM_MIXOP,
 		     ObjectMixer::MIX_PRODUCT);
 	break;
 
     case ELEM_CTRLMIXER:
-	obj = m_table->addObject(NODE_CONTROLMIXER);
+	obj = m_world->addObject(NODE_CONTROLMIXER);
 	obj.setParam(ObjectMixer::PARAM_MIXOP,
 		     ObjectMixer::MIX_SUM);
 	break;
 
     case ELEM_CTRLRINGMOD:
-	obj = m_table->addObject(NODE_CONTROLMIXER);
+	obj = m_world->addObject(NODE_CONTROLMIXER);
 	obj.setParam(ObjectMixer::PARAM_MIXOP,
 		     ObjectMixer::MIX_PRODUCT);
 	break;
@@ -260,7 +260,7 @@ void ElementManager::addElement(int e_type)
 }
 */
 
-bool ElementManager::getTablePointer(Vector2& res)
+bool ElementManager::getWorldPointer(Vector2& res)
 {
     CEGUI::Point mousepos = CEGUI::MouseCursor::getSingleton().getPosition();	
     Ray ray =  Ray(m_camera->getCameraToViewportRay(
@@ -286,7 +286,7 @@ bool ElementManager::mouseMoved(const OIS::MouseEvent& e)
     Vector2 pos;
     bool ret = false;
     
-    if (getTablePointer(pos)) {
+    if (getWorldPointer(pos)) {
 	for (ElemMapIter it = m_elems.begin(); it != m_elems.end();)
 	    if ((*it++).second->pointerMoved(pos))
 		ret = true;
@@ -300,10 +300,10 @@ bool ElementManager::mousePressed(const OIS::MouseEvent &e, OIS::MouseButtonID i
     Vector2 pos;
     bool ret = false;
 
-    if (!m_adding.isNull())
-	m_adding = TableObject();
+    if (!m_adding.is_null())
+	m_adding = world_node();
     
-    if (getTablePointer(pos)) {
+    if (getWorldPointer(pos)) {
 	for (ElemMapIter it = m_elems.begin(); it != m_elems.end(); ++it)
 	    if ((*it).second->pointerClicked(pos, id))
 		ret = true;
@@ -324,7 +324,7 @@ bool ElementManager::mouseReleased(const OIS::MouseEvent &e, OIS::MouseButtonID 
     Vector2 pos;
     bool ret = false;
     
-    if (getTablePointer(pos)) {
+    if (getWorldPointer(pos)) {
 	for (ElemMapIter it = m_elems.begin(); it != m_elems.end();)
 	    if((*it++).second->pointerReleased(pos, id))
 		ret = true;
@@ -389,7 +389,7 @@ bool ElementManager::keyReleased(const OIS::KeyEvent &e)
     return ret;
 }
 
-void ElementManager::handleAddObject(TableObject& obj)
+void ElementManager::handle_add_node (world_node& obj)
 {
     Element* elem = createElement(obj);
 
@@ -400,14 +400,14 @@ void ElementManager::handleAddObject(TableObject& obj)
 	if (m_must_own)
 	    elem->setOwned(true);
 	
-	m_elems.insert(pair<int,Element*>(obj.getID(), elem));
-	obj.addListener(elem);
+	m_elems.insert(pair<int,Element*>(obj.get_id(), elem));
+	obj.add_listener(elem);
     }
     else
 	WARNING("Could not create element.");
 }
 
-void ElementManager::handleDeleteObject(TableObject& obj)
+void ElementManager::handle_delete_node (world_node& obj)
 {
     for (ElemMapIter it = m_elems.begin(); it != m_elems.end(); )
 	if ((*it).second->getObject() == obj) {
@@ -428,16 +428,16 @@ void ElementManager::update()
     m_clear_elems.clear();
 }
 
-void ElementManager::handleLinkAdded(const TablePatcherEvent& ev)
+void ElementManager::handle_link_added (const world_patcher_event& ev)
 {
     m_cons.push_back(new Connection(m_scene, ev));
 
-    ElemMapIter it = m_elems.find(ev.src.getID());
+    ElemMapIter it = m_elems.find(ev.src.get_id());
     if (it != m_elems.end())
 	it->second->setTarget(ev.dest);
 }
 
-void ElementManager::handleLinkDeleted(const TablePatcherEvent& ev)
+void ElementManager::handle_link_deleted (const world_patcher_event& ev)
 {
     /* TODO */
     for (list<Connection*>::iterator it = m_cons.begin(); it != m_cons.end();)
@@ -447,7 +447,7 @@ void ElementManager::handleLinkDeleted(const TablePatcherEvent& ev)
 	} else
 	    ++it;
 
-    ElemMapIter it = m_elems.find(ev.src.getID());
+    ElemMapIter it = m_elems.find(ev.src.get_id());
     if (it != m_elems.end())
 	it->second->clearTarget(ev.dest);
 }

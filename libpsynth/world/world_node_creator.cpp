@@ -21,40 +21,40 @@
  ***************************************************************************/
 
 #include <algorithm>
-#include "table/TableObjectCreator.h"
-#include "table/Table.h"
+#include "world/world_node_creator.h"
+#include "world/world.h"
 
 using namespace std;
 
 namespace psynth
 {
 
-void TableObjectCreator::destroy()
+void world_node_creator::destroy()
 {
-    for (ParamMakerList::iterator it = m_param.begin();
+    for (param_maker_list::iterator it = m_param.begin();
 	 it != m_param.end();
 	 ++it)
 	delete it->second;
     m_param.clear();
 }
 
-void TableObjectCreator::copy(const TableObjectCreator& obj)
+void world_node_creator::copy(const world_node_creator& obj)
 {
     m_name = obj.m_name;
-    for (ParamMakerList::const_iterator it = obj.m_param.begin();
+    for (param_maker_list::const_iterator it = obj.m_param.begin();
 	 it != obj.m_param.end();
 	 ++it)
 	m_param.push_back(make_pair(it->first, it->second->clone()));
 }
 
-TableObject TableObjectCreator::create(Table& table)
+world_node world_node_creator::create (world& table)
 {
-    TableObject obj;
+    world_node obj;
 
-    obj = table.addObject(m_name);
+    obj = table.add_node (m_name);
 
-    if (!obj.isNull()) {
-	for (ParamMakerList::iterator it = m_param.begin();
+    if (!obj.is_null ()) {
+	for (param_maker_list::iterator it = m_param.begin();
 	     it != m_param.end();
 	     ++it)
 	    it->second->apply(obj, it->first);
@@ -63,9 +63,9 @@ TableObject TableObjectCreator::create(Table& table)
     return obj;
 }
 
-TableObjectCreator::ParamMakerBase* TableObjectCreator::find(const std::string& name)
+world_node_creator::param_maker_base* world_node_creator::find (const std::string& name)
 {
-    for (ParamMakerList::iterator it = m_param.begin();
+    for (param_maker_list::iterator it = m_param.begin();
 	 it != m_param.end();
 	 ++it)
 	if (it->first == name)

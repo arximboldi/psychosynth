@@ -58,15 +58,15 @@ protected:
     void print_base_options (std::ostream& out);
     
 public:
-    Table* get_table () {
-	return m_director.get_table ();
+    world* get_world () {
+	return m_director.get_world ();
     };
     
     output* get_output () {
 	return m_director.get_output ();
     };
     
-    int run(int argc, const char* argv[]);
+    int run (int argc, const char* argv[]);
 
     void setup_synth ();
     void close_synth ();

@@ -26,14 +26,14 @@
 #include <map>
 #include <set>
 
-#include <libpsynth/table/Patcher.h>
+#include <libpsynth/world/patcher.h>
 
 namespace psynth
 {
 
-class PatcherDynamic : public Patcher
+class patcher_dynamic : public patcher
 {    
-    struct Link {
+    struct link {
 	node* src;
 	node* dest;
 	float dist;
@@ -43,24 +43,24 @@ class PatcherDynamic : public Patcher
 	int in_sock;
 	int actual_in_sock;
 	
-	Link(node* s, node* d, float ds, float dc, int t, int os, int is) :
+	link (node* s, node* d, float ds, float dc, int t, int os, int is) :
 	    src(s), dest(d), dist(ds), dist_to_center(dc),
 	    sock_type(t), out_sock(os), in_sock(is), actual_in_sock(-1)
 	    {}
 	
-	bool operator< (const Link& l) const {
+	bool operator< (const link& l) const {
 	    return dist == l.dist ? dist_to_center < l.dist_to_center : dist < l.dist;
 	}
     };
 
-    struct Node {
+    struct pnode {
 	node* obj;
 	node* dest;
 	bool out_used; /* We output to one object only */
 	int actual_sock_type;
 	int actual_in_sock; 
 
-	Node(node* o = NULL) :
+	pnode (node* o = NULL) :
 	    obj(o),
 	    dest(NULL),
 	    out_used(false),
@@ -68,32 +68,32 @@ class PatcherDynamic : public Patcher
 	    actual_in_sock(-1) {}
     };
 
-    class LinkPtrCmp {
+    class link_ptr_cmp {
     public:
-	bool operator() (const Link* a, const Link* b) {
+	bool operator () (const link* a, const link* b) {
 	  return *a < *b;
 	}
     };
 
     bool m_changed;
     
-    std::map<int, Node> m_nodes;
-    std::multiset<Link*, LinkPtrCmp> m_links;
+    std::map<int, pnode> m_nodes;
+    std::multiset<link*, link_ptr_cmp> m_links;
 
-    inline void undoLink(Link& l);
-    inline void makeLink(Link& l);
-    inline void findInSock(Link& l);
-    inline bool isLinked(Link& l);
+    inline void undo_link (link& l);
+    inline void make_link (link& l);
+    inline void find_in_sock (link& l);
+    inline bool is_linked (link& l);
     
 public:
-    PatcherDynamic();
-    ~PatcherDynamic();
+    patcher_dynamic ();
+    ~patcher_dynamic ();
     
-    bool addNode(node* obj);
-    bool deleteNode(node* obj);
-    void setParamNode(node* obj, int id);
-    void update();
-    void clear();
+    bool add_node (node* obj);
+    bool delete_node (node* obj);
+    void set_param_node (node* obj, int id);
+    void update ();
+    void clear ();
 };
 
 } /* namespace psynth */

@@ -30,7 +30,7 @@ namespace psynth
 {
 
 osc_controller::osc_controller(bool broadcast) :
-    m_table(NULL),
+    m_world(NULL),
     m_skip(0),
     m_id(0),
     m_activated(false),
@@ -42,10 +42,10 @@ osc_controller::~osc_controller()
 {
 }
     
-void osc_controller::handleAddObject(TableObject& obj)
+void osc_controller::handle_add_node(world_node& obj)
 {
     if (!m_skip) {
-	int local_id(obj.getID());
+	int local_id(obj.get_id ());
 	pair<int,int> net_id(m_id, local_id);
 
 	m_local_id[net_id] = local_id;
@@ -55,7 +55,7 @@ void osc_controller::handleAddObject(TableObject& obj)
 	
 	lo_message_add_int32(msg, net_id.first);
 	lo_message_add_int32(msg, net_id.second);
-	lo_message_add_string(msg, obj.getName().c_str());
+	lo_message_add_string(msg, obj.get_name().c_str());
 
 	broadcast_message(PSYNTH_OSC_MSG_ADD, msg);
 
@@ -63,10 +63,10 @@ void osc_controller::handleAddObject(TableObject& obj)
     }
 }
 
-void osc_controller::handleDeleteObject(TableObject& obj)
+void osc_controller::handle_delete_node(world_node& obj)
 {
     if (!m_skip) {
-	int local_id(obj.getID());
+	int local_id(obj.get_id ());
 	pair<int,int> net_id = m_net_id[local_id];
 
 	lo_message msg = lo_message_new();
@@ -83,10 +83,10 @@ void osc_controller::handleDeleteObject(TableObject& obj)
     }
 }
 
-void osc_controller::handleActivateObject(TableObject& obj)
+void osc_controller::handle_activate_node(world_node& obj)
 {
     if (!m_skip) {
-	int local_id(obj.getID());
+	int local_id(obj.get_id ());
 	pair<int,int> net_id = m_net_id[local_id];
 
 	lo_message msg = lo_message_new();
@@ -100,10 +100,10 @@ void osc_controller::handleActivateObject(TableObject& obj)
     }
 }
 
-void osc_controller::handleDeactivateObject(TableObject& obj)
+void osc_controller::handle_deactivate_node(world_node& obj)
 {
     if (!m_skip) {
-	int local_id(obj.getID());
+	int local_id(obj.get_id ());
 	pair<int,int> net_id = m_net_id[local_id];
 
 	lo_message msg = lo_message_new();
@@ -117,10 +117,10 @@ void osc_controller::handleDeactivateObject(TableObject& obj)
     }
 }
 
-void osc_controller::handleSetParamObject(TableObject& obj, int param_id)
+void osc_controller::handle_set_param_node(world_node& obj, int param_id)
 {
     if (!m_skip) {
-	int local_id(obj.getID());
+	int local_id(obj.get_id ());
 	pair<int,int> net_id = m_net_id[local_id];
 
 	lo_message msg = lo_message_new();
@@ -129,28 +129,28 @@ void osc_controller::handleSetParamObject(TableObject& obj, int param_id)
 	lo_message_add_int32(msg, net_id.second);
 	lo_message_add_int32(msg, param_id);
 
-	switch(obj.getParamType(param_id)) {
+	switch(obj.get_param_type(param_id)) {
 	case node_param::INT: {
 	    int val;
-	    obj.getParam(param_id, val);
+	    obj.get_param(param_id, val);
 	    lo_message_add_int32(msg, val);
 	    break;
 	}    
 	case node_param::FLOAT: {
 	    float val;
-	    obj.getParam(param_id, val);
+	    obj.get_param(param_id, val);
 	    lo_message_add_float(msg, val);
 	    break;
 	}  
 	case node_param::STRING: {
 	    string val;
-	    obj.getParam(param_id, val);
+	    obj.get_param(param_id, val);
 	    lo_message_add_string(msg, val.c_str());
 	    break;
 	}
 	case node_param::VECTOR2F: {
 	    vector_2f val;
-	    obj.getParam(param_id, val);
+	    obj.get_param(param_id, val);
 	    lo_message_add_float(msg, val.x);
 	    lo_message_add_float(msg, val.y);
 	    break;
@@ -181,11 +181,11 @@ int osc_controller::_add_cb(const char* path, const char* types,
 	pair<int,int> net_id(argv[0]->i, argv[1]->i);
 
 	m_skip++;
-	TableObject obj = m_table->addObject(std::string(&argv[2]->s));
+	world_node obj = m_world->add_node(std::string(&argv[2]->s));
 	m_skip--;
 	
-	if (!obj.isNull()) {
-	    int local_id = obj.getID();
+	if (!obj.is_null()) {
+	    int local_id = obj.get_id ();
 	    m_net_id[local_id] = net_id;
 	    m_local_id[net_id] = local_id;
 
@@ -210,13 +210,13 @@ int osc_controller::_delete_cb(const char* path, const char* types,
 	pair<int,int> net_id(argv[0]->i, argv[1]->i);
 
 	map<pair<int,int>, int>::iterator it = m_local_id.find(net_id);
-	TableObject obj;
+	world_node obj;
     
 	if (it != m_local_id.end() &&
-	    !(obj = m_table->findObject(it->second)).isNull()) {
+	    !(obj = m_world->find_node(it->second)).is_null()) {
 
 	    m_skip++;
-	    m_table->deleteObject(obj);
+	    m_world->delete_node(obj);
 	    m_skip--;
 	    
 	    m_local_id.erase(net_id);
@@ -242,26 +242,26 @@ int osc_controller::_param_cb(const char* path, const char* types,
 	pair<int,int> net_id(argv[0]->i, argv[1]->i);
 
 	map<pair<int,int>, int>::iterator it = m_local_id.find(net_id);
-	TableObject obj;
+	world_node obj;
     
 	if (it != m_local_id.end() &&
-	    !(obj = m_table->findObject(it->second)).isNull()) {
+	    !(obj = m_world->find_node(it->second)).is_null()) {
 
 	    int param_id = argv[2]->i;
 	    
 	    m_skip++;
-	    switch(obj.getParamType(param_id)) {
+	    switch(obj.get_param_type(param_id)) {
 	    case node_param::FLOAT:
-		m_table->setParamObject(obj, param_id, argv[3]->f);
+		m_world->set_param_node(obj, param_id, argv[3]->f);
 		break;
 	    case node_param::INT:
-		m_table->setParamObject(obj, param_id, argv[3]->i);
+		m_world->set_param_node(obj, param_id, argv[3]->i);
 		break;
 	    case node_param::STRING:
-		m_table->setParamObject(obj, param_id, string(&argv[3]->s));
+		m_world->set_param_node(obj, param_id, string(&argv[3]->s));
 		break;
 	    case node_param::VECTOR2F:
-		m_table->setParamObject(obj, param_id,
+		m_world->set_param_node(obj, param_id,
 					vector_2f(argv[3]->f, argv[4]->f));
 		break;
 	    default:
@@ -275,7 +275,7 @@ int osc_controller::_param_cb(const char* path, const char* types,
 		lo_message_add_int32(newmsg, argv[1]->i);
 		lo_message_add_int32(newmsg, argv[2]->i);
 		
-		switch(obj.getParamType(param_id)) {
+		switch(obj.get_param_type(param_id)) {
 		case node_param::FLOAT:
 		    lo_message_add_float(newmsg, argv[3]->f);
 		    break;
@@ -309,13 +309,13 @@ int osc_controller::_activate_cb(const char* path, const char* types,
 	pair<int,int> net_id(argv[0]->i, argv[1]->i);
 
 	map<pair<int,int>, int>::iterator it = m_local_id.find(net_id);
-	TableObject obj;
+	world_node obj;
     
 	if (it != m_local_id.end() &&
-	    !(obj = m_table->findObject(it->second)).isNull()) {
+	    !(obj = m_world->find_node(it->second)).is_null()) {
 
 	    m_skip++;
-	    m_table->activateObject(obj);
+	    m_world->activate_node(obj);
 	    m_skip--;
 
 	    if (m_broadcast) {
@@ -338,13 +338,13 @@ int osc_controller::_deactivate_cb(const char* path, const char* types,
 	pair<int,int> net_id(argv[0]->i, argv[1]->i);
 
 	map<pair<int,int>, int>::iterator it = m_local_id.find(net_id);
-	TableObject obj;
+	world_node obj;
     
 	if (it != m_local_id.end() &&
-	    !(obj = m_table->findObject(it->second)).isNull()) {
+	    !(obj = m_world->find_node(it->second)).is_null()) {
 	
 	    m_skip++;
-	    m_table->deactivateObject(obj);
+	    m_world->deactivate_node(obj);
 	    m_skip--;
 
 	    if (m_broadcast) {

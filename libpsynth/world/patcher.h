@@ -31,60 +31,60 @@
 namespace psynth
 {
 
-struct PatcherEvent {
+struct patcher_event {
     node* src;
     node* dest;
     int src_socket;
     int dest_socket;
     int socket_type;
 
-    PatcherEvent(node* s, node* d, int ss, int ds, int st):
+    patcher_event (node* s, node* d, int ss, int ds, int st):
 	src(s), dest(d), src_socket(ss), dest_socket(ds), socket_type(st) {};
 };
 
-class PatcherListener {
+class patcher_listener {
 public:
-    virtual ~PatcherListener() {};
-    virtual void handleLinkAdded(const PatcherEvent& ev) = 0;
-    virtual void handleLinkDeleted(const PatcherEvent& ev) = 0;
+    virtual ~patcher_listener () {};
+    virtual void handle_link_added (const patcher_event& ev) = 0;
+    virtual void handle_link_deleted (const patcher_event& ev) = 0;
 };
 
-class PatcherSubject {
-    std::list<PatcherListener*> m_list;
+class patcher_subject {
+    std::list<patcher_listener*> m_list;
 
 protected:
-    void notifyLinkAdded(const PatcherEvent& ev) {
-	for (std::list<PatcherListener*>::iterator it = m_list.begin();
+    void notify_link_added (const patcher_event& ev) {
+	for (std::list<patcher_listener*>::iterator it = m_list.begin ();
 	     it != m_list.end(); )
-	    (*it++)->handleLinkAdded(ev);
+	    (*it++)->handle_link_added (ev);
     };
     
-    void notifyLinkDeleted(const PatcherEvent& ev) {
-	for (std::list<PatcherListener*>::iterator it = m_list.begin();
+    void notify_link_deleted (const patcher_event& ev) {
+	for (std::list<patcher_listener*>::iterator it = m_list.begin();
 	     it != m_list.end(); )
-	    (*it++)->handleLinkDeleted(ev);
+	    (*it++)->handle_link_deleted (ev);
     };
     
 public:
-    void addListener(PatcherListener* l) {
-	m_list.push_back(l);
+    void add_listener (patcher_listener* l) {
+	m_list.push_back (l);
     };
     
-    void deleteListener(PatcherListener* l) {
-	m_list.remove(l);
+    void delete_listener (patcher_listener* l) {
+	m_list.remove (l);
     };
 };
 
-class Patcher : public PatcherSubject
+class patcher : public patcher_subject
 {
 public:
-    virtual ~Patcher() {};
+    virtual ~patcher () {};
     
-    virtual bool addNode(node* obj) = 0;
-    virtual bool deleteNode(node* obj) = 0;
-    virtual void setParamNode(node* obj, int param) = 0;
-    virtual void update() = 0;
-    virtual void clear() = 0;
+    virtual bool add_node (node* obj) = 0;
+    virtual bool delete_node (node* obj) = 0;
+    virtual void set_param_node (node* obj, int param) = 0;
+    virtual void update () = 0;
+    virtual void clear () = 0;
 };
 
 } /* namespace psynth */

@@ -21,7 +21,7 @@
  ***************************************************************************/
 
 #include <algorithm>
-#include "table/PatcherDynamic.h"
+#include "world/patcher_dynamic.h"
 
 #include "node/node.h"
 #include "node/node_output.h"
@@ -44,7 +44,7 @@ namespace psynth
 
 const int PATCHER_ANY  = -1;
 
-struct PatcherData {
+struct patcher_data {
     int socket_type;
     int src_socket;
     int dest_socket;
@@ -56,7 +56,7 @@ struct PatcherData {
  * output should be connected with which inpunt on each object.
  * The first dimension is the source object type and the second is the destiny object type.
  */
-const PatcherData PATCHER_TABLE[N_NODES][N_NODES] =
+const patcher_data PATCHER_TABLE[N_NODES][N_NODES] =
 {
     /* node_output */
     {
@@ -252,21 +252,21 @@ const PatcherData PATCHER_TABLE[N_NODES][N_NODES] =
     }
 };
 
-PatcherDynamic::PatcherDynamic() :
-    m_changed(false)
+patcher_dynamic::patcher_dynamic ()
+    : m_changed(false)
 {
 }
 
-PatcherDynamic::~PatcherDynamic()
+patcher_dynamic::~patcher_dynamic ()
 {
-    for (multiset<Link*, LinkPtrCmp>::iterator i = m_links.begin(); i != m_links.end(); ++i)
+    for (multiset<link*, link_ptr_cmp>::iterator i = m_links.begin(); i != m_links.end(); ++i)
 	delete *i;
 }
 
-bool PatcherDynamic::addNode(node* obj)
+bool patcher_dynamic::add_node (node* obj)
 {
-    if (m_nodes.insert(pair<int, Node>(obj->get_id(), Node(obj))).second) {
-	map<int, Node>::iterator i;
+    if (m_nodes.insert(pair<int, pnode>(obj->get_id(), pnode(obj))).second) {
+	map<int, pnode>::iterator i;
 	int this_type = obj->get_type ();
 	int other_type;
 	
@@ -277,7 +277,7 @@ bool PatcherDynamic::addNode(node* obj)
 	    other_type = i->second.obj->get_type (); 
 
 	    if (PATCHER_TABLE[this_type][other_type].socket_type != node::LINK_NONE) {
-		m_links.insert(new Link(obj, (*i).second.obj,
+		m_links.insert(new link(obj, (*i).second.obj,
 					obj->sqr_distance_to(*i->second.obj),
 					i->second.obj->sqr_distance_to_center (),
 					PATCHER_TABLE[this_type][other_type].socket_type,
@@ -286,7 +286,7 @@ bool PatcherDynamic::addNode(node* obj)
 	    }
 
 	    if (PATCHER_TABLE[other_type][this_type].socket_type != node::LINK_NONE) {
-		m_links.insert(new Link(i->second.obj, obj,
+		m_links.insert(new link(i->second.obj, obj,
 					i->second.obj->sqr_distance_to(*obj),
 					obj->sqr_distance_to_center(),
 					PATCHER_TABLE[other_type][this_type].socket_type,
@@ -302,15 +302,15 @@ bool PatcherDynamic::addNode(node* obj)
     return false;
 }
 
-bool PatcherDynamic::deleteNode(node* obj)
+bool patcher_dynamic::delete_node (node* obj)
 {
-    if (m_nodes.erase(obj->get_id())) {
-	multiset<Link*>::iterator i, r;
+    if (m_nodes.erase (obj->get_id())) {
+	multiset<link*>::iterator i, r;
 	
 	for (i = m_links.begin(); i != m_links.end();) {
 	    if ((*i)->src == obj || (*i)->dest == obj) {
 		r = i++;
-		undoLink(**r);
+		undo_link (**r);
 		delete *r;
 		m_links.erase(r);
 	    } else
@@ -324,11 +324,11 @@ bool PatcherDynamic::deleteNode(node* obj)
     return false;
 }
 
-void PatcherDynamic::setParamNode(node* obj, int id)
+void patcher_dynamic::set_param_node(node* obj, int id)
 {
     if (id == node::PARAM_POSITION) {
-	multiset<Link*>::iterator i, r;
-	list<Link*> readd;
+	multiset<link*>::iterator i, r;
+	list<link*> readd;
     
 	for (i = m_links.begin(); i != m_links.end();) {
 	    if ((*i)->src == obj || (*i)->dest == obj) {
@@ -346,47 +346,53 @@ void PatcherDynamic::setParamNode(node* obj, int id)
 		++i;
 	}
 
-	for (list<Link*>::iterator it = readd.begin(); it != readd.end(); ++it)
+	for (list<link*>::iterator it = readd.begin(); it != readd.end(); ++it)
 	    m_links.insert(*it);
     }
 }
 
-void PatcherDynamic::makeLink(Link& l)
+void patcher_dynamic::make_link (link& l)
 {
     //cout << "making link, source: " << l.src->getID() << " dest: "<< l.dest->getID() << endl;
 
-    node* old_src = l.dest->get_in_socket(l.sock_type, l.actual_in_sock).get_source_node();
+    node* old_src = l.dest->get_in_socket (l.sock_type, l.actual_in_sock).get_source_node();
     if (old_src != NULL) {
-	notifyLinkDeleted(PatcherEvent(old_src, l.dest, l.out_sock, l.actual_in_sock, l.sock_type));
+	notify_link_deleted (patcher_event (old_src, l.dest,
+					    l.out_sock, l.actual_in_sock,
+					    l.sock_type));
 	//cout << "undoing link, source: " << old_src->getID() << " dest: "<< l.dest->getID() << endl;
     }
     
     l.dest->connect_in(l.sock_type, l.actual_in_sock, l.src, l.out_sock);
-    notifyLinkAdded(PatcherEvent(l.src, l.dest, l.out_sock, l.actual_in_sock, l.sock_type));
+    notify_link_added (patcher_event (l.src, l.dest,
+				      l.out_sock, l.actual_in_sock,
+				      l.sock_type));
 }
 
-void PatcherDynamic::undoLink(Link& l)
+void patcher_dynamic::undo_link (link& l)
 {
     if (l.actual_in_sock >= 0) {
-	if (l.dest->get_in_socket(l.sock_type, l.actual_in_sock).get_source_node() == l.src) {
+	if (l.dest->get_in_socket (l.sock_type, l.actual_in_sock).get_source_node() == l.src) {
 	    //cout << "undoing link, source: " << l.src->getID() << " dest: "<< l.dest->getID() << endl;
-	    l.dest->connect_in(l.sock_type, l.actual_in_sock, NULL, l.out_sock);
+	    l.dest->connect_in (l.sock_type, l.actual_in_sock, NULL, l.out_sock);
 
-	    notifyLinkDeleted(PatcherEvent(l.src, l.dest, l.out_sock, l.actual_in_sock, l.sock_type));
+	    notify_link_deleted (patcher_event (l.src, l.dest,
+						l.out_sock, l.actual_in_sock,
+						l.sock_type));
 	}
     }
 }
 
-bool PatcherDynamic::isLinked(Link& l)
+bool patcher_dynamic::is_linked (link& l)
 {
     if (l.actual_in_sock >= 0) {
-	if (l.dest->get_in_socket(l.sock_type, l.actual_in_sock).get_source_node() == l.src)
+	if (l.dest->get_in_socket (l.sock_type, l.actual_in_sock).get_source_node() == l.src)
 	    return true;
     }
     return false;
 }
 
-void PatcherDynamic::findInSock(Link &l)
+void patcher_dynamic::find_in_sock(link &l)
 {
     float max_dist = l.dist;
     
@@ -413,34 +419,34 @@ void PatcherDynamic::findInSock(Link &l)
     }
 }
 
-void PatcherDynamic::update()
+void patcher_dynamic::update ()
 {
     if (!m_changed)
 	return;
     
-    for (map<int, Node>::iterator i = m_nodes.begin(); i != m_nodes.end(); ++i)
+    for (map<int, pnode>::iterator i = m_nodes.begin(); i != m_nodes.end(); ++i)
 	(*i).second.out_used = false;
 
-    for (multiset<Link*>::iterator i = m_links.begin(); i != m_links.end(); ++i) {
-	map<int, Node>::iterator n = m_nodes.find((*i)->src->get_id());
-	map<int, Node>::iterator n2 = m_nodes.find((*i)->dest->get_id());
+    for (multiset<link*>::iterator i = m_links.begin(); i != m_links.end(); ++i) {
+	map<int, pnode>::iterator n = m_nodes.find((*i)->src->get_id());
+	map<int, pnode>::iterator n2 = m_nodes.find((*i)->dest->get_id());
 	if (n == m_nodes.end()) {
 	    WARNING("Object with id " << (*i)->src->get_id () << "not found.");
 	}
 	
-	Node& node_src = (*n).second;
-	Node& node_dest = (*n2).second;
-	Link& link = **i;
+	pnode& node_src = (*n).second;
+	pnode& node_dest = (*n2).second;
+	link& link = **i;
 
 	//cout << "trying, src: " << link.src->getID() << " dest: " << link.dest->getID() << " out: " << node_src.out_used << endl; 
 
 	if (!node_src.out_used &&
 	    !(node_dest.out_used == true && node_dest.dest == link.src))
 	{
-	    if (!isLinked(link)) {
-		findInSock(link);
+	    if (!is_linked (link)) {
+		find_in_sock (link);
 		if (link.actual_in_sock >= 0) {
-		    makeLink(link);
+		    make_link (link);
 		    node_src.out_used = true;
 		    node_src.dest = link.dest;
 		}
@@ -448,7 +454,7 @@ void PatcherDynamic::update()
 		node_src.out_used = true;
 	    }
 	} else {
-	    undoLink(link);
+	    undo_link (link);
 	    link.actual_in_sock = -1;
 	}
     }
@@ -458,10 +464,10 @@ void PatcherDynamic::update()
     m_changed = false;
 }
 
-void PatcherDynamic::clear()
+void patcher_dynamic::clear ()
 {
-    for (multiset<Link*>::iterator i = m_links.begin(); i != m_links.end(); ++i)
-	undoLink(**i);
+    for (multiset<link*>::iterator i = m_links.begin(); i != m_links.end(); ++i)
+	undo_link (**i);
 }
 
 } /* namespace psynth */

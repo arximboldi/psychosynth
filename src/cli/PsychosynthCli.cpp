@@ -107,7 +107,7 @@ int PsychosynthCli::runClient()
     
     add = lo_address_new (m_host.c_str(), m_server_port.c_str());
 
-    client.set_table (get_table());
+    client.set_world (get_world());
     client.activate ();
     
     client.add_listener (&logger);
@@ -120,7 +120,7 @@ int PsychosynthCli::runClient()
 	while (client.receive (TIME_OUT));
 	client.update (timer.delta_ticks());
 
-	get_table ()->update ();
+	get_world ()->update ();
 	
 	if (client.get_state () == osc_client::IDLE)
 	    ret_val = -1;
@@ -139,7 +139,7 @@ int PsychosynthCli::runServer()
     server.add_listener (&logger);
     server.listen (m_server_port.c_str());
 
-    server.set_table (get_table ());
+    server.set_world (get_world ());
     server.activate();
     
     timer.update();
@@ -149,7 +149,7 @@ int PsychosynthCli::runServer()
 	while (server.receive (TIME_OUT));
 	server.update (timer.delta_ticks ());
 
-	get_table ()->update ();
+	get_world ()->update ();
 	
 	if (server.get_state () == osc_server::IDLE)
 	    ret_val = -1;

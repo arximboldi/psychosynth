@@ -26,7 +26,7 @@
 #include <OGRE/Ogre.h>
 #include <OIS/OIS.h>
 
-#include <libpsynth/table/Table.h>
+#include <libpsynth/world/world.h>
 
 #include "gui3d/OgreMisc.h"
 
@@ -78,7 +78,7 @@ public:
     ~ConnectionWave();
 };
 
-class Connection : public psynth::TableObjectListener
+class Connection : public psynth::world_node_listener
 {
     Ogre::SceneManager* m_scene;
     Ogre::SceneNode* m_node;
@@ -87,7 +87,7 @@ class Connection : public psynth::TableObjectListener
     ConnectionLine* m_line;
     ConnectionWave* m_wave;
     
-    psynth::TablePatcherEvent m_link;
+    psynth::world_patcher_event m_link;
 
     Ogre::Vector2 m_src;
     Ogre::Vector2 m_dest;
@@ -96,7 +96,7 @@ class Connection : public psynth::TableObjectListener
     
 public:
 
-    Connection(Ogre::SceneManager* scene, const psynth::TablePatcherEvent& ev);
+    Connection (Ogre::SceneManager* scene, const psynth::world_patcher_event& ev);
 
     ~Connection();
 
@@ -107,18 +107,18 @@ public:
     bool pointerMoved(const Ogre::Vector2& pos);
 */
     
-    void handleActivateObject(psynth::TableObject& obj) {};
-    void handleDeactivateObject(psynth::TableObject& obj) {};
-    void handleSetParamObject(psynth::TableObject& ob,
+    void handle_activate_node (psynth::world_node& obj) {};
+    void handle_deactivate_node (psynth::world_node& obj) {};
+    void handle_set_param_node (psynth::world_node& ob,
 			      int param_id);
 
     void update();
     
-    const psynth::TableObject& getSource() {
+    const psynth::world_node& getSource() {
 	return m_link.src;
     }
 
-    const psynth::TableObject& getDestiny() {
+    const psynth::world_node& getDestiny() {
 	return m_link.dest;
     }
 };

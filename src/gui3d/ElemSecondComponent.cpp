@@ -56,7 +56,7 @@ ElemSecondComponent::~ElemSecondComponent()
 
 void ElemSecondComponent::init()
 {
-    getParent()->getObject().getParam(m_param, m_old_value);
+    getParent()->getObject().get_param (m_param, m_old_value);
     m_angle = Degree(180-((m_old_value - m_min_val) / (m_max_val - m_min_val) *
 			  SECOND_RANGE_ANGLE + SECOND_POINT_MIN_ANGLE));
 
@@ -102,7 +102,7 @@ bool ElemSecondComponent::handlePointerMove(Ogre::Vector2 pos)
 	if (new_val > m_max_val)
 	    new_val = m_max_val;
 
-	getParent()->getObject().setParam(m_param, new_val);
+	getParent()->getObject().set_param (m_param, new_val);
     }
     return false;
 }
@@ -132,11 +132,11 @@ bool ElemSecondComponent::handlePointerRelease(Ogre::Vector2 pos, OIS::MouseButt
     return false;
 }
 
-void ElemSecondComponent::handleParamChange(TableObject& obj, int param_id)
+void ElemSecondComponent::handleParamChange(world_node& obj, int param_id)
 {
     if (param_id == m_param) {
 	Degree new_angle;
-	obj.getParam(m_param, m_old_value);
+	obj.get_param (m_param, m_old_value);
 
 	new_angle = -Degree((m_old_value - m_min_val) / (m_max_val - m_min_val) *
 			   SECOND_RANGE_ANGLE + SECOND_POINT_MIN_ANGLE + 180.0f);

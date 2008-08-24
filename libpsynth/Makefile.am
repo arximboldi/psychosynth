@@ -70,10 +70,10 @@ nobase_libpsynthinc_HEADERS = \
 	common/file_finder.h\
 	common/file_manager.h\
 	common/tree.h\
-	table/Table.h \
-	table/Patcher.h\
-	table/PatcherDynamic.h \
-	table/TableObjectCreator.h\
+	world/world.h \
+	world/patcher.h\
+	world/patcher_dynamic.h \
+	world/world_node_creator.h\
 	node/node.h \
 	node/node_manager.h \
 	node/node_output.h \
@@ -126,10 +126,10 @@ libpsynth_la_SOURCES = \
 	common/timer.cpp \
 	common/file_finder.cpp\
 	common/file_manager.cpp\
-	table/Table.cpp \
-	table/Patcher.cpp \
-	table/PatcherDynamic.cpp \
-	table/TableObjectCreator.cpp\
+	world/world.cpp \
+	world/patcher.cpp \
+	world/patcher_dynamic.cpp \
+	world/world_node_creator.cpp\
 	node/node.cpp \
 	node/node_mixer.cpp \
 	node/node_audio_mixer.cpp \

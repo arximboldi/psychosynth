@@ -76,13 +76,13 @@ bool RecordWindow::onClick(const CEGUI::EventArgs &e)
 	std::string fname = m_file->getText().c_str();
 	m_output.set_file_name (fname);
 	if (m_output.open()) {
-	    m_table->attachPassiveOutput(&m_output);
+	    m_table->attach_passive_output (&m_output);
 	    m_button->setText("Stop");
 	    m_file->disable();
 	    m_recording = true;
 	}
     } else {
-	m_table->detachPassiveOutput(&m_output);
+	m_table->detach_passive_output (&m_output);
 	m_output.close();
 	m_button->setText("Start");
 	m_file->enable();

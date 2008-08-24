@@ -37,7 +37,7 @@ using namespace std;
 using namespace Ogre;
 using namespace psynth;
 
-Element::Element(TableObject& obj, Ogre::SceneManager* scene) :
+Element::Element (world_node& obj, Ogre::SceneManager* scene) :
     m_obj(obj),
     m_col_ghost(ELEMENT_GHOST_COLOUR),
     m_col_selected(ELEMENT_SELECTED_COLOUR),
@@ -54,7 +54,7 @@ Element::Element(TableObject& obj, Ogre::SceneManager* scene) :
     m_modifier_2(0),
     m_gui_prop(obj)
 {
-    m_base = new FlatRing(string("EB") + itoa(m_obj.getID(),10),
+    m_base = new FlatRing (string("EB") + itoa(m_obj.get_id (),10),
 			  Degree(0), Degree(360),
 			  0, 1,
 			  m_col_ghost);
@@ -66,7 +66,7 @@ Element::Element(TableObject& obj, Ogre::SceneManager* scene) :
     m_node->attachObject(m_base);
 
     vector_2f v;
-    obj.getParam(psynth::node::PARAM_POSITION, v);
+    obj.get_param (psynth::node::PARAM_POSITION, v);
     m_pos.x = v.x;
     m_pos.y = v.y;
     m_node->setPosition(Vector3(m_pos.x, Z_POS, m_pos.y));
@@ -97,20 +97,20 @@ void Element::addComponent(ElemComponent* comp)
     node->setVisible(!m_ghost);
 }
 
-void Element::setTarget(const TableObject& obj)
+void Element::setTarget(const world_node& obj)
 {
-    if (!m_target.isNull()) {
-	m_target.deleteListener(this);
+    if (!m_target.is_null()) {
+	m_target.delete_listener (this);
 	m_aimpoint = Vector3(0, Z_POS, 0);
     }
     
     m_target = obj;
 
-    if (!m_target.isNull()) {
-	m_target.addListener(this);
+    if (!m_target.is_null()) {
+	m_target.add_listener (this);
 
 	vector_2f v;
-	m_target.getParam(psynth::node::PARAM_POSITION, v);
+	m_target.get_param (psynth::node::PARAM_POSITION, v);
 	m_aimpoint.x = v.x;
 	m_aimpoint.y = v.y;
 	
@@ -120,11 +120,11 @@ void Element::setTarget(const TableObject& obj)
     m_node->lookAt(m_aimpoint, Node::TS_PARENT);
 }
 
-void Element::clearTarget(const TableObject& obj)
+void Element::clearTarget(const world_node& obj)
 {
     if (m_target == obj) {
-	m_target.deleteListener(this);
-	m_target = TableObject();
+	m_target.delete_listener (this);
+	m_target = world_node ();
 	m_aimpoint = Vector3(0, Z_POS, 0);
     }
 }
@@ -134,7 +134,7 @@ void Element::setPosition(const Ogre::Vector2& pos)
     vector_2f dest;
     dest.x = pos.x;
     dest.y = pos.y;
-    m_obj.setParam(psynth::node::PARAM_POSITION, dest);
+    m_obj.set_param (psynth::node::PARAM_POSITION, dest);
 }
 
 void Element::setGhost(bool ghost)
@@ -224,7 +224,7 @@ bool Element::keyPressed(const OIS::KeyEvent& e)
     switch(e.key) {
     case OIS::KC_DELETE:
 	if (m_selected)
-	    m_obj.deleteMe();
+	    m_obj.delete_me ();
 	break;
 
     case OIS::KC_E:
@@ -273,7 +273,7 @@ bool Element::keyReleased(const OIS::KeyEvent& e)
     return false;
 }
 
-void Element::objectMoved(TableObject& obj, vector_2f& dest)
+void Element::objectMoved(world_node& obj, vector_2f& dest)
 {
     if (obj == m_obj) {
 	m_pos.x = dest.x;
@@ -297,24 +297,24 @@ void Element::objectMoved(TableObject& obj, vector_2f& dest)
     */
 }
 
-void Element::handleActivateObject(TableObject& obj)
+void Element::handle_activate_node (world_node& obj)
 {
     if (obj == m_obj)
 	setGhost(false);
 }
 
-void Element::handleDeactivateObject(TableObject& obj)
+void Element::handle_deactivate_node (world_node& obj)
 {
     if (obj == m_obj)
 	setGhost(true);
 }
 
-void Element::handleSetParamObject(TableObject& obj, int param_id)
+void Element::handle_set_param_node (world_node& obj, int param_id)
 {
     if (obj == m_obj) {
 	if (param_id == node::PARAM_POSITION) {
 	    vector_2f dest;
-	    obj.getParam(param_id, dest);
+	    obj.get_param (param_id, dest);
 	    objectMoved(obj, dest);
 	}
     
@@ -323,7 +323,7 @@ void Element::handleSetParamObject(TableObject& obj, int param_id)
     } else if (obj == m_target) {
 	if (param_id == node::PARAM_POSITION) {
 	    vector_2f dest;
-	    obj.getParam(param_id, dest);
+	    obj.get_param (param_id, dest);
 	    objectMoved(obj, dest);
 	}
     }

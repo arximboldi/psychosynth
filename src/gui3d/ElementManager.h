@@ -26,8 +26,8 @@
 #include <map>
 #include <OIS/OIS.h>
 
-#include <libpsynth/table/Table.h>
-#include <libpsynth/table/TableObjectCreator.h>
+#include <libpsynth/world/world.h>
+#include <libpsynth/world/world_node_creator.h>
 
 #include "gui3d/Element.h"
 #include "gui3d/QueryFlags.h"
@@ -37,16 +37,16 @@ const int N_MB = OIS::MB_Button7+1;
 
 class ElementManager : public OIS::MouseListener,
 		       public OIS::KeyListener,
-		       public psynth::TableListener,
-		       public psynth::TablePatcherListener
+		       public psynth::world_listener,
+		       public psynth::world_patcher_listener
 {
     typedef std::list<Element*> ElemList;
     typedef std::map<int, Element*> ElemMap; /* TODO: turn back into a list? */
     typedef ElemList::iterator ElemIter;
     typedef ElemMap::iterator ElemMapIter;
     
-    psynth::Table* m_table;
-    psynth::TableObject m_adding;
+    psynth::world* m_world;
+    psynth::world_node m_adding;
     ElemList m_clear_elems;
     ElemMap m_elems;
     std::list<Connection*> m_cons;
@@ -61,13 +61,13 @@ class ElementManager : public OIS::MouseListener,
     Ogre::RaySceneQuery* m_rayquery;
 
     
-    bool getTablePointer(Ogre::Vector2& res);
-    Element* createElement(psynth::TableObject& obj);
+    bool getWorldPointer(Ogre::Vector2& res);
+    Element* createElement(psynth::world_node& obj);
     
 public:
-    ElementManager(psynth::Table* table,
-		   Ogre::SceneManager* scene,
-		   Ogre::Camera* camera);
+    ElementManager (psynth::world* world,
+		    Ogre::SceneManager* scene,
+		    Ogre::Camera* camera);
     
     ~ElementManager();
     
@@ -77,7 +77,7 @@ public:
     void addElement(int e_type);
     */
 
-    void addElement(psynth::TableObjectCreator& obj);
+    void addElement(psynth::world_node_creator& obj);
     
     bool mouseMoved(const OIS::MouseEvent& e);
     bool mousePressed(const OIS::MouseEvent &e, OIS::MouseButtonID id);
@@ -86,11 +86,11 @@ public:
     bool keyPressed(const OIS::KeyEvent &e);
     bool keyReleased(const OIS::KeyEvent &e);
 
-    void handleAddObject(psynth::TableObject& obj);
-    void handleDeleteObject(psynth::TableObject& obj);
+    void handle_add_node (psynth::world_node& obj);
+    void handle_delete_node (psynth::world_node& obj);
 
-    void handleLinkAdded(const psynth::TablePatcherEvent& ev);
-    void handleLinkDeleted(const psynth::TablePatcherEvent& ev);
+    void handle_link_added (const psynth::world_patcher_event& ev);
+    void handle_link_deleted (const psynth::world_patcher_event& ev);
 };
 
 #endif /* ELEMENTMANAGER_H */

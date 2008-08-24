@@ -24,9 +24,9 @@
 #define QUERYMASKS_H
 
 enum QueryMasks {
-	QFLAG_ELEMENT = 1<<0,
-	QFLAG_GHOST = 1<<1,
-	QFLAG_TABLE = 1<<2
+	QFLAG_ELEMENT = 1 << 0,
+	QFLAG_GHOST =   1 << 1,
+	QFLAG_WORLD =   1 << 2
 };
 
 #endif /* QUERYMASKS_H */
