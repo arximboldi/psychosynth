@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) 2007 by Juan Pedro Bolivar Puente                       *
+ *   Copyright (C) 2007 Juan Pedro Bolivar Puente                          *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -20,10 +20,45 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "gui3d/psychosynth_3d.h"
+#include "gui3d/toggable_window.h"
 
-int main (int argc, const char *argv[])
+using namespace CEGUI;
+
+toggable_window::toggable_window ()
+    : m_window(NULL)
+    , m_active(false)
 {
-    psychosynth_3d main_app;
-    return main_app.run (argc, argv);
 }
+
+toggable_window::~toggable_window ()
+{
+    if (m_active) {
+	Window* root_win = System::getSingleton().getGUISheet();
+	root_win->removeChildWindow(m_window);
+    }
+    delete m_window;
+}
+
+void toggable_window::build_window ()
+{
+    m_window = create_window ();
+    m_window->subscribeEvent(
+	FrameWindow::EventCloseClicked, 
+	Event::Subscriber(&toggable_window::on_close, this));
+}
+
+void toggable_window::set_active (bool active)
+{
+    if (m_window == NULL)
+	build_window ();
+		
+    if (active != m_active) {
+	m_active = active;
+	Window* root_win = System::getSingleton().getGUISheet();
+	if (m_active)  root_win->addChildWindow(m_window);
+	if (!m_active) root_win->removeChildWindow(m_window);
+    }
+}
+
+
+

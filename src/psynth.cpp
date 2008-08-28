@@ -22,10 +22,10 @@
 
 #include <cstring>
 #include <algorithm>
-#include "cli/PsychosynthCli.h"
+#include "cli/psychosynth_cli.h"
 
 int main(int argc, const char *argv[])
 {
-    PsychosynthCli main_app;
-    return main_app.run(argc, argv);
+    psychosynth_cli main_app;
+    return main_app.run (argc, argv);
 }

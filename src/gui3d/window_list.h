@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) 2007 by Juan Pedro Bolivar Puente                       *
+ *   Copyright (C) 2007 Juan Pedro Bolivar Puente                          *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -20,10 +20,62 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "gui3d/psychosynth_3d.h"
+#ifndef WINDOWLIST_H
+#define WINDOWLIST_H
 
-int main (int argc, const char *argv[])
+#include <list>
+#include <iostream>
+#include <CEGUI/CEGUI.h>
+#include <OIS/OIS.h>
+
+#include "gui3d/toggable_window.h"
+
+const int WL_BUTTON_SIZE = 32;
+const int WL_GAP = 4;
+
+class window_list : public OIS::KeyListener
 {
-    psychosynth_3d main_app;
-    return main_app.run (argc, argv);
-}
+    class button
+    {
+	friend class window_list;
+		
+	toggable_window *m_toggable;
+	CEGUI::Window *m_window;
+	CEGUI::Window *m_tooltip;
+	OIS::KeyCode m_key;
+    public:
+	button (const std::string& imageset,
+		const std::string &layout,
+		const std::string& tooltip,
+		toggable_window* window,
+		OIS::KeyCode key, int i);
+		
+	~button () {
+	    delete m_toggable;
+	}
+		
+	bool on_click (const CEGUI::EventArgs &e);
+	bool on_leave (const CEGUI::EventArgs &e);
+	bool on_enter (const CEGUI::EventArgs &e);
+    };
+	
+    std::list<button*> m_lwind;
+    int m_nwind;
+
+public:
+    window_list ()
+	: m_nwind(0) {}
+	
+    ~window_list ();
+	
+    void add_window (std::string but_imageset, std::string but_layout,
+		     std::string tooltip,
+		     toggable_window* window, OIS::KeyCode key);
+	
+    bool keyPressed (const OIS::KeyEvent &arg);
+    bool keyReleased (const OIS::KeyEvent &arg) {
+	return false;
+    };	
+};
+
+#endif /* WINDOWLIST_H */

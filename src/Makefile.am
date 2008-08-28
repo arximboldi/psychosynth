@@ -48,9 +48,9 @@ psynth_LDADD = \
 	../libpsynth/libpsynth.la
 
 psynth_SOURCES = \
-	cli/PsychosynthCli.cpp\
+	cli/psychosynth_cli.cpp\
 	psynth.cpp\
-	cli/PsychosynthCli.h
+	cli/psychosynth_cli.h
 
 #  psynth3d compilation
 # ======================================================================
@@ -70,55 +70,55 @@ psynth3d_LDADD = \
 	../libpsynth/libpsynth.la
 
 psynth3d_SOURCES = \
-	gui3d/CameraControllerRasko.cpp \
-	gui3d/Psychosynth3D.cpp \
-	gui3d/InputManager.cpp \
-	gui3d/SelectorWindow.cpp \
-	gui3d/DefaultSelectorPopulator.cpp\
-	gui3d/QuitWindow.cpp \
-	gui3d/InfoWindow.cpp \
-	gui3d/ToggableWindow.cpp \
-	gui3d/ConfWindow.cpp \
-	gui3d/TaskManager.cpp \
-	gui3d/Element.cpp \
-	gui3d/ElemMainComponent.cpp \
-	gui3d/ElemSecondComponent.cpp \
-	gui3d/ElemTogglerComponent.cpp \
-	gui3d/ElementManager.cpp \
-	gui3d/ElementProperties.cpp \
-	gui3d/TheElements.cpp \
-	gui3d/WindowList.cpp \
-	gui3d/FlatRing.cpp \
-	gui3d/Connection.cpp \
-	gui3d/OgreMisc.cpp \
-	gui3d/GuiLogSink.cpp \
+	gui3d/camera_controller_default.cpp \
+	gui3d/psychosynth_3d.cpp \
+	gui3d/input_manager.cpp \
+	gui3d/selector_window.cpp \
+	gui3d/default_selector_populator.cpp\
+	gui3d/quit_window.cpp \
+	gui3d/info_window.cpp \
+	gui3d/toggable_window.cpp \
+	gui3d/conf_window.cpp \
+	gui3d/task_manager.cpp \
+	gui3d/element.cpp \
+	gui3d/elem_main_component.cpp \
+	gui3d/elem_second_component.cpp \
+	gui3d/elem_toggler_component.cpp \
+	gui3d/element_manager.cpp \
+	gui3d/element_properties.cpp \
+	gui3d/the_elements.cpp \
+	gui3d/window_list.cpp \
+	gui3d/flat_ring.cpp \
+	gui3d/connection.cpp \
+	gui3d/ogre_misc.cpp \
+	gui3d/gui_log_sink.cpp \
 	psynth3d.cpp \
-	gui3d/InputManager.h \
-	gui3d/Psychosynth3D.h \
-	gui3d/CameraController.h \
-	gui3d/CameraControllerRasko.h \
-	gui3d/CeguiInjecter.h \
-	gui3d/QuitWindow.h \
-	gui3d/ConfWindow.h \
-	gui3d/SelectorWindow.h\
-	gui3d/InfoWindow.h\
-	gui3d/DefaultSelectorPopulator.h\
-	gui3d/ToggableWindow.h\
-	gui3d/TaskManager.h\
-	gui3d/Element.h\
-	gui3d/ElementTypes.h\
-	gui3d/ElemMainComponent.h \
-	gui3d/ElemSecondComponent.h \
-	gui3d/ElemTogglerComponent.h \
-	gui3d/ElementManager.h\
-	gui3d/ElementProperties.h \
-	gui3d/TheElements.h \
-	gui3d/QueryFlags.h\
-	gui3d/WindowList.h\
-	gui3d/FlatRing.h\
-	gui3d/Connection.h\
-	gui3d/OgreMisc.h \
-	gui3d/GuiLogSink.h 
+	gui3d/input_manager.h \
+	gui3d/psychosynth_3d.h \
+	gui3d/camera_controller.h \
+	gui3d/camera_controller_default.h \
+	gui3d/cegui_injecter.h \
+	gui3d/quit_window.h \
+	gui3d/conf_window.h \
+	gui3d/selector_window.h\
+	gui3d/info_window.h\
+	gui3d/default_selector_populator.h\
+	gui3d/toggable_window.h\
+	gui3d/task_manager.h\
+	gui3d/element.h\
+	gui3d/element_types.h\
+	gui3d/elem_main_component.h \
+	gui3d/elem_second_component.h \
+	gui3d/elem_toggler_component.h \
+	gui3d/element_manager.h\
+	gui3d/element_properties.h \
+	gui3d/the_elements.h \
+	gui3d/query_flags.h\
+	gui3d/window_list.h\
+	gui3d/flat_ring.h\
+	gui3d/connection.h\
+	gui3d/ogre_misc.h \
+	gui3d/gui_log_sink.h 
 
 if HAVE_LIBXML
 psynth3d_CXXFLAGS += $(LIBXML_CFLAGS)
@@ -129,14 +129,14 @@ if HAVE_LIBLO
 psynth3d_CXXFLAGS += $(LIBLO_CFLAGS)
 psynth3d_LDADD += $(LIBLO_LIBS)
 psynth3d_SOURCES += \
-	gui3d/NetworkWindow.cpp \
-	gui3d/NetworkWindow.h
+	gui3d/network_window.cpp \
+	gui3d/network_window.h
 endif
 
 if HAVE_SNDFILE
 psynth3d_CXXFLAGS += $(SNDFILE_CFLAGS)
 psynth3d_LDADD += $(SNDFILE_LIBS)
 psynth3d_SOURCES += \
-	gui3d/RecordWindow.cpp \
-	gui3d/RecordWindow.h
+	gui3d/record_window.cpp \
+	gui3d/record_window.h
 endif

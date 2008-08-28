@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) 2007 by Juan Pedro Bolivar Puente                       *
+ *   Copyright (C) 2007 Juan Pedro Bolivar Puente                          *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -20,10 +20,38 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "gui3d/psychosynth_3d.h"
+#ifndef ELEMSECONDCOMPONENT_H
+#define ELEMSECONDCOMPONENT_H
 
-int main (int argc, const char *argv[])
+#include "gui3d/element.h"
+
+class elem_second_component : public elem_component
 {
-    psychosynth_3d main_app;
-    return main_app.run (argc, argv);
-}
+    flat_ring* m_indicator;
+    flat_ring* m_indicator_point;   
+    Ogre::SceneNode* m_point_node;
+    Ogre::SceneNode* m_point_yaw;
+    Ogre::Degree m_angle;
+
+    int m_param;
+
+    float m_min_val;
+    float m_max_val;
+    float m_old_value;
+    bool m_changing;
+    
+public:
+    elem_second_component (int param,
+			   float min_val, float max_val);
+    ~elem_second_component ();
+    
+    void init();
+    bool handle_pointer_move (Ogre::Vector2 pos);
+    bool handle_pointer_click (Ogre::Vector2 pos, OIS::MouseButtonID id);
+    bool handle_pointer_release (Ogre::Vector2 pos, OIS::MouseButtonID id);
+    void handle_param_change (psynth::world_node& obj,
+			      int param_id);   
+};
+
+#endif /* ELEMSECONDCOMPONENT_H */
+

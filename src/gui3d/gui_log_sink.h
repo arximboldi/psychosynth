@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) 2007 by Juan Pedro Bolivar Puente                       *
+ *   Copyright (C) Juan Pedro Bolivar Puente 2007                          *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -20,10 +20,26 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "gui3d/psychosynth_3d.h"
+#ifndef GUILOGSINK_H
+#define GUILOGSINK_H
 
-int main (int argc, const char *argv[])
+#include <libpsynth/common/logger.h>
+#include <CEGUI/CEGUI.h>
+
+class gui_log_sink : public psynth::log_sink
 {
-    psychosynth_3d main_app;
-    return main_app.run (argc, argv);
-}
+    CEGUI::Window* m_window;
+    std::string m_buffer;
+
+    void dump (psynth::log& l, int level, const std::string& msg);
+    
+public:
+    gui_log_sink (CEGUI::Window* win = NULL)
+	: m_window (win) {}
+
+    void set_window (CEGUI::Window* win) {
+	m_window = win;
+    };
+};
+
+#endif /* GUILOGSINK_H */

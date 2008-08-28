@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) 2007 by Juan Pedro Bolivar Puente                       *
+ *   Copyright (C) Juan Pedro Bolivar Puente 2008                          *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -20,10 +20,29 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "gui3d/psychosynth_3d.h"
+#ifndef PSYCHOSYNTH_CLI_H
+#define PSYCHOSYNTH_CLI_H
 
-int main (int argc, const char *argv[])
+#include <libpsynth/psynth/psynth_app.h>
+#include <libpsynth/version.h>
+
+class psychosynth_cli : public psynth::psynth_app
 {
-    psychosynth_3d main_app;
-    return main_app.run (argc, argv);
-}
+    bool m_run_server;
+    std::string m_client_port;
+    std::string m_server_port;
+    std::string m_host;
+    
+    void print_help ();
+    void print_version ();
+    void prepare (psynth::arg_parser& arg_parser);
+    void init ();
+    
+    int execute ();
+    int run_server ();
+    int run_client ();
+public:
+    psychosynth_cli () {};
+};
+
+#endif /* PSYCHOSYNTH_CLI_H */

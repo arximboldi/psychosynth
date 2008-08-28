@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) 2007 by Juan Pedro Bolivar Puente                       *
+ *   Copyright (C) Juan Pedro Bolivar Puente 2007                          *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -20,10 +20,39 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "gui3d/psychosynth_3d.h"
+#ifndef RECORDWINDOW_H
+#define RECORDWINDOW_H
 
-int main (int argc, const char *argv[])
+#include <libpsynth/world/world.h>
+#include <libpsynth/output/output_wave.h>
+
+#include "gui3d/toggable_window.h"
+
+class record_window : public toggable_window
 {
-    psychosynth_3d main_app;
-    return main_app.run (argc, argv);
-}
+    psynth::world* m_table;
+    psynth::output_wave m_output;
+
+    CEGUI::Window* m_button;
+    CEGUI::Editbox* m_file;
+    
+    bool m_recording;
+    
+    virtual CEGUI::FrameWindow* create_window ();
+
+public:
+    record_window (psynth::world* table) :
+	m_table (table),
+	m_output (table->get_info ()),
+	m_recording (false)
+	{};
+
+    ~record_window () {
+	if (m_recording)
+	    m_table->detach_passive_output (&m_output);
+    }
+
+    bool on_click (const CEGUI::EventArgs &e);
+};
+
+#endif /* RECORDWINDOW_H */

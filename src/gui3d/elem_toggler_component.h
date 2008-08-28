@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) 2007 by Juan Pedro Bolivar Puente                       *
+ *   Copyright (C) Juan Pedro Bolivar Puente 2008                          *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -20,10 +20,44 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "gui3d/psychosynth_3d.h"
+#ifndef ELEMTOGGLERCOMPONENT_H
+#define ELEMTOGGLERCOMPONENT_H
 
-int main (int argc, const char *argv[])
+#include <vector>
+#include "gui3d/element.h"
+#include "gui3d/task_manager.h"
+
+class elem_toggler_component : public elem_component,
+			       public task
 {
-    psychosynth_3d main_app;
-    return main_app.run (argc, argv);
-}
+    typedef std::pair<flat_ring*, int> Toggle;
+    std::vector<Toggle> m_toggles;
+
+    int m_param_num;
+    int m_param_first;
+    int m_param_step;
+    
+    int m_step;
+    
+    void create_toggles ();
+    void destroy_toggles();
+    void update_current_step_colour (int step);
+    void update_step_colour (int step);
+    
+public:
+    elem_toggler_component (int num_param,
+			    int first_param,
+			    int step_param);
+    ~elem_toggler_component ();
+    
+    void init ();
+    void update (int ms);
+    bool handle_pointer_move (Ogre::Vector2 pos);
+    bool handle_pointer_click (Ogre::Vector2 pos, OIS::MouseButtonID id);
+    bool handle_pointer_release (Ogre::Vector2 pos, OIS::MouseButtonID id);
+    void handle_param_change (psynth::world_node& obj,
+			   int param_id);   
+};
+
+#endif /* ELEMTOGGLERCOMPONENT_H */
+

@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) 2007 by Juan Pedro Bolivar Puente                       *
+ *   Copyright (C) 2007 Juan Pedro Bolivar Puente                          *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -20,10 +20,36 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "gui3d/psychosynth_3d.h"
+#ifndef ELEMENTTYPES_H
+#define ELEMENTTYPES_H
 
-int main (int argc, const char *argv[])
+enum element_type
 {
-    psychosynth_3d main_app;
-    return main_app.run (argc, argv);
-}
+    ELEM_OSC_SINE,
+    ELEM_OSC_SQUARE,
+    ELEM_OSC_SAWTOOTH,
+    ELEM_OSC_TRIANGLE,
+    ELEM_OSC_MOOGSAW,
+    ELEM_OSC_EXP,
+    
+    ELEM_LFO_SINE,
+    ELEM_LFO_SQUARE,
+    ELEM_LFO_SAWTOOTH,
+    ELEM_LFO_TRIANGLE,
+    ELEM_LFO_MOOGSAW,
+    ELEM_LFO_EXP,
+
+    ELEM_FILTER_LOWPASS,
+    ELEM_FILTER_HIGHPASS,
+    ELEM_FILTER_BANDPASS_CSG,
+    ELEM_FILTER_BANDPASS_CZPG,
+    ELEM_FILTER_NOTCH,
+    ELEM_FILTER_MOOG,
+
+    ELEM_MIXER,
+    ELEM_RINGMOD,
+    ELEM_CTRLMIXER,
+    ELEM_CTRLRINGMOD
+};
+
+#endif /* ELEMENTTYPES_H */

@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) 2007 by Juan Pedro Bolivar Puente                       *
+ *   Copyright (C) 2007 Juan Pedro Bolivar Puente                          *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -20,10 +20,43 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "gui3d/psychosynth_3d.h"
+#ifndef TOGGABLEWINDOW_H
+#define TOGGABLEWINDOW_H
 
-int main (int argc, const char *argv[])
+#include <CEGUI/CEGUI.h>
+
+class toggable_window
 {
-    psychosynth_3d main_app;
-    return main_app.run (argc, argv);
-}
+    CEGUI::FrameWindow* m_window;
+    bool m_active;
+	
+    virtual CEGUI::FrameWindow* create_window () = 0;
+    void build_window ();
+
+protected:
+    CEGUI::FrameWindow* get_window () {
+	return m_window;
+    }
+    
+public:
+    toggable_window ();
+    virtual ~toggable_window ();
+	
+    void set_active (bool active);
+
+    bool is_active() {
+	return m_active;
+    }
+    
+    bool toggle () {
+	set_active (!m_active);
+	return m_active;
+    };
+	
+    bool on_close (const CEGUI::EventArgs &e) {
+	set_active (false);
+	return true;
+    };
+};
+
+#endif /* TOGGABLEWINDOW_H */

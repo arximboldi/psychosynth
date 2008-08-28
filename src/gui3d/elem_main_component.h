@@ -1,9 +1,10 @@
+
 /***************************************************************************
  *                                                                         *
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) 2007 by Juan Pedro Bolivar Puente                       *
+ *   Copyright (C) 2007 Juan Pedro Bolivar Puente                          *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -20,10 +21,59 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "gui3d/psychosynth_3d.h"
+#ifndef ELEMMAINCOMPONENT_H
+#define ELEMMAINCOMPONENT_H
 
-int main (int argc, const char *argv[])
+#include "gui3d/element.h"
+
+class elem_main_component : public elem_component
 {
-    psychosynth_3d main_app;
-    return main_app.run (argc, argv);
-}
+    std::string m_mesh;
+    Ogre::SceneNode* m_ent_node;
+    Ogre::Entity*   m_mesh_ent;
+
+    flat_ring* m_indicator;
+    flat_ring* m_indicator_fill;
+    
+    Ogre::Vector2 m_last_mouse_pos;
+
+    int m_param;
+
+    float m_min_val;
+    float m_max_val;
+    float m_old_value;
+    bool m_rotating;
+    
+public:
+    elem_main_component (const std::string& mesh,
+			 int param,
+			 float min_val, float max_val);
+    ~elem_main_component ();
+    
+    void set_mesh (const std::string& mesh);
+
+    void init ();
+    bool handle_pointer_move (Ogre::Vector2 pos);
+    bool handle_pointer_click(Ogre::Vector2 pos, OIS::MouseButtonID id);
+    bool handle_pointer_release (Ogre::Vector2 pos, OIS::MouseButtonID id);
+    virtual void handle_param_change (psynth::world_node& obj,
+				      int id);
+};
+
+class elem_multi_main_component : public elem_main_component
+{
+    int m_param;
+    const char** m_names;
+    
+public:
+    elem_multi_main_component (int param_1,
+			       float min_val, float max_val,
+			       int param_2,
+			       const char** names);
+    
+    void handle_param_change (psynth::world_node& obj,
+			      int id);
+};
+
+#endif /* ELEMMAIMCOMPONENT */
+

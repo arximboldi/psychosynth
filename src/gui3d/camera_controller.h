@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) 2007 by Juan Pedro Bolivar Puente                       *
+ *   Copyright (C) 2007 Juan Pedro Bolivar Puente                          *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -20,10 +20,43 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "gui3d/psychosynth_3d.h"
+#ifndef CAMERACONTROLLER_H
+#define CAMERACONTROLLER_H
 
-int main (int argc, const char *argv[])
+#include <OIS/OIS.h>
+#include <OGRE/Ogre.h>
+
+
+class camera_controller : public OIS::MouseListener,
+			  public OIS::KeyListener
 {
-    psychosynth_3d main_app;
-    return main_app.run (argc, argv);
-}
+protected:	
+    Ogre::Camera* m_camera;
+
+public:
+    camera_controller (Ogre::Camera* camera = NULL)
+	: m_camera(camera) {}
+	
+    virtual ~camera_controller() {};
+
+    const Ogre::Camera* get_camera () const {
+	return m_camera;
+    }
+    
+    Ogre::Camera* get_camera () {
+	return m_camera;
+    }
+
+    void set_camera (Ogre::Camera* camera) {
+	m_camera = camera;
+    }
+
+    /* OIS */
+    virtual bool mouseMoved(const OIS::MouseEvent& e) {return false;};
+    virtual bool mousePressed(const OIS::MouseEvent &e, OIS::MouseButtonID id) {return false;};
+    virtual bool mouseReleased(const OIS::MouseEvent &e, OIS::MouseButtonID id) {return false;};
+    virtual bool keyPressed(const OIS::KeyEvent &e) {return false;};
+    virtual bool keyReleased(const OIS::KeyEvent &e) {return false;};
+};
+
+#endif

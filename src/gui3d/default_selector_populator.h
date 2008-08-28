@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) 2007 by Juan Pedro Bolivar Puente                       *
+ *   Copyright (C) Juan Pedro Bolivar Puente 2008                          *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -20,10 +20,21 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "gui3d/psychosynth_3d.h"
+#ifndef DEFAULTSELECTORPOPULATOR_H
+#define DEFAULTSELECTORPOPULATOR_H
 
-int main (int argc, const char *argv[])
+#include <libpsynth/common/config.h>
+#include "gui3d/selector_window.h"
+
+class default_selector_populator
 {
-    psychosynth_3d main_app;
-    return main_app.run (argc, argv);
-}
+    selector_window* m_selector;
+
+    void populate_samples (selector_window::category* cat);
+    bool on_samples_conf_nudge (psynth::conf_node& conf);
+    
+public:
+    void populate (selector_window* sel);
+};
+
+#endif /* DEFAULTSELECTORPOPULATOR_H */

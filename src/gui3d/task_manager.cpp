@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) 2007 by Juan Pedro Bolivar Puente                       *
+ *   Copyright (C) 2007 Juan Pedro Bolivar Puente                          *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -20,10 +20,18 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "gui3d/psychosynth_3d.h"
+#include "task_manager.h"
 
-int main (int argc, const char *argv[])
+void task_manager::update (int ms)
 {
-    psychosynth_3d main_app;
-    return main_app.run (argc, argv);
+    task_iter i = m_tasks.begin();
+    while (i != m_tasks.end())
+	if ((*i)->m_is_finished) {
+	    delete *i;
+	    i = m_tasks.erase(i);
+	} else {
+	    if (!(*i)->m_is_paused)
+		(*i)->update(ms);
+	    i++;
+	}    
 }
