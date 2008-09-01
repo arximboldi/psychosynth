@@ -23,16 +23,14 @@
 #ifndef PSYNTH_OUTPUTOSS_H
 #define PSYNTH_OUTPUTOSS_H
 
-#include <pthread.h>
+#include <boost/thread/thread.hpp>
 
 #include <libpsynth/output/output.h>
-#include <libpsynth/common/thread.h>
 
 namespace psynth
 {
 
-class output_oss : public output,
-		   public runnable
+class output_oss : public output
 {
     int m_fd;
     int m_format;
@@ -40,7 +38,7 @@ class output_oss : public output,
     short int* m_buf;
     std::string m_device;
 	
-    thread m_thread;
+    boost::thread m_thread;
     
 public:
     output_oss ();

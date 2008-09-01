@@ -21,7 +21,8 @@
  ***************************************************************************/
 
 #include <iostream>
-#include <pthread.h>
+
+#include <boost/bind.hpp>
 
 #include "output/output_alsa.h"
 #include "common/logger.h"
@@ -32,14 +33,12 @@ namespace psynth
 {
 
 output_alsa::output_alsa()
-    : alsa_thread(*this)
 {
 }
 
 output_alsa::output_alsa(const audio_info& info, const std::string& device)
     : output(info)
     , alsa_device(device)
-    , alsa_thread(*this)
 {
 }
 
@@ -49,7 +48,7 @@ output_alsa::~output_alsa()
 	close();
 }
 
-void output_alsa::run()
+void output_alsa::run ()
 {
     snd_pcm_sframes_t nframes;
 	
@@ -73,7 +72,7 @@ bool output_alsa::start()
 {
     if (get_state () == IDLE) {
 	set_state (RUNNING);
-	alsa_thread.start();
+	alsa_thread = boost::thread (boost::bind (&output_alsa::run, this));
 	return true;
     } else {
 	logger::instance() ("alsa", log::WARNING, "Thread already started or subsystem not initialized.");

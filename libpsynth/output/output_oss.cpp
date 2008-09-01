@@ -29,6 +29,8 @@
 #include <sys/ioctl.h>
 #include <unistd.h>
 
+#include <boost/bind.hpp>
+
 #include "common/logger.h"
 #include "output/output_oss.h"
 
@@ -39,7 +41,6 @@ namespace psynth
 
 output_oss::output_oss()
     : m_buf(NULL)
-    , m_thread(*this)
 {
 }
 
@@ -47,7 +48,6 @@ output_oss::output_oss(const audio_info& info, const std::string& device)
     : output(info)
     , m_buf(NULL)
     , m_device(device)
-    , m_thread(*this)
 {
 }
 
@@ -68,7 +68,7 @@ bool output_oss::start()
 {
     if (get_state () == IDLE) {
 	set_state (RUNNING);
-	m_thread.start();
+	m_thread = boost::thread (boost::bind (&output_oss::run, this));
 	return true;
     } else {
 	logger::instance() ("oss", log::ERROR,

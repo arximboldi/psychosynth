@@ -51,8 +51,8 @@ void file_reader_fetcher::set_backwards (bool backwards)
     int diff_avail;
     
     if (m_backwards != backwards) {
-	m_buffer_lock.lock();
-	m_reader_lock.lock();
+	m_buffer_mutex.lock();
+	m_reader_mutex.lock();
 
 	old_avail = m_buffer.availible(m_read_ptr);
 	
@@ -74,15 +74,15 @@ void file_reader_fetcher::set_backwards (bool backwards)
 		m_new_read_pos -= get_info().block_size;
 	}
 	
-	m_buffer_lock.unlock();
-	m_reader_lock.unlock();
+	m_buffer_mutex.unlock();
+	m_reader_mutex.unlock();
     }
 }
 
 void file_reader_fetcher::open(const char* file)
 {
-    m_buffer_lock.lock();
-    m_reader_lock.lock();
+    m_buffer_mutex.lock();
+    m_reader_mutex.lock();
     
     m_reader->open(file);
 
@@ -94,9 +94,9 @@ void file_reader_fetcher::open(const char* file)
 	m_buffer.set_info     (get_info(), m_buffer_size);
     }
     
-    m_reader_lock.unlock();
-    m_cond.broadcast();
-    m_buffer_lock.unlock();
+    m_reader_mutex.unlock();
+    m_cond.notify_all();
+    m_buffer_mutex.unlock();
 }
 
 void file_reader_fetcher::seek (size_t pos)
@@ -106,118 +106,120 @@ void file_reader_fetcher::seek (size_t pos)
 
 void file_reader_fetcher::force_seek (size_t pos)
 {
-    m_buffer_lock.lock();
-    m_reader_lock.lock();
+    m_buffer_mutex.lock();
+    m_reader_mutex.lock();
 
     m_read_pos = pos;
     m_reader->seek(pos);
 
     m_read_ptr = m_buffer.end();
         
-    m_reader_lock.unlock();
-    m_cond.broadcast();
-    m_buffer_lock.unlock();
+    m_reader_mutex.unlock();
+    m_cond.notify_all();
+    m_buffer_mutex.unlock();
 }
 
 int file_reader_fetcher::read (audio_buffer& buf, int n_samples)
 {
     int n_read;
-    
-    m_buffer_lock.lock();
-    while (m_buffer.availible(m_read_ptr) == 0)
-	m_cond.wait(m_buffer_lock);
+
+    {
+	boost::mutex::scoped_lock lock (m_buffer_mutex);
 	
-    n_read = min(n_samples, m_buffer.availible(m_read_ptr));
-    if (n_read) {
-	m_buffer.read(m_read_ptr, buf, n_samples);
+	while (m_buffer.availible(m_read_ptr) == 0)
+	    m_cond.wait (lock);
+	
+	n_read = min(n_samples, m_buffer.availible (m_read_ptr));
+	if (n_read) {
+	    m_buffer.read (m_read_ptr, buf, n_samples);
+	    
+	    if (m_buffer.availible(m_read_ptr) < m_threshold)
+		m_cond.notify_all();
+
+	    lock.unlock();
+	    if (m_backwards)
+		buf.reverse(n_read);
+	}
+    }
     
-	if (m_buffer.availible(m_read_ptr) < m_threshold)
-	    m_cond.broadcast();
-	m_buffer_lock.unlock();
-
-	if (m_backwards)
-	    buf.reverse(n_read);
-    } else
-	m_buffer_lock.unlock();
-
     return n_read;
 }
 
 void file_reader_fetcher::close ()
 {
-    m_reader_lock.lock ();
+    boost::mutex::scoped_lock lock (m_reader_mutex);
 
     m_reader->close ();
     set_is_open (m_reader->is_open ());
-
-    m_reader_lock.unlock ();
 }
 
 void file_reader_fetcher::run ()
 {
     int n_read;
     int must_read;
+    
     do {
 	/* Read the data. */
-	n_read = 0;
-	m_reader_lock.lock ();
-	if (m_reader->is_open ()) {
-	    must_read = m_threshold;
+	{
+	    n_read = 0;
+	    boost::mutex::scoped_lock lock (m_reader_mutex);
+	
+	    if (m_reader->is_open ()) {
+		must_read = m_threshold;
 
-	    /* Do we have to seek? */
-	    if (m_new_read_pos >= 0) {
-		m_read_pos = m_new_read_pos;
-		m_new_read_pos = -1;
-		if (!m_backwards)
+		/* Do we have to seek? */
+		if (m_new_read_pos >= 0) {
+		    m_read_pos = m_new_read_pos;
+		    m_new_read_pos = -1;
+		    if (!m_backwards)
+			m_reader->seek(m_read_pos);
+		}
+
+		/* Backwards reading needs seeking. */
+		if (m_backwards) {
+		    if (m_read_pos == 0)
+			m_read_pos = get_info().block_size - must_read;
+		    else if (must_read > m_read_pos) {
+			must_read = m_read_pos;
+			m_read_pos = 0;
+		    } else
+			m_read_pos -= must_read;
 		    m_reader->seek(m_read_pos);
-	    }
+		}
 
-	    /* Backwards reading needs seeking. */
-	    if (m_backwards) {
-		if (m_read_pos == 0)
-		    m_read_pos = get_info().block_size - must_read;
-		else if (must_read > m_read_pos) {
-		    must_read = m_read_pos;
-		    m_read_pos = 0;
-		} else
-		    m_read_pos -= must_read;
-		m_reader->seek(m_read_pos);
-	    }
+		n_read = m_reader->read(m_tmp_buffer, must_read);
 
-	    n_read = m_reader->read(m_tmp_buffer, must_read);
-
-	    /* Check wether whe have finished reading and loop. */
-	    if (!n_read && !m_backwards) {
-		m_read_pos += n_read;
-		if (n_read == 0)
-		    m_new_read_pos = 0;
+		/* Check wether whe have finished reading and loop. */
+		if (!n_read && !m_backwards) {
+		    m_read_pos += n_read;
+		    if (n_read == 0)
+			m_new_read_pos = 0;
+		}
 	    }
 	}
-	m_reader_lock.unlock();
-
+	
 	/* Add it to the buffer. */
 	if (n_read) {
-	    m_buffer_lock.lock();
-	    m_buffer.write(m_tmp_buffer, n_read);
-	    m_cond.broadcast();
-	    m_buffer_lock.unlock();
+	    boost::mutex::scoped_lock lock (m_buffer_mutex);
+	    m_buffer.write (m_tmp_buffer, n_read);
+	    m_cond.notify_all ();
 	}
 
 	/* Wait until more data is needed. */
-	m_buffer_lock.lock();
-	while(!m_finished &&
-	      (m_buffer.availible(m_read_ptr) > m_threshold || !is_open()))
-	    m_cond.wait(m_buffer_lock);
-	m_buffer_lock.unlock();
-	
+	{
+	    boost::mutex::scoped_lock lock (m_buffer_mutex);
+	    while (!m_finished &&
+		   (m_buffer.availible (m_read_ptr) > m_threshold || !is_open()))
+		m_cond.wait (lock);
+	}	
     } while (!m_finished);
 }
 
 void file_reader_fetcher::finish ()
 {
     m_finished = true;
-    m_cond.broadcast();
-    join();
+    m_cond.notify_all ();
+    m_thread.join ();
     m_finished = false;
 }
 

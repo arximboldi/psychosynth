@@ -21,9 +21,9 @@
 #  Common
 # ======================================================================
 
-AM_CXXFLAGS = -Wall
-
-AM_CPPFLAGS =
+AM_CXXFLAGS = -Wall $(BOOST_CPPFLAGS)
+AM_CPPFLAGS = 
+AM_LDFLAGS  = $(BOOST_LDFLAGS)
 
 #  Libraries to build
 # ======================================================================
@@ -34,8 +34,8 @@ lib_LTLIBRARIES = libpsynth.la
 # ======================================================================
 
 libpsynth_la_CXXFLAGS =
-libpsynth_la_LDFLAGS = 
-libpsynth_la_LIBADD =
+libpsynth_la_LDFLAGS =  
+libpsynth_la_LIBADD = $(BOOST_THREAD_LIB)
 
 libpsynthincdir = @PACKAGE_INCLUDE_DIR@
 
@@ -49,8 +49,6 @@ nobase_libpsynthinc_HEADERS = \
 	common/deleter.h \
 	common/error.h \
 	common/singleton.h \
-	common/thread.h \
-	common/mutex.h \
 	common/audio_buffer.h \
 	common/sample_buffer.h\
 	common/FastDelegate.h\
@@ -119,7 +117,6 @@ libpsynth_la_SOURCES = \
 	common/ring_buffer.cpp \
 	common/ring_audio_buffer.cpp \
 	common/ring_sample_buffer.cpp \
-	common/mutex.cpp \
 	common/misc.cpp \
 	common/logger.cpp \
 	common/config.cpp \

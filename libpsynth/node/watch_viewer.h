@@ -23,7 +23,8 @@
 #ifndef PSYNTH_WATCH_VIEWER_H
 #define PSYNTH_WATCH_VIEWER_H
 
-#include <libpsynth/common/mutex.h>
+#include <boost/thread/mutex.hpp>
+
 #include <libpsynth/common/ring_audio_buffer.h>
 #include <libpsynth/common/ring_sample_buffer.h>
 #include <libpsynth/node/watch.h>
@@ -41,7 +42,7 @@ protected:
     float m_secs;
     float m_factor;
     bool m_updated;
-    mutex m_lock;
+    boost::mutex m_mutex;
     
 public:
     watch_viewer (int points, float secs) :
@@ -62,20 +63,18 @@ public:
     }
 
     virtual void update (const BufferType& buf) {
-	m_lock.lock();
+	boost::mutex::scoped_lock lock (m_mutex);
 	m_ring.write_fast_resample(buf, m_factor);
 	//m_ring.write(buf);
 	m_updated = false;
-	m_lock.unlock();
     }
 
     const BufferType& get_buffer () {
 	if (!m_updated) {
-	    m_lock.lock();
+	    boost::mutex::scoped_lock lock (m_mutex);
 	    typename RingBufferType::read_ptr ptr = m_ring.begin();
 	    m_ring.read(ptr, m_buffer);
 	    bool m_updated = true;
-	    m_lock.unlock();
 	}
 	return m_buffer;
     }

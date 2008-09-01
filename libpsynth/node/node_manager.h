@@ -25,9 +25,10 @@
 
 #include <map>
 
+#include <boost/thread/mutex.hpp>
+
 #include <libpsynth/common/map_iterator.h>
 #include <libpsynth/node/node_output.h>
-#include <libpsynth/common/mutex.h>
 
 namespace psynth
 {
@@ -38,7 +39,7 @@ class node_manager
     std::list<node_output*> m_outputs;
     std::list<node*> m_delete_list;
     
-    mutex m_update_lock;
+    boost::mutex m_update_lock;
     
 public:
     typedef map_iterator<int, node*> iterator;

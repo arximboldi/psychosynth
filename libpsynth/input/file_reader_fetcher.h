@@ -23,16 +23,17 @@
 #ifndef PSYNTH_FILEREADERFETCHER_H
 #define PSYNTH_FILEREADERFETCHER_H
 
+#include <boost/thread/thread.hpp>
+#include <boost/thread/mutex.hpp>
+#include <boost/bind.hpp>
+
 #include <libpsynth/input/file_reader.h>
-#include <libpsynth/common/thread.h>
-#include <libpsynth/common/mutex.h>
 #include <libpsynth/common/ring_audio_buffer.h>
 
 namespace psynth
 {
 
-class file_reader_fetcher : public file_reader,
-			    public self_thread
+class file_reader_fetcher : public file_reader
 {
     /* High default values for lower number of seeks when reading backwards. */
     static const int DEFAULT_BUFFER_SIZE = 16384;
@@ -50,18 +51,28 @@ class file_reader_fetcher : public file_reader,
     int m_new_read_pos;
 
     bool m_finished;
-    
-    mutex m_reader_lock;
-    mutex m_buffer_lock;
-    condition m_cond;
 
-    void run();
+    boost::thread m_thread;
+    boost::mutex m_reader_mutex;
+    boost::mutex m_buffer_mutex;
+    boost::condition_variable m_cond;
+
+    void run ();
+
+    void stop () {
+	m_thread.join ();
+    }
     
 public:
     file_reader_fetcher (file_reader* reader = NULL,
 			int buffer_size = DEFAULT_BUFFER_SIZE,
 			int threshold  = DEFAULT_THRESHOLD);
 
+    void start () {
+	if (m_thread.get_id () == boost::thread::id ())
+	    m_thread = boost::thread (boost::bind (&file_reader_fetcher::run, this));
+    }
+    
     void set_file_reader (file_reader* reader) {
 	m_reader = reader;
     }

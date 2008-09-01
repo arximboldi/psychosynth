@@ -32,7 +32,7 @@ AM_PROG_LIBTOOL
 
 psynth_config_ok="yes"
 
-# Tool m4 functions
+#  Tools
 # ======================================================================
 
 define([XE_EXPAND_VARIABLE],
@@ -43,6 +43,25 @@ while true; do
     *) break ;;
   esac
 done]) dnl XE_EXPAND_VARIABLE
+
+#  Compulsory libraries
+# ======================================================================
+
+#  BOOST
+# ----------------------------------------------------------------------
+
+AX_BOOST_BASE([1.35])
+AX_BOOST_THREAD
+
+if test "x${ax_cv_boost_thread}" != xyes ; then
+AC_MSG_ERROR([
+***
+*** You need Boost.Thread library to compile the program.
+*** Install it and run this script again.
+***
+])
+psynth_config_ok=no
+fi
 
 #  Optional libraries
 # ======================================================================

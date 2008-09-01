@@ -21,7 +21,6 @@
  ***************************************************************************/
 
 #include "common/audio_buffer.h"
-#include "common/mutex.h"
 #include "common/misc.h"
 #include "common/file_manager.h"
 #include "node/node_types.h"
@@ -69,7 +68,7 @@ node_sampler::node_sampler(const audio_info& info):
     m_scaler.set_rate (1.0);
     m_scaler.set_sample_rate (info.sample_rate);
 
-    m_fetcher.start();
+    m_fetcher.start ();
 }
 
 node_sampler::~node_sampler ()

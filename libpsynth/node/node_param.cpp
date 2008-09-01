@@ -32,7 +32,7 @@ namespace psynth
 
 void node_param::update_in ()
 {
-    m_lock.lock();
+    m_mutex.lock();
     if (m_changed) {
 	switch(m_type) {
 	case INT:
@@ -51,12 +51,12 @@ void node_param::update_in ()
 	};
 	m_changed = false;
     }
-    m_lock.unlock();
+    m_mutex.unlock();
 }
 
 void node_param::update_out ()
 {
-    m_lock.lock();
+    m_mutex.lock();
     switch(m_type) {
 	case INT:
 	    *static_cast<int*>(m_src) = *static_cast<int*>(m_dest);
@@ -72,7 +72,7 @@ void node_param::update_out ()
 	    break;
 	default: break;
     };
-    m_lock.unlock();
+    m_mutex.unlock();
 }
 
 void node_param::clear ()

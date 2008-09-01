@@ -25,8 +25,9 @@
 
 #include <list>
 
+#include <boost/thread/mutex.hpp>
+
 #include <libpsynth/common/ring_audio_buffer.h>
-#include <libpsynth/common/mutex.h>
 #include <libpsynth/node/node.h>
 #include <libpsynth/output/output.h>
 #include <libpsynth/node/node_factory.h>

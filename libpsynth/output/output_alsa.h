@@ -23,18 +23,18 @@
 #ifndef PSYNTH_OUTPUTALSA_H
 #define PSYNTH_OUTPUTALSA_H
 
+#include <boost/thread/thread.hpp>
+
 #define ALSA_PCM_NEW_HW_PARAMS_API
 #include <alsa/asoundlib.h>
 #include <pthread.h>
 
 #include <libpsynth/output/output.h>
-#include <libpsynth/common/thread.h>
 
 namespace psynth
 {
 
-class output_alsa : public output,
-		    public runnable
+class output_alsa : public output
 {
     snd_pcm_t *alsa_pcm;
     snd_pcm_hw_params_t *alsa_hwparams;
@@ -42,7 +42,8 @@ class output_alsa : public output,
     snd_pcm_format_t alsa_format;
     short int* m_buf;
     std::string alsa_device;
-    thread alsa_thread;
+
+    boost::thread alsa_thread;
     
 public:
     output_alsa ();

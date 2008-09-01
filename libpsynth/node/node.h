@@ -30,9 +30,10 @@
 #include <iostream>
 #include <algorithm>
 
+#include <boost/thread/mutex.hpp>
+
 #include <libpsynth/common/sample_buffer.h>
 #include <libpsynth/common/audio_buffer.h>
-#include <libpsynth/common/mutex.h>
 #include <libpsynth/common/vector_2d.h>
 #include <libpsynth/common/deleter.h>
 
@@ -207,7 +208,7 @@ private:
     bool m_updated;
     bool m_single_update;
     
-    mutex m_paramlock;
+    boost::mutex m_paramlock;
 
     void blend_buffer (sample* buf, int n_elem,
 		       sample stable_value, envelope_simple env);

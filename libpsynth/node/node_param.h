@@ -23,7 +23,8 @@
 #ifndef PSYNTH_OBJPARAM
 #define PSYNTH_OBJPARAM
 
-#include <libpsynth/common/mutex.h>
+#include <boost/thread/mutex.hpp>
+#include <boost/thread/locks.hpp>
 #include <string>
 
 namespace psynth
@@ -40,7 +41,8 @@ public:
 private:
     friend class node;
 	
-    mutex m_lock;
+    mutable boost::mutex m_mutex;
+
     std::string m_name;
     int m_id;
     int m_type;
@@ -103,19 +105,20 @@ public:
     };
 	
     template <typename T>
-    void set(const T& d) {
-	m_lock.lock();
-	m_changed = true;
-	*static_cast<T*>(m_src) = d;
-	m_lock.unlock();
+    void set (const T& d) {
+	{
+	    boost::mutex::scoped_lock lock (m_mutex);
+	    m_changed = true;
+	    *static_cast<T*>(m_src) = d;
+	}
 	if (!m_event.empty()) m_event(*this);
     }
 
     template <typename T>
-    void get(T& d) const {
-	m_lock.lock();
+    void get (T& d) const {
+	m_mutex.lock ();
 	d = *static_cast<T*>(m_src);
-	m_lock.unlock();
+	m_mutex.unlock ();
     }
 };
 
