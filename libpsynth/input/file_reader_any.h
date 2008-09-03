@@ -41,7 +41,7 @@ public:
 	    close ();
     }
     
-    virtual void open (const char* file);
+    virtual void open (const std::string& file);
 
     virtual void seek (size_t pos) {
 	m_the_reader->seek (pos);

@@ -32,7 +32,7 @@ namespace psynth
 class file_manager_director
 {
     conf_node* m_conf;
-    std::string m_home_path;
+    boost::filesystem::path m_home_path;
     
     bool on_conf_nudge (conf_node& node);
     void register_config ();
@@ -40,7 +40,7 @@ class file_manager_director
     
 public:
     void start (conf_node& conf,
-	        const std::string& home_path);
+	        const boost::filesystem::path& home_path);
     void stop ();
     void defaults ();
 };

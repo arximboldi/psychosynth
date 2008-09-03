@@ -26,126 +26,105 @@
 #include "common/misc.h"
 
 using namespace std;
+namespace bf = boost::filesystem;
 
 namespace psynth
 {
 
-std::string file_finder::find_in(const std::string& path,
-			       const std::string& file) const
-{
-    struct dirent **namelist;
-    std::string result;
-    int n;
-    bool finished = false;
-    
-    n = scandir(path.c_str(), &namelist, 0, alphasort);
-    
-    if (n >= 0) {
-	while(n-- && !finished) {
-	    if ((strcmp(namelist[n]->d_name, ".") != 0) &&
-		(strcmp(namelist[n]->d_name, "..") != 0) &&
-		(strcmp(namelist[n]->d_name, file.c_str()) == 0)) {
-		result = path + "/" + namelist[n]->d_name;
-		finished = true;
-	    }
-	    free(namelist[n]);
-       	}
-       	free(namelist);
+bf::path file_finder::find_in (const bf::path& dir_path, const bf::path& file) const
+{    
+    if (!bf::exists (dir_path))
+	return bf::path ();
+
+    bf::directory_iterator end_itr;
+    for (bf::directory_iterator itr (dir_path); itr != end_itr; ++itr) {
+	if (itr->leaf () == file)
+	    return itr->path ();
     }
 
-    return result;
+    return bf::path ();
 }
 
-void file_finder::cache_path (const std::string& path)
-{
-    struct dirent **namelist;
-    int n;
-    
-    n = scandir(path.c_str(), &namelist, 0, alphasort);
-    
-    if (n >= 0) {
-	while(n--) {
-	    if ((strcmp(namelist[n]->d_name, ".") != 0) &&
-		(strcmp(namelist[n]->d_name, "..") != 0)) {
-		m_cache.insert(make_pair(string(namelist[n]->d_name),
-					 string(path + namelist[n]->d_name)));
-	    }
-	    free(namelist[n]);
-       	}
-       	free(namelist);
-    }
+void file_finder::cache_path (const bf::path& dir_path)
+{    
+    if (!bf::exists (dir_path))
+	return;
+
+    bf::directory_iterator end_itr;
+    for (bf::directory_iterator itr (dir_path); itr != end_itr; ++itr)
+	m_cache.insert (make_pair (itr->leaf (), itr->path ()));    
 }
 
-void file_finder::uncache_path (const std::string& path)
+void file_finder::uncache_path (const bf::path& path)
 {
-    map<string,string>::iterator iter;
+    path_map::iterator iter;
     
     for (iter = m_cache.begin(); iter != m_cache.end();)
-	if (path == dirname_str (iter->second))
-	    m_cache.erase(iter++);
+	if (path == iter->second)
+	    m_cache.erase (iter++);
 	else
 	    ++iter;
 }
 
-void file_finder::add_path(const std::string& path)
+void file_finder::add_path (const bf::path& path)
 {
-    m_paths.push_back(path);
+    m_paths.push_back (path);
     if (m_cache_auto)
-	cache_path(path);
+	cache_path (path);
     else
 	m_cache_updated = false;
 }
 
-void file_finder::del_path(const std::string& path)
+void file_finder::del_path (const bf::path& path)
 {
-    m_paths.remove(path);
+    m_paths.remove (path);
     if (m_cache_auto)
 	uncache_path(path);
     else
 	m_cache_updated = false;
 }
 
-void file_finder::build_cache(bool autoupdate)
+void file_finder::build_cache (bool autoupdate)
 {
     if (!m_cache_updated) {
 	m_cache_updated = true;
 	m_cache_auto = autoupdate;
-	for (list<string>::iterator it = m_paths.begin(); it != m_paths.end(); ++it)
-	    cache_path(*it);
+	for (path_list::iterator it = m_paths.begin(); it != m_paths.end(); ++it)
+	    cache_path (*it);
     }
 }
 
-void file_finder::clear_cache()
+void file_finder::clear_cache ()
 {
     m_cache.clear();
     m_cache_updated = false;
     m_cache_auto = false;
 }
 
-void file_finder::clear()
+void file_finder::clear ()
 {
     m_paths.clear();
     clear_cache();
 }
 
-std::string file_finder::find(const std::string& file) const
+bf::path file_finder::find (const bf::path& file) const
 {
     if (!m_cache_updated) {
-	list<string>::const_iterator iter;
-	std::string res;
+	path_list::const_iterator iter;
+	bf::path res;
 	for (iter = m_paths.begin(); iter != m_paths.end(); ++iter) {
-	    res = find_in(*iter, file);
+	    res = find_in (*iter, file);
 	    if (!res.empty())
 		return res;
 	}
     } else {
-	map<string,string>::const_iterator iter;
-	iter = m_cache.find(file);
-	if (iter != m_cache.end())
+	path_map::const_iterator iter;
+	iter = m_cache.find (file);
+	if (iter != m_cache.end ())
 	    return iter->second;
     }
     
-    return string();
+    return bf::path ();
 }
 
 } /* namespace psynth */

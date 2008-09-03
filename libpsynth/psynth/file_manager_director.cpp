@@ -63,7 +63,7 @@ void file_manager_director::unregister_config()
 }
 
 void file_manager_director::start (conf_node& conf,
-				   const std::string& home_path)
+				   const boost::filesystem::path& home_path)
 {
     m_conf = &conf;
     m_home_path = home_path;
@@ -80,8 +80,10 @@ void file_manager_director::stop ()
 
 void file_manager_director::defaults ()
 {
-    m_conf->get_child ("samples").get_child ("path0").def(string(PSYNTH_DATA_DIR) + "/samples");
-    m_conf->get_child ("samples").get_child ("path1").def(m_home_path + "/samples");
+    m_conf->get_child ("samples").get_child ("path0").def(
+	(boost::filesystem::path (PSYNTH_DATA_DIR) / "samples").file_string ());
+    m_conf->get_child ("samples").get_child ("path1").def(
+	(m_home_path / "samples").file_string ());
 }
 
 } /* namespace psynth */

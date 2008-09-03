@@ -43,7 +43,7 @@ public:
 	    close ();
     }
     
-    void open (const char* file);
+    void open (const std::string& file);
     void seek (size_t pos);
     int read (audio_buffer& buf, int n_samples);
     void close ();

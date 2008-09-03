@@ -23,6 +23,8 @@
 #ifndef PSYNTH_PSYCHOSYNTHAPP_H
 #define PSYNTH_PSYCHOSYNTHAPP_H
 
+#include <boost/filesystem.hpp>
+
 #include <libpsynth/common/misc.h>
 #include <libpsynth/psynth/director.h>
 
@@ -40,13 +42,15 @@ public:
     };
     
     director m_director;
-    std::string m_cfg_dir;
 
+    boost::filesystem::path m_cfg_dir;
+    boost::filesystem::path m_data_dir;
+    
     void generate_paths ();
     bool parse_args (int argc, const char* argv[]);
     
-    std::string get_config_path();
-    std::string get_data_path();
+    boost::filesystem::path get_config_path ();
+    boost::filesystem::path get_data_path ();
     
     virtual void prepare (arg_parser& args) {}
     virtual int execute () { return ERR_GENERIC; }

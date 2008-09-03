@@ -177,7 +177,8 @@ bool psychosynth_3d::frameStarted (const Ogre::FrameEvent& evt)
 void psychosynth_3d::setup_settings (conf_node& conf)
 {
 #ifdef PSYNTH_HAVE_XML
-    conf.attach_backend (new conf_backend_xml (get_config_path() + "psynth3d.xml"));
+    conf.attach_backend (new conf_backend_xml
+			 ((get_config_path() / "psynth3d.xml").file_string ()));
 #endif
     conf.def_load();
 
@@ -203,17 +204,22 @@ void psychosynth_3d::setup_ogre (psynth::conf_node& conf)
     conf.get_child ("fullscreen").get(fullscreen);
     conf.get_child ("fps").get(fps);
     
-    (new LogManager)->createLog(get_config_path() + "/psynth3d_Ogre.log",
-				false, false, false);  
-    m_ogre = new Root(get_data_path() + "/plugins.cfg",
-		      get_data_path() + "/ogre.cfg");
+    (new LogManager)->createLog ((get_config_path() / "psynth3d_Ogre.log").file_string (),
+				 false, false, false);  
+    m_ogre = new Root ((get_data_path() / "plugins.cfg").file_string (),
+		       (get_data_path() / "ogre.cfg").file_string ());
         
     ResourceGroupManager& res_mgr = ResourceGroupManager::getSingleton();
-    res_mgr.addResourceLocation(get_data_path (), "FileSystem", "General");
-    res_mgr.addResourceLocation(get_data_path () + "/mesh", "FileSystem", "General");
-    res_mgr.addResourceLocation(get_data_path () + "/texture", "FileSystem", "General");
-    res_mgr.addResourceLocation(get_data_path () + "/material", "FileSystem", "General");
-    res_mgr.addResourceLocation(get_data_path () + "/gui", "FileSystem", "GUI");
+    res_mgr.addResourceLocation (get_data_path ().file_string (),
+				 "FileSystem", "General");
+    res_mgr.addResourceLocation ((get_data_path () / "mesh").file_string (),
+				 "FileSystem", "General");
+    res_mgr.addResourceLocation ((get_data_path () / "texture").file_string (),
+				 "FileSystem", "General");
+    res_mgr.addResourceLocation ((get_data_path () / "material").file_string (),
+				 "FileSystem", "General");
+    res_mgr.addResourceLocation ((get_data_path () / "gui").file_string (),
+				 "FileSystem", "GUI");
 
     if (!m_ogre->restoreConfig() && !m_ogre->showConfigDialog())
 	m_ogre->setRenderSystem( *(m_ogre->getAvailableRenderers()->begin()) );
@@ -270,7 +276,8 @@ void psychosynth_3d::setup_gui ()
 
     m_gui = new CEGUI::System(m_ceguirender);
 
-    CEGUI::Logger::getSingleton().setLogFilename(get_config_path () + "/psynth3d_CEGUI.log");
+    CEGUI::Logger::getSingleton().setLogFilename (
+	(get_config_path () / "psynth3d_CEGUI.log").file_string ());
     CEGUI::SchemeManager::getSingleton().loadScheme("TaharezLook.scheme");
     m_gui->setDefaultMouseCursor("TaharezLook", "MouseArrow");
     m_gui->setDefaultFont(CEGUI::FontManager::getSingleton().

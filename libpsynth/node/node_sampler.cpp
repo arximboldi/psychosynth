@@ -79,17 +79,19 @@ node_sampler::~node_sampler ()
 void node_sampler::on_file_change (node_param& par)
 {
     std::string val;
-    std::string path;
-    par.get(val);
-
-    path = file_manager::instance().get_path("psychosynth/samples").find(val);
+    boost::filesystem::path path;
     
-    m_update_lock.lock();
+    par.get (val);
+    path = file_manager::instance().get_path("psychosynth/samples").find (val);
+
+    cout << path << endl;
+    
+    m_update_mutex.lock();
 
     if (m_fetcher.is_open ())
 	m_fetcher.close();
     
-    m_fetcher.open(path.c_str());
+    m_fetcher.open (path.file_string ());
 
     if (m_fetcher.is_open()) {
 	m_inbuf.set_info (m_fetcher.get_info(), get_info ().block_size);
@@ -97,7 +99,7 @@ void node_sampler::on_file_change (node_param& par)
 	//m_scaler.setSampleRate(m_fetcher.get_info().sample_rate);
     }
     
-    m_update_lock.unlock();
+    m_update_mutex.unlock();
 }
 
 void node_sampler::do_update (const node* caller, int caller_port_type, int caller_port)
@@ -180,10 +182,10 @@ void node_sampler::read (audio_buffer& buf, int start, int end)
     bool backwards = false;;
     bool high_latency = false;
     
-    m_update_lock.lock ();
+    m_update_mutex.lock ();
     m_scaler.set_tempo (m_param_tempo);
     m_scaler.set_pitch (m_param_pitch);
-    m_update_lock.unlock ();
+    m_update_mutex.unlock ();
 
     if (m_param_tempo != 1.0f ||
 	m_param_pitch != 1.0f)
@@ -213,7 +215,7 @@ void node_sampler::read (audio_buffer& buf, int start, int end)
 	else
 	    must_read = must_read;
 	   
-	m_update_lock.lock();
+	m_update_mutex.lock();
 	nread = m_fetcher.read(m_inbuf, must_read);
 
 	if (nread) {
@@ -233,13 +235,13 @@ void node_sampler::read (audio_buffer& buf, int start, int end)
 
 
 	
-	m_update_lock.unlock();
+	m_update_mutex.unlock();
     }
 
     sample inter_buffer[(end - start) * m_inbuf.get_info().num_channels];
-    m_update_lock.lock();
+    m_update_mutex.lock();
     m_scaler.receive(inter_buffer, end - start);
-    m_update_lock.unlock();
+    m_update_mutex.unlock();
     buf.deinterleave (inter_buffer, start, end, m_scaler.get_channels());
 }
 

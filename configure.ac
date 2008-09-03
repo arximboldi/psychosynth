@@ -52,11 +52,22 @@ done]) dnl XE_EXPAND_VARIABLE
 
 AX_BOOST_BASE([1.35])
 AX_BOOST_THREAD
+AX_BOOST_FILESYSTEM
 
 if test "x${ax_cv_boost_thread}" != xyes ; then
 AC_MSG_ERROR([
 ***
 *** You need Boost.Thread library to compile the program.
+*** Install it and run this script again.
+***
+])
+psynth_config_ok=no
+fi
+
+if test "x${ax_cv_boost_filesystem}" != xyes ; then
+AC_MSG_ERROR([
+***
+*** You need Boost.Filsystem library to compile the program.
 *** Install it and run this script again.
 ***
 ])

@@ -20,8 +20,11 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <boost/filesystem.hpp>
+
 #include "version.h"
 #include "common/misc.h"
+#include "common/logger.h"
 #include "input/file_reader_any.h"
 
 #ifdef PSYNTH_HAVE_PCM
@@ -37,25 +40,28 @@ using namespace std;
 namespace psynth
 {
 
-void file_reader_any::open (const char* file)
+void file_reader_any::open (const std::string& file)
 {
-    if (!is_open()) {
-	const char* ext = get_extension (file);
+    if (!is_open ()) {
+	std::string ext = boost::filesystem::extension (file);
 
-	m_the_reader = NULL;
+	m_the_reader = 0;
 	
 	if (0) {}
 #ifdef PSYNTH_HAVE_PCM
-	else if (!strcmp_i("wav", ext) ||
-		 !strcmp_i("aiff", ext) ||
-		 !strcmp_i("au", ext))
+	else if ((".wav"  == ext) ||
+		 (".aiff" == ext) ||
+		 (".au"  == ext))
 	    m_the_reader = new file_reader_wave;
 #endif
 #ifdef PSYNTH_HAVE_OGG
-	else if (!strcmp_i("ogg", ext))
+	else if (".ogg" == ext)
 	    m_the_reader = new file_reader_ogg;
 #endif
-
+	else
+	    logger::instance () ("input", log::ERROR,
+				 "Could not open file: " + file +
+				 ". Unsupported file extension");
 	if (m_the_reader) {
 	    m_the_reader->open (file);
 	    if (m_the_reader->is_open()) {

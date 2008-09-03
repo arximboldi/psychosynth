@@ -41,23 +41,23 @@ class file_manager : public file_finder,
      * calling on foreign classes. */
     
     /** Hidden constructor. */
-    file_manager() {}
+    file_manager () {}
 
     /** Hidden destructor. */
-    ~file_manager() {}
+    ~file_manager () {}
     
 public:    
-    template<class StringPredicate>
-    void find_if_all(StringPredicate pred,
-		     std::list<std::string>& res) const;
+    template <class PathPredicate>
+    void find_if_all (PathPredicate pred,
+		      file_finder::path_list& res) const;
 
-    std::string find_all(const std::string& file) const;
+    boost::filesystem::path find_all (const boost::filesystem::path& file) const;
 };
 
 
 template<class StringPredicate>
-void file_manager::find_if_all(StringPredicate pred,
-			       std::list<std::string>& res) const
+void file_manager::find_if_all (StringPredicate pred,
+				file_finder::path_list& res) const
 {
     const_iterator it;
 

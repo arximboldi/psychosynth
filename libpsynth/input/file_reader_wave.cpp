@@ -28,18 +28,18 @@ using namespace std;
 namespace psynth
 {
 
-void file_reader_wave::open(const char* file)
+void file_reader_wave::open (const std::string& file)
 {
     if (!is_open()) {
 	SF_INFO sfinfo;
 	
-	m_file = sf_open(file, SFM_READ, &sfinfo);
+	m_file = sf_open (file.c_str (), SFM_READ, &sfinfo);
     
 	if (m_file == NULL) {
 	    logger::instance() ("wave", log::ERROR, string("Could not open file: ") + file);
 	    return;
 	}
-
+	
 	audio_info info;
 	info.sample_rate  = sfinfo.samplerate;
 	info.num_channels = sfinfo.channels;

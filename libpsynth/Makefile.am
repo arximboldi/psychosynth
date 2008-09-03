@@ -35,7 +35,7 @@ lib_LTLIBRARIES = libpsynth.la
 
 libpsynth_la_CXXFLAGS =
 libpsynth_la_LDFLAGS =  
-libpsynth_la_LIBADD = $(BOOST_THREAD_LIB)
+libpsynth_la_LIBADD = $(BOOST_THREAD_LIB) $(BOOST_FILESYSTEM_LIB)
 
 libpsynthincdir = @PACKAGE_INCLUDE_DIR@
 

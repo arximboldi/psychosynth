@@ -23,6 +23,8 @@
 #ifndef PSYNTH_FILEREADER_H
 #define PSYNTH_FILEREADER_H
 
+#include <string>
+
 #include <libpsynth/common/audio_info.h>
 #include <libpsynth/common/audio_buffer.h>
 
@@ -59,7 +61,7 @@ public:
 	return m_info;
     }
     
-    virtual void open (const char* file) = 0;
+    virtual void open (const std::string& file) = 0;
     virtual void seek (size_t pos) = 0;
     virtual int read (audio_buffer& buf, int n_samples) = 0;
     virtual void close () = 0;

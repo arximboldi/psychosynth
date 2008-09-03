@@ -24,12 +24,14 @@
 #include <cstdlib>
 #include "common/file_manager.h"
 
+namespace bf = boost::filesystem;
+
 namespace psynth
 {
 
-std::string file_manager::find_all (const std::string& file) const
+bf::path file_manager::find_all (const bf::path& file) const
 {
-    std::string res;
+    bf::path res;
 
     res = find (file);
     for (const_iterator it = begin(); res.empty() && it != end(); ++it)

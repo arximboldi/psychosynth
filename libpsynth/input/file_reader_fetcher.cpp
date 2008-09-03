@@ -79,12 +79,12 @@ void file_reader_fetcher::set_backwards (bool backwards)
     }
 }
 
-void file_reader_fetcher::open(const char* file)
+void file_reader_fetcher::open (const std::string& file)
 {
     m_buffer_mutex.lock();
     m_reader_mutex.lock();
     
-    m_reader->open(file);
+    m_reader->open (file);
 
     set_is_open (m_reader->is_open ());
     set_info (m_reader->get_info ());

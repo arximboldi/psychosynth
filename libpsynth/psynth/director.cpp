@@ -78,7 +78,7 @@ void director::start_output ()
     m_old_output = out_name;
 }
 
-void director::register_config()
+void director::register_config ()
 {
     m_config->get_child ("sample_rate") .def(DEFAULT_SAMPLE_RATE);
     m_config->get_child ("block_size")  .def(DEFAULT_BLOCK_SIZE);
@@ -107,12 +107,11 @@ void director::unregister_config()
 #endif
 }
 
-void director::start (conf_node& conf, const std::string& home_path)
+void director::start (conf_node& conf, const boost::filesystem::path& home_path)
 {
     m_config = &conf;
 
-    m_filemgr.start(conf.get_child ("file_manager"),
-		    home_path);
+    m_filemgr.start (conf.get_child ("file_manager"), home_path);
     
     /* A bit dirty... */
     for (odf_map::iterator i = m_outdir.begin(); i != m_outdir.end(); ++i) {

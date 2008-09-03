@@ -87,7 +87,7 @@ public:
     
     void set_backwards (bool backwards);
     
-    void open( const char* file);
+    void open (const std::string& file);
     void seek (size_t pos);
     void force_seek (size_t pos);
     int read (audio_buffer& buf, int n_samples);

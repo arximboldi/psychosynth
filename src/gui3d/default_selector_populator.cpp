@@ -60,26 +60,29 @@ void default_selector_populator::populate_samples (selector_window::category* ca
     
     creat.set_name ("sampler");
     
-    list<string> files;
+    file_manager::path_list files;
     list<string> valid_ext;
 
 #ifdef PSYNTH_HAVE_PCM
-    valid_ext.push_back("au");
-    valid_ext.push_back("wav");
-    valid_ext.push_back("aiff");
+    valid_ext.push_back(".au");
+    valid_ext.push_back(".wav");
+    valid_ext.push_back(".aiff");
 #endif
 #ifdef PSYNTH_HAVE_OGG    
-    valid_ext.push_back("ogg");
+    valid_ext.push_back(".ogg");
 #endif
     
     file_manager::instance ()
 	.get_path ("psychosynth/samples")
-	.find_if (make_has_extension(valid_ext.begin(), valid_ext.end()), files);
+	.find_if (make_has_extension (valid_ext.begin(), valid_ext.end()), files);
 
-    for (list<string>::iterator it = files.begin();
-	 it != files.end (); ++it) {
-	creat.set_param ("file", string(basename(it->c_str())));
-	cat->add_button (string(basename(it->c_str())), creat);
+    files.sort ();
+    
+    for (file_manager::path_list::iterator it = files.begin();
+	 it != files.end (); ++it)
+    {
+	creat.set_param ("file", it->leaf ());
+	cat->add_button (it->leaf (), creat);
     }
 }
 

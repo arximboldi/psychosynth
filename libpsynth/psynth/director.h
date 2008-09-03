@@ -69,7 +69,7 @@ public:
     ~director();
     
     void attach_output_director_factory (output_director_factory* fact);
-    void start (conf_node& conf, const std::string& home_path);
+    void start (conf_node& conf, const boost::filesystem::path& home_path);
     void stop ();
     
     world* get_world () {

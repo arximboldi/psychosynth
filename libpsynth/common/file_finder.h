@@ -29,21 +29,21 @@
 #include <string>
 #include <cstdlib>
 
-#include <dirent.h>
+#include <boost/filesystem.hpp>
 
 #include <libpsynth/common/misc.h>
 
 namespace psynth
 {
 
-class string_predicate
+class path_predicate
 {
 public:
-    virtual bool operator () (const std::string& str) = 0;
+    virtual bool operator () (const boost::filesystem::path& str) = 0;
 };
 
 template <class IterType>
-class has_extension : public string_predicate
+class has_extension : public path_predicate
 {
     IterType m_first;
     IterType m_last;
@@ -54,10 +54,9 @@ public:
 	m_last(last)
 	{};
     
-    bool operator () (const std::string& str) {
-	const char* ext = get_extension(str.c_str());
+    bool operator () (const boost::filesystem::path& path) {
 	for (IterType i = m_first; i != m_last; ++i)
-	    if (!strcmp_i(ext, std::string(*i).c_str()))
+	    if (extension (path) != *i)
 		return true;
 	return false;
     }
@@ -72,89 +71,86 @@ has_extension <IterType> make_has_extension (IterType first, IterType last)
 
 class file_finder
 {
-    std::list<std::string> m_paths;
-    std::map<std::string, std::string> m_cache;
+public:
+    typedef std::list <boost::filesystem::path> path_list;
+    typedef std::map <boost::filesystem::path,
+		      boost::filesystem::path> path_map;
+private:
+    path_list m_paths;
+    path_map m_cache;
+    
     bool m_cache_updated;
     bool m_cache_auto;
 
-    void cache_path (const std::string& path);
-    void uncache_path (const std::string& path);
+    void cache_path (const boost::filesystem::path& path);
+    void uncache_path (const boost::filesystem::path& path);
 
-    std::string find_in (const std::string& path,
-			 const std::string& file) const;
-    
-    template<class string_predicate>
-    int get_file_list (const std::string& folder,
-		       std::list<std::string>& res,
-		       string_predicate pred) const;
+    boost::filesystem::path find_in (const boost::filesystem::path& path,
+				     const boost::filesystem::path& file) const;
+
+    template<class path_predicate>
+    int get_file_list (const boost::filesystem::path& folder,
+		       path_list& res,
+		       path_predicate pred) const;
     
 public:
-    file_finder() :
+    file_finder () :
 	m_cache_updated(false),
 	m_cache_auto(false)
 	{}
     
-    void add_path (const std::string& path);
-    void del_path (const std::string& path);
+    void add_path (const boost::filesystem::path& path);
+    void del_path (const boost::filesystem::path& path);
     void build_cache (bool autoupdate);
     void clear_cache ();
     void clear ();
 
-    std::string find (const std::string& file) const;
+    boost::filesystem::path
+    find (const boost::filesystem::path& file) const;
 
-    template<class string_predicate>
-    void find_if (string_predicate pred,
-		 std::list<std::string>& res) const; 
+    template <class PathPredicate>
+    void find_if (PathPredicate pred, path_list & res) const; 
 };
 
-template<class string_predicate>
-int file_finder::get_file_list(const std::string& folder,
-			     std::list<std::string>& res,
-			     string_predicate pred) const
-{
-    struct dirent **namelist;
-    std::string curr;
-    int n;
-    
-    n = scandir(folder.c_str(), &namelist, 0, alphasort);
-    
-    if (n >= 0) {
-	while(n--) {
-	    curr = folder + "/" + namelist[n]->d_name;
 
-	    if ((strcmp(namelist[n]->d_name, ".") != 0) &&
-		(strcmp(namelist[n]->d_name, "..") != 0) &&
-		pred (std::string(namelist[n]->d_name))) {
-		res.push_back(curr);
-	    }
-	    
-	    free(namelist[n]);
-       	}
-	
-       	free(namelist);
+template<class path_predicate>
+int file_finder::get_file_list (const boost::filesystem::path& folder,
+				path_list& res,
+				path_predicate pred) const
+{
+    int n = 0;
+    
+    if (!boost::filesystem::exists (folder))
+	return n;
+
+    boost::filesystem::directory_iterator end_itr;
+    for (boost::filesystem::directory_iterator itr (folder);
+	 itr != end_itr;
+	 ++itr) {
+	if (pred (itr->path ())) {
+	    res.push_back (itr->path ());
+	    ++n;
+	}
     }
     
     return n;
 }
 
-template<class string_predicate>
-void file_finder::find_if(string_predicate pred,
-			 std::list<std::string>& result) const
+template<class path_predicate>
+void file_finder::find_if (path_predicate pred, path_list& result) const
 {
     if (!m_cache_updated) {
-	std::list<std::string>::const_iterator iter;
-	for (iter = m_paths.begin(); iter != m_paths.end(); ++iter) {
+	path_list::const_iterator iter;
+	for (iter = m_paths.begin(); iter != m_paths.end(); ++iter)
 	    get_file_list (*iter, result, pred);
-	}
     } else {
-	std::map<std::string, std::string>::const_iterator iter;
+	path_map::const_iterator iter;
 	for (iter = m_cache.begin(); iter != m_cache.end(); ++iter)
 	    if (pred (iter->first))
-		result.push_back(iter->second);
+		result.push_back (iter->second);
     }
 }
 
 } /* namespace psynth */
 
 #endif /* PSYNTH_FILEFINDER_H */
-

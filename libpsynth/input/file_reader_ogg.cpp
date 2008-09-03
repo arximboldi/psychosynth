@@ -28,11 +28,11 @@ using namespace std;
 namespace psynth
 {
 
-void file_reader_ogg::open(const char* file)
+void file_reader_ogg::open (const std::string& file)
 {
     if (!is_open()) {
 	/* const_cast cause vorbis code sucks a little bit... */
-	if (ov_fopen(const_cast<char*>(file), &m_file)) {
+	if (ov_fopen (const_cast<char*>(file.c_str ()), &m_file)) {
 	    logger::instance() ("ogg", log::ERROR, string("Could not open file: ") + file);
 	    return;
 	}

@@ -81,7 +81,7 @@ private:
     
     std::string m_param_file;
     
-    boost::mutex m_update_lock;
+    boost::mutex m_update_mutex;
     
     void on_file_change (node_param& par);
     void read (audio_buffer& buf, int start, int end);

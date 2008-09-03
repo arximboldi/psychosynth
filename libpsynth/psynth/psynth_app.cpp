@@ -44,6 +44,7 @@
 #include "psynth/psynth_app.h"
 
 using namespace std;
+namespace bf = boost::filesystem;
 
 namespace psynth
 {
@@ -51,15 +52,17 @@ namespace psynth
 void psynth_app::generate_paths ()
 {
 #ifdef WIN32
-    m_cfg_dir = "./";
+    m_cfg_dir = ".";
 #else
-    char* home_dir = getenv("HOME");
-    m_cfg_dir = std::string(home_dir) + "/.psychosynth/";
-    if (access(m_cfg_dir.c_str(), F_OK) < 0) {
-	mkdir(m_cfg_dir.c_str(), S_IRWXU|S_IRWXG|S_IROTH|S_IXOTH);
-	mkdir((m_cfg_dir + "samples").c_str(), S_IRWXU|S_IRWXG|S_IROTH|S_IXOTH);
+    bf::path home_dir = getenv  ("HOME");
+    m_cfg_dir = home_dir / ".psychosynth";
+    if (!bf::exists (m_cfg_dir)) {
+	bf::create_directory (m_cfg_dir);
+	bf::create_directory (m_cfg_dir / "samples");
     }
 #endif
+
+    m_data_dir = PSYNTH_DATA_DIR;
 }
 
 bool psynth_app::parse_args (int argc, const char* argv[])
@@ -102,14 +105,14 @@ bool psynth_app::parse_args (int argc, const char* argv[])
     return true;
 }
 
-std::string psynth_app::get_config_path ()
+bf::path psynth_app::get_config_path ()
 {
     return m_cfg_dir;
 }
 
-std::string psynth_app::get_data_path ()
+bf::path psynth_app::get_data_path ()
 {
-    return string (PSYNTH_DATA_DIR) + "/";
+    return m_data_dir;
 }
 
 void psynth_app::print_base_options (ostream& out)
@@ -158,18 +161,18 @@ int psynth_app::run (int argc, const char* argv[])
     generate_paths();
     
 #ifdef PSYNTH_HAVE_XML
-    conf.attach_backend(new conf_backend_xml(get_config_path () + "psychosynth.xml"));
+    conf.attach_backend (new conf_backend_xml ((get_config_path () / "psychosynth.xml").file_string ()));
 #endif
     conf.def_load();
 
 #ifdef PSYNTH_HAVE_ALSA
-    m_director.attach_output_director_factory(new output_director_alsa_factory);
+    m_director.attach_output_director_factory (new output_director_alsa_factory);
 #endif
 #ifdef PSYNTH_HAVE_OSS
-    m_director.attach_output_director_factory(new output_director_oss_factory);
+    m_director.attach_output_director_factory (new output_director_oss_factory);
 #endif
 #ifdef PSYNTH_HAVE_JACK
-    m_director.attach_output_director_factory(new output_director_jack_factory);
+    m_director.attach_output_director_factory (new output_director_jack_factory);
 #endif
     
     ret_val = execute();

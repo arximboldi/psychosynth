@@ -24,7 +24,6 @@
 AM_CXXFLAGS = -Wall $(BOOST_CPPFLAGS)
 AM_CPPFLAGS = -I$(src_topdir) $(all_includes)
 AM_LDFLAGS  = $(BOOST_LDFLAGS)
-AM_LDADD    = $(BOOST_THREAD_LIB)
 
 #  Programs to build
 # ======================================================================
