@@ -20,32 +20,83 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef PSYNTH_FILEMANAGERDIRECTOR_H
-#define PSYNTH_FILEMANAGERDIRECTOR_H
+#ifndef PSYNTH_ENVELOPE_SIMPLE_H
+#define PSYNTH_ENVELOPE_SIMPLE_H
 
-#include <libpsynth/common/config.h>
-#include <libpsynth/common/file_manager.h>
+#include <libpsynth/node/envelope.h>
 
 namespace psynth
 {
 
-class file_manager_director
+/**
+ * Simplistic evenlope implementation with only two points.
+ */
+class envelope_simple : public envelope
 {
-    conf_node* m_conf;
-    boost::filesystem::path m_home_path;
-    
-    bool on_conf_nudge (conf_node& node);
-    void register_config ();
-    void unregister_config ();
+public:
+    float m_rise_dt;
+    float m_fall_dt;
+    float m_curr_dt;
+    float m_val;
     
 public:
-    void start (conf_node& conf,
-	        const boost::filesystem::path& home_path);
-    void stop ();
-    void defaults ();
+    envelope_simple () :
+	m_rise_dt(0.0f),
+	m_fall_dt(0.0f),
+	m_curr_dt(0.0f),
+	m_val(0.0f)
+	{}
+    
+    envelope_simple (float rise_dt, float fall_dt) :
+	m_rise_dt(rise_dt),
+	m_fall_dt(fall_dt),
+	m_curr_dt(0.0f),
+	m_val(0.0f)
+	{}
+
+    void set_deltas (float rise_dt, float fall_dt) {
+	m_rise_dt = rise_dt;
+	m_fall_dt = fall_dt;
+    }
+
+    void set (float value) {
+	m_val = value;
+    }
+    
+    float update () {
+	float val = m_val;
+	m_val = m_val + m_curr_dt;
+	if (m_val > 1.0f) m_val = 1.0;
+	else if (m_val < 0.0f) m_val = 0.0;
+	return val;
+    }
+
+    float update (float sample) {
+	float val = m_val;
+	m_val = m_val + m_curr_dt * sample;
+	if (m_val > 1.0f) m_val = 1.0;
+	else if (m_val < 0.0f) m_val = 0.0;
+	return val;
+    }
+
+    void update (float* samples, int n_samples) {
+	while(n_samples--)
+	    *samples++ *= update();
+    }
+
+    void press () {
+	m_curr_dt = m_rise_dt;
+    }
+
+    void release () {
+	m_curr_dt = m_fall_dt;
+    }
+
+    bool finished () {
+	return m_val <= 0.0f;
+    }
 };
 
 } /* namespace psynth */
 
-
-#endif /* PSYNTH_FILEMANAGERDIRECTOR_H */
+#endif /* PSYNTH_ENVELOPE_SIMPLE_H */

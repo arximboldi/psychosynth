@@ -20,80 +20,82 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef PSYNTH_OUTPUT_DIRECTOR_JACK_H
-#define PSYNTH_OUTPUT_DIRECTOR_JACK_H
+#ifndef PSYNTH_OUTPUT_DIRECTOR_ALSA_H
+#define PSYNTH_OUTPUT_DIRECTOR_ALSA_H
 
-#include <libpsynth/psynth/defaults_jack.h>
+#include <libpsynth/psynth/defaults_alsa.h>
 #include <libpsynth/psynth/output_director.h>
-#include <libpsynth/output/output_jack.h>
+#include <libpsynth/output/output_alsa.h>
 
 namespace psynth
 {
 
-class output_director_jack : public output_director
+class output_director_alsa : public output_director
 {
-    output_jack* m_output;
-
-    ~output_director_jack() {
+    output_alsa* m_output;
+    sigc::connection m_on_device_change_slot;
+    
+    ~output_director_alsa() {
 	if (m_output)
 	    stop();
     }
     
-    bool on_server_change (conf_node& conf) {
-	std::string server;
+    void on_device_change (conf_node& conf) {
+	std::string device;
 	output::state old_state;
 	
-	conf.get(server);
+	conf.get(device);
 	
 	old_state = m_output->get_state();
 	m_output->goto_state(output::NOTINIT);
-	m_output->set_server(server);
+	m_output->set_device(device);
 	m_output->goto_state(old_state);
-
-	return false;
     }
-  
+    
     virtual output* do_start (conf_node& conf) {
-	std::string server;
-
-     	conf.get_child ("server").get(server);
-	conf.get_child ("server").add_change_event(MakeDelegate(this, &output_director_jack::on_server_change));
+	std::string device;
 	
-	m_output = new output_jack;
+	conf.get_child ("out_device").get (device);
+	m_on_device_change_slot =
+	    conf.get_child ("out_device").on_change.connect
+	    (sigc::mem_fun (*this, &output_director_alsa::on_device_change));
 
-	m_output->set_server(server);
+	m_output = new output_alsa;
+	m_output->set_device(device);
 
 	return m_output;
     };
 
     virtual void do_stop (conf_node& conf) {
-	conf.get_child ("server").delete_change_event(MakeDelegate(this, &output_director_jack::on_server_change));
+	m_on_device_change_slot.disconnect ();
 	
-	delete m_output;
-	m_output = NULL;
+	if (m_output) {
+	    delete m_output;
+	    m_output = NULL;
+	}
     }
 
 public:
     void defaults (conf_node& conf) {
-	conf.get_child ("server").def(DEFAULT_JACK_SERVER);
+	conf.get_child ("out_device").def (DEFAULT_ALSA_OUT_DEVICE);
     }
-
-    output_director_jack () :
+    
+    output_director_alsa () :
 	m_output(NULL) {}
 };
 
-class output_director_jack_factory : public output_director_factory
+class output_director_alsa_factory : public output_director_factory
 {
 public:
-    virtual const char* get_name () {
-	return DEFAULT_JACK_NAME;
+    virtual const char* get_name() {
+	return DEFAULT_ALSA_NAME;
     }
     
-    virtual output_director* create_output_director () {
-	return new output_director_jack;
+    virtual output_director* create_output_director() {
+	return new output_director_alsa;
     }
 };
 
 } /* namespace psynth */
 
-#endif /* PSYNTH_OUTPUT_DIRECTOR_JACK_H */
+#endif /* PSYNTH_OUTPUT_DIRECTOR_ALSA_H */

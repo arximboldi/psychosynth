@@ -27,18 +27,13 @@
 #include <map>
 #include <iostream>
 
+#include <libpsynth/common/signal.h>
 #include <libpsynth/common/tree.h>
 #include <libpsynth/common/misc.h>
 #include <libpsynth/common/singleton.h>
 
 namespace psynth
 {
-
-/*
- * We wanto to put the delegate into our own namespace.
- */
-#include <libpsynth/common/FastDelegate.h>
-using namespace fastdelegate;
 
 /**
  * The type of a data in the config.
@@ -89,7 +84,8 @@ public:
     virtual bool handle_conf_remove_child (conf_node& child) = 0;
 };
 
-
+/* TODO */
+#if 0
 //typedef fastdelegate::FastDelegate<bool (const conf_node&)> ConfEvent;
 
 /**
@@ -180,6 +176,18 @@ public:
      * @param child The created child.
      */
     void notify_conf_remove_child (conf_node& child);
+};
+#endif
+
+class conf_subject
+{
+public:
+    typedef sigc::signal <void, conf_node&> signal;
+
+    signal on_change;
+    signal on_nudge;
+    signal on_new_child;
+    signal on_remove_child;
 };
 
 /**
@@ -353,14 +361,6 @@ class conf_node : public conf_subject,
 	if (get_parent ())
 	    m_backend = get_parent ()->m_backend;
     }
-
-    void on_new_child (conf_node& new_child) {
-	notify_conf_new_child (new_child);
-    }
-
-    void on_remove_child (conf_node& new_child) {
-	notify_conf_remove_child (new_child);
-    }
     
 public:
     /** Constructor */
@@ -382,7 +382,7 @@ public:
     template<class T>
     void set (const T& val) {
 	m_element.set (val);
-	notify_conf_change (*this);
+	on_change (*this);
     }
 
     /**
@@ -395,7 +395,7 @@ public:
     void def (const T& val) {
 	if (m_element.unset ()) {
 	    m_element.set (val);
-	    notify_conf_change (*this);
+	    on_change (*this);
 	}
     }
 
@@ -435,7 +435,7 @@ public:
      * Nudges the node. It just raises a nudge event.
      */
     void nudge () {
-	notify_conf_nudge (*this);
+	on_nudge (*this);
     }
 
     /**

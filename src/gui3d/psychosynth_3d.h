@@ -94,8 +94,8 @@ class psychosynth_3d : public psynth::psynth_app,
     void print_help ();
     void print_version ();
 
-    bool on_config_change (psynth::conf_node& conf);
-    bool on_fps_change (psynth::conf_node& conf);
+    void on_config_change (psynth::conf_node& conf);
+    void on_fps_change (psynth::conf_node& conf);
 
 public:
     psychosynth_3d ();

@@ -42,53 +42,53 @@ using namespace std;
 namespace psynth
 {
 
-void world_subject::notify_add_node (world_node& obj)
+void world_subject::notify_add_node (world_node& nod)
 {
-    m_obj_listeners [obj.get_id()];
+    m_nod_listeners [nod.get_id()];
     for (listener_iter i = m_listeners.begin(); i != m_listeners.end(); i++)
-	(*i)->handle_add_node (obj);
+	(*i)->handle_add_node (nod);
 }
 
-void world_subject::notify_delete_node (world_node& obj)
+void world_subject::notify_delete_node (world_node& nod)
 {
-    m_obj_listeners.erase (obj.get_id());
+    m_nod_listeners.erase (nod.get_id());
     for (listener_iter i = m_listeners.begin(); i != m_listeners.end(); i++)
-	(*i)->handle_delete_node (obj);
+	(*i)->handle_delete_node (nod);
 }
     
-void world_subject::notify_activate_node (world_node& obj)
+void world_subject::notify_activate_node (world_node& nod)
 {
-    for (node_listener_iter i = m_all_obj_list.begin(); i != m_all_obj_list.end(); i++)
-	(*i)->handle_activate_node (obj);
+    for (node_listener_iter i = m_all_nod_list.begin(); i != m_all_nod_list.end(); i++)
+	(*i)->handle_activate_node (nod);
     
     std::map<int, std::list<world_node_listener*> >::iterator it;
-    if ((it = m_obj_listeners.find (obj.get_id ())) != m_obj_listeners.end()) {
+    if ((it = m_nod_listeners.find (nod.get_id ())) != m_nod_listeners.end()) {
 	for (node_listener_iter i = it->second.begin(); i != it->second.end(); i++)
-	    (*i)->handle_activate_node (obj);
+	    (*i)->handle_activate_node (nod);
     }
 }
     
-void world_subject::notify_deactivate_node (world_node& obj)
+void world_subject::notify_deactivate_node (world_node& nod)
 {
-    for (node_listener_iter i = m_all_obj_list.begin(); i != m_all_obj_list.end(); i++)
-	(*i)->handle_deactivate_node (obj);
+    for (node_listener_iter i = m_all_nod_list.begin(); i != m_all_nod_list.end(); i++)
+	(*i)->handle_deactivate_node (nod);
     
     std::map<int, std::list<world_node_listener*> >::iterator it;
-    if ((it = m_obj_listeners.find(obj.get_id ())) != m_obj_listeners.end()) {
+    if ((it = m_nod_listeners.find(nod.get_id ())) != m_nod_listeners.end()) {
 	for (node_listener_iter i = it->second.begin(); i != it->second.end(); i++)
-	    (*i)->handle_deactivate_node (obj);
+	    (*i)->handle_deactivate_node (nod);
     }
 }
 
-void world_subject::notify_set_param_node (world_node& obj, int param_id)
+void world_subject::notify_set_param_node (world_node& nod, int param_id)
 {
-    for (node_listener_iter i = m_all_obj_list.begin(); i != m_all_obj_list.end(); i++)
-	(*i)->handle_set_param_node (obj, param_id);
+    for (node_listener_iter i = m_all_nod_list.begin(); i != m_all_nod_list.end(); i++)
+	(*i)->handle_set_param_node (nod, param_id);
     
     std::map<int, std::list<world_node_listener*> >::iterator it;
-    if ((it = m_obj_listeners.find (obj.get_id ())) != m_obj_listeners.end()) {
+    if ((it = m_nod_listeners.find (nod.get_id ())) != m_nod_listeners.end()) {
 	for (node_listener_iter i = it->second.begin(); i != it->second.end(); i++)
-	    (*i)->handle_set_param_node (obj, param_id);	
+	    (*i)->handle_set_param_node (nod, param_id);	
     }
 }
 
@@ -116,8 +116,8 @@ world::world (const audio_info& info)
 
     m_mixer->param("amplitude").set(0.5f);
 
-    m_node_mgr.attach_node (m_output, OUTPUT_ID);
-    m_node_mgr.attach_node (m_mixer, MIXER_ID);
+    m_node_mgr.add_node (manage (m_output), OUTPUT_ID);
+    m_node_mgr.add_node (manage (m_mixer), MIXER_ID);
 
     register_default_node_factory ();
 }
@@ -140,7 +140,6 @@ void world::register_default_node_factory ()
 
 world::~world ()
 {
-    delete m_patcher;
 }
 
 void
@@ -151,8 +150,8 @@ world::clear ()
 	if ((*it)->get_id () >= MIN_USER_ID) {
 	    if (m_patcher)
 		m_patcher->delete_node (*it);
-	    world_node obj(*it, this);
-	    notify_delete_node (obj);
+	    world_node nod(*it, this);
+	    notify_delete_node (nod);
 	    //m_node_mgr.remove(it++);
 	    m_node_mgr.delete_node (it);
 	} else
@@ -174,101 +173,101 @@ world_node world::add_node (int type)
     node* nod;
 
     switch (type) {
-    case OBJ_OSCILLATOR:
-	obj = new node_audio_oscillator(m_info);
+    case NOD_OSCILLATOR:
+	nod = new node_audio_oscillator(m_info);
 	break;
-    case OBJ_LFO:
-	obj = new node_lfo(m_info);
+    case NOD_LFO:
+	nod = new node_lfo(m_info);
 	break;
-    case OBJ_FILTER:
-	obj = new node_filter(m_info);
+    case NOD_FILTER:
+	nod = new node_filter(m_info);
 	break;
-    case OBJ_MIXER:
-	obj = new node_audio_mixer(m_info);
+    case NOD_MIXER:
+	nod = new node_audio_mixer(m_info);
 	break;
-    case OBJ_CONTROLMIXER:
-	obj = new node_control_mixer (m_info);
+    case NOD_CONTROLMIXER:
+	nod = new node_control_mixer (m_info);
 	break;
-    case OBJ_SAMPLER:
-	obj = new node_sampler(m_info);
+    case NOD_SAMPLER:
+	nod = new node_sampler(m_info);
 	break;
     default:
-	obj = NULL;
+	nod = NULL;
 	return world_node(NULL, NULL);
     }
     
-    if (!m_node_mgr.attachNode(obj, m_last_id++))
+    if (!m_node_mgr.attachNode(nod, m_last_id++))
 	return world_node(NULL, NULL);
 
-    world_node tobj(obj, this);
-    notifyAddNode(tobj);
-    return tobj;
+    world_node tnod(nod, this);
+    notifyAddNode(tnod);
+    return tnod;
 }
 #endif
 
 world_node world::add_node (const std::string& name)
 {
-    node* obj;
-    world_node tobj;
+    node* nod;
+    world_node tnod;
 	
-    obj = m_objfact.create (name, m_info);
+    nod = m_nodfact.create (name, m_info);
 
-    if (obj) {
-	if (!m_node_mgr.attach_node (obj, m_last_id++))
-	    return world_node (NULL, NULL);
+    if (nod) {
+	if (!m_node_mgr.add_node (manage (nod), m_last_id++))
+	    return world_node (0, 0);
     
-	tobj = world_node (obj, this);
-	notify_add_node (tobj);
+	tnod = world_node (nod, this);
+	notify_add_node (tnod);
     }
     
-    return tobj;
+    return tnod;
 }
 
-void world::delete_node (world_node& obj)
+void world::delete_node (world_node& nod)
 {
     if (m_patcher)
-	m_patcher->delete_node (obj.m_obj);
-    notify_delete_node (obj);
-/*
-  m_node_mgr.detachNode(obj.m_obj->get_id ());
-  delete obj.m_obj;
-*/
-    m_node_mgr.delete_node (obj.m_obj->get_id ());
+	m_patcher->delete_node (nod.m_nod);
+
+    notify_delete_node (nod);
+
+    m_node_mgr.delete_node (nod.m_nod->get_id ());
 }
 
-void world::activate_node (world_node& obj)
+void world::activate_node (world_node& nod)
 {
     /* HACK */
-    obj.m_obj->update_params_in ();
+    nod.m_nod->update_params_in ();
      
     if (m_patcher)
-	m_patcher->add_node (obj.m_obj);
-    notify_activate_node (obj);
+	m_patcher->add_node (nod.m_nod);
+    notify_activate_node (nod);
 }
 
-void world::deactivate_node (world_node& obj)
+void world::deactivate_node (world_node& nod)
 {
     if (m_patcher)
-	m_patcher->delete_node (obj.m_obj);
-    notify_deactivate_node (obj);
+	m_patcher->delete_node (nod.m_nod);
+    notify_deactivate_node (nod);
 }
 
-void world::attach_patcher (patcher* pat)
+void world::set_patcher (mgr_ptr<patcher> pat)
 {
-    detach_patcher ();
+    unset_patcher ();
     m_patcher = pat;
     pat->add_listener (this);
-    for (node_manager::iterator it = m_node_mgr.begin(); it != m_node_mgr.end(); ++it)
+    for (node_manager::iterator it = m_node_mgr.begin();
+	 it != m_node_mgr.end();
+	 ++it)
 	m_patcher->add_node (*it);
     m_patcher->update ();
 }
 
-void world::detach_patcher ()
+void world::unset_patcher ()
 {
     if (m_patcher) {
 	m_patcher->delete_listener (this);
 	m_patcher->clear ();
-	m_patcher = NULL;
+	m_patcher = 0;
     }
 }
 

@@ -45,37 +45,37 @@ class world_node
 {
     friend class world;
     
-    node* m_obj; /* Use node_manager::Iterator instead? */
+    node* m_nod; /* Use node_manager::Iterator instead? */
     world* m_world;
 
-    world_node (node* obj, world* world) :
-	m_obj (obj), m_world (world) {};
+    world_node (node* nod, world* world) :
+	m_nod (nod), m_world (world) {};
 
 public:
     world_node ()
-	: m_obj (NULL)
+	: m_nod (NULL)
 	, m_world (NULL)
 	{}
     
     world_node(const world_node& o)
-	: m_obj(o.m_obj)
+	: m_nod(o.m_nod)
 	, m_world(o.m_world)
 	{};
 
     bool is_null () const {
-	return m_obj == NULL;
+	return m_nod == NULL;
     };
 
     int get_id () const {
-	return m_obj->get_id ();
+	return m_nod->get_id ();
     };
     
     int get_type () const {
-	return m_obj->get_type ();
+	return m_nod->get_type ();
     };
 
     const std::string& get_name () {
-	return m_obj->get_name ();
+	return m_nod->get_name ();
     };
     
     world* get_world() {
@@ -99,45 +99,45 @@ public:
     inline void set_param (const std::string& name, const T& data);
 
     void attach_watch (int type, int in_sock, watch* watch) {
-	m_obj->attach_watch (type, in_sock, watch);
+	m_nod->attach_watch (type, in_sock, watch);
     }
 
     void detach_watch (int type, int in_sock, watch* watch) {
-	m_obj->detach_watch (type, in_sock, watch);
+	m_nod->detach_watch (type, in_sock, watch);
     }
     
     int get_param_id (const std::string& name) const {
-	m_obj->param(name).get_id ();
+	return m_nod->param(name).get_id ();
     }
 
     const std::string& get_param_name (int id) const {
-	m_obj->param(id).get_name ();
+	return m_nod->param(id).get_name ();
     }
     
     int get_param_type (int id) const {
-	return m_obj->param(id).type();
+	return m_nod->param(id).type();
     }
 
     int get_param_type (const std::string& name) const {
-	return m_obj->param(name).type();
+	return m_nod->param(name).type();
     }
     
     template <typename T>
     void get_param (int id, T& data) const {
-	m_obj->param(id).get(data);
+	m_nod->param(id).get(data);
     }
 
     template <typename T>
     void get_param (const std::string& name, T& data) const {
-	m_obj->param(name).get(data);
+	m_nod->param(name).get(data);
     }
 
     bool operator== (const world_node& o) const {
-	return m_obj == o.m_obj;
+	return m_nod == o.m_nod;
     }
 
     bool operator!= (const world_node& o) const {
-	return m_obj != o.m_obj;
+	return m_nod != o.m_nod;
     }
 };
 
@@ -145,16 +145,16 @@ class world_listener
 {
 public:
     virtual ~world_listener() {};
-    virtual void handle_add_node (world_node& obj) = 0;
-    virtual void handle_delete_node (world_node& obj) = 0;
+    virtual void handle_add_node (world_node& nod) = 0;
+    virtual void handle_delete_node (world_node& nod) = 0;
 };
 
 class world_node_listener
 {
 public:
     virtual ~world_node_listener () {};
-    virtual void handle_activate_node (world_node& obj) = 0;
-    virtual void handle_deactivate_node (world_node& obj) = 0;
+    virtual void handle_activate_node (world_node& nod) = 0;
+    virtual void handle_deactivate_node (world_node& nod) = 0;
     virtual void handle_set_param_node (world_node& ob, int id) = 0;
 };
 
@@ -186,15 +186,15 @@ class world_subject
     
     std::list<world_listener*> m_listeners;
     std::list<world_patcher_listener*> m_patch_list;
-    std::map<int, std::list<world_node_listener*> > m_obj_listeners; 
-    std::list<world_node_listener*> m_all_obj_list;
+    std::map<int, std::list<world_node_listener*> > m_nod_listeners; 
+    std::list<world_node_listener*> m_all_nod_list;
     
 protected:
-    void notify_add_node (world_node& obj);
-    void notify_delete_node (world_node& obj);
-    void notify_activate_node (world_node& obj);
-    void notify_deactivate_node (world_node& obj);
-    void notify_set_param_node (world_node& obj, int param_id);
+    void notify_add_node (world_node& nod);
+    void notify_delete_node (world_node& nod);
+    void notify_activate_node (world_node& nod);
+    void notify_deactivate_node (world_node& nod);
+    void notify_set_param_node (world_node& nod, int param_id);
     void notify_link_added (const world_patcher_event& ev);
     void notify_link_deleted (const world_patcher_event& ev);
     
@@ -208,13 +208,13 @@ public:
     };
 
     void add_world_node_listener (world_node_listener* cl) {
-	m_all_obj_list.push_back(cl);
+	m_all_nod_list.push_back(cl);
     };
     
-    void add_world_node_listener (world_node& obj, world_node_listener* cl) {
+    void add_world_node_listener (world_node& nod, world_node_listener* cl) {
 	std::map<int, std::list<world_node_listener*> >::iterator it;
 	
-	if ((it = m_obj_listeners.find(obj.get_id ())) != m_obj_listeners.end())
+	if ((it = m_nod_listeners.find(nod.get_id ())) != m_nod_listeners.end())
 	    it->second.push_back(cl);
     };
     
@@ -227,13 +227,13 @@ public:
     };
 
     void delete_world_node_listener (world_node_listener* cl) {
-	m_all_obj_list.remove(cl);
+	m_all_nod_list.remove(cl);
     };
     
-    void delete_world_node_listener (world_node& obj, world_node_listener* cl) {
+    void delete_world_node_listener (world_node& nod, world_node_listener* cl) {
 	std::map<int, std::list<world_node_listener*> >::iterator it;
 	
-	if ((it = m_obj_listeners.find(obj.get_id())) != m_obj_listeners.end())
+	if ((it = m_nod_listeners.find(nod.get_id())) != m_nod_listeners.end())
 	    it->second.remove(cl);
     };
 };
@@ -242,12 +242,14 @@ class world : public world_subject,
 	      public patcher_listener
 {    
     audio_info m_info;
+
+    mgr_auto_ptr<patcher> m_patcher;
+    
     node_manager m_node_mgr;
-    patcher* m_patcher;
     node_output* m_output;
     node_audio_mixer* m_mixer;
     int m_last_id;
-    node_factory_manager m_objfact;
+    node_factory_manager m_nodfact;
     
     static const int MIXER_CHANNELS = 16;
 
@@ -275,7 +277,7 @@ public:
     }
 
     void register_node_factory (node_factory& f) {
-	m_objfact.register_factory (f);
+	m_nodfact.register_factory (f);
     }
     
     world_node find_node (int id);
@@ -284,27 +286,27 @@ public:
     world_node add_node (const std::string& type_name);
     
     template <typename T>
-    void set_param_node (world_node& obj, int id, const T& data) {
-	obj.m_obj->param(id).set(data);
-	notify_set_param_node (obj, id);
+    void set_param_node (world_node& nod, int id, const T& data) {
+	nod.m_nod->param(id).set(data);
+	notify_set_param_node (nod, id);
 	if (m_patcher)
-	    m_patcher->set_param_node (obj.m_obj, id);
+	    m_patcher->set_param_node (nod.m_nod, id);
     }
 
     template <typename T>
-    void set_param_node (world_node& obj, const std::string& name, const T& data) {
-	node_param& param = obj.m_obj->param(name);
+    void set_param_node (world_node& nod, const std::string& name, const T& data) {
+	node_param& param = nod.m_nod->param(name);
 	param.set (data);
-	notify_set_param_node (obj, param.get_id());
+	notify_set_param_node (nod, param.get_id());
 	if (m_patcher)
-	    m_patcher->set_param_node (obj.m_obj, param.get_id());
+	    m_patcher->set_param_node (nod.m_nod, param.get_id());
     }
     
-    void delete_node (world_node& obj);
+    void delete_node (world_node& nod);
 
-    void activate_node (world_node& obj);
+    void activate_node (world_node& nod);
 
-    void deactivate_node (world_node& obj);
+    void deactivate_node (world_node& nod);
 
     void attach_output (output* out) {
 	m_output->attach_output (out);
@@ -322,9 +324,9 @@ public:
 	m_output->detach_passive_output (out);
     };
 
-    void attach_patcher (patcher* pat);
-    
-    void detach_patcher ();
+    void set_patcher (mgr_ptr<patcher> pat);
+
+    void unset_patcher ();
     
     void update () {
 	if (m_patcher)

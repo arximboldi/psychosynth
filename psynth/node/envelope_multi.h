@@ -124,7 +124,7 @@ public:
 	return m_time;
     }
 
-    float set_time (float time) {
+    void set_time (float time) {
 	m_time = time;
     }
 

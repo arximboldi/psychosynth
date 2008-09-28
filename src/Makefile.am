@@ -21,9 +21,8 @@
 #  Common
 # ======================================================================
 
-AM_CXXFLAGS = -Wall $(BOOST_CPPFLAGS)
-AM_CPPFLAGS = -I$(src_topdir) $(all_includes)
-AM_LDFLAGS  = $(BOOST_LDFLAGS)
+AM_CPPFLAGS = -Wall $(BOOST_CPPFLAGS) $(all_includes)
+AM_LDFLAGS  = $(BOOST_LDFLAGS) $(SIGC_LDFLAGS)
 
 #  Programs to build
 # ======================================================================
@@ -41,9 +40,9 @@ endif
 #  psynth compilation
 # ======================================================================
 
-psynth_CXXFLAGS = 
+psynth_CXXFLAGS = $(SIGC_CFLAGS)
 psynth_LDFLAGS = 
-psynth_LDADD = \
+psynth_LDADD = $(SIGC_LIBS) \
 	../libpsynth/libpsynth.la
 
 psynth_SOURCES = \
@@ -55,6 +54,7 @@ psynth_SOURCES = \
 # ======================================================================
 
 psynth3d_CXXFLAGS = \
+	$(SIGC_CFLAGS)\
 	$(OGRE_CFLAGS) \
 	$(CEGUI_CFLAGS) \
 	$(OIS_CFLAGS) \
@@ -62,6 +62,8 @@ psynth3d_CXXFLAGS = \
 
 psynth3d_LDFLAGS = 
 psynth3d_LDADD = \
+	$(BOOST_SIGNALS_LIB) \
+	$(SIGC_LIBS) \
 	$(OGRE_LIBS) \
 	$(CEGUI_LIBS) \
 	$(OIS_LIBS) \

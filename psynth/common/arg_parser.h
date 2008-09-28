@@ -232,11 +232,13 @@ class arg_parser
     };
 
     int get_type (const char *arg) {
-	if (arg[0] == '-')
+	if (arg[0] == '-') {
 	    if (arg[1] == '-')
 		return ARG_LONG;
 	    else
 		return ARG_SHORT;
+	}
+	
 	return ARG_FREE;
     }
     

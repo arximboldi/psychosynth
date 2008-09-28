@@ -80,12 +80,12 @@ void director::start_output ()
 
 void director::register_config ()
 {
-    m_config->get_child ("sample_rate") .def(DEFAULT_SAMPLE_RATE);
-    m_config->get_child ("block_size")  .def(DEFAULT_BLOCK_SIZE);
-    m_config->get_child ("num_channels").def(DEFAULT_NUM_CHANNELS);
-    m_config->get_child ("output")      .def(DEFAULT_OUTPUT);
+    m_config->get_child ("sample_rate") .def (DEFAULT_SAMPLE_RATE);
+    m_config->get_child ("block_size")  .def (DEFAULT_BLOCK_SIZE);
+    m_config->get_child ("num_channels").def (DEFAULT_NUM_CHANNELS);
+    m_config->get_child ("output")      .def (DEFAULT_OUTPUT);
 
-    m_config->add_nudge_event (MakeDelegate(this, &director::on_config_nudge));
+    m_config->on_nudge.connect (sigc::mem_fun (*this, &director::on_config_nudge));
 
 #if 0
     m_config->get_child ("sample_rate").addChangeEvent(MakeDelegate(this, &director::on_sample_rate_change));
@@ -97,7 +97,7 @@ void director::register_config ()
 
 void director::unregister_config()
 {
-    m_config->delete_nudge_event (MakeDelegate(this, &director::on_config_nudge));
+    m_config->on_nudge.connect (sigc::mem_fun (*this, &director::on_config_nudge));
 
 #if 0
     m_config->get_child ("sample_rate").deleteChangeEvent(MakeDelegate(this, &director::on_sample_rate_change));
@@ -127,7 +127,7 @@ void director::start (conf_node& conf, const boost::filesystem::path& home_path)
     conf.get_child ("block_size").get(m_info.block_size);
 
     m_world = new world (m_info);
-    m_world->attach_patcher (new patcher_dynamic); /* FIXME: */
+    m_world->set_patcher (manage (new patcher_dynamic));
     
     start_output ();
 }
@@ -158,7 +158,7 @@ void director::update_info ()
     m_output->get_output()->goto_state (old_state);
 }
 
-bool director::on_config_nudge(conf_node& node)
+void director::on_config_nudge (conf_node& node)
 {
     string out;
     
@@ -179,8 +179,6 @@ bool director::on_config_nudge(conf_node& node)
 	stop_output ();
 	start_output ();
     }
-    
-    return false;
 }
 
 #if 0

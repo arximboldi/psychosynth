@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) Juan Pedro Bolivar Puente 2007                          *
+ *   Copyright (C) Juan Pedro Bolivar Puente 2008                          *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -20,53 +20,33 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "common/config.h"
+#ifndef PSYNTH_FILEMANAGERDIRECTOR_H
+#define PSYNTH_FILEMANAGERDIRECTOR_H
 
-using namespace std;
+#include <libpsynth/common/config.h>
+#include <libpsynth/common/file_manager.h>
 
 namespace psynth
 {
 
-void conf_subject::notify_conf_change (conf_node& source)
+class file_manager_director
 {
-    for (list<conf_listener*>::iterator i = m_list.begin();
-	 i != m_list.end();
-	 ++i)
-	(*i)->handle_conf_change (source);
-
-    for (list<conf_event>::iterator i = m_change_del.begin();
-	 i != m_change_del.end();
-	 ++i)
-	(*i) (source);    
-}
-
-void conf_subject::notify_conf_nudge (conf_node& source)
-{
-    for (list<conf_listener*>::iterator i = m_list.begin();
-	 i != m_list.end();
-	 ++i)
-	(*i)->handle_conf_nudge (source);
-
-    for (list<conf_event>::iterator i = m_nudge_del.begin ();
-	 i != m_nudge_del.end ();
-	 ++i)
-	(*i) (source);
-}
-
-void conf_subject::notify_conf_new_child (conf_node& child)
-{
-    for (list<conf_listener*>::iterator i = m_list.begin();
-	 i != m_list.end ();
-	 ++i)
-	(*i)->handle_conf_new_child (child);
-}
-
-void conf_subject::notify_conf_remove_child (conf_node& child)
-{
-    for (list<conf_listener*>::iterator i = m_list.begin();
-	 i != m_list.end();
-	 ++i)
-	(*i)->handle_conf_remove_child (child);
-}
+    conf_node* m_conf;
+    boost::filesystem::path m_home_path;
+    sigc::connection m_on_conf_nudge_slot;
+    
+    void on_conf_nudge (conf_node& node);
+    void register_config ();
+    void unregister_config ();
+    
+public:
+    void start (conf_node& conf,
+	        const boost::filesystem::path& home_path);
+    void stop ();
+    void defaults ();
+};
 
 } /* namespace psynth */
+
+
+#endif /* PSYNTH_FILEMANAGERDIRECTOR_H */

@@ -31,7 +31,7 @@ using namespace std;
 namespace psynth
 {
 
-bool file_manager_director::on_conf_nudge (conf_node& node)
+void file_manager_director::on_conf_nudge (conf_node& node)
 {
     file_manager& mgr =
 	file_manager::instance()
@@ -45,21 +45,19 @@ bool file_manager_director::on_conf_nudge (conf_node& node)
 	(*it)->get(val);
 	mgr.add_path(val);
     }
-    
-    return true;
 }
 
 void file_manager_director::register_config ()
 {
-    m_conf->get_child ("samples")
-	.add_nudge_event (MakeDelegate(this, &file_manager_director::on_conf_nudge));
-    m_conf->get_child ("samples").nudge();
+    m_on_conf_nudge_slot = 
+	m_conf->get_child ("samples").on_nudge.connect
+	(sigc::mem_fun (*this, &file_manager_director::on_conf_nudge));
+    m_conf->get_child ("samples").nudge ();
 }
 
 void file_manager_director::unregister_config()
 {
-    m_conf->get_child ("samples")
-	.delete_nudge_event (MakeDelegate(this, &file_manager_director::on_conf_nudge));
+    m_on_conf_nudge_slot.disconnect ();
 }
 
 void file_manager_director::start (conf_node& conf,

@@ -147,9 +147,9 @@ protected:
      */
     ring_buffer (int size = 0) :
 	m_size(size),
+	m_backwards(false),
 	m_writepos(0),
 	m_writecount(0),
-	m_backwards(false),
 	m_startpos(0)
 	{}
 

@@ -74,6 +74,33 @@ AC_MSG_ERROR([
 psynth_config_ok=no
 fi
 
+#if test "x${ax_cv_boost_signals}" != xyes ; then
+#AC_MSG_ERROR([
+#***
+#*** You need Boost.Signals library to compile the program.
+#*** Install it and run this script again.
+#***
+#])
+#psynth_config_ok=no
+#fi
+
+#  Sigc
+# ----------------------------------------------------------------------
+   
+PKG_CHECK_MODULES(SIGC, [ sigc++-2.0 ],
+[
+    HAVE_SIGC=yes
+    AC_DEFINE([HAVE_SIGC], 1, [Have Sndfile?])
+],
+[
+AC_MSG_ERROR([
+***
+*** You need Sigc++ library to compile the program.
+*** Install it and run this script again. 
+***
+])
+])
+
 #  Optional libraries
 # ======================================================================
 

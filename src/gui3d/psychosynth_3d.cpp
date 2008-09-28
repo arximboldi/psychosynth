@@ -188,8 +188,10 @@ void psychosynth_3d::setup_settings (conf_node& conf)
     conf.get_child ("fps").def(DEFAULT_FPS);
 
     /* Is it dangerous to have this set before the gui is initialized? */
-    conf.add_nudge_event (MakeDelegate(this, &psychosynth_3d::on_config_change));
-    conf.get_child ("fps").add_change_event (MakeDelegate(this, &psychosynth_3d::on_fps_change));
+    conf.on_nudge.connect
+	(sigc::mem_fun (*this, &psychosynth_3d::on_config_change));
+    conf.get_child ("fps").on_change.connect
+	(sigc::mem_fun (*this, &psychosynth_3d::on_fps_change));
 }
 
 void psychosynth_3d::setup_ogre (psynth::conf_node& conf)
@@ -467,7 +469,7 @@ void psychosynth_3d::close_ogre ()
     delete m_ogre;
 }
 
-bool psychosynth_3d::on_config_change (psynth::conf_node& conf)
+void psychosynth_3d::on_config_change (psynth::conf_node& conf)
 {
     int sc_width;
     int sc_height;
@@ -484,17 +486,13 @@ bool psychosynth_3d::on_config_change (psynth::conf_node& conf)
 			    sc_width,
 			    sc_height);
     //m_ogre->reinitialise();
-    
-    return true;
 }
 
-bool psychosynth_3d::on_fps_change (psynth::conf_node& conf)
+void psychosynth_3d::on_fps_change (psynth::conf_node& conf)
 {
     int fps;
     
     conf.get(fps);
     m_timer.force_fps(fps);
-
-    return true;
 }
 

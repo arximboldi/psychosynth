@@ -27,6 +27,7 @@
 
 #include <boost/thread/mutex.hpp>
 
+#include <libpsynth/common/memory.h>
 #include <libpsynth/common/map_iterator.h>
 #include <libpsynth/node/node_output.h>
 
@@ -35,22 +36,25 @@ namespace psynth
 
 class node_manager
 {
-    std::map<int, node*> m_node_map;
+public:
+    typedef map_iterator<int, mgr_ptr<node> > iterator;
+    typedef map_const_iterator<int, mgr_ptr<node> > const_iterator;
+
+private:
+    mgr_assoc <std::map <int, mgr_ptr <node> > > m_node_map;
     std::list<node_output*> m_outputs;
     std::list<node*> m_delete_list;
     
-    boost::mutex m_update_lock;
-    
-public:
-    typedef map_iterator<int, node*> iterator;
-    typedef map_const_iterator<int, node*> const_iterator;
+    boost::mutex m_update_mutex;
 
+    void do_delete_node (iterator it);
+
+public:
     node_manager ();
     ~node_manager ();
 	
-    bool attach_node (node* obj, int id);
-    bool detach_node (int id);
-    void detach_node (iterator it);
+    bool add_node (mgr_ptr<node> obj, int id);
+
     bool delete_node (int id);
     void delete_node (iterator it);
 

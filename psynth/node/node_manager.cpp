@@ -35,125 +35,113 @@ node_manager::node_manager ()
 
 node_manager::~node_manager ()
 {
-    map<int, node*>::iterator map_iter;
-    for (map_iter = m_node_map.begin(); map_iter != m_node_map.end(); ++map_iter)
-	delete (*map_iter).second;
 }
 
-bool node_manager::attach_node (node* obj, int id)
+bool node_manager::add_node (mgr_ptr<node> obj, int id)
 {
-    if (!m_node_map.insert(pair<int, node*>(id, obj)).second)
+    if (!m_node_map.insert(make_pair (id, obj)).second)
 	return false;
 
     obj->set_id (id);
     
-    node_output* out = dynamic_cast<node_output*>(obj);
+    node_output* out = dynamic_cast<node_output*> (obj.get ());
 
-    if (out != NULL) {
+    if (out) {
 	if (!out->set_manager (this)) {
-	    m_node_map.erase(id);
-	    return false; /* Already attached to an node_manager!! */
+	    m_node_map.erase (id);
+	    return false; /* Already attached to a node_manager! */
 	}
-		
-	m_outputs.push_back(out);
+	
+	m_outputs.push_back (out);
     }
-	
-    return true;
-}
 
-bool node_manager::detach_node(int id)
-{
-    map<int, node*>::iterator iter;
-    iter = m_node_map.find(id);
-	
-    if (iter == m_node_map.end())
-	return false;
-
-    detach_node(iter);
+    if (obj.is_managed ())
+	std::cout << "macagonla\n";
     
     return true;
 }
 
-void node_manager::detach_node (iterator it)
+void node_manager::do_delete_node (iterator it)
 {
-    map<int, node*>::iterator& iter = it;
+    //map<int, mgr_ptr<node> >::iterator& iter = it;
     
-    node_output* out = dynamic_cast<node_output*> (iter->second);
+    node_output* out = dynamic_cast<node_output*> (it->get ());
     if (out != 0) {
-	m_outputs.remove(out);
+	m_outputs.remove (out);
 	out->set_manager (0);
     }
 
-    iter->second->set_id (node::NULL_ID);
-    m_node_map.erase(iter);
+    (*it)->set_id (node::NULL_ID);
+    m_node_map.erase (it);
 }
 
 bool node_manager::delete_node (int id)
 {
-    map<int, node*>::iterator iter;
-    iter = m_node_map.find(id);
+    map<int, mgr_ptr<node> >::iterator iter;
+    iter = m_node_map.find (id);
     
     if (iter == m_node_map.end())
 	return false;
 
-    delete_node(iter);
+    delete_node (iter);
 
     return true;
 }
 
-void node_manager::delete_node(iterator it)
+void node_manager::delete_node (iterator it)
 {
     node* obj = *it;
-/*    
-    detach_node(it); 
-*/
+    
     obj->clear_connections ();
-
-    if (!obj->has_connections ()) {
-	detach_node (it);
-	delete obj;
-    }
+    if (!obj->has_connections ())
+	do_delete_node (it);
     else
-	m_delete_list.push_back(obj);
+	m_delete_list.push_back (*it);
 }
 
 void node_manager::set_info (const audio_info& info)
 {
-    m_update_lock.lock();
+    boost::mutex::scoped_lock lock (m_update_mutex);
 
-    map<int, node*>::iterator map_iter;
-    for (map_iter = m_node_map.begin(); map_iter != m_node_map.end(); ++map_iter) {
+    map<int, mgr_ptr<node> >::iterator map_iter;
+    for (map_iter = m_node_map.begin();
+	 map_iter != m_node_map.end();
+	 ++map_iter)
+    {
 	map_iter->second->set_info (info);
     }
-    
-    m_update_lock.unlock ();
 }
 
 void node_manager::update()
 {
-    m_update_lock.lock();
+    boost::mutex::scoped_lock lock (m_update_mutex);
     
-    map<int, node*>::iterator map_iter;
-    for (map_iter = m_node_map.begin(); map_iter != m_node_map.end(); ++map_iter) {
+    map<int, mgr_ptr<node> >::iterator map_iter;
+    for (map_iter = m_node_map.begin();
+	 map_iter != m_node_map.end();
+	 ++map_iter)
+    {
 	(*map_iter).second->advance();
     }
 	
     list<node_output*>::iterator out_iter;
-    for (out_iter = m_outputs.begin(); out_iter != m_outputs.end(); ++out_iter) {
-	(*out_iter)->update(NULL, -1, -1);
+    for (out_iter = m_outputs.begin();
+	 out_iter != m_outputs.end();
+	 ++out_iter)
+    {
+	(*out_iter)->update (0, -1, -1);
     }
 
     list<node*>::iterator del_iter;
-    for (del_iter = m_delete_list.begin(); del_iter != m_delete_list.end();) {
+    for (del_iter = m_delete_list.begin();
+	 del_iter != m_delete_list.end();)
+    {
 	if (!(*del_iter)->has_connections ()) {
-	    detach_node((*del_iter)->get_id ());
-	    delete *del_iter;
-	    m_delete_list.erase(del_iter++);
+	    delete_node ((*del_iter)->get_id ());
+	    m_delete_list.erase (del_iter++);
 	} else
 	    ++del_iter;
     }
-    
-    m_update_lock.unlock();
 }
 
 } /* namespace psynth */

@@ -42,7 +42,7 @@
 using namespace psynth;
 using namespace std;
 
-bool default_selector_populator::on_samples_conf_nudge (psynth::conf_node& conf)
+void default_selector_populator::on_samples_conf_nudge (psynth::conf_node& conf)
 {
     selector_window::category* cat = m_selector->find_category ("Samples");
 
@@ -50,8 +50,6 @@ bool default_selector_populator::on_samples_conf_nudge (psynth::conf_node& conf)
 	cat->clear_buttons ();
 	populate_samples (cat);
     }
-    
-    return true;
 }
 
 void default_selector_populator::populate_samples (selector_window::category* cat)
@@ -89,9 +87,9 @@ void default_selector_populator::populate_samples (selector_window::category* ca
 void default_selector_populator::populate(selector_window* sel)
 {
     m_selector = sel;
-    config::instance()
-	.get_path ("psychosynth/file_manager/samples")
-	.add_nudge_event (MakeDelegate(this, &default_selector_populator::on_samples_conf_nudge));
+    config::instance ()
+	.get_path ("psychosynth/file_manager/samples").on_nudge.connect
+	(sigc::mem_fun (*this, &default_selector_populator::on_samples_conf_nudge));
     
     selector_window::category* cat = NULL;
     world_node_creator creat;
