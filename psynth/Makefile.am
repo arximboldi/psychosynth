@@ -51,8 +51,6 @@ nobase_libpsynthinc_HEADERS = \
 	common/singleton.hpp \
 	common/audio_buffer.hpp \
 	common/sample_buffer.hpp\
-	common/FastDelegate.hpp\
-	common/FastDelegateBind.hpp\
 	common/ring_buffer.hpp\
 	common/ring_audio_buffer.hpp \
 	common/ring_sample_buffer.hpp \
@@ -68,6 +66,7 @@ nobase_libpsynthinc_HEADERS = \
 	common/file_finder.hpp\
 	common/file_manager.hpp\
 	common/tree.hpp\
+	common/signal.hpp\
 	common/memory.hpp\
 	world/world.hpp \
 	world/patcher.hpp\
