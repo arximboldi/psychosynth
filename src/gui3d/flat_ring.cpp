@@ -20,8 +20,8 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "gui3d/flat_ring.h"
-#include "gui3d/ogre_misc.h"
+#include "gui3d/flat_ring.hpp"
+#include "gui3d/ogre_misc.hpp"
 
 using namespace std;
 using namespace Ogre;

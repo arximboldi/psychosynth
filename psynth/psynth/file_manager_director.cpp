@@ -22,9 +22,10 @@
 
 #include <cstring>
 #include <cstdlib>
-#include "version.h"
-#include "common/file_manager.h"
-#include "psynth/file_manager_director.h"
+
+#include "version.hpp"
+#include "common/file_manager.hpp"
+#include "psynth/file_manager_director.hpp"
 
 using namespace std;
 

@@ -20,9 +20,9 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <libpsynth/node/watch_viewer.h>
+#include <psynth/node/watch_viewer.hpp>
 
-#include "gui3d/connection.h"
+#include "gui3d/connection.hpp"
 
 using namespace Ogre;
 using namespace std;

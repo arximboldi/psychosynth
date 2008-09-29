@@ -21,8 +21,9 @@
  ***************************************************************************/
 
 #include <algorithm>
-#include "common/deleter.h"
-#include "node/node.h"
+
+#include "common/deleter.hpp"
+#include "node/node.hpp"
 
 #include <cmath>
 

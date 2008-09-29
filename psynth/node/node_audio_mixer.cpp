@@ -21,7 +21,7 @@
  ***************************************************************************/
 
 #include <algorithm>
-#include "node/node_audio_mixer.h"
+#include "node/node_audio_mixer.hpp"
 
 namespace psynth
 {

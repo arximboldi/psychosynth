@@ -22,8 +22,8 @@
 
 #include <cstring>
 #include <cstdlib>
-#include "common/file_finder.h"
-#include "common/misc.h"
+#include "common/file_finder.hpp"
+#include "common/misc.hpp"
 
 using namespace std;
 namespace bf = boost::filesystem;

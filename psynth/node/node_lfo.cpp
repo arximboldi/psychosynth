@@ -21,7 +21,7 @@
  ***************************************************************************/
 
 #include <algorithm>
-#include "node/node_lfo.h"
+#include "node/node_lfo.hpp"
 
 using namespace std;
 

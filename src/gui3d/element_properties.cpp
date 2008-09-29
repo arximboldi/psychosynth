@@ -21,7 +21,7 @@
  ***************************************************************************/
 
 #include <algorithm>
-#include "gui3d/element_properties.h"
+#include "gui3d/element_properties.hpp"
 
 #define ELEMENT_EDITOR_WIDTH  200.0f
 #define ELEMENT_EDITOR_HEIGHT 30.0f

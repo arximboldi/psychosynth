@@ -22,20 +22,20 @@
 
 #include <algorithm>
 
-#include "world/world.h"
+#include "world/world.hpp"
 
-#include "node/node_output.h"
-#include "node/node_audio_mixer.h"
-#include "node/node_control_mixer.h"
-#include "node/node_audio_oscillator.h"
-#include "node/node_lfo.h"
-#include "node/node_filter.h"
-#include "node/node_sampler.h"
-#include "node/node_step_seq.h"
-#include "node/node_audio_noise.h"
-#include "node/node_control_noise.h"
-#include "node/node_echo.h"
-#include "node/node_delay.h"
+#include "node/node_output.hpp"
+#include "node/node_audio_mixer.hpp"
+#include "node/node_control_mixer.hpp"
+#include "node/node_audio_oscillator.hpp"
+#include "node/node_lfo.hpp"
+#include "node/node_filter.hpp"
+#include "node/node_sampler.hpp"
+#include "node/node_step_seq.hpp"
+#include "node/node_audio_noise.hpp"
+#include "node/node_control_noise.hpp"
+#include "node/node_echo.hpp"
+#include "node/node_delay.hpp"
 
 using namespace std;
 

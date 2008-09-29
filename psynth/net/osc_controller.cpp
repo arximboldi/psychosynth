@@ -21,8 +21,8 @@
  ***************************************************************************/
 
 #include <algorithm>
-#include "net/osc_controller.h"
-#include "net/osc_protocol.h"
+#include "net/osc_controller.hpp"
+#include "net/osc_protocol.hpp"
 
 using namespace std;
 

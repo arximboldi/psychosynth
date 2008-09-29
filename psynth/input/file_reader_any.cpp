@@ -22,16 +22,16 @@
 
 #include <boost/filesystem.hpp>
 
-#include "version.h"
-#include "common/misc.h"
-#include "common/logger.h"
-#include "input/file_reader_any.h"
+#include "version.hpp"
+#include "common/misc.hpp"
+#include "common/logger.hpp"
+#include "input/file_reader_any.hpp"
 
 #ifdef PSYNTH_HAVE_PCM
-#include "input/file_reader_wave.h"
+#include "input/file_reader_wave.hpp"
 #endif
 #ifdef PSYNTH_HAVE_OGG
-#include "input/file_reader_ogg.h"
+#include "input/file_reader_ogg.hpp"
 #endif
 
 #include <iostream>

@@ -43,12 +43,12 @@ endif
 psynth_CXXFLAGS = $(SIGC_CFLAGS)
 psynth_LDFLAGS = 
 psynth_LDADD = $(SIGC_LIBS) \
-	../libpsynth/libpsynth.la
+	../psynth/libpsynth.la
 
 psynth_SOURCES = \
 	cli/psychosynth_cli.cpp\
 	psynth.cpp\
-	cli/psychosynth_cli.h
+	cli/psychosynth_cli.hpp
 
 #  psynth3d compilation
 # ======================================================================
@@ -68,7 +68,7 @@ psynth3d_LDADD = \
 	$(CEGUI_LIBS) \
 	$(OIS_LIBS) \
 	$(CEGUIOGRE_LIBS) \
-	../libpsynth/libpsynth.la
+	../psynth/libpsynth.la
 
 psynth3d_SOURCES = \
 	gui3d/camera_controller_default.cpp \
@@ -94,32 +94,32 @@ psynth3d_SOURCES = \
 	gui3d/ogre_misc.cpp \
 	gui3d/gui_log_sink.cpp \
 	psynth3d.cpp \
-	gui3d/input_manager.h \
-	gui3d/psychosynth_3d.h \
-	gui3d/camera_controller.h \
-	gui3d/camera_controller_default.h \
-	gui3d/cegui_injecter.h \
-	gui3d/quit_window.h \
-	gui3d/conf_window.h \
-	gui3d/selector_window.h\
-	gui3d/info_window.h\
-	gui3d/default_selector_populator.h\
-	gui3d/toggable_window.h\
-	gui3d/task_manager.h\
-	gui3d/element.h\
-	gui3d/element_types.h\
-	gui3d/elem_main_component.h \
-	gui3d/elem_second_component.h \
-	gui3d/elem_toggler_component.h \
-	gui3d/element_manager.h\
-	gui3d/element_properties.h \
-	gui3d/the_elements.h \
-	gui3d/query_flags.h\
-	gui3d/window_list.h\
-	gui3d/flat_ring.h\
-	gui3d/connection.h\
-	gui3d/ogre_misc.h \
-	gui3d/gui_log_sink.h 
+	gui3d/input_manager.hpp \
+	gui3d/psychosynth_3d.hpp \
+	gui3d/camera_controller.hpp \
+	gui3d/camera_controller_default.hpp \
+	gui3d/cegui_injecter.hpp \
+	gui3d/quit_window.hpp \
+	gui3d/conf_window.hpp \
+	gui3d/selector_window.hpp\
+	gui3d/info_window.hpp\
+	gui3d/default_selector_populator.hpp\
+	gui3d/toggable_window.hpp\
+	gui3d/task_manager.hpp\
+	gui3d/element.hpp\
+	gui3d/element_types.hpp\
+	gui3d/elem_main_component.hpp \
+	gui3d/elem_second_component.hpp \
+	gui3d/elem_toggler_component.hpp \
+	gui3d/element_manager.hpp\
+	gui3d/element_properties.hpp \
+	gui3d/the_elements.hpp \
+	gui3d/query_flags.hpp\
+	gui3d/window_list.hpp\
+	gui3d/flat_ring.hpp\
+	gui3d/connection.hpp\
+	gui3d/ogre_misc.hpp \
+	gui3d/gui_log_sink.hpp 
 
 if HAVE_LIBXML
 psynth3d_CXXFLAGS += $(LIBXML_CFLAGS)
@@ -131,7 +131,7 @@ psynth3d_CXXFLAGS += $(LIBLO_CFLAGS)
 psynth3d_LDADD += $(LIBLO_LIBS)
 psynth3d_SOURCES += \
 	gui3d/network_window.cpp \
-	gui3d/network_window.h
+	gui3d/network_window.hpp
 endif
 
 if HAVE_SNDFILE
@@ -139,5 +139,5 @@ psynth3d_CXXFLAGS += $(SNDFILE_CFLAGS)
 psynth3d_LDADD += $(SNDFILE_LIBS)
 psynth3d_SOURCES += \
 	gui3d/record_window.cpp \
-	gui3d/record_window.h
+	gui3d/record_window.hpp
 endif

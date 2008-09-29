@@ -22,7 +22,7 @@
 
 #include <cstring>
 #include <algorithm>
-#include "cli/psychosynth_cli.h"
+#include "cli/psychosynth_cli.hpp"
 
 int main(int argc, const char *argv[])
 {

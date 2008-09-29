@@ -20,7 +20,7 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "task_manager.h"
+#include "task_manager.hpp"
 
 void task_manager::update (int ms)
 {

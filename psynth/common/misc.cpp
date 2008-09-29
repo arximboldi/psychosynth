@@ -24,14 +24,14 @@
 #include <cmath>
 #include <cctype>
 
-#include "common/misc.h"
+#include "common/misc.hpp"
 
 using namespace std;
 
 namespace psynth
 {
 
-const char* get_extension(const char* file)
+const char* get_extension (const char* file)
 {
     const char* ext;
     
@@ -41,7 +41,7 @@ const char* get_extension(const char* file)
     return ext+1;
 }
 
-int strcmp_i(const char* a, const char* b)
+int strcmp_i (const char* a, const char* b)
 {
     while (*a && *b && tolower(*a++) == tolower(*b++));
 

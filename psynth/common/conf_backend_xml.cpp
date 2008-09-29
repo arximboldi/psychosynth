@@ -22,9 +22,9 @@
 
 #include <sstream>
 
-#include "common/logger.h"
-#include "common/misc.h"
-#include "common/conf_backend_xml.h"
+#include "common/logger.hpp"
+#include "common/misc.hpp"
+#include "common/conf_backend_xml.hpp"
 
 #define DEFAULT_FLOAT_VALUE  0.0f
 #define DEFAULT_INT_VALUE    0

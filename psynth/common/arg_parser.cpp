@@ -22,7 +22,8 @@
 
 #include <cstring>
 #include <cstdlib>
-#include "common/arg_parser.h"
+
+#include "common/arg_parser.hpp"
 
 using namespace std;
 

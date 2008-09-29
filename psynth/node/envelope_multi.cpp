@@ -21,7 +21,7 @@
  ***************************************************************************/
 
 #include <iostream>
-#include "node/envelope_multi.h"
+#include "node/envelope_multi.hpp"
 
 namespace psynth
 {

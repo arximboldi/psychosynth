@@ -20,9 +20,9 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <libpsynth/common/misc.h>
-#include "gui3d/elem_toggler_component.h"
-#include "gui3d/ogre_misc.h"
+#include <psynth/common/misc.hpp>
+#include "gui3d/elem_toggler_component.hpp"
+#include "gui3d/ogre_misc.hpp"
 
 #define TOGGLE_RAD 1.5
 #define TOGGLE_GAP 4

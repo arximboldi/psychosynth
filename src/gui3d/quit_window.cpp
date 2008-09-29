@@ -22,7 +22,7 @@
 
 #include <OGRE/Ogre.h>
 
-#include "gui3d/quit_window.h"
+#include "gui3d/quit_window.hpp"
 
 using namespace CEGUI;
 using namespace std;

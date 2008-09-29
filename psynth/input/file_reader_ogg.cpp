@@ -20,8 +20,8 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "common/logger.h"
-#include "input/file_reader_ogg.h"
+#include "common/logger.hpp"
+#include "input/file_reader_ogg.hpp"
 
 using namespace std;
 

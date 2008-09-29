@@ -23,8 +23,8 @@
 #include <cstring>
 #include <iostream>
 
-#include "net/osc_broadcast.h"
-#include "net/osc_misc.h"
+#include "net/osc_broadcast.hpp"
+#include "net/osc_misc.hpp"
 
 using namespace std;
 

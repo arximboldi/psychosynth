@@ -20,7 +20,7 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "gui_log_sink.h"
+#include "gui_log_sink.hpp"
 
 using namespace std;
 using namespace CEGUI;

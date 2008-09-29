@@ -20,7 +20,7 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "common/config.h"
+#include "common/config.hpp"
 
 using namespace std;
 

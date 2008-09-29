@@ -20,7 +20,7 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "node/filter.h"
+#include "node/filter.hpp"
 
 namespace psynth
 {

@@ -21,8 +21,8 @@
  ***************************************************************************/
 
 #include <algorithm>
-#include "node/node_types.h"
-#include "node/node_mixer.h"
+#include "node/node_types.hpp"
+#include "node/node_mixer.hpp"
 
 using namespace std;
 

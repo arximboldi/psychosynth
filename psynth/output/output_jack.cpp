@@ -20,9 +20,11 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "common/misc.h"
-#include "common/logger.h"
-#include "output/output_jack.h"
+#include <cstdlib>
+
+#include "common/misc.hpp"
+#include "common/logger.hpp"
+#include "output/output_jack.hpp"
 
 using namespace std;
 
@@ -132,7 +134,7 @@ void output_jack::connect_ports()
 {
     const char** ports;
 
-    ports = jack_get_ports (m_client, NULL, NULL, JackPortIsPhysical|JackPortIsInput);
+    ports = jack_get_ports (m_client, 0, 0, JackPortIsPhysical | JackPortIsInput);
 
     if (!ports) {
 	logger::instance () ("jack", log::WARNING, "There are no phisical output ports.");
@@ -142,7 +144,7 @@ void output_jack::connect_ports()
     for (size_t i = 0; i < m_out_ports.size() && ports[i]; ++i)
 	jack_connect (m_client, jack_port_name(m_out_ports[i]), ports[i]);
 
-    free(ports);
+    ::free (ports);
 }
 
 bool output_jack::start()

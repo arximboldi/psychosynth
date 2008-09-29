@@ -24,8 +24,8 @@
 
 #include <boost/bind.hpp>
 
-#include "output/output_alsa.h"
-#include "common/logger.h"
+#include "output/output_alsa.hpp"
+#include "common/logger.hpp"
 
 using namespace std;
 
@@ -178,8 +178,8 @@ bool output_alsa::put(const audio_buffer& in_buf, size_t nframes)
 				    string("Could not write to device. (")
 				    + snd_strerror(err) + ")");
 		//close(); /* WTF! */
-		snd_pcm_recover(alsa_pcm, err, 1);
-		snd_pcm_prepare(alsa_pcm);
+		snd_pcm_recover (alsa_pcm, err, 1);
+		//snd_pcm_prepare (alsa_pcm);
 		ret = false;
 	    }
 	    

@@ -22,7 +22,7 @@ AUTOMAKE_OPTIONS = foreign
 
 ACLOCAL_AMFLAGS = -I m4
 
-SUBDIRS = libpsynth src data
+SUBDIRS = psynth src data
 
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = libpsynth.pc

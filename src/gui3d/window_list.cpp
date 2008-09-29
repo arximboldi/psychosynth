@@ -20,7 +20,7 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "gui3d/window_list.h"
+#include "gui3d/window_list.hpp"
 
 using namespace CEGUI;
 

@@ -21,8 +21,8 @@
  ***************************************************************************/
 
 #include <algorithm>
-#include "node/node_echo.h"
-#include "node/node_types.h"
+#include "node/node_echo.hpp"
+#include "node/node_types.hpp"
 
 using namespace std;
 

@@ -20,7 +20,7 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "gui3d/toggable_window.h"
+#include "gui3d/toggable_window.hpp"
 
 using namespace CEGUI;
 

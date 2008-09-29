@@ -21,9 +21,12 @@
  ***************************************************************************/
 
 #include <iostream>
-#include <libpsynth/version.h>
+
+#include <psynth/version.hpp>
+
+#include "gui3d/info_window.hpp"
 #include "config.h"
-#include "gui3d/info_window.h"
+
 
 using namespace CEGUI;
 using namespace std;

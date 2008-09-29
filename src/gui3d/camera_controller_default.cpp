@@ -22,7 +22,7 @@
 
 #include <CEGUI/CEGUI.h>
 
-#include "gui3d/camera_controller_default.h"
+#include "gui3d/camera_controller_default.hpp"
 
 #define CAMERA_MOVE_DELAY 400
 

@@ -20,7 +20,7 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "common/sample_buffer.h"
+#include "common/sample_buffer.hpp"
 
 namespace psynth
 {

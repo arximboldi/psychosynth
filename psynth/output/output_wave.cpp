@@ -20,8 +20,8 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "common/logger.h"
-#include "output/output_wave.h"
+#include "common/logger.hpp"
+#include "output/output_wave.hpp"
 
 using namespace std;
 

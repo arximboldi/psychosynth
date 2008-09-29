@@ -24,34 +24,34 @@
 #include <cstdlib>
 #include <config.h>
 
-#include <libpsynth/version.h>
-#include <libpsynth/common/logger.h>
-#include <libpsynth/common/misc.h>
-#include <libpsynth/common/option_conf.h>
+#include <psynth/version.hpp>
+#include <psynth/common/logger.hpp>
+#include <psynth/common/misc.hpp>
+#include <psynth/common/option_conf.hpp>
 #ifdef PSYNTH_HAVE_XML
-#include <libpsynth/common/conf_backend_xml.h>
+#include <psynth/common/conf_backend_xml.hpp>
 #endif
 
-#include "gui3d/psychosynth_3d.h"
+#include "gui3d/psychosynth_3d.hpp"
 
-#include "gui3d/quit_window.h"
-#include "gui3d/conf_window.h"
-#include "gui3d/info_window.h"
-#include "gui3d/selector_window.h"
-#include "gui3d/default_selector_populator.h"
+#include "gui3d/quit_window.hpp"
+#include "gui3d/conf_window.hpp"
+#include "gui3d/info_window.hpp"
+#include "gui3d/selector_window.hpp"
+#include "gui3d/default_selector_populator.hpp"
 
 #ifdef PSYNTH_HAVE_OSC
-#include "gui3d/network_window.h"
+#include "gui3d/network_window.hpp"
 #endif
 #ifdef PSYNTH_HAVE_PCM
-#include "gui3d/record_window.h"
+#include "gui3d/record_window.hpp"
 #endif
 
-#include "gui3d/camera_controller_default.h"
-#include "gui3d/element.h"
-#include "gui3d/element_types.h"
-#include "gui3d/query_flags.h"
-#include "gui3d/flat_ring.h"
+#include "gui3d/camera_controller_default.hpp"
+#include "gui3d/element.hpp"
+#include "gui3d/element_types.hpp"
+#include "gui3d/query_flags.hpp"
+#include "gui3d/flat_ring.hpp"
 
 #define DEFAULT_SCREEN_WIDTH  800
 #define DEFAULT_SCREEN_HEIGHT 600

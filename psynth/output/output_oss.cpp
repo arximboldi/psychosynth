@@ -23,6 +23,7 @@
 #include <iostream>
 
 #include <cmath>
+
 #include <fcntl.h>
 #include <sys/soundcard.h>
 #include <sys/stat.h>
@@ -31,8 +32,8 @@
 
 #include <boost/bind.hpp>
 
-#include "common/logger.h"
-#include "output/output_oss.h"
+#include "common/logger.hpp"
+#include "output/output_oss.hpp"
 
 using namespace std;
 

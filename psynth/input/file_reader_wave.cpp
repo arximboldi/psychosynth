@@ -20,8 +20,8 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "input/file_reader_wave.h"
-#include "common/logger.h"
+#include "input/file_reader_wave.hpp"
+#include "common/logger.hpp"
 
 using namespace std;
 

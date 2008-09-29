@@ -21,16 +21,16 @@
  ***************************************************************************/
 
 #include <iostream>
-#include "input/file_reader_fetcher.h"
+#include "input/file_reader_fetcher.hpp"
 
 using namespace std;
 
 namespace psynth
 {
 
-file_reader_fetcher::file_reader_fetcher(file_reader* reader,
-					 int buffer_size,
-					 int threshold) :
+file_reader_fetcher::file_reader_fetcher (file_reader* reader,
+					  int buffer_size,
+					  int threshold) :
     m_reader(reader),
     m_buffer_size(buffer_size),
     m_threshold(threshold),

@@ -412,8 +412,8 @@ AC_OUTPUT(libpsynth.pc
 	  doc/Doxyfile
 	  src/Makefile
 	  data/Makefile
-	  libpsynth/Makefile
-	  libpsynth/version.h)
+	  psynth/Makefile
+	  psynth/version.hpp)
 
 
 #  Result

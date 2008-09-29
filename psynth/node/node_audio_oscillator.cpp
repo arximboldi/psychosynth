@@ -21,7 +21,7 @@
  ***************************************************************************/
 
 #include <algorithm>
-#include "node/node_audio_oscillator.h"
+#include "node/node_audio_oscillator.hpp"
 
 using namespace std;
 

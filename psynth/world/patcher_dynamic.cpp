@@ -21,21 +21,24 @@
  ***************************************************************************/
 
 #include <algorithm>
-#include "world/patcher_dynamic.h"
 
-#include "node/node.h"
-#include "node/node_output.h"
-#include "node/node_audio_mixer.h"
-#include "node/node_control_mixer.h"
-#include "node/node_audio_oscillator.h"
-#include "node/node_lfo.h"
-#include "node/node_filter.h"
-#include "node/node_sampler.h"
-#include "node/node_step_seq.h"
-#include "node/node_audio_noise.h"
-#include "node/node_control_noise.h"
-#include "node/node_echo.h"
-#include "node/node_delay.h"
+#include "common/logger.hpp"
+
+#include "world/patcher_dynamic.hpp"
+
+#include "node/node.hpp"
+#include "node/node_output.hpp"
+#include "node/node_audio_mixer.hpp"
+#include "node/node_control_mixer.hpp"
+#include "node/node_audio_oscillator.hpp"
+#include "node/node_lfo.hpp"
+#include "node/node_filter.hpp"
+#include "node/node_sampler.hpp"
+#include "node/node_step_seq.hpp"
+#include "node/node_audio_noise.hpp"
+#include "node/node_control_noise.hpp"
+#include "node/node_echo.hpp"
+#include "node/node_delay.hpp"
 
 using namespace std;
 
@@ -424,14 +427,19 @@ void patcher_dynamic::update ()
     if (!m_changed)
 	return;
     
-    for (map<int, pnode>::iterator i = m_nodes.begin(); i != m_nodes.end(); ++i)
+    for (map<int, pnode>::iterator i = m_nodes.begin();
+	 i != m_nodes.end();
+	 ++i)
 	(*i).second.out_used = false;
 
-    for (multiset<link*>::iterator i = m_links.begin(); i != m_links.end(); ++i) {
+    for (multiset<link*>::iterator i = m_links.begin();
+	 i != m_links.end();
+	 ++i)
+    {
 	map<int, pnode>::iterator n = m_nodes.find((*i)->src->get_id());
 	map<int, pnode>::iterator n2 = m_nodes.find((*i)->dest->get_id());
 	if (n == m_nodes.end()) {
-	    WARNING("Object with id " << (*i)->src->get_id () << "not found.");
+	    logger::instance () ("dynamic_patcher", log::WARNING, "Object not found.");
 	}
 	
 	pnode& node_src = (*n).second;

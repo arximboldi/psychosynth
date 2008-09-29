@@ -20,7 +20,7 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "common/ring_buffer.h"
+#include "common/ring_buffer.hpp"
 
 namespace psynth
 {

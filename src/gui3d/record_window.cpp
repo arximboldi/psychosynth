@@ -23,7 +23,7 @@
 #include <algorithm>
 #include <string>
 
-#include "gui3d/record_window.h"
+#include "gui3d/record_window.hpp"
 
 using namespace std;
 using namespace CEGUI;

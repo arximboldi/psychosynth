@@ -21,7 +21,8 @@
  ***************************************************************************/
 
 #include <algorithm>
-#include "common/audio_buffer.h"
+
+#include "common/audio_buffer.hpp"
 
 #define INT_MAX_VALUE_F    2147483647.0
 #define SHORT_MAX_VALUE_F  32766.0

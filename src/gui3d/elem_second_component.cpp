@@ -20,8 +20,8 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "gui3d/elem_second_component.h"
-#include "gui3d/ogre_misc.h"
+#include "gui3d/elem_second_component.hpp"
+#include "gui3d/ogre_misc.hpp"
 
 #define SECOND_RAD 1.2
 #define SECOND_MIN_ANGLE -5

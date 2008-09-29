@@ -24,7 +24,7 @@
 #include <iostream>
 #include <sys/time.h>
 
-#include "common/timer.h"
+#include "common/timer.hpp"
 
 using namespace std;
 

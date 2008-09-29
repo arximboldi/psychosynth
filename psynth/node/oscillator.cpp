@@ -21,8 +21,8 @@
  ***************************************************************************/
 
 #include <iostream>
-#include <node/oscillator.h>
-#include <node/envelope_simple.h>
+#include <node/oscillator.hpp>
+#include <node/envelope_simple.hpp>
 
 using namespace std;
 

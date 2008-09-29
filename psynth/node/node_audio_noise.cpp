@@ -21,7 +21,7 @@
  ***************************************************************************/
 
 #include <algorithm>
-#include "node/node_audio_noise.h"
+#include "node/node_audio_noise.hpp"
 
 using namespace std;
 

@@ -20,7 +20,7 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "gui3d/psychosynth_3d.h"
+#include "gui3d/psychosynth_3d.hpp"
 #include <sigc++/sigc++.h>
 
 #if 0

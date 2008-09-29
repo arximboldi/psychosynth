@@ -20,20 +20,20 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "gui3d/the_elements.h"
+#include "gui3d/the_elements.hpp"
 
-#include "gui3d/elem_main_component.h"
-#include "gui3d/elem_second_component.h"
-#include "gui3d/elem_toggler_component.h"
+#include "gui3d/elem_main_component.hpp"
+#include "gui3d/elem_second_component.hpp"
+#include "gui3d/elem_toggler_component.hpp"
 
-#include <libpsynth/node/node_mixer.h>
-#include <libpsynth/node/node_oscillator.h>
-#include <libpsynth/node/node_filter.h>
-#include <libpsynth/node/node_sampler.h>
-#include <libpsynth/node/node_step_seq.h>
-#include <libpsynth/node/node_noise.h>
-#include <libpsynth/node/node_echo.h>
-#include <libpsynth/node/node_delay.h>
+#include <psynth/node/node_mixer.hpp>
+#include <psynth/node/node_oscillator.hpp>
+#include <psynth/node/node_filter.hpp>
+#include <psynth/node/node_sampler.hpp>
+#include <psynth/node/node_step_seq.hpp>
+#include <psynth/node/node_noise.hpp>
+#include <psynth/node/node_echo.hpp>
+#include <psynth/node/node_delay.hpp>
 
 using namespace std;
 using namespace Ogre;

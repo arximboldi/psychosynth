@@ -22,9 +22,9 @@
 
 #include <cstring>
 #include <algorithm>
-#include "psynth/director.h"
-#include "psynth/defaults.h"
-#include "world/patcher_dynamic.h"
+#include "psynth/director.hpp"
+#include "psynth/defaults.hpp"
+#include "world/patcher_dynamic.hpp"
 
 using namespace std;
 

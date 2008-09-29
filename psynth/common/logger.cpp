@@ -20,7 +20,7 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "common/logger.h"
+#include "common/logger.hpp"
 
 using namespace std;
 

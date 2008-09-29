@@ -21,8 +21,8 @@
  ***************************************************************************/
 
 #include <algorithm>
-#include "node/node_filter.h"
-#include "node/node_types.h"
+#include "node/node_filter.hpp"
+#include "node/node_types.hpp"
 
 using namespace std;
 

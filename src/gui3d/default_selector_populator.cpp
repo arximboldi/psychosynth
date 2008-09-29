@@ -26,18 +26,19 @@
 #include <string>
 #include <dirent.h>
 
-#include <libpsynth/version.h>
-#include <libpsynth/common/misc.h>
-#include <libpsynth/common/file_manager.h>
-#include <libpsynth/world/world_node_creator.h>
+#include <psynth/version.hpp>
+#include <psynth/common/misc.hpp>
+#include <psynth/common/file_manager.hpp>
+#include <psynth/world/world_node_creator.hpp>
 
-#include <libpsynth/node/node_mixer.h>
-#include <libpsynth/node/node_oscillator.h>
-#include <libpsynth/node/node_filter.h>
-#include <libpsynth/node/node_step_seq.h>
-#include <libpsynth/node/node_noise.h>
-#include "gui3d/selector_window.h"
-#include "gui3d/default_selector_populator.h"
+#include <psynth/node/node_mixer.hpp>
+#include <psynth/node/node_oscillator.hpp>
+#include <psynth/node/node_filter.hpp>
+#include <psynth/node/node_step_seq.hpp>
+#include <psynth/node/node_noise.hpp>
+
+#include "gui3d/selector_window.hpp"
+#include "gui3d/default_selector_populator.hpp"
 
 using namespace psynth;
 using namespace std;

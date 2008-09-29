@@ -20,7 +20,7 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "common/scaler_st.h"
+#include "common/scaler_st.hpp"
 
 namespace psynth
 {

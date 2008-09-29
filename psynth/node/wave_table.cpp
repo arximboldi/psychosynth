@@ -21,7 +21,7 @@
  ***************************************************************************/
 
 #include <cmath>
-#include "node/wave_table.h"
+#include "node/wave_table.hpp"
 
 using namespace std;
 

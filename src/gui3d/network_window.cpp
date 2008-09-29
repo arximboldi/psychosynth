@@ -21,7 +21,7 @@
  ***************************************************************************/
 
 #include <algorithm>
-#include "gui3d/network_window.h"
+#include "gui3d/network_window.hpp"
 
 using namespace std;
 using namespace CEGUI;

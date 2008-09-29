@@ -20,7 +20,7 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "node/node_manager.h"
+#include "node/node_manager.hpp"
 
 using namespace std;
 

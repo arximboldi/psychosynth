@@ -23,14 +23,14 @@
 #include <algorithm>
 #include <CEGUI/CEGUI.h>
 
-#include "gui3d/element_manager.h"
-#include "gui3d/element_types.h"
-#include "gui3d/the_elements.h"
-#include "gui3d/query_flags.h"
+#include "gui3d/element_manager.hpp"
+#include "gui3d/element_types.hpp"
+#include "gui3d/the_elements.hpp"
+#include "gui3d/query_flags.hpp"
 
-#include <libpsynth/common/logger.h>
+#include <psynth/common/logger.hpp>
 
-#include <libpsynth/node/node_types.h>
+#include <psynth/node/node_types.hpp>
 
 using namespace std;
 using namespace Ogre;
@@ -404,7 +404,7 @@ void element_manager::handle_add_node (world_node& obj)
 	obj.add_listener(elem);
     }
     else
-	WARNING("Could not create element.");
+	logger::instance () ("gui3d", log::WARNING, "Could not create element.");
 }
 
 void element_manager::handle_delete_node (world_node& obj)

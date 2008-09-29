@@ -22,26 +22,26 @@
 
 #include <cstring>
 #include <algorithm>
-#include <libpsynth/version.h>
-#include <sys/stat.h>
 
-#include "common/logger.h"
-#include "common/arg_parser.h"
-#include "common/option_conf.h"
+#include "version.hpp"
+
+#include "common/logger.hpp"
+#include "common/arg_parser.hpp"
+#include "common/option_conf.hpp"
 #ifdef PSYNTH_HAVE_XML
-#include "common/conf_backend_xml.h"
+#include "common/conf_backend_xml.hpp"
 #endif
 #ifdef PSYNTH_HAVE_ALSA
-#include "psynth/output_director_alsa.h"
+#include "psynth/output_director_alsa.hpp"
 #endif
 #ifdef PSYNTH_HAVE_OSS
-#include "psynth/output_director_oss.h"
+#include "psynth/output_director_oss.hpp"
 #endif
 #ifdef PSYNTH_HAVE_JACK
-#include "psynth/output_director_jack.h"
+#include "psynth/output_director_jack.hpp"
 #endif
 
-#include "psynth/psynth_app.h"
+#include "psynth/psynth_app.hpp"
 
 using namespace std;
 namespace bf = boost::filesystem;

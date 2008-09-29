@@ -22,10 +22,10 @@
 
 #include <iostream>
 
-#include "gui3d/element.h"
-#include "gui3d/query_flags.h"
+#include "gui3d/element.hpp"
+#include "gui3d/query_flags.hpp"
 
-#include <libpsynth/common/misc.h>
+#include <psynth/common/misc.hpp>
 
 #define ROTATION_FACTOR     100.0f
 

@@ -24,26 +24,26 @@
 #include <iostream>
 #include <cmath>
 
-#include "common/sample_buffer.h"
-#include "common/ring_sample_buffer.h"
+#include "common/sample_buffer.hpp"
+#include "common/ring_sample_buffer.hpp"
 
 using namespace std;
 
 namespace psynth
 {
 
-void ring_sample_buffer::allocate()
+void ring_sample_buffer::allocate ()
 {
     m_data = new sample  [ m_size ];
 }
 
-ring_sample_buffer::ring_sample_buffer() :
+ring_sample_buffer::ring_sample_buffer () :
     m_data(NULL),
     m_fr_count(0)
 {
 };
 
-ring_sample_buffer::ring_sample_buffer(int size) :
+ring_sample_buffer::ring_sample_buffer (int size) :
     ring_buffer(size),
     m_data(NULL),
     m_fr_count(0)

@@ -20,11 +20,11 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "common/audio_buffer.h"
-#include "common/misc.h"
-#include "common/file_manager.h"
-#include "node/node_types.h"
-#include "node/node_sampler.h"
+#include "common/audio_buffer.hpp"
+#include "common/misc.hpp"
+#include "common/file_manager.hpp"
+#include "node/node_types.hpp"
+#include "node/node_sampler.hpp"
 
 using namespace std;
 
@@ -58,7 +58,7 @@ node_sampler::node_sampler(const audio_info& info):
     m_restart(false)
 {
     add_param ("file", node_param::STRING, &m_param_file,
-	       MakeDelegate(this, &node_sampler::on_file_change));
+	       boost::bind (&node_sampler::on_file_change, this, _1));
     add_param ("amplitude", node_param::FLOAT, &m_param_ampl);
     add_param ("rate", node_param::FLOAT, &m_param_rate);
     add_param ("tempo", node_param::FLOAT, &m_param_tempo);

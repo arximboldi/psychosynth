@@ -23,7 +23,7 @@
 
 #include "OGRE/Ogre.h"
 
-#include "gui3d/ogre_misc.h"
+#include "gui3d/ogre_misc.hpp"
 
 using namespace Ogre;
 using namespace std;

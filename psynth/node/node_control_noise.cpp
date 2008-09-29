@@ -21,7 +21,7 @@
  ***************************************************************************/
 
 #include <algorithm>
-#include "node/node_control_noise.h"
+#include "node/node_control_noise.hpp"
 
 using namespace std;
 

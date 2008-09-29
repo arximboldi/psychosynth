@@ -22,7 +22,7 @@
 
 #include <algorithm>
 #include <climits>
-#include "node/node_noise.h"
+#include "node/node_noise.hpp"
 
 namespace psynth
 {

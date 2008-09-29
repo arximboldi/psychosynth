@@ -23,8 +23,9 @@
 #include <cstring>
 #include <algorithm>
 #include <cstdio>
-#include "net/osc_server.h"
-#include "net/osc_protocol.h"
+
+#include "net/osc_server.hpp"
+#include "net/osc_protocol.hpp"
 
 static const int MAX_ALIVE_DELAY = 10000;
 static const int MIN_ALIVE_DELAY = 1000;

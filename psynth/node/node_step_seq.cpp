@@ -21,10 +21,10 @@
  ***************************************************************************/
 
 #include <algorithm>
-#include "common/misc.h"
-#include "node/node_types.h"
-#include "node/envelope_multi.h"
-#include "node/node_step_seq.h"
+#include "common/misc.hpp"
+#include "node/node_types.hpp"
+#include "node/envelope_multi.hpp"
+#include "node/node_step_seq.hpp"
 
 using namespace std;
 

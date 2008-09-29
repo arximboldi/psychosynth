@@ -22,7 +22,7 @@
 
 #include <cstring>
 #include <cstdlib>
-#include "gui3d/conf_window.h"
+#include "gui3d/conf_window.hpp"
 
 using namespace psynth;
 using namespace CEGUI;

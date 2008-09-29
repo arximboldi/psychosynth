@@ -22,10 +22,11 @@
 
 #include <iostream>
 #include <cmath>
-#include "common/ring_audio_buffer.h"
-#include "common/misc.h"
-#include "common/logger.h"
-#include "common/scaler.h"
+
+#include "common/ring_audio_buffer.hpp"
+#include "common/misc.hpp"
+#include "common/logger.hpp"
+#include "common/scaler.hpp"
 
 using namespace std;
 

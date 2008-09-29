@@ -21,8 +21,8 @@
  ***************************************************************************/
 
 #include <algorithm>
-#include "world/world_node_creator.h"
-#include "world/world.h"
+#include "world/world_node_creator.hpp"
+#include "world/world.hpp"
 
 using namespace std;
 

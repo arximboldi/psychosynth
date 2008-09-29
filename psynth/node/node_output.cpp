@@ -20,9 +20,9 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "node/node_types.h"
-#include "node/node_output.h"
-#include "node/node_manager.h"
+#include "node/node_types.hpp"
+#include "node/node_output.hpp"
+#include "node/node_manager.hpp"
 
 const int SAFETY_FACTOR = 4;
 

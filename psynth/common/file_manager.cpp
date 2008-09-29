@@ -22,7 +22,7 @@
 
 #include <cstring>
 #include <cstdlib>
-#include "common/file_manager.h"
+#include "common/file_manager.hpp"
 
 namespace bf = boost::filesystem;
 

@@ -20,7 +20,7 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "gui3d/input_manager.h"
+#include "gui3d/input_manager.hpp"
 
 input_manager::input_manager(OIS::ParamList& pl)
 {

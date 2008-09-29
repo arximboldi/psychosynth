@@ -21,7 +21,7 @@
  ***************************************************************************/
 
 #include <algorithm>
-#include "node/node_control_mixer.h"
+#include "node/node_control_mixer.hpp"
 
 namespace psynth
 {

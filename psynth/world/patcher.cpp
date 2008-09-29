@@ -21,7 +21,7 @@
  ***************************************************************************/
 
 #include <algorithm>
-#include "world/patcher.h"
+#include "world/patcher.hpp"
 
 using namespace std;
 

@@ -21,7 +21,7 @@
  ***************************************************************************/
 
 #include <algorithm>
-#include "node/node_factory_manager.h"
+#include "node/node_factory_manager.hpp"
 
 using namespace std;
 

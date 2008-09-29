@@ -23,8 +23,8 @@
 #include <algorithm>
 #include <iostream>
 
-#include "node/node_types.h"
-#include "node/node_oscillator.h"
+#include "node/node_types.hpp"
+#include "node/node_oscillator.hpp"
 
 using namespace std;
 

@@ -23,14 +23,14 @@
 #include <algorithm>
 #include <config.h>
 
-#include <libpsynth/net/osc_client.h>
-#include <libpsynth/net/osc_server.h>
-#include <libpsynth/net/osc_client_logger.h>
-#include <libpsynth/net/osc_server_logger.h>
-#include <libpsynth/common/timer.h>
-#include <libpsynth/common/arg_parser.h>
+#include <psynth/net/osc_client.hpp>
+#include <psynth/net/osc_server.hpp>
+#include <psynth/net/osc_client_logger.hpp>
+#include <psynth/net/osc_server_logger.hpp>
+#include <psynth/common/timer.hpp>
+#include <psynth/common/arg_parser.hpp>
 
-#include "cli/psychosynth_cli.h"
+#include "cli/psychosynth_cli.hpp"
 
 using namespace std;
 using namespace psynth;
