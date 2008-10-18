@@ -223,6 +223,7 @@ bool element::key_pressed (const OIS::KeyEvent& e)
 {
     switch(e.key) {
     case OIS::KC_DELETE:
+    case OIS::KC_BACK:
 	if (m_selected)
 	    m_obj.delete_me ();
 	break;
