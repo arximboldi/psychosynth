@@ -202,4 +202,11 @@ void default_selector_populator::populate(selector_window* sel)
     
     cat = sel->add_category ("Samples");
     populate_samples (cat);
+
+    creat.clear ();
+    cat = sel->add_category ("Bi-Samples");
+    creat.set_name ("double_sampler");
+    creat.set_param ("file_one", std::string ("pmas1.wav"));
+    creat.set_param ("file_two", std::string ("pmas3.wav"));
+    cat->add_button ("Dub-Step 1-3", creat);
 }

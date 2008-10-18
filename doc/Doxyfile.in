@@ -514,12 +514,13 @@ WARN_LOGFILE           =
 # with spaces.
 
 INPUT                  = \
-		       libpsynth/common \
-		       libpsynth/input \
-		       libpsynth/net \
-		       libpsynth/object \
-		       libpsynth/psynth \
-		       libpsynth/table 
+		       psynth/common \
+		       psynth/input \
+		       psynth/net \
+		       psynth/node \
+		       psynth/psynth \
+		       psynth/world \
+		       psynth/output 
 
 # This tag can be used to specify the character encoding of the source files 
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding, which is 

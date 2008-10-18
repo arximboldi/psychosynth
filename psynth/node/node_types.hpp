@@ -40,6 +40,7 @@ enum node_types
     NODE_CONTROLNOISE,
     NODE_ECHO,
     NODE_DELAY,
+    NODE_DOUBLE_SAMPLER,
     N_NODES
 };
 

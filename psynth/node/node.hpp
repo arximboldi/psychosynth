@@ -85,7 +85,7 @@ public:
 	void remove_reference (node* obj, int port) {
 	    m_ref.remove(std::pair<node*, int>(obj, port));
 	}
-		
+	
 	void clear_references () {
 	    std::list<std::pair<node*, int> >::iterator i, r;
 	    for (i = m_ref.begin(); i != m_ref.end(); ) {

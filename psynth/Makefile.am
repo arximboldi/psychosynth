@@ -83,6 +83,7 @@ nobase_libpsynthinc_HEADERS = \
 	node/node_audio_oscillator.hpp \
 	node/node_filter.hpp \
 	node/node_sampler.hpp \
+	node/node_double_sampler.hpp \
 	node/node_step_seq.hpp \
 	node/node_noise.hpp \
 	node/node_audio_noise.hpp \
@@ -138,6 +139,7 @@ libpsynth_la_SOURCES = \
 	node/node_audio_oscillator.cpp \
 	node/node_filter.cpp \
 	node/node_sampler.cpp \
+	node/node_double_sampler.cpp \
 	node/node_step_seq.cpp \
 	node/node_noise.cpp \
 	node/node_audio_noise.cpp \

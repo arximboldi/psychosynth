@@ -36,6 +36,7 @@
 #include "node/node_control_noise.hpp"
 #include "node/node_echo.hpp"
 #include "node/node_delay.hpp"
+#include "node/node_double_sampler.hpp"
 
 using namespace std;
 
@@ -136,6 +137,7 @@ void world::register_default_node_factory ()
     register_node_factory (get_node_control_noise_factory());
     register_node_factory (get_node_echo_factory());
     register_node_factory (get_node_delay_factory());
+    register_node_factory (get_node_double_sampler_factory());
 }
 
 world::~world ()

@@ -86,6 +86,8 @@ element* element_manager::create_element (world_node& obj)
 	return new element_echo (obj, m_scene);
     case NODE_DELAY:
 	return new element_delay (obj, m_scene);
+    case NODE_DOUBLE_SAMPLER:
+	return new element_double_sampler (obj, m_scene);
     default:
 	return NULL;
     }

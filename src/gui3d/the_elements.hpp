@@ -102,4 +102,11 @@ public:
 		   Ogre::SceneManager* m_scene);
 };
 
+class element_double_sampler : public element
+{
+public:
+    element_double_sampler (psynth::world_node& obj,
+			    Ogre::SceneManager* m_scene);
+};
+
 #endif /* THEELEMENTS_H */

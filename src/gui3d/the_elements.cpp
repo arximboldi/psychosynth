@@ -34,6 +34,7 @@
 #include <psynth/node/node_noise.hpp>
 #include <psynth/node/node_echo.hpp>
 #include <psynth/node/node_delay.hpp>
+#include <psynth/node/node_double_sampler.hpp>
 
 using namespace std;
 using namespace Ogre;
@@ -424,4 +425,31 @@ element_delay::element_delay (world_node& obj,
 					node_delay::PARAM_DEPTH,
 					0.0f, 1.0f,
 					"Depth"));
+}
+
+element_double_sampler::element_double_sampler (world_node& obj,
+						Ogre::SceneManager* m_scene) :
+    element (obj, m_scene)
+{	    
+    static const char* mesh_name = "double_sampler.mesh";
+    
+    add_component (new elem_main_component(
+		       string(mesh_name), 
+		       node_double_sampler::PARAM_BLEND,
+		       0.0f, 1.0f));
+    
+    add_component (new elem_second_component(
+		       node_double_sampler::PARAM_AMPLITUDE,
+		       0.0f, 1.0f));
+
+
+    get_gui_properties().add_parameter (new elem_gui_param_float(
+					node_double_sampler::PARAM_AMPLITUDE,
+					0.0f, 1.0f,
+					"Amplitude"));
+    
+    get_gui_properties().add_parameter (new elem_gui_param_float(
+					node_double_sampler::PARAM_BLEND,
+					0.0f, 1.0f,
+					"Blend"));
 }

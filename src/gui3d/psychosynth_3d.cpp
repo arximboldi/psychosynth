@@ -366,6 +366,8 @@ void psychosynth_3d::setup_world ()
     flat_ring* ring1 = new flat_ring ("the_point_1", Degree(0), Degree(360),
 				      0.4, 0.5,
 				      ColourValue(0, 0, 0, 0.8));
+
+    m_scene->setSkyBox (true, "space_sky_box");
     
     node->attachObject(ring0);
     node->attachObject(ring1);
