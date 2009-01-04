@@ -83,11 +83,12 @@ public:
 	ERR_CODES
     };
 
+protected:
     bool m_backwards; /**< @c true if we are reading and writting the
 			 ringbuffer backwards. */
-    int m_startpos;  /**< The new starting position of the ring buffer. */
+    int m_startpos;   /**< The new starting position of the ring buffer. */
 	
-protected:
+
     int m_size;       /**< The size of the buffer. */
     int m_writepos;   /**< The current writting position of the buffer. */
     int m_writecount; /**< Total number of elements written to the buffer. */ 
@@ -146,8 +147,8 @@ protected:
      * @param size The size of the buffer, defaults to zero.
      */
     ring_buffer (int size = 0) :
-	m_size(size),
 	m_backwards(false),
+	m_size(size),
 	m_writepos(0),
 	m_writecount(0),
 	m_startpos(0)

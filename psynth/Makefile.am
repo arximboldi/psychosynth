@@ -21,8 +21,7 @@
 #  Common
 # ======================================================================
 
-AM_CXXFLAGS = -Wall $(BOOST_CPPFLAGS)
-AM_CPPFLAGS = 
+AM_CPPFLAGS = -Wall $(BOOST_CPPFLAGS)
 AM_LDFLAGS  = $(BOOST_LDFLAGS)
 
 #  Libraries to build

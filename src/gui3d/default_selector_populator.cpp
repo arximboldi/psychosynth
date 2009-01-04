@@ -209,4 +209,11 @@ void default_selector_populator::populate(selector_window* sel)
     creat.set_param ("file_one", std::string ("pmas1.wav"));
     creat.set_param ("file_two", std::string ("pmas3.wav"));
     cat->add_button ("Dub-Step 1-3", creat);
+    creat.set_param ("file_one", std::string ("a1.wav"));
+    creat.set_param ("file_two", std::string ("b1.wav"));
+    cat->add_button ("ab1", creat);
+    creat.set_param ("file_one", std::string ("a2.wav"));
+    creat.set_param ("file_two", std::string ("b2.wav"));
+    cat->add_button ("ab2", creat);
+
 }

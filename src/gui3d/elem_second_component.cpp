@@ -84,8 +84,8 @@ void elem_second_component::init()
 bool elem_second_component::handle_pointer_move (Ogre::Vector2 pos)
 {
     if (m_changing) {
-	Quaternion orig_angle = get_scene_node()->getWorldOrientation();
-	Vector3 abs_position = get_scene_node()->getWorldPosition();
+	Quaternion orig_angle = get_scene_node()->_getDerivedOrientation();
+	Vector3 abs_position = get_scene_node()->_getDerivedPosition();
 	Vector2 abs_pos = Vector2(abs_position.x, abs_position.z);
 
 	pos -= abs_pos;
@@ -109,7 +109,7 @@ bool elem_second_component::handle_pointer_move (Ogre::Vector2 pos)
 
 bool elem_second_component::handle_pointer_click (Ogre::Vector2 pos, OIS::MouseButtonID id)
 {
-    Vector3 real_position = m_point_node->getWorldPosition();
+    Vector3 real_position = m_point_node->_getDerivedPosition();
     Vector2 real_pos = Vector2(real_position.x, real_position.z);
 
     if ((pos - real_pos).length() < SECOND_POINT_RAD) {

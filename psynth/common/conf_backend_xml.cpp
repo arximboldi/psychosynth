@@ -30,7 +30,7 @@
 #define DEFAULT_INT_VALUE    0
 #define DEFAULT_STRING_VALUE ""
 
-#define DEFAULT_EMPTY_NAME "config"
+#define DEFAULT_EMPTY_NAME   "config"
 
 #define CHAR_CAST reinterpret_cast<const char*>
 #define XML_CAST  reinterpret_cast<const xmlChar*>
@@ -40,21 +40,22 @@ using namespace std;
 namespace psynth
 {
 
-conf_node* conf_backend_xml::process_new_element(xmlTextReaderPtr reader, conf_node* node)
+conf_node* conf_backend_xml::process_new_element (xmlTextReaderPtr reader,
+						  conf_node* node)
 {
     xmlChar* type;
-
+    
     if (xmlTextReaderDepth(reader) == 0) {
 	if (node->get_name ().empty()) {
-	    if (xmlStrcmp(xmlTextReaderConstName(reader),
-			  XML_CAST("root")))
+	    if (xmlStrcmp (xmlTextReaderConstName(reader),
+			   XML_CAST ("root")))
 		return NULL;
-	} else if (xmlStrcmp(xmlTextReaderConstName(reader),
-			     XML_CAST(node->get_name ().c_str()))) 
+	} else if (xmlStrcmp (xmlTextReaderConstName(reader),
+			      XML_CAST (node->get_name ().c_str()))) 
 	    return NULL;
        
     } else if (!xmlTextReaderIsEmptyElement(reader)) {
-	node = &node->get_child (CHAR_CAST(xmlTextReaderConstName(reader)));
+	node = &node->get_child (CHAR_CAST (xmlTextReaderConstName(reader)));
     }
 
     type = xmlTextReaderGetAttribute(reader, XML_CAST ("type"));
@@ -78,12 +79,14 @@ conf_node* conf_backend_xml::process_new_element(xmlTextReaderPtr reader, conf_n
     return node;
 }
 
-conf_node* conf_backend_xml::process_end_element(xmlTextReaderPtr reader, conf_node* node)
+conf_node* conf_backend_xml::process_end_element (xmlTextReaderPtr reader,
+						  conf_node* node)
 {
     return node->get_parent();
 }
 
-conf_node* conf_backend_xml::process_text(xmlTextReaderPtr reader, conf_node* node)
+conf_node* conf_backend_xml::process_text (xmlTextReaderPtr reader,
+					   conf_node* node)
 {
     const xmlChar* value;
     
@@ -99,7 +102,7 @@ conf_node* conf_backend_xml::process_text(xmlTextReaderPtr reader, conf_node* no
 	    if (!m_defaulty) node->set(val);
 	    else node->def(val);
 	}
-	break;
+	    break;
 
 	case CONF_FLOAT: {
 	    float val;
@@ -107,7 +110,7 @@ conf_node* conf_backend_xml::process_text(xmlTextReaderPtr reader, conf_node* no
 	    if (!m_defaulty) node->set(val);
 	    else node->def(val);
 	}
-	break;
+	    break;
 	
 	case CONF_STRING: {
 	    string val;
@@ -115,7 +118,7 @@ conf_node* conf_backend_xml::process_text(xmlTextReaderPtr reader, conf_node* no
 	    if (!m_defaulty) node->set(val);
 	    else node->def(val);
 	}
-	break;
+	    break;
 	
 	default:
 	    break;
@@ -125,7 +128,8 @@ conf_node* conf_backend_xml::process_text(xmlTextReaderPtr reader, conf_node* no
     return node;
 }
 
-conf_node* conf_backend_xml::process (xmlTextReaderPtr reader, conf_node* node)
+conf_node* conf_backend_xml::process (xmlTextReaderPtr reader,
+				      conf_node* node)
 {
     switch(xmlTextReaderNodeType(reader)) {
     case XML_READER_TYPE_ELEMENT:
@@ -150,17 +154,17 @@ void conf_backend_xml::do_load (conf_node& node)
     int ret;
     conf_node* cur_node;
     
-    reader = xmlReaderForFile(m_file.c_str(), NULL,
-			      XML_PARSE_NOENT |
-			      XML_PARSE_NOBLANKS);
+    reader = xmlReaderForFile (m_file.c_str(), NULL,
+			       XML_PARSE_NOENT |
+			       XML_PARSE_NOBLANKS);
     
     if (reader != NULL) {
 	cur_node = &node;
 	    
 	ret = xmlTextReaderRead(reader);
         while (ret == 1 && cur_node != NULL) {
-            cur_node = process(reader, cur_node);
-            ret = xmlTextReaderRead(reader);
+            cur_node = process (reader, cur_node);
+            ret = xmlTextReaderRead (reader);
         }
 
 	xmlFreeTextReader(reader);
@@ -177,7 +181,8 @@ void conf_backend_xml::do_load (conf_node& node)
 void conf_backend_xml::expand_value (xmlTextWriterPtr writer, conf_node& node)
 {
     switch(node.type()) {
-    case CONF_INT: {
+    case CONF_INT:
+    {
 	int val = 0;
 	node.get(val);
 	xmlTextWriterWriteAttribute(writer, XML_CAST ("type"), XML_CAST ("int"));
@@ -185,7 +190,8 @@ void conf_backend_xml::expand_value (xmlTextWriterPtr writer, conf_node& node)
     }
     break;
 	
-    case CONF_FLOAT: {
+    case CONF_FLOAT:
+    {
 	float val = 0;
 	node.get(val);
 	xmlTextWriterWriteAttribute(writer, XML_CAST ("type"), XML_CAST ("float"));
@@ -193,7 +199,8 @@ void conf_backend_xml::expand_value (xmlTextWriterPtr writer, conf_node& node)
     }
     break;
 	
-    case CONF_STRING: {
+    case CONF_STRING:
+    {
 	string val;
 	node.get(val);
 	
@@ -219,9 +226,9 @@ void conf_backend_xml::expand_childs (xmlTextWriterPtr writer, conf_node& node)
 void conf_backend_xml::expand (xmlTextWriterPtr writer, conf_node& node)
 {
     if (node.get_name ().empty())
-	xmlTextWriterStartElement(writer, XML_CAST ("root"));
+	xmlTextWriterStartElement (writer, XML_CAST ("root"));
     else
-	xmlTextWriterStartElement(writer, XML_CAST (node.get_name ().c_str()));
+	xmlTextWriterStartElement (writer, XML_CAST (node.get_name ().c_str()));
 
     expand_value  (writer, node);
     expand_childs (writer, node);
@@ -234,6 +241,7 @@ void conf_backend_xml::save (conf_node& node)
     xmlTextWriterPtr writer;
     
     writer = xmlNewTextWriterFilename (m_file.c_str(), 0);
+
     if (writer == NULL) {
 	logger::instance() ("xmlconf", log::ERROR, "Could not open config file for writing: " + m_file);
         return;

@@ -313,7 +313,8 @@ void psychosynth_3d::setup_world ()
 {
     m_scene->setAmbientLight(ColourValue(0, 0, 0));
     //m_scene->setShadowTechnique(SHADOWTYPE_STENCIL_ADDITIVE);
-
+    m_scene->setShadowTechnique (SHADOWTYPE_TEXTURE_MODULATIVE);
+    
     m_camera = m_scene->createCamera("camera");
     m_camera->setNearClipDistance(0.1);
     m_camera->setCastShadows(false);
@@ -328,28 +329,28 @@ void psychosynth_3d::setup_world ()
     light->setPosition(Vector3(-30, 20, -25));
     light->setDiffuseColour(1.0, 1.0, 1.0);
     light->setSpecularColour(1.0, 1.0, 1.0);
-    light->setAttenuation(100, 1.1, 0, 0);
+    light->setAttenuation(100, 2, 0, 0);
 
     light = m_scene->createLight("light2");
     light->setType(Light::LT_POINT);
     light->setPosition(Vector3(20, 20, 15));
     light->setDiffuseColour(1.0, 1.0, 1.0);
     light->setSpecularColour(1.0, 1.0, 1.0);
-    light->setAttenuation(100, 1.5, 0, 0);
+    light->setAttenuation(100, 2.5, 0, 0);
 
     light = m_scene->createLight("light3");
     light->setType(Light::LT_POINT);
     light->setPosition(Vector3(20, 20, -15));
     light->setDiffuseColour(1.0, 0.5, 0.5);
     light->setSpecularColour(1.0, 1.0, 1.0);
-    light->setAttenuation(100, 1.3, 0, 0);
+    light->setAttenuation(100, 2.6, 0, 0);
 
     light = m_scene->createLight("light4");
     light->setType(Light::LT_POINT);
     light->setPosition(Vector3(-20, 20, 15));
     light->setDiffuseColour(1.0, 0.3, 0.3);
     light->setSpecularColour(1.0, 1.0, 0.3);
-    light->setAttenuation(100, 1.5, 0, 0);
+    light->setAttenuation(100, 2.3, 0, 0);
     
     Entity *ent1 = m_scene->createEntity( "object1", "world.mesh" );
     ent1->setQueryFlags(QFLAG_WORLD);
@@ -371,7 +372,7 @@ void psychosynth_3d::setup_world ()
     
     node->attachObject(ring0);
     node->attachObject(ring1);
-    node->setPosition(Vector3(0,0.001,0));
+    node->setPosition(Vector3(0,0.01,0));
 
     m_taskmgr = &task_manager::instance ();
     m_elemmgr = new element_manager (get_world(), m_scene, m_camera);

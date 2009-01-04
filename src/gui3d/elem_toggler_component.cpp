@@ -110,8 +110,8 @@ bool elem_toggler_component::handle_pointer_move (Ogre::Vector2 pos)
 
 bool elem_toggler_component::handle_pointer_click (Ogre::Vector2 pos, OIS::MouseButtonID id)
 {
-    Quaternion orig_angle = get_scene_node()->getWorldOrientation();
-    Vector3 abs_position = get_scene_node()->getWorldPosition();
+    Quaternion orig_angle = get_scene_node()->_getDerivedOrientation();
+    Vector3 abs_position = get_scene_node()->_getDerivedPosition();
     Vector2 abs_pos = Vector2(abs_position.x, abs_position.z);
 
     if ((pos - abs_pos).length() < TOGGLE_RAD + 0.1 &&
