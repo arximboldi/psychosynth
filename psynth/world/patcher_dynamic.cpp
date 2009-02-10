@@ -224,7 +224,7 @@ const patcher_data PATCHER_TABLE[N_NODES][N_NODES] =
 	{node::LINK_CONTROL, node_control_noise::OUT_C_OUTPUT, node_oscillator::IN_C_FREQUENCY}, /* node_audio_oscillator */
 	{node::LINK_CONTROL, node_control_noise::OUT_C_OUTPUT, node_oscillator::IN_C_FREQUENCY}, /* node_lfo */
 	{node::LINK_CONTROL, node_control_noise::OUT_C_OUTPUT, node_filter::IN_C_CUTOFF},  /* node_filter */
-	{node::LINK_CONTROL, node_control_noise::OUT_C_OUTPUT, node_sampler::IN_C_RATE}, /* node_sampler /*
+	{node::LINK_CONTROL, node_control_noise::OUT_C_OUTPUT, node_sampler::IN_C_RATE}, /* node_sampler */
 	{node::LINK_CONTROL, node_control_noise::OUT_C_OUTPUT, node_step_seq::IN_C_BPM}, /* node_step_seq */
 	{node::LINK_CONTROL, node_control_noise::OUT_C_OUTPUT, node_audio_noise::IN_C_AMPLITUDE}, /* node_audio_noise */
 	{node::LINK_CONTROL, node_control_noise::OUT_C_OUTPUT, node_control_noise::IN_C_AMPLITUDE}, /* node_control_noise */

@@ -18,16 +18,10 @@
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-AUTOMAKE_OPTIONS = foreign
+desktopdir = $(datadir)/applications
+desktop_DATA = psychosynth.desktop
 
-ACLOCAL_AMFLAGS = -I m4
+pixmapdir = $(datadir)/pixmaps
+pixmap_DATA = psychosynth.png
 
-SUBDIRS = psynth src data doc
-
-pkgconfigdir = $(libdir)/pkgconfig
-pkgconfig_DATA = libpsynth.pc
-
-.PHONY: doc
-
-doc:
-	\doxygen doc/Doxyfile
+EXTRA_DIST = $(desktop_DATA) $(pixmap_DATA)

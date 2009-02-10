@@ -1,8 +1,0 @@
-#!/bin/bash
-
-all_files=`ls $1`
-for file in $all_files; do
-    echo "updating $1/$file"
-    mv $1/$file $1/$file.old
-    sed 's/<libpsynth\/\([a-z\/_0-9]*\).h>/<psynth\/\1.hpp>/' $1/$file.old > $1/$file;
-done

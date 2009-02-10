@@ -2,7 +2,7 @@
 #   PSYCHOSYNTH
 #   ===========
 #              
-#   Copyright (C) 2007, 2008 by Juan Pedro Bolivar Puente
+#   Copyright (C) 2009 by Juan Pedro Bolivar Puente
 #                                                        
 #   This program is free software: you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -18,16 +18,7 @@
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-AUTOMAKE_OPTIONS = foreign
+man_MANS = man/psynth.1 man/psynth3d.1
 
-ACLOCAL_AMFLAGS = -I m4
+EXTRA_DIST = $(man_MANS) Doxyfile.in
 
-SUBDIRS = psynth src data doc
-
-pkgconfigdir = $(libdir)/pkgconfig
-pkgconfig_DATA = libpsynth.pc
-
-.PHONY: doc
-
-doc:
-	\doxygen doc/Doxyfile

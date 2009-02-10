@@ -24,7 +24,7 @@
 AC_INIT(configure.ac)
 
 AM_CONFIG_HEADER(config.h)
-AM_INIT_AUTOMAKE(psychosynth, 0.1.1)
+AM_INIT_AUTOMAKE(psychosynth, 0.1.2)
 
 AC_LANG_CPLUSPLUS
 AC_PROG_CXX
@@ -353,7 +353,7 @@ XE_EXPAND_VARIABLE(bindir, PACKAGE_BIN_DIR)
 XE_EXPAND_VARIABLE(libdir, PACKAGE_LIB_DIR)
 
 # Uncomment only for development purposes
-PACKAGE_DATA_DIR="./data"
+# PACKAGE_DATA_DIR="./data"
 
 AC_SUBST(PACKAGE_DATA_DIR)
 AC_SUBST(PACKAGE_BIN_DIR)
@@ -410,8 +410,11 @@ AM_CONDITIONAL([BUILD_PSYNTH3D], [test "x$BUILD_PSYNTH3D" = xyes])
 AC_OUTPUT(libpsynth.pc
 	  Makefile
 	  doc/Doxyfile
+	  doc/Makefile
 	  src/Makefile
 	  data/Makefile
+	  data/desktop/Makefile
+	  data/gui3d/Makefile
 	  psynth/Makefile
 	  psynth/version.hpp)
 

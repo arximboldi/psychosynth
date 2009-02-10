@@ -114,8 +114,7 @@ public:
      * @param data Pointer to where you want to store the argument value.
      */
     option_generic (T * data)
-	: m_data (data)
-	{}
+	: m_data (data) {}
 
     /**
      * Parses an argument.

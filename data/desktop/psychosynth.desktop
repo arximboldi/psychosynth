@@ -1,0 +1,11 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=PsychoSynth
+Name[es]=Psychosynth
+Comment=Music synthesizer
+Comment[es]=Sintetizador de música
+Icon=psychosynth.png
+Type=Application
+Categories=AudioVideo;Audio;Recorder;
+Exec=psynth3d 
+Terminal=false

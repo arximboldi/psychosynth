@@ -2,7 +2,7 @@
 #   PSYCHOSYNTH
 #   ===========
 #              
-#   Copyright (C) 2007, 2008 by Juan Pedro Bolivar Puente
+#   Copyright (C) 2009 by Juan Pedro Bolivar Puente
 #                                                        
 #   This program is free software: you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -18,26 +18,4 @@
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-pkgdatadir = @PACKAGE_DATA_DIR@
-
-nobase_pkgdata_DATA = \
-	ogre.cfg \
-	plugins.cfg \
-	$(wildcard gui/*.xsd)\
-	$(wildcard gui/*.tga)\
-	$(wildcard gui/*.imageset)\
-	$(wildcard gui/*.looknfeel)\
-	$(wildcard gui/*.scheme)\
-	$(wildcard gui/*.layout)\
-	$(wildcard gui/*.tff)\
-	$(wildcard gui/*.font)\
-	$(wildcard material/*.material)\
-	$(wildcard material/*.cg)\
-	$(wildcard mesh/*.mesh)\
-	$(wildcard texture/*.tga)\
-	$(wildcard samples/*.wav)\
-	$(wildcard samples/*.ogg)\
-	gui/DejaVuSans.ttf
-
-EXTRA_DIST = $(nobase_pkgdata_DATA)
-
+SUBDIRS = gui3d desktop

@@ -40,12 +40,11 @@ using namespace psynth;
 void psychosynth_cli::print_help()
 {
     cout <<
-	"psychosynth_cli (c) 2007-2008 Juan Pedro Bolívar Puente\n"
+	"GNU psynth is a standalone command line Psychosynth server and client.\n"
 	"\n"
-	"Usage:\n"
-	"  psynth [options]\n"
+	"Usage: psynth [options]\n"
 	"\n"
-	"Base options:\n";
+	"Options:\n";
     print_base_options (cout);
     cout <<
 	"\n"
@@ -58,7 +57,13 @@ void psychosynth_cli::print_help()
 
 void psychosynth_cli::print_version()
 {
-    cout << "psychosynth_cli " << VERSION << endl;
+  cout << "GNU psynth " << VERSION << endl <<
+    "Copyright (C) 2007-2009 Juan Pedro Bolivar Puente\n"
+    "This is free software; see the source for copying conditions.  There is NO\n"
+    "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n"
+
+    "\nWritten by Juan Pedro Bolivar Puente";
+    
 }
 
 void psychosynth_cli::prepare (psynth::arg_parser& ap)

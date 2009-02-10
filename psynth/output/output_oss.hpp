@@ -35,6 +35,8 @@ class output_oss : public output
     int m_fd;
     int m_format;
     int m_stereo;
+  int m_fragments;
+  int m_fragmentsize;
     short int* m_buf;
     std::string m_device;
 	
@@ -45,6 +47,17 @@ public:
     output_oss (const audio_info& info, const std::string& device);
     ~output_oss ();
 
+  bool set_buffer_size (int fragmentsize, int fragments = -1) {
+	if (get_state () == NOTINIT) {
+	  if (m_fragments > 0)
+	    m_fragments = fragments;
+	  m_fragmentsize = fragmentsize;
+	    return true;
+	}
+	
+	return false;
+  }
+  
     bool set_device (const std::string& device) {
 	if (get_state () == NOTINIT) {
 	    m_device = device;

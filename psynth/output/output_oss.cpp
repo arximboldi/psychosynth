@@ -49,6 +49,8 @@ output_oss::output_oss(const audio_info& info, const std::string& device)
     : output(info)
     , m_buf(NULL)
     , m_device(device)
+    , m_fragments (4)
+    , m_fragmentsize (4096)
 {
 }
 
@@ -102,16 +104,16 @@ bool output_oss::open()
 	m_format = AFMT_S16_LE;
 	m_stereo = get_info ().num_channels == 2 ? 1 : 0;
 
-	
-	//int tmp = (0x0004 << 16) | ((int) log2(get_info ().block_size));
-	int tmp = (0x0004 << 16) | ((int) log2(4096));
+	int tmp = (m_fragments << 16) | ((int) log2 (m_fragmentsize));
 	
 	ioctl (m_fd, SNDCTL_DSP_SETFRAGMENT, &tmp);
 	ioctl(m_fd, SNDCTL_DSP_SETFMT, &m_format);
 	ioctl(m_fd, SNDCTL_DSP_STEREO, &m_stereo);
 	ioctl(m_fd, SNDCTL_DSP_SPEED,  &get_info ().sample_rate);
 		
-	m_buf = new short int[get_info ().block_size * get_info ().num_channels * sizeof(short int)];
+	m_buf = new short int [get_info ().block_size *
+			       get_info ().num_channels *
+			       sizeof(short int)];
 		
 	set_state (IDLE);
 	return true;

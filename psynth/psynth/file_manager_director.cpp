@@ -80,7 +80,7 @@ void file_manager_director::stop ()
 void file_manager_director::defaults ()
 {
     m_conf->get_child ("samples").get_child ("path0").def(
-	(boost::filesystem::path (PSYNTH_DATA_DIR) / "samples").file_string ());
+	(boost::filesystem::path (PSYNTH_DATA_DIR) / "gui3d/samples").file_string ());
     m_conf->get_child ("samples").get_child ("path1").def(
 	(m_home_path / "samples").file_string ());
 }

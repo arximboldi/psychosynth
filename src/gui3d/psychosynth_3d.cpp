@@ -74,12 +74,11 @@ psychosynth_3d::~psychosynth_3d()
 void psychosynth_3d::print_help ()
 {
     cout <<
-	"psychosynth_3d (c) 2007-2008 Juan Pedro Bolívar Puente\n"
+	"GNU psynth3d is a 3D interface using the Psychosynth system.\n"
 	"\n"
-	"Usage:\n"
-	"  psynth3d [options]\n"
+	"Usage: psynth3d [options]\n"
 	"\n"
-	"Base options:\n";
+	"Options:\n";
     print_base_options (cout);
     cout <<
 	"\n"
@@ -93,18 +92,29 @@ void psychosynth_3d::print_help ()
 
 void psychosynth_3d::print_version ()
 {
-    cout << "psychosynth_3d " << VERSION << endl;	
+  cout << "GNU psynth3d " << VERSION << endl <<
+    "Copyright (C) 2007-2009 Juan Pedro Bolivar Puente\n"
+    "This is free software; see the source for copying conditions.  There is NO\n"
+    "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n"
+
+    "\nWritten by Juan Pedro Bolivar Puente";
+
 }
 
 void psychosynth_3d::prepare (psynth::arg_parser& arg_parser)
 {
     conf_node& conf = config::instance().get_child ("psynth3d");
     
-    arg_parser.add('W', "width", new option_conf<int>(conf.get_child ("screen_width")));
-    arg_parser.add('H', "height", new option_conf<int>(conf.get_child ("screen_height")));
-    arg_parser.add('f', "fullscreen", new option_conf_value<int>(1, conf.get_child ("fullscreen")));
-    arg_parser.add('w', "window", new option_conf_value<int>(0, conf.get_child ("fullscreen")));
-    arg_parser.add('F', "fps", new option_conf<int>(conf.get_child ("fps")));
+    arg_parser.add ('W', "width",
+		    new option_conf<int>(conf.get_child ("screen_width")));
+    arg_parser.add ('H', "height",
+		    new option_conf<int>(conf.get_child ("screen_height")));
+    arg_parser.add ('f', "fullscreen",
+		    new option_conf_value<int>(1, conf.get_child ("fullscreen")));
+    arg_parser.add ('w', "window",
+		    new option_conf_value<int>(0, conf.get_child ("fullscreen")));
+    arg_parser.add ('F', "fps",
+		    new option_conf<int>(conf.get_child ("fps")));
 }
 
 int psychosynth_3d::execute()
@@ -206,21 +216,21 @@ void psychosynth_3d::setup_ogre (psynth::conf_node& conf)
     conf.get_child ("fullscreen").get(fullscreen);
     conf.get_child ("fps").get(fps);
     
-    (new LogManager)->createLog ((get_config_path() / "psynth3d_Ogre.log").file_string (),
+    (new LogManager)->createLog ((get_config_path() / "gui3d/psynth3d_Ogre.log").file_string (),
 				 false, false, false);  
-    m_ogre = new Root ((get_data_path() / "plugins.cfg").file_string (),
-		       (get_data_path() / "ogre.cfg").file_string ());
+    m_ogre = new Root ((get_data_path() / "gui3d/plugins.cfg").file_string (),
+		       (get_data_path() / "gui3d/ogre.cfg").file_string ());
         
     ResourceGroupManager& res_mgr = ResourceGroupManager::getSingleton();
     res_mgr.addResourceLocation (get_data_path ().file_string (),
 				 "FileSystem", "General");
-    res_mgr.addResourceLocation ((get_data_path () / "mesh").file_string (),
+    res_mgr.addResourceLocation ((get_data_path () / "gui3d/mesh").file_string (),
 				 "FileSystem", "General");
-    res_mgr.addResourceLocation ((get_data_path () / "texture").file_string (),
+    res_mgr.addResourceLocation ((get_data_path () / "gui3d/texture").file_string (),
 				 "FileSystem", "General");
-    res_mgr.addResourceLocation ((get_data_path () / "material").file_string (),
+    res_mgr.addResourceLocation ((get_data_path () / "gui3d/material").file_string (),
 				 "FileSystem", "General");
-    res_mgr.addResourceLocation ((get_data_path () / "gui").file_string (),
+    res_mgr.addResourceLocation ((get_data_path () / "gui3d/gui").file_string (),
 				 "FileSystem", "GUI");
 
     if (!m_ogre->restoreConfig() && !m_ogre->showConfigDialog())
@@ -313,7 +323,8 @@ void psychosynth_3d::setup_world ()
 {
     m_scene->setAmbientLight(ColourValue(0, 0, 0));
     //m_scene->setShadowTechnique(SHADOWTYPE_STENCIL_ADDITIVE);
-    m_scene->setShadowTechnique (SHADOWTYPE_TEXTURE_MODULATIVE);
+    //m_scene->setShadowTechnique (SHADOWTYPE_TEXTURE_MODULATIVE);
+    m_scene->setShadowTechnique (SHADOWTYPE_TEXTURE_ADDITIVE);
     
     m_camera = m_scene->createCamera("camera");
     m_camera->setNearClipDistance(0.1);

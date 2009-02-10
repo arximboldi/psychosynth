@@ -39,6 +39,7 @@ output_alsa::output_alsa()
 output_alsa::output_alsa(const audio_info& info, const std::string& device)
     : output(info)
     , alsa_device(device)
+    , m_buffersize (4096)
 {
 }
 
@@ -121,16 +122,15 @@ bool output_alsa::open()
 	snd_pcm_hw_params_set_rate_near (alsa_pcm, alsa_hwparams, &uirate, &dir);
 	snd_pcm_hw_params_set_channels (alsa_pcm, alsa_hwparams, get_info ().num_channels);
 
-	/* FIXME */
-	snd_pcm_hw_params_set_periods(alsa_pcm, alsa_hwparams, 2, 0);
-	snd_pcm_hw_params_set_buffer_size (alsa_pcm, alsa_hwparams, get_info ().block_size);
+	/* TODO optimize period size and all that stuff... */
+    snd_pcm_hw_params_set_buffer_size (alsa_pcm, alsa_hwparams, m_buffersize);
 
 	snd_pcm_hw_params (alsa_pcm, alsa_hwparams);
-	//snd_pcm_prepare (alsa_pcm);
 		
 	snd_pcm_sw_params_malloc (&alsa_swparams);
 	snd_pcm_sw_params_set_avail_min(alsa_pcm, alsa_swparams, get_info ().block_size);
-	snd_pcm_sw_params_set_start_threshold (alsa_pcm, alsa_swparams, 0U);
+	snd_pcm_sw_params_set_start_threshold (alsa_pcm, alsa_swparams, m_buffersize);
+	snd_pcm_sw_params_set_stop_threshold (alsa_pcm, alsa_swparams, -1);
 	snd_pcm_sw_params (alsa_pcm, alsa_swparams);
 
 	if ((err = snd_pcm_prepare (alsa_pcm)) < 0) {

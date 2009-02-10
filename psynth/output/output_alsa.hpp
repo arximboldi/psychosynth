@@ -41,6 +41,7 @@ class output_alsa : public output
     snd_pcm_sw_params_t *alsa_swparams;
     snd_pcm_format_t alsa_format;
     short int* m_buf;
+  int m_buffersize;
     std::string alsa_device;
 
     boost::thread alsa_thread;
@@ -59,6 +60,15 @@ public:
 	return false;
     }
 
+  bool set_buffer_size (int size) {
+    if (get_state () == NOTINIT) {
+      m_buffersize = size;
+      return true;
+    }
+
+    return false;
+  }
+  
     const std::string& get_device () const {
 	return alsa_device;
     }

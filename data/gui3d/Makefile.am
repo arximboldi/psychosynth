@@ -18,16 +18,26 @@
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-AUTOMAKE_OPTIONS = foreign
+pkgdatadir = @PACKAGE_DATA_DIR@/gui3d
 
-ACLOCAL_AMFLAGS = -I m4
+nobase_pkgdata_DATA = \
+	ogre.cfg \
+	plugins.cfg \
+	$(wildcard gui/*.xsd)\
+	$(wildcard gui/*.tga)\
+	$(wildcard gui/*.imageset)\
+	$(wildcard gui/*.looknfeel)\
+	$(wildcard gui/*.scheme)\
+	$(wildcard gui/*.layout)\
+	$(wildcard gui/*.tff)\
+	$(wildcard gui/*.font)\
+	$(wildcard material/*.material)\
+	$(wildcard material/*.cg)\
+	$(wildcard mesh/*.mesh)\
+	$(wildcard texture/*.tga)\
+	$(wildcard texture/*.jpg)\
+	$(wildcard samples/*.wav)\
+	$(wildcard samples/*.ogg)\
+	gui/DejaVuSans.ttf
 
-SUBDIRS = psynth src data doc
-
-pkgconfigdir = $(libdir)/pkgconfig
-pkgconfig_DATA = libpsynth.pc
-
-.PHONY: doc
-
-doc:
-	\doxygen doc/Doxyfile
+EXTRA_DIST = $(nobase_pkgdata_DATA)
