@@ -136,7 +136,7 @@ public:
      * @return The actual number of samples received.
      */
     int receive (float* data, int samples) {
-	m_st.receiveSamples(data, samples);
+	return m_st.receiveSamples(data, samples);
     }
 
     /**

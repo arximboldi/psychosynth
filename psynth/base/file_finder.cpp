@@ -38,7 +38,7 @@ bf::path file_finder::find_in (const bf::path& dir_path, const bf::path& file) c
 
     bf::directory_iterator end_itr;
     for (bf::directory_iterator itr (dir_path); itr != end_itr; ++itr) {
-	if (itr->leaf () == file)
+	if (itr->path().leaf() == file)
 	    return itr->path ();
     }
 
@@ -52,7 +52,7 @@ void file_finder::cache_path (const bf::path& dir_path)
 
     bf::directory_iterator end_itr;
     for (bf::directory_iterator itr (dir_path); itr != end_itr; ++itr)
-	m_cache.insert (make_pair (itr->leaf (), itr->path ()));    
+	m_cache.insert (make_pair (itr->path().leaf(), itr->path ()));    
 }
 
 void file_finder::uncache_path (const bf::path& path)

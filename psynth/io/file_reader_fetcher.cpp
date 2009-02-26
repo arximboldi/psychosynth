@@ -22,6 +22,7 @@
 
 #include <iostream>
 #include "input/file_reader_fetcher.hpp"
+#include <boost/thread.hpp>
 
 using namespace std;
 
