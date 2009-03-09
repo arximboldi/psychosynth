@@ -21,7 +21,7 @@
  ***************************************************************************/
 
 #include "gui3d/elem_main_component.hpp"
-#include <psynth/common/misc.hpp>
+#include <psynth/base/misc.hpp>
 
 #define INDICATOR_MIN_ANGLE 175
 #define INDICATOR_RANGE_ANGLE 170

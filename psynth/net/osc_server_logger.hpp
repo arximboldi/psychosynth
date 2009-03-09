@@ -31,20 +31,22 @@ namespace psynth
 class osc_server_logger : public osc_server_listener
 {
 public:
-    virtual bool handle_server_start_listening (osc_server* server) {
-	logger::instance() ("oscserver", log::INFO, "Server listening.");
+    virtual bool handle_server_start_listening (osc_server* server)
+    {
+	logger::self () ("oscserver", log::INFO, "Server listening.");
 	return false;
     }
     
-    virtual bool handle_server_stop_listening(osc_server* server,
-					   osc_server_error err) {
+    virtual bool handle_server_stop_listening (osc_server* server,
+					       osc_server_error err)
+    {
 	switch(err) {
 	case SE_NONE:
-	    logger::instance() ("oscserver", log::INFO, "Server no longer listening.");
+	    logger::self () ("oscserver", log::INFO, "Server no longer listening.");
 	    break;
 	    
 	case SE_PORT_BINDING:
-	    logger::instance() ("oscserver", log::INFO, "Could not bind port.");
+	    logger::self () ("oscserver", log::INFO, "Could not bind port.");
 	    break;
 
 	default:
@@ -54,20 +56,23 @@ public:
 	return false;
     }
     
-    virtual bool handle_server_client_connect(osc_server* server, int client_id) {
-	logger::instance() ("oscserver", log::INFO, "Client connected.");
+    virtual bool handle_server_client_connect(osc_server* server, int client_id)
+    {
+	logger::self () ("oscserver", log::INFO, "Client connected.");
 	return false;
     }
     
-    virtual bool handle_server_client_disconnect(osc_server* server, int client_id,
-					      osc_server_client_error cause) {
+    virtual bool handle_server_client_disconnect(osc_server* server,
+						 int client_id,
+						 osc_server_client_error cause)
+    {
 	switch(cause) {
 	case SCE_NONE:
-	    logger::instance() ("oscserver", log::INFO, "Client disconnected.");
+	    logger::self () ("oscserver", log::INFO, "Client disconnected.");
 	    break;
 
 	case SCE_CLIENT_TIMEOUT:
-	    logger::instance() ("oscserver", log::INFO, "Client timeout.");
+	    logger::self () ("oscserver", log::INFO, "Client timeout.");
 	    break;
 	    
 	default:

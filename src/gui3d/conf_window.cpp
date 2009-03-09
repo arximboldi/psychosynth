@@ -44,6 +44,7 @@ bool path_conf_window::on_delete (const CEGUI::EventArgs &e)
     ItemEntry* item = m_listbox->getFirstSelectedItem();
     if (item)
 	m_listbox->removeItem(item);
+	return true;
 }
 
 bool path_conf_window::on_add (const CEGUI::EventArgs &e)
@@ -57,6 +58,7 @@ bool path_conf_window::on_add (const CEGUI::EventArgs &e)
 			 Event::Subscriber(&path_conf_window::on_generic, this));
     
     m_listbox->addItem(item);
+	return true;
 }
 
 bool path_conf_window::on_change (const CEGUI::EventArgs &e)
@@ -64,6 +66,7 @@ bool path_conf_window::on_change (const CEGUI::EventArgs &e)
     ItemEntry* item = m_listbox->getFirstSelectedItem();
     if (item)
 	item->setText(m_editbox->getText());
+	return true;
 }
 
 bool path_conf_window::on_apply (const CEGUI::EventArgs &e)
@@ -76,6 +79,8 @@ bool path_conf_window::on_apply (const CEGUI::EventArgs &e)
     }
     
     m_conf.nudge();
+
+	return true;
 }
 
 bool path_conf_window::on_selection (const CEGUI::EventArgs &e)
@@ -94,7 +99,7 @@ void path_conf_window::populate ()
     std::string val;
     
     for (conf_node::iterator iter = m_conf.begin(); iter != m_conf.end(); ++iter) {
-	(*iter)->get(val);
+	iter->get(val);
 	item = static_cast<ItemEntry*>(wmgr.createWindow("TaharezLook/ListboxItem"));
 	item->setText(val);
 	item->setWantsMultiClickEvents(false);

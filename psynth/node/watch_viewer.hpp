@@ -25,8 +25,8 @@
 
 #include <boost/thread/mutex.hpp>
 
-#include <psynth/common/ring_audio_buffer.hpp>
-#include <psynth/common/ring_sample_buffer.hpp>
+#include <psynth/synth/ring_audio_buffer.hpp>
+#include <psynth/synth/ring_sample_buffer.hpp>
 #include <psynth/node/watch.hpp>
 
 namespace psynth

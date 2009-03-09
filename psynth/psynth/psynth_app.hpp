@@ -25,7 +25,7 @@
 
 #include <boost/filesystem.hpp>
 
-#include <psynth/common/misc.hpp>
+#include <psynth/base/misc.hpp>
 #include <psynth/psynth/director.hpp>
 
 namespace psynth

@@ -21,12 +21,13 @@
 #  Global config
 # ======================================================================
 
-AC_INIT(configure.ac)
+AC_PREREQ(2.61)
+AC_INIT([psychosynth], [0.1.2], [raskolnikov@es.gnu.org])
 
+AM_INIT_AUTOMAKE
 AM_CONFIG_HEADER(config.h)
-AM_INIT_AUTOMAKE(psychosynth, 0.1.2)
 
-AC_LANG_CPLUSPLUS
+AC_LANG(C++)
 AC_PROG_CXX
 AM_PROG_LIBTOOL
 
@@ -44,6 +45,15 @@ while true; do
   esac
 done]) dnl XE_EXPAND_VARIABLE
 
+#  Options
+# ======================================================================
+
+AC_ARG_ENABLE([debug], 
+		[AC_HELP_STRING([--enable-debug],
+	        [enable debug [default=disabled] ])],
+		[CXXFLAGS="${CXXFLAGS} -g -O0"], 
+		[CXXFLAGS="${CXXFLAGS} -DNDEBUG"])
+
 #  Compulsory libraries
 # ======================================================================
 
@@ -53,6 +63,7 @@ done]) dnl XE_EXPAND_VARIABLE
 AX_BOOST_BASE([1.35])
 AX_BOOST_THREAD
 AX_BOOST_FILESYSTEM
+AX_BOOST_UNIT_TEST_FRAMEWORK
 
 if test "x${ax_cv_boost_thread}" != xyes ; then
 AC_MSG_ERROR([
@@ -74,16 +85,6 @@ AC_MSG_ERROR([
 psynth_config_ok=no
 fi
 
-#if test "x${ax_cv_boost_signals}" != xyes ; then
-#AC_MSG_ERROR([
-#***
-#*** You need Boost.Signals library to compile the program.
-#*** Install it and run this script again.
-#***
-#])
-#psynth_config_ok=no
-#fi
-
 #  Sigc
 # ----------------------------------------------------------------------
    
@@ -103,6 +104,13 @@ AC_MSG_ERROR([
 
 #  Optional libraries
 # ======================================================================
+
+# Unit Testing Framework support
+# ----------------------------------------------------------------------
+HAVE_BOOST_TEST="no"
+if test "x${ax_cv_boost_unit_test_framework}" == xyes ; then
+   HAVE_BOOST_TEST="yes"
+fi
 
 #  Liblo support
 # ----------------------------------------------------------------------
@@ -353,7 +361,7 @@ XE_EXPAND_VARIABLE(bindir, PACKAGE_BIN_DIR)
 XE_EXPAND_VARIABLE(libdir, PACKAGE_LIB_DIR)
 
 # Uncomment only for development purposes
-# PACKAGE_DATA_DIR="./data"
+PACKAGE_DATA_DIR="./data"
 
 AC_SUBST(PACKAGE_DATA_DIR)
 AC_SUBST(PACKAGE_BIN_DIR)
@@ -363,6 +371,8 @@ AC_SUBST(PACKAGE_LIB_DIR)
 #  Conditions
 # ======================================================================
 
+if test "x$HAVE_BOOST_TEST" = xyes; then HAVE_BOOST_TEST_P=1
+else HAVE_BOOST_TEST_P=0; fi
 if test "x$HAVE_LIBLO" = xyes; then HAVE_LIBLO_P=1
 else HAVE_LIBLO_P=0; fi
 if test "x$HAVE_LIBXML" = xyes; then HAVE_LIBXML_P=1
@@ -382,6 +392,7 @@ else HAVE_ALSA_P=0; fi
 if test "x$HAVE_JACK" = xyes; then HAVE_JACK_P=1
 else HAVE_JACK_P=0; fi
 
+AC_SUBST(HAVE_BOOST_TEST_P)
 AC_SUBST(HAVE_LIBLO_P)
 AC_SUBST(HAVE_LIBXML_P)
 AC_SUBST(HAVE_VORBIS_P)
@@ -392,6 +403,7 @@ AC_SUBST(HAVE_OSS_P)
 AC_SUBST(HAVE_ALSA_P)
 AC_SUBST(HAVE_JACK_P)
 
+AM_CONDITIONAL([HAVE_BOOST_TEST], [test "x$HAVE_BOOST_TEST" = xyes])
 AM_CONDITIONAL([HAVE_LIBLO], [test "x$HAVE_LIBLO" = xyes])
 AM_CONDITIONAL([HAVE_LIBXML], [test "x$HAVE_LIBXML" = xyes])
 AM_CONDITIONAL([HAVE_VORBIS], [test "x$HAVE_VORBIS" = xyes])
@@ -416,7 +428,8 @@ AC_OUTPUT(libpsynth.pc
 	  data/desktop/Makefile
 	  data/gui3d/Makefile
 	  psynth/Makefile
-	  psynth/version.hpp)
+	  psynth/version.hpp
+	  test/Makefile)
 
 
 #  Result
@@ -454,6 +467,7 @@ AC_MSG_RESULT([
 *      OSS support: ............. $HAVE_OSS
 *      ALSA support: ............ $HAVE_ALSA
 *      Jack support: ............ $HAVE_JACK
+*      Unit tests support: ...... $HAVE_BOOST_TEST
 *      Translations: ............ Not suported.
 * 
 *   Installation directories:

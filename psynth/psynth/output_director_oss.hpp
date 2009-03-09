@@ -25,7 +25,7 @@
 
 #include <psynth/psynth/defaults_oss.hpp>
 #include <psynth/psynth/output_director.hpp>
-#include <psynth/output/output_oss.hpp>
+#include <psynth/io/output_oss.hpp>
 
 namespace psynth
 {

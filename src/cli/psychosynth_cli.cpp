@@ -27,8 +27,8 @@
 #include <psynth/net/osc_server.hpp>
 #include <psynth/net/osc_client_logger.hpp>
 #include <psynth/net/osc_server_logger.hpp>
-#include <psynth/common/timer.hpp>
-#include <psynth/common/arg_parser.hpp>
+#include <psynth/base/timer.hpp>
+#include <psynth/base/arg_parser.hpp>
 
 #include "cli/psychosynth_cli.hpp"
 

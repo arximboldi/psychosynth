@@ -44,34 +44,44 @@ nobase_libpsynthinc_HEADERS = \
 	psynth/output_director.hpp \
 	psynth/file_manager_director.hpp \
 	psynth/psynth_app.hpp \
-	common/arg_parser.hpp \
-	common/deleter.hpp \
-	common/error.hpp \
-	common/singleton.hpp \
-	common/audio_buffer.hpp \
-	common/sample_buffer.hpp\
-	common/ring_buffer.hpp\
-	common/ring_audio_buffer.hpp \
-	common/ring_sample_buffer.hpp \
-	common/audio_info.hpp \
-        common/map_iterator.hpp \
-	common/misc.hpp \
-	common/logger.hpp \
-	common/config.hpp \
-	common/option_conf.hpp \
-	common/timer.hpp \
-	common/vector_2d.hpp\
-	common/scaler.hpp\
-	common/file_finder.hpp\
-	common/file_manager.hpp\
-	common/tree.hpp\
-	common/signal.hpp\
-	common/memory.hpp\
+	base/arg_parser.hpp \
+	base/deleter.hpp \
+	base/error.hpp \
+	base/singleton.hpp \
+        base/iterator.hpp \
+	base/misc.hpp \
+	base/logger.hpp \
+	base/config.hpp \
+	base/option_conf.hpp \
+	base/timer.hpp \
+	base/vector_2d.hpp\
+	base/file_finder.hpp\
+	base/file_manager.hpp\
+	base/tree.hpp\
+	base/tree.tpp\
+	base/signal.hpp\
+	base/pointer.hpp\
+	base/exception.hpp\
+	synth/scaler.hpp\
+	synth/audio_buffer.hpp \
+	synth/sample_buffer.hpp\
+	synth/ring_buffer.hpp\
+	synth/ring_audio_buffer.hpp \
+	synth/ring_sample_buffer.hpp \
+	synth/audio_info.hpp \
+	synth/filter.hpp \
+	synth/wave_table.hpp \
+	synth/oscillator.hpp \
+	synth/envelope_simple.hpp\
+	synth/envelope_multi.hpp\
+	synth/envelope.hpp\
 	world/world.hpp \
 	world/patcher.hpp\
 	world/patcher_dynamic.hpp \
 	world/world_node_creator.hpp\
 	node/node.hpp \
+	node/node_types.hpp \
+	node/node_param.hpp\
 	node/node_manager.hpp \
 	node/node_output.hpp \
 	node/node_mixer.hpp \
@@ -89,45 +99,44 @@ nobase_libpsynthinc_HEADERS = \
 	node/node_control_noise.hpp \
 	node/node_echo.hpp \
 	node/node_delay.hpp \
-	node/filter.hpp \
-	node/wave_table.hpp \
-	node/oscillator.hpp \
-	node/node_types.hpp \
-	node/node_param.hpp\
-	node/envelope_simple.hpp\
-	node/envelope_multi.hpp\
-	node/envelope.hpp\
 	node/watch.hpp\
 	node/watch_viewer.hpp\
 	node/node_factory.hpp\
 	node/node_factory_manager.hpp\
-	output/output.hpp\
-	input/file_reader.hpp\
-	input/file_reader_any.hpp\
-	input/file_reader_fetcher.hpp\
+	io/output.hpp\
+	io/file_reader.hpp\
+	io/file_reader_any.hpp\
+	io/file_reader_fetcher.hpp\
 	version.hpp
 
 libpsynth_la_SOURCES = \
 	psynth/director.cpp \
 	psynth/psynth_app.cpp \
 	psynth/file_manager_director.cpp \
-	common/arg_parser.cpp \
-	common/audio_buffer.cpp \
-	common/sample_buffer.cpp \
-	common/ring_buffer.cpp \
-	common/ring_audio_buffer.cpp \
-	common/ring_sample_buffer.cpp \
-	common/misc.cpp \
-	common/logger.cpp \
-	common/config.cpp \
-	common/timer.cpp \
-	common/file_finder.cpp\
-	common/file_manager.cpp\
+	base/arg_parser.cpp \
+	base/misc.cpp \
+	base/logger.cpp \
+	base/config.cpp \
+	base/timer.cpp \
+	base/file_finder.cpp\
+	base/file_manager.cpp\
+	base/exception.cpp\
+	synth/audio_buffer.cpp \
+	synth/sample_buffer.cpp \
+	synth/ring_buffer.cpp \
+	synth/ring_audio_buffer.cpp \
+	synth/ring_sample_buffer.cpp \
+	synth/filter.cpp \
+	synth/wave_table.cpp \
+	synth/oscillator.cpp\
+	synth/envelope_multi.cpp\
 	world/world.cpp \
 	world/patcher.cpp \
 	world/patcher_dynamic.cpp \
 	world/world_node_creator.cpp\
 	node/node.cpp \
+	node/node_param.cpp \
+	node/node_factory_manager.cpp\
 	node/node_mixer.cpp \
 	node/node_audio_mixer.cpp \
 	node/node_control_mixer.cpp \
@@ -145,40 +154,34 @@ libpsynth_la_SOURCES = \
 	node/node_control_noise.cpp \
 	node/node_echo.cpp \
 	node/node_delay.cpp \
-	node/filter.cpp \
-	node/wave_table.cpp \
-	node/oscillator.cpp\
-	node/node_param.cpp \
-	node/node_factory_manager.cpp\
-	node/envelope_multi.cpp\
-	input/file_reader_any.cpp\
-	input/file_reader_fetcher.cpp
+	io/file_reader_any.cpp\
+	io/file_reader_fetcher.cpp
 
 if HAVE_SAMPLERATE
 libpsynth_la_CXXFLAGS += $(SAMPLERATE_CFLAGS)
 libpsynth_la_LIBADD += $(SAMPLERATE_LIBS)
 libpsynth_la_SOURCES += \
-	common/scaler_src.cpp
+	synth/scaler_src.cpp
 nobase_libpsynthinc_HEADERS += \
-	common/scaler_src.hpp
+	synth/scaler_src.hpp
 endif
 
 if HAVE_SOUNDTOUCH
 libpsynth_la_CXXFLAGS += $(SOUNDTOUCH_CFLAGS)
 libpsynth_la_LIBADD += $(SOUNDTOUCH_LIBS)
 libpsynth_la_SOURCES += \
-	common/scaler_st.cpp
+	synth/scaler_st.cpp
 nobase_libpsynthinc_HEADERS += \
-	common/scaler_st.hpp
+	synth/scaler_st.hpp
 endif
 
 if HAVE_LIBXML
 libpsynth_la_CXXFLAGS += $(LIBXML_CFLAGS)
 libpsynth_la_LIBADD += $(LIBXML_LIBS)
 libpsynth_la_SOURCES += \
-	common/conf_backend_xml.cpp
+	base/conf_backend_xml.cpp
 nobase_libpsynthinc_HEADERS += \
-	common/conf_backend_xml.hpp
+	base/conf_backend_xml.hpp
 endif
 
 if HAVE_LIBLO
@@ -206,18 +209,18 @@ libpsynth_la_LIBADD += $(ALSA_LIBS)
 nobase_libpsynthinc_HEADERS += \
 	psynth/defaults_alsa.hpp \
 	psynth/output_director_alsa.hpp \
-	output/output_alsa.hpp	
+	io/output_alsa.hpp	
 libpsynth_la_SOURCES += \
-	output/output_alsa.cpp
+	io/output_alsa.cpp
 endif
 
 if HAVE_OSS
 nobase_libpsynthinc_HEADERS += \
 	psynth/defaults_oss.hpp \
 	psynth/output_director_oss.hpp \
-	output/output_oss.hpp
+	io/output_oss.hpp
 libpsynth_la_SOURCES += \
-	output/output_oss.cpp
+	io/output_oss.cpp
 endif
 
 if HAVE_JACK
@@ -226,29 +229,29 @@ libpsynth_la_LDFLAGS += $(JACK_LIBS)
 nobase_libpsynthinc_HEADERS += \
 	psynth/defaults_jack.hpp \
 	psynth/output_director_jack.hpp \
-	output/output_jack.hpp
+	io/output_jack.hpp
 libpsynth_la_SOURCES += \
-	output/output_jack.cpp
+	io/output_jack.cpp
 endif
 
 if HAVE_SNDFILE
 libpsynth_la_CXXFLAGS += $(SNDFILE_CFLAGS)
 libpsynth_la_LIBADD += $(SNDFILE_LIBS)
 nobase_libpsynthinc_HEADERS += \
-	output/output_wave.hpp\
-	input/file_reader_wave.hpp
+	io/output_wave.hpp\
+	io/file_reader_wave.hpp
 libpsynth_la_SOURCES += \
-	output/output_wave.cpp\
-	input/file_reader_wave.cpp
+	io/output_wave.cpp\
+	io/file_reader_wave.cpp
 endif
 
 if HAVE_VORBIS
 libpsynth_la_CXXFLAGS += $(VORBIS_CFLAGS)
 libpsynth_la_LIBADD += $(VORBIS_LIBS)
 nobase_libpsynthinc_HEADERS += \
-	input/file_reader_ogg.hpp
+	io/file_reader_ogg.hpp
 libpsynth_la_SOURCES += \
-	input/file_reader_ogg.cpp
+	io/file_reader_ogg.cpp
 endif
 
 libpsynth_la_SOURCES += $(nobase_libpsynthinc_HEADERS)

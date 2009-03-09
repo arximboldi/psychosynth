@@ -23,7 +23,7 @@
 #ifndef DEFAULTSELECTORPOPULATOR_H
 #define DEFAULTSELECTORPOPULATOR_H
 
-#include <psynth/common/config.hpp>
+#include <psynth/base/config.hpp>
 #include "gui3d/selector_window.hpp"
 
 class default_selector_populator

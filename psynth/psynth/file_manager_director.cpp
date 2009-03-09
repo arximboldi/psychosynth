@@ -24,7 +24,7 @@
 #include <cstdlib>
 
 #include "version.hpp"
-#include "common/file_manager.hpp"
+#include "base/file_manager.hpp"
 #include "psynth/file_manager_director.hpp"
 
 using namespace std;
@@ -35,7 +35,7 @@ namespace psynth
 void file_manager_director::on_conf_nudge (conf_node& node)
 {
     file_manager& mgr =
-	file_manager::instance()
+	file_manager::self ()
 	.get_child ("psychosynth")
 	.get_child (node.get_name());
     
@@ -43,7 +43,7 @@ void file_manager_director::on_conf_nudge (conf_node& node)
     
     mgr.clear();
     for (conf_node::iterator it = node.begin(); it != node.end(); ++it) {
-	(*it)->get(val);
+	it->get (val);
 	mgr.add_path(val);
     }
 }
@@ -80,7 +80,7 @@ void file_manager_director::stop ()
 void file_manager_director::defaults ()
 {
     m_conf->get_child ("samples").get_child ("path0").def(
-	(boost::filesystem::path (PSYNTH_DATA_DIR) / "gui3d/samples").file_string ());
+	(boost::filesystem::path (PSYNTH_DATA_DIR) / "samples").file_string ());
     m_conf->get_child ("samples").get_child ("path1").def(
 	(m_home_path / "samples").file_string ());
 }

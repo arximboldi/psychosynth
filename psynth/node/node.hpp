@@ -32,13 +32,12 @@
 
 #include <boost/thread/mutex.hpp>
 
-#include <psynth/common/sample_buffer.hpp>
-#include <psynth/common/audio_buffer.hpp>
-#include <psynth/common/vector_2d.hpp>
-#include <psynth/common/deleter.hpp>
-
+#include <psynth/synth/sample_buffer.hpp>
+#include <psynth/synth/audio_buffer.hpp>
+#include <psynth/base/vector_2d.hpp>
+#include <psynth/base/deleter.hpp>
+#include <psynth/synth/envelope_simple.hpp>
 #include <psynth/node/node_param.hpp>
-#include <psynth/node/envelope_simple.hpp>
 #include <psynth/node/watch.hpp>
 
 namespace psynth

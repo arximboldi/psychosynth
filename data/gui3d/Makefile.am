@@ -36,8 +36,6 @@ nobase_pkgdata_DATA = \
 	$(wildcard mesh/*.mesh)\
 	$(wildcard texture/*.tga)\
 	$(wildcard texture/*.jpg)\
-	$(wildcard samples/*.wav)\
-	$(wildcard samples/*.ogg)\
 	gui/DejaVuSans.ttf
 
 EXTRA_DIST = $(nobase_pkgdata_DATA)

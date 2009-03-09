@@ -28,7 +28,7 @@
 #include <OgreCEGUIRenderer.h>
 
 #include <psynth/version.hpp>
-#include <psynth/common/timer.hpp>
+#include <psynth/base/timer.hpp>
 #include <psynth/psynth/psynth_app.hpp>
 #ifdef PSYNTH_HAVE_OSC
 #include <psynth/net/osc_client.hpp>

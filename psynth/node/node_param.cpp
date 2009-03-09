@@ -23,7 +23,7 @@
 #include <iostream>
 
 #include "node/node_param.hpp"
-#include "common/vector_2d.hpp"
+#include "base/vector_2d.hpp"
 
 using namespace std;
 

@@ -23,8 +23,8 @@
 #ifndef PSYNTH_FILEMANAGERDIRECTOR_H
 #define PSYNTH_FILEMANAGERDIRECTOR_H
 
-#include <psynth/common/config.hpp>
-#include <psynth/common/file_manager.hpp>
+#include <psynth/base/config.hpp>
+#include <psynth/base/file_manager.hpp>
 
 namespace psynth
 {

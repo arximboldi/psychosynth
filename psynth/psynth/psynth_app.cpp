@@ -25,11 +25,11 @@
 
 #include "version.hpp"
 
-#include "common/logger.hpp"
-#include "common/arg_parser.hpp"
-#include "common/option_conf.hpp"
+#include "base/logger.hpp"
+#include "base/arg_parser.hpp"
+#include "base/option_conf.hpp"
 #ifdef PSYNTH_HAVE_XML
-#include "common/conf_backend_xml.hpp"
+#include "base/conf_backend_xml.hpp"
 #endif
 #ifdef PSYNTH_HAVE_ALSA
 #include "psynth/output_director_alsa.hpp"
@@ -68,7 +68,7 @@ void psynth_app::generate_paths ()
 bool psynth_app::parse_args (int argc, const char* argv[])
 {
     arg_parser ap;
-    conf_node& conf = config::instance().get_child ("psychosynth");
+    conf_node& conf = config::self ().get_child ("psychosynth");
     bool show_help = false;
     bool show_version = false;
     
@@ -139,7 +139,7 @@ void psynth_app::print_base_options (ostream& out)
 
 void psynth_app::setup_synth()
 {
-    m_director.start (config::instance ().get_child ("psychosynth"),
+    m_director.start (config::self  ().get_child ("psychosynth"),
 		      get_config_path ());
 }
     
@@ -152,8 +152,8 @@ int psynth_app::run (int argc, const char* argv[])
 {   
     int ret_val;
  
-    conf_node& conf = config::instance().get_child ("psychosynth");
-    logger::instance().attach_sink (new log_default_sink);
+    conf_node& conf = config::self ().get_child ("psychosynth");
+    logger::self ().attach_sink (new log_default_sink);
 
     if (!parse_args (argc, argv))
 	return ERR_GENERIC;

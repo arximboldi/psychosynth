@@ -20,9 +20,9 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "common/audio_buffer.hpp"
-#include "common/misc.hpp"
-#include "common/file_manager.hpp"
+#include "synth/audio_buffer.hpp"
+#include "base/misc.hpp"
+#include "base/file_manager.hpp"
 #include "node/node_types.hpp"
 #include "node/node_sampler.hpp"
 
@@ -82,7 +82,7 @@ void node_sampler::on_file_change (node_param& par)
     boost::filesystem::path path;
     
     par.get (val);
-    path = file_manager::instance().get_path("psychosynth/samples").find (val);
+    path = file_manager::self ().get_path("psychosynth/samples").find (val);
 
     cout << path << endl;
     

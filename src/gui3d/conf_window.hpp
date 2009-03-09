@@ -24,7 +24,7 @@
 #define CONFWINDOW_H
 
 #include <psynth/version.hpp>
-#include <psynth/common/config.hpp>
+#include <psynth/base/config.hpp>
 #include "gui3d/toggable_window.hpp"
 
 class output_conf_window

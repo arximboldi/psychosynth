@@ -27,7 +27,7 @@
 #include <map>
 #include <iostream>
 
-#include <psynth/common/audio_info.hpp>
+#include <psynth/synth/audio_info.hpp>
 #include <psynth/world/patcher.hpp>
 #include <psynth/node/node.hpp>
 #include <psynth/node/node_output.hpp>

@@ -25,7 +25,7 @@
 
 #include <psynth/psynth/defaults_jack.hpp>
 #include <psynth/psynth/output_director.hpp>
-#include <psynth/output/output_jack.hpp>
+#include <psynth/io/output_jack.hpp>
 
 namespace psynth
 {

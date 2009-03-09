@@ -24,7 +24,7 @@
 #define RECORDWINDOW_H
 
 #include <psynth/world/world.hpp>
-#include <psynth/output/output_wave.hpp>
+#include <psynth/io/output_wave.hpp>
 
 #include "gui3d/toggable_window.hpp"
 

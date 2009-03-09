@@ -25,7 +25,7 @@
 #include "gui3d/element.hpp"
 #include "gui3d/query_flags.hpp"
 
-#include <psynth/common/misc.hpp>
+#include <psynth/base/misc.hpp>
 
 #define ROTATION_FACTOR     100.0f
 

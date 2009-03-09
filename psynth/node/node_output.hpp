@@ -27,9 +27,9 @@
 
 #include <boost/thread/mutex.hpp>
 
-#include <psynth/common/ring_audio_buffer.hpp>
+#include <psynth/synth/ring_audio_buffer.hpp>
 #include <psynth/node/node.hpp>
-#include <psynth/output/output.hpp>
+#include <psynth/io/output.hpp>
 #include <psynth/node/node_factory.hpp>
 
 namespace psynth

@@ -21,9 +21,9 @@
  ***************************************************************************/
 
 #include <algorithm>
-#include "common/misc.hpp"
+#include "base/misc.hpp"
 #include "node/node_types.hpp"
-#include "node/envelope_multi.hpp"
+#include "synth/envelope_multi.hpp"
 #include "node/node_step_seq.hpp"
 
 using namespace std;

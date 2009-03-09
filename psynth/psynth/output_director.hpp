@@ -23,7 +23,7 @@
 #ifndef PSYNTH_OUTPUT_DIRECTOR_H
 #define PSYNTH_OUTPUT_DIRECTOR_H
 
-#include <psynth/common/config.hpp>
+#include <psynth/base/config.hpp>
 
 namespace psynth
 {

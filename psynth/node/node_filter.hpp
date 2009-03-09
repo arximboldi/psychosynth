@@ -26,8 +26,8 @@
 #include <vector>
 
 #include <psynth/node/node.hpp>
-#include <psynth/node/filter.hpp>
 #include <psynth/node/node_factory.hpp>
+#include <psynth/synth/filter.hpp>
 
 namespace psynth
 {

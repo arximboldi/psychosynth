@@ -23,8 +23,8 @@
 #ifndef PSYNTH_DIRECTOR_H
 #define PSYNTH_DIRECTOR_H
 
-#include <psynth/common/config.hpp>
-#include <psynth/common/misc.hpp>
+#include <psynth/base/config.hpp>
+#include <psynth/base/misc.hpp>
 #include <psynth/world/world.hpp>
 #include <psynth/psynth/output_director.hpp>
 #include <psynth/psynth/file_manager_director.hpp>

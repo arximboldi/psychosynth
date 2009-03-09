@@ -28,7 +28,7 @@
 
 #include <psynth/node/node.hpp>
 #include <psynth/node/node_types.hpp>
-#include <psynth/node/oscillator.hpp>
+#include <psynth/synth/oscillator.hpp>
 
 namespace psynth
 {

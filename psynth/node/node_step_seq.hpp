@@ -25,7 +25,7 @@
 
 #include <psynth/node/node.hpp>
 #include <psynth/node/node_factory.hpp>
-#include <psynth/node/envelope_multi.hpp>
+#include <psynth/synth/envelope_multi.hpp>
 
 namespace psynth
 {

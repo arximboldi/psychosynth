@@ -20,7 +20,7 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <psynth/common/misc.hpp>
+#include <psynth/base/misc.hpp>
 #include "gui3d/elem_toggler_component.hpp"
 #include "gui3d/ogre_misc.hpp"
 
@@ -41,16 +41,16 @@ using namespace psynth;
 elem_toggler_component::elem_toggler_component(int param_num,
 					   int param_first,
 					   int param_step) :
-    m_param_num(param_num),
-    m_param_first(param_first),
-    m_param_step(param_step)
+    m_param_num (param_num),
+    m_param_first (param_first),
+    m_param_step (param_step)
 {
-    task_manager::instance().attach (this);
+    task_manager::self ().attach (this);
 }
 
 elem_toggler_component::~elem_toggler_component()
 {
-    task_manager::instance().detach (this);
+    task_manager::self ().detach (this);
 }
 
 void elem_toggler_component::create_toggles ()

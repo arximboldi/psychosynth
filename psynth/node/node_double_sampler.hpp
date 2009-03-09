@@ -24,10 +24,10 @@
 #define PSYNTH_NODE_DOUBLE_SAMPLER_H
 
 #include <psynth/node/node.hpp>
-#include <psynth/input/file_reader_any.hpp>
-#include <psynth/input/file_reader_fetcher.hpp>
+#include <psynth/io/file_reader_any.hpp>
+#include <psynth/io/file_reader_fetcher.hpp>
 #include <psynth/node/node_factory.hpp>
-#include <psynth/common/scaler_st.hpp>
+#include <psynth/synth/scaler_st.hpp>
 
 namespace psynth
 {

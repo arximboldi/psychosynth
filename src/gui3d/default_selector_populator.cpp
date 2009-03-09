@@ -27,8 +27,8 @@
 #include <dirent.h>
 
 #include <psynth/version.hpp>
-#include <psynth/common/misc.hpp>
-#include <psynth/common/file_manager.hpp>
+#include <psynth/base/misc.hpp>
+#include <psynth/base/file_manager.hpp>
 #include <psynth/world/world_node_creator.hpp>
 
 #include <psynth/node/node_mixer.hpp>
@@ -63,16 +63,16 @@ void default_selector_populator::populate_samples (selector_window::category* ca
     list<string> valid_ext;
 
 #ifdef PSYNTH_HAVE_PCM
-    valid_ext.push_back(".au");
-    valid_ext.push_back(".wav");
-    valid_ext.push_back(".aiff");
+    valid_ext.push_back (".au");
+    valid_ext.push_back (".wav");
+    valid_ext.push_back (".aiff");
 #endif
 #ifdef PSYNTH_HAVE_OGG    
-    valid_ext.push_back(".ogg");
+    valid_ext.push_back (".ogg");
 #endif
     
-    file_manager::instance ()
-	.get_path ("psychosynth/samples")
+    file_manager::self  ()
+	.get_path ("psychosynth.samples")
 	.find_if (make_has_extension (valid_ext.begin(), valid_ext.end()), files);
 
     files.sort ();
@@ -88,8 +88,8 @@ void default_selector_populator::populate_samples (selector_window::category* ca
 void default_selector_populator::populate(selector_window* sel)
 {
     m_selector = sel;
-    config::instance ()
-	.get_path ("psychosynth/file_manager/samples").on_nudge.connect
+    config::self ()
+	.get_path ("psychosynth.file_manager.samples").on_nudge.connect
 	(sigc::mem_fun (*this, &default_selector_populator::on_samples_conf_nudge));
     
     selector_window::category* cat = NULL;

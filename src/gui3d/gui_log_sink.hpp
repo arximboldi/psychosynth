@@ -23,7 +23,7 @@
 #ifndef GUILOGSINK_H
 #define GUILOGSINK_H
 
-#include <psynth/common/logger.hpp>
+#include <psynth/base/logger.hpp>
 #include <CEGUI/CEGUI.h>
 
 class gui_log_sink : public psynth::log_sink

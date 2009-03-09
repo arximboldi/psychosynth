@@ -28,7 +28,7 @@
 #include "gui3d/the_elements.hpp"
 #include "gui3d/query_flags.hpp"
 
-#include <psynth/common/logger.hpp>
+#include <psynth/base/logger.hpp>
 
 #include <psynth/node/node_types.hpp>
 
@@ -406,7 +406,7 @@ void element_manager::handle_add_node (world_node& obj)
 	obj.add_listener(elem);
     }
     else
-      logger::instance () ("gui3d", psynth::log::WARNING, "Could not create element.");
+      logger::self () ("gui3d", psynth::log::WARNING, "Could not create element.");
 }
 
 void element_manager::handle_delete_node (world_node& obj)

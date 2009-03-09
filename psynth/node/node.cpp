@@ -22,7 +22,7 @@
 
 #include <algorithm>
 
-#include "common/deleter.hpp"
+#include "base/deleter.hpp"
 #include "node/node.hpp"
 
 #include <cmath>
@@ -139,7 +139,7 @@ const node_param& node::param (const std::string& name) const
 
 void node::clear_connections()
 {
-    int i, j;
+    size_t i, j;
 
     for (i = 0; i < LINK_TYPES; ++i)
 	for (j = 0; j < m_in_sockets[i].size(); ++j)
@@ -154,7 +154,7 @@ void node::clear_connections()
 
 bool node::has_connections ()
 {
-    int i, j;
+    size_t i, j;
 
     for (i = 0; i < LINK_TYPES; ++i)
 	for (j = 0; j < m_in_sockets[i].size(); ++j)
@@ -250,7 +250,7 @@ void node::blend_buffer (sample* buf, int n_elem,
 
 void node::update_envelopes ()
 {
-    int i, j;
+    size_t i, j;
     
     for (i = 0; i < LINK_TYPES; ++i)
 	for (vector<envelope_simple>::iterator it = m_in_envelope[i].begin();

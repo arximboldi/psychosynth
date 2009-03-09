@@ -39,7 +39,7 @@ client_tab::client_tab (osc_client* client) :
     m_client->add_listener(this);
     m_client->add_listener(&m_logger);
     
-    psynth::logger::instance().get_child ("oscclient").attach_sink (&m_logsink);
+    psynth::logger::self ().get_child ("oscclient").attach_sink (&m_logsink);
 }
 
 client_tab::~client_tab ()
@@ -47,7 +47,7 @@ client_tab::~client_tab ()
     m_client->delete_listener(this);
     m_client->delete_listener(&m_logger);
  
-    psynth::logger::instance().get_child ("oscclient").dattach_sink (&m_logsink);
+    psynth::logger::self ().get_child ("oscclient").dattach_sink (&m_logsink);
     m_logsink.set_window (0);
 }
 
@@ -174,7 +174,7 @@ server_tab::server_tab (osc_server* server) :
     m_server->add_listener(this);
     m_server->add_listener(&m_logger);
  
-    psynth::logger::instance().get_child ("oscserver").attach_sink (&m_logsink);
+    psynth::logger::self ().get_child ("oscserver").attach_sink (&m_logsink);
 }
 
 server_tab::~server_tab ()
@@ -183,7 +183,7 @@ server_tab::~server_tab ()
     m_server->delete_listener(this);
     m_server->delete_listener(&m_logger);
     
-    psynth::logger::instance().get_child ("oscserver").dattach_sink (&m_logsink);
+    psynth::logger::self ().get_child ("oscserver").dattach_sink (&m_logsink);
     m_logsink.set_window (0);
 }
 

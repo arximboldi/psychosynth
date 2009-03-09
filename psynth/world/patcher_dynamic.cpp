@@ -22,7 +22,7 @@
 
 #include <algorithm>
 
-#include "common/logger.hpp"
+#include "base/logger.hpp"
 
 #include "world/patcher_dynamic.hpp"
 
@@ -469,7 +469,7 @@ void patcher_dynamic::update ()
 	map<int, pnode>::iterator n = m_nodes.find((*i)->src->get_id());
 	map<int, pnode>::iterator n2 = m_nodes.find((*i)->dest->get_id());
 	if (n == m_nodes.end()) {
-	    logger::instance () ("dynamic_patcher", log::WARNING, "Object not found.");
+	    logger::self () ("dynamic_patcher", log::WARNING, "Object not found.");
 	}
 	
 	pnode& node_src = (*n).second;

@@ -27,8 +27,8 @@
 
 #include <boost/thread/mutex.hpp>
 
-#include <psynth/common/memory.hpp>
-#include <psynth/common/map_iterator.hpp>
+#include <psynth/base/pointer.hpp>
+#include <psynth/base/iterator.hpp>
 #include <psynth/node/node_output.hpp>
 
 namespace psynth

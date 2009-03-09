@@ -174,9 +174,9 @@ bool camera_controller_default::mousePressed (const OIS::MouseEvent &e, OIS::Mou
 
 	if (get_table_intersection (table_pos)) {
 	    if (m_modifier) {
-		task_manager::instance().attach (new camera_move (this, m_camera->getPosition() +
-								  (table_pos - m_aimpoint),
-								  CAMERA_MOVE_DELAY)); 
+		task_manager::self ().attach (new camera_move (this, m_camera->getPosition() +
+							       (table_pos - m_aimpoint),
+							       CAMERA_MOVE_DELAY)); 
 	    } else {
 		m_moving = true;
 		m_last_tpos = table_pos;

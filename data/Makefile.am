@@ -19,3 +19,11 @@
 #
 
 SUBDIRS = gui3d desktop
+
+pkgdatadir = @PACKAGE_DATA_DIR@
+
+nobase_pkgdata_DATA = \
+	$(wildcard samples/*.wav)\
+	$(wildcard samples/*.ogg)
+
+EXTRA_DIST = $(nobase_pkgdata_DATA)

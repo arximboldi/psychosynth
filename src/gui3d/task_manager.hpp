@@ -24,7 +24,7 @@
 #define TASKMANAGER_H
 
 #include <list>
-#include <psynth/common/singleton.hpp>
+#include <psynth/base/singleton.hpp>
 
 class task_manager;
 

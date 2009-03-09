@@ -25,11 +25,11 @@
 #include <config.h>
 
 #include <psynth/version.hpp>
-#include <psynth/common/logger.hpp>
-#include <psynth/common/misc.hpp>
-#include <psynth/common/option_conf.hpp>
+#include <psynth/base/logger.hpp>
+#include <psynth/base/misc.hpp>
+#include <psynth/base/option_conf.hpp>
 #ifdef PSYNTH_HAVE_XML
-#include <psynth/common/conf_backend_xml.hpp>
+#include <psynth/base/conf_backend_xml.hpp>
 #endif
 
 #include "gui3d/psychosynth_3d.hpp"
@@ -103,7 +103,7 @@ void psychosynth_3d::print_version ()
 
 void psychosynth_3d::prepare (psynth::arg_parser& arg_parser)
 {
-    conf_node& conf = config::instance().get_child ("psynth3d");
+    conf_node& conf = config::self ().get_child ("psynth3d");
     
     arg_parser.add ('W', "width",
 		    new option_conf<int>(conf.get_child ("screen_width")));
@@ -119,48 +119,48 @@ void psychosynth_3d::prepare (psynth::arg_parser& arg_parser)
 
 int psychosynth_3d::execute()
 {
-    logger::instance() ("gui", psynth::log::INFO, "Loading settings.");
+    logger::self () ("gui", psynth::log::INFO, "Loading settings.");
      
-    conf_node& conf = config::instance().get_child ("psynth3d");
+    conf_node& conf = config::self ().get_child ("psynth3d");
     setup_settings (conf);
     
-    logger::instance() ("gui", psynth::log::INFO, "Initializing Ogre.");
+    logger::self () ("gui", psynth::log::INFO, "Initializing Ogre.");
     setup_ogre (conf);
-    logger::instance() ("gui", psynth::log::INFO, "Initializing OIS.");
+    logger::self () ("gui", psynth::log::INFO, "Initializing OIS.");
     setup_input ();
-    logger::instance() ("gui", psynth::log::INFO, "Initializing synthesizer.");
+    logger::self () ("gui", psynth::log::INFO, "Initializing synthesizer.");
     setup_synth ();
 #ifdef PSYNTH_HAVE_OSC
-    logger::instance() ("gui", psynth::log::INFO, "Initializing networking.");
+    logger::self () ("gui", psynth::log::INFO, "Initializing networking.");
     setup_net ();
 #endif
-    logger::instance() ("gui", psynth::log::INFO, "Initializing scene.");
+    logger::self () ("gui", psynth::log::INFO, "Initializing scene.");
     setup_world ();
-    logger::instance() ("gui", psynth::log::INFO, "Initializing CEGUI.");
+    logger::self () ("gui", psynth::log::INFO, "Initializing CEGUI.");
     setup_gui ();
-    logger::instance() ("gui", psynth::log::INFO, "Initializing GUI elements.");
+    logger::self () ("gui", psynth::log::INFO, "Initializing GUI elements.");
     setup_menus ();
 		
     m_ogre->startRendering();
 
-    logger::instance() ("gui", psynth::log::INFO, "Closing GUI elements.");
+    logger::self () ("gui", psynth::log::INFO, "Closing GUI elements.");
     close_menus ();
-    logger::instance() ("gui", psynth::log::INFO, "Closing CEGUI.");
+    logger::self () ("gui", psynth::log::INFO, "Closing CEGUI.");
     close_gui ();
 #ifdef PSYNTH_HAVE_OSC
-    logger::instance() ("gui", psynth::log::INFO, "Closing networking.");
+    logger::self () ("gui", psynth::log::INFO, "Closing networking.");
     close_net ();
 #endif
-    logger::instance() ("gui", psynth::log::INFO, "Closing scene.");
+    logger::self () ("gui", psynth::log::INFO, "Closing scene.");
     close_world ();
-    logger::instance() ("gui", psynth::log::INFO, "Closing synthesizer.");
+    logger::self () ("gui", psynth::log::INFO, "Closing synthesizer.");
     close_synth ();
-    logger::instance() ("gui", psynth::log::INFO, "Closing OIS.");
+    logger::self () ("gui", psynth::log::INFO, "Closing OIS.");
     close_input ();
-    logger::instance() ("gui", psynth::log::INFO, "Closing Ogre.");
+    logger::self () ("gui", psynth::log::INFO, "Closing Ogre.");
     close_ogre ();
 
-    logger::instance() ("gui", psynth::log::INFO, "Storing settings.");
+    logger::self () ("gui", psynth::log::INFO, "Storing settings.");
     conf.save();
     
     return 0;
@@ -217,7 +217,8 @@ void psychosynth_3d::setup_ogre (psynth::conf_node& conf)
     conf.get_child ("fps").get(fps);
     
     (new LogManager)->createLog ((get_config_path() / "gui3d/psynth3d_Ogre.log").file_string (),
-				 false, false, false);  
+				 false, false, false);
+    std::cout << get_data_path () << std::endl;
     m_ogre = new Root ((get_data_path() / "gui3d/plugins.cfg").file_string (),
 		       (get_data_path() / "gui3d/ogre.cfg").file_string ());
         
@@ -256,7 +257,7 @@ void psychosynth_3d::setup_ogre (psynth::conf_node& conf)
 void psychosynth_3d::setup_input ()
 {
     int fullscreen; /* I prefer not using the singleton here. */
-    config::instance().get_path("psynth3d/fullscreen").get(fullscreen);
+    config::self ().get_path("psynth3d.fullscreen").get(fullscreen);
     
     OIS::ParamList pl;
     size_t window_hnd = 0;
@@ -385,7 +386,7 @@ void psychosynth_3d::setup_world ()
     node->attachObject(ring1);
     node->setPosition(Vector3(0,0.01,0));
 
-    m_taskmgr = &task_manager::instance ();
+    m_taskmgr = &task_manager::self  ();
     m_elemmgr = new element_manager (get_world(), m_scene, m_camera);
     m_camctrl = new camera_controller_default (m_camera);
 
@@ -429,8 +430,8 @@ void psychosynth_3d::setup_menus ()
     m_windowlist->add_window ("ConfWindowButton.imageset",
 			      "ConfWindowButton.layout",
 			      "Configure the program settings.",
-			      new conf_window (config::instance().get_child ("psynth3d"),
-					       config::instance().get_child ("psychosynth")),
+			      new conf_window (config::self ().get_child ("psynth3d"),
+					       config::self ().get_child ("psychosynth")),
 			      OIS::KC_UNASSIGNED);
     m_windowlist->add_window ("InfoWindowButton.imageset",
 			      "InfoWindowButton.layout",
