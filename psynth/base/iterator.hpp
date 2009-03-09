@@ -66,6 +66,8 @@ template <typename Iterator>
 class ptr_iterator : public Iterator
 {
 public:
+    typedef std::iterator_traits<Iterator> base_traits;
+    
     typedef typename std::iterator_traits<Iterator>::value_type ptr_value_type;
     typedef typename take_pointer<ptr_value_type>::type value_type;
 
@@ -93,14 +95,16 @@ public:
      * Const indirection operator, returns a constant reference to the
      * referred value.
      */
-    value_type& operator*() const {
+    value_type& operator*() const
+    {
 	return *Iterator::operator* ();
     }
 
     /**
      * Indirection operator, returns a pointer to the referred value const value.
      */
-    value_type* operator->() const {
+    value_type* operator->() const
+    {
 	return Iterator::operator* ();
     }
 };
@@ -136,14 +140,16 @@ public:
      * Const indirection operator, returns a constant reference to the
      * referred value.
      */
-    const value_type& operator*() const {
+    const value_type& operator*() const
+    {
 	return *Iterator::operator* ();
     }
 
     /**
      * Indirection operator, returns a pointer to the referred value const value.
      */
-    const value_type* operator->() const {
+    const value_type* operator->() const
+    {
 	return Iterator::operator* ();
     }
 };
@@ -183,14 +189,16 @@ public:
     /**
      * Indirection operator, returns a reference to the referred value.
      */
-    Data& operator*() {
+    Data& operator*()
+    {
 	return std::map<Key, Data>::iterator::operator*().second;
     }
 
     /**
      * Indirection operator, returns a pointer to the referred value.
      */
-    Data* operator->() {
+    Data* operator->()
+    {
 	return &std::map<Key, Data>::iterator::operator*().second;
     }
 
@@ -198,28 +206,32 @@ public:
      * Const indirection operator, returns a constant reference to the
      * referred value.
      */
-    const Data& operator*() const {
+    const Data& operator*() const
+    {
 	return std::map<Key, Data>::iterator::operator*().second;
     }
 
     /**
      * Indirection operator, returns a pointer to the referred value const value.
      */
-    const Data* operator->() const {
+    const Data* operator->() const
+    {
 	return &std::map<Key, Data>::iterator::operator*().second;
     }
 
     /**
      * Preincrement operator.
      */
-    map_iterator<Key, Data> operator++() {
+    map_iterator<Key, Data> operator++ ()
+    {
 	return std::map<Key, Data>::iterator::operator++();
     }
 
     /**
      * Postincrement operator.
      */
-    map_iterator<Key, Data> operator++(int) {
+    map_iterator<Key, Data> operator++ (int)
+    {
 	return std::map<Key, Data>::iterator::operator++(0);
     }
 };
@@ -256,7 +268,8 @@ public:
     /**
      * Indirection operator, returns a reference to the referred value.
      */
-    const Data& operator* () {
+    const Data& operator* ()
+    {
 	return std::map<Key, Data>::const_iterator::operator*().second;
     }
 
@@ -264,7 +277,8 @@ public:
      * Const indirection operator, returns a constant reference to the
      * referred value.
      */
-    const Data& operator* () const {
+    const Data& operator* () const
+    {
 	return std::map<Key, Data>::const_iterator::operator*().second;
     }
 };

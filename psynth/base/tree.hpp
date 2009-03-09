@@ -33,10 +33,10 @@
 namespace psynth
 {
 
-template <typename KeyType>
+template <typename Key>
 struct tree_node_traits
 {
-    typedef typename KeyType::value_type value_type;
+    typedef typename Key::value_type value_type;
     static const value_type separator = value_type ();
 };
 
@@ -58,21 +58,21 @@ PSYNTH_ERROR_WHERE(base_error, tree_node_error, "psynth.base.tree");
  *
  * @todo Fix copy operations. Fix string operations to be more generic.
  */
-template <class NodeType,
-	  class KeyType = std::string,
-	  class Traits = tree_node_traits<KeyType> > 
+template <class Node,
+	  class Key = std::string,
+	  class Traits = tree_node_traits<Key> > 
 class tree_node
 {  
 public:
     /**
      * Iterator to check the childs of this node.
      */
-    typedef ptr_iterator<map_iterator<KeyType, null_ptr<NodeType> > > iterator;
+    typedef ptr_iterator<map_iterator<Key, null_ptr<Node> > > iterator;
 
     /**
      * Iterator to check the childs of this node, const version.
      */
-    typedef ptr_const_iterator<map_const_iterator<KeyType, null_ptr<NodeType> > >
+    typedef ptr_const_iterator<map_const_iterator<Key, null_ptr<Node> > >
     const_iterator;
 
     /**
@@ -104,7 +104,7 @@ public:
     {
 	return m_childs.begin ();
     }
-
+    
     /**
      * Returns an iterator to the end of this node childs.
      */
@@ -125,7 +125,7 @@ public:
      * Returns a pointer to the parent of this node or @c null if this is a root
      * node.
      */
-    const NodeType* get_parent () const
+    const Node* get_parent () const
     {
 	return m_parent;
     }
@@ -134,7 +134,7 @@ public:
      * Returns a pointer to the parent of this node or @c null if this is a root
      * node.
      */
-    NodeType* get_parent ()
+    Node* get_parent ()
     {
 	return m_parent;
     }
@@ -142,15 +142,63 @@ public:
     /**
      * Returns the name of this node.
      */
-    const KeyType& get_name () const
+    const Key& get_name () const
     {
 	return m_name;
     }
+   
+    /**
+     * Returns an iterator to a child given by its key or end () otherwise.
+     * @param name The key name of the child.
+     */
+    iterator find_child (const Key& name)
+    {
+	return m_childs.find (name);
+    }
+ 
+    /**
+     * Returns an iterator to a child given by its key or end () otherwise.
+     * @param name The key name of the child.
+     */
+    const_iterator find_child (const Key& name) const
+    {
+	return m_childs.find (name);
+    }
 
+    /**
+     * Detaches a node from the tree. Once detached you are responsible
+     * of freeing the node memory. If the key does not refer to a node
+     * it throws an exception.
+     *
+     * @return A pointer to the detached node. 
+     */
+    Node& detach (const Key& name)
+    {
+	return detach (find_child (name));
+    }
+    
+    /**
+     * Attaches a node to a tree. Note that this wil fail if the node is
+     * already attached to another tree or if the selected key is already
+     * used by another child of this tree.
+     *
+     * @return true If the node was successfully attached and false otherwise.
+     */
+    bool attach (const Key& name, Node& node);
+    
+    /**
+     * Detaches a node from the tree. Once detached you are responsible
+     * of freeing the node memory. If the iterator points to end ()
+     * it throws an exception.
+     *
+     * @return A pointer to the detached node. 
+     */
+    Node& detach (iterator iter);
+    
     /**
      * Returns the path of this node from the root to the node.
      */
-    KeyType get_path_name () const;
+    Key get_path_name () const;
     
     /**
      * Deletes a child of this node.
@@ -168,14 +216,14 @@ public:
      * is created if it does not exist yet.
      * @param name The name of the child.
      */
-    NodeType& get_child (const KeyType& name);
+    Node& get_child (const Key& name);
 
     /**
      * Returns a reference to the child of this node mathing a name,
      * throwing an exception if the node does not exist.
      * @param name The name of the child.
      */
-    NodeType& get_existing_child (const KeyType& name);
+    Node& get_existing_child (const Key& name);
 
 
     /**
@@ -183,70 +231,77 @@ public:
      * throwing an exception if the node does not exist.
      * @param name The name of the child.
      */
-    const NodeType& get_existing_child (const KeyType& name) const;
+    const Node& get_existing_child (const Key& name) const;
     
     /**
      * Returns a reference to the child matching a path. All nodes
      * in the path are created if they do not exist.
      */
-    NodeType& get_path (const KeyType& name);
+    Node& get_path (const Key& name);
     
     /**
      * Returns a reference to the child matching a path, an
      * exception is thrown if the path does not exist.
      * @param name The path to find.
      */
-    NodeType& get_existing_path (const KeyType& name);
+    Node& get_existing_path (const Key& name);
 
     /**
      * Returns a reference to the child matching a path, an
      * exception is thrown if the path does not exist.
      * @param name The path to find.
      */
-    const NodeType& get_existing_path (const KeyType& name) const;
+    const Node& get_existing_path (const Key& name) const;
 
-protected:
-    void set_name (const KeyType& name)
-    {
-	m_name = name;
-    }
-    
-    virtual void on_new_child (NodeType& node) {}
-    virtual void on_remove_child (NodeType& node) {}
+protected:    
+    virtual void on_new_child (Node& node) {}
+    virtual void on_remove_child (Node& node) {}
     virtual void on_init () {}
+    virtual void on_uninit () {}
     
 private:
-    std::map<KeyType, null_ptr<NodeType> > m_childs;
-    NodeType* m_parent;
-    KeyType m_name;
+    std::map<Key, null_ptr<Node> > m_childs;
+    Node* m_parent;
+    Key m_name;
     bool m_isinit;
 
     template <typename InputIterator>
     static void find_base (InputIterator& base_b, InputIterator& base_e);
 
-    const NodeType&
-    get_existing_path (typename KeyType::const_iterator begin,
-		       typename KeyType::const_iterator end) const;
-    NodeType&
-    get_existing_path (typename KeyType::const_iterator begin,
-		       typename KeyType::const_iterator end);
-    NodeType& get_path (typename KeyType::const_iterator begin,
-			typename KeyType::const_iterator end);
+    const Node&
+    get_existing_path (typename Key::const_iterator begin,
+		       typename Key::const_iterator end) const;
+    Node&
+    get_existing_path (typename Key::const_iterator begin,
+		       typename Key::const_iterator end);
+    Node& get_path (typename Key::const_iterator begin,
+		    typename Key::const_iterator end);
     
-    void get_path_name (KeyType& prefix) const;
+    void get_path_name (Key& prefix) const;
 
     bool is_init() const
     {
 	return m_isinit;
     }
 
-    void init (const KeyType& name, NodeType* parent)
+    void init (const Key& name, Node* parent)
     {
 	m_isinit = true;
 	m_name = name;
 	m_parent = parent;
 	on_init ();
     }
+
+    void uninit ()
+    {
+	if (m_isinit) {
+	    m_isinit = false;
+	    m_name = Key ();
+	    m_parent = 0;
+	    on_uninit ();
+	}
+    }
+
 };
 
 } /* namespace psynth */

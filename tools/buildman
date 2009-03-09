@@ -1,0 +1,5 @@
+#!/bin/sh
+
+echo "Making man pages"
+help2man src/psynth3d -o doc/man/psynth3d.1
+help2man src/psynth -o doc/man/psynth.1

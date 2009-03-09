@@ -31,17 +31,17 @@ namespace psynth
 
 file_reader_fetcher::file_reader_fetcher (file_reader* reader,
 					  int buffer_size,
-					  int threshold) :
-    m_reader(reader),
-    m_buffer_size(buffer_size),
-    m_threshold(threshold),
-    m_tmp_buffer(audio_info(), m_threshold),
-    m_buffer(audio_info(), m_buffer_size),
-    m_read_ptr(m_buffer.begin()),
-    m_backwards(false),
-    m_read_pos(0),
-    m_new_read_pos(-1),
-    m_finished(false)
+					  int threshold)
+    : m_reader(reader)
+    , m_buffer_size(buffer_size)
+    , m_threshold(threshold)
+    , m_tmp_buffer(audio_info(), m_threshold)
+    , m_buffer(audio_info(), m_buffer_size)
+    , m_read_ptr(m_buffer.begin())
+    , m_backwards(false)
+    , m_read_pos(0)
+    , m_new_read_pos(-1)
+    , m_finished(false)
 {
 }
 

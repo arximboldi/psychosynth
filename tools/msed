@@ -1,0 +1,13 @@
+#!/bin/bash
+
+if let "$# < 2"; then
+    echo "Debe pasar dos parámetros al menos."
+    exit 1
+fi
+
+for ((i=2; i <= $#; i++)); do
+    file=${!i}
+    echo "Making substitution $1 in $file"
+    cp $file $file.old
+    sed "$1" $file.old > $file
+done

@@ -22,6 +22,8 @@
 
 #include <cstring>
 #include <cstdlib>
+#include <iostream>
+#include <typeinfo>
 
 #include "base/arg_parser.hpp"
 
@@ -32,17 +34,16 @@ namespace psynth
 
 arg_parser::~arg_parser ()
 {
-    for (list <option*>::iterator i = m_all.begin (); i != m_all.end ();
-	 ++i)
+    for (option_iterator i = m_all.begin (); i != m_all.end (); ++i)
 	delete *i;
 }
 
-void arg_parser::add (unsigned char flag, const char *str, option * op)
-{
+void arg_parser::add (unsigned char flag, const char* str, option* op)
+{    
     if (flag != NULL_FLAG)
 	m_short[flag].push_back (op);
 
-    if (str != NULL)
+    if (str != 0)
 	m_long[str].push_back (op);
 
     m_all.push_back (op);
@@ -51,53 +52,58 @@ void arg_parser::add (unsigned char flag, const char *str, option * op)
 void arg_parser::parse (int argc, const char *argv[])
 {
     int i;
-
+    
     m_free.clear ();
 
-    for (i = 1; i < argc; i++) {
-        bool skip = false;
-	
-        switch (get_type (argv[i]))
-	{
-	case ARG_FREE:
-            m_free.push_back (argv[i]);
-            break;
+    try
+    {
+	for (i = 1; i < argc; i++) {
+	    bool skip = false;
+	    switch (get_type (argv[i]))
+	    {
+	    case ARG_FREE:
+		m_free.push_back (argv[i]);
+		break;
 
-	case ARG_SHORT:
-            for (const char *s = argv[i] + 1; *s != '\0'; ++s) {
-                for (list <option *>::iterator j =
-			 m_short[(size_t) * s].begin ();
-		     j != m_short[(size_t) * s].end (); ++j)
-		{
-                    if ((i + 1 == argc) ||
-			!is_free (argv[i + 1]) || !(*j)->parse (argv[i + 1]))
-			(*j)->parse ();
-                    else
-			skip = true;
+	    case ARG_SHORT:
+		for (const char *s = argv[i] + 1; *s != '\0'; ++s) {
+		    for (option_iterator j = m_short[(size_t) *s].begin ();
+			 j != m_short[(size_t) *s].end ();
+			 ++j)
+		    {
+			if ((i + 1 == argc) ||
+			    !(*j)->parse (argv[i + 1]))
+			    (*j)->parse ();
+			else
+			    skip = true;
+		    }
 		}
+		break;
+
+	    case ARG_LONG:
+		map <const char *, list <option*> >::iterator
+		    l = m_long.find (argv[i] + 2);
+
+		if (l != m_long.end()) {
+		    for (option_iterator j = (*l).second.begin ();
+			 j != (*l).second.end (); ++j)
+		    {
+			if ((i + 1 == argc) ||
+			    !(*j)->parse (argv[i + 1]))
+			    (*j)->parse ();
+			else
+			    skip = true;
+		    }
+		}
+		break;
 	    }
-            break;
-
-	case ARG_LONG:
-            map <const char *, list <option * > >::iterator l =
-		m_long.find (argv[i] + 2);
-
-	    if (l != m_long.end()) {
-		for (list < option * >::iterator j = (*l).second.begin ();
-		     j != (*l).second.end (); ++j)
-		{
-		    if ((i + 1 == argc) ||
-			!is_free (argv[i + 1]) || !(*j)->parse (argv[i + 1]))
-			(*j)->parse ();
-		    else
-			skip = true;
-		}
-            }
-	    
-            break;
+	
+	    i += skip;
 	}
-
-        i += skip;
+    }
+    catch (...)
+    {
+	throw arg_parser_error (argv [i]);
     }
 }
 

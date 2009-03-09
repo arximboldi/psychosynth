@@ -1,0 +1,26 @@
+#!/bin/bash
+
+EXTENSIONS="*.hpp *.cpp *.tpp"
+DIRS="\
+src \
+src/gui3d \
+src/cli \
+psynth/base \
+psynth/synth \
+psynth/io \
+psynth/node \
+psynth/world \
+psynth/psynth \
+psynth/net \
+test \
+test/unit
+"
+
+PATTERNS=""
+for ext in $EXTENSIONS; do
+    for dir in $DIRS; do
+	PATTERNS="$PATTERNS $dir/$ext"
+    done
+done
+
+wc $PATTERNS

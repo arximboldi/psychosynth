@@ -26,10 +26,40 @@ namespace psynth
 template <class N, class K, class T>
 tree_node <N, K, T>::~tree_node ()
 {
+    uninit ();
+    
     for (map_iterator<K, null_ptr<N> > it = m_childs.begin ();
 	 it != m_childs.end ();
 	 ++it)
 	delete *it;
+}
+
+template <class N, class K, class T>
+bool tree_node<N, K, T>::attach (const K& name, N& node)
+{
+    if (node.m_isinit || find_child (name) != end ())
+	return false;
+
+    node.init (name, dynamic_cast<N*> (this));
+    m_childs.insert (std::make_pair (name, null_ptr<N>(&node)));
+    on_new_child (node);
+
+    return true;
+}
+
+template <class N, class K, class T>
+N& tree_node<N, K, T>::detach (iterator iter)
+{
+    if (iter == end ())
+	throw tree_node_error ("Invalid iterator.");
+    
+    N& node = *iter;
+      
+    m_childs.erase (iter);
+    on_remove_child (*iter);
+    iter->uninit ();
+      
+    return node;
 }
 
 template <class N, class K, class T>
@@ -64,11 +94,12 @@ K tree_node <N, K, T>::get_path_name () const
 template <class N, class K, class T>
 void tree_node <N, K, T>::get_path_name (K& prefix) const
 {
-    if (!m_parent)
-	prefix.insert (prefix.end (), m_name.begin (), m_name.end ());
-    else {
-	m_parent->get_path_name (prefix);
-	prefix.insert (prefix.end (), T::separator);
+    if (m_parent)
+    {
+	if (m_parent->m_parent) {
+	    m_parent->get_path_name (prefix);
+	    prefix.insert (prefix.end (), T::separator);
+	}
 	prefix.insert (prefix.end (), m_name.begin (), m_name.end ());
     }
 }
@@ -146,7 +177,7 @@ get_existing_path (typename K::const_iterator begin,
     return base_end == end ?
 	get_existing_child (K (begin, base_end)) :
 	get_existing_child (K (begin, base_end))
-	.get_existing_path (++ base_end, end);
+	.get_existing_path (rest_begin, end);
 }
 
 template <class N, class K, class T>
@@ -170,7 +201,7 @@ get_existing_path (typename K::const_iterator begin,
     return base_end == end ?
 	get_existing_child (K (begin, base_end)) :
 	get_existing_child (K (begin, base_end))
-	.get_existing_path (base_end, end);
+	.get_existing_path (rest_begin, end);
 }
 
 template <class N, class K, class T>

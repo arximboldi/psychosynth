@@ -26,6 +26,7 @@ noinst_PROGRAMS = $(TESTS)
 
 psynth_unit_test_SOURCES = \
 	unit/tree_node_test.cpp \
+	unit/arg_parser_test.cpp \
 	psynth_unit_test.cpp
 
 AM_CPPFLAGS = -Wall $(BOOST_CPPFLAGS)
