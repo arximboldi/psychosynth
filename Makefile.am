@@ -27,7 +27,15 @@ SUBDIRS = psynth src data doc test
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = libpsynth.pc
 
-.PHONY: doc
+noinst_DATA = ChangeLog
+
+.PHONY: doc log
 
 doc:
 	\doxygen doc/Doxyfile
+
+log: ChangeLog
+
+ChangeLog:
+	\bzr log --gnu-changelog -r97.. > ChangeLog
+
