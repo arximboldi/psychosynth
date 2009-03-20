@@ -203,6 +203,9 @@ bool psychosynth_3d::frameStarted (const Ogre::FrameEvent& evt)
     while(m_oscserver->receive());
     m_oscserver->update (m_timer.delta_ticks());
 #endif
+
+    if (m_window->isClosed ())
+	m_must_quit = true;
     
     return !m_must_quit;
 }
