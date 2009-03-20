@@ -59,7 +59,7 @@ bool output_wave::open()
 	m_file = sf_open (m_file_name.c_str(), SFM_WRITE, &sfinfo);
 
 	if (m_file == NULL) {
-	    logger::self () ("wave", log::ERROR,
+	    logger::self () ("wave", log::error,
 			     string("Could not open file ") + m_file_name);
 	    return false;
 	}

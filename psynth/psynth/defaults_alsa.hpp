@@ -23,7 +23,7 @@
 #ifndef PSYNTH_DEFAULTS_ALSA_H
 #define PSYNTH_DEFAULTS_ALSA_H
 
-#define DEFAULT_ALSA_NAME        "alsa"
-#define DEFAULT_ALSA_OUT_DEVICE  "default"
+#define PSYNTH_DEFAULT_ALSA_NAME        "alsa"
+#define PSYNTH_DEFAULT_ALSA_OUT_DEVICE  "default"
 
 #endif /* PSYNTH_DEFAULTS_ALSA_H */

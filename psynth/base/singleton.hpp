@@ -38,19 +38,6 @@ namespace psynth
 template<typename T>
 class singleton
 {
-    /** Hidden copy constructor. */
-    singleton (singleton const&) {};
-
-    /** Hidden copy operator. */
-    singleton& operator= (singleton const&) {};
-
-protected:
-    /** Hidden constructor. */
-    singleton() {};
-
-    /** Hidden destructor. */
-    ~singleton() {};
-    
 public:
     /**
      * Returns the instance of the Singleton.
@@ -60,6 +47,20 @@ public:
         static T _instance;
         return _instance;
     };
+
+protected:
+    /** Hidden constructor. */
+    singleton() {};
+
+    /** Hidden destructor. */
+    ~singleton() {};
+    
+private:
+    /** Hidden copy constructor. */
+    singleton (singleton const&) {};
+
+    /** Hidden copy operator. */
+    singleton& operator= (singleton const&) {};
 };
 
 } /* namespace psynth */

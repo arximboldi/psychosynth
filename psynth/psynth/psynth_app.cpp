@@ -80,13 +80,13 @@ bool psynth_app::parse_args (int argc, const char* argv[])
     ap.add('o', "output", new option_conf<string>(conf.get_child ("output")));
 
 #ifdef PSYNTH_HAVE_ALSA
-    ap.add(0, "alsa-device", new option_conf<string>(conf.get_path ("alsa/out_device")));
+    ap.add(0, "alsa-device", new option_conf<string>(conf.get_path ("alsa.out_device")));
 #endif
 #ifdef PSYNTH_HAVE_OSS
-    ap.add(0, "oss-device", new option_conf<string>(conf.get_path ("oss/out_device")));
+    ap.add(0, "oss-device", new option_conf<string>(conf.get_path ("oss.out_device")));
 #endif
 #ifdef PSYNTH_HAVE_JACK
-    ap.add(0, "jack-server", new option_conf<string>(conf.get_path ("jack/server")));
+    ap.add(0, "jack-server", new option_conf<string>(conf.get_path ("jack.server")));
 #endif
 
     prepare (ap);
@@ -153,18 +153,22 @@ int psynth_app::run (int argc, const char* argv[])
     int ret_val;
  
     conf_node& conf = config::self ().get_child ("psychosynth");
-    logger::self ().attach_sink (new log_default_sink);
+    logger::self ().attach_sink (new log_std_sink);
 
     if (!parse_args (argc, argv))
 	return ERR_GENERIC;
 
     generate_paths();
-    
-#ifdef PSYNTH_HAVE_XML
-    conf.attach_backend (new conf_backend_xml ((get_config_path () / "psychosynth.xml").file_string ()));
-#endif
-    conf.def_load();
 
+    try {
+#ifdef PSYNTH_HAVE_XML
+	conf.attach_backend (new conf_backend_xml ((get_config_path () / "psychosynth.xml").file_string ()));
+#endif
+	conf.def_load();
+    } catch (psynth::exception& error) {
+	error.log ();
+    }
+    
 #ifdef PSYNTH_HAVE_ALSA
     m_director.attach_output_director_factory (new output_director_alsa_factory);
 #endif
@@ -177,8 +181,12 @@ int psynth_app::run (int argc, const char* argv[])
     
     ret_val = execute();
 
-    if (ret_val == SUCCESS)
-	conf.save ();
+    try {
+	if (ret_val == SUCCESS)
+	    conf.save ();
+    } catch (psynth::exception& error) {
+	error.log ();
+    }
     
     return ret_val;
 }

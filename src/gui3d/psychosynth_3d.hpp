@@ -46,6 +46,16 @@
 class psychosynth_3d : public psynth::psynth_app,
 		       public Ogre::FrameListener
 {
+ public:
+    psychosynth_3d ();
+    ~psychosynth_3d ();
+
+    void prepare (psynth::arg_parser& args);
+    int execute ();
+       	
+    bool frameStarted(const Ogre::FrameEvent& evt);
+
+private:
     Ogre::Root*          m_ogre;
     Ogre::RenderSystem*   m_render;
     Ogre::RenderWindow*  m_window;
@@ -70,8 +80,10 @@ class psychosynth_3d : public psynth::psynth_app,
     psynth::osc_server* m_oscserver;
 #endif
     
-    bool must_quit;
-
+    bool m_must_quit;
+    int m_curr_width;
+    int m_curr_height;
+    
     void setup_settings (psynth::conf_node& conf);
     void setup_ogre (psynth::conf_node& conf);
     void setup_input ();
@@ -96,15 +108,6 @@ class psychosynth_3d : public psynth::psynth_app,
 
     void on_config_change (psynth::conf_node& conf);
     void on_fps_change (psynth::conf_node& conf);
-
-public:
-    psychosynth_3d ();
-    ~psychosynth_3d ();
-
-    void prepare (psynth::arg_parser& args);
-    int execute ();
-       	
-    bool frameStarted(const Ogre::FrameEvent& evt);
 };
 
 #endif /* PSYCHOSYNTH3D_H */

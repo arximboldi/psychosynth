@@ -133,7 +133,7 @@ void ring_audio_buffer::write(const audio_buffer& buf, int nwrite)
     int offset = 0;
 
     if (nwrite > m_size) {
-	logger::self () ("core", log::WARNING, "Ring buffer overflow.");
+	logger::self () ("core", log::warning, "Ring buffer overflow.");
 	return;
     }
 
@@ -159,7 +159,7 @@ void ring_audio_buffer::write(const audio_buffer& buf, int nwrite)
 void ring_audio_buffer::deinterleave (const sample* buf, int to_write)
 {
     if (to_write > m_size) {
-	logger::self () ("core", log::WARNING, "Ring buffer overflow.");
+	logger::self () ("core", log::warning, "Ring buffer overflow.");
 	return;
     }
 

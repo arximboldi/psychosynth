@@ -26,9 +26,9 @@
 #include <map>
 #include <list>
 #include <iostream>
+#include <fstream>
 
 #include <psynth/base/singleton.hpp>
-#include <psynth/base/misc.hpp>
 #include <psynth/base/tree.hpp>
 
 namespace psynth
@@ -61,32 +61,32 @@ public:
  */
 class log : public tree_node <log>
 {
-    std::list<log_sink*> m_dumpers;
-    
 public:
     /**
      * The message relevance.
      */
-    enum level {
-	INFO,    /**< Usefull info to the user. */
-	WARNING, /**< A problem that may cause inconvenience. */
-	ERROR,   /**< A problem that definetly causes inconvenience. */
-	FATAL    /**< A problem that from which we cannot recover. */
+    enum level
+    {
+	info,    /**< Usefull info to the user. */
+	warning, /**< A problem that may cause inconvenience. */
+	error,   /**< A problem that definetly causes inconvenience. */
+	fatal    /**< A problem that from which we cannot recover. */
     };
 
     /**
      * Returns a string version of each level name.
      * @param level The level of which we want to now its string name.
      */
-    static const char* level_name (int level) {
+    static const char* level_name (int level)
+    {
 	switch(level) {
-	case INFO:
+	case info:
 	    return "INFO";
-	case WARNING:
+	case warning:
 	    return "WARNING";
-	case ERROR:
+	case error:
 	    return "ERROR";
-	case FATAL:
+	case fatal:
 	    return "FATAL";
 	default:
 	    return "UNKNOWN";
@@ -103,7 +103,8 @@ public:
      * Attachs a sink to this node.
      * @param d The sink that we want to dump this log's messages.
      */
-    void attach_sink (log_sink* d) {
+    void attach_sink (log_sink* d)
+    {
 	m_dumpers.push_back(d);
     }
 
@@ -111,7 +112,8 @@ public:
      * Dettachs a sink from this node.
      * @param d The sink we don't want to dump massages of this log anymore.
      */
-    void dattach_sink (log_sink* d) {
+    void dattach_sink (log_sink* d)
+    {
 	m_dumpers.remove(d);
     }
 
@@ -121,7 +123,8 @@ public:
      * @param level The relevance of this message.
      * @param msg The message to log.
      */
-    void operator () (const std::string& child, int level, const std::string& msg) {
+    void operator () (const std::string& child, int level, const std::string& msg)
+    {
 	get_child (child) (level, msg);
     }
 
@@ -130,7 +133,8 @@ public:
      * @param level The relevance of this message.
      * @param msg The message to log.
      */
-    void operator () (int level, const std::string& msg) {
+    void operator () (int level, const std::string& msg)
+    {
 	operator () (*this, level, msg);
     };
 
@@ -142,6 +146,9 @@ public:
      * @param msg The message to log.
      */
     void operator () (log& log, int level, const std::string& msg);
+
+private:
+    std::list<log_sink*> m_dumpers;
 };
 
 /**
@@ -155,9 +162,8 @@ class logger : public singleton <logger>,
     /** Hidden constructor. */
     logger () {};
 
-     /** Hidden destructor. */
+    /** Hidden destructor. */
     ~logger () {};
-public:
 };
 
 /**
@@ -169,7 +175,7 @@ public:
  * Messages with relevales less or equal to @c INFO will be dumped to
  * @c cout and others to @c cerr.
  */
-class log_default_sink : public log_sink
+class log_std_sink : public log_sink
 {
 public:
     /**
@@ -178,8 +184,9 @@ public:
      * @param level The relevance of the message.
      * @param msg The message to dump.
      */
-    void dump (log& l, int level, const std::string& msg) {
-	(level > log::INFO ? std::cerr : std::cout)
+    void dump (log& l, int level, const std::string& msg)
+    {
+	(level > log::info ? std::cerr : std::cout)
 	    << '['
 	    << l.get_path_name ()
 	    << "] "
@@ -190,6 +197,79 @@ public:
     }
 };
 
+/**
+ * Logs messages to a standard stream.
+ *
+ * The messages will look like this:
+ * [log_node_name] MSG_LEVEL : Message.
+ *
+ */
+
+class log_stream_sink : public log_sink
+{
+public:
+    /** Constructor */
+    log_stream_sink ()
+	: _output (0)
+    {}
+
+    /** Copy constructor */
+    log_stream_sink (const log_stream_sink& s)
+	: _output (s._output)
+    {}
+
+    /** Constructor with a stream */
+    log_stream_sink (std::ostream& os)
+	: _output (&os)
+    {}
+    
+    /**
+     * Dums a message to a stream.
+     * @param log The log that originated the message.
+     * @param level The relevance of the message.
+     * @param msg The message to dump.
+     */
+    void dump (log& l, int level, const std::string& msg)
+    {
+	if (_output)
+	    *(_output)
+		<< '['
+		<< l.get_path_name ()
+		<< "] "
+		<< log::level_name (level)
+		<< ": "
+		<< msg
+		<< std::endl;
+    }
+
+protected:
+    void set_stream (std::ostream& os)
+    {
+	_output = &os;
+    }
+    
+private:
+    std::ostream* _output;
+};
+
+/**
+ * Outputs to stream file.
+ */
+class log_file_sink : public log_stream_sink
+{
+public:
+    log_file_sink (const char* file,
+		   std::ios_base::openmode mode =
+		   std::ios_base::out | std::ios_base::app)
+	: _file (file, mode)
+    {
+	set_stream (_file);
+    }
+
+private:
+    std::ofstream _file;
+};
+    
 } /* namespace psynth */
 
 #endif /* PSYNTH_LOGGER_H */

@@ -27,48 +27,6 @@ using namespace std;
 namespace psynth
 {
 
-#if 0
-void conf_subject::notify_conf_change (conf_node& source)
-{
-    for (list<conf_listener*>::iterator i = m_list.begin();
-	 i != m_list.end();
-	 ++i)
-	(*i)->handle_conf_change (source);
 
-    for (list<conf_event>::iterator i = m_change_del.begin();
-	 i != m_change_del.end();
-	 ++i)
-	(*i) (source);    
-}
-
-void conf_subject::notify_conf_nudge (conf_node& source)
-{
-    for (list<conf_listener*>::iterator i = m_list.begin();
-	 i != m_list.end();
-	 ++i)
-	(*i)->handle_conf_nudge (source);
-
-    for (list<conf_event>::iterator i = m_nudge_del.begin ();
-	 i != m_nudge_del.end ();
-	 ++i)
-	(*i) (source);
-}
-
-void conf_subject::notify_conf_new_child (conf_node& child)
-{
-    for (list<conf_listener*>::iterator i = m_list.begin();
-	 i != m_list.end ();
-	 ++i)
-	(*i)->handle_conf_new_child (child);
-}
-
-void conf_subject::notify_conf_remove_child (conf_node& child)
-{
-    for (list<conf_listener*>::iterator i = m_list.begin();
-	 i != m_list.end();
-	 ++i)
-	(*i)->handle_conf_remove_child (child);
-}
-#endif
 
 } /* namespace psynth */

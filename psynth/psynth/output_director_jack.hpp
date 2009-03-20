@@ -76,7 +76,7 @@ class output_director_jack : public output_director
 
 public:
     void defaults (conf_node& conf) {
-	conf.get_child ("server").def(DEFAULT_JACK_SERVER);
+	conf.get_child ("server").def (std::string (PSYNTH_DEFAULT_JACK_SERVER));
     }
 
     output_director_jack () :
@@ -87,7 +87,7 @@ class output_director_jack_factory : public output_director_factory
 {
 public:
     virtual const char* get_name () {
-	return DEFAULT_JACK_NAME;
+	return PSYNTH_DEFAULT_JACK_NAME;
     }
     
     virtual output_director* create_output_director () {

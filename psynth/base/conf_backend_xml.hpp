@@ -28,10 +28,16 @@
 #include <libxml/xmlreader.h>
 #include <libxml/xmlwriter.h>
 
+#include <psynth/base/type_value.hpp>
 #include <psynth/base/config.hpp>
 
 namespace psynth
 {
+
+PSYNTH_ERROR_WHERE (conf_error, conf_xml_error, "psynth.base.conf.xml")
+PSYNTH_ERROR_WHAT  (conf_xml_error, conf_xml_type_error,
+		    "Config node type unsupported by the XML backend")
+PSYNTH_ERROR       (conf_xml_error, conf_xml_io_error)
 
 /**
  * XML configuration backend that stores the config to an XML file. This
@@ -40,20 +46,6 @@ namespace psynth
  */
 class conf_backend_xml : public conf_backend
 {
-    std::string m_file;
-    bool m_defaulty;
-    
-    conf_node* process_new_element (xmlTextReaderPtr reader, conf_node* node);
-    conf_node* process_text (xmlTextReaderPtr reader, conf_node* node);
-    conf_node* process_end_element (xmlTextReaderPtr reader, conf_node* node);
-    conf_node* process (xmlTextReaderPtr reader, conf_node* node);
-
-    void do_load (conf_node& node);
-    
-    void expand (xmlTextWriterPtr writer, conf_node& node);
-    void expand_childs (xmlTextWriterPtr writer, conf_node& node);
-    void expand_value (xmlTextWriterPtr writer, conf_node& node);
-
 public:
     /**
      * Constructor.
@@ -62,7 +54,7 @@ public:
      */
     conf_backend_xml (const std::string& file)
 	: m_file(file)
-	{}
+    {}
 
     /** Constructor */
     ~conf_backend_xml () {}
@@ -71,14 +63,16 @@ public:
      * Changes the name of the file to use.
      * @param file The new file name to use.
      */
-    void set_file (const std::string& file) {
+    void set_file (const std::string& file)
+    {
 	m_file = file;
     }
 
     /**
      * Returns the name of the current filename.
      */
-    const std::string& get_file () {
+    const std::string& get_file ()
+    {
 	return m_file;
     }
 
@@ -98,8 +92,9 @@ public:
      * Loads the conentent of the XML file into a node.
      * @param node The node where to store the config.
      */
-    void load (conf_node& node) {
-	m_defaulty = false;
+    void load (conf_node& node)
+    {
+	m_overwrite = true;
 	do_load(node);
     }
 
@@ -107,10 +102,28 @@ public:
      * Loads the content of the XML file into a node but preserving the node
      * values that are already set.
      */
-    void def_load (conf_node& node) {
-	m_defaulty = true;
+    void def_load (conf_node& node)
+    {
+	m_overwrite = false;;
 	do_load(node);
     }
+
+private:
+    type_value m_current_type;
+    
+    std::string m_file;
+    bool m_overwrite;
+    
+    conf_node* process_new_element (xmlTextReaderPtr reader, conf_node* node);
+    conf_node* process_text (xmlTextReaderPtr reader, conf_node* node);
+    conf_node* process_end_element (xmlTextReaderPtr reader, conf_node* node);
+    conf_node* process (xmlTextReaderPtr reader, conf_node* node);
+
+    void do_load (conf_node& node);
+    
+    void expand (xmlTextWriterPtr writer, conf_node& node);
+    void expand_childs (xmlTextWriterPtr writer, conf_node& node);
+    void expand_value (xmlTextWriterPtr writer, conf_node& node);
 };
 
 } /* namespace psynth */

@@ -46,7 +46,6 @@ nobase_libpsynthinc_HEADERS = \
 	psynth/psynth_app.hpp \
 	base/arg_parser.hpp \
 	base/deleter.hpp \
-	base/error.hpp \
 	base/singleton.hpp \
         base/iterator.hpp \
 	base/misc.hpp \
@@ -62,6 +61,7 @@ nobase_libpsynthinc_HEADERS = \
 	base/signal.hpp\
 	base/pointer.hpp\
 	base/exception.hpp\
+	base/type_value.hpp\
 	synth/scaler.hpp\
 	synth/audio_buffer.hpp \
 	synth/sample_buffer.hpp\

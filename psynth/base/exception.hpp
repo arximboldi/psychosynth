@@ -79,7 +79,7 @@ private:
     class d_error : public d_parent					\
     {									\
     public:								\
-	d_error () : d_parent () {}					\
+	d_error (const char* what) : d_parent (what) {}			\
     protected:								\
 	d_error (const char* where, const char* what)			\
 	    : d_parent (where, what) {}					\

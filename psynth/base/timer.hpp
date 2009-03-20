@@ -35,7 +35,7 @@ class timer
 {
     timeval now;
     timeval start;
-	
+    
     int nowticks;
     int sinceticks;
     int ms;
@@ -82,16 +82,18 @@ public:
      * Returns the milliseconds elapsed between the last call to
      * @c update() and the creation of the Timer or the last @c rest call.
      */
-    int ticks () {
+    int ticks ()
+    {
 	return nowticks;
-    };
-
+    }
+    
     /**
      * Returns the milliseconds elapsed between the last two @c update() calls.
      */
-    int delta_ticks () {
+    int delta_ticks ()
+    {
 	return ms;
-    };
+    }
 };
 
 } /* namespace psynth */

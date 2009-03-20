@@ -74,7 +74,7 @@ bool output_oss::start()
 	m_thread = boost::thread (boost::bind (&output_oss::run, this));
 	return true;
     } else {
-	logger::self () ("oss", log::ERROR,
+	logger::self () ("oss", log::error,
 			    "Output thread already started or OSS subsystem not initialized.");
 	return false;
     }
@@ -87,7 +87,7 @@ bool output_oss::stop()
 	m_thread.join();
 	return true;
     } else {
-	logger::self () ("oss", log::ERROR,
+	logger::self () ("oss", log::error,
 			    "Output thread not running.");
 	return false;
     }
@@ -97,7 +97,7 @@ bool output_oss::open()
 {
     if (get_state () == NOTINIT) {
 	if ((m_fd = ::open(m_device.c_str(), O_WRONLY, 0)) < 0) {
-	    logger::self () ("oss", log::ERROR, "Could not open OSS device.");
+	    logger::self () ("oss", log::error, "Could not open OSS device.");
 	    return false;
 	}
 		
@@ -118,7 +118,7 @@ bool output_oss::open()
 	set_state (IDLE);
 	return true;
     } else {
-	logger::self () ("oss", log::ERROR, "Device already initialized.");
+	logger::self () ("oss", log::error, "Device already initialized.");
 	return false;
     }
 }
@@ -147,7 +147,7 @@ bool output_oss::put(const audio_buffer& in_buf, size_t nframes)
 	}
 		
     } else {
-	logger::self () ("oss", log::ERROR, "Cannot write to uninitialized device.");
+	logger::self () ("oss", log::error, "Cannot write to uninitialized device.");
 	ret = false;
     }
 	
@@ -165,7 +165,7 @@ bool output_oss::close()
 	set_state (NOTINIT);
 	return true;
     } else {
-	logger::self () ("oss", log::ERROR, "Cannot close uninitialized device.");
+	logger::self () ("oss", log::error, "Cannot close uninitialized device.");
 	return false;
     }
 }

@@ -59,7 +59,7 @@ void file_reader_any::open (const std::string& file)
 	    m_the_reader = new file_reader_ogg;
 #endif
 	else
-	    logger::self () ("input", log::ERROR,
+	    logger::self () ("input", log::error,
 			     "Could not open file: " + file +
 			     ". Unsupported file extension");
 	if (m_the_reader) {

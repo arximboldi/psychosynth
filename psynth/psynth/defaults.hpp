@@ -26,21 +26,21 @@
 #include <psynth/version.hpp>
 
 #ifdef PSYNTH_HAVE_ALSA
-#define DEFAULT_OUTPUT        "alsa"
+#define PSYNTH_DEFAULT_OUTPUT        "alsa"
 #else
 # ifdef PSYNTH_HAVE_JACK
-# define DEFAULT_OUTPUT       "jack"
+# define PSYNTH_DEFAULT_OUTPUT       "jack"
 # else
 #  ifdef PSYNTH_HAVE_OSS
-#  define DEFAULT_OUTPUT      "oss"
+#  define PSYNTH_DEFAULT_OUTPUT      "oss"
 #  else
-#  define DEFAULT_OPUTPUT     "dummy"
+#  define PSYNTH_DEFAULT_OUTPUT     "dummy"
 #  endif
 # endif
 #endif
 
-#define DEFAULT_NUM_CHANNELS  2
-#define DEFAULT_BLOCK_SIZE    256
-#define DEFAULT_SAMPLE_RATE   44100
+#define PSYNTH_DEFAULT_NUM_CHANNELS  2
+#define PSYNTH_DEFAULT_BLOCK_SIZE    256
+#define PSYNTH_DEFAULT_SAMPLE_RATE   44100
 
 #endif /* PSYNTH_DEFAULTS_H */

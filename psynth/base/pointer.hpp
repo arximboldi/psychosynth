@@ -48,7 +48,7 @@ public:
     
     null_ptr (T* ptr)
 	: m_ptr (ptr)
-	{}
+    {}
     
     template <class Y>
     null_ptr (Y* ptr)
@@ -96,7 +96,7 @@ public:
 
     manage_me_ptr (T* p)
 	: m_ptr (p)
-	{}
+    {}
 };
 
 template <class T>
@@ -115,97 +115,111 @@ public:
     mgr_ptr (const mgr_ptr& p)
 	: m_ptr (p.m_ptr)
 	, m_managed (p.m_managed)
-	{}
+    {}
     
     template <class Y>
     mgr_ptr (const mgr_ptr<Y>& p)
 	: m_ptr (p.m_ptr)
 	, m_managed (p.m_managed)
-	{}
+    {}
     
     mgr_ptr (T* ptr)
 	: m_ptr (ptr)
 	, m_managed (false)
-	{}
+    {}
     
     template <class Y>
     mgr_ptr (Y* ptr)
 	: m_ptr (ptr)
 	, m_managed (false)
-	{}
+    {}
     
     template <class Y>
     mgr_ptr (const manage_me_ptr<Y>& p)
 	: m_ptr (p.m_ptr)
 	, m_managed (true)
-	{}
+    {}
 
-    mgr_ptr& operator= (const mgr_ptr& p) {
+    mgr_ptr& operator= (const mgr_ptr& p)
+    {
 	m_ptr = p.m_ptr;
 	m_managed = p.m_managed;
 	return *this;
     }
     
     template <class Y>
-    mgr_ptr& operator= (const mgr_ptr<Y>& p) {
+    mgr_ptr& operator= (const mgr_ptr<Y>& p)
+    {
 	m_ptr = p.m_ptr;
 	m_managed = p.m_managed;
 	return *this;
     }
 
-    mgr_ptr& operator= (T* p) {
+    mgr_ptr& operator= (T* p)
+    {
 	m_ptr = p;
 	m_managed = false;
 	return *this;
     }
     
     template <class Y>
-    mgr_ptr& operator= (Y* p) {
+    mgr_ptr& operator= (Y* p)
+    {
 	m_ptr = p;
 	m_managed = false;
 	return *this;
     }
 
     template <class Y>
-    mgr_ptr& operator= (const manage_me_ptr<Y>& p) {
+    mgr_ptr& operator= (const manage_me_ptr<Y>& p)
+    {
 	m_ptr = p.m_ptr;
 	m_managed = true;
 	return *this;
     }
 
-    T* operator-> () const {
+    T* operator-> () const
+    {
 	return m_ptr;
     }
     
-    T& operator* () const {
+    T& operator* () const
+    {
 	return *m_ptr;
     }
 
-    operator T* () const {
+    operator T* () const
+    {
 	return m_ptr;
     }
 
-    operator bool () const {
+    operator bool () const
+    {
 	return m_ptr != 0;
     }
     
-    T* get () const {
+    T* get () const
+    {
 	return m_ptr;
     }
 
-    bool is_managed () const {
+    bool is_managed () const
+    {
 	return m_managed;
     }
     
-    void manage () {
+    void manage ()
+    {
 	m_managed = true;
     }
     
-    void unmanage () {
+    void unmanage ()
+    {
 	m_managed = false;
     }
     
-    void clean () {
+    void clean ()
+    {
 	if (m_managed) {
 	    delete m_ptr;
 	    m_ptr = 0;
@@ -220,7 +234,8 @@ class mgr_auto_ptr
     bool m_managed;
     
 public:
-    ~mgr_auto_ptr () {
+    ~mgr_auto_ptr ()
+    {
 	clean ();
     }
     
@@ -231,66 +246,80 @@ public:
 
     mgr_auto_ptr (mgr_auto_ptr& p)
 	: m_ptr (p.m_ptr)
-	, m_managed (p.m_managed) {
+	, m_managed (p.m_managed)
+    {
 	p.unmanage ();
     }
     
     template <class Y>
     mgr_auto_ptr (mgr_auto_ptr<Y>& p)
 	: m_ptr (p.m_ptr)
-	, m_managed (p.m_managed) {
+	, m_managed (p.m_managed)
+    {
 	p.unmanage ();
     }
     
     mgr_auto_ptr (T* ptr)
 	: m_ptr (ptr)
 	, m_managed (false)
-	{}
+    {}
     
     template <class Y>
     mgr_auto_ptr (Y* ptr)
 	: m_ptr (ptr)
 	, m_managed (false)
-	{}
+    {}
     
     template <class Y>
     mgr_auto_ptr (const manage_me_ptr<Y>& p)
 	: m_ptr (p.m_ptr)
 	, m_managed (true)
-	{}
+    {}
 
     template <class Y>
     mgr_auto_ptr (std::auto_ptr<Y>& p)
 	: m_ptr (p.release ())
 	, m_managed (true)
-	{}
+    {}
     
-    mgr_auto_ptr& operator= (mgr_auto_ptr& p) {
-	clean ();
-	m_ptr = p.m_ptr;
-	m_managed = p.m_managed;
-	p.unmanage ();
+    mgr_auto_ptr& operator= (mgr_auto_ptr& p)
+    {
+	if (&p != this) {
+	    clean ();
+	    m_ptr = p.m_ptr;
+	    m_managed = p.m_managed;
+	    p.unmanage ();
+	}
+	
 	return *this;
     }
     
     template <class Y>
-    mgr_auto_ptr& operator= (mgr_auto_ptr<Y>& p) {
-	clean ();
-	m_ptr = p.m_ptr;
-	m_managed = p.m_managed;
-	p.unmanage ();
+    mgr_auto_ptr& operator= (mgr_auto_ptr<Y>& p)
+    {
+	if (&p != this) {
+	    clean ();
+	    m_ptr = p.m_ptr;
+	    m_managed = p.m_managed;
+	    p.unmanage ();
+	}
 	return *this;
     }
     
-    mgr_auto_ptr& operator= (T* p) {
-	clean ();
-	m_ptr = p;
-	m_managed = false;
+    mgr_auto_ptr& operator= (T* p)
+    {
+	if (p != m_ptr) {
+	    clean ();
+	    m_ptr = p;
+	    m_managed = false;
+	}
+	
 	return *this;
     }
     
     template <class Y>
-    mgr_auto_ptr& operator= (Y* p) {
+    mgr_auto_ptr& operator= (Y* p)
+    {
 	clean ();
 	m_ptr = p;
 	m_managed = false;
@@ -298,7 +327,8 @@ public:
     }
 
     template <class Y>
-    mgr_auto_ptr& operator= (const manage_me_ptr<Y>& p) {
+    mgr_auto_ptr& operator= (const manage_me_ptr<Y>& p)
+    {
 	clean ();
 	m_ptr = p.m_ptr;
 	m_managed = true;
@@ -306,46 +336,56 @@ public:
     }
 
     template <class Y>
-    mgr_auto_ptr& operator= (std::auto_ptr<Y>& p) {
+    mgr_auto_ptr& operator= (std::auto_ptr<Y>& p)
+    {
 	clean ();
 	m_ptr = p.release ();
 	m_managed = true;
 	return *this;
     }
     
-    T* operator-> () const {
+    T* operator-> () const
+    {
 	return m_ptr;
     }
     
-    T& operator* () const {
+    T& operator* () const
+    {
 	return *m_ptr;
     }
 
-    operator T* () const {
+    operator T* () const
+    {
 	return m_ptr;
     }
 
-    operator bool () const {
+    operator bool () const
+    {
 	return m_ptr != 0;
     }
     
-    T* get () const {
+    T* get () const
+    {
 	return m_ptr;
     }
 
-    bool is_managed () const {
+    bool is_managed () const
+    {
 	return m_managed;
     }
     
-    void manage () {
+    void manage ()
+    {
 	m_managed = true;
     }
     
-    void unmanage () {
+    void unmanage ()
+    {
 	m_managed = false;
     }
     
-    void clean () {
+    void clean ()
+    {
 	if (m_managed) {
 	    delete m_ptr;
 	    m_ptr = 0;
@@ -363,7 +403,8 @@ template <class T>
 class mgr_container : public T
 {
 public:
-    ~mgr_container () {
+    ~mgr_container ()
+    {
 	std::for_each (T::begin (),
 		       T::end (),
 		       std::mem_fun (&T::value_type::clean ()));
@@ -374,7 +415,8 @@ template <class T>
 class mgr_assoc : public T
 {
 public:
-    ~mgr_assoc () {
+    ~mgr_assoc ()
+    {
 	for (typename T::iterator it = T::begin ();
 	     it != T::end ();
 	     ++it)
@@ -385,4 +427,3 @@ public:
 } /* namespace psynth*/
 
 #endif /* PSYNTH_POINTER_HPP */
-

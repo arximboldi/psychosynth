@@ -59,9 +59,9 @@ void output_alsa::run ()
 
 	if ((nframes = snd_pcm_avail_update (alsa_pcm)) < 0) {
 	    if (nframes == -EPIPE)
-		logger::self () ("alsa", log::WARNING, "Buffer underrun ocurred.");
+		logger::self () ("alsa", log::warning, "Buffer underrun ocurred.");
 	    else
-		logger::self () ("alsa", log::WARNING, "Unknown snd_pcm_avail_update() return value.");
+		logger::self () ("alsa", log::warning, "Unknown snd_pcm_avail_update() return value.");
 	} else {
 	    // cout << "processing " << nframes << endl; 
 	    process(get_info ().block_size); //get_info ().block_size);
@@ -76,7 +76,7 @@ bool output_alsa::start()
 	alsa_thread = boost::thread (boost::bind (&output_alsa::run, this));
 	return true;
     } else {
-	logger::self () ("alsa", log::WARNING, "Thread already started or subsystem not initialized.");
+	logger::self () ("alsa", log::warning, "Thread already started or subsystem not initialized.");
 	return false;
     }
 }
@@ -88,7 +88,7 @@ bool output_alsa::stop()
 	alsa_thread.join();
 	return true;
     } else {
-	logger::self () ("alsa", log::WARNING, "Thread not running.");
+	logger::self () ("alsa", log::warning, "Thread not running.");
 	return false;
     }
 }
@@ -105,7 +105,7 @@ bool output_alsa::open()
 	cout << "num_channels " << get_info ().num_channels << endl;
 	
 	if ((err = snd_pcm_open (&alsa_pcm, alsa_device.c_str(), SND_PCM_STREAM_PLAYBACK, 0)) < 0) {
-	    logger::self () ("alsa", log::WARNING,
+	    logger::self () ("alsa", log::warning,
 				string("Could not open device. (")
 				+ snd_strerror(err) + ")");
 	    return false;
@@ -134,7 +134,7 @@ bool output_alsa::open()
 	snd_pcm_sw_params (alsa_pcm, alsa_swparams);
 
 	if ((err = snd_pcm_prepare (alsa_pcm)) < 0) {
-	    logger::self () ("alsa", log::WARNING,
+	    logger::self () ("alsa", log::warning,
 				string("Could not prepare device. (")
 				+ snd_strerror(err) + ")");	    
 	} else {
@@ -145,7 +145,7 @@ bool output_alsa::open()
 	
 	return true;
     } else {
-	logger::self () ("alsa", log::WARNING, "Can not initialize twice.");
+	logger::self () ("alsa", log::warning, "Can not initialize twice.");
 	return false;
     }
 }
@@ -159,7 +159,7 @@ bool output_alsa::put(const audio_buffer& in_buf, size_t nframes)
     if (in_buf.get_info().num_channels != get_info ().num_channels ||
 	in_buf.get_info().sample_rate != get_info ().sample_rate) {
 	/* TODO: Adapt the audio signal to fit our requeriments. */
-	logger::self () ("alsa", log::WARNING,
+	logger::self () ("alsa", log::warning,
 			    "Cant send data to the device: data and output system properties missmatch.");
 	return false;
     }
@@ -174,7 +174,7 @@ bool output_alsa::put(const audio_buffer& in_buf, size_t nframes)
 	    in_buf.interleave_s16(m_buf, copyframes);
 
 	    if ((err = snd_pcm_writei (alsa_pcm, m_buf, copyframes)) != (int)copyframes) {
-		logger::self () ("alsa", log::WARNING,
+		logger::self () ("alsa", log::warning,
 				    string("Could not write to device. (")
 				    + snd_strerror(err) + ")");
 		//close(); /* WTF! */
@@ -187,7 +187,7 @@ bool output_alsa::put(const audio_buffer& in_buf, size_t nframes)
 	}
 		
     } else {
-	logger::self () ("alsa", log::WARNING, "Cannot write to an unitialized device");
+	logger::self () ("alsa", log::warning, "Cannot write to an unitialized device");
 	ret = false;
     }
 	
@@ -208,7 +208,7 @@ bool output_alsa::close()
 	delete [] m_buf;
 	return true;
     } else {
-	logger::self () ("alsa", log::WARNING, "Cannot close a device which is not opened.");
+	logger::self () ("alsa", log::warning, "Cannot close a device which is not opened.");
 	return false;
     }
 }

@@ -31,6 +31,7 @@
 #include <map>
 
 #include <psynth/base/exception.hpp>
+#include <psynth/base/iterator.hpp>
 
 namespace psynth
 {
@@ -202,6 +203,33 @@ public:
     bool parse ()
     {
 	*m_flag = true;
+	return true;
+    }
+};
+
+/**
+ * A boolan option that is set to true if the option exists.
+ */
+class option_not_flag : public option
+{
+    bool* m_flag;
+
+public:
+    /**
+     * Constructor.
+     * @param f Where to notify if it was found.
+     */
+    option_not_flag (bool* f)
+	: m_flag (f)
+    {}
+
+    /**
+     * Sets to false.
+     * @return @c true.
+     */
+    bool parse ()
+    {
+	*m_flag = false;
 	return true;
     }
 };
@@ -398,7 +426,7 @@ public:
     }
 
 private:
-    typedef std::list <option*>::iterator option_iterator;
+    typedef ptr_iterator<std::list <option*>::iterator> option_iterator;
     
     static const unsigned char NULL_FLAG = '\0';
     std::list <option*> m_short[256];

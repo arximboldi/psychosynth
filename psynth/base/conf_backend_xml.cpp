@@ -21,21 +21,30 @@
  ***************************************************************************/
 
 #include <sstream>
+#include <boost/lexical_cast.hpp>
 
 #include "base/logger.hpp"
 #include "base/misc.hpp"
 #include "base/conf_backend_xml.hpp"
 
-#define DEFAULT_FLOAT_VALUE  0.0f
-#define DEFAULT_INT_VALUE    0
-#define DEFAULT_STRING_VALUE ""
-
-#define DEFAULT_EMPTY_NAME   "config"
-
-#define CHAR_CAST reinterpret_cast<const char*>
-#define XML_CAST  reinterpret_cast<const xmlChar*>
-
+using namespace boost;
 using namespace std;
+
+static const int         default_int    = 0;
+static const int         default_float  = 0;
+static const std::string default_string = "";
+
+static inline const char*
+char_cast (const xmlChar* str)
+{
+    return reinterpret_cast<const char*> (str);
+}
+
+static inline const xmlChar*
+xml_cast (const char* str)
+{
+    return reinterpret_cast<const xmlChar*> (str);
+}
 
 namespace psynth
 {
@@ -45,33 +54,29 @@ conf_node* conf_backend_xml::process_new_element (xmlTextReaderPtr reader,
 {
     xmlChar* type;
     
-    if (xmlTextReaderDepth(reader) == 0) {
-	if (node->get_name ().empty()) {
-	    if (xmlStrcmp (xmlTextReaderConstName(reader),
-			   XML_CAST ("root")))
-		return NULL;
-	} else if (xmlStrcmp (xmlTextReaderConstName(reader),
-			      XML_CAST (node->get_name ().c_str()))) 
-	    return NULL;
-       
-    } else if (!xmlTextReaderIsEmptyElement(reader)) {
-	node = &node->get_child (CHAR_CAST (xmlTextReaderConstName(reader)));
+    if (xmlTextReaderDepth (reader) == 0) {
+	if ((node->get_name ().empty()
+	     && xmlStrcmp (xmlTextReaderConstName(reader),
+			   xml_cast ("root")))
+	    || xmlStrcmp (xmlTextReaderConstName(reader),
+			  xml_cast (node->get_name ().c_str()))) 
+	    return 0;
     }
+    else if (!xmlTextReaderIsEmptyElement(reader))
+	node = &node->get_child (char_cast (xmlTextReaderConstName(reader)));
 
-    type = xmlTextReaderGetAttribute(reader, XML_CAST ("type"));
+    type = xmlTextReaderGetAttribute (reader, xml_cast ("type"));
 
-    if (type != NULL) {
-	conf_type ct = CONF_INT;
-	
-	if(xmlStrcmp(type, XML_CAST ("int")) == 0)
-	    ct = CONF_INT;
-	else if (xmlStrcmp(type, XML_CAST ("float")) == 0)
-	    ct = CONF_FLOAT;
-	else if (xmlStrcmp(type, XML_CAST ("string")) == 0)
-	    ct = CONF_STRING;
-
-	if (!m_defaulty) node->set_type(ct);
-	else node->def_type(ct);
+    if (type != 0)
+    {
+	if (xmlStrcmp (type, xml_cast ("int")) == 0)
+	    m_current_type = typeid (int);
+	else if (xmlStrcmp (type, xml_cast ("float")) == 0)
+	    m_current_type = typeid (float);
+	else if (xmlStrcmp (type, xml_cast ("string")) == 0)
+	    m_current_type = typeid (std::string);
+	else
+	    throw conf_xml_type_error ();
 	
 	xmlFree(type);
     }
@@ -81,6 +86,7 @@ conf_node* conf_backend_xml::process_new_element (xmlTextReaderPtr reader,
 
 conf_node* conf_backend_xml::process_end_element (xmlTextReaderPtr reader,
 						  conf_node* node)
+
 {
     return node->get_parent();
 }
@@ -92,37 +98,16 @@ conf_node* conf_backend_xml::process_text (xmlTextReaderPtr reader,
     
     value = xmlTextReaderConstValue(reader);
 
-    if (value) {
-	istringstream value_str(CHAR_CAST(value));
-	
-	switch(node->type()) {
-	case CONF_INT: {
-	    int val;
-	    value_str >> val;
-	    if (!m_defaulty) node->set(val);
-	    else node->def(val);
-	}
-	    break;
-
-	case CONF_FLOAT: {
-	    float val;
-	    value_str >> val;
-	    if (!m_defaulty) node->set(val);
-	    else node->def(val);
-	}
-	    break;
-	
-	case CONF_STRING: {
-	    string val;
-	    value_str >> val;
-	    if (!m_defaulty) node->set(val);
-	    else node->def(val);
-	}
-	    break;
-	
-	default:
-	    break;
-	}
+    if (value)
+    {
+	if (m_current_type == typeid (int))
+	    node->set (lexical_cast<int> (char_cast (value)), m_overwrite);
+	else if (m_current_type == typeid (float))
+	    node->set (lexical_cast<float> (char_cast (value)), m_overwrite);
+	else if (m_current_type == typeid (std::string))
+	    node->set (lexical_cast<string> (char_cast (value)), m_overwrite);
+	else
+	    throw conf_xml_type_error ();
     }
 
     return node;
@@ -131,16 +116,14 @@ conf_node* conf_backend_xml::process_text (xmlTextReaderPtr reader,
 conf_node* conf_backend_xml::process (xmlTextReaderPtr reader,
 				      conf_node* node)
 {
-    switch(xmlTextReaderNodeType(reader)) {
+    switch(xmlTextReaderNodeType(reader))
+    {
     case XML_READER_TYPE_ELEMENT:
 	return process_new_element (reader, node);
-
     case XML_READER_TYPE_END_ELEMENT:
 	return process_end_element (reader, node);
-
     case XML_READER_TYPE_TEXT:
 	return process_text (reader, node);
-	
     default:
 	break;
     }
@@ -157,62 +140,56 @@ void conf_backend_xml::do_load (conf_node& node)
     reader = xmlReaderForFile (m_file.c_str(), NULL,
 			       XML_PARSE_NOENT |
 			       XML_PARSE_NOBLANKS);
+    if (reader == 0)
+	throw conf_xml_io_error ("Could not open config file for reading.");
     
-    if (reader != NULL) {
-	cur_node = &node;
+    cur_node = &node;
 	    
-	ret = xmlTextReaderRead(reader);
-        while (ret == 1 && cur_node != NULL) {
-            cur_node = process (reader, cur_node);
-            ret = xmlTextReaderRead (reader);
-        }
-
-	xmlFreeTextReader(reader);
-
-	if (ret != 0) {
-	    logger::self () ("xmlconf", log::ERROR, "Failed to parse config file: " + m_file);
-        }
-	
-    } else {
-	logger::self () ("xmlconf", log::ERROR, "Could not open config file for reading: " + m_file);
+    ret = xmlTextReaderRead(reader);
+    while (ret == 1 && cur_node != NULL) {
+	cur_node = process (reader, cur_node);
+	ret = xmlTextReaderRead (reader);
     }
+
+    xmlFreeTextReader(reader);
+
+    if (ret != 0)
+	throw conf_xml_io_error ("Failed to parse config file");
 }
 
 void conf_backend_xml::expand_value (xmlTextWriterPtr writer, conf_node& node)
 {
-    switch(node.type()) {
-    case CONF_INT:
+    if (node.type () == typeid (int))
     {
-	int val = 0;
-	node.get(val);
-	xmlTextWriterWriteAttribute(writer, XML_CAST ("type"), XML_CAST ("int"));
-	xmlTextWriterWriteString(writer, XML_CAST (itoa(val, 10)));
-    }
-    break;
+	int val = default_int;
+	string repr;
+	node.get (val);
+	repr = lexical_cast<string> (val);
 	
-    case CONF_FLOAT:
+	xmlTextWriterWriteAttribute (writer, xml_cast ("type"), xml_cast ("int"));
+	xmlTextWriterWriteString (writer, xml_cast (repr.c_str ()));
+    }
+    else if (node.type () == typeid (float))
     {
-	float val = 0;
-	node.get(val);
-	xmlTextWriterWriteAttribute(writer, XML_CAST ("type"), XML_CAST ("float"));
-	xmlTextWriterWriteString(writer, XML_CAST (ftoa(val, 8)));
-    }
-    break;
+	float val = default_int;
+	string repr;
+	node.get (val);
+	repr = lexical_cast<string> (val);
 	
-    case CONF_STRING:
+	xmlTextWriterWriteAttribute (writer, xml_cast ("type"), xml_cast ("float"));
+	xmlTextWriterWriteString (writer, xml_cast (repr.c_str ()));
+    }
+    else if (node.type () == typeid (std::string))
     {
-	string val;
-	node.get(val);
+	string repr;
+	node.get (repr);
 	
-	xmlTextWriterWriteAttribute(writer, XML_CAST ("type"), XML_CAST ("string"));
-	xmlTextWriterWriteString(writer, XML_CAST (val.c_str()));
+	xmlTextWriterWriteAttribute (writer, xml_cast ("type"), xml_cast ("string"));
+	xmlTextWriterWriteString (writer, xml_cast (repr.c_str ()));
     }
-    break;
-	    
-    default:
-	break;
-    }
-
+    else if (!node.empty ())
+	throw conf_xml_type_error ();
+    
 }
 
 void conf_backend_xml::expand_childs (xmlTextWriterPtr writer, conf_node& node)
@@ -226,15 +203,13 @@ void conf_backend_xml::expand_childs (xmlTextWriterPtr writer, conf_node& node)
 void conf_backend_xml::expand (xmlTextWriterPtr writer, conf_node& node)
 {
     if (node.get_name ().empty())
-	xmlTextWriterStartElement (writer, XML_CAST ("root"));
+	xmlTextWriterStartElement (writer, xml_cast ("root"));
     else
-	xmlTextWriterStartElement (writer, XML_CAST (node.get_name ().c_str()));
+	xmlTextWriterStartElement (writer, xml_cast (node.get_name ().c_str()));
 
-    std::cout << "starting element: " << node.get_name () << std::endl;
     expand_value  (writer, node);
     expand_childs (writer, node);
     
-    std::cout << "ending element: " << node.get_name () << std::endl;
     xmlTextWriterEndElement (writer);
 }
 
@@ -244,13 +219,11 @@ void conf_backend_xml::save (conf_node& node)
     
     writer = xmlNewTextWriterFilename (m_file.c_str(), 0);
 
-    if (writer == NULL) {
-	logger::self () ("xmlconf", log::ERROR, "Could not open config file for writing: " + m_file);
-        return;
-    }
+    if (writer == 0)
+	throw conf_xml_io_error ("Error while writing XML config file");
 
     xmlTextWriterSetIndent (writer, 1);
-    xmlTextWriterStartDocument (writer, NULL, NULL, NULL);
+    xmlTextWriterStartDocument (writer, 0, 0, 0);
 
     expand (writer, node);
     

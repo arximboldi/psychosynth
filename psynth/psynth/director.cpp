@@ -72,7 +72,7 @@ void director::start_output ()
 	m_output->get_output()->open();
 	m_output->get_output()->start();
     } else {
-	m_config->get_child ("output").set(DEFAULT_OUTPUT);
+	m_config->get_child ("output").set (string (PSYNTH_DEFAULT_OUTPUT));
     }
 
     m_old_output = out_name;
@@ -80,31 +80,17 @@ void director::start_output ()
 
 void director::register_config ()
 {
-    m_config->get_child ("sample_rate") .def (DEFAULT_SAMPLE_RATE);
-    m_config->get_child ("block_size")  .def (DEFAULT_BLOCK_SIZE);
-    m_config->get_child ("num_channels").def (DEFAULT_NUM_CHANNELS);
-    m_config->get_child ("output")      .def (DEFAULT_OUTPUT);
+    m_config->get_child ("sample_rate") .def (int (PSYNTH_DEFAULT_SAMPLE_RATE));
+    m_config->get_child ("block_size")  .def (int (PSYNTH_DEFAULT_BLOCK_SIZE));
+    m_config->get_child ("num_channels").def (int (PSYNTH_DEFAULT_NUM_CHANNELS));
+    m_config->get_child ("output")      .def (string (PSYNTH_DEFAULT_OUTPUT));
 
     m_config->on_nudge.connect (sigc::mem_fun (*this, &director::on_config_nudge));
-
-#if 0
-    m_config->get_child ("sample_rate").addChangeEvent(MakeDelegate(this, &director::on_sample_rate_change));
-    m_config->get_child ("block_size").addChangeEvent(MakeDelegate(this, &director::on_block_Size_change));
-    m_config->get_child ("num_channels").addChangeEvent(MakeDelegate(this, &director::on_num_channels_change));
-    m_config->get_child ("output").addChangeEvent(MakeDelegate(this, &director::on_output_change));
-#endif
 }
 
 void director::unregister_config()
 {
     m_config->on_nudge.connect (sigc::mem_fun (*this, &director::on_config_nudge));
-
-#if 0
-    m_config->get_child ("sample_rate").deleteChangeEvent(MakeDelegate(this, &director::on_sample_rate_change));
-    m_config->get_child ("block_size").deleteChangeEvent(MakeDelegate(this, &director::on_block_Size_change));
-    m_config->get_child ("num_channels").deleteChangeEvent(MakeDelegate(this, &director::on_num_channels_change));
-    m_config->get_child ("output").deleteChangeEvent(MakeDelegate(this, &director::on_output_change));    
-#endif
 }
 
 void director::start (conf_node& conf, const boost::filesystem::path& home_path)
@@ -122,9 +108,9 @@ void director::start (conf_node& conf, const boost::filesystem::path& home_path)
     
     register_config();
 
-    conf.get_child ("sample_rate").get(m_info.sample_rate);
-    conf.get_child ("num_channels").get(m_info.num_channels);
-    conf.get_child ("block_size").get(m_info.block_size);
+    conf.get_child ("sample_rate").get (m_info.sample_rate);
+    conf.get_child ("num_channels").get (m_info.num_channels);
+    conf.get_child ("block_size").get (m_info.block_size);
 
     m_world = new world (m_info);
     m_world->set_patcher (manage (new patcher_dynamic));

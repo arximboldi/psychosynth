@@ -21,6 +21,7 @@
  ***************************************************************************/
 
 #include <algorithm>
+#include <psynth/base/misc.hpp>
 #include "gui3d/network_window.hpp"
 
 using namespace std;
@@ -145,9 +146,9 @@ bool client_tab::on_button_click (const CEGUI::EventArgs &e)
     if (!m_connected) {
 	lo_address add;
 	add = lo_address_new(m_host->getText().c_str(),
-			     itoa(m_rport->getCurrentValue(), 10));
+			     itoa (m_rport->getCurrentValue(), 10));
 
-	m_client->connect(add, itoa(m_lport->getCurrentValue(), 10));
+	m_client->connect(add, itoa (m_lport->getCurrentValue(), 10));
     } else {
 	m_client->disconnect();
     }

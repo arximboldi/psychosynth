@@ -598,7 +598,7 @@ CEGUI::FrameWindow* conf_window::create_window ()
 
 conf_window::conf_window (psynth::conf_node& gui_conf,
 			  psynth::conf_node& psynth_conf) :
-    m_samples_win(psynth_conf.get_path ("file_manager/samples")),
+    m_samples_win(psynth_conf.get_path ("file_manager.samples")),
     m_gui_conf(gui_conf),
     m_psynth_conf(psynth_conf)
 {

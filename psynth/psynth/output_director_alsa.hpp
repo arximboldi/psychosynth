@@ -35,12 +35,14 @@ class output_director_alsa : public output_director
     output_alsa* m_output;
     sigc::connection m_on_device_change_slot;
     
-    ~output_director_alsa() {
+    ~output_director_alsa()
+    {
 	if (m_output)
 	    stop();
     }
     
-    void on_device_change (conf_node& conf) {
+    void on_device_change (conf_node& conf)
+    {
 	std::string device;
 	output::state old_state;
 	
@@ -52,7 +54,8 @@ class output_director_alsa : public output_director
 	m_output->goto_state(old_state);
     }
     
-    virtual output* do_start (conf_node& conf) {
+    virtual output* do_start (conf_node& conf)
+    {
 	std::string device;
 	
 	conf.get_child ("out_device").get (device);
@@ -66,7 +69,8 @@ class output_director_alsa : public output_director
 	return m_output;
     };
 
-    virtual void do_stop (conf_node& conf) {
+    virtual void do_stop (conf_node& conf)
+    {
 	m_on_device_change_slot.disconnect ();
 	
 	if (m_output) {
@@ -76,8 +80,9 @@ class output_director_alsa : public output_director
     }
 
 public:
-    void defaults (conf_node& conf) {
-	conf.get_child ("out_device").def (DEFAULT_ALSA_OUT_DEVICE);
+    void defaults (conf_node& conf)
+    {
+	conf.get_child ("out_device").def (std::string (PSYNTH_DEFAULT_ALSA_OUT_DEVICE));
     }
     
     output_director_alsa () :
@@ -87,11 +92,13 @@ public:
 class output_director_alsa_factory : public output_director_factory
 {
 public:
-    virtual const char* get_name() {
-	return DEFAULT_ALSA_NAME;
+    virtual const char* get_name()
+    {
+	return PSYNTH_DEFAULT_ALSA_NAME;
     }
     
-    virtual output_director* create_output_director() {
+    virtual output_director* create_output_director()
+    {
 	return new output_director_alsa;
     }
 };

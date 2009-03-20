@@ -23,7 +23,7 @@
 #ifndef PSYNTH_DEFAULTS_OSS_H
 #define PSYNTH_DEFAULTS_OSS_H
 
-#define DEFAULT_OSS_NAME        "oss"
-#define DEFAULT_OSS_OUT_DEVICE  "/dev/dsp"
+#define PSYNTH_DEFAULT_OSS_NAME        "oss"
+#define PSYNTH_DEFAULT_OSS_OUT_DEVICE  "/dev/dsp"
 
 #endif /* PSYNTH_DEFAULTS_OSS_H */

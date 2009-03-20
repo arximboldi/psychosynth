@@ -33,7 +33,7 @@ void file_reader_ogg::open (const std::string& file)
     if (!is_open()) {
 	/* const_cast cause vorbis code sucks a little bit... */
 	if (ov_fopen (const_cast<char*>(file.c_str ()), &m_file)) {
-	    logger::self () ("ogg", log::ERROR, string("Could not open file: ") + file);
+	    logger::self () ("ogg", log::error, string("Could not open file: ") + file);
 	    return;
 	}
 
@@ -54,7 +54,7 @@ void file_reader_ogg::seek(size_t pos)
     if (ov_seekable (&m_file))
 	ov_pcm_seek (&m_file, pos); //*getInfo().num_channels);
     else
-	logger::self () ("ogg", log::ERROR, "Stream not seekable.");
+	logger::self () ("ogg", log::error, "Stream not seekable.");
 }
 
 int file_reader_ogg::read(audio_buffer& buf, int n_samples)

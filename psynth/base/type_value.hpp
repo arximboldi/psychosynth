@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) 2007 Juan Pedro Bolivar Puente                          *
+ *   Copyright (C) Juan Pedro Bolivar Puente 2009                          *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -20,22 +20,78 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef PSYNTH_ERROR_H
-#define PSYNTH_ERROR_H
+#ifndef PSYNTH_TYPE_INFO_H_
+#define PSYNTH_TYPE_INFO_H_
 
-#include <cstdlib>
-#include <iostream>
+#include <typeinfo>
 
-#ifndef NDEBUG
- #define DEBUG(err) std::cerr << "DEBUG: (" << __FILE__ << ':' << __LINE__ << ')' \
-							  << err << std::endl; 
- #define WARNING(err) std::cerr << "WARNING: (" << __FILE__ << ':' << __LINE__ << ')' << err << std::endl;
- #define FATAL(err) if(1) { std::cerr << "FATAL: (" << __FILE__ << ':' << __LINE__ << ')' \
-							  << err << std::endl; exit(-1)} else;
-#else
- #define DEBUG(err) 
- #define WARNING(err) std::cerr << "WARNING: " << err << std::endl;
- #define FATAL(err) if(1) { std::cerr << "FATAL: " << err << std::endl; exit(-1) } else;
-#endif
+namespace psynth
+{
 
-#endif /* PSYNTH_ERROR_H */
+/**
+ * A @a typeid wrapper that have value semantics. This class is analogous to
+ * the TypeInfo class described in Andrei Alexandrescu's "Modern C++ Design".
+ */
+class type_value
+{
+public:
+    type_value ()
+	: _info (&typeid (void))
+    {};
+    
+    type_value (const std::type_info& t)
+	: _info (&t)
+    {}
+    
+    bool before (const type_value& t) const
+    {
+	return _info->before (*t._info);
+    }
+    
+    const char* name () const
+    {
+	return _info->name ();
+    }
+
+    const std::type_info& get () const
+    {
+	return *_info;
+    }
+    
+private:
+    const std::type_info* _info;
+};
+
+inline bool operator== (const type_value& lhs, const type_value& rhs)
+{
+    return lhs.get () == rhs.get ();
+}
+
+inline bool operator< (const type_value& lhs, const type_value& rhs)
+{
+    return lhs.before (rhs);
+}
+
+inline bool operator!= (const type_value& lhs, const type_value& rhs)
+{
+    return ! (lhs == rhs);
+}    
+    
+inline bool operator> (const type_value& lhs, const type_value& rhs)
+{
+    return rhs < lhs;
+}
+    
+inline bool operator<= (const type_value& lhs, const type_value& rhs)
+{
+    return !(lhs > rhs);
+}
+     
+inline bool operator>= (const type_value& lhs, const type_value& rhs)
+{
+    return !(lhs < rhs);
+}
+
+} /* namespace psynth */
+
+#endif /* PSYNTH_TYPE_VALUE_H_ */

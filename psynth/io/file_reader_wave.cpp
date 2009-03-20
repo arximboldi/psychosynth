@@ -36,7 +36,7 @@ void file_reader_wave::open (const std::string& file)
 	m_file = sf_open (file.c_str (), SFM_READ, &sfinfo);
     
 	if (m_file == NULL) {
-	    logger::self () ("wave", log::ERROR, string("Could not open file: ") + file);
+	    logger::self () ("wave", log::error, string("Could not open file: ") + file);
 	    return;
 	}
 	

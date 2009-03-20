@@ -34,7 +34,7 @@ namespace psynth
 
 arg_parser::~arg_parser ()
 {
-    for (option_iterator i = m_all.begin (); i != m_all.end (); ++i)
+    for (std::list <option*>::iterator i = m_all.begin (); i != m_all.end (); ++i)
 	delete *i;
 }
 
@@ -52,13 +52,14 @@ void arg_parser::add (unsigned char flag, const char* str, option* op)
 void arg_parser::parse (int argc, const char *argv[])
 {
     int i;
+    int skip;
     
     m_free.clear ();
 
     try
     {
-	for (i = 1; i < argc; i++) {
-	    bool skip = false;
+	for (i = 1, skip = 1; i < argc; i += skip, skip = 1)
+	{
 	    switch (get_type (argv[i]))
 	    {
 	    case ARG_FREE:
@@ -71,11 +72,11 @@ void arg_parser::parse (int argc, const char *argv[])
 			 j != m_short[(size_t) *s].end ();
 			 ++j)
 		    {
-			if ((i + 1 == argc) ||
-			    !(*j)->parse (argv[i + 1]))
-			    (*j)->parse ();
+			if ((i + skip >= argc) ||
+			    !j->parse (argv[i + skip]))
+			    j->parse ();
 			else
-			    skip = true;
+			    ++ skip;
 		    }
 		}
 		break;
@@ -85,20 +86,18 @@ void arg_parser::parse (int argc, const char *argv[])
 		    l = m_long.find (argv[i] + 2);
 
 		if (l != m_long.end()) {
-		    for (option_iterator j = (*l).second.begin ();
-			 j != (*l).second.end (); ++j)
+		    for (option_iterator j = l->second.begin ();
+			 j != l->second.end (); ++j)
 		    {
-			if ((i + 1 == argc) ||
-			    !(*j)->parse (argv[i + 1]))
-			    (*j)->parse ();
+			if ((i + skip >= argc) ||
+			    !j->parse (argv[i + skip]))
+			    j->parse ();
 			else
-			    skip = true;
+			    ++ skip;
 		    }
 		}
 		break;
 	    }
-	
-	    i += skip;
 	}
     }
     catch (...)

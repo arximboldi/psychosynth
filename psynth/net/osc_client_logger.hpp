@@ -33,26 +33,26 @@ class osc_client_logger : public osc_client_listener
 {
 public:
     virtual bool handle_client_connect (osc_client* client) {
-	logger::self () ("oscclient", log::INFO, "Connecting...");
+	logger::self () ("oscclient", log::info, "Connecting...");
 	return false;
     }
     
     virtual bool handle_client_disconnect(osc_client* client, osc_client_error err) {
 	switch(err) {
 	case CE_NONE:
-	    logger::self () ("oscclient", log::INFO, "Disconnected.");
+	    logger::self () ("oscclient", log::info, "Disconnected.");
 	    break;
 
 	case CE_PORT_BINDING:
-	    logger::self () ("oscclient", log::ERROR, "Could not bind port.");
+	    logger::self () ("oscclient", log::error, "Could not bind port.");
 	    break;
 
 	case CE_SERVER_DROP:
-	    logger::self () ("oscclient", log::ERROR, "Connection dropped by server.");
+	    logger::self () ("oscclient", log::error, "Connection dropped by server.");
 	    break;
 
 	case CE_SERVER_TIMEOUT:
-	    logger::self () ("oscclient", log::ERROR, "Connection timeout");
+	    logger::self () ("oscclient", log::error, "Connection timeout");
 	    break;
 
 	default:
@@ -62,7 +62,7 @@ public:
     }
     
     virtual bool handle_client_accept (osc_client* client) {
-	logger::self () ("oscclient", log::INFO, "Accepted.");
+	logger::self () ("oscclient", log::info, "Accepted.");
 	return false;
     }
 };

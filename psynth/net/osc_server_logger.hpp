@@ -33,7 +33,7 @@ class osc_server_logger : public osc_server_listener
 public:
     virtual bool handle_server_start_listening (osc_server* server)
     {
-	logger::self () ("oscserver", log::INFO, "Server listening.");
+	logger::self () ("oscserver", log::info, "Server listening.");
 	return false;
     }
     
@@ -42,11 +42,11 @@ public:
     {
 	switch(err) {
 	case SE_NONE:
-	    logger::self () ("oscserver", log::INFO, "Server no longer listening.");
+	    logger::self () ("oscserver", log::info, "Server no longer listening.");
 	    break;
 	    
 	case SE_PORT_BINDING:
-	    logger::self () ("oscserver", log::INFO, "Could not bind port.");
+	    logger::self () ("oscserver", log::info, "Could not bind port.");
 	    break;
 
 	default:
@@ -58,7 +58,7 @@ public:
     
     virtual bool handle_server_client_connect(osc_server* server, int client_id)
     {
-	logger::self () ("oscserver", log::INFO, "Client connected.");
+	logger::self () ("oscserver", log::info, "Client connected.");
 	return false;
     }
     
@@ -68,11 +68,11 @@ public:
     {
 	switch(cause) {
 	case SCE_NONE:
-	    logger::self () ("oscserver", log::INFO, "Client disconnected.");
+	    logger::self () ("oscserver", log::info, "Client disconnected.");
 	    break;
 
 	case SCE_CLIENT_TIMEOUT:
-	    logger::self () ("oscserver", log::INFO, "Client timeout.");
+	    logger::self () ("oscserver", log::info, "Client timeout.");
 	    break;
 	    
 	default:

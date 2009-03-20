@@ -79,7 +79,7 @@ void node_double_sampler::on_file_one_change (node_param& par)
     boost::filesystem::path path;
     
     par.get (val);
-    path = file_manager::self ().get_path("psychosynth/samples").find (val);
+    path = file_manager::self ().get_path("psychosynth.samples").find (val);
 
     cout << path << endl;
     

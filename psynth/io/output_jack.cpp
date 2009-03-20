@@ -62,7 +62,7 @@ bool output_jack::open()
 
 	m_client = jack_client_new(m_serv_name.c_str());
 	if (!m_client) {
-	    logger::self () ("jack", log::ERROR,
+	    logger::self () ("jack", log::error,
 				"Could not connect to jackd, maybe it's not running"
 				"or the client name is duplicated.");
 	    return false;
@@ -74,7 +74,7 @@ bool output_jack::open()
 	
 	m_actual_rate = jack_get_sample_rate(m_client);
 	if (m_actual_rate != (size_t)get_info ().sample_rate) {
-	    logger::self () ("jack", log::WARNING,
+	    logger::self () ("jack", log::warning,
 				"Jackd sample rate and application sample rate mismatch."
 				"Better sound quality is achieved if both are the same.");
 	}
@@ -114,7 +114,7 @@ bool output_jack::put(const audio_buffer& in_buf, size_t nframes)
 {
     if (in_buf.get_info().num_channels != get_info ().num_channels ||
 	in_buf.get_info().sample_rate != get_info ().sample_rate) {
-	logger::self () ("jack", log::WARNING,
+	logger::self () ("jack", log::warning,
 			    "Cant send data to the device:"
 			    "data and output system properties missmatch.");
 	
@@ -137,7 +137,7 @@ void output_jack::connect_ports()
     ports = jack_get_ports (m_client, 0, 0, JackPortIsPhysical | JackPortIsInput);
 
     if (!ports) {
-	logger::self () ("jack", log::WARNING, "There are no phisical output ports.");
+	logger::self () ("jack", log::warning, "There are no phisical output ports.");
 	return;
     }
 

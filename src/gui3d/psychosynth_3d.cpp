@@ -53,10 +53,10 @@
 #include "gui3d/query_flags.hpp"
 #include "gui3d/flat_ring.hpp"
 
-#define DEFAULT_SCREEN_WIDTH  800
-#define DEFAULT_SCREEN_HEIGHT 600
-#define DEFAULT_FULLSCREEN    0
-#define DEFAULT_FPS           120
+#define DEFAULT_SCREEN_WIDTH  int (800)
+#define DEFAULT_SCREEN_HEIGHT int (600)
+#define DEFAULT_FULLSCREEN    int (0)
+#define DEFAULT_FPS           int (120)
 
 using namespace Ogre;
 using namespace std;
@@ -64,6 +64,7 @@ using namespace psynth;
 
 
 psychosynth_3d::psychosynth_3d()
+    : m_must_quit (0)
 {
 }
 
@@ -92,12 +93,12 @@ void psychosynth_3d::print_help ()
 
 void psychosynth_3d::print_version ()
 {
-  cout << "GNU psynth3d " << VERSION << endl <<
-    "Copyright (C) 2007-2009 Juan Pedro Bolivar Puente\n"
-    "This is free software; see the source for copying conditions.  There is NO\n"
-    "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n"
+    cout << "GNU psynth3d " << VERSION << endl <<
+	"Copyright (C) 2007-2009 Juan Pedro Bolivar Puente\n"
+	"This is free software; see the source for copying conditions.  There is NO\n"
+	"warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n"
 
-    "\nWritten by Juan Pedro Bolivar Puente";
+	"\nWritten by Juan Pedro Bolivar Puente";
 
 }
 
@@ -119,55 +120,77 @@ void psychosynth_3d::prepare (psynth::arg_parser& arg_parser)
 
 int psychosynth_3d::execute()
 {
-    logger::self () ("gui", psynth::log::INFO, "Loading settings.");
+    logger::self () ("gui", psynth::log::info, "Loading settings.");
      
     conf_node& conf = config::self ().get_child ("psynth3d");
     setup_settings (conf);
     
-    logger::self () ("gui", psynth::log::INFO, "Initializing Ogre.");
+    logger::self () ("gui", psynth::log::info, "Initializing Ogre.");
     setup_ogre (conf);
-    logger::self () ("gui", psynth::log::INFO, "Initializing OIS.");
+    logger::self () ("gui", psynth::log::info, "Initializing OIS.");
     setup_input ();
-    logger::self () ("gui", psynth::log::INFO, "Initializing synthesizer.");
+    logger::self () ("gui", psynth::log::info, "Initializing synthesizer.");
     setup_synth ();
 #ifdef PSYNTH_HAVE_OSC
-    logger::self () ("gui", psynth::log::INFO, "Initializing networking.");
+    logger::self () ("gui", psynth::log::info, "Initializing networking.");
     setup_net ();
 #endif
-    logger::self () ("gui", psynth::log::INFO, "Initializing scene.");
+    logger::self () ("gui", psynth::log::info, "Initializing scene.");
     setup_world ();
-    logger::self () ("gui", psynth::log::INFO, "Initializing CEGUI.");
+    logger::self () ("gui", psynth::log::info, "Initializing CEGUI.");
     setup_gui ();
-    logger::self () ("gui", psynth::log::INFO, "Initializing GUI elements.");
+    logger::self () ("gui", psynth::log::info, "Initializing GUI elements.");
     setup_menus ();
 		
     m_ogre->startRendering();
 
-    logger::self () ("gui", psynth::log::INFO, "Closing GUI elements.");
+    logger::self () ("gui", psynth::log::info, "Closing GUI elements.");
     close_menus ();
-    logger::self () ("gui", psynth::log::INFO, "Closing CEGUI.");
+    logger::self () ("gui", psynth::log::info, "Closing CEGUI.");
     close_gui ();
 #ifdef PSYNTH_HAVE_OSC
-    logger::self () ("gui", psynth::log::INFO, "Closing networking.");
+    logger::self () ("gui", psynth::log::info, "Closing networking.");
     close_net ();
 #endif
-    logger::self () ("gui", psynth::log::INFO, "Closing scene.");
+    logger::self () ("gui", psynth::log::info, "Closing scene.");
     close_world ();
-    logger::self () ("gui", psynth::log::INFO, "Closing synthesizer.");
+    logger::self () ("gui", psynth::log::info, "Closing synthesizer.");
     close_synth ();
-    logger::self () ("gui", psynth::log::INFO, "Closing OIS.");
+    logger::self () ("gui", psynth::log::info, "Closing OIS.");
     close_input ();
-    logger::self () ("gui", psynth::log::INFO, "Closing Ogre.");
+    logger::self () ("gui", psynth::log::info, "Closing Ogre.");
     close_ogre ();
 
-    logger::self () ("gui", psynth::log::INFO, "Storing settings.");
-    conf.save();
+    logger::self () ("gui", psynth::log::info, "Storing settings.");
+    try {
+	conf.save();
+    } catch (psynth::exception& error) {
+	error.log ();
+    } catch (std::exception& error) {
+	logger::log () ("gui", log::error, error.what ());
+    }
     
     return 0;
 }
 
 bool psychosynth_3d::frameStarted (const Ogre::FrameEvent& evt)
 {
+    /* Hack, there is no special event for this? */
+    if (m_curr_height != m_window->getHeight () &&
+	m_curr_width  != m_window->getWidth ()) {
+	m_curr_height = m_window->getHeight ();
+	m_curr_width  = m_window->getWidth ();
+	
+	m_camera->setAspectRatio (Ogre::Real (m_window->getWidth())
+				  / m_window->getHeight());
+
+	CEGUI::Size size = CEGUI::Size(static_cast<float> (m_curr_width),
+				       static_cast<float> (m_curr_height));	
+	dynamic_cast<CEGUI::OgreCEGUIRenderer*> (m_gui->getRenderer())->setDisplaySize (size);
+	CEGUI::ImagesetManager::getSingleton().notifyScreenResolution(size);	
+	CEGUI::FontManager::getSingleton().notifyScreenResolution(size);
+    }
+    
     m_timer.update ();
     m_inputmgr->capture ();
     m_taskmgr->update (m_timer.delta_ticks ());
@@ -181,27 +204,36 @@ bool psychosynth_3d::frameStarted (const Ogre::FrameEvent& evt)
     m_oscserver->update (m_timer.delta_ticks());
 #endif
     
-    return !must_quit;
+    return !m_must_quit;
 }
 
 void psychosynth_3d::setup_settings (conf_node& conf)
 {
+    try
+    {
 #ifdef PSYNTH_HAVE_XML
-    conf.attach_backend (new conf_backend_xml
-			 ((get_config_path() / "psynth3d.xml").file_string ()));
+	conf.attach_backend (new conf_backend_xml
+			     ((get_config_path() / "psynth3d.xml").file_string ()));
 #endif
-    conf.def_load();
-
-    conf.get_child ("screen_width").def(DEFAULT_SCREEN_WIDTH);
-    conf.get_child ("screen_height").def(DEFAULT_SCREEN_HEIGHT);
-    conf.get_child ("fullscreen").def(DEFAULT_FULLSCREEN);
-    conf.get_child ("fps").def(DEFAULT_FPS);
-
+	conf.def_load();
+    }
+    catch (psynth::exception& error) {
+	error.log ();
+    } catch (std::exception& error) {
+	logger::log () ("gui", log::error, error.what ());
+    }
+    
+    conf.get_child ("screen_width").def (DEFAULT_SCREEN_WIDTH);
+    conf.get_child ("screen_height").def (DEFAULT_SCREEN_HEIGHT);
+    conf.get_child ("fullscreen").def (DEFAULT_FULLSCREEN);
+    conf.get_child ("fps").def (DEFAULT_FPS);
+	
     /* Is it dangerous to have this set before the gui is initialized? */
     conf.on_nudge.connect
 	(sigc::mem_fun (*this, &psychosynth_3d::on_config_change));
     conf.get_child ("fps").on_change.connect
 	(sigc::mem_fun (*this, &psychosynth_3d::on_fps_change));
+    
 }
 
 void psychosynth_3d::setup_ogre (psynth::conf_node& conf)
@@ -211,14 +243,15 @@ void psychosynth_3d::setup_ogre (psynth::conf_node& conf)
     int fullscreen;
     int fps;
 
-    conf.get_child ("screen_width").get(screen_width);
-    conf.get_child ("screen_height").get(screen_height);
-    conf.get_child ("fullscreen").get(fullscreen);
-    conf.get_child ("fps").get(fps);
+    conf.get_child ("screen_width").get (screen_width);
+    conf.get_child ("screen_height").get (screen_height);
+    conf.get_child ("fullscreen").get (fullscreen);
+    conf.get_child ("fps").get (fps);
     
-    (new LogManager)->createLog ((get_config_path() / "gui3d/psynth3d_Ogre.log").file_string (),
-				 false, false, false);
-    std::cout << get_data_path () << std::endl;
+    (new LogManager)->createLog
+	((get_config_path() / "gui3d/psynth3d_Ogre.log").file_string (),
+	 false, false, false);
+    
     m_ogre = new Root ((get_data_path() / "gui3d/plugins.cfg").file_string (),
 		       (get_data_path() / "gui3d/ogre.cfg").file_string ());
         
@@ -246,6 +279,8 @@ void psychosynth_3d::setup_ogre (psynth::conf_node& conf)
 					  screen_width,
 					  screen_height,
 					  fullscreen);
+    m_curr_height = m_window->getHeight ();
+    m_curr_width  = m_window->getWidth ();
 	
     m_ogre->addFrameListener(this);
 	

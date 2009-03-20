@@ -406,7 +406,7 @@ void element_manager::handle_add_node (world_node& obj)
 	obj.add_listener(elem);
     }
     else
-      logger::self () ("gui3d", psynth::log::WARNING, "Could not create element.");
+      logger::self () ("gui3d", psynth::log::warning, "Could not create element.");
 }
 
 void element_manager::handle_delete_node (world_node& obj)
