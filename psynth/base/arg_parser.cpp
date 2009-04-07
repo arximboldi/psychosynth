@@ -32,6 +32,8 @@ using namespace std;
 namespace psynth
 {
 
+PSYNTH_DEFINE_ERROR_WHERE (arg_parser_error, "arg_parser")
+
 arg_parser::~arg_parser ()
 {
     for (std::list <option*>::iterator i = m_all.begin (); i != m_all.end (); ++i)
@@ -102,7 +104,7 @@ void arg_parser::parse (int argc, const char *argv[])
     }
     catch (...)
     {
-	throw arg_parser_error (argv [i]);
+	throw arg_parser_error (std::string ("Error while parsing: ") + argv [i]);
     }
 }
 

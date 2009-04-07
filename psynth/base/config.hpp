@@ -39,11 +39,9 @@
 namespace psynth
 {
 
-PSYNTH_ERROR_WHERE (base_error, conf_error, "psynth.base.conf");
-PSYNTH_ERROR_WHAT  (conf_error, no_conf_backend_error,
-		    "No configuration backend set on this config node.");
-PSYNTH_ERROR_WHAT  (conf_error, conf_type_error,
-		    "Type mismatch in configuration node type.");
+PSYNTH_DECLARE_ERROR (base_error, config_error);
+PSYNTH_DECLARE_ERROR (config_error, config_type_error);
+PSYNTH_DECLARE_ERROR (config_error, config_backend_error);
 
 class conf_node;
 
@@ -109,10 +107,13 @@ public:
  * some childs identifyed by its name crating a whole hierarchy that allows
  * a better organization of the values and the information.
  *
+ * @note This implementation is thread safe.
  * @todo Rethink the backend system.
+ * @todo Template threading model.
  */
 class conf_node : public conf_subject,
-		  public tree_node <conf_node>
+		  public tree_node <conf_node>,
+		  public PSYNTH_DEFAULT_THREADING <conf_node>
 {
 public:
     /** Constructor */
@@ -123,8 +124,18 @@ public:
     /** Destructor. */
     ~conf_node ()
     {
-	if (!get_parent () || get_parent ()->m_backend != m_backend)
+	if (!get_parent () ||
+	    get_parent ()->m_backend != m_backend)
 	    delete m_backend;
+    }
+
+    /**
+     * Returns the type of the node.
+     */
+    const std::type_info& type () const
+    {
+	lock lock (this);
+	return m_element.type ();
     }
 
     /**
@@ -132,7 +143,16 @@ public:
      */
     bool empty () const
     {
+	lock lock (this);
 	return m_element.empty ();
+    }
+
+    /**
+     * Nudges the node. It just raises a nudge event.
+     */
+    void nudge ()
+    {
+	on_nudge (*this);
     }
     
     /**
@@ -143,6 +163,7 @@ public:
     template<class T>
     void set (const T& val)
     {
+	lock lock (this);
 	m_element = val;
 	on_change (*this);
     }
@@ -153,13 +174,7 @@ public:
      * @param val The new value of the node.
      */
     template<class T>
-    void set (const T& val, bool overwrite)
-    {
-	if (overwrite || m_element.empty ()) {
-	    m_element = val;
-	    on_change (*this);
-	}
-    }
+    void set (const T& val, bool overwrite);
     
     /**
      * Sets the value of the node if no previous value has been give to
@@ -168,103 +183,43 @@ public:
      * @param val The new value of the node.
      */
     template<class T>
-    void def (const T& val)
-    {
-	if (m_element.empty ()) {
-	    m_element = val;
-	    on_change (*this);
-	}
-    }
-
+    void def (const T& val);
+    
     /**
      * Gets the value of the node. Make sure that @a T matches the node type.
      * @param data Somewhere to store the node value.
      */
     template<class T>
-    void get (T& data) const
-    {
-	try {
-	    data = boost::any_cast<T> (m_element);
-	} catch (boost::bad_any_cast&) {
-	    throw conf_type_error ();
-	}
-    }
+    void get (T& data) const;
     
-    /**
-     * Returns the type of the node.
-     */
-    const std::type_info& type () const
-    {
-	return m_element.type ();
-    }
-
-    /**
-     * Nudges the node. It just raises a nudge event.
-     */
-    void nudge ()
-    {
-	on_nudge (*this);
-    }
-
     /**
      * Permanently stores this node hierarchy using the attached backend.
      */
-    void save ()
-    {
-	if (m_backend)
-	    m_backend->save (*this);
-	else
-	    throw no_conf_backend_error ();
-    }
+    void save ();
 
     /**
      * Loads this node hierarchy from the permanent media.
      */
-    void load ()
-    {
-	if (m_backend)
-	    m_backend->load (*this);
-	else
-	    throw no_conf_backend_error ();
-    }
+    void load ();
 
     /**
      * Loads this node hierarchy from the permanent media but leaving already
      * set values with their old value.
      */
-    void def_load ()
-    {
-	if (m_backend)
-	    m_backend->def_load (*this);
-	else
-	    throw no_conf_backend_error ();
-    }
-
+    void def_load ();
+    
     /**
      * Attaches a backend to the node. If another backend has already been
      * attached it is datached.
      * @param backend The backend to attach.
      */
-    void attach_backend (conf_backend* backend)
-    {
-	if (m_backend)
-	    datach_backend ();
-	m_backend = backend;
-	m_backend->attach (*this);
-    }
+    void attach_backend (conf_backend* backend);
 
     /**
      * Dataches the currently attached backend to the node.
      */
-    void datach_backend ()
-    {
-	if (m_backend) {
-	    m_backend->datach (*this);
-	    m_backend = NULL;
-	} else
-	    throw no_conf_backend_error ();
-    }
-
+    void datach_backend ();
+    
 private:
     boost::any m_element;
     conf_backend* m_backend;
@@ -285,17 +240,41 @@ private:
 /**
  * Singleton @c conf_node to store the global config.
  */
-class config : public conf_node,
-	       public singleton <config>
+typedef singleton_holder <conf_node> config;
+
+template<class T>
+void conf_node::get (T& data) const
 {
-    friend class singleton <config>;
+    lock lock (this);
+    
+    try {
+	data = boost::any_cast<T> (m_element);
+    } catch (boost::bad_any_cast&) {
+	throw config_type_error ();
+    }
+}
 
-    /** Hidden constructor. */
-    config () {};
+template<class T>
+void conf_node::def (const T& val)
+{
+    lock lock (this);
+    
+    if (m_element.empty ()) {
+	m_element = val;
+	on_change (*this);
+    }
+}
 
-    /** Hidden destructor. */
-    ~config () {};
-};
+template<class T>
+void conf_node::set (const T& val, bool overwrite)
+{
+    lock lock (this);
+    
+    if (overwrite || m_element.empty ()) {
+	m_element = val;
+	on_change (*this);
+    }
+}
 
 } /* namespace psynth */
 

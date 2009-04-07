@@ -29,14 +29,22 @@
 #include <psynth/base/iterator.hpp>
 #include <psynth/base/deleter.hpp>
 #include <psynth/base/exception.hpp>
+#include <psynth/base/threads.hpp>
 
 namespace psynth
 {
 
+/**
+ * Traits that provide additional information about how to
+ * make paths out of a key.
+ */
 template <typename Key>
 struct tree_node_traits
 {
+    /** The value of the contained type inside key. */
     typedef typename Key::value_type value_type;
+
+    /** The value of the character used as separator for paths. */
     static const value_type separator = value_type ();
 };
 
@@ -50,19 +58,37 @@ struct tree_node_traits<std::string>
 /**
  * Exception for this type.
  */
-PSYNTH_ERROR_WHERE(base_error, tree_node_error, "psynth.base.tree");
+PSYNTH_DECLARE_ERROR(base_error, tree_node_error);
 
 /**
- * A tree node. The void sequence is a valid name, so the key string "..."
+ * A tree node. This class in intended to be used by inheriting from it,
+ * so you directly gain a tree interface for a composite type.
+ * You should pass it the derived class as type parameter.
+ *
+ * Note that the void sequence is a valid name, so the key string "..."
  * denotes the node "" -> "" -> "" -> "".
  *
- * @todo Fix copy operations. Fix string operations to be more generic.
+ * @param Node    The type of the class that is inheriting from us.
+ * @param Key     They type of the class that identifies tree nodes.
+ *                It must be some kind of compound type and in the current
+ *                implementation it must have std::string semantics.
+ * @param Traits  Additional information about the key type that is
+ *                used to compose the paths.
+ * @param ThreadingPolicy
+ *                Wether you want your tree type to be thread-safe.
+ *                Note that to avoid problems when creating mix-ins
+ *                tree_node won't inherit from ThreadingPolicy but it
+ *                will expect you to do so (it uses Node::lock).
+ *
+ * @todo Fix copy operations.
+ * @todo Fix string operations to be more generic.
  */
 template <class Node,
 	  class Key = std::string,
-	  class Traits = tree_node_traits<Key> > 
+	  class Traits = tree_node_traits<Key>,
+	  class ThreadingPolicy = PSYNTH_DEFAULT_THREADING <Node> >
 class tree_node
-{  
+{   
 public:
     /**
      * Iterator to check the childs of this node.
@@ -91,6 +117,7 @@ public:
 
     /**
      * Returns an iterator to the first child of this node.
+     * @note Using iterators is not thread safe with any threading model.
      */
     iterator begin ()
     {
@@ -99,6 +126,7 @@ public:
 
     /**
      * Returns an iterator to the first child of this node. Const version.
+     * @note Using iterators is not thread safe with any threading model.
      */
     const_iterator begin () const
     {
@@ -107,6 +135,7 @@ public:
     
     /**
      * Returns an iterator to the end of this node childs.
+     * @note Using iterators is not thread safe with any threading model.
      */
     iterator end ()
     {
@@ -115,6 +144,7 @@ public:
 
     /**
      * Returns an iterator to the end of this node childs. Const version.
+     * @note Using iterators is not thread safe with any threading model.
      */
     const_iterator end () const
     {
@@ -127,6 +157,7 @@ public:
      */
     const Node* get_parent () const
     {
+	tree_lock lock (this);
 	return m_parent;
     }
 
@@ -136,6 +167,7 @@ public:
      */
     Node* get_parent ()
     {
+	tree_lock lock (this);
 	return m_parent;
     }
     
@@ -144,6 +176,7 @@ public:
      */
     const Key& get_name () const
     {
+	tree_lock lock (this);
 	return m_name;
     }
    
@@ -153,6 +186,7 @@ public:
      */
     iterator find_child (const Key& name)
     {
+	tree_lock lock (this);
 	return m_childs.find (name);
     }
  
@@ -162,6 +196,7 @@ public:
      */
     const_iterator find_child (const Key& name) const
     {
+	tree_lock lock (this);
 	return m_childs.find (name);
     }
 
@@ -174,9 +209,20 @@ public:
      */
     Node& detach (const Key& name)
     {
-	return detach (find_child (name));
+	tree_lock lock (this);
+	return detach (m_childs.find (name));
     }
-    
+
+    /**
+     * Deletes a child of this node.
+     * @return An iterator to the next child.
+     */
+    iterator remove_child (const Key& name)
+    {
+	tree_lock lock (this);
+	return remove_child (m_childs.find (name));
+    }
+
     /**
      * Attaches a node to a tree. Note that this wil fail if the node is
      * already attached to another tree or if the selected key is already
@@ -191,7 +237,8 @@ public:
      * of freeing the node memory. If the iterator points to end ()
      * it throws an exception.
      *
-     * @return A pointer to the detached node. 
+     * @return A pointer to the detached node.
+     * @note This version of detach is not thread-safe.
      */
     Node& detach (iterator iter);
     
@@ -203,6 +250,7 @@ public:
     /**
      * Deletes a child of this node.
      * @return An iterator to the next child.
+     * @return This version of remove child is not thread-safe.
      */
     iterator remove_child (iterator& iter);
 
@@ -271,9 +319,11 @@ private:
     const Node&
     get_existing_path (typename Key::const_iterator begin,
 		       typename Key::const_iterator end) const;
+
     Node&
     get_existing_path (typename Key::const_iterator begin,
 		       typename Key::const_iterator end);
+
     Node& get_path (typename Key::const_iterator begin,
 		    typename Key::const_iterator end);
     
@@ -302,6 +352,12 @@ private:
 	}
     }
 
+    struct tree_lock : public ThreadingPolicy::lock
+    {
+	tree_lock (const tree_node* self)
+	    : ThreadingPolicy::lock (dynamic_cast<const Node*> (self))
+	{}
+    };
 };
 
 } /* namespace psynth */

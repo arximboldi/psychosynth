@@ -27,6 +27,59 @@ using namespace std;
 namespace psynth
 {
 
+PSYNTH_DEFINE_ERROR_WHERE (config_error, "config");
+PSYNTH_DEFINE_ERROR_WHAT  (config_type_error, "Config node type mismatch.");
+PSYNTH_DEFINE_ERROR_WHAT  (config_backend_error, "Config node has no backend.");
 
+void conf_node::save ()
+{
+    lock lock (this);
+    
+    if (m_backend)
+	m_backend->save (*this);
+    else
+	throw config_backend_error ();
+}
+
+void conf_node::load ()
+{
+    lock lock (this);
+    
+    if (m_backend)
+	m_backend->load (*this);
+    else
+	throw config_backend_error ();
+}
+
+void conf_node::def_load ()
+{
+    lock lock (this);
+    
+    if (m_backend)
+	m_backend->def_load (*this);
+    else
+	throw config_backend_error ();
+}
+
+void conf_node::attach_backend (conf_backend* backend)
+{
+    lock lock (this);
+    
+    if (m_backend)
+	datach_backend ();
+    m_backend = backend;
+    m_backend->attach (*this);
+}
+
+void conf_node::datach_backend ()
+{
+    lock lock (this);
+    
+    if (m_backend) {
+	m_backend->datach (*this);
+	m_backend = NULL;
+    } else
+	throw config_backend_error ();
+}
 
 } /* namespace psynth */

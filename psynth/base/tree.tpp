@@ -20,11 +20,14 @@
  *                                                                         *
  ***************************************************************************/
 
+#ifndef PSYNTH_TREE_T_
+#define PSYNTH_TREE_T_
+
 namespace psynth
 {
 
-template <class N, class K, class T>
-tree_node <N, K, T>::~tree_node ()
+template <class N, class K, class T, class P>
+tree_node <N, K, T, P>::~tree_node ()
 {
     uninit ();
     
@@ -34,10 +37,12 @@ tree_node <N, K, T>::~tree_node ()
 	delete *it;
 }
 
-template <class N, class K, class T>
-bool tree_node<N, K, T>::attach (const K& name, N& node)
+template <class N, class K, class T, class P>
+bool tree_node<N, K, T, P>::attach (const K& name, N& node)
 {
-    if (node.m_isinit || find_child (name) != end ())
+    tree_lock lock (this);
+    
+    if (node.m_isinit || m_childs.find (name) != end ())
 	return false;
 
     node.init (name, dynamic_cast<N*> (this));
@@ -47,9 +52,9 @@ bool tree_node<N, K, T>::attach (const K& name, N& node)
     return true;
 }
 
-template <class N, class K, class T>
-N& tree_node<N, K, T>::detach (iterator iter)
-{
+template <class N, class K, class T, class P>
+N& tree_node<N, K, T, P>::detach (iterator iter)
+{    
     if (iter == end ())
 	throw tree_node_error ("Invalid iterator.");
     
@@ -62,9 +67,9 @@ N& tree_node<N, K, T>::detach (iterator iter)
     return node;
 }
 
-template <class N, class K, class T>
-typename tree_node <N, K, T>::iterator
-tree_node <N, K, T>::remove_child (iterator& iter)
+template <class N, class K, class T, class P>
+typename tree_node <N, K, T, P>::iterator
+tree_node <N, K, T, P>::remove_child (iterator& iter)
 {
     iterator next = iter;
     next ++;
@@ -75,38 +80,31 @@ tree_node <N, K, T>::remove_child (iterator& iter)
     return next;
 }
 
-template <class N, class K, class T>
-void tree_node <N, K, T>::clear_childs ()
+template <class N, class K, class T, class P>
+void tree_node <N, K, T, P>::clear_childs ()
 {
+    tree_lock lock (this);
+    
     iterator iter = begin ();
     while (iter != end ())
 	iter = remove_child (iter);
 }
 
-template <class N, class K, class T>
-K tree_node <N, K, T>::get_path_name () const
+template <class N, class K, class T, class P>
+K tree_node <N, K, T, P>::get_path_name () const
 {
+    tree_lock lock (this);
+    
     K prefix;
     get_path_name (prefix);
     return prefix;
 }
 
-template <class N, class K, class T>
-void tree_node <N, K, T>::get_path_name (K& prefix) const
+template <class N, class K, class T, class P>
+N& tree_node <N, K, T, P>::get_child (const K& name)
 {
-    if (m_parent)
-    {
-	if (m_parent->m_parent) {
-	    m_parent->get_path_name (prefix);
-	    prefix.insert (prefix.end (), T::separator);
-	}
-	prefix.insert (prefix.end (), m_name.begin (), m_name.end ());
-    }
-}
-
-template <class N, class K, class T>
-N& tree_node <N, K, T>::get_child (const K& name)
-{
+    tree_lock lock (this);
+    
     null_ptr<N>& c = m_childs [name]; 
     
     if (!c) {
@@ -118,9 +116,11 @@ N& tree_node <N, K, T>::get_child (const K& name)
     return *c;
 }
 
-template <class N, class K, class T>
-N& tree_node <N, K, T>::get_existing_child (const K& name)
+template <class N, class K, class T, class P>
+N& tree_node <N, K, T, P>::get_existing_child (const K& name)
 {
+    tree_lock lock (this);
+    
     iterator it = m_childs.find (name);
 
     if (it == end ())
@@ -129,19 +129,45 @@ N& tree_node <N, K, T>::get_existing_child (const K& name)
     return *it;
 }
 
-template <class N, class K, class T>
-template <typename InputIterator>
-void tree_node <N, K, T>::find_base (InputIterator& base_b,
-				     InputIterator& base_e)
+template <class N, class K, class T, class P>
+N& tree_node <N, K, T, P>::get_path (const K& path)
 {
-    InputIterator end = base_e;
-    base_e = base_b;
-    while (base_e != end && *base_e != T::separator)
-	++ base_e;
+    return get_path (path.begin (), path.end ());
 }
 
-template <class N, class K, class T>
-N& tree_node <N, K, T>::get_path (typename K::const_iterator begin,
+template <class N, class K, class T, class P>
+const N& tree_node <N, K, T, P>::get_existing_path (const K& path) const
+{
+    return get_existing_path (path.begin (), path.end ());
+}
+
+template <class N, class K, class T, class P>
+N& tree_node <N, K, T, P>::get_existing_path (const K& path)
+{
+    return get_existing_path (path.begin (), path.end ());
+}
+
+/*
+  Private methods
+*/
+
+template <class N, class K, class T, class P>
+void tree_node <N, K, T, P>::get_path_name (K& prefix) const
+{
+    tree_lock lock (this);
+    
+    if (m_parent)
+    {
+	if (m_parent->m_parent) {
+	    m_parent->get_path_name (prefix);
+	    prefix.insert (prefix.end (), T::separator);
+	}
+	prefix.insert (prefix.end (), m_name.begin (), m_name.end ());
+    }
+}
+
+template <class N, class K, class T, class P>
+N& tree_node <N, K, T, P>::get_path (typename K::const_iterator begin,
 				  typename K::const_iterator end)
 {
     typename K::const_iterator base_end = end;
@@ -156,14 +182,8 @@ N& tree_node <N, K, T>::get_path (typename K::const_iterator begin,
 	get_child (K (begin, base_end)).get_path (rest_begin, end);
 }
 
-template <class N, class K, class T>
-N& tree_node <N, K, T>::get_path (const K& path)
-{
-    return get_path (path.begin (), path.end ());
-}
-
-template <class N, class K, class T>
-N& tree_node <N, K, T>::
+template <class N, class K, class T, class P>
+N& tree_node <N, K, T, P>::
 get_existing_path (typename K::const_iterator begin,
 		   typename K::const_iterator end)
 {
@@ -180,17 +200,11 @@ get_existing_path (typename K::const_iterator begin,
 	.get_existing_path (rest_begin, end);
 }
 
-template <class N, class K, class T>
-N& tree_node <N, K, T>::get_existing_path (const K& path)
-{
-    return get_existing_path (path.begin (), path.end ());
-}
-
-template <class N, class K, class T>
-const N& tree_node <N, K, T>::
+template <class N, class K, class T, class P>
+const N& tree_node <N, K, T, P>::
 get_existing_path (typename K::const_iterator begin,
 		   typename K::const_iterator end) const
-{
+{   
     typename K::const_iterator base_end = end;
     typename K::const_iterator rest_begin;
     
@@ -204,10 +218,17 @@ get_existing_path (typename K::const_iterator begin,
 	.get_existing_path (rest_begin, end);
 }
 
-template <class N, class K, class T>
-const N& tree_node <N, K, T>::get_existing_path (const K& path) const
-{
-    return get_existing_path (path.begin (), path.end ());
+template <class N, class K, class T, class P>
+template <typename InputIterator>
+void tree_node <N, K, T, P>::find_base (InputIterator& base_b,
+				     InputIterator& base_e)
+{   
+    InputIterator end = base_e;
+    base_e = base_b;
+    while (base_e != end && *base_e != T::separator)
+	++ base_e;
 }
 
 } /* namespace psynth */
+
+#endif /* PSYNTH_TREE_T_ */

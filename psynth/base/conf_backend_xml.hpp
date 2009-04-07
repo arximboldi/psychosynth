@@ -34,10 +34,9 @@
 namespace psynth
 {
 
-PSYNTH_ERROR_WHERE (conf_error, conf_xml_error, "psynth.base.conf.xml")
-PSYNTH_ERROR_WHAT  (conf_xml_error, conf_xml_type_error,
-		    "Config node type unsupported by the XML backend")
-PSYNTH_ERROR       (conf_xml_error, conf_xml_io_error)
+PSYNTH_DECLARE_ERROR (config_error, config_xml_error)
+PSYNTH_DECLARE_ERROR (config_xml_error, config_xml_type_error)
+PSYNTH_DECLARE_ERROR (config_xml_error, config_xml_io_error)
 
 /**
  * XML configuration backend that stores the config to an XML file. This

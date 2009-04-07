@@ -81,10 +81,11 @@ public:
     virtual void update (int ms) = 0;
 };
 
-class task_manager : public psynth::singleton<task_manager>
+/**
+ * @todo separate from singleton_holder
+ */
+class task_manager : public psynth::singleton_holder<task_manager>
 {
-    friend class psynth::singleton<task_manager>;
-    
     typedef std::list<task*> task_list;
     typedef std::list<task*>::iterator task_iter;
 	
@@ -94,15 +95,13 @@ class task_manager : public psynth::singleton<task_manager>
 	for (task_iter i = m_tasks.begin(); i != m_tasks.end(); i++)
 	    delete *i;
     }
-
-    task_manager ()
-	{}
-    
-    ~task_manager () {
-	delete_tasks();
-    };
     
 public:
+    ~task_manager ()
+    {
+	delete_tasks();
+    };
+
     void attach (task* task) {
 	m_tasks.push_back(task);
 	task->m_mgr = this;

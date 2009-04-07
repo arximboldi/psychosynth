@@ -24,7 +24,7 @@
 #define PSYNTH_DIRECTOR_H
 
 #include <psynth/base/config.hpp>
-#include <psynth/base/misc.hpp>
+#include <psynth/base/util.hpp>
 #include <psynth/world/world.hpp>
 #include <psynth/psynth/output_director.hpp>
 #include <psynth/psynth/file_manager_director.hpp>
@@ -32,7 +32,7 @@
 namespace psynth
 {
 
-class director : public no_copy
+class director : public non_copyable
 {
     typedef std::map<std::string, output_director_factory*> odf_map;
     odf_map m_outdir;

@@ -25,7 +25,6 @@
 
 #include <boost/filesystem.hpp>
 
-#include <psynth/base/misc.hpp>
 #include <psynth/psynth/director.hpp>
 
 namespace psynth
@@ -33,7 +32,7 @@ namespace psynth
 
 class arg_parser;
 
-class psynth_app : public no_copy
+class psynth_app : public non_copyable
 {
 public:
     enum err_code {

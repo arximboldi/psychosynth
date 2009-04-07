@@ -57,9 +57,16 @@ public:
  * A logger node. The log structure is actually a tree so log messages can be
  * categorized hierarchically. When a message its logged, the message is
  * propagated by all the log parents so, for example, you can set up your sinks
- * the root node if you want to listen for all messages. 
+ * the root node if you want to listen for all messages.
+ *
+ * @note This class is thread safe.
+ * @todo Make thread-safety optional.
+ *       Note that there are some thread-safety in some corner cases in all the
+ *       new thread safe classes. Please, take a deep look at it and consider
+ *       using recursive_mutex as a default.
  */
-class log : public tree_node <log>
+class log : public tree_node <log>,
+	    public PSYNTH_DEFAULT_THREADING <log>
 {
 public:
     /**
@@ -105,6 +112,7 @@ public:
      */
     void attach_sink (log_sink* d)
     {
+	lock lock (this);
 	m_dumpers.push_back(d);
     }
 
@@ -114,6 +122,7 @@ public:
      */
     void dattach_sink (log_sink* d)
     {
+	lock lock (this);
 	m_dumpers.remove(d);
     }
 
@@ -125,7 +134,8 @@ public:
      */
     void operator () (const std::string& child, int level, const std::string& msg)
     {
-	get_child (child) (level, msg);
+	lock lock (this);
+	get_path (child) (level, msg);
     }
 
     /**
@@ -135,9 +145,11 @@ public:
      */
     void operator () (int level, const std::string& msg)
     {
+	lock lock (this);
 	operator () (*this, level, msg);
     };
 
+private:
     /**
      * Log a message into this node which has been propagated from
      * another log.
@@ -147,24 +159,13 @@ public:
      */
     void operator () (log& log, int level, const std::string& msg);
 
-private:
     std::list<log_sink*> m_dumpers;
 };
 
 /**
  * Root singleton @c Log to log global messages.
  */
-class logger : public singleton <logger>,
-	       public log
-{
-    friend class singleton <logger>;
-
-    /** Hidden constructor. */
-    logger () {};
-
-    /** Hidden destructor. */
-    ~logger () {};
-};
+typedef singleton_holder<log> logger;
 
 /**
  * Simple log sink that logs messages to @c cout and @c cerr.

@@ -54,7 +54,8 @@ public:
      * Parse an argument.
      * @return @c true.
      */
-    bool parse(const char* arg) {
+    bool parse(const char* arg)
+    {
 	T val;
 	std::istringstream str(arg);
 	str >> val;
@@ -84,8 +85,9 @@ public:
      * Parse an argument.
      * @return @c true.
      */
-    bool parse(const char* arg) {
-	m_node.set(std::string(arg));
+    bool parse(const char* arg)
+    {
+	m_node.set (std::string(arg));
 	return true;
     }
 };
@@ -99,10 +101,7 @@ public:
 template<class T>
 class option_conf_value : public option
 {
-    conf_node& m_node;
-    T m_val;
 public:
-    
     /**
      * Constructor.
      * @param val The value to set the node to if the argument is present.
@@ -115,10 +114,15 @@ public:
      * Parse the argument.
      * @return @c true.
      */
-    bool parse() {
+    bool parse()
+    {
 	m_node.set(m_val);
 	return true;
     }
+
+private:
+    conf_node& m_node;
+    T m_val;
 };
 
 } /* namespace psynth */

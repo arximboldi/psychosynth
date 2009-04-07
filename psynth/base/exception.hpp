@@ -24,6 +24,7 @@
 #define PSYNTH_EXCEPTION_H_
 
 #include <exception>
+#include <string>
 
 namespace psynth
 {
@@ -33,89 +34,95 @@ class exception : public std::exception
 public:
     virtual ~exception () throw () {}
     
-    virtual void log () const
-    {
-	do_log (where (), what ());
-    }
-    
+    virtual void log () const {}
     virtual const char* what () const throw () = 0;
-    
     virtual const char* where () const throw () = 0;
-
-protected:
-    void do_log (const char* where, const char* what) const;
-    
-private:
-    const char* _where;
-    const char* _what;
 };
 
 class error : public exception
 {
-public:    
-    error (const char* where, const char* what) throw ()
-	: _where (where)
-	, _what (what)
-    {}
-    
+public:
     virtual ~error () throw () {}
+
+    virtual void log () const;
     
     virtual const char* what () const throw ()
     {
-	return _what;
+	return _what.c_str ();
     }
 
     virtual const char* where () const throw ()
     {
-	return _where;
+	return _where.c_str ();
     }
+
+protected:    
+    error (const std::string& where, const std::string& what) throw ();
+    std::string default_error ();
     
 private:
-    const char* _where;
-    const char* _what;
+    std::string _what;
+    std::string _where;
 };
-
-#define PSYNTH_ERROR(d_parent, d_error)					\
+    
+#define PSYNTH_DECLARE_ERROR(d_parent, d_error)				\
     class d_error : public d_parent					\
     {									\
     public:								\
-	d_error (const char* what) : d_parent (what) {}			\
+	typedef d_parent base;						\
+	d_error (const std::string& what);				\
+	d_error ();							\
+									\
     protected:								\
-	d_error (const char* where, const char* what)			\
-	    : d_parent (where, what) {}					\
+	d_error (const std::string& where, const std::string& what);	\
     };
 
-#define PSYNTH_ERROR_WHERE(d_parent, d_error, d_where)			\
-    class d_error : public d_parent					\
-    {									\
-    public:								\
-	d_error (const char* what) : d_parent (d_where, what) {}	\
-    protected:								\
-	d_error (const char* where, const char* what)			\
-	    : d_parent (where, what) {}					\
-    };
+#define PSYNTH_DEFINE_ERROR_WHERE_WHAT(d_error, d_where, d_what)	\
+    d_error::d_error (const std::string& where, const std::string& what) \
+	: base (d_where + std::string (".") + where, what)		\
+    {}									\
+    d_error::d_error (const std::string& what)				\
+	: base (d_where, what)						\
+    {}									\
+    d_error::d_error ()							\
+	: base (d_where, d_what)					\
+    {}
 
-#define PSYNTH_ERROR_WHAT(d_parent, d_error, d_what)			\
-    class d_error : public d_parent					\
-    {									\
-    public:								\
-	d_error () : d_parent (d_what) {}				\
-    protected:								\
-	d_error (const char* where, const char* what)			\
-	    : d_parent (where, what) {}					\
-    };
+#define PSYNTH_DEFINE_ERROR_WHERE(d_error, d_where)			\
+    d_error::d_error (const std::string& where, const std::string& what) \
+	: base (d_where + std::string (".") + where, what)		\
+    {}									\
+    d_error::d_error (const std::string& what)				\
+	: base (d_where, what)						\
+    {}									\
+    d_error::d_error ()							\
+	: base (d_where, default_error ())				\
+    {}
 
-#define PSYNTH_ERROR_WHERE_WHAT(d_parent, d_error, d_where, d_what)	\
-    class d_error : public d_parent					\
-    {									\
-    public:								\
-	d_error () : d_parent (d_where, d_what) {}			\
-    protected:								\
-	d_error (const char* where, const char* what)			\
-	    : d_parent (where, what) {}					\
-    };
+#define PSYNTH_DEFINE_ERROR_WHAT(d_error, d_what)			\
+    d_error::d_error (const std::string& where, const std::string& what) \
+	: base (where, what)						\
+    {}									\
+    d_error::d_error (const std::string& what)				\
+	: base (what)							\
+    {}									\
+    d_error::d_error ()							\
+	: base (d_what)							\
+    {}
 
-PSYNTH_ERROR_WHERE (error, base_error, "psynth.base");
+#define PSYNTH_DEFINE_ERROR(d_error)					\
+    d_error::d_error (const std::string& where, const std::string& what) \
+	: base (where, what)						\
+    {}									\
+    d_error::d_error (const std::string& what)				\
+	: base (what)							\
+    {}									\
+    d_error::d_error ()							\
+	: base ()							\
+    {}
+
+PSYNTH_DECLARE_ERROR (error, psynth_error);
+PSYNTH_DECLARE_ERROR (psynth_error, base_error);
 
 } /* namespace psynth */
 

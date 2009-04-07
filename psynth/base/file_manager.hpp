@@ -30,35 +30,33 @@
 namespace psynth
 {
 
-class file_manager : public file_finder,
-		     public tree_node <file_manager>,
-		     public singleton <file_manager>
+/**
+ * @note This class is thread-safe.
+ *
+ * @todo Make thread-safety optional?
+ * @todo Document.
+ */
+class file_mgr_node : public file_finder,
+		      public tree_node <file_mgr_node>,
+		      public PSYNTH_DEFAULT_THREADING <file_mgr_node>,
+		      public non_copyable
 {
-    friend class singleton <file_manager>;
-    friend class tree_node <file_manager>;
-
-    /* TODO: Fix the tre node class so it does not require constructor or destructor
-     * calling on foreign classes. */
-    
-    /** Hidden constructor. */
-    file_manager () {}
-
-    /** Hidden destructor. */
-    ~file_manager () {}
+    friend class tree_node <file_mgr_node>;
     
 public:    
     template <class PathPredicate>
     void find_if_all (PathPredicate pred,
 		      file_finder::path_list& res) const;
 
-    boost::filesystem::path find_all (const boost::filesystem::path& file) const;
+    boost::filesystem::path
+    find_all (const boost::filesystem::path& file) const;
 };
 
-
 template<class StringPredicate>
-void file_manager::find_if_all (StringPredicate pred,
-				file_finder::path_list& res) const
+void file_mgr_node::find_if_all (StringPredicate pred,
+				 file_finder::path_list& res) const
 {
+    lock lock (this);
     const_iterator it;
 
     res = find_if (pred, res);
@@ -66,6 +64,8 @@ void file_manager::find_if_all (StringPredicate pred,
     for (it = begin(); it != end(); ++it)
       it->find_if_all (pred, res);
 }
+
+typedef singleton_holder<file_mgr_node> file_manager;
 
 } /* namespace psynth */
 

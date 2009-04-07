@@ -25,12 +25,25 @@
 
 namespace psynth
 {
-  void exception::do_log (const char* where, const char* what) const
-  {
-    if (where)
-      logger::self  ().get_child (where) (log::error, what);
-    else
-      logger::self  () (log::error, what);
-  }
+
+PSYNTH_DEFINE_ERROR_WHERE(base_error,   "base");
+PSYNTH_DEFINE_ERROR_WHERE(psynth_error, "psynth");
+
+error::error (const std::string& where, const std::string& what) throw ()
+    : _what (what)
+    , _where (where)
+{
+}
+
+std::string error::default_error ()
+{
+    return "unknown message";
+}
+
+void error::log () const
+{
+    logger::self  () (_where, log::error, _what);
+}
+
 } /* namespace psynth */
 

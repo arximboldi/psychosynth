@@ -24,13 +24,15 @@
 #include <psynth/base/tree.hpp>
 
 template <class T>
-struct value_node : public psynth::tree_node<value_node<T> >
+struct value_node : public psynth::tree_node<value_node<T> >,
+		    public PSYNTH_DEFAULT_THREADING <value_node<T> >
 {
     T value;
 };
 
 template <>
 struct value_node<int> : public psynth::tree_node<value_node<int> >
+		       , public PSYNTH_DEFAULT_THREADING <value_node<int> >
 {
     int value;
 

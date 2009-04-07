@@ -1,24 +1,31 @@
-/**************************************************************************
- *                                                                         *
- *   PSYCHOSYNTH                                                           *
- *   ===========                                                           *
- *                                                                         *
- *   Copyright (C) 2007 Juan Pedro Bolivar Puente                          *
- *                                                                         *
- *   This program is free software: you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation, either version 3 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
- *   This program is distributed in the hope that it will be useful,       *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
- *   GNU General Public License for more details.                          *
- *                                                                         *
- *   You should have received a copy of the GNU General Public License     *
- *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
- *                                                                         *
- ***************************************************************************/
+/**
+ *  Time-stamp:  <2009-04-07 12:38:56 raskolnikov>
+ *
+ *  @file        misc.hpp
+ *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
+ *  @date        2007
+ *
+ *  Miscellaneos functions. Interface.
+ *  This file is part of the Psychosynth project.
+ */
+
+/*
+ *  Copyright (C) 2007, 2009 Juan Pedro Bolívar Puente
+ *  
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
 
 #ifndef PSYNTH_MISC_H
 #define PSYNTH_MISC_H
@@ -27,31 +34,6 @@
 
 namespace psynth
 {
-
-/**
- * Inherit from this class if you want to forbid the copying of objects of
- * your class.
- */
-class no_copy
-{
-protected:
-    /**
-     * Forbids the creation of instances of NoCopy but allows instances of
-     * its derivated..
-     */
-    no_copy () {}
-
-private:
-    /**
-     * Private copy constructor.
-     */
-    no_copy (const no_copy&);
-
-    /**
-     * Private assignment operator.
-     */
-    no_copy& operator= (const no_copy&);
-};
 
 /**
  * Returns the fractional part of a number.

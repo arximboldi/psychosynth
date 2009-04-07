@@ -34,7 +34,7 @@ namespace psynth
 
 void file_manager_director::on_conf_nudge (conf_node& node)
 {
-    file_manager& mgr =
+    file_mgr_node& mgr =
 	file_manager::self ()
 	.get_child ("psychosynth")
 	.get_child (node.get_name());

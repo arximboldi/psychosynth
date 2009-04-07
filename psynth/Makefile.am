@@ -62,6 +62,8 @@ nobase_libpsynthinc_HEADERS = \
 	base/pointer.hpp\
 	base/exception.hpp\
 	base/type_value.hpp\
+	base/threads.hpp\
+	base/util.hpp\
 	synth/scaler.hpp\
 	synth/audio_buffer.hpp \
 	synth/sample_buffer.hpp\
@@ -121,6 +123,8 @@ libpsynth_la_SOURCES = \
 	base/file_finder.cpp\
 	base/file_manager.cpp\
 	base/exception.cpp\
+	base/tree.cpp\
+	base/singleton.cpp\
 	synth/audio_buffer.cpp \
 	synth/sample_buffer.cpp \
 	synth/ring_buffer.cpp \

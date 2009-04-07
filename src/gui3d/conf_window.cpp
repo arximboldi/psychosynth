@@ -528,7 +528,6 @@ bool conf_window::on_output_change (const CEGUI::EventArgs &e)
     return true;
 }
 
-
 bool conf_window::on_audio_apply_press (const CEGUI::EventArgs &e)
 {
     int sr = atoi(m_srate->getText().c_str());

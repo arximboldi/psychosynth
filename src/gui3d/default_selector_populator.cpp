@@ -59,7 +59,7 @@ void default_selector_populator::populate_samples (selector_window::category* ca
     
     creat.set_name ("sampler");
     
-    file_manager::path_list files;
+    file_mgr_node::path_list files;
     list<string> valid_ext;
 
 #ifdef PSYNTH_HAVE_PCM
@@ -77,7 +77,7 @@ void default_selector_populator::populate_samples (selector_window::category* ca
 
     files.sort ();
     
-    for (file_manager::path_list::iterator it = files.begin();
+    for (file_mgr_node::path_list::iterator it = files.begin();
 	 it != files.end (); ++it)
     {
 	creat.set_param ("file", it->leaf ());

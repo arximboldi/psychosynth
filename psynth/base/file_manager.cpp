@@ -29,8 +29,10 @@ namespace bf = boost::filesystem;
 namespace psynth
 {
 
-bf::path file_manager::find_all (const bf::path& file) const
+bf::path file_mgr_node::find_all (const bf::path& file) const
 {
+    lock lock (this);
+    
     bf::path res;
 
     res = find (file);

@@ -110,7 +110,7 @@ struct atoany_func
 /**
  * A parsing error.
  */
-PSYNTH_ERROR_WHERE (error, arg_parser_error, "psynth.base.arg_parser")
+PSYNTH_DECLARE_ERROR (error, arg_parser_error)
 
 /**
  * The interface of an option of the argument parser.

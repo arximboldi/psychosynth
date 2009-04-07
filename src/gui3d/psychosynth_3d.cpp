@@ -167,7 +167,7 @@ int psychosynth_3d::execute()
     } catch (psynth::exception& error) {
 	error.log ();
     } catch (std::exception& error) {
-	logger::log () ("gui", log::error, error.what ());
+	logger::self () ("gui", log::error, error.what ());
     }
     
     return 0;
@@ -223,7 +223,7 @@ void psychosynth_3d::setup_settings (conf_node& conf)
     catch (psynth::exception& error) {
 	error.log ();
     } catch (std::exception& error) {
-	logger::log () ("gui", log::error, error.what ());
+	logger::self () ("gui", log::error, error.what ());
     }
     
     conf.get_child ("screen_width").def (DEFAULT_SCREEN_WIDTH);
