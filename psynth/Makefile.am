@@ -58,7 +58,7 @@ nobase_libpsynthinc_HEADERS = \
 	base/file_manager.hpp\
 	base/tree.hpp\
 	base/tree.tpp\
-	base/signal.hpp\
+	base/observer.hpp\
 	base/pointer.hpp\
 	base/exception.hpp\
 	base/type_value.hpp\

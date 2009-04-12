@@ -2,7 +2,7 @@
  *  File:       singleton.hpp
  *  Author:     Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
  *  Date:       2007
- *  Time-stamp: <2009-04-07 17:23:37 raskolnikov>
+ *  Time-stamp: <2009-04-08 20:35:31 raskolnikov>
  *
  *  This file implements a policy-based generic singleton. It is a
  *  simplification (less policy implementations are provided) of
@@ -45,9 +45,9 @@ namespace psynth
 
 /* Default parameters forward declaration. */
 template <class T>
-class create_with_static;
+class create_with_new;
 template <class T>
-class lifetime_no_destroy;
+class lifetime_atexit;
 
 /**
  * This is a generic singleton implementation. Note that you should not
@@ -63,8 +63,8 @@ class lifetime_no_destroy;
  */
 template <
     class T,
-    template <class> class CreationPolicy  = create_with_static,
-    template <class> class LifetimePolicy  = lifetime_no_destroy,
+    template <class> class CreationPolicy  = create_with_new,
+    template <class> class LifetimePolicy  = lifetime_atexit,
     template <class> class ThreadingPolicy = PSYNTH_DEFAULT_NONOBJ_THREADING
     >
 class singleton_holder
@@ -90,9 +90,9 @@ private:
     /** The single instance pointer type. */
     typedef typename ThreadingPolicy<T*>::volatile_type instance_type;
     /** The single instance pointer. */
-    static instance_type _instance;
+    static instance_type m_instance;
     /** Did we kill the singleton already? */
-    static bool _destroyed;
+    static bool m_destroyed;
     
     /** The destroy handler */
     static void destroy_singleton ();
@@ -256,15 +256,15 @@ private:
     struct scheduler
     {
 	scheduler (destroy_func_t fun)
-	    : _fun (fun)
+	    : m_fun (fun)
 	{}
 
 	~scheduler ()
 	{
-	    _fun ();
+	    m_fun ();
 	}
 
-	destroy_func_t _fun;
+	destroy_func_t m_fun;
     };
 };
 
@@ -282,7 +282,7 @@ public:
     static void schedule (T*, destroy_func_t pFun)
     {
 #ifndef PSYNTH_ATEXIT_FIXED
-	if (!_destroyed)
+	if (!m_destroyed)
 #endif
 	    std::atexit(pFun);
     }
@@ -291,13 +291,13 @@ public:
     static void on_dead_reference ()
     {
 #ifndef PSYNTH_ATEXIT_FIXED
-	_destroyed = true;
+	m_destroyed = true;
 #endif
     }
         
 private:
 #ifndef PSYNTH_ATEXIT_FIXED
-    static bool _destroyed;
+    static bool m_destroyed;
 #endif
 };
 

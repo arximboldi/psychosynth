@@ -32,17 +32,26 @@
 
 #include <psynth/base/exception.hpp>
 #include <psynth/base/iterator.hpp>
+#include <psynth/base/util.hpp>
 
 namespace psynth
 {
 
-namespace detail
-{
+/**
+ * A parsing error.
+ */
+PSYNTH_DECLARE_ERROR (base_error, arg_parser_error)
+PSYNTH_DECLARE_ERROR (arg_parser_error, unknown_option_error)
+PSYNTH_DECLARE_ERROR (arg_parser_error, parse_option_error)
 
 /**
- * Utility exception.
+ * Utility exception. Parsers (options) must throw this in order to get
+ * arg_parser to correctly wrap the message.
  */
-class parse_error : std::exception {};
+class parse_error : public std::exception {};
+
+namespace detail
+{
 
 /**
  * Less-than functor for @c cstrings.
@@ -106,11 +115,6 @@ struct atoany_func
 };
 
 } /* namespace detail */
-
-/**
- * A parsing error.
- */
-PSYNTH_DECLARE_ERROR (error, arg_parser_error)
 
 /**
  * The interface of an option of the argument parser.
@@ -263,7 +267,12 @@ public:
 	stream.exceptions (std::stringstream::eofbit |
 			   std::stringstream::failbit |
 			   std::stringstream::badbit);
-	stream >> *m_data;
+	try {
+	    stream >> *m_data;
+	} catch (...) {
+	    throw parse_error ();
+	}
+	
 	return true;
     }
 };
@@ -284,7 +293,7 @@ typedef option_generic <const char*> option_cstring;
  *
  * @see option
  */
-class arg_parser
+class arg_parser : public non_copyable
 {
 public:
     /**
@@ -308,7 +317,7 @@ public:
      */
     void add (unsigned char flag, const char* str, int* data)
     {
-	add (flag, str, new option_int (data));
+	add (flag, str, data ? new option_int (data) : 0);
     }
 
     /**
@@ -319,7 +328,7 @@ public:
      */
     void add (unsigned char flag, const char* str, float* data)
     {
-	add (flag, str, new option_float (data));
+	add (flag, str, data ? new option_float (data) : 0);
     }
 
     /**
@@ -330,7 +339,7 @@ public:
      */
     void add (unsigned char flag, const char* str, bool* data)
     {
-	add (flag, str, new option_flag (data));
+	add (flag, str, data ? new option_flag (data) : 0);
     }
 
     /**
@@ -341,7 +350,7 @@ public:
      */
     void add (unsigned char flag, const char* str, std::string* data)
     {
-	add (flag, str, new option_string (data));
+	add (flag, str, data ? new option_string (data) : 0);
     }
 
     /**
@@ -352,17 +361,18 @@ public:
      */
     void add (unsigned char flag, const char* str, const char** data)
     {
-	add (flag, str, new option_cstring (data));
+	add (flag, str, data ? new option_cstring (data) : 0);
     }
 
     /**
-     * Adds an user defined option.
+     * Adds an user defined option. If the option is null an empty option
+     * is added -produces no result but avoids exceptions.
      * @param flag Short version of the option.
      * @param str Long version of the option.
      * @param op The option to associate to @a and @str.
      * @see Option
      */
-    void add (unsigned char flag, const char *str, option* op);
+    void add (unsigned char flag, const char *str, option* op = 0);
 
     /**
      * Parse the command line arguments using the defined options. Any
@@ -436,32 +446,32 @@ private:
 
     enum arg_type
     {
-	ARG_SHORT,
-	ARG_LONG,
-	ARG_FREE
+	arg_short,
+	arg_long,
+	arg_free
     };
 
+    const char** parse_short (const char** argv, const char** argv_end);
+    const char** parse_long (const char** argv, const char** argv_end);
+    
     arg_type get_type (const char *arg)
     {
 	if (arg[0] == '-') {
 	    if (arg[1] == '-')
-		return ARG_LONG;
+		return arg_long;
 	    else
-		return ARG_SHORT;
+		return arg_short;
 	}
 	
-	return ARG_FREE;
+	return arg_free;
     }
     
     bool is_free (const char *arg)
     {
-	return arg[0] != '-';
+	return arg [0] != '-';
     }
-
-    arg_parser (const arg_parser & arg);
-    arg_parser & operator= (const arg_parser & arg);
 };
 
-}				/* namespace psynth */
+} /* namespace psynth */
 
 #endif /* PSYNTH_ARGPARSER_H */

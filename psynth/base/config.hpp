@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2009-04-07 19:40:05 raskolnikov>
+ *  Time-stamp:  <2009-04-08 18:21:29 raskolnikov>
  *
  *  @file        config.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -37,11 +37,11 @@
 
 #include <boost/any.hpp>
 
-#include <psynth/base/signal.hpp>
 #include <psynth/base/tree.hpp>
 #include <psynth/base/misc.hpp>
 #include <psynth/base/singleton.hpp>
 #include <psynth/base/exception.hpp>
+#include <psynth/base/observer.hpp>
 
 namespace psynth
 {
@@ -52,15 +52,70 @@ PSYNTH_DECLARE_ERROR (config_error, config_backend_error);
 
 class conf_node;
 
-class conf_subject
+/**
+ * A configuration node listener to aid you when you are interested
+ * in all the signals emitted by a @a conf_subject.
+ */
+class conf_listener : public listener_base
+{
+public:
+    /**
+     * Invoked on a change event.
+     * @param c The source config.
+     */
+    virtual void handle_conf_change (conf_node& c)    = 0;
+
+    /**
+     * Invoked on a nudge event.
+     * @param c The source config.
+     */
+    virtual void handle_conf_nudge (conf_node& c)     = 0;
+
+    /**
+     * Invoked on a new child event.
+     * @param c The source config.
+     */
+    virtual void handle_conf_add_child (conf_node& c) = 0;
+
+    /**
+     * Invoked on a delete child event.
+     * @param c The source config.
+     */
+    virtual void handle_conf_del_child (conf_node& c) = 0;
+};
+
+/**
+ * The base class of an observable configuration node.
+ */
+class conf_subject : public subject_base <conf_listener>
 {
 public:
     typedef sigc::signal <void, conf_node&> signal;
 
+    /** Event emitted whenever the node value is changed. */
     signal on_change;
+
+    /**
+     * Generic event to notify changes on the node subchilds.
+     * It should be emitted by the user with the nudge () method.
+     */
     signal on_nudge;
-    signal on_new_child;
-    signal on_remove_child;
+
+    /** Generic event to notify the addition of a child to the config node. */
+    signal on_add_child;
+
+    /** Generic event to notify the removal of a child to the config node. */
+    signal on_del_child;
+
+    /**
+     * Register a new listener in the subject connecting all the signals.
+     */
+    void add_listener (conf_listener& l);
+
+    /**
+     * Unregister a new listener on this object disconnectin all the signals.
+     */
+    void del_listener (conf_listener& l);
 };
 
 /**

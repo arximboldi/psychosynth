@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2009-04-07 19:47:39 raskolnikov>
+ *  Time-stamp:  <2009-04-12 16:14:08 raskolnikov>
  *
  *  @file        default_selector_populator.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -207,8 +207,10 @@ void default_selector_populator::populate(selector_window* sel)
     cat->add_button ("Step BW Saw", creat);
     
     cat = sel->add_category ("Samples");
-    populate_samples (cat);
-
+    /* FIXME: populate_samples (cat); */
+    config::self ().get_path ("psychosynth.file_manager.samples").nudge ();
+    //config::self ().get_path ("psychosynth.file_manager.samples").nudge ();
+    
     creat.clear ();
     cat = sel->add_category ("Bi-Samples");
     creat.set_name ("double_sampler");

@@ -18,7 +18,7 @@
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-AUTOMAKE_OPTIONS = foreign
+AUTOMAKE_OPTIONS = 
 
 ACLOCAL_AMFLAGS = -I m4
 

@@ -26,12 +26,12 @@
 namespace psynth
 {
 
-PSYNTH_DEFINE_ERROR_WHERE(base_error,   "base");
-PSYNTH_DEFINE_ERROR_WHERE(psynth_error, "psynth");
+PSYNTH_DEFINE_ERROR_WHERE (base_error,   "base");
+PSYNTH_DEFINE_ERROR_WHERE (psynth_error, "psynth");
 
 error::error (const std::string& where, const std::string& what) throw ()
-    : _what (what)
-    , _where (where)
+    : m_what (what)
+    , m_where (where)
 {
 }
 
@@ -42,7 +42,7 @@ std::string error::default_error ()
 
 void error::log () const
 {
-    logger::self  () (_where, log::error, _what);
+    logger::self  () (m_where, log::error, m_what);
 }
 
 } /* namespace psynth */

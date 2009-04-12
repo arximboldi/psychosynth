@@ -1,5 +1,5 @@
 /**
- *  Time-stamp: <2009-04-07 17:38:51 raskolnikov>
+ *  Time-stamp: <2009-04-07 22:08:55 raskolnikov>
  *
  *  @file       singleton.tpp
  *  @author     Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -40,13 +40,13 @@ template <class T,
 	  template <class> class LP,
 	  template <class> class TP>
 typename singleton_holder<T, CP, LP, TP>::instance_type
-singleton_holder<T, CP, LP, TP>::_instance = 0;
+singleton_holder<T, CP, LP, TP>::m_instance = 0;
 
 template <class T,
 	  template <class> class CP,
 	  template <class> class LP,
 	  template <class> class TP>
-bool singleton_holder<T, CP, LP, TP>::_destroyed = false;
+bool singleton_holder<T, CP, LP, TP>::m_destroyed = false;
 
 template <class T,
 	  template <class> class CP,
@@ -54,21 +54,21 @@ template <class T,
 	  template <class> class TP>
 T& singleton_holder<T, CP, LP, TP>::self ()
 {
-    if (!_instance) {
+    if (!m_instance) {
 	typename TP<T>::lock guard;
 
-	if (!_instance) {
-	    if (_destroyed) {
+	if (!m_instance) {
+	    if (m_destroyed) {
 		LP<T>::on_dead_reference ();
-		_destroyed = false;
+		m_destroyed = false;
 	    }
 
-	    _instance = CP<T>::create ();
-	    LP<T>::schedule (_instance, &destroy_singleton);
+	    m_instance = CP<T>::create ();
+	    LP<T>::schedule (m_instance, &destroy_singleton);
 	}
     }
 
-    return *_instance;
+    return *m_instance;
 }
 
 template <class T,
@@ -77,15 +77,15 @@ template <class T,
 	  template <class> class TP>
 void singleton_holder<T, CP, LP, TP>::destroy_singleton ()
 {
-    assert (!_destroyed);
-    CP<T>::destroy (_instance);
-    _instance  = 0;
-    _destroyed = true;
+    assert (!m_destroyed);
+    CP<T>::destroy (m_instance);
+    m_instance  = 0;
+    m_destroyed = true;
 }
 
 #ifndef PSYNTH_ATEXIT_FIXED
 template <class T>
-bool lifetime_phoenix<T>::_destroyed = false;
+bool lifetime_phoenix<T>::m_destroyed = false;
 #endif
 
 } /* namespace psynth */

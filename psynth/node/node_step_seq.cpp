@@ -46,6 +46,8 @@ node_step_seq::node_step_seq(const audio_info& info) :
     m_param_high(DEFAULT_HIGH),
     m_param_slope(DEFAULT_SLOPE),
     m_param_num_steps(DEFAULT_NUM_STEPS),
+    m_old_param_high(DEFAULT_HIGH),
+    m_old_param_shape(SHAPE_SQUARE),
     m_env(&m_hi_env_vals),
     m_cur_step(0)
 {

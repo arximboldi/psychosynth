@@ -121,8 +121,8 @@ public:
     }
 
 private:
-    conf_node& m_node;
     T m_val;
+    conf_node& m_node;
 };
 
 } /* namespace psynth */

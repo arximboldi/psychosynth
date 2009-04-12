@@ -23,6 +23,7 @@
 
 AC_PREREQ(2.61)
 AC_INIT([psychosynth], [0.1.2], [raskolnikov@es.gnu.org])
+AC_CONFIG_MACRO_DIR([m4])
 
 AM_INIT_AUTOMAKE
 AM_CONFIG_HEADER(config.h)
@@ -47,6 +48,11 @@ done]) dnl XE_EXPAND_VARIABLE
 
 #  Options
 # ======================================================================
+
+AC_ARG_ENABLE([gprof], 
+		[AC_HELP_STRING([--enable-gprof],
+	        [enable fprof [default=disabled] ])],
+		[CXXFLAGS="${CXXFLAGS} -pg"], [])
 
 AC_ARG_ENABLE([debug], 
 		[AC_HELP_STRING([--enable-debug],

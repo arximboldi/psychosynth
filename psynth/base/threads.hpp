@@ -1,8 +1,9 @@
-/*
- *  File:       threads.hpp
- *  Author:     Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
- *  Date:       Tue Apr  7 11:29:08 2009
- *  Time-stamp: <2009-04-07 19:05:54 raskolnikov>
+/**
+ *  Time-stamp:  <2009-04-07 22:53:48 raskolnikov>
+ *
+ *  @file        threads.hpp
+ *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
+ *  @date        Tue Apr  7 11:29:08 2009
  *
  *  This module provides simplified and abstracted threading models
  *  that can be used for policy-based designs. It is inspired
@@ -44,7 +45,6 @@
 #define PSYNTH_THREADS_H_
 
 #include <psynth/base/util.hpp>
-
 
 #define PSYNTH_DEFAULT_THREADING         psynth::default_object_lockable::type
 #define PSYNTH_DEFAULT_NONOBJ_THREADING  psynth::default_class_lockable::type
@@ -88,28 +88,28 @@ public:
     {
     public:
 	lock (const object_lockable& host)
-	    : _host (host)
+	    : m_host (host)
 	{
-	    _host._mutex.lock ();
+	    m_host.m_mutex.lock ();
 	}
 
 	lock (const object_lockable* host)
-	    : _host (*host)
+	    : m_host (*host)
 	{
-	    _host._mutex.lock ();
+	    m_host.m_mutex.lock ();
 	}
 	
 	~lock ()
 	{
-	    _host._mutex.unlock ();
+	    m_host.m_mutex.unlock ();
 	}
 
     private:
-	const object_lockable& _host;
+	const object_lockable& m_host;
     };
     
 private:
-    mutable Mutex _mutex;
+    mutable Mutex m_mutex;
 };
 
 template <class T, class Mutex = PSYNTH_DEFAULT_MUTEX>
@@ -121,48 +121,48 @@ public:
     public:
 	lock ()
 	{
-	    _init._mutex.lock ();
+	    s_init.m_mutex.lock ();
 	}
 
 	lock (const class_lockable& host)
 	{
-	    _init._mutex.lock ();
+	    s_init.m_mutex.lock ();
 	}
 
 	lock (const class_lockable* host)
 	{
-	    _init._mutex.lock ();
+	    s_init.m_mutex.lock ();
 	}
 	
 	~lock ()
 	{
-	    _init._mutex.unlock ();
+	    s_init.m_mutex.unlock ();
 	}
     };
 	
 private:
     struct initializer
     {
-	bool  _is_init;
-	Mutex _mutex;
+	bool  m_is_init;
+	Mutex m_mutex;
 
 	initializer ()
-	    : _is_init (false)
+	    : m_is_init (false)
 	{
-	    _is_init = true;
+	    m_is_init = true;
 	}
 
 	~initializer ()
 	{
-	    assert (_is_init);
+	    assert (m_is_init);
 	}
     };
 
-    static initializer _init;
+    static initializer s_init;
 };
 
 template<class T, class M>
-typename class_lockable<T, M>::initializer class_lockable<T, M>::_init;
+typename class_lockable<T, M>::initializer class_lockable<T, M>::s_init;
 
 typedef
 tpl_bind_snd<object_lockable, PSYNTH_DEFAULT_MUTEX>

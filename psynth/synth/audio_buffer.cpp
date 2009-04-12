@@ -47,6 +47,7 @@ void audio_buffer::liberate()
 {
     delete [] *m_data;
     delete [] m_data;
+    m_data = 0;
 }
 
 audio_buffer& audio_buffer::operator= (const audio_buffer& buf)

@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2009-04-07 19:52:56 raskolnikov>
+ *  Time-stamp:  <2009-04-07 22:05:52 raskolnikov>
  *
  *  @file        exception.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -59,12 +59,12 @@ public:
     
     virtual const char* what () const throw ()
     {
-	return _what.c_str ();
+	return m_what.c_str ();
     }
 
     virtual const char* where () const throw ()
     {
-	return _where.c_str ();
+	return m_where.c_str ();
     }
 
 protected:    
@@ -72,8 +72,8 @@ protected:
     std::string default_error ();
     
 private:
-    std::string _what;
-    std::string _where;
+    std::string m_what;
+    std::string m_where;
 };
     
 #define PSYNTH_DECLARE_ERROR(d_parent, d_error)				\

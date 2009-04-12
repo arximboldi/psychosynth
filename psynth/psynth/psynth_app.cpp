@@ -150,42 +150,47 @@ void psynth_app::close_synth ()
 
 int psynth_app::run (int argc, const char* argv[])
 {   
-    int ret_val;
- 
-    conf_node& conf = config::self ().get_child ("psychosynth");
-    logger::self ().attach_sink (new log_std_sink);
-
-    if (!parse_args (argc, argv))
-	return ERR_GENERIC;
-
-    generate_paths();
+    int ret_val = 0;
 
     try {
+	conf_node& conf = config::self ().get_child ("psychosynth");
+	logger::self ().attach_sink (new log_std_sink);
+
+	if (!parse_args (argc, argv))
+	    return ERR_GENERIC;
+
+	generate_paths();
+
+	try {
 #ifdef PSYNTH_HAVE_XML
-	conf.attach_backend (new conf_backend_xml ((get_config_path () / "psychosynth.xml").file_string ()));
+	    conf.attach_backend (new conf_backend_xml ((get_config_path () / "psychosynth.xml").file_string ()));
 #endif
-	conf.def_load();
-    } catch (psynth::exception& error) {
-	error.log ();
-    }
+	    conf.def_load();
+	} catch (psynth::exception& error) {
+	    error.log ();
+	}
     
 #ifdef PSYNTH_HAVE_ALSA
-    m_director.attach_output_director_factory (new output_director_alsa_factory);
+	m_director.attach_output_director_factory (new output_director_alsa_factory);
 #endif
 #ifdef PSYNTH_HAVE_OSS
-    m_director.attach_output_director_factory (new output_director_oss_factory);
+	m_director.attach_output_director_factory (new output_director_oss_factory);
 #endif
 #ifdef PSYNTH_HAVE_JACK
-    m_director.attach_output_director_factory (new output_director_jack_factory);
+	m_director.attach_output_director_factory (new output_director_jack_factory);
 #endif
-    
-    ret_val = execute();
+	
+	ret_val = execute();
 
-    try {
-	if (ret_val == SUCCESS)
-	    conf.save ();
+	try {
+	    if (ret_val == SUCCESS)
+		conf.save ();
+	} catch (psynth::exception& error) {
+	    error.log ();
+	}
     } catch (psynth::exception& error) {
 	error.log ();
+	ret_val = -1;
     }
     
     return ret_val;

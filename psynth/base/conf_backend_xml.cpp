@@ -87,13 +87,16 @@ conf_node* conf_backend_xml::process_new_element (xmlTextReaderPtr reader,
 						  conf_node* node)
 {
     xmlChar* type;
-    
-    if (xmlTextReaderDepth (reader) == 0 &&           /* If is root */
-	((node->get_name ().empty() &&                /* Then the node must be the default "root"*/
-	  xmlStrcmp (xmlTextReaderConstName(reader), xml_cast ("root"))) ||
-	 xmlStrcmp (xmlTextReaderConstName(reader),   /* Or the actual node name */
-		    xml_cast (node->get_name ().c_str())))) 
+
+    /* Root test. Don't merge both if's because they change the "else semantics" */
+    if (xmlTextReaderDepth (reader) == 0)
+    {
+	if ((node->get_name ().empty() &&
+	     xmlStrcmp (xmlTextReaderConstName(reader), xml_cast ("root"))) ||
+	    xmlStrcmp (xmlTextReaderConstName(reader),   
+		       xml_cast (node->get_name ().c_str()))) 
 	    return 0;
+    }
     else if (!xmlTextReaderIsEmptyElement(reader))
 	node = &node->get_child (char_cast (xmlTextReaderConstName(reader)));
 

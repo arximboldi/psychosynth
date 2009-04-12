@@ -1,22 +1,24 @@
-/*
- *  File:       tree_node_test.cpp
- *  Author:     Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
- *  Date:       2009
- *  Time-stamp: <2009-04-07 19:43:15 raskolnikov>
+/**
+ *  Time-stamp:  <2009-04-11 16:10:30 raskolnikov>
+ *
+ *  @file        tree_node_test.cpp
+ *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
+ *  @date        2009.
  *
  *  tree_node unit tests.
- *  This file is part of the Psychosynth project.
  */
 
 /*
  *  Copyright (C) 2009 Juan Pedro Bolívar Puente
- *  
- *  This program is free software: you can redistribute it and/or modify
+ *
+ *  This file is part of Psychosynth.
+ *   
+ *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful,
+ *  Psychosynth is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
