@@ -34,8 +34,6 @@ noinst_DATA = ChangeLog
 doc:
 	\doxygen doc/Doxyfile
 
-log: ChangeLog
-
-ChangeLog:
+log:
 	\bzr log --gnu-changelog -r97.. > ChangeLog
 
