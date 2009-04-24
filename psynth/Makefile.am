@@ -47,6 +47,7 @@ nobase_libpsynthinc_HEADERS = \
 	base/arg_parser.hpp \
 	base/deleter.hpp \
 	base/singleton.hpp \
+	base/singleton.tpp \
         base/iterator.hpp \
 	base/misc.hpp \
 	base/logger.hpp \
