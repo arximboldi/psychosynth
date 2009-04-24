@@ -22,7 +22,7 @@
 # ======================================================================
 
 AC_PREREQ(2.61)
-AC_INIT([psychosynth], [0.1.2], [raskolnikov@es.gnu.org])
+AC_INIT([psychosynth], [0.1.3], [raskolnikov@es.gnu.org])
 AC_CONFIG_MACRO_DIR([m4])
 
 AM_INIT_AUTOMAKE
@@ -367,7 +367,7 @@ XE_EXPAND_VARIABLE(bindir, PACKAGE_BIN_DIR)
 XE_EXPAND_VARIABLE(libdir, PACKAGE_LIB_DIR)
 
 # Uncomment only for development purposes
-PACKAGE_DATA_DIR="./data"
+# PACKAGE_DATA_DIR="./data"
 
 AC_SUBST(PACKAGE_DATA_DIR)
 AC_SUBST(PACKAGE_BIN_DIR)
