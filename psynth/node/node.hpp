@@ -35,7 +35,7 @@
 #include <psynth/synth/sample_buffer.hpp>
 #include <psynth/synth/audio_buffer.hpp>
 #include <psynth/base/vector_2d.hpp>
-#include <psynth/base/deleter.hpp>
+#include <psynth/base/pointer.hpp>
 #include <psynth/synth/envelope_simple.hpp>
 #include <psynth/node/node_param.hpp>
 #include <psynth/node/watch.hpp>

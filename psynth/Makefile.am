@@ -32,11 +32,11 @@ lib_LTLIBRARIES = libpsynth.la
 #  libpsynth compilation
 # ======================================================================
 
-libpsynth_la_CXXFLAGS = $(SIGC_CFLAGS)
+libpsynth_la_CXXFLAGS = $(SIGC_CFLAGS) -DPSYNTH_DATA_DIR=\"$(PACKAGE_DATA_DIR)\"
 libpsynth_la_LDFLAGS =  
 libpsynth_la_LIBADD = $(BOOST_THREAD_LIB) $(BOOST_FILESYSTEM_LIB) $(SIGC_LIBS)
 
-libpsynthincdir = @PACKAGE_INCLUDE_DIR@
+libpsynthincdir = $(PACKAGE_INCLUDE_DIR)
 
 nobase_libpsynthinc_HEADERS = \
 	psynth/director.hpp \

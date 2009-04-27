@@ -1,28 +1,28 @@
-#
-#   PSYCHOSYNTH
-#   ===========
-#              
-#   Copyright (C) 2007, 2008 by Juan Pedro Bolivar Puente
-#                                                        
-#   This program is free software: you can redistribute it and/or modify
-#   it under the terms of the GNU General Public License as published by
-#   the Free Software Foundation, either version 3 of the License, or
-#   (at your option) any later version.
-#                                      
-#   This program is distributed in the hope that it will be useful,
-#   but WITHOUT ANY WARRANTY; without even the implied warranty of
-#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#   GNU General Public License for more details.
-#
-#   You should have received a copy of the GNU General Public License
-#   along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
+dnl
+dnl   PSYCHOSYNTH
+dnl   ===========
+dnl              
+dnl   Copyright (C) 2007, 2008 by Juan Pedro Bolivar Puente
+dnl                                                        
+dnl   This program is free software: you can redistribute it and/or modify
+dnl   it under the terms of the GNU General Public License as published by
+dnl   the Free Software Foundation, either version 3 of the License, or
+dnl   (at your option) any later version.
+dnl                                      
+dnl   This program is distributed in the hope that it will be useful,
+dnl   but WITHOUT ANY WARRANTY; without even the implied warranty of
+dnl   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+dnl   GNU General Public License for more details.
+dnl
+dnl   You should have received a copy of the GNU General Public License
+dnl   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+dnl
 
-#  Global config
-# ======================================================================
+dnl  Global config
+dnl ======================================================================
 
 AC_PREREQ(2.61)
-AC_INIT([psychosynth], [0.1.3], [raskolnikov@es.gnu.org])
+AC_INIT([psychosynth], [0.1.4], [raskolnikov@es.gnu.org])
 AC_CONFIG_MACRO_DIR([m4])
 
 AM_INIT_AUTOMAKE
@@ -34,20 +34,8 @@ AM_PROG_LIBTOOL
 
 psynth_config_ok="yes"
 
-#  Tools
-# ======================================================================
-
-define([XE_EXPAND_VARIABLE],
-[$2=[$]$1
-while true; do
-  case "[$]$2" in
-    *\[$]* ) eval "$2=[$]$2" ;;
-    *) break ;;
-  esac
-done]) dnl XE_EXPAND_VARIABLE
-
-#  Options
-# ======================================================================
+dnl  Options
+dnl ======================================================================
 
 AC_ARG_ENABLE([gprof], 
 		[AC_HELP_STRING([--enable-gprof],
@@ -60,11 +48,11 @@ AC_ARG_ENABLE([debug],
 		[CXXFLAGS="${CXXFLAGS} -g -O0"], 
 		[CXXFLAGS="${CXXFLAGS} -DNDEBUG"])
 
-#  Compulsory libraries
-# ======================================================================
+dnl  Compulsory libraries
+dnl ======================================================================
 
-#  BOOST
-# ----------------------------------------------------------------------
+dnl  BOOST
+dnl ----------------------------------------------------------------------
 
 AX_BOOST_BASE([1.35])
 AX_BOOST_THREAD
@@ -91,8 +79,8 @@ AC_MSG_ERROR([
 psynth_config_ok=no
 fi
 
-#  Sigc
-# ----------------------------------------------------------------------
+dnl  Sigc
+dnl ----------------------------------------------------------------------
    
 PKG_CHECK_MODULES(SIGC, [ sigc++-2.0 ],
 [
@@ -108,18 +96,18 @@ AC_MSG_ERROR([
 ])
 ])
 
-#  Optional libraries
-# ======================================================================
+dnl  Optional libraries
+dnl ======================================================================
 
-# Unit Testing Framework support
-# ----------------------------------------------------------------------
+dnl Unit Testing Framework support
+dnl ----------------------------------------------------------------------
 HAVE_BOOST_TEST="no"
 if test "x${ax_cv_boost_unit_test_framework}" == xyes ; then
    HAVE_BOOST_TEST="yes"
 fi
 
-#  Liblo support
-# ----------------------------------------------------------------------
+dnl  Liblo support
+dnl ----------------------------------------------------------------------
 
 AC_ARG_ENABLE([liblo],
     AC_HELP_STRING([--disable-liblo], [Disable optional Liblo support]),
@@ -138,8 +126,8 @@ else
     HAVE_LIBLO=disabled
 fi
 
-#  LibXML support
-# ----------------------------------------------------------------------
+dnl  LibXML support
+dnl ----------------------------------------------------------------------
 
 AC_ARG_ENABLE([libxml],
     AC_HELP_STRING([--disable-libxml], [Disable optional LibXML support]),
@@ -158,8 +146,8 @@ else
     HAVE_LIBXML=disabled
 fi
 
-#  Sndfile
-# ----------------------------------------------------------------------
+dnl  Sndfile
+dnl ----------------------------------------------------------------------
 
 AC_ARG_ENABLE([sndfile],
     AC_HELP_STRING([--disable-sndfile], [Disable optional Sndfile support]),
@@ -178,8 +166,8 @@ else
     HAVE_SNDFILE=disabled
 fi
 
-#  Soundtouch
-# ----------------------------------------------------------------------
+dnl  Soundtouch
+dnl ----------------------------------------------------------------------
 
 AC_ARG_ENABLE([soundtouch],
     AC_HELP_STRING([--disable-soundtouch], [Disable optional Soundtouch support]),
@@ -198,28 +186,28 @@ else
     HAVE_SOUNDTOUCH=disabled
 fi
 
-#  Samplerate
-# ----------------------------------------------------------------------
+dnl  Samplerate
+dnl ----------------------------------------------------------------------
 
-#AC_ARG_ENABLE([samplerate],
-#    AC_HELP_STRING([--disable-samplerate], [Disable optional Samplerate support]),
-#        [samplerate=$enableval], [samplerate=auto])
-#
-#if test "x${samplerate}" != xno ; then
-#    PKG_CHECK_MODULES(SAMPLERATE, [ samplerate ],
-#        [
-#            HAVE_SAMPLERATE=yes
-#            AC_DEFINE([HAVE_SAMPLERATE], 1, [Have Samplerate?])
-#        ],
-#        [
-#            HAVE_SAMPLERATE=no
-#        ])
-#else
-#    HAVE_SAMPLERATE=disabled
-#fi
+dnl AC_ARG_ENABLE([samplerate],
+dnl    AC_HELP_STRING([--disable-samplerate], [Disable optional Samplerate support]),
+dnl        [samplerate=$enableval], [samplerate=auto])
+dnl
+dnl if test "x${samplerate}" != xno ; then
+dnl    PKG_CHECK_MODULES(SAMPLERATE, [ samplerate ],
+dnl        [
+dnl            HAVE_SAMPLERATE=yes
+dnl            AC_DEFINE([HAVE_SAMPLERATE], 1, [Have Samplerate?])
+dnl        ],
+dnl        [
+dnl            HAVE_SAMPLERATE=no
+dnl        ])
+dnl else
+dnl    HAVE_SAMPLERATE=disabled
+dnl fi
 
-#  OGG Vorbis
-# ----------------------------------------------------------------------
+dnl  OGG Vorbis
+dnl ----------------------------------------------------------------------
 
 AC_ARG_ENABLE([vorbis],
     AC_HELP_STRING([--disable-vorbis], [Disable optional Vorbis support]),
@@ -238,8 +226,8 @@ else
     HAVE_VORBIS=disabled
 fi
 
-#  OSS
-# ----------------------------------------------------------------------
+dnl  OSS
+dnl ----------------------------------------------------------------------
 
 AC_ARG_ENABLE([oss],
     AC_HELP_STRING([--disable-oss], [Disable optional OSS support]),
@@ -258,8 +246,8 @@ else
     HAVE_OSS=disabled
 fi
 
-#  ALSA
-# ----------------------------------------------------------------------
+dnl  ALSA
+dnl ----------------------------------------------------------------------
 
 AC_ARG_ENABLE([alsa],
     AC_HELP_STRING([--disable-alsa], [Disable optional ALSA support]),
@@ -278,8 +266,8 @@ else
     HAVE_ALSA=disabled
 fi
 
-#  JACK
-# ----------------------------------------------------------------------
+dnl  JACK
+dnl ----------------------------------------------------------------------
 
 AC_ARG_ENABLE([jack],
     AC_HELP_STRING([--disable-jack], [Disable optional JACK support]),
@@ -299,8 +287,8 @@ else
 fi
 
 
-#  psynth3d dependencies
-# ======================================================================
+dnl  psynth3d dependencies
+dnl ======================================================================
 
 AC_ARG_ENABLE([psynth3d],
     AC_HELP_STRING([--disable-psynth3d], [Do not build the 3d client.]),
@@ -309,20 +297,20 @@ AC_ARG_ENABLE([psynth3d],
 if test "x${psynth3d}" != xno ; then
    BUILD_PSYNTH3D=yes
    
-   # Check OGRE
+   dnl Check OGRE
    PKG_CHECK_MODULES(OGRE, [OGRE >= 1.2], BUILD_PSYNTH3D=yes, BUILD_PSYNTH3D=no)
    
-   # Check CEGUI
+   dnl Check CEGUI
    if test "x$BUILD_PSYNTH3D" = xyes; then
        PKG_CHECK_MODULES(CEGUI, [CEGUI >= 0.5], BUILD_PSYNTH3D=yes, BUILD_PSYNTH3D=no)
    fi
    
-   # Check CEGUI OGRE backend
+   dnl Check CEGUI OGRE backend
    if test "x$BUILD_PSYNTH3D" = xyes; then
        PKG_CHECK_MODULES(CEGUIOGRE, [CEGUI-OGRE >= 1.2], BUILD_PSYNTH3D=yes, BUILD_PSYNTH3D=no)
    fi
    
-   # Check OIS
+   dnl Check OIS
    if test "x$BUILD_PSYNTH3D" = xyes; then   
        PKG_CHECK_MODULES(OIS, [OIS >= 1.0], BUILD_PSYNTH3D=yes, BUILD_PSYNTH3D=no)
    fi
@@ -330,13 +318,13 @@ else
    BUILD_PSYNTH3D=no
 fi
 
-#  psynth dependencies
-# ======================================================================
+dnl  psynth dependencies
+dnl ======================================================================
 
 BUILD_PSYNTH=$HAVE_LIBLO
 
-#  psynth global
-# ======================================================================
+dnl  psynth global
+dnl ======================================================================
 
 if test "x$HAVE_SOUNDTOUCH" == xno; then
 AC_MSG_ERROR([
@@ -350,32 +338,30 @@ psynth_config_ok=no
 fi
 
 
-#  Directories
-# ======================================================================
+dnl  Directories
+dnl ======================================================================
 
-# Set PREFIX
-if test "x${prefix}" = "xNONE"; then
-  prefix=${ac_default_prefix}
-  exec_prefix=${ac_default_prefix}
-fi
+dnl Set PREFIX
+dnl if test "x${prefix}" = "xNONE"; then
+dnl  prefix=${ac_default_prefix}
+dnl  exec_prefix=${ac_default_prefix}
+dnl fi
 
-XE_EXPAND_VARIABLE(datadir, PACKAGE_DATA_DIR)
-PACKAGE_DATA_DIR="$PACKAGE_DATA_DIR/psychosynth"
-XE_EXPAND_VARIABLE(includedir, PACKAGE_INCLUDE_DIR)
-PACKAGE_INCLUDE_DIR="$PACKAGE_INCLUDE_DIR/libpsynth"
-XE_EXPAND_VARIABLE(bindir, PACKAGE_BIN_DIR)
-XE_EXPAND_VARIABLE(libdir, PACKAGE_LIB_DIR)
+PACKAGE_DATA_DIR="$datarootdir/psychosynth"
+PACKAGE_INCLUDE_DIR="$includedir/psynth"
+PACKAGE_BIN_DIR=$bindir
+PACKAGE_LIB_DIR=$libdir
 
-# Uncomment only for development purposes
-# PACKAGE_DATA_DIR="./data"
+dnl Uncomment only for development purposes
+dnl PACKAGE_DATA_DIR="./data"
 
 AC_SUBST(PACKAGE_DATA_DIR)
 AC_SUBST(PACKAGE_BIN_DIR)
 AC_SUBST(PACKAGE_INCLUDE_DIR)
 AC_SUBST(PACKAGE_LIB_DIR)
 
-#  Conditions
-# ======================================================================
+dnl  Conditions
+dnl ======================================================================
 
 if test "x$HAVE_BOOST_TEST" = xyes; then HAVE_BOOST_TEST_P=1
 else HAVE_BOOST_TEST_P=0; fi
@@ -422,8 +408,8 @@ AM_CONDITIONAL([HAVE_JACK], [test "x$HAVE_JACK" = xyes])
 AM_CONDITIONAL([BUILD_PSYNTH], [test "x$BUILD_PSYNTH" = xyes])
 AM_CONDITIONAL([BUILD_PSYNTH3D], [test "x$BUILD_PSYNTH3D" = xyes])
 
-#  Create files
-# ======================================================================
+dnl  Create files
+dnl ======================================================================
 
 AC_OUTPUT(libpsynth.pc
 	  Makefile
@@ -438,8 +424,8 @@ AC_OUTPUT(libpsynth.pc
 	  test/Makefile)
 
 
-#  Result
-# ======================================================================
+dnl  Result
+dnl ======================================================================
 
 if test "x${psynth_config_ok}" != xyes; then
 AC_MSG_RESULT([
@@ -474,14 +460,13 @@ AC_MSG_RESULT([
 *      ALSA support: ............ $HAVE_ALSA
 *      Jack support: ............ $HAVE_JACK
 *      Unit tests support: ...... $HAVE_BOOST_TEST
-*      Translations: ............ Not suported.
 * 
 *   Installation directories:
 * 
 *      Program: ................. $PACKAGE_BIN_DIR
-*      Data: .................... $PACKAGE_DATA_DIR
 *      Library: ................. $PACKAGE_LIB_DIR
 *      Includes: ................ $PACKAGE_INCLUDE_DIR
+*      Data: .................... $PACKAGE_DATA_DIR
 *
 * 
 **

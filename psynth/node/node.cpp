@@ -22,7 +22,6 @@
 
 #include <algorithm>
 
-#include "base/deleter.hpp"
 #include "node/node.hpp"
 
 #include <cmath>
