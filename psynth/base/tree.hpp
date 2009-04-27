@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2009-04-07 19:42:32 raskolnikov>
+ *  Time-stamp:  <2009-04-27 17:19:33 raskolnikov>
  *
  *  @file        tree.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -34,7 +34,7 @@
 #include <typeinfo>
 
 #include <psynth/base/iterator.hpp>
-#include <psynth/base/deleter.hpp>
+#include <psynth/base/pointer.hpp>
 #include <psynth/base/exception.hpp>
 #include <psynth/base/threads.hpp>
 

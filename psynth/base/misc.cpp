@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2009-04-27 16:49:21 raskolnikov>
+ *  Time-stamp:  <2009-04-27 17:01:44 raskolnikov>
  *
  *  @file        misc.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
