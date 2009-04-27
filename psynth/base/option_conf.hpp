@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2009-04-27 16:50:58 raskolnikov>
+ *  Time-stamp:  <2009-04-27 17:00:59 raskolnikov>
  *
  *  @file        option_conf.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -27,8 +27,6 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-
-
 
 #ifndef PSYNTH_OPTIONCONF_H
 #define PSYNTH_OPTIONCONF_H
