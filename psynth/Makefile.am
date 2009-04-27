@@ -45,7 +45,6 @@ nobase_libpsynthinc_HEADERS = \
 	psynth/file_manager_director.hpp \
 	psynth/psynth_app.hpp \
 	base/arg_parser.hpp \
-	base/deleter.hpp \
 	base/singleton.hpp \
 	base/singleton.tpp \
         base/iterator.hpp \

@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2009-04-07 15:29:04 raskolnikov>
+ *  Time-stamp:  <2009-04-27 16:45:51 raskolnikov>
  *
  *  @file        type_traits.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -12,13 +12,15 @@
 
 /*
  *  Copyright (C) 2009 Juan Pedro Bolívar Puente
- *  
- *  This program is free software: you can redistribute it and/or modify
+ *
+ *  This file is part of Psychosynth.
+ *   
+ *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful,
+ *  Psychosynth is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
