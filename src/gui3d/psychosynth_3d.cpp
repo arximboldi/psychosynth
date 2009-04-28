@@ -320,15 +320,14 @@ void psychosynth_3d::setup_input ()
 }
 
 void psychosynth_3d::setup_gui ()
-{  
+{   
     m_ceguirender = new CEGUI::OgreCEGUIRenderer(m_window,
 						 Ogre::RENDER_QUEUE_OVERLAY,
 						 false, 3000, m_scene);
+    
+    m_gui = new CEGUI::System (m_ceguirender, 0, 0, 0, "",
+			       (get_config_path () / "psynth3d_CEGUI.log").file_string ());
 
-    m_gui = new CEGUI::System(m_ceguirender);
-
-    CEGUI::Logger::getSingleton().setLogFilename (
-	(get_config_path () / "psynth3d_CEGUI.log").file_string ());
     CEGUI::SchemeManager::getSingleton().loadScheme("TaharezLook.scheme");
     m_gui->setDefaultMouseCursor("TaharezLook", "MouseArrow");
     m_gui->setDefaultFont(CEGUI::FontManager::getSingleton().
