@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2009-04-12 16:14:08 raskolnikov>
+ *  Time-stamp:  <2009-04-29 09:33:41 raskolnikov>
  *
  *  @file        default_selector_populator.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -214,14 +214,14 @@ void default_selector_populator::populate(selector_window* sel)
     creat.clear ();
     cat = sel->add_category ("Bi-Samples");
     creat.set_name ("double_sampler");
-    creat.set_param ("file_one", std::string ("pmas1.wav"));
-    creat.set_param ("file_two", std::string ("pmas3.wav"));
+    creat.set_param ("file_one", std::string ("pmas1.ogg"));
+    creat.set_param ("file_two", std::string ("pmas3.ogg"));
     cat->add_button ("Dub-Step 1-3", creat);
-    creat.set_param ("file_one", std::string ("a1.wav"));
-    creat.set_param ("file_two", std::string ("b1.wav"));
+    creat.set_param ("file_one", std::string ("a1.ogg"));
+    creat.set_param ("file_two", std::string ("b1.ogg"));
     cat->add_button ("ab1", creat);
-    creat.set_param ("file_one", std::string ("a2.wav"));
-    creat.set_param ("file_two", std::string ("b2.wav"));
+    creat.set_param ("file_one", std::string ("a2.ogg"));
+    creat.set_param ("file_two", std::string ("b2.ogg"));
     cat->add_button ("ab2", creat);
 
 }
