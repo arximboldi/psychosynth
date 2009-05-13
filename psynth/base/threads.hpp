@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2009-04-27 16:46:12 raskolnikov>
+ *  Time-stamp:  <2009-05-03 18:16:34 raskolnikov>
  *
  *  @file        threads.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -68,8 +68,8 @@ public:
     struct lock
     {
 	lock () {}
-	explicit lock (no_threading& host) {}
-	explicit lock (no_threading* host) {}
+	explicit lock (const no_threading& host) {}
+	explicit lock (const no_threading* host) {}
     };
 	
 private:

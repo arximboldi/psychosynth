@@ -22,7 +22,7 @@ dnl  Global config
 dnl ======================================================================
 
 AC_PREREQ(2.61)
-AC_INIT([psychosynth], [0.1.4], [raskolnikov@es.gnu.org])
+AC_INIT([psychosynth], [0.1.5], [raskolnikov@es.gnu.org])
 AC_CONFIG_MACRO_DIR([m4])
 
 AM_INIT_AUTOMAKE
