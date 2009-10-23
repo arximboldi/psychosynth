@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2009-04-27 16:57:24 raskolnikov>
+ *  Time-stamp:  <2009-10-23 13:27:37 raskolnikov>
  *
  *  @file        timer.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -40,28 +40,17 @@ namespace psynth
 {
 
 timer::timer ()
-    : nowticks (0)
-    , sinceticks (0)
-    , ms (0)
-    , framecount(0)
-    , rate (-1)
-    , rateticks (1)
+ : m_fps (0)
+ , m_rate (0)
 {
     reset ();
-    update_ticks ();
-};
+}
 
 timer::timer (int fpsrate)
-    : nowticks (0)
-    , sinceticks (0)
-    , ms (0)
-    , framecount (0)
-    , rate (fpsrate)
-    , rateticks (1000.0/fpsrate)
 {
+    force_fps (fpsrate);
     reset ();
-    update_ticks ();
-};
+}
 
 timer::~timer ()
 {
@@ -69,50 +58,56 @@ timer::~timer ()
 	
 void timer::force_fps (int fpsrate)
 {
-    framecount = 0;
-    rate = fpsrate;
-    rateticks = (1000.0 /rate);
+    m_fps = fpsrate;
+    if (m_fps > 0)
+	m_rate = 1000.0 / double (m_fps);
+    m_frame_count = 0;
 }
 	
 void timer::reset ()
 {
-    gettimeofday (&start, NULL);
+    m_total_frame_count = 0;
+
+    m_delta = 0;
+    m_time_count = 0.0;
+
+    m_last_time = 0;
+    m_frame_count = 0;
+     
+    gettimeofday (&m_clock_start, NULL);
 }
 
 void timer::update ()
 {
-    int lastticks;
-    int targetticks;
-    
-    lastticks = nowticks;
-    
-    update_ticks ();
-	
-    if (rate > 0) {
-        framecount++;
-        
-        targetticks = sinceticks + int(framecount * rateticks);
-		
-        if (nowticks <= targetticks)
-            usleep((targetticks - nowticks)*1000);
-        else {
-            framecount = 0;
-            update_ticks ();
-            sinceticks = nowticks;
-        }
-    } else {
+    m_total_frame_count ++;
+
+    if (m_fps > 0)
+    {
+	m_frame_count ++;
+
+	tick_type target_time =
+	    m_last_time + m_frame_count * m_rate;
+
 	update_ticks ();
+	if (m_time_count < target_time)
+	    usleep ((target_time - m_time_count) * 1000);
+	else {
+	    m_last_time = m_time_count;
+	    m_frame_count = 0;
+	}
     }
-    
-    ms = nowticks - lastticks;
+    else
+    	update_ticks ();
 }
 
 void timer::update_ticks ()
 {
-    gettimeofday (&now, NULL);
-    nowticks =
-        (now.tv_sec - start.tv_sec) * 1000 + (now.tv_usec -
-                                              start.tv_usec) / 1000;
+    gettimeofday (&m_clock_now, NULL);
+    tick_type new_time =
+        tick_type (m_clock_now.tv_sec  - m_clock_start.tv_sec) * 1000 +
+	tick_type (m_clock_now.tv_usec - m_clock_start.tv_usec) / 1000;
+    m_delta = new_time - m_time_count;
+    m_time_count = new_time;
 }
 
 } /* namespace psynth */

@@ -28,6 +28,10 @@
 
 class psychosynth_cli : public psynth::psynth_app
 {
+public:
+    psychosynth_cli () {};
+
+private:
     bool m_run_server;
     std::string m_client_port;
     std::string m_server_port;
@@ -37,12 +41,10 @@ class psychosynth_cli : public psynth::psynth_app
     void print_version ();
     void prepare (psynth::arg_parser& arg_parser);
     void init ();
-    
+
     int execute ();
     int run_server ();
     int run_client ();
-public:
-    psychosynth_cli () {};
 };
 
 #endif /* PSYCHOSYNTH_CLI_H */

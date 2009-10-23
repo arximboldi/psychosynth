@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2009-04-27 16:55:41 raskolnikov>
+ *  Time-stamp:  <2009-10-23 13:21:09 raskolnikov>
  *
  *  @file        timer.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -41,19 +41,10 @@ namespace psynth
  */
 class timer
 {
-    timeval now;
-    timeval start;
-    
-    int nowticks;
-    int sinceticks;
-    int ms;
-    int framecount;
-    int rate;
-    float rateticks;
-	
-    void update_ticks ();
-	
 public:
+    typedef int tick_type;
+    typedef size_t frame_type;
+    
     /** Constructor. */
     timer ();
 
@@ -90,18 +81,42 @@ public:
      * Returns the milliseconds elapsed between the last call to
      * @c update() and the creation of the Timer or the last @c rest call.
      */
-    int ticks ()
+    tick_type ticks ()
     {
-	return nowticks;
+	return m_time_count;
     }
     
     /**
      * Returns the milliseconds elapsed between the last two @c update() calls.
      */
-    int delta_ticks ()
+    tick_type delta_ticks ()
     {
-	return ms;
+	return m_delta;
     }
+
+    /**
+     * Returns the number of total updates since start.
+     */
+    frame_type frames ()
+    {
+	return m_total_frame_count;
+    }
+
+private:
+    timeval m_clock_now;
+    timeval m_clock_start;
+    
+    frame_type m_frame_count;
+    frame_type m_total_frame_count;
+    
+    tick_type m_time_count;
+    tick_type m_delta;
+    tick_type m_last_time;
+    
+    int    m_fps;
+    double m_rate;
+    
+    void update_ticks ();
 };
 
 } /* namespace psynth */
