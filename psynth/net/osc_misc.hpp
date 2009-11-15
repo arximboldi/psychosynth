@@ -23,6 +23,7 @@
 #ifndef PSYNTH_OSCMISC_H
 #define PSYNTH_OSCMISC_H
 
+#include <cstdio>
 #include <lo/lo.h>
 
 namespace psynth

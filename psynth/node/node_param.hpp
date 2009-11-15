@@ -25,6 +25,7 @@
 
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/locks.hpp>
+#include <boost/function.hpp>
 #include <string>
 
 namespace psynth
@@ -35,28 +36,8 @@ class node_param
 public:
     typedef boost::function <void (node_param&)> event;
 
-private:
-    friend class node;
-	
-    mutable boost::mutex m_mutex;
-
-    std::string m_name;
-    int m_id;
-    int m_type;
-    bool m_changed;
-    event m_event;
-    void* m_src;
-    void* m_dest;
-    
-    void clear ();
-    void configure (int id, std::string name, int type, void* dest);
-    void configure (int id, std::string name, int type, void* dest, event ev);
-
-    void update_in ();
-    void update_out ();
-    
-public:
-    enum type {
+    enum type
+    {
 	NONE = -1,
 	INT,       /* int */
 	FLOAT,     /* float */
@@ -117,6 +98,26 @@ public:
 	d = *static_cast<T*>(m_src);
 	m_mutex.unlock ();
     }
+
+private:
+    friend class node;
+	
+    mutable boost::mutex m_mutex;
+
+    std::string m_name;
+    int m_id;
+    int m_type;
+    bool m_changed;
+    event m_event;
+    void* m_src;
+    void* m_dest;
+    
+    void clear ();
+    void configure (int id, std::string name, int type, void* dest);
+    void configure (int id, std::string name, int type, void* dest, event ev);
+
+    void update_in ();
+    void update_out ();
 };
 
 } /* namespace psynth */

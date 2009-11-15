@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2009-04-27 17:01:44 raskolnikov>
+ *  Time-stamp:  <2009-11-15 16:01:22 raskolnikov>
  *
  *  @file        misc.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -29,6 +29,7 @@
  *
  */
 
+#include <cstdio>
 #include <cstring>
 #include <cmath>
 #include <cctype>

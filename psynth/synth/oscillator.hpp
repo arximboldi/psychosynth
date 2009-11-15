@@ -114,9 +114,9 @@ public:
     
     static sample compute_triangle (float x) {
 	float p = phase(x);
-	if(p <= 0.25f)
+	if (p <= 0.25f)
 	    return p * 4.0f;
-	else if(p <= 0.75f)
+	else if (p <= 0.75f)
 	    return 2.0f - p * 4.0f;
 	return p * 4.0f - 4.0f;
     }
