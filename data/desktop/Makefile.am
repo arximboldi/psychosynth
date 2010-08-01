@@ -22,6 +22,7 @@ desktopdir = $(datadir)/applications
 desktop_DATA = psychosynth.desktop
 
 pixmapdir = $(datadir)/pixmaps
-pixmap_DATA = psychosynth.png
+pixmap_DATA = psychosynth.png \
+              psychosynth.xpm
 
 EXTRA_DIST = $(desktop_DATA) $(pixmap_DATA)
