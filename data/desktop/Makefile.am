@@ -19,7 +19,7 @@
 #
 
 desktopdir = $(datadir)/applications
-desktop_DATA = psychosynth.desktop
+desktop_DATA = psynth3d.desktop
 
 pixmapdir = $(datadir)/pixmaps
 pixmap_DATA = psychosynth.png \
