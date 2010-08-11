@@ -114,26 +114,6 @@ AC_MSG_ERROR([
 ])
 ])
 
-
-
-dnl  Gtk 2.0
-dnl ----------------------------------------------------------------------
-
-PKG_CHECK_MODULES(GTK, [ gtk+-2.0 ],
-[
-    HAVE_GTK=yes
-    AC_DEFINE([HAVE_GTK], 1, [Have Gtk?])
-],
-[
-AC_MSG_ERROR([
-***
-*** You need GTK 2.0 development libraries to compile the program.
-*** Install it and run this script again.
-***
-])
-])
-
-
 dnl  Optional libraries
 dnl ======================================================================
 
