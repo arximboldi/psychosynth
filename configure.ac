@@ -46,7 +46,7 @@ AC_ARG_ENABLE([debug],
 		[AC_HELP_STRING([--enable-debug],
 	        [enable debug [default=disabled] ])],
 		[CXXFLAGS="${CXXFLAGS} -g -O0"], 
-		[CXXFLAGS="${CXXFLAGS} -DNDEBUG"])
+		[CXXFLAGS="${CXXFLAGS} -DNDEBUG -std=c++0x"])
 
 dnl  Compulsory libraries
 dnl ======================================================================
@@ -54,7 +54,7 @@ dnl ======================================================================
 dnl  BOOST
 dnl ----------------------------------------------------------------------
 
-AX_BOOST_BASE([1.35])
+AX_BOOST_BASE([1.39])
 AX_BOOST_THREAD
 AX_BOOST_FILESYSTEM
 AX_BOOST_UNIT_TEST_FRAMEWORK

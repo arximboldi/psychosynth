@@ -1,4 +1,6 @@
-##### http://autoconf-archive.cryp.to/ax_boost_date_time.html
+# ===========================================================================
+#    http://www.gnu.org/software/autoconf-archive/ax_boost_date_time.html
+# ===========================================================================
 #
 # SYNOPSIS
 #
@@ -7,8 +9,8 @@
 # DESCRIPTION
 #
 #   Test for Date_Time library from the Boost C++ libraries. The macro
-#   requires a preceding call to AX_BOOST_BASE. Further documentation
-#   is available at <http://randspringer.de/boost/index.html>.
+#   requires a preceding call to AX_BOOST_BASE. Further documentation is
+#   available at <http://randspringer.de/boost/index.html>.
 #
 #   This macro calls:
 #
@@ -18,18 +20,17 @@
 #
 #     HAVE_BOOST_DATE_TIME
 #
-# LAST MODIFICATION
+# LICENSE
 #
-#   2007-03-12
+#   Copyright (c) 2008 Thomas Porschberg <thomas@randspringer.de>
+#   Copyright (c) 2008 Michael Tindal
 #
-# COPYLEFT
-#
-#   Copyright (c) 2007 Thomas Porschberg <thomas@randspringer.de>
-#   Copyright (c) 2007 Michael Tindal <mtindal@paradoxpoint.com>
-#
-#   Copying and distribution of this file, with or without
-#   modification, are permitted in any medium without royalty provided
-#   the copyright notice and this notice are preserved.
+#   Copying and distribution of this file, with or without modification, are
+#   permitted in any medium without royalty provided the copyright notice
+#   and this notice are preserved. This file is offered as-is, without any
+#   warranty.
+
+#serial 13
 
 AC_DEFUN([AX_BOOST_DATE_TIME],
 [
@@ -73,23 +74,32 @@ AC_DEFUN([AX_BOOST_DATE_TIME],
 		])
 		if test "x$ax_cv_boost_date_time" = "xyes"; then
 			AC_DEFINE(HAVE_BOOST_DATE_TIME,,[define if the Boost::Date_Time library is available])
-			BN=boost_date_time
+            BOOSTLIBDIR=`echo $BOOST_LDFLAGS | sed -e 's/@<:@^\/@:>@*//'`
             if test "x$ax_boost_user_date_time_lib" = "x"; then
-			   for ax_lib in $BN $BN-$CC $BN-$CC-mt $BN-$CC-mt-s $BN-$CC-s \
-                               lib$BN lib$BN-$CC lib$BN-$CC-mt lib$BN-$CC-mt-s lib$BN-$CC-s \
-                               $BN-mgw $BN-mgw $BN-mgw-mt $BN-mgw-mt-s $BN-mgw-s ; do
-			      AC_CHECK_LIB($ax_lib, main, [BOOST_DATE_TIME_LIB="-l$ax_lib"; AC_SUBST(BOOST_DATE_TIME_LIB) link_date_time="yes"; break],
-                               [link_date_time="no"])
-  			   done
+                for libextension in `ls $BOOSTLIBDIR/libboost_date_time*.so* $BOOSTLIBDIR/libboost_date_time*.a* 2>/dev/null | sed 's,.*/,,' | sed -e 's;^lib\(boost_date_time.*\)\.so.*$;\1;' -e 's;^lib\(boost_date_time.*\)\.a*$;\1;'` ; do
+                     ax_lib=${libextension}
+				    AC_CHECK_LIB($ax_lib, exit,
+                                 [BOOST_DATE_TIME_LIB="-l$ax_lib"; AC_SUBST(BOOST_DATE_TIME_LIB) link_date_time="yes"; break],
+                                 [link_date_time="no"])
+  				done
+                if test "x$link_date_time" != "xyes"; then
+                for libextension in `ls $BOOSTLIBDIR/boost_date_time*.{dll,a}* 2>/dev/null | sed 's,.*/,,' | sed -e 's;^\(boost_date_time.*\)\.dll.*$;\1;' -e 's;^\(boost_date_time.*\)\.a*$;\1;'` ; do
+                     ax_lib=${libextension}
+				    AC_CHECK_LIB($ax_lib, exit,
+                                 [BOOST_DATE_TIME_LIB="-l$ax_lib"; AC_SUBST(BOOST_DATE_TIME_LIB) link_date_time="yes"; break],
+                                 [link_date_time="no"])
+  				done
+                fi
+
             else
-               for ax_lib in $ax_boost_user_date_time_lib $BN-$ax_boost_user_date_time_lib; do
+               for ax_lib in $ax_boost_user_date_time_lib boost_date_time-$ax_boost_user_date_time_lib; do
 				      AC_CHECK_LIB($ax_lib, main,
                                    [BOOST_DATE_TIME_LIB="-l$ax_lib"; AC_SUBST(BOOST_DATE_TIME_LIB) link_date_time="yes"; break],
                                    [link_date_time="no"])
                   done
 
             fi
-			if test "x$link_date_time" = "xno"; then
+			if test "x$link_date_time" != "xyes"; then
 				AC_MSG_ERROR(Could not link against $ax_lib !)
 			fi
 		fi
