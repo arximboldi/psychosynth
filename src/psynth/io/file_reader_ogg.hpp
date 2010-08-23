@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) Juan Pedro Bolivar Puente 2008                          *
+ *   Copyright (C) Juan Pedro Bolivar Puente 2007                          *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -20,31 +20,35 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef PSYCHOSYNTH_CLI_H
-#define PSYCHOSYNTH_CLI_H
+#ifndef PSYNTH_FILEREADEROGG
+#define PSYNTH_FILEREADEROGG
 
-#include <psynth/app/psynth_app.hpp>
-#include <psynth/version.hpp>
+#include <psynth/io/file_reader.hpp>
+#include <vorbis/vorbisfile.h>
 
-class psychosynth_cli : public psynth::psynth_app
+namespace psynth
 {
-public:
-    psychosynth_cli () {};
 
-private:
-    bool m_run_server;
-    std::string m_client_port;
-    std::string m_server_port;
-    std::string m_host;
+class file_reader_ogg : public file_reader
+{
+    OggVorbis_File m_file;
+    size_t m_bitstream;
     
-    void print_help ();
-    void print_version ();
-    void prepare (psynth::arg_parser& arg_parser);
-    void init ();
+public:
+    file_reader_ogg () :
+	m_bitstream (0) {}
 
-    int execute ();
-    int run_server ();
-    int run_client ();
+    ~file_reader_ogg () {
+	if (is_open ())
+	    close ();
+    }
+    
+    void open (const std::string& file);
+    void seek (size_t pos);
+    size_t read (audio_buffer& buf, size_t n_samples);
+    void close ();
 };
+    
+} /* namespace psynth */
 
-#endif /* PSYCHOSYNTH_CLI_H */
+#endif /* PSYNTH_FILEREADEROGG */

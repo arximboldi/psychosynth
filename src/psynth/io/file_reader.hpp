@@ -20,31 +20,57 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef PSYCHOSYNTH_CLI_H
-#define PSYCHOSYNTH_CLI_H
+#ifndef PSYNTH_FILEREADER_H
+#define PSYNTH_FILEREADER_H
 
-#include <psynth/app/psynth_app.hpp>
-#include <psynth/version.hpp>
+#include <string>
 
-class psychosynth_cli : public psynth::psynth_app
+#include <psynth/synth/audio_info.hpp>
+#include <psynth/synth/audio_buffer.hpp>
+
+namespace psynth
 {
-public:
-    psychosynth_cli () {};
 
-private:
-    bool m_run_server;
-    std::string m_client_port;
-    std::string m_server_port;
-    std::string m_host;
+class file_reader
+{
+    bool m_isopen;
+    audio_info m_info;
     
-    void print_help ();
-    void print_version ();
-    void prepare (psynth::arg_parser& arg_parser);
-    void init ();
+protected:
+    void set_is_open (bool isopen) {
+	m_isopen = isopen;
+    };
 
-    int execute ();
-    int run_server ();
-    int run_client ();
+    void set_info(const audio_info& info) {
+	m_info = info;
+    }
+    
+public:
+    file_reader()
+	: m_isopen(false)
+	, m_info(0,0,0)
+	{}
+    
+    virtual ~file_reader() {};
+    
+    bool is_open () {
+	return m_isopen;
+    }
+
+    const audio_info& get_info () {
+	return m_info;
+    }
+    
+    virtual void open (const std::string& file) = 0;
+    virtual void seek (size_t pos) = 0;
+    virtual size_t read (audio_buffer& buf, size_t n_samples) = 0;
+    virtual void close () = 0;
+    
+    size_t read (audio_buffer& buf) {
+	return read(buf, buf.size());
+    }
 };
 
-#endif /* PSYCHOSYNTH_CLI_H */
+} /* namespace psynth */
+
+#endif /* PSYNTH_FILEREADER_H */

@@ -22,7 +22,7 @@ dnl  Global config
 dnl ======================================================================
 
 AC_PREREQ(2.61)
-AC_INIT([psychosynth], [0.1.5], [raskolnikov@es.gnu.org])
+AC_INIT([psychosynth], [0.1.7], [raskolnikov@es.gnu.org])
 AC_CONFIG_MACRO_DIR([m4])
 
 AM_INIT_AUTOMAKE
@@ -433,13 +433,13 @@ AC_OUTPUT(libpsynth.pc
 	  Makefile
 	  doc/Doxyfile
 	  doc/Makefile
-	  src/Makefile
 	  data/Makefile
 	  data/desktop/Makefile
 	  data/gui3d/Makefile
-	  psynth/Makefile
-	  psynth/version.hpp
-	  test/Makefile)
+	  src/Makefile
+	  src/psynth/Makefile
+	  src/psynth/version.hpp
+	  src/test/Makefile)
 
 
 dnl  Result

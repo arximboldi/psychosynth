@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) Juan Pedro Bolivar Puente 2008                          *
+ *   Copyright (C) Juan Pedro Bolivar Puente 2007                          *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -20,31 +20,49 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef PSYCHOSYNTH_CLI_H
-#define PSYCHOSYNTH_CLI_H
+#include <algorithm>
+#include "node/node_audio_mixer.hpp"
 
-#include <psynth/app/psynth_app.hpp>
-#include <psynth/version.hpp>
-
-class psychosynth_cli : public psynth::psynth_app
+namespace psynth
 {
-public:
-    psychosynth_cli () {};
 
-private:
-    bool m_run_server;
-    std::string m_client_port;
-    std::string m_server_port;
-    std::string m_host;
+PSYNTH_DEFINE_NODE_FACTORY (node_audio_mixer);
+
+void node_audio_mixer::do_update (const node* caller,
+				  int caller_port_type,
+				  int caller_port)
+{
+    audio_buffer* buf = get_output<audio_buffer> (LINK_AUDIO, OUT_A_OUTPUT);
+    const audio_buffer* in = NULL;
+    const sample_buffer * ampl = get_input<sample_buffer> (LINK_CONTROL, IN_C_AMPLITUDE);
+    size_t i, j;
+    bool input = false;
     
-    void print_help ();
-    void print_version ();
-    void prepare (psynth::arg_parser& arg_parser);
-    void init ();
+    for (i = 0; i < get_info().num_channels; ++i) {
+	init(buf->get_channel(i), get_info().block_size);
 
-    int execute ();
-    int run_server ();
-    int run_client ();
-};
+	for (j = 0; j < m_numchan; ++j)
+	    if ((in = get_input <audio_buffer> (LINK_AUDIO, j))) {
+		envelope_simple env = get_in_envelope(LINK_AUDIO, j);
 
-#endif /* PSYCHOSYNTH_CLI_H */
+		if (!ampl)
+		    mix(buf->get_channel(i), in->get_channel(i),
+			env, get_info().block_size);
+		else {
+		    envelope_simple ctrl_env = get_in_envelope(LINK_CONTROL,
+							       IN_C_AMPLITUDE);
+		    mix(buf->get_channel(i),
+			in->get_channel(i),
+			ampl->get_data(),
+			env, ctrl_env, get_info ().block_size);
+		}
+		input = true;
+	    }
+
+	if (!input)
+	    memset(buf->get_channel(i), 0,
+		   sizeof(sample) * get_info ().block_size);
+    }
+}
+
+} /* namespace psynth */

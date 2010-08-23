@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) Juan Pedro Bolivar Puente 2008                          *
+ *   Copyright (C) 2007 Juan Pedro Bolivar Puente                          *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -20,31 +20,49 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef PSYCHOSYNTH_CLI_H
-#define PSYCHOSYNTH_CLI_H
+#ifndef PSYNTH_AUDIOINFO_H
+#define PSYNTH_AUDIOINFO_H
 
-#include <psynth/app/psynth_app.hpp>
-#include <psynth/version.hpp>
+#include <cstring>
 
-class psychosynth_cli : public psynth::psynth_app
+namespace psynth {
+
+/**
+ * An audio Sample type.
+ */
+typedef float sample;
+
+/**
+ * Basic information of an audio stream.
+ */
+struct audio_info
 {
-public:
-    psychosynth_cli () {};
-
-private:
-    bool m_run_server;
-    std::string m_client_port;
-    std::string m_server_port;
-    std::string m_host;
+    size_t sample_rate;   /**< Sampling rate of the stream. */
+    size_t block_size;    /**< Size of processing buffers. */
+    size_t num_channels;  /**< Number of channels of the audio stream. */
     
-    void print_help ();
-    void print_version ();
-    void prepare (psynth::arg_parser& arg_parser);
-    void init ();
+    audio_info (const audio_info& i) :
+	sample_rate(i.sample_rate), block_size(i.block_size), num_channels(i.num_channels) {}
 
-    int execute ();
-    int run_server ();
-    int run_client ();
+    audio_info (size_t r = 0, size_t s = 0, size_t c = 0) :
+	sample_rate(r), block_size(s), num_channels(c) {}
+
+    bool operator== (const audio_info& i) {
+	return
+	    sample_rate == i.sample_rate &&
+	    block_size == i.block_size &&
+	    num_channels == i.num_channels;
+    }
+
+    bool operator!= (const audio_info& i) {
+	return
+	    sample_rate != i.sample_rate ||
+	    block_size != i.block_size ||
+	    num_channels != i.num_channels;
+    }
 };
 
-#endif /* PSYCHOSYNTH_CLI_H */
+} /* namespace psynth */
+
+#endif /* PSYNTH_AUDIOINFO_H */
+

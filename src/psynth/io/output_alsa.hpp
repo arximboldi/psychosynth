@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) Juan Pedro Bolivar Puente 2008                          *
+ *   Copyright (C) 2007 by Juan Pedro Bolivar Puente                       *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -20,31 +20,67 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef PSYCHOSYNTH_CLI_H
-#define PSYCHOSYNTH_CLI_H
+#ifndef PSYNTH_OUTPUTALSA_H
+#define PSYNTH_OUTPUTALSA_H
 
-#include <psynth/app/psynth_app.hpp>
-#include <psynth/version.hpp>
+#include <boost/thread/thread.hpp>
 
-class psychosynth_cli : public psynth::psynth_app
+#define ALSA_PCM_NEW_HW_PARAMS_API
+#include <alsa/asoundlib.h>
+#include <pthread.h>
+
+#include <psynth/io/output.hpp>
+
+namespace psynth
 {
-public:
-    psychosynth_cli () {};
 
-private:
-    bool m_run_server;
-    std::string m_client_port;
-    std::string m_server_port;
-    std::string m_host;
+class output_alsa : public output
+{
+    snd_pcm_t *alsa_pcm;
+    snd_pcm_hw_params_t *alsa_hwparams;
+    snd_pcm_sw_params_t *alsa_swparams;
+    snd_pcm_format_t alsa_format;
+    short int* m_buf;
+    std::string alsa_device;
+    int m_buffersize;
+  
+    boost::thread alsa_thread;
     
-    void print_help ();
-    void print_version ();
-    void prepare (psynth::arg_parser& arg_parser);
-    void init ();
+public:
+    output_alsa ();
+    output_alsa (const audio_info& info, const std::string& device);
+    ~output_alsa ();
 
-    int execute ();
-    int run_server ();
-    int run_client ();
+    bool set_device (const std::string& device) {
+	if (get_state () == NOTINIT) {
+	    alsa_device = device;
+	    return true;
+	}
+	
+	return false;
+    }
+
+  bool set_buffer_size (int size) {
+    if (get_state () == NOTINIT) {
+      m_buffersize = size;
+      return true;
+    }
+
+    return false;
+  }
+  
+    const std::string& get_device () const {
+	return alsa_device;
+    }
+	
+    void run();
+    bool open();
+    bool close();
+    bool put (const audio_buffer& buf, size_t nframes);
+    bool start();
+    bool stop();
 };
 
-#endif /* PSYCHOSYNTH_CLI_H */
+} /* namespace psynth */
+
+#endif /* PSYNTH_OUTPUTALSA_H */

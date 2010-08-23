@@ -20,31 +20,61 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef PSYCHOSYNTH_CLI_H
-#define PSYCHOSYNTH_CLI_H
+#include "io/file_reader_wave.hpp"
+#include "base/logger.hpp"
 
-#include <psynth/app/psynth_app.hpp>
-#include <psynth/version.hpp>
+using namespace std;
 
-class psychosynth_cli : public psynth::psynth_app
+namespace psynth
 {
-public:
-    psychosynth_cli () {};
 
-private:
-    bool m_run_server;
-    std::string m_client_port;
-    std::string m_server_port;
-    std::string m_host;
+void file_reader_wave::open (const std::string& file)
+{
+    if (!is_open()) {
+	SF_INFO sfinfo;
+	
+	m_file = sf_open (file.c_str (), SFM_READ, &sfinfo);
     
-    void print_help ();
-    void print_version ();
-    void prepare (psynth::arg_parser& arg_parser);
-    void init ();
+	if (m_file == NULL) {
+	    logger::self () ("wave", log::error, string("Could not open file: ") + file);
+	    return;
+	}
+	
+	audio_info info;
+	info.sample_rate  = sfinfo.samplerate;
+	info.num_channels = sfinfo.channels;
+	info.block_size   = sfinfo.frames;
+	set_info(info);
+		
+	set_is_open(true);
+    }
+}
 
-    int execute ();
-    int run_server ();
-    int run_client ();
-};
+void file_reader_wave::seek(size_t pos)
+{
+    sf_seek(m_file, pos, SEEK_SET);
+}
 
-#endif /* PSYCHOSYNTH_CLI_H */
+size_t file_reader_wave::read(audio_buffer& outbuf, size_t n_samples)
+{
+    size_t n_read;
+
+    float buf [n_samples * get_info().num_channels];
+    
+    n_read = sf_readf_float(m_file, buf, n_samples);
+
+    if (n_read)
+	outbuf.deinterleave(buf, n_read, get_info().num_channels);
+    
+    return n_read;
+}
+
+void file_reader_wave::close()
+{
+    if (is_open()) {
+	sf_close(m_file);
+	set_is_open(false);
+    }
+}
+
+} /* namespace psynth */

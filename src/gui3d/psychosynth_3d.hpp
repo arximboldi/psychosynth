@@ -29,7 +29,7 @@
 
 #include <psynth/version.hpp>
 #include <psynth/base/timer.hpp>
-#include <psynth/psynth/psynth_app.hpp>
+#include <psynth/app/psynth_app.hpp>
 #ifdef PSYNTH_HAVE_OSC
 #include <psynth/net/osc_client.hpp>
 #include <psynth/net/osc_server.hpp>

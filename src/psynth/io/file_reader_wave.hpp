@@ -20,31 +20,31 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef PSYCHOSYNTH_CLI_H
-#define PSYCHOSYNTH_CLI_H
+#ifndef PSYNTH_FILEREADERWAVE_H
+#define PSYNTH_FILEREADERWAVE_H
 
-#include <psynth/app/psynth_app.hpp>
-#include <psynth/version.hpp>
+#include <sndfile.h>
+#include <psynth/io/file_reader.hpp>
 
-class psychosynth_cli : public psynth::psynth_app
+namespace psynth
 {
-public:
-    psychosynth_cli () {};
 
-private:
-    bool m_run_server;
-    std::string m_client_port;
-    std::string m_server_port;
-    std::string m_host;
+class file_reader_wave : public file_reader
+{
+    SNDFILE* m_file;
     
-    void print_help ();
-    void print_version ();
-    void prepare (psynth::arg_parser& arg_parser);
-    void init ();
-
-    int execute ();
-    int run_server ();
-    int run_client ();
+public:
+    ~file_reader_wave() {
+	if (is_open())
+	    close();
+    }
+    
+    void open (const std::string& file);
+    void seek (size_t pos);
+    size_t read (audio_buffer& buf, size_t n_samples);
+    void close ();
 };
 
-#endif /* PSYCHOSYNTH_CLI_H */
+} /* namespace psynth */
+
+#endif /* PSYNTH_FILEREADERWAVE_H */

@@ -24,6 +24,11 @@
 AM_CPPFLAGS = -Wall $(BOOST_CPPFLAGS) $(all_includes)
 AM_LDFLAGS  = $(BOOST_LDFLAGS) $(SIGC_LDFLAGS)
 
+#  The library
+# ======================================================================
+
+SUBDIRS = psynth test
+
 #  Programs to build
 # ======================================================================
 
@@ -34,18 +39,18 @@ bin_PROGRAMS += psynth3d
 endif
 
 if BUILD_PSYNTH
-bin_PROGRAMS += psynth
+bin_PROGRAMS += psynth-cli
 endif
 
-#  psynth compilation
+#  psynth-cli compilation
 # ======================================================================
 
-psynth_CXXFLAGS = $(SIGC_CFLAGS)
-psynth_LDFLAGS = 
-psynth_LDADD = $(SIGC_LIBS) \
-	../psynth/libpsynth.la
+psynth_cli_CXXFLAGS = $(SIGC_CFLAGS)
+psynth_cli_LDFLAGS = 
+psynth_cli_LDADD = $(SIGC_LIBS) \
+	./psynth/libpsynth.la
 
-psynth_SOURCES = \
+psynth_cli_SOURCES = \
 	cli/psychosynth_cli.cpp\
 	psynth.cpp\
 	cli/psychosynth_cli.hpp
@@ -68,7 +73,7 @@ psynth3d_LDADD = \
 	$(CEGUI_LIBS) \
 	$(OIS_LIBS) \
 	$(CEGUIOGRE_LIBS) \
-	../psynth/libpsynth.la
+	./psynth/libpsynth.la
 
 psynth3d_SOURCES = \
 	gui3d/camera_controller_default.cpp \
