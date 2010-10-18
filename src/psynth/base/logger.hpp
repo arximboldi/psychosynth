@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2009-04-27 16:41:00 raskolnikov>
+ *  Time-stamp:  <2010-10-17 19:56:06 raskolnikov>
  *
  *  @file        logger.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -41,6 +41,8 @@
 #include <psynth/base/tree.hpp>
 
 namespace psynth
+{
+namespace base
 {
 
 class log;
@@ -279,7 +281,8 @@ public:
 private:
     std::ofstream _file;
 };
-    
+
+} /* namespace base */
 } /* namespace psynth */
 
 #endif /* PSYNTH_LOGGER_H */

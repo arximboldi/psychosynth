@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2009-04-07 16:48:51 raskolnikov>
+ *  Time-stamp:  <2010-10-17 20:42:06 raskolnikov>
  *
  *  @file        singleton.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -30,10 +30,13 @@
 
 namespace psynth
 {
+namespace base
+{
 
 PSYNTH_DEFINE_ERROR_WHERE_WHAT (singleton_error,
 				"singleton",
 				"Dead reference to singleton.")
 
+} /* namespace base */
 } /* namespace psynth */
 

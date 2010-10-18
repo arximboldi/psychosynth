@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2009-04-27 16:47:54 raskolnikov>
+ *  Time-stamp:  <2010-10-17 19:52:29 raskolnikov>
  *
  *  @file        file_finder.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -43,6 +43,8 @@
 
 namespace psynth
 {
+namespace base
+{
 
 class path_predicate
 {
@@ -83,6 +85,24 @@ public:
     typedef std::list <boost::filesystem::path> path_list;
     typedef std::map <boost::filesystem::path,
 		      boost::filesystem::path> path_map;
+
+    file_finder ()
+	: m_cache_updated (false)
+	, m_cache_auto (false)
+    {}
+    
+    void add_path (const boost::filesystem::path& path);
+    void del_path (const boost::filesystem::path& path);
+    void build_cache (bool autoupdate);
+    void clear_cache ();
+    void clear ();
+
+    boost::filesystem::path
+    find (const boost::filesystem::path& file) const;
+
+    template <class PathPredicate>
+    void find_if (PathPredicate pred, path_list & res) const; 
+
 private:
     path_list m_paths;
     path_map m_cache;
@@ -100,24 +120,6 @@ private:
     int get_file_list (const boost::filesystem::path& folder,
 		       path_list& res,
 		       path_predicate pred) const;
-    
-public:
-    file_finder ()
-	: m_cache_updated (false)
-	, m_cache_auto (false)
-    {}
-    
-    void add_path (const boost::filesystem::path& path);
-    void del_path (const boost::filesystem::path& path);
-    void build_cache (bool autoupdate);
-    void clear_cache ();
-    void clear ();
-
-    boost::filesystem::path
-    find (const boost::filesystem::path& file) const;
-
-    template <class PathPredicate>
-    void find_if (PathPredicate pred, path_list & res) const; 
 };
 
 
@@ -159,6 +161,7 @@ void file_finder::find_if (path_predicate pred, path_list& result) const
     }
 }
 
+} /* namespace base */
 } /* namespace psynth */
 
 #endif /* PSYNTH_FILEFINDER_H */

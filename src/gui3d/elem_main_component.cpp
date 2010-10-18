@@ -32,6 +32,7 @@
 using namespace std;
 using namespace Ogre;
 using namespace psynth;
+using namespace psynth::base;
 
 elem_main_component::elem_main_component (const std::string& mesh,
 					  int param,
@@ -60,9 +61,10 @@ void elem_main_component::set_mesh (const std::string& mesh)
 	get_parent()->get_scene()->destroyEntity(m_mesh_ent);
     }
 
-    m_mesh_ent = get_parent()->get_scene()->createEntity (string("EE") +
-							  itoa(get_parent()->get_node().get_id (),10),
-							  mesh);
+    m_mesh_ent = get_parent()->get_scene()->createEntity (
+	string("EE") +
+	itoa(get_parent()->get_node().get_id (),10),
+	mesh);
     m_ent_node->attachObject(m_mesh_ent);
     update_visibility ();
 }

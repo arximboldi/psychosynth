@@ -25,6 +25,7 @@
 #include "gui3d/conf_window.hpp"
 
 using namespace psynth;
+using namespace psynth::base;
 using namespace CEGUI;
 using namespace std;
 
@@ -73,9 +74,9 @@ bool path_conf_window::on_apply (const CEGUI::EventArgs &e)
 {
     m_conf.clear_childs();
 
-    for (int i = 0; i < m_listbox->getItemCount(); ++i) {
+    for (size_t i = 0; i < m_listbox->getItemCount(); ++i) {
 	string val = m_listbox->getItemFromIndex(i)->getText().c_str();
-	m_conf.get_child(string("path") + itoa(i, 10)).set(val);
+	m_conf.get_child(string("path") + base::itoa(i, 10)).set(val);
     }
     
     m_conf.nudge();
@@ -98,7 +99,10 @@ void path_conf_window::populate ()
     ItemEntry* item;
     std::string val;
     
-    for (conf_node::iterator iter = m_conf.begin(); iter != m_conf.end(); ++iter) {
+    for (base::conf_node::iterator iter = m_conf.begin();
+	 iter != m_conf.end();
+	 ++iter)
+    {
 	iter->get(val);
 	item = static_cast<ItemEntry*>(wmgr.createWindow("TaharezLook/ListboxItem"));
 	item->setText(val);
@@ -175,7 +179,7 @@ CEGUI::FrameWindow* path_conf_window::create_window ()
     return window;
 }
 
-Window* output_conf_window_simple::create_window (psynth::conf_node& node)
+Window* output_conf_window_simple::create_window (psynth::base::conf_node& node)
 {
     m_node = &node;
     
@@ -595,8 +599,8 @@ CEGUI::FrameWindow* conf_window::create_window ()
     return window;
 }
 
-conf_window::conf_window (psynth::conf_node& gui_conf,
-			  psynth::conf_node& psynth_conf) :
+conf_window::conf_window (psynth::base::conf_node& gui_conf,
+			  psynth::base::conf_node& psynth_conf) :
     m_samples_win(psynth_conf.get_path ("file_manager.samples")),
     m_gui_conf(gui_conf),
     m_psynth_conf(psynth_conf)

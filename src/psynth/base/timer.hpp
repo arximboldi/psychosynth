@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2009-10-23 13:21:09 raskolnikov>
+ *  Time-stamp:  <2010-10-17 20:07:07 raskolnikov>
  *
  *  @file        timer.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -34,6 +34,8 @@
 #include <ctime>
 
 namespace psynth
+{
+namespace base
 {
 
 /**
@@ -119,6 +121,7 @@ private:
     void update_ticks ();
 };
 
+} /* namespace base */
 } /* namespace psynth */
 
 #endif /* PSYNTH_TIMER_H */

@@ -37,8 +37,8 @@ namespace psynth
 class node_manager
 {
 public:
-    typedef map_iterator <int, mgr_ptr<node> > iterator;
-    typedef map_const_iterator <int, mgr_ptr<node> > const_iterator;
+    typedef base::map_iterator <int, mgr_ptr<node> > iterator;
+    typedef base::map_const_iterator <int, mgr_ptr<node> > const_iterator;
 
 private:
     mgr_assoc <std::map <int, mgr_ptr <node> > > m_node_map;

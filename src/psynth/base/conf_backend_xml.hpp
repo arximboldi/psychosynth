@@ -1,11 +1,11 @@
 /**
- *  Time-stamp:  <2009-04-27 16:35:34 raskolnikov>
+ *  Time-stamp:  <2010-10-18 15:38:34 raskolnikov>
  *
  *  @file        conf_backend_xml.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
  *  @date        2007
  *
- *  XML based configuration backend.
+ *  XML psynthd configuration backend.
  */
 
 /*
@@ -38,8 +38,11 @@
 
 #include <psynth/base/type_value.hpp>
 #include <psynth/base/config.hpp>
+#include <psynth/base/conf_backend_xml_def.hpp>
 
 namespace psynth
+{
+namespace base
 {
 
 PSYNTH_DECLARE_ERROR (config_error, config_xml_error)
@@ -102,7 +105,7 @@ public:
     void load (conf_node& node)
     {
 	m_overwrite = true;
-	do_load(node);
+	do_load (node);
     }
 
     /**
@@ -111,9 +114,33 @@ public:
      */
     void def_load (conf_node& node)
     {
-	m_overwrite = false;;
-	do_load(node);
+	m_overwrite = false;
+	do_load (node);
     }
+
+    /**
+     * Invoked on a change event.
+     * @param c The source config.
+     */
+    void handle_conf_change (conf_node& c) {};
+
+    /**
+     * Invoked on a nudge event.
+     * @param c The source config.
+     */
+    void handle_conf_nudge (conf_node& c) {};
+
+    /**
+     * Invoked on a new child event.
+     * @param c The source config.
+     */
+    void handle_conf_add_child (conf_node& c) {};
+
+    /**
+     * Invoked on a delete child event.
+     * @param c The source config.
+     */
+    void handle_conf_del_child (conf_node& c) {};
 
 private:
     type_value m_current_type;
@@ -133,6 +160,7 @@ private:
     void expand_value (xmlTextWriterPtr writer, conf_node& node);
 };
 
+} /* namespace base */
 } /* namespace psynth */
 
 #endif /* PSYNTH_CONFBACKENDXML_H */

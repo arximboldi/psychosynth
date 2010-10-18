@@ -197,7 +197,7 @@ private:
     int m_type;
     std::string m_name;
     
-    vector_2f m_param_position;
+    base::vector_2f m_param_position;
     float m_param_radious;
     int m_param_mute;
     
@@ -371,11 +371,11 @@ public:
 	return m_param_position.sqr_length();
     }
     
-    float distance_to (const vector_2f& obj) const {
+    float distance_to (const base::vector_2f& obj) const {
 	return m_param_position.distance(obj);
     }
 	
-    float sqr_distance_to (const vector_2f &obj) const {
+    float sqr_distance_to (const base::vector_2f &obj) const {
 	return m_param_position.sqr_distance(obj);
     }
 };

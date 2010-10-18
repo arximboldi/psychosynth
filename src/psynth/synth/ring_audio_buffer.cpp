@@ -29,6 +29,7 @@
 #include "synth/scaler.hpp"
 
 using namespace std;
+using namespace psynth::base;
 
 namespace psynth
 {

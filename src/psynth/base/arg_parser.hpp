@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-08-23 11:02:32 raskolnikov>
+ *  Time-stamp:  <2010-10-18 16:14:48 raskolnikov>
  *
  *  @file        arg_parser.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -43,6 +43,8 @@
 #include <psynth/base/util.hpp>
 
 namespace psynth
+{
+namespace base
 {
 
 /**
@@ -173,8 +175,8 @@ public:
      * Constructor.
      * @param data Pointer to where you want to store the argument value.
      */
-    option_generic (T * data)
-	: m_data (data)
+    option_generic (T* data)
+	: _data (data)
     {}
 
     /**
@@ -184,12 +186,12 @@ public:
      */
     bool parse (const char *arg)
     {
-	*m_data = ConvFunc ()(arg);
+	*_data = ConvFunc ()(arg);
 	return true;
     }
 
 private:
-    T *m_data;
+    T* _data;
 };
 
 /**
@@ -197,7 +199,7 @@ private:
  */
 class option_flag : public option
 {
-    bool* m_flag;
+    bool* _flag;
 
 public:
     /**
@@ -205,7 +207,7 @@ public:
      * @param f Where to notify if it was found.
      */
     option_flag (bool* f)
-	: m_flag (f)
+	: _flag (f)
     {}
 
     /**
@@ -214,7 +216,7 @@ public:
      */
     bool parse ()
     {
-	*m_flag = true;
+	*_flag = true;
 	return true;
     }
 };
@@ -224,7 +226,7 @@ public:
  */
 class option_not_flag : public option
 {
-    bool* m_flag;
+    bool* _flag;
 
 public:
     /**
@@ -232,7 +234,7 @@ public:
      * @param f Where to notify if it was found.
      */
     option_not_flag (bool* f)
-	: m_flag (f)
+	: _flag (f)
     {}
 
     /**
@@ -241,7 +243,7 @@ public:
      */
     bool parse ()
     {
-	*m_flag = false;
+	*_flag = false;
 	return true;
     }
 };
@@ -301,7 +303,7 @@ typedef option_generic <const char*> option_cstring;
  *
  * @see option
  */
-class arg_parser : public noncopyable
+class arg_parser : public boost::noncopyable
 {
 public:
     /**
@@ -313,10 +315,6 @@ public:
      * ConstIterator for the arguments that where not parse.
      */
     typedef std::list <const char*>::const_iterator const_iterator;
-
-    arg_parser () {}
-    
-    ~arg_parser ();
 
     /**
      * Adds an @c int option.
@@ -380,8 +378,8 @@ public:
      * @param op The option to associate to @a and @str.
      * @see Option
      */
-    void add (unsigned char flag, const char *str, option* op = 0);
-
+    void add (unsigned char flag, const char* str, option* op);
+    
     /**
      * Parse the command line arguments using the defined options. Any
      * arguments that had no option associated are added to the free
@@ -400,7 +398,7 @@ public:
      */
     iterator begin ()
     {
-	return m_free.begin ();
+	return _free.begin ();
     }
 
     /**
@@ -408,7 +406,7 @@ public:
      */
     const_iterator begin () const
     {
-	return m_free.begin ();
+	return _free.begin ();
     }
 
     /**
@@ -416,7 +414,7 @@ public:
      */
     iterator end ()
     {
-	return m_free.end ();
+	return _free.end ();
     }
 
     /**
@@ -424,7 +422,7 @@ public:
      */
     const_iterator end () const
     {
-	return m_free.end ();
+	return _free.end ();
     }
 
     /**
@@ -432,7 +430,7 @@ public:
      */
     size_t free_args () const
     {
-	return m_free.size ();
+	return _free.size ();
     }
 
     /**
@@ -440,46 +438,28 @@ public:
      */
     bool has_free_args () const
     {
-	return !m_free.empty ();
+	return !_free.empty ();
     }
 
 private:
-    typedef ptr_iterator<std::list <option*>::iterator> option_iterator;
-    
-    static const unsigned char NULL_FLAG = '\0';
-    std::list <option*> m_short[256];
-    std::map <const char*, std::list <option*>, detail::ltstr> m_long;
-    std::list <option*> m_all;
-    std::list <const char *> m_free;
+    typedef ptr_iterator<std::list<option*>::iterator> option_iterator;
+    typedef std::list<option*> option_list;
+    typedef std::list<std::unique_ptr<option>> unique_option_list;
+    typedef std::map <const char*, option_list, detail::ltstr>
+    option_map;
 
-    enum arg_type
-    {
-	arg_short,
-	arg_long,
-	arg_free
-    };
+    static const unsigned char null_flag = '\0';
+    
+    option_list              _short [256];
+    option_map               _long;
+    unique_option_list       _all;
+    std::list <const char *> _free;
 
     const char** parse_short (const char** argv, const char** argv_end);
-    const char** parse_long (const char** argv, const char** argv_end);
-    
-    arg_type get_type (const char *arg)
-    {
-	if (arg[0] == '-') {
-	    if (arg[1] == '-')
-		return arg_long;
-	    else
-		return arg_short;
-	}
-	
-	return arg_free;
-    }
-    
-    bool is_free (const char *arg)
-    {
-	return arg [0] != '-';
-    }
+    const char** parse_long (const char** argv, const char** argv_end);    
 };
 
+} /* namespace base */
 } /* namespace psynth */
 
 #endif /* PSYNTH_ARGPARSER_H */

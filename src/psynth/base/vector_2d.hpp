@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2009-04-27 16:52:45 raskolnikov>
+ *  Time-stamp:  <2010-10-17 20:18:35 raskolnikov>
  *
  *  @file        vector_2d.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -34,6 +34,8 @@
 #include <iostream>
 
 namespace psynth
+{
+namespace base
 {
 
 /**
@@ -126,7 +128,8 @@ public:
  * operator of the @a T type stored in the vector.
  */
 template<class T>
-std::ostream& operator<< (std::ostream& os, const psynth::vector_2d<T> v)
+std::ostream& operator<< (std::ostream& os,
+			  const psynth::base::vector_2d<T> v)
 {
     os << v.x << " " << v.y;
     return os;
@@ -137,6 +140,7 @@ std::ostream& operator<< (std::ostream& os, const psynth::vector_2d<T> v)
  */
 typedef vector_2d<float> vector_2f;
 
+} /* namespace base */
 } /* namespace psynth */
 
 #endif /* PSYNTH_VECTOR2D */

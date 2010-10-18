@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2009-04-27 16:41:19 raskolnikov>
+ *  Time-stamp:  <2010-10-17 19:57:19 raskolnikov>
  *
  *  @file        logger.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -35,11 +35,14 @@ using namespace std;
 
 namespace psynth
 {
+namespace base
+{
 
 log::~log()
 {
     for (list<log_sink*>::iterator it = m_dumpers.begin();
-	 it != m_dumpers.end(); ++it) {
+	 it != m_dumpers.end(); ++it)
+    {
 	delete *it;
     }
 }
@@ -47,7 +50,8 @@ log::~log()
 void log::operator () (log& l, int level, const string& msg)
 {
     for (list<log_sink*>::iterator it = m_dumpers.begin();
-	 it != m_dumpers.end(); ++it) {
+	 it != m_dumpers.end(); ++it)
+    {
 	(*it)->dump (l, level, msg);
     }
 
@@ -55,5 +59,6 @@ void log::operator () (log& l, int level, const string& msg)
 	get_parent ()->operator () (l, level, msg);
 }
 
+} /* namespace base */
 } /* namespace psynth */
 

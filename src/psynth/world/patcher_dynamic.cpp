@@ -42,6 +42,7 @@
 #include "node/node_double_sampler.hpp"
 
 using namespace std;
+using namespace psynth::base;
 
 namespace psynth
 {

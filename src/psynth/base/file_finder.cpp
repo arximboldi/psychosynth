@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2009-04-27 16:48:10 raskolnikov>
+ *  Time-stamp:  <2010-10-17 19:53:24 raskolnikov>
  *
  *  @file        file_finder.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -37,6 +37,8 @@ using namespace std;
 namespace bf = boost::filesystem;
 
 namespace psynth
+{
+namespace base
 {
 
 bf::path file_finder::find_in (const bf::path& dir_path, const bf::path& file) const
@@ -135,5 +137,6 @@ bf::path file_finder::find (const bf::path& file) const
     return bf::path ();
 }
 
+} /* namespace base */
 } /* namespace psynth */
 

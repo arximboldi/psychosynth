@@ -50,7 +50,7 @@ class psychosynth_3d : public psynth::psynth_app,
     psychosynth_3d ();
     ~psychosynth_3d ();
 
-    void prepare (psynth::arg_parser& args);
+    void prepare (psynth::base::arg_parser& args);
     int execute ();
        	
     bool frameStarted(const Ogre::FrameEvent& evt);
@@ -73,19 +73,19 @@ private:
     element_manager*    m_elemmgr;
     window_list*        m_windowlist;
     camera_controller*  m_camctrl;
-    psynth::timer m_timer;
+    psynth::base::timer m_timer;
 
 #ifdef PSYNTH_HAVE_OSC
     psynth::osc_client* m_oscclient;
     psynth::osc_server* m_oscserver;
 #endif
     
-    bool m_must_quit;
-    int m_curr_width;
-    int m_curr_height;
+    bool   m_must_quit;
+    size_t m_curr_width;
+    size_t m_curr_height;
     
-    void setup_settings (psynth::conf_node& conf);
-    void setup_ogre (psynth::conf_node& conf);
+    void setup_settings (psynth::base::conf_node& conf);
+    void setup_ogre (psynth::base::conf_node& conf);
     void setup_input ();
     void setup_gui ();
 #ifdef PSYNTH_HAVE_OSC
@@ -106,8 +106,8 @@ private:
     void print_help ();
     void print_version ();
 
-    void on_config_change (psynth::conf_node& conf);
-    void on_fps_change (psynth::conf_node& conf);
+    void on_config_change (psynth::base::conf_node& conf);
+    void on_fps_change (psynth::base::conf_node& conf);
 };
 
 #endif /* PSYCHOSYNTH3D_H */

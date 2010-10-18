@@ -37,6 +37,7 @@
 using namespace std;
 using namespace Ogre;
 using namespace psynth;
+using namespace psynth::base;
 
 elem_toggler_component::elem_toggler_component(int param_num,
 					   int param_first,
@@ -56,7 +57,6 @@ elem_toggler_component::~elem_toggler_component()
 void elem_toggler_component::create_toggles ()
 {
     int num_toggles;
-    int values;
     float angle_width;
     float curr_angle;
     Toggle tog;
@@ -90,8 +90,7 @@ void elem_toggler_component::create_toggles ()
 
 void elem_toggler_component::destroy_toggles ()
 {
-    int i;
-    for (i = 0; i < m_toggles.size(); ++i) {
+    for (size_t i = 0; i < m_toggles.size(); ++i) {
 	get_scene_node()->detachObject(m_toggles[i].first);
 	delete m_toggles[i].first;
 	m_toggles[i].first = 0;
@@ -139,8 +138,8 @@ void elem_toggler_component::handle_param_change (world_node& obj, int param_id)
     if (param_id == m_param_num) {
 	destroy_toggles ();
 	create_toggles ();
-    } else if (param_id >= m_param_first &&
-	       param_id <= m_param_first + m_toggles.size()) {
+    } else if (param_id >= (int) m_param_first &&
+	       param_id <= m_param_first + (int) m_toggles.size()) {
 	int index = param_id - m_param_first;
 	
 	obj.get_param(param_id, m_toggles[index].second);

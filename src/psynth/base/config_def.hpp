@@ -1,15 +1,15 @@
 /**
- *  Time-stamp:  <2010-10-17 19:48:11 raskolnikov>
+ *  Time-stamp:  <2010-10-18 15:36:21 raskolnikov>
  *
- *  @file        exception.cpp
- *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
- *  @date        2009
+ *  @file        config_def.hpp
+ *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
+ *  @date        Mon Oct 18 15:21:32 2010
  *
- *  Exception handling system implementation.
+ *  Forward declarations for the config module.
  */
 
 /*
- *  Copyright (C) 2009 Juan Pedro Bolívar Puente
+ *  Copyright (C) 2010 Juan Pedro Bolivar Puente
  *
  *  This file is part of Psychosynth.
  *   
@@ -28,33 +28,22 @@
  *
  */
 
-#include "base/exception.hpp"
-#include "base/logger.hpp"
+#include <psynth/base/declare.hpp>
+
+#ifndef PSYNTH_CONFIG_DEF_H_
+#define PSYNTH_CONFIG_DEF_H_
 
 namespace psynth
 {
 namespace base
 {
 
-PSYNTH_DEFINE_ERROR_WHERE (base_error,   "base");
-PSYNTH_DEFINE_ERROR_WHERE (psynth_error, "psynth");
-
-error::error (const std::string& where, const std::string& what) throw ()
-    : m_what (what)
-    , m_where (where)
-{
-}
-
-std::string error::default_error ()
-{
-    return "unknown message";
-}
-
-void error::log () const
-{
-    logger::self  () (m_where, log::error, m_what);
-}
+PSYNTH_DECLARE_SHARED_TYPE (conf_backend)
+PSYNTH_DECLARE_TYPE (conf_node)
+PSYNTH_DECLARE_TYPE (config)
 
 } /* namespace base */
 } /* namespace psynth */
+
+#endif /* PSYNTH_CONFIG_DEF_H_ */
 

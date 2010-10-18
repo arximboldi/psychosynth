@@ -30,7 +30,8 @@
 class output_conf_window
 {
 public:
-    virtual CEGUI::Window* create_window (psynth::conf_node& node) = 0;
+    virtual CEGUI::Window* create_window (
+	psynth::base::conf_node& node) = 0;
     virtual void apply() = 0;
 };
 
@@ -39,14 +40,14 @@ class output_conf_window_simple : public output_conf_window
     std::string m_conf_path;
     std::string m_name;
     CEGUI::Editbox* m_value;
-    psynth::conf_node* m_node;
+    psynth::base::conf_node* m_node;
     
 public:
     output_conf_window_simple (const std::string& cp,
 			      const std::string& name) :
 	m_conf_path(cp), m_name(name) {}
 
-    CEGUI::Window* create_window(psynth::conf_node& node);
+    CEGUI::Window* create_window(psynth::base::conf_node& node);
 
     void apply () {
 	m_node->get_path(m_conf_path).set<std::string>(m_value->getText().c_str ());
@@ -106,7 +107,7 @@ class path_conf_window : public toggable_window
     CEGUI::ItemListbox* m_listbox;
     CEGUI::Editbox* m_editbox;
     
-    psynth::conf_node& m_conf;
+    psynth::base::conf_node& m_conf;
     
     bool on_generic (const CEGUI::EventArgs &e);
     bool on_delete (const CEGUI::EventArgs &e);
@@ -118,7 +119,7 @@ class path_conf_window : public toggable_window
     CEGUI::FrameWindow* create_window ();
     
 public:
-    path_conf_window (psynth::conf_node& conf_node) :
+    path_conf_window (psynth::base::conf_node& conf_node) :
 	m_conf (conf_node)
 	{}  
 };
@@ -134,8 +135,8 @@ class conf_window : public toggable_window
     output_conf_window* m_out_win;
     CEGUI::Window* m_out_cegui_win;
     
-    psynth::conf_node& m_gui_conf;
-    psynth::conf_node& m_psynth_conf;
+    psynth::base::conf_node& m_gui_conf;
+    psynth::base::conf_node& m_psynth_conf;
     
     
     /* Video options */
@@ -169,8 +170,8 @@ class conf_window : public toggable_window
     }
     
 public:
-    conf_window (psynth::conf_node& gui_conf,
-		 psynth::conf_node& psynth_conf);
+    conf_window (psynth::base::conf_node& gui_conf,
+		 psynth::base::conf_node& psynth_conf);
 
     ~conf_window ();
     

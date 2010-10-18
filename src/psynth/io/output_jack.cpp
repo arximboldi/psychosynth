@@ -27,6 +27,7 @@
 #include "io/output_jack.hpp"
 
 using namespace std;
+using namespace psynth::base;
 
 namespace psynth
 {

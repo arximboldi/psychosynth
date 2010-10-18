@@ -37,6 +37,8 @@
 #include <iostream>
 
 using namespace std;
+using namespace psynth::base;
+
 namespace psynth
 {
 

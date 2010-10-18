@@ -78,8 +78,8 @@ int node_delay::do_update_channel (int chan)
     envelope_simple in_env = get_in_envelope (LINK_AUDIO, IN_A_INPUT);
     
     float delay, the_delay;
-    int i;
-    int pos = m_pos;
+    size_t i;
+    int   pos = m_pos;
     float prev, next, frac;
     float delayed_sample;
     float in_val;
@@ -126,7 +126,7 @@ void node_delay::do_update (const node* caller,
     
     int new_pos = m_pos;
  
-    for (int i = 0; i < get_info().num_channels; ++i)
+    for (size_t i = 0; i < get_info().num_channels; ++i)
 	new_pos = do_update_channel (i);
     
     m_pos = new_pos;

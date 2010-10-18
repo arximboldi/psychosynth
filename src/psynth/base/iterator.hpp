@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2009-04-27 16:54:08 raskolnikov>
+ *  Time-stamp:  <2010-10-18 17:06:11 raskolnikov>
  *
  *  @file        iterator.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -38,6 +38,12 @@
 
 namespace psynth
 {
+namespace base
+{
+
+/**
+ * @todo take_pointer substituted by new traits?
+ */
 
 template <typename T>
 struct take_pointer
@@ -63,9 +69,20 @@ struct take_pointer<mgr_auto_ptr<T> >
     typedef T type;
 };
 
-
 template <typename T>
 struct take_pointer<null_ptr<T> >
+{
+    typedef T type;
+};
+
+template <typename T>
+struct take_pointer<std::shared_ptr<T> >
+{
+    typedef T type;
+};
+
+template <typename T>
+struct take_pointer<std::unique_ptr<T> >
 {
     typedef T type;
 };
@@ -111,7 +128,7 @@ public:
     /**
      * Indirection operator, returns a pointer to the referred value const value.
      */
-    value_type* operator->() const
+    typename Iterator::value_type operator->() const
     {
 	return Iterator::operator* ();
     }
@@ -269,8 +286,7 @@ public:
     /** Copy constructor. */
     map_const_iterator (const map_const_iterator<Key, Data>& i)
 	: std::map<Key, Data>::const_iterator (
-	    static_cast<const typename std::map<Key, Data>::const_iterator>(i)
-	    )
+	    static_cast<const typename std::map<Key, Data>::const_iterator>(i))
     {}
 
     /**
@@ -291,6 +307,7 @@ public:
     }
 };
 
+} /* namespace base */
 } /* namespace psynth */
 
 #endif /* PSYNTH_ITERATOR_H */

@@ -138,7 +138,6 @@ bool camera_controller_default::mouseMoved (const OIS::MouseEvent& e)
     }
 	
     if (m_mousecenter) {
-	const Vector3* corners = m_camera->getWorldSpaceCorners();
 	// Real h = (corners[0] - corners[3]).length();
 	Real min_dist = 1;//h/Math::Tan(m_yangle);
 	m_dist += 25.0 * Real(e.state.Y.rel) / m_camera->getViewport()->getActualHeight();
@@ -150,8 +149,6 @@ bool camera_controller_default::mouseMoved (const OIS::MouseEvent& e)
     }
 	
     if (e.state.Z.rel != 0) {
-	const Vector3* corners = m_camera->getWorldSpaceCorners();
-	Real h = (corners[0] - corners[3]).length();
 	Real min_dist = 1;//h/Math::Tan(m_yangle);
 	m_dist += e.state.Z.rel * 0.01;
 	if (m_dist < min_dist)
@@ -166,7 +163,7 @@ bool camera_controller_default::mousePressed (const OIS::MouseEvent &e, OIS::Mou
 {
     Vector3 table_pos;
     const Vector3* corners;
-    Real h, min_dist;
+    Real min_dist;
 	
     switch(id) {
     case OIS::MB_Left:

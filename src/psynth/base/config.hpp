@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-08-23 11:41:54 raskolnikov>
+ *  Time-stamp:  <2010-10-18 15:30:36 raskolnikov>
  *
  *  @file        config.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -43,10 +43,14 @@
 #include <psynth/base/exception.hpp>
 #include <psynth/base/observer.hpp>
 
+#include <psynth/base/config_def.hpp>
+
 namespace psynth
 {
+namespace base
+{
 
-PSYNTH_DECLARE_ERROR (base_error, config_error);
+PSYNTH_DECLARE_ERROR (base_error,   config_error);
 PSYNTH_DECLARE_ERROR (config_error, config_type_error);
 PSYNTH_DECLARE_ERROR (config_error, config_backend_error);
 
@@ -85,16 +89,17 @@ public:
 };
 
 /**
- * The base class of an observable configuration node.
+ * The psynth class of an observable configuration node.
  */
 class conf_subject : public subject_base <conf_listener>
 {
 public:
     typedef sigc::signal <void, conf_node&> signal;
-
+    //typedef psynth::base::signal <void, conf_node&> signal;
+    
     /** Event emitted whenever the node value is changed. */
     signal on_change;
-
+    
     /**
      * Generic event to notify changes on the node subchilds.
      * It should be emitted by the user with the nudge () method.
@@ -122,7 +127,7 @@ public:
  * A backend for a config system. It implements the actual phisical storing of
  * the data.
  */
-class conf_backend
+class conf_backend : public conf_listener
 {
 public:
     /** Virtual destructor */
@@ -178,26 +183,13 @@ class conf_node : public conf_subject,
 		  public PSYNTH_DEFAULT_THREADING <conf_node>
 {
 public:
-    /** Constructor */
-    conf_node ()
-	: m_backend (0)
-    {}
-    
-    /** Destructor. */
-    ~conf_node ()
-    {
-	if (!get_parent () ||
-	    get_parent ()->m_backend != m_backend)
-	    delete m_backend;
-    }
-
     /**
      * Returns the type of the node.
      */
     const std::type_info& type () const
     {
 	lock lock (this);
-	return m_element.type ();
+	return _element.type ();
     }
 
     /**
@@ -206,7 +198,7 @@ public:
     bool empty () const
     {
 	lock lock (this);
-	return m_element.empty ();
+	return _element.empty ();
     }
 
     /**
@@ -226,7 +218,7 @@ public:
     void set (const T& val)
     {
 	lock lock (this);
-	m_element = val;
+	_element = val;
 	on_change (*this);
     }
 
@@ -254,10 +246,12 @@ public:
     template<class T>
     void get (T& data) const;
 
+    /**
+     * Gets the value of the node. Make sure that @a T matches the node type.
+     */
     template<class T>
     T get () const;
     
-  
     /**
      * Permanently stores this node hierarchy using the attached backend.
      */
@@ -279,7 +273,7 @@ public:
      * attached it is datached.
      * @param backend The backend to attach.
      */
-    void attach_backend (conf_backend* backend);
+    void attach_backend (conf_backend_ptr backend);
 
     /**
      * Dataches the currently attached backend to the node.
@@ -287,26 +281,26 @@ public:
     void datach_backend ();
     
 private:
-    boost::any m_element;
-    conf_backend* m_backend;
+    boost::any       _element;
+    conf_backend_ptr _backend;
 
     void on_init ()
     {
-	m_backend = 0;
+	_backend.reset ();
 	if (get_parent ())
-	    m_backend = get_parent ()->m_backend;
+	    _backend = get_parent ()->_backend;
     }
 
     void on_uninit ()
     {
-	m_backend = 0;
+	_backend.reset ();
     }
 };
 
 /**
  * Singleton @c conf_node to store the global config.
  */
-typedef singleton_holder <conf_node> config;
+struct config : public singleton_holder <conf_node> {};
 
 template<class T>
 void conf_node::get (T& data) const
@@ -314,7 +308,7 @@ void conf_node::get (T& data) const
     lock lock (this);
     
     try {
-	data = boost::any_cast<T> (m_element);
+	data = boost::any_cast<T> (_element);
     } catch (boost::bad_any_cast&) {
 	throw config_type_error ();
     }
@@ -324,21 +318,25 @@ template<class T>
 T conf_node::get () const
 {
     lock lock (this);
+    T ret;
     
     try {
-	return boost::any_cast<T> (m_element);
+	ret = boost::any_cast<T> (_element);
     } catch (boost::bad_any_cast&) {
 	throw config_type_error ();
     }
+
+    return ret;
 }
+
 
 template<class T>
 void conf_node::def (const T& val)
 {
     lock lock (this);
     
-    if (m_element.empty ()) {
-	m_element = val;
+    if (_element.empty ()) {
+	_element = val;
 	on_change (*this);
     }
 }
@@ -348,12 +346,13 @@ void conf_node::set (const T& val, bool overwrite)
 {
     lock lock (this);
     
-    if (overwrite || m_element.empty ()) {
-	m_element = val;
+    if (overwrite || _element.empty ()) {
+	_element = val;
 	on_change (*this);
     }
 }
 
+} /* namespace base */
 } /* namespace psynth */
 
 #endif /* PSYNTH_CONFIG_H */

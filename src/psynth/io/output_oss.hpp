@@ -35,8 +35,8 @@ class output_oss : public output
     int m_fd;
     int m_format;
     int m_stereo;
-  int m_fragments;
-  int m_fragmentsize;
+    int m_fragments;
+    int m_fragmentsize;
     short int* m_buf;
     std::string m_device;
 	

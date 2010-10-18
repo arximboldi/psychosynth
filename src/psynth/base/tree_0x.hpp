@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-10-18 17:51:45 raskolnikov>
+ *  Time-stamp:  <2010-10-18 17:30:30 raskolnikov>
  *
  *  @file        tree.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -7,9 +7,6 @@
  *
  *  A generic way of building composite objects. Interface.
  *  This file is part of the Psychosynth project.
- *
- *  @todo Implement using unique_ptr when GCC supports it for map
- *  containers. Initial implementation in tree_0x.*
  */
 
 /*
@@ -34,6 +31,7 @@
 #define PSYNTH_TREE_H
 
 #include <map>
+#include <unordered_map>
 #include <typeinfo>
 
 #include <psynth/base/iterator.hpp>
@@ -70,7 +68,7 @@ struct tree_node_traits<std::string>
 /**
  * Exception for this type.
  */
-PSYNTH_DECLARE_ERROR (base_error, tree_node_error);
+PSYNTH_DECLARE_ERROR(base_error, tree_node_error);
 
 /**
  * A tree node. This class in intended to be used by inheriting from it,
@@ -105,12 +103,12 @@ public:
     /**
      * Iterator to check the childs of this node.
      */
-    typedef ptr_iterator<map_iterator<Key, null_ptr<Node> > > iterator;
+    typedef ptr_iterator<map_iterator<Key, std::unique_ptr<Node> > > iterator;
 
     /**
      * Iterator to check the childs of this node, const version.
      */
-    typedef ptr_const_iterator<map_const_iterator<Key, null_ptr<Node> > >
+    typedef ptr_const_iterator<map_const_iterator<Key, std::unique_ptr<Node>>>
     const_iterator;
 
     /**
@@ -120,7 +118,7 @@ public:
     
     /** Constuctor. */
     tree_node () :
-	m_parent(NULL), m_isinit(false)
+	_parent(NULL), _isinit(false)
     {
     };
 
@@ -133,7 +131,7 @@ public:
      */
     iterator begin ()
     {
-	return m_childs.begin();
+	return _childs.begin();
     }
 
     /**
@@ -142,7 +140,7 @@ public:
      */
     const_iterator begin () const
     {
-	return m_childs.begin ();
+	return _childs.begin ();
     }
     
     /**
@@ -151,7 +149,7 @@ public:
      */
     iterator end ()
     {
-	return m_childs.end ();
+	return _childs.end ();
     }
 
     /**
@@ -160,7 +158,7 @@ public:
      */
     const_iterator end () const
     {
-	return m_childs.end ();
+	return _childs.end ();
     }
     
     /**
@@ -170,7 +168,7 @@ public:
     const Node* get_parent () const
     {
 	tree_lock lock (this);
-	return m_parent;
+	return _parent;
     }
 
     /**
@@ -180,7 +178,7 @@ public:
     Node* get_parent ()
     {
 	tree_lock lock (this);
-	return m_parent;
+	return _parent;
     }
     
     /**
@@ -189,7 +187,7 @@ public:
     const Key& get_name () const
     {
 	tree_lock lock (this);
-	return m_name;
+	return _name;
     }
    
     /**
@@ -199,7 +197,7 @@ public:
     iterator find_child (const Key& name)
     {
 	tree_lock lock (this);
-	return m_childs.find (name);
+	return _childs.find (name);
     }
  
     /**
@@ -209,7 +207,7 @@ public:
     const_iterator find_child (const Key& name) const
     {
 	tree_lock lock (this);
-	return m_childs.find (name);
+	return _childs.find (name);
     }
 
     /**
@@ -222,7 +220,7 @@ public:
     Node& detach (const Key& name)
     {
 	tree_lock lock (this);
-	return detach (m_childs.find (name));
+	return detach (_childs.find (name));
     }
 
     /**
@@ -232,7 +230,7 @@ public:
     iterator remove_child (const Key& name)
     {
 	tree_lock lock (this);
-	return remove_child (m_childs.find (name));
+	return remove_child (_childs.find (name));
     }
 
     /**
@@ -320,10 +318,12 @@ protected:
     virtual void on_uninit () {}
     
 private:
-    std::map<Key, null_ptr<Node> > m_childs;
-    Node* m_parent;
-    Key m_name;
-    bool m_isinit;
+    typedef std::map<Key, std::unique_ptr<Node>> child_map;
+
+    child_map   _childs;
+    Node*       _parent;
+    Key         _name;
+    bool        _isinit;
 
     template <typename InputIterator>
     static void find_base (InputIterator& base_b, InputIterator& base_e);
@@ -343,23 +343,23 @@ private:
 
     bool is_init() const
     {
-	return m_isinit;
+	return _isinit;
     }
 
     void init (const Key& name, Node* parent)
     {
-	m_isinit = true;
-	m_name = name;
-	m_parent = parent;
+	_isinit = true;
+	_name = name;
+	_parent = parent;
 	on_init ();
     }
 
     void uninit ()
     {
-	if (m_isinit) {
-	    m_isinit = false;
-	    m_name = Key ();
-	    m_parent = 0;
+	if (_isinit) {
+	    _isinit = false;
+	    _name = Key ();
+	    _parent = 0;
 	    on_uninit ();
 	}
     }

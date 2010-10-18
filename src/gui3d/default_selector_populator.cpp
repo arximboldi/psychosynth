@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2009-04-29 09:33:41 raskolnikov>
+ *  Time-stamp:  <2010-10-18 02:50:35 raskolnikov>
  *
  *  @file        default_selector_populator.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -46,10 +46,11 @@
 #include "gui3d/selector_window.hpp"
 #include "gui3d/default_selector_populator.hpp"
 
-using namespace psynth;
 using namespace std;
+using namespace psynth;
+using namespace psynth::base;
 
-void default_selector_populator::on_samples_conf_nudge (psynth::conf_node& conf)
+void default_selector_populator::on_samples_conf_nudge (psynth::base::conf_node& conf)
 {
     selector_window::category* cat = m_selector->find_category ("Samples");
 
@@ -65,7 +66,7 @@ void default_selector_populator::populate_samples (selector_window::category* ca
     
     creat.set_name ("sampler");
     
-    file_mgr_node::path_list files;
+    base::file_mgr_node::path_list files;
     list<string> valid_ext;
 
 #ifdef PSYNTH_HAVE_PCM
@@ -77,7 +78,7 @@ void default_selector_populator::populate_samples (selector_window::category* ca
     valid_ext.push_back (".ogg");
 #endif
     
-    file_manager::self  ()
+    base::file_manager::self  ()
 	.get_path ("psychosynth.samples")
 	.find_if (make_has_extension (valid_ext.begin(), valid_ext.end()), files);
 

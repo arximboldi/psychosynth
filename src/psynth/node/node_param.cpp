@@ -26,6 +26,7 @@
 #include "base/vector_2d.hpp"
 
 using namespace std;
+using namespace psynth::base;
 
 namespace psynth
 {

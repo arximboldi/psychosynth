@@ -79,7 +79,7 @@ void node_double_sampler::on_file_one_change (node_param& par)
     boost::filesystem::path path;
     
     par.get (val);
-    path = file_manager::self ().get_path("psychosynth.samples").find (val);
+    path = base::file_manager::self ().get_path("psychosynth.samples").find (val);
 
     cout << path << endl;
     
@@ -103,8 +103,8 @@ void node_double_sampler::on_file_two_change (node_param& par)
     boost::filesystem::path path;
     
     par.get (val);
-    path = file_manager::self ().get_path("psychosynth.samples").find (val);
-
+    path = base::file_manager::self ().get_path("psynth.samples").find (val);
+    
     cout << path << endl;
     
     m_update_mutex.lock();
@@ -194,7 +194,6 @@ void node_double_sampler::read (audio_buffer& buf, int start, int end)
     const sample_buffer* blend = get_input<sample_buffer> (node::LINK_CONTROL, IN_C_BLEND);
     const sample* blend_buf = blend ? blend->get_data() : 0;
 
-    size_t start2 = start;
     size_t must_read;
     size_t nread;
     size_t tbeg, tend;
@@ -227,8 +226,8 @@ void node_double_sampler::read (audio_buffer& buf, int start, int end)
 	if (nread) {
 	    must_read -= nread;
 	    tend += nread;
-	    for (int i = 0; i < buf.get_info().num_channels; ++i) {
-		for (int j = tbeg; j < tend; j++) {
+	    for (size_t i = 0; i < buf.get_info().num_channels; ++i) {
+		for (size_t j = tbeg; j < tend; j++) {
 		    buf[i][j] +=
 			m_inbuf_two[i%m_inbuf_two.get_info().num_channels][j-tbeg]
 			* (1 - m_param_blend *

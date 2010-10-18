@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2009-04-27 17:00:59 raskolnikov>
+ *  Time-stamp:  <2010-10-17 20:06:47 raskolnikov>
  *
  *  @file        option_conf.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -37,6 +37,8 @@
 #include <psynth/base/config.hpp>
 
 namespace psynth
+{
+namespace base
 {
 
 /**
@@ -133,6 +135,7 @@ private:
     conf_node& m_node;
 };
 
+} /* namespace base */
 } /* namespace psynth */
 
 #endif /* PSYNTH_OPTION_CONF_H */

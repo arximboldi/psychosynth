@@ -27,6 +27,7 @@
 using namespace Ogre;
 using namespace std;
 using namespace psynth;
+using namespace psynth::base;
 
 const ColourValue WAVE_NORMAL_C_COLOUR = ColourValue(7.0, 0.7, 0.0, 0.6);
 const ColourValue WAVE_NORMAL_A_COLOUR = ColourValue(0.0, 0.7, 0.0, 0.6);

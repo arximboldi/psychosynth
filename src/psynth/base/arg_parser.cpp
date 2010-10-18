@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2009-04-27 16:34:18 raskolnikov>
+ *  Time-stamp:  <2010-10-18 16:11:41 raskolnikov>
  *
  *  @file        arg_parser.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -40,15 +40,40 @@ using namespace std;
 
 namespace psynth
 {
+namespace base
+{
 
 PSYNTH_DEFINE_ERROR_WHERE (arg_parser_error, "arg_parser")
 PSYNTH_DEFINE_ERROR_WHAT  (unknown_option_error, "Unknown option.")
 PSYNTH_DEFINE_ERROR_WHAT  (parse_option_error,   "Error while parsing option parameter.")
 
-arg_parser::~arg_parser ()
+namespace
 {
-    for (std::list <option*>::iterator i = m_all.begin (); i != m_all.end (); ++i)
-	delete *i;
+
+enum arg_type
+{
+    arg_short,
+    arg_long,
+    arg_free
+};
+
+arg_type get_type (const char *arg)
+{
+    if (arg[0] == '-') {
+	if (arg[1] == '-')
+	    return arg_long;
+	else
+	    return arg_short;
+    }
+	
+    return arg_free;
+}
+    
+bool is_free (const char *arg)
+{
+    return arg [0] != '-';
+}
+
 }
 
 void arg_parser::add (unsigned char flag, const char* str, option* op)
@@ -56,27 +81,27 @@ void arg_parser::add (unsigned char flag, const char* str, option* op)
     if (op == 0)
 	op = new option;
     
-    if (flag != NULL_FLAG)
-	m_short[flag].push_back (op);
+    if (flag != null_flag)
+	_short[flag].push_back (op);
 
     if (str != 0)
-	m_long[str].push_back (op);
+	_long[str].push_back (op);
 
-    m_all.push_back (op);
+    _all.push_back (std::unique_ptr<option> (op));
 }
 
 void arg_parser::parse (int argc, const char *argv[])
 {
     const char** argv_end = argv++ + argc;
     
-    m_free.clear ();
+    _free.clear ();
 
     try {
 	while (argv < argv_end) {
 	    switch (get_type (*argv))
 	    {
 	    case arg_free:
-		m_free.push_back (*argv++);
+		_free.push_back (*argv++);
 		break;
 
 	    case arg_short:
@@ -102,11 +127,11 @@ const char** arg_parser::parse_short (const char** argv, const char** argv_end)
     /* Several options can be grouped like '-xzvf' */
     for (const char *s = *argv + 1; *s != '\0'; ++s)
     {
-	option_iterator iter = m_short [(size_t) *s].begin ();
-	if (iter == m_short [(size_t) *s].end ())
+	option_iterator iter = _short [(size_t) *s].begin ();
+	if (iter == _short [(size_t) *s].end ())
 	    throw unknown_option_error (std::string ("Unknown option: ") + *s);
 	
-	for (; iter != m_short [(size_t) *s].end (); ++iter)
+	for (; iter != _short [(size_t) *s].end (); ++iter)
 	{
 	    if (argv_next >= argv_end ||
 		!iter->parse (*argv_next))
@@ -124,9 +149,9 @@ const char** arg_parser::parse_long (const char** argv, const char** argv_end)
     const char** argv_next = argv + 1;
 
     map <const char *, list <option*> >::iterator opt
-	= m_long.find (*argv + 2);
+	= _long.find (*argv + 2);
 
-    if (opt == m_long.end ())
+    if (opt == _long.end ())
 	throw unknown_option_error (std::string ("Unknown option: ") +
 				    (*argv + 2));
     
@@ -144,5 +169,6 @@ const char** arg_parser::parse_long (const char** argv, const char** argv_end)
     return argv_next;
 }
 
+} /* namespace base */
 } /* namespace psynth */
 

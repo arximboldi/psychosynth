@@ -2,7 +2,7 @@
  *  File:       singleton.hpp
  *  Author:     Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
  *  Date:       2007
- *  Time-stamp: <2009-04-08 20:35:31 raskolnikov>
+ *  Time-stamp: <2010-10-17 20:11:35 raskolnikov>
  *
  *  This file implements a policy-based generic singleton. It is a
  *  simplification (less policy implementations are provided) of
@@ -41,6 +41,8 @@
 #include <psynth/base/threads.hpp>
 
 namespace psynth
+{
+namespace base
 {
 
 /* Default parameters forward declaration. */
@@ -318,6 +320,7 @@ struct lifetime_no_destroy
     }
 };
 
+} /* namespace base */
 } /* namespace psynth */
 
 #include <psynth/base/singleton.tpp>

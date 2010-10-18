@@ -103,7 +103,7 @@ class element : public psynth::world_node_listener
     element_properties m_gui_prop;
 
     void node_moved (psynth::world_node& pos,
-		     psynth::vector_2f& dest);
+		     psynth::base::vector_2f& dest);
 
 public:
     static const Ogre::Real RADIOUS = 1.0f;

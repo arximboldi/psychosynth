@@ -33,7 +33,7 @@ void node_control_mixer::do_update (const node* caller,
 {
     sample_buffer* buf = get_output<sample_buffer >(LINK_CONTROL, OUT_C_OUTPUT);
     const sample_buffer* in = NULL;
-    int j;
+    size_t j;
     bool input = false;
     
     init (buf->get_data(), get_info().block_size);

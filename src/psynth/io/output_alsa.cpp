@@ -28,6 +28,7 @@
 #include "base/logger.hpp"
 
 using namespace std;
+using namespace psynth::base;
 
 namespace psynth
 {
@@ -38,8 +39,8 @@ output_alsa::output_alsa()
 
 output_alsa::output_alsa(const audio_info& info, const std::string& device)
     : output(info)
-    , alsa_device(device)
-    , m_buffersize (4096)
+    , alsa_device (device) //device)
+    , m_buffersize (128)
 {
 }
 
@@ -64,7 +65,7 @@ void output_alsa::run ()
 		logger::self () ("alsa", log::warning, "Unknown snd_pcm_avail_update() return value.");
 	} else {
 	    // cout << "processing " << nframes << endl; 
-	    process(get_info ().block_size); //get_info ().block_size);
+	    process(nframes); //get_info ().block_size);
 	}
     }
 }
@@ -100,10 +101,6 @@ bool output_alsa::open()
     unsigned int uirate = get_info ().sample_rate;
 	
     if (get_state () == NOTINIT) {
-	cout << "sample_rate " << get_info ().sample_rate << endl;
-	cout << "block_size " << get_info ().block_size << endl;
-	cout << "num_channels " << get_info ().num_channels << endl;
-	
 	if ((err = snd_pcm_open (&alsa_pcm, alsa_device.c_str(), SND_PCM_STREAM_PLAYBACK, 0)) < 0) {
 	    logger::self () ("alsa", log::warning,
 				string("Could not open device. (")
@@ -123,8 +120,7 @@ bool output_alsa::open()
 	snd_pcm_hw_params_set_channels (alsa_pcm, alsa_hwparams, get_info ().num_channels);
 
 	/* TODO optimize period size and all that stuff... */
-    snd_pcm_hw_params_set_buffer_size (alsa_pcm, alsa_hwparams, m_buffersize);
-
+	snd_pcm_hw_params_set_buffer_size (alsa_pcm, alsa_hwparams, m_buffersize);
 	snd_pcm_hw_params (alsa_pcm, alsa_hwparams);
 		
 	snd_pcm_sw_params_malloc (&alsa_swparams);

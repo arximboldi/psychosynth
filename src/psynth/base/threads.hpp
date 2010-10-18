@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-08-23 11:01:13 raskolnikov>
+ *  Time-stamp:  <2010-10-18 16:06:42 raskolnikov>
  *
  *  @file        threads.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -48,8 +48,10 @@
 
 #include <psynth/base/util.hpp>
 
-#define PSYNTH_DEFAULT_THREADING         psynth::default_object_lockable::type
-#define PSYNTH_DEFAULT_NONOBJ_THREADING  psynth::default_class_lockable::type
+#define PSYNTH_DEFAULT_THREADING         \
+    psynth::base::default_object_lockable::type
+#define PSYNTH_DEFAULT_NONOBJ_THREADING  \
+    psynth::base::default_class_lockable::type
 
 #ifndef PSYNTH_DEFAULT_MUTEX
 #include <boost/thread/recursive_mutex.hpp>
@@ -57,6 +59,8 @@
 #endif
 
 namespace psynth
+{
+namespace base
 {
 
 template <class T>
@@ -86,7 +90,7 @@ template <class T, class Mutex = PSYNTH_DEFAULT_MUTEX>
 class object_lockable : public lockable_base<T>
 {
 public:
-    class lock : public noncopyable
+    class lock : public boost::noncopyable
     {
     public:
 	lock (const object_lockable& host)
@@ -118,7 +122,7 @@ template <class T, class Mutex = PSYNTH_DEFAULT_MUTEX>
 class class_lockable : public lockable_base<T>
 {
 public:
-    class lock : public noncopyable
+    class lock : public boost::noncopyable
     {
     public:
 	lock ()
@@ -174,6 +178,7 @@ typedef
 tpl_bind_snd<class_lockable, PSYNTH_DEFAULT_MUTEX>
 default_class_lockable;
 
+} /* namespace base */
 } /* namespace psynth */
 
 #endif /* PSYNTH_THREADS_H_ */

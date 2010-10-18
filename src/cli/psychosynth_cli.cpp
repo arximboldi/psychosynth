@@ -66,7 +66,7 @@ void psychosynth_cli::print_version()
     
 }
 
-void psychosynth_cli::prepare (psynth::arg_parser& ap)
+void psychosynth_cli::prepare (psynth::base::arg_parser& ap)
 {
     init ();
     
@@ -104,7 +104,7 @@ void psychosynth_cli::init ()
 
 int psychosynth_cli::run_client ()
 {
-    timer timer;
+    base::timer timer;
     osc_client client;
     osc_client_logger logger;
     lo_address add;
@@ -136,7 +136,7 @@ int psychosynth_cli::run_client ()
 
 int psychosynth_cli::run_server ()
 {
-    timer timer;
+    base::timer timer;
     osc_server server;
     osc_server_logger logger;
     int ret_val = 0;

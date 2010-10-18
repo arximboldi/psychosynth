@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2009-04-08 18:10:46 raskolnikov>
+ *  Time-stamp:  <2010-10-18 15:37:49 raskolnikov>
  *
  *  @file        config.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -26,11 +26,13 @@
  *
  */
 
-#include "base/config.hpp"
+#include "config.hpp"
 
 using namespace std;
 
 namespace psynth
+{
+namespace base
 {
 
 PSYNTH_DEFINE_ERROR_WHERE (config_error, "config");
@@ -57,8 +59,8 @@ void conf_node::save ()
 {
     lock lock (this);
     
-    if (m_backend)
-	m_backend->save (*this);
+    if (_backend)
+	_backend->save (*this);
     else
 	throw config_backend_error ();
 }
@@ -67,8 +69,8 @@ void conf_node::load ()
 {
     lock lock (this);
     
-    if (m_backend)
-	m_backend->load (*this);
+    if (_backend)
+	_backend->load (*this);
     else
 	throw config_backend_error ();
 }
@@ -77,31 +79,32 @@ void conf_node::def_load ()
 {
     lock lock (this);
     
-    if (m_backend)
-	m_backend->def_load (*this);
+    if (_backend)
+	_backend->def_load (*this);
     else
 	throw config_backend_error ();
 }
 
-void conf_node::attach_backend (conf_backend* backend)
+void conf_node::attach_backend (conf_backend_ptr backend)
 {
     lock lock (this);
     
-    if (m_backend)
+    if (_backend)
 	datach_backend ();
-    m_backend = backend;
-    m_backend->attach (*this);
+    _backend = backend;
+    _backend->attach (*this);
 }
 
 void conf_node::datach_backend ()
 {
     lock lock (this);
     
-    if (m_backend) {
-	m_backend->datach (*this);
-	m_backend = NULL;
+    if (_backend) {
+	_backend->datach (*this);
+	_backend.reset ();
     } else
 	throw config_backend_error ();
 }
 
+} /* namespace base */
 } /* namespace psynth */

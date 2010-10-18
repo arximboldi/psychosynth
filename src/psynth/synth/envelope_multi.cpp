@@ -54,7 +54,7 @@ void envelope_multi_values::set_adsr (env_point a, env_point d, env_point s, env
  */
 float envelope_multi::update (float sample)
 {
-    float val;
+    float val = .0f;
 
     //cout << "factor: " << m_val->m_factor << endl;
     //cout << "prev m_time: " << m_time << endl; 

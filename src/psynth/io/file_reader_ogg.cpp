@@ -24,6 +24,7 @@
 #include "io/file_reader_ogg.hpp"
 
 using namespace std;
+using namespace psynth::base;
 
 namespace psynth
 {

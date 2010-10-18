@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2009-04-07 19:46:58 raskolnikov>
+ *  Time-stamp:  <2010-10-17 20:57:12 raskolnikov>
  *
  *  @file        task_manager.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -90,7 +90,7 @@ public:
 /**
  * @todo separate from singleton_holder
  */
-class task_manager : public psynth::singleton_holder<task_manager>
+class task_manager : public psynth::base::singleton_holder<task_manager>
 {
     typedef std::list<task*> task_list;
     typedef std::list<task*>::iterator task_iter;

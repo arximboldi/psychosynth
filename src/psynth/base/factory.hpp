@@ -1,12 +1,12 @@
 /**
- *  Time-stamp:  <2010-10-18 16:10:48 raskolnikov>
+ *  Time-stamp:  <2010-10-17 19:48:24 raskolnikov>
  *
- *  @file        util.hpp
+ *  @file        factory.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
- *  @date        Tue Apr  7 11:53:31 2009
+ *  @date        Fri May 22 12:50:06 2009
  *
- *  Small utilities, most of them with almost no compilation overhead.
- *  Some of them where before in misc.hpp
+ *  Utilitarios para la construcción de factorías.
+ *  @todo Aquí tal vez haya que generalizar algunas cosas...
  */
 
 /*
@@ -27,34 +27,51 @@
  *
  */
 
-#ifndef PSYNTH_UTIL_H_
-#define PSYNTH_UTIL_H_
-
-#include <boost/utility.hpp>
+#ifndef PSYNTH_FACTORY_H_
+#define PSYNTH_FACTORY_H_
 
 namespace psynth
 {
 namespace base
 {
 
-template <template <class, class> class F, typename Y>
-struct tpl_bind_snd
+template <class Base>
+class factory_functor_base
 {
-    template <class X>
-    struct type : public F<X, Y>
-    {};
+public:
+    virtual ~factory_functor_base () {};
+    virtual Base* operator () () = 0;    
 };
 
-template <template <class, class> class F, typename X>
-struct tpl_bind_fst
+template <class Base, class Concrete>
+class factory_functor : public factory_functor_base <Base>
 {
-    template <class Y>
-    struct type : public F<X, Y>
-    {};
+public:
+    Concrete* operator () ()
+    {
+	return new Concrete;
+    }
+};
+
+template <class Base>
+class factory_base
+{
+public:
+    virtual ~factory_base () {};
+    virtual Base* create () = 0;
+};
+
+template <class Base, class Concrete>
+class factory : public factory_base <Base>
+{
+public:
+    Concrete* create ()
+    {
+	return new Concrete;
+    }
 };
 
 } /* namespace base */
 } /* namespace psynth */
 
-
-#endif /* PSYNTH_UTIL_H_ */
+#endif /* PSYNTH_FACTORY_H_ */

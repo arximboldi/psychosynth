@@ -1,11 +1,11 @@
 /**
- *  Time-stamp:  <2009-05-24 18:16:49 raskolnikov>
+ *  Time-stamp:  <2010-10-17 19:45:42 raskolnikov>
  *
  *  @file        conf_backend_xml.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
  *  @date        2007
  *
- *  XML based configuration backend.
+ *  XML psynthd configuration backend.
  */
 
 /*
@@ -31,9 +31,9 @@
 #include <sstream>
 #include <boost/lexical_cast.hpp>
 
-#include "base/logger.hpp"
-#include "base/misc.hpp"
-#include "base/conf_backend_xml.hpp"
+#include "logger.hpp"
+#include "misc.hpp"
+#include "conf_backend_xml.hpp"
 
 using namespace boost;
 using namespace std;
@@ -86,6 +86,8 @@ private:
 
 namespace psynth
 {
+namespace base
+{
 
 PSYNTH_DEFINE_ERROR_WHERE (config_xml_error,      "xml")
 PSYNTH_DEFINE_ERROR_WHAT  (config_xml_type_error, "Wrong type.")
@@ -95,14 +97,13 @@ conf_node* conf_backend_xml::process_new_element (xmlTextReaderPtr reader,
 						  conf_node* node)
 {
     xmlChar* type;
-
-    /* Root test. Don't merge both if's because they change the "else semantics" */
+    
     if (xmlTextReaderDepth (reader) == 0)
     {
 	if ((node->get_name ().empty() &&
 	     xmlStrcmp (xmlTextReaderConstName(reader), xml_cast ("root"))) ||
-	    xmlStrcmp (xmlTextReaderConstName(reader),   
-		       xml_cast (node->get_name ().c_str()))) 
+	    (!node->get_name ().empty() &&
+	     xmlStrcmp (xmlTextReaderConstName(reader), xml_cast (node->get_name ().c_str()))))
 	    return 0;
     }
     else if (!xmlTextReaderIsEmptyElement(reader))
@@ -159,7 +160,7 @@ conf_node* conf_backend_xml::process_text (xmlTextReaderPtr reader,
 conf_node* conf_backend_xml::process (xmlTextReaderPtr reader,
 				      conf_node* node)
 {
-    switch(xmlTextReaderNodeType(reader))
+    switch (xmlTextReaderNodeType (reader))
     {
     case XML_READER_TYPE_ELEMENT:
 	return process_new_element (reader, node);
@@ -191,8 +192,8 @@ void conf_backend_xml::do_load (conf_node& node)
 				   ". The application might create it later.");
     
     cur_node = &node;
-	    
-    ret = xmlTextReaderRead(reader);
+	
+    ret = xmlTextReaderRead (reader);
     while (ret == 1 && cur_node != 0) {
 	cur_node = process (reader, cur_node);
 	ret = xmlTextReaderRead (reader);
@@ -289,5 +290,6 @@ void conf_backend_xml::save (conf_node& node)
 	throw config_xml_error ("Error while ending document.");
 }
 
+} /* namespace base */
 } /* namespace psynth */
 

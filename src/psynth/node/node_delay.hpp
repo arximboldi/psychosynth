@@ -67,8 +67,8 @@ public:
 private:
     float m_param_delay;
     float m_param_depth;
-    int m_max_delay_pos;
     int m_pos;
+    int m_max_delay_pos;
     
     audio_buffer m_buffer;
 

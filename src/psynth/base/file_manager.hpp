@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-08-23 11:01:22 raskolnikov>
+ *  Time-stamp:  <2010-10-18 16:06:52 raskolnikov>
  *
  *  @file        file_manager.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -37,6 +37,8 @@
 
 namespace psynth
 {
+namespace base
+{
 
 /**
  * @note This class is thread-safe.
@@ -47,7 +49,7 @@ namespace psynth
 class file_mgr_node : public file_finder,
 		      public tree_node <file_mgr_node>,
 		      public PSYNTH_DEFAULT_THREADING <file_mgr_node>,
-		      public noncopyable
+		      public boost::noncopyable
 {
     friend class tree_node <file_mgr_node>;
     
@@ -75,6 +77,7 @@ void file_mgr_node::find_if_all (StringPredicate pred,
 
 typedef singleton_holder<file_mgr_node> file_manager;
 
+} /* namespace base */
 } /* namespace psynth */
 
 #endif /* PSYNTH_FILEMANAGER_H */

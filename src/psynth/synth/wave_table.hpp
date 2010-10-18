@@ -78,7 +78,7 @@ public:
     }
     
     sample get (float x) const {
-	float  findex = (m_size - 1) * phase(x);
+	float  findex = (m_size - 1) * base::phase(x);
 	size_t index  = findex;
 	float alpha = findex - index;
 	

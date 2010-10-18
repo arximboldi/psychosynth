@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2009-04-27 16:42:50 raskolnikov>
+ *  Time-stamp:  <2010-10-17 20:41:21 raskolnikov>
  *
  *  @file        file_manager.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -36,6 +36,8 @@ namespace bf = boost::filesystem;
 
 namespace psynth
 {
+namespace base
+{
 
 bf::path file_mgr_node::find_all (const bf::path& file) const
 {
@@ -50,4 +52,5 @@ bf::path file_mgr_node::find_all (const bf::path& file) const
     return res;
 }
 
+} /* namespace base */
 } /* namespace psynth */

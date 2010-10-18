@@ -54,9 +54,6 @@ bool node_manager::add_node (mgr_ptr<node> obj, int id)
 	
 	m_outputs.push_back (out);
     }
-
-    if (obj.is_managed ())
-	std::cout << "macagonla\n";
     
     return true;
 }

@@ -39,7 +39,7 @@ private:
     
     void print_help ();
     void print_version ();
-    void prepare (psynth::arg_parser& arg_parser);
+    void prepare (psynth::base::arg_parser& arg_parser);
     void init ();
 
     int execute ();

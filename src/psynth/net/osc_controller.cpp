@@ -149,7 +149,7 @@ void osc_controller::handle_set_param_node(world_node& obj, int param_id)
 	    break;
 	}
 	case node_param::VECTOR2F: {
-	    vector_2f val;
+	    base::vector_2f val;
 	    obj.get_param(param_id, val);
 	    lo_message_add_float(msg, val.x);
 	    lo_message_add_float(msg, val.y);
@@ -262,7 +262,7 @@ int osc_controller::_param_cb(const char* path, const char* types,
 		break;
 	    case node_param::VECTOR2F:
 		m_world->set_param_node(obj, param_id,
-					vector_2f(argv[3]->f, argv[4]->f));
+					base::vector_2f(argv[3]->f, argv[4]->f));
 		break;
 	    default:
 		break;

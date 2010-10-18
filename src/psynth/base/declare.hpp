@@ -1,15 +1,15 @@
 /**
- *  Time-stamp:  <2010-10-17 19:48:11 raskolnikov>
+ *  Time-stamp:  <2010-10-18 15:25:45 raskolnikov>
  *
- *  @file        exception.cpp
- *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
- *  @date        2009
+ *  @file        declare.hpp
+ *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
+ *  @date        Mon Oct 18 15:11:23 2010
  *
- *  Exception handling system implementation.
+ *  Aiding in forward declaring types.
  */
 
 /*
- *  Copyright (C) 2009 Juan Pedro Bolívar Puente
+ *  Copyright (C) 2010 Juan Pedro Bolivar Puente
  *
  *  This file is part of Psychosynth.
  *   
@@ -28,33 +28,27 @@
  *
  */
 
-#include "base/exception.hpp"
-#include "base/logger.hpp"
+#include <memory>
 
 namespace psynth
 {
 namespace base
 {
 
-PSYNTH_DEFINE_ERROR_WHERE (base_error,   "base");
-PSYNTH_DEFINE_ERROR_WHERE (psynth_error, "psynth");
+#define PSYNTH_DECLARE_SHARED_POINTER(type_name)		\
+    typedef std::shared_ptr<type_name> type_name ## _ptr;	\
+    template <typename... Args>					\
+    type_name ## _ptr new_ ## type_name (Args && ... args)	\
+    {								\
+	return std::make_shared <type_name> (args ...);		\
+    }
 
-error::error (const std::string& where, const std::string& what) throw ()
-    : m_what (what)
-    , m_where (where)
-{
-}
+#define PSYNTH_DECLARE_TYPE(type_name)		\
+    struct type_name;
 
-std::string error::default_error ()
-{
-    return "unknown message";
-}
-
-void error::log () const
-{
-    logger::self  () (m_where, log::error, m_what);
-}
+#define PSYNTH_DECLARE_SHARED_TYPE(type_name)	\
+    PSYNTH_DECLARE_TYPE (type_name)		\
+    PSYNTH_DECLARE_SHARED_POINTER (type_name)
 
 } /* namespace base */
 } /* namespace psynth */
-

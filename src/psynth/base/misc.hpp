@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2009-04-27 16:49:16 raskolnikov>
+ *  Time-stamp:  <2010-10-17 20:09:36 raskolnikov>
  *
  *  @file        misc.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -35,6 +35,8 @@
 #include <string>
 
 namespace psynth
+{
+namespace base
 {
 
 /**
@@ -101,6 +103,7 @@ std::string dirname_str (std::string str);
  */
 const char* get_extension (const char* file);
 
+} /* namespace base */
 } /* namespace psynth */
 
 #endif /* PSYNTH_MISC_H */

@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2009-04-07 22:05:52 raskolnikov>
+ *  Time-stamp:  <2010-10-18 17:45:55 raskolnikov>
  *
  *  @file        exception.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -38,6 +38,8 @@
 #include <string>
 
 namespace psynth
+{
+namespace base
 {
 
 class exception : public std::exception
@@ -135,6 +137,7 @@ private:
 PSYNTH_DECLARE_ERROR (error, psynth_error);
 PSYNTH_DECLARE_ERROR (psynth_error, base_error);
 
+} /* namespace base */
 } /* namespace psynth */
 
 #endif /* PSYNTH_EXCEPTION_H_ */

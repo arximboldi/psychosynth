@@ -36,6 +36,7 @@
 #include "io/output_oss.hpp"
 
 using namespace std;
+using namespace psynth::base;
 
 namespace psynth
 {
@@ -47,10 +48,10 @@ output_oss::output_oss()
 
 output_oss::output_oss(const audio_info& info, const std::string& device)
     : output(info)
-    , m_buf(NULL)
-    , m_device(device)
     , m_fragments (4)
     , m_fragmentsize (4096)
+    , m_buf(NULL)
+    , m_device(device)
 {
 }
 

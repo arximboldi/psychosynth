@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2009-04-27 16:45:51 raskolnikov>
+ *  Time-stamp:  <2010-10-17 20:14:23 raskolnikov>
  *
  *  @file        type_traits.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -8,6 +8,8 @@
  *  Usefull traits to use when programming templates.
  *  Inspired by Loki's type traits but not as complete. Feel free
  *  to extend as needed.
+ *
+ *  @todo Needid in C++0x?
  */
 
 /*
@@ -35,6 +37,8 @@
 
 namespace psynth
 {
+namespace base
+{
 
 template<typename T>
 type_traits
@@ -58,6 +62,7 @@ struct take_pointer<T*>
     typename T type;
 };
 
+} /* namespace base */
 } /* namespace psynth */
 
 

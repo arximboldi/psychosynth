@@ -25,7 +25,7 @@
 using namespace std;
 using namespace CEGUI;
 
-void gui_log_sink::dump (psynth::log& l, int level, const string& msg)
+void gui_log_sink::dump (psynth::base::log& l, int level, const string& msg)
 {
     m_buffer += msg;
     m_buffer += "\n";

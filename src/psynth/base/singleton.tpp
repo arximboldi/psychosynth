@@ -1,5 +1,5 @@
 /**
- *  Time-stamp: <2009-04-07 22:08:55 raskolnikov>
+ *  Time-stamp: <2010-10-17 20:11:52 raskolnikov>
  *
  *  @file       singleton.tpp
  *  @author     Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -33,6 +33,8 @@
 #include <cassert>
 
 namespace psynth
+{
+namespace base
 {
 
 template <class T,
@@ -88,6 +90,7 @@ template <class T>
 bool lifetime_phoenix<T>::m_destroyed = false;
 #endif
 
+} /* namespace base */
 } /* namespace psynth */
 
 #endif /* PSYNTH_SINGLETON_T_ */

@@ -62,7 +62,7 @@ node_step_seq::node_step_seq(const audio_info& info) :
 	
     for (i = 0; i < MAX_STEPS; ++i) {
 	m_param_step[i] = DEFAULT_STEP;
-	add_param (string("step") + itoa(i, 10), node_param::INT, &m_param_step[i]);
+	add_param (string("step") + base::itoa(i, 10), node_param::INT, &m_param_step[i]);
     }
 
     set_output_stable_value (LINK_CONTROL, OUT_C_OUTPUT, 1.0f);
@@ -82,7 +82,7 @@ void node_step_seq::do_update (const node* caller,
     sample* output = outbuf->get_data();
     const sample_buffer* bpmbuf = get_input<sample_buffer> (LINK_CONTROL, IN_C_BPM);
     const sample* bpm = bpmbuf ? bpmbuf->get_data() : 0;
-    int i;
+    size_t i;
 
     update_envelope_values ();
     

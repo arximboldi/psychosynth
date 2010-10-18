@@ -39,8 +39,8 @@ protected:
     RingBufferType m_ring;
     BufferType m_buffer;
     int m_points;
-    float m_secs;
     float m_factor;
+    float m_secs;
     bool m_updated;
     boost::mutex m_mutex;
     
@@ -74,7 +74,7 @@ public:
 	    boost::mutex::scoped_lock lock (m_mutex);
 	    typename RingBufferType::read_ptr ptr = m_ring.begin();
 	    m_ring.read(ptr, m_buffer);
-	    bool m_updated = true;
+	    m_updated = true;
 	}
 	return m_buffer;
     }

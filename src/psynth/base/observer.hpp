@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2009-04-08 18:29:07 raskolnikov>
+ *  Time-stamp:  <2010-10-18 03:52:13 raskolnikov>
  *
  *  @file        observer.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -38,6 +38,17 @@
 
 namespace psynth
 {
+namespace base
+{
+
+#if 0
+/**
+ * @todo Use template aliases when they are availible.
+ * @note Even this implementation is not working now.
+ */
+template <typename ...Types>
+class signal : public sigc::signal <Types...> { };
+#endif
 
 /**
  * This should be the base of all listener types. This class
@@ -120,6 +131,7 @@ void subject_base<Listener>::remove_slot (Signal& sig,
     }
 }
 
+} /* namespace base */
 } /* namespace psynth */
 
 #endif /* PSYNTH_OBSERVER_H_ */

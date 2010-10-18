@@ -36,6 +36,7 @@
 using namespace std;
 using namespace Ogre;
 using namespace psynth;
+using namespace psynth::base;
 
 element::element (world_node& obj, Ogre::SceneManager* scene) :
     m_obj(obj),

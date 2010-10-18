@@ -82,7 +82,7 @@ void node_sampler::on_file_change (node_param& par)
     boost::filesystem::path path;
     
     par.get (val);
-    path = file_manager::self ().get_path("psychosynth.samples").find (val);
+    path = base::file_manager::self ().get_path("psychosynth.samples").find (val);
 
     cout << path << endl;
     
@@ -221,9 +221,7 @@ void node_sampler::read (audio_buffer& buf, int start, int end)
 	if (nread) {
 	    m_ctrl_pos += (float) nread / (factor * m_param_tempo);
 	    if (m_ctrl_pos >= get_info ().block_size)
-		m_ctrl_pos = phase(m_ctrl_pos) + ((int) m_ctrl_pos % get_info ().block_size);
-
-	    int old_availible = m_scaler.availible();
+		m_ctrl_pos = base::phase(m_ctrl_pos) + ((int) m_ctrl_pos % get_info ().block_size);
 
 	    sample inter_buffer[nread * m_inbuf.get_info().num_channels];
 	    m_inbuf.interleave(inter_buffer, nread);

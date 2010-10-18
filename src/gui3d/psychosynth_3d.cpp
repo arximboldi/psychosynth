@@ -60,8 +60,9 @@
 
 using namespace Ogre;
 using namespace std;
-using namespace psynth;
 
+using namespace psynth;
+using namespace psynth::base;
 
 psychosynth_3d::psychosynth_3d()
     : m_must_quit (0)
@@ -102,7 +103,7 @@ void psychosynth_3d::print_version ()
 
 }
 
-void psychosynth_3d::prepare (psynth::arg_parser& arg_parser)
+void psychosynth_3d::prepare (arg_parser& arg_parser)
 {
     conf_node& conf = config::self ().get_child ("psynth3d");
     
@@ -120,51 +121,51 @@ void psychosynth_3d::prepare (psynth::arg_parser& arg_parser)
 
 int psychosynth_3d::execute()
 {
-    logger::self () ("gui", psynth::log::info, "Loading settings.");
+    logger::self () ("gui", log::info, "Loading settings.");
      
     conf_node& conf = config::self ().get_child ("psynth3d");
     setup_settings (conf);
     
-    logger::self () ("gui", psynth::log::info, "Initializing Ogre.");
+    logger::self () ("gui", log::info, "Initializing Ogre.");
     setup_ogre (conf);
-    logger::self () ("gui", psynth::log::info, "Initializing OIS.");
+    logger::self () ("gui", log::info, "Initializing OIS.");
     setup_input ();
-    logger::self () ("gui", psynth::log::info, "Initializing synthesizer.");
+    logger::self () ("gui", log::info, "Initializing synthesizer.");
     setup_synth ();
 #ifdef PSYNTH_HAVE_OSC
-    logger::self () ("gui", psynth::log::info, "Initializing networking.");
+    logger::self () ("gui", log::info, "Initializing networking.");
     setup_net ();
 #endif
-    logger::self () ("gui", psynth::log::info, "Initializing scene.");
+    logger::self () ("gui", log::info, "Initializing scene.");
     setup_world ();
-    logger::self () ("gui", psynth::log::info, "Initializing CEGUI.");
+    logger::self () ("gui", log::info, "Initializing CEGUI.");
     setup_gui ();
-    logger::self () ("gui", psynth::log::info, "Initializing GUI elements.");
+    logger::self () ("gui", log::info, "Initializing GUI elements.");
     setup_menus ();
 		
     m_ogre->startRendering();
 
-    logger::self () ("gui", psynth::log::info, "Closing GUI elements.");
+    logger::self () ("gui", log::info, "Closing GUI elements.");
     close_menus ();
-    logger::self () ("gui", psynth::log::info, "Closing CEGUI.");
+    logger::self () ("gui", log::info, "Closing CEGUI.");
     close_gui ();
 #ifdef PSYNTH_HAVE_OSC
-    logger::self () ("gui", psynth::log::info, "Closing networking.");
+    logger::self () ("gui", log::info, "Closing networking.");
     close_net ();
 #endif
-    logger::self () ("gui", psynth::log::info, "Closing scene.");
+    logger::self () ("gui", log::info, "Closing scene.");
     close_world ();
-    logger::self () ("gui", psynth::log::info, "Closing synthesizer.");
+    logger::self () ("gui", log::info, "Closing synthesizer.");
     close_synth ();
-    logger::self () ("gui", psynth::log::info, "Closing OIS.");
+    logger::self () ("gui", log::info, "Closing OIS.");
     close_input ();
-    logger::self () ("gui", psynth::log::info, "Closing Ogre.");
+    logger::self () ("gui", log::info, "Closing Ogre.");
     close_ogre ();
 
-    logger::self () ("gui", psynth::log::info, "Storing settings.");
+    logger::self () ("gui", log::info, "Storing settings.");
     try {
 	conf.save();
-    } catch (psynth::exception& error) {
+    } catch (psynth::base::exception& error) {
 	error.log ();
     } catch (std::exception& error) {
 	logger::self () ("gui", log::error, error.what ());
@@ -215,12 +216,13 @@ void psychosynth_3d::setup_settings (conf_node& conf)
     try
     {
 #ifdef PSYNTH_HAVE_XML
-	conf.attach_backend (new conf_backend_xml
-			     ((get_config_path() / "psynth3d.xml").file_string ()));
+	conf.attach_backend (
+	    new_conf_backend_xml (
+		(get_config_path() / "psynth3d.xml").file_string ()));
 #endif
 	conf.def_load();
     }
-    catch (psynth::exception& error) {
+    catch (psynth::base::exception& error) {
 	error.log ();
     } catch (std::exception& error) {
 	logger::self () ("gui", log::error, error.what ());
@@ -239,7 +241,7 @@ void psychosynth_3d::setup_settings (conf_node& conf)
     
 }
 
-void psychosynth_3d::setup_ogre (psynth::conf_node& conf)
+void psychosynth_3d::setup_ogre (conf_node& conf)
 {
     int screen_width;
     int screen_height;
@@ -521,7 +523,7 @@ void psychosynth_3d::close_ogre ()
     delete m_ogre;
 }
 
-void psychosynth_3d::on_config_change (psynth::conf_node& conf)
+void psychosynth_3d::on_config_change (conf_node& conf)
 {
     int sc_width;
     int sc_height;
@@ -540,7 +542,7 @@ void psychosynth_3d::on_config_change (psynth::conf_node& conf)
     //m_ogre->reinitialise();
 }
 
-void psychosynth_3d::on_fps_change (psynth::conf_node& conf)
+void psychosynth_3d::on_fps_change (conf_node& conf)
 {
     int fps;
     

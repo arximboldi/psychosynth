@@ -24,6 +24,7 @@
 #include "io/output_wave.hpp"
 
 using namespace std;
+using namespace psynth::base;
 
 namespace psynth
 {

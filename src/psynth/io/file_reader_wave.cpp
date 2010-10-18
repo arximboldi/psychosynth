@@ -24,6 +24,7 @@
 #include "base/logger.hpp"
 
 using namespace std;
+using namespace psynth::base;
 
 namespace psynth
 {

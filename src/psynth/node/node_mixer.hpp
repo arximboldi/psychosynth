@@ -54,7 +54,7 @@ public:
 
 
 protected:
-    int m_numchan;
+    size_t m_numchan;
 
     void mix (sample* dest, const sample* src, size_t n_samples);
     
