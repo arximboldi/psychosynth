@@ -117,8 +117,8 @@ world::world (const audio_info& info)
 
     m_mixer->param("amplitude").set(0.5f);
 
-    m_node_mgr.add_node (manage (m_output), OUTPUT_ID);
-    m_node_mgr.add_node (manage (m_mixer), MIXER_ID);
+    m_node_mgr.add_node (base::manage (m_output), OUTPUT_ID);
+    m_node_mgr.add_node (base::manage (m_mixer), MIXER_ID);
 
     register_default_node_factory ();
 }
@@ -215,7 +215,7 @@ world_node world::add_node (const std::string& name)
     nod = m_nodfact.create (name, m_info);
 
     if (nod) {
-	if (!m_node_mgr.add_node (manage (nod), m_last_id++))
+	if (!m_node_mgr.add_node (base::manage (nod), m_last_id++))
 	    return world_node (0, 0);
     
 	tnod = world_node (nod, this);
@@ -252,7 +252,7 @@ void world::deactivate_node (world_node& nod)
     notify_deactivate_node (nod);
 }
 
-void world::set_patcher (mgr_ptr<patcher> pat)
+void world::set_patcher (base::mgr_ptr<patcher> pat)
 {
     unset_patcher ();
     m_patcher = pat;

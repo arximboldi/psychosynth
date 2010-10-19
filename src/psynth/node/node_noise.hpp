@@ -61,6 +61,9 @@ protected:
     void update_noise (sample* buf);
     
 private:
+    int   m_param_type;
+    float m_param_ampl;
+    
     /* Pink noise factors. */
     sample m_b0;
     sample m_b1;
@@ -69,9 +72,7 @@ private:
     sample m_b4;
     sample m_b5;
     sample m_b6;
-
-    int   m_param_type;
-    float m_param_ampl;
+    
     //bool  m_restart;
     
 public:

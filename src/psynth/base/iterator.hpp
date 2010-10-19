@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-10-18 17:06:11 raskolnikov>
+ *  Time-stamp:  <2010-10-19 18:16:46 raskolnikov>
  *
  *  @file        iterator.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -33,6 +33,7 @@
 
 #include <map>
 #include <iterator>
+#include <type_traits>
 
 #include <psynth/base/pointer.hpp>
 
@@ -41,52 +42,6 @@ namespace psynth
 namespace base
 {
 
-/**
- * @todo take_pointer substituted by new traits?
- */
-
-template <typename T>
-struct take_pointer
-{
-    typedef T type;
-};
-  
-template <typename T>
-struct take_pointer<T*>
-{
-    typedef T type;
-};
-
-template <typename T>
-struct take_pointer<mgr_ptr<T> >
-{
-    typedef T type;
-};
-
-template <typename T>
-struct take_pointer<mgr_auto_ptr<T> >
-{
-    typedef T type;
-};
-
-template <typename T>
-struct take_pointer<null_ptr<T> >
-{
-    typedef T type;
-};
-
-template <typename T>
-struct take_pointer<std::shared_ptr<T> >
-{
-    typedef T type;
-};
-
-template <typename T>
-struct take_pointer<std::unique_ptr<T> >
-{
-    typedef T type;
-};
-
 template <typename Iterator>
 class ptr_iterator : public Iterator
 {
@@ -94,7 +49,7 @@ public:
     typedef std::iterator_traits<Iterator> base_traits;
     
     typedef typename std::iterator_traits<Iterator>::value_type ptr_value_type;
-    typedef typename take_pointer<ptr_value_type>::type value_type;
+    typedef typename std::remove_pointer<ptr_value_type>::type value_type;
 
     typedef typename Iterator::iterator_category iterator_category;
     typedef typename Iterator::difference_type difference_type;
@@ -139,7 +94,7 @@ class ptr_const_iterator : public Iterator
 {
 public:
     typedef typename std::iterator_traits<Iterator>::value_type ptr_value_type;
-    typedef typename take_pointer<ptr_value_type>::type value_type;
+    typedef typename std::remove_pointer<ptr_value_type>::type value_type;
     
     typedef typename Iterator::iterator_category iterator_category;
     typedef typename Iterator::difference_type difference_type;

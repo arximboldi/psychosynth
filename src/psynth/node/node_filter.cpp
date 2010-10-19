@@ -77,7 +77,7 @@ void node_filter::do_update (const node* caller,
 				      m_param_resonance,
 				      get_info().sample_rate);
 	
-	for (int i = 0; i < get_info().num_channels; ++i) {
+	for (size_t i = 0; i < get_info().num_channels; ++i) {
 	    sample* outbuf = output->get_channel(i);
 	    const sample* inbuf = input->get_channel(i);
 	    filter& filter = m_filter[i];

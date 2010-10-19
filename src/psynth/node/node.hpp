@@ -141,7 +141,7 @@ public:
 	
     public:
 	virtual ~in_socket() {
-	    for_each (m_watchs.begin(), m_watchs.end(), deleter<watch*>());
+	    for_each (m_watchs.begin(), m_watchs.end(), base::deleter<watch*>());
 	}
 	
 	virtual node* get_source_node () const {
