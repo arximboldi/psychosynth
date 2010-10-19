@@ -46,12 +46,12 @@ elem_toggler_component::elem_toggler_component(int param_num,
     m_param_first (param_first),
     m_param_step (param_step)
 {
-    task_manager::self ().attach (this);
+    global_task_manager::self ().attach (this);
 }
 
 elem_toggler_component::~elem_toggler_component()
 {
-    task_manager::self ().detach (this);
+    global_task_manager::self ().detach (this);
 }
 
 void elem_toggler_component::create_toggles ()

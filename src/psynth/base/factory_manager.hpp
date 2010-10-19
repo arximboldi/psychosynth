@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-10-17 19:49:57 raskolnikov>
+ *  Time-stamp:  <2010-10-19 01:59:44 raskolnikov>
  *
  *  @file        factory_manager.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -33,6 +33,7 @@
 #include <functional>
 #include <psynth/base/exception.hpp>
 #include <psynth/base/iterator.hpp>
+#include <psynth/base/singleton.hpp>
 
 namespace psynth
 {
@@ -41,19 +42,54 @@ namespace base
 
 PSYNTH_DECLARE_ERROR (psynth_error, factory_error);
 
+namespace detail
+{
+
+/**
+ * Factory manager with private mutation can be mutated through this
+ * class.
+ */
+class <typename FactoryManager>
+class factory_access
+{
+    template <class Concrete>
+    void add (FactoryManager& self,
+	      const FactoryManager::key_type& k)
+    {
+	self.add <Concrete> (k)
+    }
+
+    void add (FactoryManager& self,
+	      const FactoryManager::key_type& k,
+	      FactoryManager::factory_method fn)
+    {
+	self.add (k, fn);
+    }
+
+    void del (FactoryManager& self, const Key& k)
+    {
+	self.del (k);
+    }
+};
+
+}
+
+/**
+ * A factory manager that is mutable through special
+ * detail::factory_access class.
+ */
 template <class Key, class Base, typename Pointer = Base*>
-class factory_manager
+class resticted_factory_manager
 {
 public:
-    typedef Pointer ptr_type;
-    typedef std::function<Base*()> factory_method;
+    typedef Key     key_type;
+    typedef Pointer pointer_type;
+    typedef Base    base_type;
+    
+    typedef std::function<ptr_type ()>            factory_method;
     typedef map_key_iterator<Key, factory_method> iterator;
     
-    template <class Concrete>
-    void add (const Key& k);
-    void add (const Key& k, factory_method fn);
-    void del (const Key& k);
-    Pointer create (const Key&);
+    pointer_type create (const Key&);
 
     size_t size ()
     {
@@ -69,11 +105,67 @@ public:
     {
 	return m_map.end ();
     }
-    
+
+protected:
+    template <class Concrete>
+    void add (const Key& k);
+
+    void add (const Key& k, factory_method fn);
+
+    void del (const Key& k);
+
 private:
+    friend class factory_access<restricted_factory_manager>;
     typedef std::map<Key, factory_method> factory_map;
     factory_map m_map;
 };
+
+template <class Key, class Base, typename Pointer = Base*>
+class factory_manager : public restricted_factory_manager <Key, Base, Pointer>
+{
+    typedef restricted_factory_manager <Key, Base, Pointer> base;
+    
+public:
+    template <class Concrete>
+    void add (const Key& k)
+    {
+	base::add <Concrete> (k);
+    }
+    
+    void add (const Key& k, factory_method fn)
+    {
+	base::add (k, fn);
+    }
+    
+    void del (const Key& k)
+    {
+	base::del (k);
+    }
+};
+
+template <class GlobalFactory>
+struct factory_registrant : public boost::noncopyable
+{
+    registrant (GlobalFactory::type::key_type k)
+    {
+	detail::factory_access::add<Concrete> (GlobalFactory::self (), k);
+    }
+};
+
+template <typename Key, typename Base, Pointer = Base*>
+struct global_factory_manager :
+	public singleton_holder<factory_manager<Key, Base, Pointer>>
+{
+    typedef factory_registrant<global_factory_manager> registrant;
+};
+
+template <typename Key, typename Base, Pointer = Base*>
+struct restricted_global_factory_manager :
+	public singleton_holder<restricted_factory_manager<Key, Base, Pointer>>
+{
+    typedef factory_registrant<restricted_global_factory_manager> registrant;
+};
+
 
 } /* namespace base */
 } /* namespace psynth */

@@ -2,7 +2,7 @@
  *  File:       singleton.hpp
  *  Author:     Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
  *  Date:       2007
- *  Time-stamp: <2010-10-17 20:11:35 raskolnikov>
+ *  Time-stamp: <2010-10-19 01:29:13 raskolnikov>
  *
  *  This file implements a policy-based generic singleton. It is a
  *  simplification (less policy implementations are provided) of
@@ -72,13 +72,15 @@ template <
 class singleton_holder
 {
 public:
+    typedef T type;
+    
     /**
      * Access the singleton only instance.
      * @return The singleton instance.
      */
     static T& self ();
     
-protected:
+private:
     /** Hidden constructor. */
     singleton_holder () {};
     /** Hidden destructor. */
@@ -88,7 +90,6 @@ protected:
     /** Hidden copy operator. */
     singleton_holder& operator= (singleton_holder const&) {};
 
-private:
     /** The single instance pointer type. */
     typedef typename ThreadingPolicy<T*>::volatile_type instance_type;
     /** The single instance pointer. */

@@ -425,7 +425,7 @@ void psychosynth_3d::setup_world ()
     node->attachObject(ring1);
     node->setPosition(Vector3(0,0.01,0));
 
-    m_taskmgr = &task_manager::self  ();
+    m_taskmgr = &global_task_manager::self  ();
     m_elemmgr = new element_manager (get_world(), m_scene, m_camera);
     m_camctrl = new camera_controller_default (m_camera);
 

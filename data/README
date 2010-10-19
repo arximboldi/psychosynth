@@ -1,5 +1,3 @@
-
-
 ********************************************************************************
 *                        Data files license notes                              *
 ********************************************************************************
@@ -20,13 +18,15 @@ parent directory.
 
 == EXCEPTIONS ==================================================================
 
-Some of the files under this directory hierarchy are not licensed as explained above. In this section we will explain which are those files and the legal
-notice from its original author.
+Some of the files under this directory hierarchy are not licensed as
+explained above. In this section we will explain which are those files
+and the legal notice from its original author.
 
 
 -- SAMPLES ----------
 
-All .ogg samples included in the 'samples' distributed under the terms of the "Creative Commons Attribution-Share Alike 3.0".
+All .ogg samples included in the 'samples' distributed under the terms
+of the "Creative Commons Attribution-Share Alike 3.0".
 
 (c) 2008 Nacho Castrillo Velasco
 
@@ -37,9 +37,9 @@ http://creativecommons.org/licenses/by-sa/3.0/legalcode
 
 -- CEGUI SKIN ----------
 
-CEGUI Skin XML template files -every .xsd file- and the TaharezLooks skin
--every containing the string TaharezLooks in its name- are taken from the CEGUI
-library.
+CEGUI Skin XML template files -every .xsd file- and the TaharezLooks
+skin -every containing the string TaharezLooks in its name- are taken
+from the CEGUI library.
 
 
 >> Original Note

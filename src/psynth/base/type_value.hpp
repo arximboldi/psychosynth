@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2009-04-27 17:00:03 raskolnikov>
+ *  Time-stamp:  <2010-10-18 18:56:06 raskolnikov>
  *
  *  @file        type_value.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -34,6 +34,8 @@
 #include <typeinfo>
 
 namespace psynth
+{
+namespace base
 {
 
 /**
@@ -100,6 +102,7 @@ inline bool operator>= (const type_value& lhs, const type_value& rhs)
     return !(lhs < rhs);
 }
 
+} /* namespace base */
 } /* namespace psynth */
 
 #endif /* PSYNTH_TYPE_VALUE_H_ */
