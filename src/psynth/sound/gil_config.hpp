@@ -41,10 +41,15 @@
 #endif
 #endif
 
-// Enable GIL_NONWORD_POINTER_ALIGNMENT_SUPPORTED if your platform supports dereferencing on non-word memory boundary.
-// Enabling the flag results in performance improvement
-#if !defined(__hpux) && !defined(sun) && !defined(__sun) && !defined(__osf__)
-    #define GIL_NONWORD_POINTER_ALIGNMENT_SUPPORTED
+/**
+   Enable GIL_NONWORD_POINTER_ALIGNMENT_SUPPORTED if your platform
+   supports dereferencing on non-word memory boundary.
+   
+   Enabling the flag results in performance improvement
+*/
+#if !defined(__hpux) && !defined(sun) && \
+    !defined(__sun) && !defined(__osf__)
+#    define GIL_NONWORD_POINTER_ALIGNMENT_SUPPORTED
 #endif
 
 #endif
