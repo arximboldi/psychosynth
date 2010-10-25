@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-10-20 21:36:18 raskolnikov>
+ *  Time-stamp:  <2010-10-25 19:13:31 raskolnikov>
  *
  *  @file        concept.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -55,35 +55,35 @@ namespace psynth
 namespace sound
 {
 
-template <typename T> struct channel_traits;
-template <typename P> struct is_pixel;
+template <typename T> struct sample_traits;
+template <typename P> struct is_frame;
 template <typename dstT, typename srcT>
 
-typename channel_traits<dstT>::value_type channel_convert (const srcT& val);
+typename sample_traits<dstT>::value_type sample_convert (const srcT& val);
 template <typename T> class point2;
 template <std::size_t K, typename T>
 const T& axis_value(const point2<T>& p);
 template <std::size_t K, typename T>
 T& axis_value(point2<T>& p);
 
-template <typename ColorBase, int K> struct
+template <typename ChannelBase, int K> struct
 kth_element_type;
-template <typename ColorBase, int K> struct
+template <typename ChannelBase, int K> struct
 kth_element_reference_type;
-template <typename ColorBase, int K> struct
+template <typename ChannelBase, int K> struct
 kth_element_const_reference_type;
-template <typename ColorBase, int K>
+template <typename ChannelBase, int K>
 struct kth_semantic_element_reference_type;
-template <typename ColorBase, int K>
+template <typename ChannelBase, int K>
 struct kth_semantic_element_const_reference_type;
 
-template <typename ColorBase> struct size;
-template <typename ColorBase> struct element_type;
-template <typename T> struct channel_type;
-template <typename T> struct color_space_type;
-template <typename T> struct channel_mapping_type;
+template <typename ChannelBase> struct size;
+template <typename ChannelBase> struct element_type;
+template <typename T> struct sample_type;
+template <typename T> struct channel_space_type;
+template <typename T> struct sample_mapping_type;
 template <typename T> struct is_planar;
-template <typename T> struct num_channels;
+template <typename T> struct num_samples;
 
 template <typename It> struct const_iterator_type;
 template <typename It> struct iterator_is_mutable;
@@ -95,46 +95,46 @@ template <typename It> struct iterator_adaptor_get_base;
 namespace detail
 {
 template <typename Element, typename Layout, int K>
-struct homogeneous_color_base;
+struct homogeneous_channel_base;
 } /* namespace detail */
 
 template <int K, typename E, typename L, int N>
 typename add_reference<E>::type at_c (
-    detail::homogeneous_color_base<E,L,N>& p);
+    detail::homogeneous_channel_base<E,L,N>& p);
 
 template <int K, typename E, typename L, int N>
 typename add_reference<typename add_const<E>::type>::type at_c (
-    const detail::homogeneous_color_base<E,L,N>& p);
+    const detail::homogeneous_channel_base<E,L,N>& p);
 
 #if !defined(_MSC_VER)  || _MSC_VER > 1310
-template <typename P, typename C, typename L> struct packed_pixel;
+template <typename P, typename C, typename L> struct packed_frame;
 template <int K, typename P, typename C, typename L>
-typename kth_element_reference_type<packed_pixel<P,C,L>, K>::type 
-at_c (packed_pixel<P,C,L>& p);
+typename kth_element_reference_type<packed_frame<P,C,L>, K>::type 
+at_c (packed_frame<P,C,L>& p);
 
 template <int K, typename P, typename C, typename L>
-typename kth_element_const_reference_type<packed_pixel<P,C,L>,K>::type 
-at_c (const packed_pixel<P,C,L>& p);
+typename kth_element_const_reference_type<packed_frame<P,C,L>,K>::type 
+at_c (const packed_frame<P,C,L>& p);
 
 template <typename B, typename C, typename L, bool M>
-struct bit_aligned_pixel_reference;
+struct bit_aligned_frame_reference;
 
 template <int K, typename B, typename C, typename L, bool M> inline
 typename kth_element_reference_type<
-    bit_aligned_pixel_reference<B,C,L,M>, K>::type
-at_c(const bit_aligned_pixel_reference<B,C,L,M>& p);
+    bit_aligned_frame_reference<B,C,L,M>, K>::type
+at_c(const bit_aligned_frame_reference<B,C,L,M>& p);
 #endif
 
 /* Forward-declare semantic_at_c */
-template <int K, typename ColorBase>
+template <int K, typename ChannelBase>
 typename disable_if<
-    is_const<ColorBase>,
-    typename kth_semantic_element_reference_type<ColorBase,K>::type>::type
-semantic_at_c (ColorBase& p);
+    is_const<ChannelBase>,
+    typename kth_semantic_element_reference_type<ChannelBase,K>::type>::type
+semantic_at_c (ChannelBase& p);
 
-template <int K, typename ColorBase>
-typename kth_semantic_element_const_reference_type<ColorBase,K>::type
-semantic_at_c(const ColorBase& p);
+template <int K, typename ChannelBase>
+typename kth_semantic_element_const_reference_type<ChannelBase,K>::type
+semantic_at_c(const ChannelBase& p);
 
 template <typename T> struct dynamic_x_step_type;
 template <typename T> struct dynamic_y_step_type;
@@ -276,74 +276,74 @@ struct RandomAccessIteratorIsMutableConcept
 
 /*
  *
- *  Color Space concepts.
+ *  Channel Space concepts.
  *
  */
 
 /**
-   \brief Color space type concept
-   \ingroup ColorSpaceAndLayoutConcept
+   \brief Channel space type concept
+   \ingroup ChannelSpaceAndLayoutConcept
 */
 
 /**
 \code
-concept ColorSpaceConcept<MPLRandomAccessSequence Cs> {
-   // An MPL Random Access Sequence, whose elements are color tags
+concept ChannelSpaceConcept<MPLRandomAccessSequence Cs> {
+   // An MPL Random Access Sequence, whose elements are channel tags
 };
 \endcode
 */
 template <typename Cs>
-struct ColorSpaceConcept
+struct ChannelSpaceConcept
 {
     void constraints() {
-        // An MPL Random Access Sequence, whose elements are color tags
+        // An MPL Random Access Sequence, whose elements are channel tags
     }
 };
 
-template <typename ColorSpace1, typename ColorSpace2>  // Models ColorSpaceConcept
-struct color_spaces_are_compatible : public is_same<ColorSpace1,ColorSpace2> {};
+template <typename ChannelSpace1, typename ChannelSpace2>  // Models ChannelSpaceConcept
+struct channel_spaces_are_compatible : public is_same<ChannelSpace1,ChannelSpace2> {};
 
 /**
-   \brief Two color spaces are compatible if they are the same
-   \ingroup ColorSpaceAndLayoutConcept
+   \brief Two channel spaces are compatible if they are the same
+   \ingroup ChannelSpaceAndLayoutConcept
 */
 /**
 \code
-concept ColorSpacesCompatibleConcept<ColorSpaceConcept Cs1,
-    ColorSpaceConcept Cs2> {
+concept ChannelSpacesCompatibleConcept<ChannelSpaceConcept Cs1,
+    ChannelSpaceConcept Cs2> {
     where SameType<Cs1,Cs2>;
 };
 \endcode
 */
 template <typename Cs1, typename Cs2>
-struct ColorSpacesCompatibleConcept
+struct ChannelSpacesCompatibleConcept
 {
     void constraints() {
-        BOOST_STATIC_ASSERT((color_spaces_are_compatible<Cs1,Cs2>::value));
+        BOOST_STATIC_ASSERT((channel_spaces_are_compatible<Cs1,Cs2>::value));
     }
 };
 
 
 /*
  *
- *  Channel concepts
+ *  Sample concepts
  *
  */
 
 /**
-   \brief Channel mapping concept
-   \ingroup ColorSpaceAndLayoutConcept
+   \brief Sample mapping concept
+   \ingroup ChannelSpaceAndLayoutConcept
 */
 /**
 \code
-concept ChannelMappingConcept<MPLRandomAccessSequence CM> {
+concept SampleMappingConcept<MPLRandomAccessSequence CM> {
    // An MPL Random Access Sequence, whose elements model
    // MPLIntegralConstant representing a permutation
 };
 \endcode
 */
 template <typename CM>
-struct ChannelMappingConcept
+struct SampleMappingConcept
 {
     void constraints() {
         // An MPL Random Access Sequence, whose elements model
@@ -353,60 +353,60 @@ struct ChannelMappingConcept
 
 
 /**
-   \ingroup ChannelConcept
+   \ingroup SampleConcept
 
-   \brief A channel is the building block of a color. Color is defined
-   as a mixture of primary colors and a channel defines the degree to
-   which each primary color is used in the mixture.
+   \brief A sample is the building block of a channel. Channel is defined
+   as a mixture of primary channels and a sample defines the degree to
+   which each primary channel is used in the mixture.
 */
 
 /**         
-   For example, in the RGB color space, using 8-bit unsigned channels,
-   the color red is defined as [255 0 0], which means maximum of Red, and
+   For example, in the RGB channel space, using 8-bit unsigned samples,
+   the channel red is defined as [255 0 0], which means maximum of Red, and
    no Green and Blue.
     
    Built-in scalar types, such as \p int and \p float, are valid GIL
-   channels. In more complex scenarios, channels may be represented as
+   samples. In more complex scenarios, samples may be represented as
    bit ranges or even individual bits.  In such cases special classes are
-   needed to represent the value and reference to a channel.
+   needed to represent the value and reference to a sample.
     
-   Channels have a traits class, \p channel_traits, which defines
+   Samples have a traits class, \p sample_traits, which defines
    their associated types as well as their operating ranges.
 
 \code
-concept ChannelConcept<typename T> : EqualityComparable<T> {
+concept SampleConcept<typename T> : EqualityComparable<T> {
     typename value_type      = T;
-    // use channel_traits<T>::value_type to access it
+    // use sample_traits<T>::value_type to access it
     typename reference       = T&;
-    // use channel_traits<T>::reference to access it
+    // use sample_traits<T>::reference to access it
     typename pointer         = T*;
-    // use channel_traits<T>::pointer to access it
+    // use sample_traits<T>::pointer to access it
     typename const_reference = const T&;
-    // use channel_traits<T>::const_reference to access it
+    // use sample_traits<T>::const_reference to access it
     typename const_pointer   = const T*;
-    // use channel_traits<T>::const_pointer to access it
+    // use sample_traits<T>::const_pointer to access it
     static const bool is_mutable;
-    // use channel_traits<T>::is_mutable to access it
+    // use sample_traits<T>::is_mutable to access it
 
-    static T min_value(); // use channel_traits<T>::min_value to access it
-    static T max_value(); // use channel_traits<T>::min_value to access it
+    static T min_value(); // use sample_traits<T>::min_value to access it
+    static T max_value(); // use sample_traits<T>::min_value to access it
 };
 \endcode
 */
 template <typename T>
-struct ChannelConcept
+struct SampleConcept
 {
     void constraints() {
         gil_function_requires< boost::EqualityComparableConcept<T> >(); 
         
-        typedef typename channel_traits<T>::value_type v;
-        typedef typename channel_traits<T>::reference r;
-        typedef typename channel_traits<T>::pointer p;
-        typedef typename channel_traits<T>::const_reference cr;
-        typedef typename channel_traits<T>::const_pointer cp;
+        typedef typename sample_traits<T>::value_type v;
+        typedef typename sample_traits<T>::reference r;
+        typedef typename sample_traits<T>::pointer p;
+        typedef typename sample_traits<T>::const_reference cr;
+        typedef typename sample_traits<T>::const_pointer cp;
 
-        channel_traits<T>::min_value();
-        channel_traits<T>::max_value();
+        sample_traits<T>::min_value();
+        sample_traits<T>::max_value();
     }
 
      T c;
@@ -414,9 +414,9 @@ struct ChannelConcept
 
 namespace detail
 {
-    // Preconditions: T models ChannelConcept
+    // Preconditions: T models SampleConcept
     template <typename T>
-    struct ChannelIsMutableConcept
+    struct SampleIsMutableConcept
     {
         void constraints() {
             c=c;
@@ -428,154 +428,154 @@ namespace detail
 } /* namespace detail*/
 
 /**
-   \brief A channel that allows for modifying its value
-   \ingroup ChannelConcept
+   \brief A sample that allows for modifying its value
+   \ingroup SampleConcept
 */
 /**
 \code
-concept MutableChannelConcept<ChannelConcept T> : Assignable<T>, Swappable<T> {};
+concept MutableSampleConcept<SampleConcept T> : Assignable<T>, Swappable<T> {};
 \endcode
 */
 template <typename T>
-struct MutableChannelConcept
+struct MutableSampleConcept
 {
     void constraints() {
-        gil_function_requires<ChannelConcept<T> >();
-        gil_function_requires<detail::ChannelIsMutableConcept<T> >();
+        gil_function_requires<SampleConcept<T> >();
+        gil_function_requires<detail::SampleIsMutableConcept<T> >();
     }
 };
 
 /**
-   \brief A channel that supports default construction. 
-   \ingroup ChannelConcept
+   \brief A sample that supports default construction. 
+   \ingroup SampleConcept
 */
 /**
 \code
-concept ChannelValueConcept<ChannelConcept T> : Regular<T> {}; 
+concept SampleValueConcept<SampleConcept T> : Regular<T> {}; 
 \endcode
 */
 template <typename T>
-struct ChannelValueConcept
+struct SampleValueConcept
 {
     void constraints() {
-        gil_function_requires<ChannelConcept<T> >();
+        gil_function_requires<SampleConcept<T> >();
         gil_function_requires<Regular<T> >();
     }
 };
 
 /**
-   \brief Predicate metafunction returning whether two channels are
+   \brief Predicate metafunction returning whether two samples are
    compatible
-   \ingroup ChannelAlgorithm
+   \ingroup SampleAlgorithm
 
-   Channels are considered compatible if their value types (ignoring
+   Samples are considered compatible if their value types (ignoring
    constness and references) are the same.
 */
 /**
 Example:
 
 \code
-BOOST_STATIC_ASSERT((channels_are_compatible<bits8, const bits8&>::value));
+BOOST_STATIC_ASSERT((samples_are_compatible<bits8, const bits8&>::value));
 \endcode
 */
-template <typename T1, typename T2>  // Models GIL Pixel
-struct channels_are_compatible 
-    : public is_same<typename channel_traits<T1>::value_type,
-		     typename channel_traits<T2>::value_type> {};
+template <typename T1, typename T2>  // Models GIL Frame
+struct samples_are_compatible 
+    : public is_same<typename sample_traits<T1>::value_type,
+		     typename sample_traits<T2>::value_type> {};
 
 /**
-   \brief Channels are compatible if their associated value types
+   \brief Samples are compatible if their associated value types
    (ignoring constness and references) are the same
-   \ingroup ChannelConcept
+   \ingroup SampleConcept
 */
 /**
 \code
-concept ChannelsCompatibleConcept<ChannelConcept T1, ChannelConcept T2> {
+concept SamplesCompatibleConcept<SampleConcept T1, SampleConcept T2> {
     where SameType<T1::value_type, T2::value_type>;
 };
 \endcode
 */
 template <typename T1, typename T2>
-struct ChannelsCompatibleConcept
+struct SamplesCompatibleConcept
 {
     void constraints() {
-        BOOST_STATIC_ASSERT((channels_are_compatible<T1,T2>::value));
+        BOOST_STATIC_ASSERT((samples_are_compatible<T1,T2>::value));
     }
 };
 
 /**
-   \brief A channel is convertible to another one if the \p
-   channel_convert algorithm is defined for the two channels
+   \brief A sample is convertible to another one if the \p
+   sample_convert algorithm is defined for the two samples
 
-   Convertibility is non-symmetric and implies that one channel can be
+   Convertibility is non-symmetric and implies that one sample can be
    converted to another. Conversion is explicit and often lossy
    operation.
-   \ingroup ChannelConcept
+   \ingroup SampleConcept
 */
 /**
 \code
-concept ChannelConvertibleConcept<ChannelConcept SrcChannel,
-     ChannelValueConcept DstChannel> {
-    DstChannel channel_convert(const SrcChannel&);
+concept SampleConvertibleConcept<SampleConcept SrcSample,
+     SampleValueConcept DstSample> {
+    DstSample sample_convert(const SrcSample&);
 };
 \endcode
 */
-template <typename SrcChannel, typename DstChannel>
-struct ChannelConvertibleConcept
+template <typename SrcSample, typename DstSample>
+struct SampleConvertibleConcept
 {
     void constraints() {
-        gil_function_requires<ChannelConcept<SrcChannel> >();
-        gil_function_requires<MutableChannelConcept<DstChannel> >();
-        dst = channel_convert<DstChannel, SrcChannel>(src);
+        gil_function_requires<SampleConcept<SrcSample> >();
+        gil_function_requires<MutableSampleConcept<DstSample> >();
+        dst = sample_convert<DstSample, SrcSample>(src);
 	ignore_unused_variable_warning(dst);
     }
-    SrcChannel src;
-    DstChannel dst;
+    SrcSample src;
+    DstSample dst;
 };
 
 
 /**
  *
- *  Color Base Concepts
+ *  Channel Base Concepts
  *
  */
 
 /**
-   \ingroup ColorBaseConcept
+   \ingroup ChannelBaseConcept
 
-   \brief A color base is a container of color elements (such as
-   channels, channel references or channel pointers)
+   \brief A channel base is a container of channel elements (such as
+   samples, sample references or sample pointers)
 */
 /** 
-    The most common use of color base is in the implementation of a
-    pixel, in which case the color elements are channel values. The
-    color base concept, however, can be used in other scenarios. For
-    example, a planar pixel has channels that are not contiguous in
-    memory. Its reference is a proxy class that uses a color base
-    whose elements are channel references. Its iterator uses a color
-    base whose elements are channel iterators.
+    The most common use of channel base is in the implementation of a
+    frame, in which case the channel elements are sample values. The
+    channel base concept, however, can be used in other scenarios. For
+    example, a planar frame has samples that are not contiguous in
+    memory. Its reference is a proxy class that uses a channel base
+    whose elements are sample references. Its iterator uses a channel
+    base whose elements are sample iterators.
 
-    A color base must have an associated layout (which consists of a
-    color space, as well as an ordering of the channels).  There are
-    two ways to index the elements of a color base: A physical index
+    A channel base must have an associated layout (which consists of a
+    channel space, as well as an ordering of the samples).  There are
+    two ways to index the elements of a channel base: A physical index
     corresponds to the way they are ordered in memory, and a semantic
     index corresponds to the way the elements are ordered in their
-    color space.  For example, in the RGB color space the elements are
-    ordered as {red_t, green_t, blue_t}. For a color base with a BGR
+    channel space.  For example, in the RGB channel space the elements are
+    ordered as {red_t, green_t, blue_t}. For a channel base with a BGR
     layout, the first element in physical ordering is the blue
     element, whereas the first semantic element is the red one.
-    Models of \p ColorBaseConcept are required to provide the \p
-    at_c<K>(ColorBase) function, which allows for accessing the
+    Models of \p ChannelBaseConcept are required to provide the \p
+    at_c<K>(ChannelBase) function, which allows for accessing the
     elements based on their physical order. GIL provides a \p
-    semantic_at_c<K>(ColorBase) function (described later) which can
-    operate on any model of ColorBaseConcept and returns the
+    semantic_at_c<K>(ChannelBase) function (described later) which can
+    operate on any model of ChannelBaseConcept and returns the
     corresponding semantic element.
 
 \code
-concept ColorBaseConcept<typename T> :
+concept ChannelBaseConcept<typename T> :
       CopyConstructible<T>, EqualityComparable<T>
 {
-    // a GIL layout (the color space and element permutation)
+    // a GIL layout (the channel space and element permutation)
     typename layout_t;     
         
     // The type of K-th element
@@ -588,43 +588,43 @@ concept ColorBaseConcept<typename T> :
     
     template <int K> kth_element_const_reference_type<T,K>::type at_c(T);
 
-    // Copy-constructible and equality comparable with other compatible color bases
-    template <ColorBaseConcept T2> where { ColorBasesCompatibleConcept<T,T2> } 
+    // Copy-constructible and equality comparable with other compatible channel bases
+    template <ChannelBaseConcept T2> where { ChannelBasesCompatibleConcept<T,T2> } 
         T::T(T2);
-    template <ColorBaseConcept T2> where { ColorBasesCompatibleConcept<T,T2> } 
+    template <ChannelBaseConcept T2> where { ChannelBasesCompatibleConcept<T,T2> } 
         bool operator==(const T&, const T2&);
-    template <ColorBaseConcept T2> where { ColorBasesCompatibleConcept<T,T2> } 
+    template <ChannelBaseConcept T2> where { ChannelBasesCompatibleConcept<T,T2> } 
         bool operator!=(const T&, const T2&);
 
 };
 \endcode
 */
 
-template <typename ColorBase>
-struct ColorBaseConcept
+template <typename ChannelBase>
+struct ChannelBaseConcept
 {
     void constraints() {
-        gil_function_requires< CopyConstructible<ColorBase> >();
-        gil_function_requires< EqualityComparable<ColorBase> >();
+        gil_function_requires< CopyConstructible<ChannelBase> >();
+        gil_function_requires< EqualityComparable<ChannelBase> >();
 
-        typedef typename ColorBase::layout_t::color_space_t color_space_t;
-        gil_function_requires<ColorSpaceConcept<color_space_t> >();
+        typedef typename ChannelBase::layout_t::channel_space_t channel_space_t;
+        gil_function_requires<ChannelSpaceConcept<channel_space_t> >();
 
-        typedef typename ColorBase::layout_t::channel_mapping_t channel_mapping_t;
-        // TODO: channel_mapping_t must be an MPL RandomAccessSequence
+        typedef typename ChannelBase::layout_t::sample_mapping_t sample_mapping_t;
+        // TODO: sample_mapping_t must be an MPL RandomAccessSequence
 
-        static const std::size_t num_elements = size<ColorBase>::value;
+        static const std::size_t num_elements = size<ChannelBase>::value;
 
-        typedef typename kth_element_type<ColorBase,num_elements-1>::type TN; 
+        typedef typename kth_element_type<ChannelBase,num_elements-1>::type TN; 
         typedef typename kth_element_const_reference_type<
-	    ColorBase,num_elements-1>::type CR; 
+	    ChannelBase,num_elements-1>::type CR; 
 
 #if !defined(_MSC_VER) || _MSC_VER > 1310
         CR cr = at_c<num_elements-1>(cb);
 	ignore_unused_variable_warning(cr);
 #endif
 
-        // functions that work for every pixel (no need to require them)
+        // functions that work for every frame (no need to require them)
         semantic_at_c<0>(cb);
         semantic_at_c<num_elements-1>(cb);
         // also static_max(cb), static_min(cb), static_fill(cb,value),
@@ -632,17 +632,17 @@ struct ColorBaseConcept
         // static_transform()
     }
 
-    ColorBase cb;
+    ChannelBase cb;
 };
 
 /**
-   \ingroup ColorBaseConcept
-   \brief Color base which allows for modifying its elements
+   \ingroup ChannelBaseConcept
+   \brief Channel base which allows for modifying its elements
 */
 /** 
 
 \code
-concept MutableColorBaseConcept<ColorBaseConcept T> :
+concept MutableChannelBaseConcept<ChannelBaseConcept T> :
            Assignable<T>, Swappable<T> {
     template <int K> struct kth_element_reference_type;
     where Metafunction<kth_element_reference_type>;
@@ -650,20 +650,20 @@ concept MutableColorBaseConcept<ColorBaseConcept T> :
     template <int K>
     kth_element_reference_type<kth_element_type<T,K>::type>::type at_c(T);
     
-    template <ColorBaseConcept T2> where { ColorBasesCompatibleConcept<T,T2> } 
+    template <ChannelBaseConcept T2> where { ChannelBasesCompatibleConcept<T,T2> } 
         T& operator=(T&, const T2&);
 };
 \endcode
 */
-template <typename ColorBase>
-struct MutableColorBaseConcept
+template <typename ChannelBase>
+struct MutableChannelBaseConcept
 {
     void constraints() {
-        gil_function_requires< ColorBaseConcept<ColorBase> >();
-        gil_function_requires< Assignable<ColorBase> >();
-        gil_function_requires< Swappable<ColorBase> >();
+        gil_function_requires< ChannelBaseConcept<ChannelBase> >();
+        gil_function_requires< Assignable<ChannelBase> >();
+        gil_function_requires< Swappable<ChannelBase> >();
 
-        typedef typename kth_element_reference_type<ColorBase, 0>::type CR; 
+        typedef typename kth_element_reference_type<ChannelBase, 0>::type CR; 
 
 #if !defined(_MSC_VER) || _MSC_VER > 1310
         CR r=at_c<0>(cb);
@@ -671,37 +671,37 @@ struct MutableColorBaseConcept
 #endif
     }
 
-    ColorBase cb;
+    ChannelBase cb;
 };
 
 /**
-   \ingroup ColorBaseConcept
-   \brief Color base that also has a default-constructor. Refines
+   \ingroup ChannelBaseConcept
+   \brief Channel base that also has a default-constructor. Refines
    Regular
 */
 /** 
 \code
-concept ColorBaseValueConcept<typename T> :
-    MutableColorBaseConcept<T>, Regular<T> {
+concept ChannelBaseValueConcept<typename T> :
+    MutableChannelBaseConcept<T>, Regular<T> {
 };
 \endcode
 */
-template <typename ColorBase>
-struct ColorBaseValueConcept
+template <typename ChannelBase>
+struct ChannelBaseValueConcept
 {
     void constraints() {
-        gil_function_requires< MutableColorBaseConcept<ColorBase> >();
-        gil_function_requires< Regular<ColorBase> >();
+        gil_function_requires< MutableChannelBaseConcept<ChannelBase> >();
+        gil_function_requires< Regular<ChannelBase> >();
     }
 };
 
 /**
-   \ingroup ColorBaseConcept
-   \brief Color base whose elements all have the same type
+   \ingroup ChannelBaseConcept
+   \brief Channel base whose elements all have the same type
 */
 /** 
 \code
-concept HomogeneousColorBaseConcept<ColorBaseConcept CB> {
+concept HomogeneousChannelBaseConcept<ChannelBaseConcept CB> {
     // For all K in [0 ... size<C1>::value-1):
     //     where SameType<kth_element_type<CB,K>::type,
                              kth_element_type<CB,K+1>::type>;    
@@ -710,86 +710,86 @@ concept HomogeneousColorBaseConcept<ColorBaseConcept CB> {
 };
 \endcode
 */
-template <typename ColorBase>
-struct HomogeneousColorBaseConcept
+template <typename ChannelBase>
+struct HomogeneousChannelBaseConcept
 {
     void constraints() {
-        gil_function_requires< ColorBaseConcept<ColorBase> >();
+        gil_function_requires< ChannelBaseConcept<ChannelBase> >();
 
-        static const std::size_t num_elements = size<ColorBase>::value;
+        static const std::size_t num_elements = size<ChannelBase>::value;
 
-        typedef typename kth_element_type<ColorBase,0>::type T0; 
-        typedef typename kth_element_type<ColorBase,num_elements-1>::type TN; 
+        typedef typename kth_element_type<ChannelBase,0>::type T0; 
+        typedef typename kth_element_type<ChannelBase,num_elements-1>::type TN; 
 
         BOOST_STATIC_ASSERT((is_same<T0,TN>::value));   // better than nothing
-        typedef typename kth_element_const_reference_type<ColorBase,0>::type CRef0; 
+        typedef typename kth_element_const_reference_type<ChannelBase,0>::type CRef0; 
         CRef0 e0=dynamic_at_c(cb,0);
     }
-    ColorBase cb;
+    ChannelBase cb;
 };
 
 /**
-   \ingroup ColorBaseConcept
-   \brief Homogeneous color base that allows for modifying its
+   \ingroup ChannelBaseConcept
+   \brief Homogeneous channel base that allows for modifying its
    elements
 */
 /** 
 
 \code
-concept MutableHomogeneousColorBaseConcept<ColorBaseConcept CB> :
-            HomogeneousColorBaseConcept<CB> {
+concept MutableHomogeneousChannelBaseConcept<ChannelBaseConcept CB> :
+            HomogeneousChannelBaseConcept<CB> {
     kth_element_reference_type<CB,0>::type dynamic_at_c(CB&, std::size_t n);
 };
 \endcode
 */
 
-template <typename ColorBase>
-struct MutableHomogeneousColorBaseConcept
+template <typename ChannelBase>
+struct MutableHomogeneousChannelBaseConcept
 {
     void constraints() {
-        gil_function_requires< ColorBaseConcept<ColorBase> >();
-        gil_function_requires< HomogeneousColorBaseConcept<ColorBase> >();
-        typedef typename kth_element_reference_type<ColorBase, 0>::type R0;
+        gil_function_requires< ChannelBaseConcept<ChannelBase> >();
+        gil_function_requires< HomogeneousChannelBaseConcept<ChannelBase> >();
+        typedef typename kth_element_reference_type<ChannelBase, 0>::type R0;
         R0 x = dynamic_at_c (cb, 0);
         dynamic_at_c(cb,0) = dynamic_at_c (cb, 0);
     }
-    ColorBase cb;
+    ChannelBase cb;
 };
 
 /**
-   \ingroup ColorBaseConcept
-   \brief Homogeneous color base that also has a default
+   \ingroup ChannelBaseConcept
+   \brief Homogeneous channel base that also has a default
    constructor. Refines Regular.
 */
 /** 
 
 \code
-concept HomogeneousColorBaseValueConcept<typename T> :
-         MutableHomogeneousColorBaseConcept<T>, Regular<T>
+concept HomogeneousChannelBaseValueConcept<typename T> :
+         MutableHomogeneousChannelBaseConcept<T>, Regular<T>
 { };
 \endcode
 */
 
-template <typename ColorBase>
-struct HomogeneousColorBaseValueConcept
+template <typename ChannelBase>
+struct HomogeneousChannelBaseValueConcept
 {
     void constraints() {
-        gil_function_requires< MutableHomogeneousColorBaseConcept<ColorBase> >();
-        gil_function_requires< Regular<ColorBase> >();
+        gil_function_requires< MutableHomogeneousChannelBaseConcept<ChannelBase> >();
+        gil_function_requires< Regular<ChannelBase> >();
     }
 };
 
 
 /**
-   \ingroup ColorBaseConcept
-   \brief Two color bases are compatible if they have the same color
+   \ingroup ChannelBaseConcept
+   \brief Two channel bases are compatible if they have the same channel
    space and their elements are compatible, semantic-pairwise.
 */
 /** 
 
 \code
-concept ColorBasesCompatibleConcept<ColorBaseConcept C1, ColorBaseConcept C2> {
-    where SameType<C1::layout_t::color_space_t, C2::layout_t::color_space_t>;
+concept ChannelBasesCompatibleConcept<ChannelBaseConcept C1, ChannelBaseConcept C2> {
+    where SameType<C1::layout_t::channel_space_t, C2::layout_t::channel_space_t>;
     // also, for all K in [0 ... size<C1>::value):
     //     where Convertible<kth_semantic_element_type<C1,K>::type,
                  kth_semantic_element_type<C2,K>::type>;
@@ -798,14 +798,14 @@ concept ColorBasesCompatibleConcept<ColorBaseConcept C1, ColorBaseConcept C2> {
 };
 \endcode
 */
-template <typename ColorBase1, typename ColorBase2>
-struct ColorBasesCompatibleConcept {
+template <typename ChannelBase1, typename ChannelBase2>
+struct ChannelBasesCompatibleConcept {
     void constraints() {
         BOOST_STATIC_ASSERT(
-	    (is_same<typename ColorBase1::layout_t::color_space_t, 
-	     typename ColorBase2::layout_t::color_space_t>::value));
-//        typedef typename kth_semantic_element_type<ColorBase1,0>::type e1;
-//        typedef typename kth_semantic_element_type<ColorBase2,0>::type e2;
+	    (is_same<typename ChannelBase1::layout_t::channel_space_t, 
+	     typename ChannelBase2::layout_t::channel_space_t>::value));
+//        typedef typename kth_semantic_element_type<ChannelBase1,0>::type e1;
+//        typedef typename kth_semantic_element_type<ChannelBase2,0>::type e2;
 //        "e1 is convertible to e2"
     }
 };
@@ -813,25 +813,25 @@ struct ColorBasesCompatibleConcept {
 
 /*
  *
- *      Pixel Concepts
+ *      Frame Concepts
  *
  */
 
 /**
-   \brief Concept for all pixel-based GIL constructs, such as pixels,
-   iterators, locators, views and images whose value type is a pixel
+   \brief Concept for all frame-based GIL constructs, such as frames,
+   iterators, locators, views and buffers whose value type is a frame
    
-   \ingroup PixelBasedConcept
+   \ingroup FrameBasedConcept
 */
 /**
 \code
-concept PixelBasedConcept<typename T> {
-    typename color_space_type<T>;     
-        where Metafunction<color_space_type<T> >;
-        where ColorSpaceConcept<color_space_type<T>::type>;
-    typename channel_mapping_type<T>; 
-        where Metafunction<channel_mapping_type<T> >;  
-        where ChannelMappingConcept<channel_mapping_type<T>::type>;
+concept FrameBasedConcept<typename T> {
+    typename channel_space_type<T>;     
+        where Metafunction<channel_space_type<T> >;
+        where ChannelSpaceConcept<channel_space_type<T>::type>;
+    typename sample_mapping_type<T>; 
+        where Metafunction<sample_mapping_type<T> >;  
+        where SampleMappingConcept<sample_mapping_type<T>::type>;
     typename is_planar<T>;
         where Metafunction<is_planar<T> >;
         where SameType<is_planar<T>::type, bool>;
@@ -839,153 +839,153 @@ concept PixelBasedConcept<typename T> {
 \endcode
 */
 template <typename P>
-struct PixelBasedConcept
+struct FrameBasedConcept
 {
     void constraints() {
-        typedef typename color_space_type<P>::type color_space_t;
-        gil_function_requires<ColorSpaceConcept<color_space_t> >();
-        typedef typename channel_mapping_type<P>::type channel_mapping_t;
-        gil_function_requires<ChannelMappingConcept<channel_mapping_t> >();
+        typedef typename channel_space_type<P>::type channel_space_t;
+        gil_function_requires<ChannelSpaceConcept<channel_space_t> >();
+        typedef typename sample_mapping_type<P>::type sample_mapping_t;
+        gil_function_requires<SampleMappingConcept<sample_mapping_t> >();
 
         static const bool planar = is_planar<P>::type::value;
 	ignore_unused_variable_warning(planar);
 
 
         // This is not part of the concept, but should still work
-        static const std::size_t nc = num_channels<P>::value;
+        static const std::size_t nc = num_samples<P>::value;
         ignore_unused_variable_warning(nc);
     }
 };
 
 /**
-   \brief Concept for homogeneous pixel-based GIL constructs
-   \ingroup PixelBasedConcept
+   \brief Concept for homogeneous frame-based GIL constructs
+   \ingroup FrameBasedConcept
 */
 /**
 \code
-concept HomogeneousPixelBasedConcept<PixelBasedConcept T> {
-    typename channel_type<T>;         
-        where Metafunction<channel_type<T> >;
-        where ChannelConcept<channel_type<T>::type>;
+concept HomogeneousFrameBasedConcept<FrameBasedConcept T> {
+    typename sample_type<T>;         
+        where Metafunction<sample_type<T> >;
+        where SampleConcept<sample_type<T>::type>;
 };
 \endcode
 */
 template <typename P>
-struct HomogeneousPixelBasedConcept
+struct HomogeneousFrameBasedConcept
 {
     void constraints() {
-        gil_function_requires<PixelBasedConcept<P> >();
-        typedef typename channel_type<P>::type channel_t;
-        gil_function_requires<ChannelConcept<channel_t> >();        
+        gil_function_requires<FrameBasedConcept<P> >();
+        typedef typename sample_type<P>::type sample_t;
+        gil_function_requires<SampleConcept<sample_t> >();        
     }
 };
 
 
 /**
-   \brief Pixel concept - A color base whose elements are channels
-   \ingroup PixelConcept
+   \brief Frame concept - A channel base whose elements are samples
+   \ingroup FrameConcept
 */
 /**
 \code
-concept PixelConcept<typename P> : ColorBaseConcept<P>, PixelBasedConcept<P> {    
-    where is_pixel<P>::type::value==true;
+concept FrameConcept<typename P> : ChannelBaseConcept<P>, FrameBasedConcept<P> {    
+    where is_frame<P>::type::value==true;
     // where for each K [0..size<P>::value-1]:
-    //      ChannelConcept<kth_element_type<P,K> >;
+    //      SampleConcept<kth_element_type<P,K> >;
         
-    typename P::value_type;       where PixelValueConcept<value_type>;
-    typename P::reference;        where PixelConcept<reference>;
-    typename P::const_reference;  where PixelConcept<const_reference>;
+    typename P::value_type;       where FrameValueConcept<value_type>;
+    typename P::reference;        where FrameConcept<reference>;
+    typename P::const_reference;  where FrameConcept<const_reference>;
     static const bool P::is_mutable;
 
-    template <PixelConcept P2> where { PixelConcept<P,P2> } 
+    template <FrameConcept P2> where { FrameConcept<P,P2> } 
         P::P(P2);
-    template <PixelConcept P2> where { PixelConcept<P,P2> } 
+    template <FrameConcept P2> where { FrameConcept<P,P2> } 
         bool operator==(const P&, const P2&);
-    template <PixelConcept P2> where { PixelConcept<P,P2> } 
+    template <FrameConcept P2> where { FrameConcept<P,P2> } 
         bool operator!=(const P&, const P2&);
 }; 
 \endcode
 */
 
 template <typename P>
-struct PixelConcept
+struct FrameConcept
 {
     void constraints() {
-        gil_function_requires<ColorBaseConcept<P> >();
-        gil_function_requires<PixelBasedConcept<P> >();
+        gil_function_requires<ChannelBaseConcept<P> >();
+        gil_function_requires<FrameBasedConcept<P> >();
 
-        BOOST_STATIC_ASSERT((is_pixel<P>::value));
+        BOOST_STATIC_ASSERT((is_frame<P>::value));
         static const bool is_mutable = P::is_mutable;
 	ignore_unused_variable_warning(is_mutable);
 
         typedef typename P::value_type      value_type;
-//      gil_function_requires<PixelValueConcept<value_type> >();
+//      gil_function_requires<FrameValueConcept<value_type> >();
 
         typedef typename P::reference       reference;
         gil_function_requires<
-	    PixelConcept<typename remove_const_and_reference<reference>::type> >();
+	    FrameConcept<typename remove_const_and_reference<reference>::type> >();
 
         typedef typename P::const_reference const_reference;
         gil_function_requires<
-	    PixelConcept<
+	    FrameConcept<
 		typename remove_const_and_reference<const_reference>::type> >();
     }
 };
 
 
 /**
-   \brief Pixel concept that allows for changing its channels
-   \ingroup PixelConcept
+   \brief Frame concept that allows for changing its samples
+   \ingroup FrameConcept
 */
 /**
 \code
-concept MutablePixelConcept<PixelConcept P> : MutableColorBaseConcept<P> {
+concept MutableFrameConcept<FrameConcept P> : MutableChannelBaseConcept<P> {
     where is_mutable==true;
 };
 \endcode
 */
 template <typename P>
-struct MutablePixelConcept
+struct MutableFrameConcept
 {
     void constraints() {
-        gil_function_requires<PixelConcept<P> >();
+        gil_function_requires<FrameConcept<P> >();
         BOOST_STATIC_ASSERT(P::is_mutable);
     }
 };
 
 /**
-   \brief Homogeneous pixel concept
-   \ingroup PixelConcept
+   \brief Homogeneous frame concept
+   \ingroup FrameConcept
 */
 /**
 \code
-concept HomogeneousPixelConcept<PixelConcept P> :
-   HomogeneousColorBaseConcept<P>, HomogeneousPixelBasedConcept<P> { 
+concept HomogeneousFrameConcept<FrameConcept P> :
+   HomogeneousChannelBaseConcept<P>, HomogeneousFrameBasedConcept<P> { 
      P::template element_const_reference_type<P>::type operator[] (
           P p, std::size_t i) const { return dynamic_at_c(p,i); }
 };
 \endcode
 */
 template <typename P>
-struct HomogeneousPixelConcept
+struct HomogeneousFrameConcept
 {
     void constraints() {
-        gil_function_requires<PixelConcept<P> >();
-        gil_function_requires<HomogeneousColorBaseConcept<P> >();
-        gil_function_requires<HomogeneousPixelBasedConcept<P> >();
+        gil_function_requires<FrameConcept<P> >();
+        gil_function_requires<HomogeneousChannelBaseConcept<P> >();
+        gil_function_requires<HomogeneousFrameBasedConcept<P> >();
         p[0];
     }
     P p;
 };
 
 /**
-   \brief Homogeneous pixel concept that allows for changing its channels
-   \ingroup PixelConcept
+   \brief Homogeneous frame concept that allows for changing its samples
+   \ingroup FrameConcept
 */
 /**
 \code
-concept MutableHomogeneousPixelConcept<HomogeneousPixelConcept P> :
-           MutableHomogeneousColorBaseConcept<P> { 
+concept MutableHomogeneousFrameConcept<HomogeneousFrameConcept P> :
+           MutableHomogeneousChannelBaseConcept<P> { 
     P::template element_reference_type<P>::type operator[](P p,
     std::size_t i) {
      return dynamic_at_c(p,i); }
@@ -993,51 +993,51 @@ concept MutableHomogeneousPixelConcept<HomogeneousPixelConcept P> :
 \endcode
 */
 template <typename P>
-struct MutableHomogeneousPixelConcept
+struct MutableHomogeneousFrameConcept
 {
     void constraints() {
-        gil_function_requires<HomogeneousPixelConcept<P> >();
-        gil_function_requires<MutableHomogeneousColorBaseConcept<P> >();
+        gil_function_requires<HomogeneousFrameConcept<P> >();
+        gil_function_requires<MutableHomogeneousChannelBaseConcept<P> >();
         p[0] = p[0];
     }
     P p;
 };
 
 /**
-   \brief Pixel concept that is a Regular type
-   \ingroup PixelConcept
+   \brief Frame concept that is a Regular type
+   \ingroup FrameConcept
 */
 /**
 \code
-concept PixelValueConcept<PixelConcept P> : Regular<P> {
+concept FrameValueConcept<FrameConcept P> : Regular<P> {
     where SameType<value_type,P>;
 };    
 \endcode
 */
 template <typename P>
-struct PixelValueConcept {
+struct FrameValueConcept {
     void constraints() {
-        gil_function_requires<PixelConcept<P> >();
+        gil_function_requires<FrameConcept<P> >();
         gil_function_requires<Regular<P> >();
     }
 };
 
 /**
-   \brief Homogeneous pixel concept that is a Regular type
-   \ingroup PixelConcept
+   \brief Homogeneous frame concept that is a Regular type
+   \ingroup FrameConcept
 */
 /**
 \code
-concept HomogeneousPixelValueConcept<HomogeneousPixelConcept P> : Regular<P> {
+concept HomogeneousFrameValueConcept<HomogeneousFrameConcept P> : Regular<P> {
     where SameType<value_type,P>;
 }; 
 \endcode
 */
 template <typename P>
-struct HomogeneousPixelValueConcept
+struct HomogeneousFrameValueConcept
 {
     void constraints() {
-        gil_function_requires<HomogeneousPixelConcept<P> >();
+        gil_function_requires<HomogeneousFrameConcept<P> >();
         gil_function_requires<Regular<P> >();
         BOOST_STATIC_ASSERT((is_same<P, typename P::value_type>::value));
     }
@@ -1046,85 +1046,85 @@ struct HomogeneousPixelValueConcept
 namespace detail
 {
     template <typename P1, typename P2, int K>
-    struct channels_are_pairwise_compatible : public 
-        mpl::and_<channels_are_pairwise_compatible<P1,P2,K-1>,
-		  channels_are_compatible<
+    struct samples_are_pairwise_compatible : public 
+        mpl::and_<samples_are_pairwise_compatible<P1,P2,K-1>,
+		  samples_are_compatible<
 		      typename kth_semantic_element_reference_type<P1,K>::type,
 		      typename kth_semantic_element_reference_type<P2,K>::type> >
     {};
                                                  
     template <typename P1, typename P2>
-    struct channels_are_pairwise_compatible<P1,P2,-1> : public mpl::true_ {};
+    struct samples_are_pairwise_compatible<P1,P2,-1> : public mpl::true_ {};
 } /* namespace detail */
 
 /**
-   \brief Returns whether two pixels are compatible
+   \brief Returns whether two frames are compatible
 
-   Pixels are compatible if their channels and color space types are
-   compatible. Compatible pixels can be assigned and copy constructed
+   Frames are compatible if their samples and channel space types are
+   compatible. Compatible frames can be assigned and copy constructed
    from one another.
    
-   \ingroup PixelAlgorithm
+   \ingroup FrameAlgorithm
 */
-template <typename P1, typename P2>  // Models GIL Pixel
-struct pixels_are_compatible 
-    : public mpl::and_<typename color_spaces_are_compatible<
-			   typename color_space_type<P1>::type, 
-			   typename color_space_type<P2>::type>::type, 
-                       detail::channels_are_pairwise_compatible<
-			   P1, P2, num_channels<P1>::value-1> > {};
+template <typename P1, typename P2>  // Models GIL Frame
+struct frames_are_compatible 
+    : public mpl::and_<typename channel_spaces_are_compatible<
+			   typename channel_space_type<P1>::type, 
+			   typename channel_space_type<P2>::type>::type, 
+                       detail::samples_are_pairwise_compatible<
+			   P1, P2, num_samples<P1>::value-1> > {};
 
 /**
-   \brief  Concept for pixel compatibility
+   \brief  Concept for frame compatibility
 
-   Pixels are compatible if their channels and color space types are
-   compatible. Compatible pixels can be assigned and copy constructed
+   Frames are compatible if their samples and channel space types are
+   compatible. Compatible frames can be assigned and copy constructed
    from one another.
    
-   \ingroup PixelConcept
+   \ingroup FrameConcept
 */
 /**
 \code
-concept PixelsCompatibleConcept<PixelConcept P1, PixelConcept P2> :
-          ColorBasesCompatibleConcept<P1,P2> {
+concept FramesCompatibleConcept<FrameConcept P1, FrameConcept P2> :
+          ChannelBasesCompatibleConcept<P1,P2> {
     // where for each K [0..size<P1>::value):
-    //    ChannelsCompatibleConcept<kth_semantic_element_type<P1,K>::type,
+    //    SamplesCompatibleConcept<kth_semantic_element_type<P1,K>::type,
                 kth_semantic_element_type<P2,K>::type>;
 };
 \endcode
 */
 template <typename P1, typename P2>
-// precondition: P1 and P2 model PixelConcept
-struct PixelsCompatibleConcept
+// precondition: P1 and P2 model FrameConcept
+struct FramesCompatibleConcept
 {
     void constraints() {
-        BOOST_STATIC_ASSERT((pixels_are_compatible<P1,P2>::value));
+        BOOST_STATIC_ASSERT((frames_are_compatible<P1,P2>::value));
     }
 };
 
 /**
-   \brief Pixel convertible concept
+   \brief Frame convertible concept
 
-   Convertibility is non-symmetric and implies that one pixel can be
-   converted to another, approximating the color. Conversion is
+   Convertibility is non-symmetric and implies that one frame can be
+   converted to another, approximating the channel. Conversion is
    explicit and sometimes lossy.
-   \ingroup PixelConcept
+   \ingroup FrameConcept
 */
 /**
 \code
-template <PixelConcept SrcPixel, MutablePixelConcept DstPixel>
-concept PixelConvertibleConcept {
-    void color_convert(const SrcPixel&, DstPixel&);
+template <FrameConcept SrcFrame, MutableFrameConcept DstFrame>
+concept FrameConvertibleConcept {
+    void channel_convert(const SrcFrame&, DstFrame&);
 };
 \endcode
 */
 template <typename SrcP, typename DstP>
-struct PixelConvertibleConcept
+struct FrameConvertibleConcept
 {
     void constraints() {
-        gil_function_requires<PixelConcept<SrcP> >();
-        gil_function_requires<MutablePixelConcept<DstP> >();
-        color_convert(src,dst);
+        gil_function_requires<FrameConcept<SrcP> >();
+        gil_function_requires<MutableFrameConcept<DstP> >();
+        channel_convert(src,dst);
     }
     SrcP src;
     DstP dst;
@@ -1137,21 +1137,21 @@ struct PixelConvertibleConcept
  */
 
 /**
-   \ingroup PixelDereferenceAdaptorConcept
+   \ingroup FrameDereferenceAdaptorConcept
 
    \brief Represents a unary function object that can be invoked upon
-   dereferencing a pixel iterator.
+   dereferencing a frame iterator.
    
-   This can perform an arbitrary computation, such as color conversion
+   This can perform an arbitrary computation, such as channel conversion
    or table lookup
 */
 /**
 \code
-concept PixelDereferenceAdaptorConcept<boost::UnaryFunctionConcept D>
+concept FrameDereferenceAdaptorConcept<boost::UnaryFunctionConcept D>
   : DefaultConstructibleConcept<D>, CopyConstructibleConcept<D>,
     AssignableConcept<D>  {
-    typename const_t;         where PixelDereferenceAdaptorConcept<const_t>;
-    typename value_type;      where PixelValueConcept<value_type>;
+    typename const_t;         where FrameDereferenceAdaptorConcept<const_t>;
+    typename value_type;      where FrameValueConcept<value_type>;
     typename reference;         // may be mutable
     typename const_reference;   // must not be mutable
     static const bool D::is_mutable;
@@ -1162,7 +1162,7 @@ concept PixelDereferenceAdaptorConcept<boost::UnaryFunctionConcept D>
 */
 
 template <typename D>
-struct PixelDereferenceAdaptorConcept
+struct FrameDereferenceAdaptorConcept
 {
     void constraints() {
         gil_function_requires< boost::UnaryFunctionConcept<D, 
@@ -1172,18 +1172,18 @@ struct PixelDereferenceAdaptorConcept
         gil_function_requires< boost::CopyConstructibleConcept<D> >();
         gil_function_requires< boost::AssignableConcept<D> >();
 
-        gil_function_requires<PixelConcept<
+        gil_function_requires<FrameConcept<
 	    typename remove_const_and_reference<
 		typename D::result_type>::type> >();
 
         typedef typename D::const_t const_t;
-        gil_function_requires<PixelDereferenceAdaptorConcept<const_t> >();
+        gil_function_requires<FrameDereferenceAdaptorConcept<const_t> >();
         typedef typename D::value_type value_type;
-        gil_function_requires<PixelValueConcept<value_type> >();
+        gil_function_requires<FrameValueConcept<value_type> >();
         typedef typename D::reference reference;
-	// == PixelConcept (if you remove const and reference)
+	// == FrameConcept (if you remove const and reference)
         typedef typename D::const_reference const_reference;
-	// == PixelConcept (if you remove const and reference)
+	// == FrameConcept (if you remove const and reference)
 
         const bool is_mutable = D::is_mutable;
 	ignore_unused_variable_warning (is_mutable);
@@ -1192,9 +1192,9 @@ struct PixelDereferenceAdaptorConcept
 };
 
 template <typename P>
-struct PixelDereferenceAdaptorArchetype : public std::unary_function<P, P>
+struct FrameDereferenceAdaptorArchetype : public std::unary_function<P, P>
 {
-    typedef PixelDereferenceAdaptorArchetype const_t;
+    typedef FrameDereferenceAdaptorArchetype const_t;
     typedef typename remove_reference<P>::type value_type;
     typedef typename add_reference<P>::type reference;
     typedef reference const_reference;
@@ -1205,7 +1205,7 @@ struct PixelDereferenceAdaptorArchetype : public std::unary_function<P, P>
 
 /*
  *
- *     Pixel iterator concepts.
+ *     Frame iterator concepts.
  *
  */
 
@@ -1214,7 +1214,7 @@ struct PixelDereferenceAdaptorArchetype : public std::unary_function<P, P>
    type just like the given iterator/locator/view, except it supports
    runtime specified step along the X navigation
    
-   \ingroup PixelIteratorConcept
+   \ingroup FrameIteratorConcept
 */
 /**
 \code
@@ -1237,7 +1237,7 @@ struct HasDynamicXStepTypeConcept
    like the given locator or view, except it supports runtime
    specified step along the Y navigation
    
-   \ingroup PixelLocatorConcept
+   \ingroup FrameLocatorConcept
 */
 /**
 \code
@@ -1260,7 +1260,7 @@ struct HasDynamicYStepTypeConcept
    \brief Concept for locators and views that can define a type just
    like the given locator or view, except X and Y is swapped
    
-   \ingroup PixelLocatorConcept
+   \ingroup FrameLocatorConcept
 */
 /**
 \code
@@ -1279,13 +1279,13 @@ struct HasTransposedTypeConcept
 };
 
 /**
-   \defgroup PixelIteratorConceptPixelIterator PixelIteratorConcept
-   \ingroup PixelIteratorConcept
-   \brief STL iterator over pixels
+   \defgroup FrameIteratorConceptFrameIterator FrameIteratorConcept
+   \ingroup FrameIteratorConcept
+   \brief STL iterator over frames
    
-   \ingroup PixelIteratorConceptPixelIterator
+   \ingroup FrameIteratorConceptFrameIterator
    \brief An STL random access traversal iterator over a model of
-   PixelConcept.
+   FrameConcept.
 */
 /**
    GIL's iterators must also provide the following metafunctions:
@@ -1299,12 +1299,12 @@ struct HasTransposedTypeConcept
    adaptors.
 
  \code
-concept PixelIteratorConcept<typename Iterator> :
+concept FrameIteratorConcept<typename Iterator> :
 boost_concepts::RandomAccessTraversalConcept<Iterator>,
-PixelBasedConcept<Iterator> {
-    where PixelValueConcept<value_type>;
+FrameBasedConcept<Iterator> {
+    where FrameValueConcept<value_type>;
     typename const_iterator_type<It>::type;         
-        where PixelIteratorConcept<const_iterator_type<It>::type>;
+        where FrameIteratorConcept<const_iterator_type<It>::type>;
     static const bool  iterator_is_mutable<It>::type::value;          
     static const bool  is_iterator_adaptor<It>::type::value;
 // is it an iterator adaptor
@@ -1312,16 +1312,16 @@ PixelBasedConcept<Iterator> {
 \endcode
 */
 template <typename Iterator>
-struct PixelIteratorConcept
+struct FrameIteratorConcept
 {   
     void constraints()
     {
         gil_function_requires<
 	    boost_concepts::RandomAccessTraversalConcept<Iterator> >();
-        gil_function_requires<PixelBasedConcept<Iterator> >();
+        gil_function_requires<FrameBasedConcept<Iterator> >();
         
         typedef typename std::iterator_traits<Iterator>::value_type value_type;
-        gil_function_requires<PixelValueConcept<value_type> >();
+        gil_function_requires<FrameValueConcept<value_type> >();
  
         typedef typename const_iterator_type<Iterator>::type const_t;
         static const bool is_mut = iterator_is_mutable<Iterator>::type::value;
@@ -1339,7 +1339,7 @@ struct PixelIteratorConcept
     void check_base(mpl::true_)
     {
         typedef typename iterator_adaptor_get_base<Iterator>::type base_t;
-        gil_function_requires<PixelIteratorConcept<base_t> >();
+        gil_function_requires<FrameIteratorConcept<base_t> >();
     }
 
     Iterator it;
@@ -1348,8 +1348,8 @@ struct PixelIteratorConcept
 namespace detail
 {
     template <typename Iterator>
-    // Preconditions: Iterator Models PixelIteratorConcept
-    struct PixelIteratorIsMutableConcept
+    // Preconditions: Iterator Models FrameIteratorConcept
+    struct FrameIteratorIsMutableConcept
     {
         void constraints()
 	{
@@ -1357,30 +1357,30 @@ namespace detail
 		detail::RandomAccessIteratorIsMutableConcept<Iterator> >();
             typedef typename remove_reference<
 		typename std::iterator_traits<Iterator>::reference>::type ref;
-            typedef typename element_type<ref>::type channel_t;
-            gil_function_requires<detail::ChannelIsMutableConcept<channel_t> >();
+            typedef typename element_type<ref>::type sample_t;
+            gil_function_requires<detail::SampleIsMutableConcept<sample_t> >();
         }
     };
 }
 
 /**
-   \brief Pixel iterator that allows for changing its pixel
-   \ingroup PixelIteratorConceptPixelIterator
+   \brief Frame iterator that allows for changing its frame
+   \ingroup FrameIteratorConceptFrameIterator
 */
 /**
 \code
-concept MutablePixelIteratorConcept<PixelIteratorConcept Iterator> :
+concept MutableFrameIteratorConcept<FrameIteratorConcept Iterator> :
           MutableRandomAccessIteratorConcept<Iterator> {};
 
 \endcode
 */
 template <typename Iterator>
-struct MutablePixelIteratorConcept
+struct MutableFrameIteratorConcept
 {
     void constraints()
     {
-        gil_function_requires<PixelIteratorConcept<Iterator> >();
-        gil_function_requires<detail::PixelIteratorIsMutableConcept<Iterator> >();
+        gil_function_requires<FrameIteratorConcept<Iterator> >();
+        gil_function_requires<detail::FrameIteratorIsMutableConcept<Iterator> >();
     }
 };
 
@@ -1408,13 +1408,13 @@ struct RandomAccessIteratorIsMemoryBasedConcept
 } /* namespace detail */
 
 /**
-   \defgroup PixelIteratorConceptStepIterator StepIteratorConcept
-   \ingroup PixelIteratorConcept
+   \defgroup FrameIteratorConceptStepIterator StepIteratorConcept
+   \ingroup FrameIteratorConcept
    \brief Iterator that advances by a specified step
 
    \brief Concept of a random-access iterator that can be advanced in
    memory units (bytes or bits)
-   \ingroup PixelIteratorConceptStepIterator
+   \ingroup FrameIteratorConceptStepIterator
 */
 /**
 \code
@@ -1449,7 +1449,7 @@ struct MemoryBasedIteratorConcept
    \brief Step iterator concept
 
    Step iterators are iterators that have a set_step method
-   \ingroup PixelIteratorConceptStepIterator
+   \ingroup FrameIteratorConceptStepIterator
 */
 /**
 \code
@@ -1473,7 +1473,7 @@ struct StepIteratorConcept
 
 /**
    \brief Step iterator that allows for modifying its current value
-   \ingroup PixelIteratorConceptStepIterator
+   \ingroup FrameIteratorConceptStepIterator
 */
 /**
 \code
@@ -1493,11 +1493,11 @@ struct MutableStepIteratorConcept
 };
 
 /**
-   \defgroup PixelIteratorConceptIteratorAdaptor IteratorAdaptorConcept
-   \ingroup PixelIteratorConcept
+   \defgroup FrameIteratorConceptIteratorAdaptor IteratorAdaptorConcept
+   \ingroup FrameIteratorConcept
    \brief Adaptor over another iterator
 
-   \ingroup PixelIteratorConceptIteratorAdaptor
+   \ingroup FrameIteratorConceptIteratorAdaptor
    \brief Iterator adaptor is a forward iterator adapting another
    forward iterator.
 */
@@ -1550,7 +1550,7 @@ struct IteratorAdaptorConcept
 
 /**
    \brief Iterator adaptor that is mutable
-   \ingroup PixelIteratorConceptIteratorAdaptor
+   \ingroup FrameIteratorConceptIteratorAdaptor
 */
 /**
 \code
@@ -1573,31 +1573,31 @@ struct MutableIteratorAdaptorConcept
 
 ////////////////////////////////////////////////////////////////////////////////////////
 ///
-///         IMAGE VIEW CONCEPTS
+///         BUFFER VIEW CONCEPTS
 ///
 ////////////////////////////////////////////////////////////////////////////////////////
 
-/// \defgroup ImageViewNDConcept ImageViewNDLocatorConcept
-/// \ingroup ImageViewConcept
+/// \defgroup BufferViewNDConcept BufferViewNDLocatorConcept
+/// \ingroup BufferViewConcept
 /// \brief N-dimensional range
 
-/// \defgroup ImageView2DConcept ImageView2DConcept
-/// \ingroup ImageViewConcept
+/// \defgroup BufferView2DConcept BufferView2DConcept
+/// \ingroup BufferViewConcept
 /// \brief 2-dimensional range
 
-/// \defgroup PixelImageViewConcept ImageViewConcept
-/// \ingroup ImageViewConcept
-/// \brief 2-dimensional range over pixel data
+/// \defgroup FrameBufferViewConcept BufferViewConcept
+/// \ingroup BufferViewConcept
+/// \brief 2-dimensional range over frame data
 
-/// \ingroup ImageViewNDConcept
+/// \ingroup BufferViewNDConcept
 /// \brief N-dimensional view over immutable values
 /**
 \code
-concept RandomAccessNDImageViewConcept<Regular View> {
+concept RandomAccessNDBufferViewConcept<Regular View> {
     typename value_type;
     typename reference;       // result of dereferencing
     typename difference_type; // result of operator-(iterator,iterator) (1-dimensional!)
-    typename const_t;  where RandomAccessNDImageViewConcept<View>; // same as View, but over immutable values
+    typename const_t;  where RandomAccessNDBufferViewConcept<View>; // same as View, but over immutable values
     typename point_t;  where PointNDConcept<point_t>; // N-dimensional point
     typename locator;  where RandomAccessNDLocatorConcept<locator>; // N-dimensional locator.
     typename iterator; where RandomAccessTraversalConcept<iterator>; // 1-dimensional iterator over all values
@@ -1613,8 +1613,8 @@ concept RandomAccessNDImageViewConcept<Regular View> {
     };
 
     // Defines the type of a view similar to this type, except it invokes Deref upon dereferencing
-    template <PixelDereferenceAdaptorConcept Deref> struct add_deref {
-        typename type;        where RandomAccessNDImageViewConcept<type>;
+    template <FrameDereferenceAdaptorConcept Deref> struct add_deref {
+        typename type;        where RandomAccessNDBufferViewConcept<type>;
         static type make(const View& v, const Deref& deref);
     };
 
@@ -1641,7 +1641,7 @@ concept RandomAccessNDImageViewConcept<Regular View> {
 \endcode
 */
 template <typename View>
-struct RandomAccessNDImageViewConcept {
+struct RandomAccessNDBufferViewConcept {
     void constraints() {
         gil_function_requires< Regular<View> >();
 
@@ -1683,7 +1683,7 @@ struct RandomAccessNDImageViewConcept {
         View(p,lc); // view must be constructible from a locator and a point
 
         p=view.dimensions();
-        lc=view.pixels();
+        lc=view.frames();
         size_type sz=view.size();  ignore_unused_variable_warning(sz);
         bool is_contiguous=view.is_1d_traversable(); ignore_unused_variable_warning(is_contiguous);
 
@@ -1695,21 +1695,21 @@ struct RandomAccessNDImageViewConcept {
         reference r1=view[d]; ignore_unused_variable_warning(r1);    // 1D access 
         reference r2=view(p); ignore_unused_variable_warning(r2);    // 2D access
 
-        // get 1-D iterator of any dimension at a given pixel location
+        // get 1-D iterator of any dimension at a given frame location
         first_it_type fi=view.template axis_iterator<0>(p); ignore_unused_variable_warning(fi);
         last_it_type li=view.template axis_iterator<N-1>(p); ignore_unused_variable_warning(li);
 
-        typedef PixelDereferenceAdaptorArchetype<typename View::value_type> deref_t;
+        typedef FrameDereferenceAdaptorArchetype<typename View::value_type> deref_t;
         typedef typename View::template add_deref<deref_t>::type dtype;
     }
     View view;
 };
 
-/// \ingroup ImageView2DConcept
+/// \ingroup BufferView2DConcept
 /// \brief 2-dimensional view over immutable values
 /**
 \code
-concept RandomAccess2DImageViewConcept<RandomAccessNDImageViewConcept View> {
+concept RandomAccess2DBufferViewConcept<RandomAccessNDBufferViewConcept View> {
     where num_dimensions==2;
 
     typename x_iterator = axis<0>::iterator;
@@ -1745,9 +1745,9 @@ concept RandomAccess2DImageViewConcept<RandomAccessNDImageViewConcept View> {
 \endcode
 */
 template <typename View>
-struct RandomAccess2DImageViewConcept {
+struct RandomAccess2DBufferViewConcept {
     void constraints() {
-        gil_function_requires<RandomAccessNDImageViewConcept<View> >();
+        gil_function_requires<RandomAccessNDBufferViewConcept<View> >();
         BOOST_STATIC_ASSERT(View::num_dimensions==2);
 
         // TODO: This executes the requirements for RandomAccessNDLocatorConcept again. Fix it to improve compile time
@@ -1792,42 +1792,42 @@ struct RandomAccess2DImageViewConcept {
 };
 
 
-/// \ingroup PixelImageViewConcept
-/// \brief GIL's 2-dimensional view over immutable GIL pixels
+/// \ingroup FrameBufferViewConcept
+/// \brief GIL's 2-dimensional view over immutable GIL frames
 /**
 \code
-concept ImageViewConcept<RandomAccess2DImageViewConcept View> {
-    where PixelValueConcept<value_type>;
-    where PixelIteratorConcept<x_iterator>;        
-    where PixelIteratorConcept<y_iterator>;
+concept BufferViewConcept<RandomAccess2DBufferViewConcept View> {
+    where FrameValueConcept<value_type>;
+    where FrameIteratorConcept<x_iterator>;        
+    where FrameIteratorConcept<y_iterator>;
     where x_coord_t == y_coord_t;
     
     typename coord_t = x_coord_t;
 
-    std::size_t View::num_channels() const;
+    std::size_t View::num_samples() const;
 };
 \endcode
 */
 template <typename View>
-struct ImageViewConcept {
+struct BufferViewConcept {
     void constraints() {
-        gil_function_requires<RandomAccess2DImageViewConcept<View> >();
+        gil_function_requires<RandomAccess2DBufferViewConcept<View> >();
 
         // TODO: This executes the requirements for RandomAccess2DLocatorConcept again. Fix it to improve compile time
-        gil_function_requires<PixelLocatorConcept<typename View::xy_locator> >();
+        gil_function_requires<FrameLocatorConcept<typename View::xy_locator> >();
         
         BOOST_STATIC_ASSERT((is_same<typename View::x_coord_t, typename View::y_coord_t>::value));
 
         typedef typename View::coord_t           coord_t;      // 1D difference type (same for all dimensions)
-        std::size_t num_chan = view.num_channels(); ignore_unused_variable_warning(num_chan);
+        std::size_t num_chan = view.num_samples(); ignore_unused_variable_warning(num_chan);
     }
     View view;
 };
 
 
 namespace detail {
-    template <typename View>    // Preconditions: View Models RandomAccessNDImageViewConcept
-    struct RandomAccessNDImageViewIsMutableConcept {
+    template <typename View>    // Preconditions: View Models RandomAccessNDBufferViewConcept
+    struct RandomAccessNDBufferViewIsMutableConcept {
         void constraints() {
             gil_function_requires<detail::RandomAccessNDLocatorIsMutableConcept<typename View::locator> >();
 
@@ -1846,10 +1846,10 @@ namespace detail {
         View view;
     };
 
-    template <typename View>    // preconditions: View Models RandomAccessNDImageViewConcept
-    struct RandomAccess2DImageViewIsMutableConcept {
+    template <typename View>    // preconditions: View Models RandomAccessNDBufferViewConcept
+    struct RandomAccess2DBufferViewIsMutableConcept {
         void constraints() {        
-            gil_function_requires<detail::RandomAccessNDImageViewIsMutableConcept<View> >();
+            gil_function_requires<detail::RandomAccessNDBufferViewIsMutableConcept<View> >();
             typename View::x_coord_t xd=0; ignore_unused_variable_warning(xd);
             typename View::y_coord_t yd=0; ignore_unused_variable_warning(yd);
             typename View::value_type v; initialize_it(v);
@@ -1858,73 +1858,73 @@ namespace detail {
         View view;
     };
 
-    template <typename View>    // preconditions: View Models ImageViewConcept
-    struct PixelImageViewIsMutableConcept {
+    template <typename View>    // preconditions: View Models BufferViewConcept
+    struct FrameBufferViewIsMutableConcept {
         void constraints() {        
-            gil_function_requires<detail::RandomAccess2DImageViewIsMutableConcept<View> >();
+            gil_function_requires<detail::RandomAccess2DBufferViewIsMutableConcept<View> >();
         }
     };
 }
 
-/// \ingroup ImageViewNDConcept
+/// \ingroup BufferViewNDConcept
 /// \brief N-dimensional view over mutable values
 /**
 \code
-concept MutableRandomAccessNDImageViewConcept<RandomAccessNDImageViewConcept View> {
+concept MutableRandomAccessNDBufferViewConcept<RandomAccessNDBufferViewConcept View> {
     where Mutable<reference>;
 };
 \endcode
 */
 template <typename View>
-struct MutableRandomAccessNDImageViewConcept {
+struct MutableRandomAccessNDBufferViewConcept {
     void constraints() {
-        gil_function_requires<RandomAccessNDImageViewConcept<View> >();
-        gil_function_requires<detail::RandomAccessNDImageViewIsMutableConcept<View> >();
+        gil_function_requires<RandomAccessNDBufferViewConcept<View> >();
+        gil_function_requires<detail::RandomAccessNDBufferViewIsMutableConcept<View> >();
     }
 };
 
-/// \ingroup ImageView2DConcept
+/// \ingroup BufferView2DConcept
 /// \brief 2-dimensional view over mutable values
 /**
 \code
-concept MutableRandomAccess2DImageViewConcept<RandomAccess2DImageViewConcept View> : MutableRandomAccessNDImageViewConcept<View> {};
+concept MutableRandomAccess2DBufferViewConcept<RandomAccess2DBufferViewConcept View> : MutableRandomAccessNDBufferViewConcept<View> {};
 \endcode
 */
 template <typename View>
-struct MutableRandomAccess2DImageViewConcept {
+struct MutableRandomAccess2DBufferViewConcept {
     void constraints() {
-        gil_function_requires<RandomAccess2DImageViewConcept<View> >();
-        gil_function_requires<detail::RandomAccess2DImageViewIsMutableConcept<View> >();
+        gil_function_requires<RandomAccess2DBufferViewConcept<View> >();
+        gil_function_requires<detail::RandomAccess2DBufferViewIsMutableConcept<View> >();
     }
 };
 
-/// \ingroup PixelImageViewConcept
-/// \brief GIL's 2-dimensional view over mutable GIL pixels
+/// \ingroup FrameBufferViewConcept
+/// \brief GIL's 2-dimensional view over mutable GIL frames
 /**
 \code
-concept MutableImageViewConcept<ImageViewConcept View> : MutableRandomAccess2DImageViewConcept<View> {};
+concept MutableBufferViewConcept<BufferViewConcept View> : MutableRandomAccess2DBufferViewConcept<View> {};
 \endcode
 */
 template <typename View>
-struct MutableImageViewConcept {
+struct MutableBufferViewConcept {
     void constraints() {
-        gil_function_requires<ImageViewConcept<View> >();
-        gil_function_requires<detail::PixelImageViewIsMutableConcept<View> >();
+        gil_function_requires<BufferViewConcept<View> >();
+        gil_function_requires<detail::FrameBufferViewIsMutableConcept<View> >();
     }
 };
 
 /// \brief Returns whether two views are compatible
 ///
-/// Views are compatible if their pixels are compatible. Compatible views can be assigned and copy constructed from one another.
-template <typename V1, typename V2>  // Model ImageViewConcept
-struct views_are_compatible : public pixels_are_compatible<typename V1::value_type, typename V2::value_type> {};
+/// Views are compatible if their frames are compatible. Compatible views can be assigned and copy constructed from one another.
+template <typename V1, typename V2>  // Model BufferViewConcept
+struct views_are_compatible : public frames_are_compatible<typename V1::value_type, typename V2::value_type> {};
 
-/// \brief Views are compatible if they have the same color spaces and compatible channel values. Constness and layout are not important for compatibility
-/// \ingroup ImageViewConcept
+/// \brief Views are compatible if they have the same channel spaces and compatible sample values. Constness and layout are not important for compatibility
+/// \ingroup BufferViewConcept
 /**
 \code
-concept ViewsCompatibleConcept<ImageViewConcept V1, ImageViewConcept V2> {
-    where PixelsCompatibleConcept<V1::value_type, P2::value_type>;
+concept ViewsCompatibleConcept<BufferViewConcept V1, BufferViewConcept V2> {
+    where FramesCompatibleConcept<V1::value_type, P2::value_type>;
 };
 \endcode
 */
@@ -1938,128 +1938,128 @@ struct ViewsCompatibleConcept {
 
 ////////////////////////////////////////////////////////////////////////////////////////
 ///
-///         IMAGE CONCEPTS
+///         BUFFER CONCEPTS
 ///
 ////////////////////////////////////////////////////////////////////////////////////////
 
 
-/// \ingroup ImageConcept
+/// \ingroup BufferConcept
 /// \brief N-dimensional container of values
 /**
 \code
-concept RandomAccessNDImageConcept<typename Img> : Regular<Img> {
-    typename view_t; where MutableRandomAccessNDImageViewConcept<view_t>;
+concept RandomAccessNDBufferConcept<typename Buf> : Regular<Buf> {
+    typename view_t; where MutableRandomAccessNDBufferViewConcept<view_t>;
     typename const_view_t = view_t::const_t;
     typename point_t      = view_t::point_t;
     typename value_type   = view_t::value_type;
     typename allocator_type;
 
-    Img::Img(point_t dims, std::size_t alignment=1);
-    Img::Img(point_t dims, value_type fill_value, std::size_t alignment);
+    Buf::Buf(point_t dims, std::size_t alignment=1);
+    Buf::Buf(point_t dims, value_type fill_value, std::size_t alignment);
     
-    void Img::recreate(point_t new_dims, std::size_t alignment=1);
-    void Img::recreate(point_t new_dims, value_type fill_value, std::size_t alignment);
+    void Buf::recreate(point_t new_dims, std::size_t alignment=1);
+    void Buf::recreate(point_t new_dims, value_type fill_value, std::size_t alignment);
 
-    const point_t&        Img::dimensions() const;
-    const const_view_t&   const_view(const Img&);
-    const view_t&         view(Img&);
+    const point_t&        Buf::dimensions() const;
+    const const_view_t&   const_view(const Buf&);
+    const view_t&         view(Buf&);
 };
 \endcode
 */
-template <typename Img>
-struct RandomAccessNDImageConcept {
+template <typename Buf>
+struct RandomAccessNDBufferConcept {
     void constraints() {
-        gil_function_requires<Regular<Img> >();
+        gil_function_requires<Regular<Buf> >();
 
-        typedef typename Img::view_t       view_t;
-        gil_function_requires<MutableRandomAccessNDImageViewConcept<view_t> >();
+        typedef typename Buf::view_t       view_t;
+        gil_function_requires<MutableRandomAccessNDBufferViewConcept<view_t> >();
 
-        typedef typename Img::const_view_t const_view_t;
-        typedef typename Img::value_type   pixel_t;
+        typedef typename Buf::const_view_t const_view_t;
+        typedef typename Buf::value_type   frame_t;
 
-        typedef typename Img::point_t        point_t;
+        typedef typename Buf::point_t        point_t;
         gil_function_requires<PointNDConcept<point_t> >();
 
-        const_view_t cv = const_view(img); ignore_unused_variable_warning(cv);
-        view_t       v  = view(img);       ignore_unused_variable_warning(v);
+        const_view_t cv = const_view(buf); ignore_unused_variable_warning(cv);
+        view_t       v  = view(buf);       ignore_unused_variable_warning(v);
 
-        pixel_t fill_value;
-        point_t pt=img.dimensions();
-        Img im1(pt);
-        Img im2(pt,1);
-        Img im3(pt,fill_value,1);
-        img.recreate(pt);
-        img.recreate(pt,1);
-        img.recreate(pt,fill_value,1);
+        frame_t fill_value;
+        point_t pt=buf.dimensions();
+        Buf im1(pt);
+        Buf im2(pt,1);
+        Buf im3(pt,fill_value,1);
+        buf.recreate(pt);
+        buf.recreate(pt,1);
+        buf.recreate(pt,fill_value,1);
     }
-    Img img;
+    Buf buf;
 };
 
 
-/// \ingroup ImageConcept
+/// \ingroup BufferConcept
 /// \brief 2-dimensional container of values
 /**
 \code
-concept RandomAccess2DImageConcept<RandomAccessNDImageConcept Img> {
+concept RandomAccess2DBufferConcept<RandomAccessNDBufferConcept Buf> {
     typename x_coord_t = const_view_t::x_coord_t;
     typename y_coord_t = const_view_t::y_coord_t;
     
-    Img::Img(x_coord_t width, y_coord_t height, std::size_t alignment=1);
-    Img::Img(x_coord_t width, y_coord_t height, value_type fill_value, std::size_t alignment);
+    Buf::Buf(x_coord_t width, y_coord_t height, std::size_t alignment=1);
+    Buf::Buf(x_coord_t width, y_coord_t height, value_type fill_value, std::size_t alignment);
 
-    x_coord_t Img::width() const;
-    y_coord_t Img::height() const;
+    x_coord_t Buf::width() const;
+    y_coord_t Buf::height() const;
     
-    void Img::recreate(x_coord_t width, y_coord_t height, std::size_t alignment=1);
-    void Img::recreate(x_coord_t width, y_coord_t height, value_type fill_value, std::size_t alignment);
+    void Buf::recreate(x_coord_t width, y_coord_t height, std::size_t alignment=1);
+    void Buf::recreate(x_coord_t width, y_coord_t height, value_type fill_value, std::size_t alignment);
 };
 \endcode
 */
-template <typename Img>
-struct RandomAccess2DImageConcept {
+template <typename Buf>
+struct RandomAccess2DBufferConcept {
     void constraints() {
-        gil_function_requires<RandomAccessNDImageConcept<Img> >();
-        typedef typename Img::x_coord_t  x_coord_t;
-        typedef typename Img::y_coord_t  y_coord_t;
-        typedef typename Img::value_type value_t;
+        gil_function_requires<RandomAccessNDBufferConcept<Buf> >();
+        typedef typename Buf::x_coord_t  x_coord_t;
+        typedef typename Buf::y_coord_t  y_coord_t;
+        typedef typename Buf::value_type value_t;
 
-        gil_function_requires<MutableRandomAccess2DImageViewConcept<typename Img::view_t> >();
+        gil_function_requires<MutableRandomAccess2DBufferViewConcept<typename Buf::view_t> >();
 
-        x_coord_t w=img.width();
-        y_coord_t h=img.height();
+        x_coord_t w=buf.width();
+        y_coord_t h=buf.height();
         value_t fill_value;
-        Img im1(w,h);
-        Img im2(w,h,1);
-        Img im3(w,h,fill_value,1);
-        img.recreate(w,h);
-        img.recreate(w,h,1);
-        img.recreate(w,h,fill_value,1);
+        Buf im1(w,h);
+        Buf im2(w,h,1);
+        Buf im3(w,h,fill_value,1);
+        buf.recreate(w,h);
+        buf.recreate(w,h,1);
+        buf.recreate(w,h,fill_value,1);
     }
-    Img img;
+    Buf buf;
 };
 
-/// \ingroup ImageConcept
-/// \brief 2-dimensional image whose value type models PixelValueConcept
+/// \ingroup BufferConcept
+/// \brief 2-dimensional buffer whose value type models FrameValueConcept
 /**
 \code 
-concept ImageConcept<RandomAccess2DImageConcept Img> {
-    where MutableImageViewConcept<view_t>;
+concept BufferConcept<RandomAccess2DBufferConcept Buf> {
+    where MutableBufferViewConcept<view_t>;
     typename coord_t  = view_t::coord_t;
 };
 \endcode
 */
-template <typename Img>
-struct ImageConcept {
+template <typename Buf>
+struct BufferConcept {
     void constraints() {
-        gil_function_requires<RandomAccess2DImageConcept<Img> >();
-        gil_function_requires<MutableImageViewConcept<typename Img::view_t> >();
-        typedef typename Img::coord_t        coord_t;
-        BOOST_STATIC_ASSERT(num_channels<Img>::value == mpl::size<typename color_space_type<Img>::type>::value);
+        gil_function_requires<RandomAccess2DBufferConcept<Buf> >();
+        gil_function_requires<MutableBufferViewConcept<typename Buf::view_t> >();
+        typedef typename Buf::coord_t        coord_t;
+        BOOST_STATIC_ASSERT(num_samples<Buf>::value == mpl::size<typename channel_space_type<Buf>::type>::value);
 
-        BOOST_STATIC_ASSERT((is_same<coord_t, typename Img::x_coord_t>::value));
-        BOOST_STATIC_ASSERT((is_same<coord_t, typename Img::y_coord_t>::value));
+        BOOST_STATIC_ASSERT((is_same<coord_t, typename Buf::x_coord_t>::value));
+        BOOST_STATIC_ASSERT((is_same<coord_t, typename Buf::y_coord_t>::value));
     }
-    Img img;
+    Buf buf;
 };
 
 
