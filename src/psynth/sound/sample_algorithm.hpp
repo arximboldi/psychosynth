@@ -1,469 +1,702 @@
+/**
+ *  Time-stamp:  <2010-10-26 18:08:11 raskolnikov>
+ *
+ *  @file        sample_algorithm.hpp
+ *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
+ *  @date        Tue Oct 26 17:21:42 2010
+ *
+ *  Algorithms over sample types.
+ */
+
 /*
-    Copyright 2005-2007 Adobe Systems Incorporated
-   
-    Use, modification and distribution are subject to the Boost Software License,
-    Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
-    http://www.boost.org/LICENSE_1_0.txt).
+ *  Copyright (C) 2010 Juan Pedro Bolivar Puente
+ *
+ *  This file is part of Psychosynth.
+ *   
+ *  Psychosynth is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  Psychosynth is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
 
-    See http://opensource.adobe.com/gil for most recent version including documentation.
-*/
-/*************************************************************************************************/
+/*
+ *  Copyright 2005-2007 Adobe Systems Incorporated
+ * 
+ *  Use, modification and distribution are subject to the Boost
+ *  Software License, Version 1.0. (See accompanying file
+ *  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt).
+ */
 
-#ifndef GIL_CHANNEL_ALGORITHM_HPP
-#define GIL_CHANNEL_ALGORITHM_HPP
+#ifndef PSYNTH_SAMPLE_ALGORITHM_HPP
+#define PSYNTH_SAMPLE_ALGORITHM_HPP
 
-////////////////////////////////////////////////////////////////////////////////////////
-/// \file               
-/// \brief Channel algorithms
-/// \author Lubomir Bourdev and Hailin Jin \n
-///         Adobe Systems Incorporated
-/// \date   2005-2007 \n Last updated on May 6, 2007
-///
-/// Definitions of standard GIL 8-bit, 16-bit, 32-bit channels
-///
-////////////////////////////////////////////////////////////////////////////////////////
+#include <psynth/base/compat.hpp>
+#include <psynth/sound/sample.hpp>
 
-#include "gil_config.hpp"
-#include "channel.hpp"
 #include <boost/mpl/less.hpp>
 #include <boost/mpl/integral_c.hpp>
 #include <boost/mpl/greater.hpp>
 #include <boost/type_traits.hpp>
 
-namespace boost { namespace gil {
+namespace psynth
+{
+namespace sound
+{
 
 //#ifdef _MSC_VER
 //#pragma warning(push)
-//#pragma warning(disable: 4309)      // disable truncation of constant value warning (using -1 to get the max value of an integral)
+//#pragma warning(disable: 4309)
+// disable truncation of constant value warning (using -1 to get the
+// max value of an integral)
 //#endif
 
-namespace detail {
+namespace detail
+{
 
-// some forward declarations
-template <typename SrcChannelV, typename DstChannelV, bool SrcIsIntegral, bool DstIsIntegral> struct channel_converter_unsigned_impl;
-template <typename SrcChannelV, typename DstChannelV, bool SrcIsGreater> struct channel_converter_unsigned_integral;
-template <typename SrcChannelV, typename DstChannelV, bool SrcLessThanDst, bool SrcDivisible> struct channel_converter_unsigned_integral_impl;
-template <typename SrcChannelV, typename DstChannelV, bool SrcLessThanDst, bool CannotFitInInteger> struct channel_converter_unsigned_integral_nondivisible;
-
-//////////////////////////////////////
-////  unsigned_integral_max_value - given an unsigned integral channel type, returns its maximum value as an MPL integral constant
-//////////////////////////////////////
-
-
-template <typename UnsignedIntegralChannel>
-struct unsigned_integral_max_value : public mpl::integral_c<UnsignedIntegralChannel,-1> {};
-
-template <>
-struct unsigned_integral_max_value<uint8_t> : public mpl::integral_c<uint32_t,0xFF> {};
-template <>
-struct unsigned_integral_max_value<uint16_t> : public mpl::integral_c<uint32_t,0xFFFF> {};
-template <>
-struct unsigned_integral_max_value<uint32_t> : public mpl::integral_c<uintmax_t,0xFFFFFFFF> {};
-
-
-template <int K>
-struct unsigned_integral_max_value<packed_channel_value<K> >
-    : public mpl::integral_c<typename packed_channel_value<K>::integer_t, (1<<K)-1> {};
-
-//////////////////////////////////////
-////  unsigned_integral_num_bits - given an unsigned integral channel type, returns the minimum number of bits needed to represent it
-//////////////////////////////////////
-
-template <typename UnsignedIntegralChannel>
-struct unsigned_integral_num_bits : public mpl::int_<sizeof(UnsignedIntegralChannel)*8> {};
-
-template <int K>
-struct unsigned_integral_num_bits<packed_channel_value<K> >
-    : public mpl::int_<K> {};
-
-} // namespace detail
+/* some forward declarations */
+template <typename SrcSampleV, typename DstSampleV,
+	  bool SrcIsIntegral, bool DstIsIntegral>
+struct sample_converter_unsigned_impl;
+template <typename SrcSampleV, typename DstSampleV,
+	  bool SrcIsGreater>
+struct sample_converter_unsigned_integral;
+template <typename SrcSampleV, typename DstSampleV,
+	  bool SrcLessThanDst, bool SrcDivisible>
+struct sample_converter_unsigned_integral_impl;
+template <typename SrcSampleV, typename DstSampleV,
+	  bool SrcLessThanDst, bool CannotFitInInteger>
+struct sample_converter_unsigned_integral_nondivisible;
 
 /**
-\defgroup ChannelConvertAlgorithm channel_convert
-\brief Converting from one channel type to another
-\ingroup ChannelAlgorithm
+ * unsigned_integral_max_value - given an unsigned integral sample
+ * type, returns its maximum value as an MPL integral constant
+ */
 
-Conversion is done as a simple linear mapping of one channel range to the other, 
-such that the minimum/maximum value of the source maps to the minimum/maximum value of the destination.
-One implication of this is that the value 0 of signed channels may not be preserved!
+template <typename UnsignedIntegralSample>
+struct unsigned_integral_max_value :
+	public mpl::integral_c<UnsignedIntegralSample, -1> {};
 
-When creating new channel models, it is often a good idea to provide specializations for the channel conversion algorithms, for
-example, for performance optimizations. If the new model is an integral type that can be signed, it is easier to define the conversion 
-only for the unsigned type (\p channel_converter_unsigned) and provide specializations of \p detail::channel_convert_to_unsigned 
-and \p detail::channel_convert_from_unsigned to convert between the signed and unsigned type.
+template <>
+struct unsigned_integral_max_value<uint8_t> :
+	public mpl::integral_c<uint32_t, 0xFF> {};
+template <>
+struct unsigned_integral_max_value<uint16_t> :
+	public mpl::integral_c<uint32_t, 0xFFFF> {};
+template <>
+struct unsigned_integral_max_value<uint32_t> :
+	public mpl::integral_c<uintmax_t, 0xFFFFFFFF> {};
 
-Example:
-\code
-// bits32f is a floating point channel with range [0.0f ... 1.0f]
-bits32f src_channel = channel_traits<bits32f>::max_value();
-assert(src_channel == 1);
+template <int K>
+struct unsigned_integral_max_value<packed_sample_value<K> >
+    : public mpl::integral_c<typename packed_sample_value<K>::integer_t, (1 << K) - 1> {};
 
-// bits8 is 8-bit unsigned integral channel (typedef-ed from unsigned char)
-bits8 dst_channel = channel_convert<bits8>(src_channel);
-assert(dst_channel == 255);     // max value goes to max value
-\endcode
+/**
+ * unsigned_integral_num_bits - given an unsigned integral sample
+ * type, returns the minimum number of bits needed to represent it
+ */
+
+template <typename UnsignedIntegralSample>
+struct unsigned_integral_num_bits : public mpl::int_<sizeof(UnsignedIntegralSample)*8> {};
+
+template <int K>
+struct unsigned_integral_num_bits<packed_sample_value<K> >
+    : public mpl::int_<K> {};
+
+} /* namespace detail */
+
+/**
+   \defgroup SampleConvertAlgorithm sample_convert
+   \brief Converting from one sample type to another
+   \ingroup SampleAlgorithm
+
+   Conversion is done as a simple linear mapping of one sample range
+   to the other, such that the minimum/maximum value of the source
+   maps to the minimum/maximum value of the destination.  One
+   implication of this is that the value 0 of signed samples may not
+   be preserved!
+
+   When creating new sample models, it is often a good idea to provide
+   specializations for the sample conversion algorithms, for example,
+   for performance optimizations. If the new model is an integral type
+   that can be signed, it is easier to define the conversion only for
+   the unsigned type (\p sample_converter_unsigned) and provide
+   specializations of \p detail::sample_convert_to_unsigned and \p
+   detail::sample_convert_from_unsigned to convert between the signed
+   and unsigned type.
+
+   Example:
+   \code
+   // bits32f is a floating point sample with range [0.0f ... 1.0f]
+   bits32f src_sample = sample_traits<bits32f>::max_value();
+   assert(src_sample == 1);
+
+   // bits8 is 8-bit unsigned integral sample (typedef-ed from unsigned char)
+   bits8 dst_sample = sample_convert<bits8>(src_sample);
+   assert(dst_sample == 255);     // max value goes to max value
+   \endcode
 */
 
 /** 
-\defgroup ChannelConvertUnsignedAlgorithm channel_converter_unsigned
-\ingroup ChannelConvertAlgorithm
-\brief Convert one unsigned/floating point channel to another. Converts both the channel type and range
+    \defgroup SampleConvertUnsignedAlgorithm sample_converter_unsigned
+    \ingroup SampleConvertAlgorithm
+    \brief Convert one unsigned/floating point sample to
+    another. Converts both the sample type and range
  @{
  */
 
-//////////////////////////////////////
-////  channel_converter_unsigned
-//////////////////////////////////////
+/**
+ *  sample_converter_unsigned
+ */
 
-template <typename SrcChannelV, typename DstChannelV>     // Model ChannelValueConcept
-struct channel_converter_unsigned
-    : public detail::channel_converter_unsigned_impl<SrcChannelV,DstChannelV,is_integral<SrcChannelV>::value,is_integral<DstChannelV>::value> {};
+template <typename SrcSampleV, typename DstSampleV>
+// Model SampleValueConcept
+struct sample_converter_unsigned
+    : public detail::sample_converter_unsigned_impl<
+    SrcSampleV, DstSampleV,
+    is_integral<SrcSampleV>::value,is_integral<DstSampleV>::value>
+{};
+
+/** \brief Converting a sample to itself - identity operation */
+template <typename T> struct sample_converter_unsigned<T,T> :
+	public detail::identity<T> {};
 
 
-/// \brief Converting a channel to itself - identity operation
-template <typename T> struct channel_converter_unsigned<T,T> : public detail::identity<T> {};
+namespace detail
+{
 
+/**
+ *  sample_converter_unsigned_impl
+ */
 
-namespace detail {
-
-//////////////////////////////////////
-////  channel_converter_unsigned_impl
-//////////////////////////////////////
-
-/// \brief This is the default implementation. Performance specializatons are provided
-template <typename SrcChannelV, typename DstChannelV, bool SrcIsIntegral, bool DstIsIntegral> 
-struct channel_converter_unsigned_impl : public std::unary_function<DstChannelV,SrcChannelV> {
-    DstChannelV operator()(SrcChannelV src) const { 
-        return DstChannelV(channel_traits<DstChannelV>::min_value() +
-            (src - channel_traits<SrcChannelV>::min_value()) / channel_range<SrcChannelV>() * channel_range<DstChannelV>()); 
+/**
+   \brief This is the default implementation. Performance
+   specializatons are provided
+*/
+template <typename SrcSampleV, typename DstSampleV, bool SrcIsIntegral, bool DstIsIntegral> 
+struct sample_converter_unsigned_impl : public std::unary_function <DstSampleV, SrcSampleV>
+{
+    DstSampleV operator () (SrcSampleV src) const
+    { 
+        return DstSampleV (
+	    sample_traits<DstSampleV>::min_value() +
+	    (src - sample_traits<SrcSampleV>::min_value()) /
+	    sample_range<SrcSampleV>() * sample_range<DstSampleV> ()); 
     }
+    
 private:
     template <typename C>
-    static double channel_range() {
-        return double(channel_traits<C>::max_value()) - double(channel_traits<C>::min_value());
+    static double sample_range ()
+    {
+        return double (sample_traits<C>::max_value ()) -
+	    double (sample_traits<C>::min_value ());
     }
 };
 
-// When both the source and the destination are integral channels, perform a faster conversion
-template <typename SrcChannelV, typename DstChannelV> 
-struct channel_converter_unsigned_impl<SrcChannelV,DstChannelV,true,true>
-    : public channel_converter_unsigned_integral<SrcChannelV,DstChannelV,
-    mpl::less<unsigned_integral_max_value<SrcChannelV>,unsigned_integral_max_value<DstChannelV> >::value > {};
+// When both the source and the destination are integral samples, perform a faster conversion
+template <typename SrcSampleV, typename DstSampleV> 
+struct sample_converter_unsigned_impl<SrcSampleV, DstSampleV, true, true>
+    : public sample_converter_unsigned_integral<SrcSampleV, DstSampleV,
+    mpl::less<unsigned_integral_max_value<SrcSampleV>,
+	      unsigned_integral_max_value<DstSampleV> >::value > {};
 
 
-//////////////////////////////////////
-////  channel_converter_unsigned_integral
-//////////////////////////////////////
+/**
+ *  sample_converter_unsigned_integral
+ */
 
-template <typename SrcChannelV, typename DstChannelV> 
-struct channel_converter_unsigned_integral<SrcChannelV,DstChannelV,true>
-    : public channel_converter_unsigned_integral_impl<SrcChannelV,DstChannelV,true,
-    !(unsigned_integral_max_value<DstChannelV>::value % unsigned_integral_max_value<SrcChannelV>::value) > {};
+template <typename SrcSampleV, typename DstSampleV> 
+struct sample_converter_unsigned_integral<SrcSampleV, DstSampleV, true>
+    : public sample_converter_unsigned_integral_impl<
+    SrcSampleV, DstSampleV, true,
+    !(unsigned_integral_max_value<DstSampleV>::value %
+      unsigned_integral_max_value<SrcSampleV>::value)> {};
 
-template <typename SrcChannelV, typename DstChannelV> 
-struct channel_converter_unsigned_integral<SrcChannelV,DstChannelV,false>
-    : public channel_converter_unsigned_integral_impl<SrcChannelV,DstChannelV,false,
-    !(unsigned_integral_max_value<SrcChannelV>::value % unsigned_integral_max_value<DstChannelV>::value) > {};
+template <typename SrcSampleV, typename DstSampleV> 
+struct sample_converter_unsigned_integral<SrcSampleV,DstSampleV, false>
+    : public sample_converter_unsigned_integral_impl<
+    SrcSampleV, DstSampleV, false,
+    !(unsigned_integral_max_value<SrcSampleV>::value %
+      unsigned_integral_max_value<DstSampleV>::value) > {};
 
 
-//////////////////////////////////////
-////  channel_converter_unsigned_integral_impl
-//////////////////////////////////////
+/**
+ *  sample_converter_unsigned_integral_impl
+ */
 
-// Both source and destination are unsigned integral channels, 
-// the src max value is less than the dst max value,
-// and the dst max value is divisible by the src max value
-template <typename SrcChannelV, typename DstChannelV> 
-struct channel_converter_unsigned_integral_impl<SrcChannelV,DstChannelV,true,true> {
-    DstChannelV operator()(SrcChannelV src) const { 
-        typedef typename unsigned_integral_max_value<DstChannelV>::value_type integer_t;
-        static const integer_t mul = unsigned_integral_max_value<DstChannelV>::value / unsigned_integral_max_value<SrcChannelV>::value;
-        return DstChannelV(src * mul);
+/*
+  Both source and destination are unsigned integral samples, the src
+  max value is less than the dst max value, and the dst max value is
+  divisible by the src max value
+*/
+template <typename SrcSampleV, typename DstSampleV> 
+struct sample_converter_unsigned_integral_impl<SrcSampleV, DstSampleV, true, true>
+{
+    DstSampleV operator () (SrcSampleV src) const
+    { 
+        typedef typename unsigned_integral_max_value<DstSampleV>::value_type integer_t;
+        static const integer_t mul =
+	    unsigned_integral_max_value<DstSampleV>::value /
+	    unsigned_integral_max_value<SrcSampleV>::value;
+        return DstSampleV (src * mul);
     }
 };
 
-// Both source and destination are unsigned integral channels, 
-// the dst max value is less than (or equal to) the src max value,
-// and the src max value is divisible by the dst max value
-template <typename SrcChannelV, typename DstChannelV> 
-struct channel_converter_unsigned_integral_impl<SrcChannelV,DstChannelV,false,true> {
-    DstChannelV operator()(SrcChannelV src) const { 
-        typedef typename unsigned_integral_max_value<SrcChannelV>::value_type integer_t;
-        static const integer_t div = unsigned_integral_max_value<SrcChannelV>::value / unsigned_integral_max_value<DstChannelV>::value;
-        static const integer_t div2 = div/2;
-        return DstChannelV((src + div2) / div);
+/*
+  Both source and destination are unsigned integral samples, the dst
+  max value is less than (or equal to) the src max value, and the src
+  max value is divisible by the dst max value
+*/
+template <typename SrcSampleV, typename DstSampleV> 
+struct sample_converter_unsigned_integral_impl<SrcSampleV,DstSampleV, false, true>
+{
+    DstSampleV operator () (SrcSampleV src) const
+    { 
+        typedef typename unsigned_integral_max_value<SrcSampleV>::value_type integer_t;
+        static const integer_t div =
+	    unsigned_integral_max_value<SrcSampleV>::value /
+	    unsigned_integral_max_value<DstSampleV>::value;
+        static const integer_t div2 = div / 2;
+        return DstSampleV ((src + div2) / div);
     }
 };
 
-// Prevent overflow for the largest integral type
-template <typename DstChannelV> 
-struct channel_converter_unsigned_integral_impl<uintmax_t,DstChannelV,false,true> {
-    DstChannelV operator()(uintmax_t src) const { 
-        static const uintmax_t div = unsigned_integral_max_value<bits32>::value / unsigned_integral_max_value<DstChannelV>::value;
+/* Prevent overflow for the largest integral type */
+template <typename DstSampleV> 
+struct sample_converter_unsigned_integral_impl<uintmax_t, DstSampleV, false, true>
+{
+    DstSampleV operator () (uintmax_t src) const
+    { 
+        static const uintmax_t div =
+	    unsigned_integral_max_value<bits32>::value /
+	    unsigned_integral_max_value<DstSampleV>::value;
         static const uintmax_t div2 = div/2;
         if (src > unsigned_integral_max_value<uintmax_t>::value - div2)
-            return unsigned_integral_max_value<DstChannelV>::value;
-        return DstChannelV((src + div2) / div);
+            return unsigned_integral_max_value<DstSampleV>::value;
+        return DstSampleV ((src + div2) / div);
     }
 };
 
-// Both source and destination are unsigned integral channels, 
-// and the dst max value is not divisible by the src max value
-// See if you can represent the expression (src * dst_max) / src_max in integral form
-template <typename SrcChannelV, typename DstChannelV, bool SrcLessThanDst> 
-struct channel_converter_unsigned_integral_impl<SrcChannelV,DstChannelV,SrcLessThanDst,false> 
-    : public channel_converter_unsigned_integral_nondivisible<SrcChannelV,DstChannelV,SrcLessThanDst,
+/*
+  Both source and destination are unsigned integral samples, and the
+  dst max value is not divisible by the src max value See if you can
+  represent the expression (src * dst_max) / src_max in integral form
+*/
+template <typename SrcSampleV, typename DstSampleV, bool SrcLessThanDst> 
+struct sample_converter_unsigned_integral_impl<SrcSampleV, DstSampleV,
+					       SrcLessThanDst, false> 
+    : public sample_converter_unsigned_integral_nondivisible<
+    SrcSampleV, DstSampleV,
+    SrcLessThanDst,
     mpl::greater<
-        mpl::plus<unsigned_integral_num_bits<SrcChannelV>,unsigned_integral_num_bits<DstChannelV> >,
-        unsigned_integral_num_bits<uintmax_t>
-    >::value> {};
+        mpl::plus<unsigned_integral_num_bits<SrcSampleV>,
+		  unsigned_integral_num_bits<DstSampleV> >,
+        unsigned_integral_num_bits<uintmax_t> >::value>
+{};
 
 
-// Both source and destination are unsigned integral channels, 
-// the src max value is less than the dst max value,
-// and the dst max value is not divisible by the src max value
-// The expression (src * dst_max) / src_max fits in an integer
-template <typename SrcChannelV, typename DstChannelV> 
-struct channel_converter_unsigned_integral_nondivisible<SrcChannelV,DstChannelV,true,false> {
-    DstChannelV operator()(SrcChannelV src) const {
-        typedef typename detail::min_fast_uint<unsigned_integral_num_bits<SrcChannelV>::value+unsigned_integral_num_bits<DstChannelV>::value>::type integer_t;
-        return DstChannelV(integer_t(src * unsigned_integral_max_value<DstChannelV>::value) / unsigned_integral_max_value<SrcChannelV>::value);
+/*
+  Both source and destination are unsigned integral samples, the src
+  max value is less than the dst max value, and the dst max value is
+  not divisible by the src max value The expression (src * dst_max) /
+  src_max fits in an integer
+*/
+template <typename SrcSampleV, typename DstSampleV> 
+struct sample_converter_unsigned_integral_nondivisible<SrcSampleV, DstSampleV, true, false>
+{
+    DstSampleV operator () (SrcSampleV src) const
+    {
+        typedef typename detail::min_fast_uint<
+	    unsigned_integral_num_bits<SrcSampleV>::value +
+	    unsigned_integral_num_bits<DstSampleV>::value>::type integer_t;
+	
+        return DstSampleV (
+	    integer_t (src * unsigned_integral_max_value<DstSampleV>::value) /
+	    unsigned_integral_max_value<SrcSampleV>::value);
     }
 };
 
-// Both source and destination are unsigned integral channels, 
-// the src max value is less than the dst max value,
-// and the dst max value is not divisible by the src max value
-// The expression (src * dst_max) / src_max cannot fit in an integer (overflows). Use a double
-template <typename SrcChannelV, typename DstChannelV> 
-struct channel_converter_unsigned_integral_nondivisible<SrcChannelV,DstChannelV,true,true> {
-    DstChannelV operator()(SrcChannelV src) const {
-        static const double mul = unsigned_integral_max_value<DstChannelV>::value / double(unsigned_integral_max_value<SrcChannelV>::value);
-        return DstChannelV(src * mul);
+/*
+  Both source and destination are unsigned integral samples, the src
+  max value is less than the dst max value, and the dst max value is
+  not divisible by the src max value The expression (src * dst_max) /
+  src_max cannot fit in an integer (overflows). Use a double
+*/
+template <typename SrcSampleV, typename DstSampleV> 
+struct sample_converter_unsigned_integral_nondivisible <SrcSampleV, DstSampleV, true, true>
+{
+    DstSampleV operator () (SrcSampleV src) const
+    {
+        static const double mul =
+	    unsigned_integral_max_value<DstSampleV>::value /
+	    double (unsigned_integral_max_value<SrcSampleV>::value);
+        return DstSampleV (src * mul);
     }
 };
 
-
-// Both source and destination are unsigned integral channels, 
-// the dst max value is less than (or equal to) the src max value,
-// and the src max value is not divisible by the dst max value
-template <typename SrcChannelV, typename DstChannelV, bool CannotFit> 
-struct channel_converter_unsigned_integral_nondivisible<SrcChannelV,DstChannelV,false,CannotFit> {
-    DstChannelV operator()(SrcChannelV src) const { 
-        typedef typename unsigned_integral_max_value<SrcChannelV>::value_type integer_t;
-
-        static const double div = unsigned_integral_max_value<SrcChannelV>::value / double(unsigned_integral_max_value<DstChannelV>::value);
-        static const integer_t div2 = integer_t(div/2);
-        return DstChannelV((src + div2) / div);
+/*
+  Both source and destination are unsigned integral samples, the dst
+  max value is less than (or equal to) the src max value, and the src
+  max value is not divisible by the dst max value
+*/
+template <typename SrcSampleV, typename DstSampleV, bool CannotFit> 
+struct sample_converter_unsigned_integral_nondivisible<
+    SrcSampleV, DstSampleV, false, CannotFit>
+{
+    DstSampleV operator () (SrcSampleV src) const
+    { 
+        typedef typename unsigned_integral_max_value<SrcSampleV>::value_type integer_t;
+        static const double div =
+	    unsigned_integral_max_value<SrcSampleV>::value /
+	    double (unsigned_integral_max_value<DstSampleV>::value);
+        static const integer_t div2 = integer_t (div/2);
+        return DstSampleV ((src + div2) / div);
     }
 };
 
-} // namespace detail
-
-/////////////////////////////////////////////////////
-///  bits32f conversion
-/////////////////////////////////////////////////////
-
-template <typename DstChannelV> struct channel_converter_unsigned<bits32f,DstChannelV> : public std::unary_function<bits32f,DstChannelV> {
-    DstChannelV   operator()(bits32f x) const { return DstChannelV(x*channel_traits<DstChannelV>::max_value()+0.5f); }
-};
-
-template <typename SrcChannelV> struct channel_converter_unsigned<SrcChannelV,bits32f> : public std::unary_function<SrcChannelV,bits32f> {
-    bits32f operator()(SrcChannelV   x) const { return bits32f(x/float(channel_traits<SrcChannelV>::max_value())); }
-};
-
-template <> struct channel_converter_unsigned<bits32f,bits32f> : public std::unary_function<bits32f,bits32f> {
-    bits32f operator()(bits32f   x) const { return x; }
-};
+} /* namespace detail */
 
 
-/// \brief 32 bit <-> float channel conversion
-template <> struct channel_converter_unsigned<bits32,bits32f> : public std::unary_function<bits32,bits32f> {
-    bits32f operator()(bits32 x) const { 
-        // unfortunately without an explicit check it is possible to get a round-off error. We must ensure that max_value of bits32 matches max_value of bits32f
-        if (x>=channel_traits<bits32>::max_value()) return channel_traits<bits32f>::max_value();
-        return float(x) / float(channel_traits<bits32>::max_value());
+/**
+ *    bits32f conversion
+ *    @todo We changed the range, we have to change it back here.
+ */
+
+template <typename DstSampleV>
+struct sample_converter_unsigned<bits32f,DstSampleV> :
+    public std::unary_function<bits32f,DstSampleV>
+{
+    DstSampleV   operator () (bits32f x) const
+    {
+	return DstSampleV (x * sample_traits<DstSampleV>::max_value () + 0.5f);
     }
 };
-/// \brief 32 bit <-> float channel conversion
-template <> struct channel_converter_unsigned<bits32f,bits32> : public std::unary_function<bits32f,bits32> {
-    bits32 operator()(bits32f x) const { 
-        // unfortunately without an explicit check it is possible to get a round-off error. We must ensure that max_value of bits32 matches max_value of bits32f
-        if (x>=channel_traits<bits32f>::max_value()) return channel_traits<bits32>::max_value();
-        return bits32(x * channel_traits<bits32>::max_value() + 0.5f); 
+
+template <typename SrcSampleV>
+struct sample_converter_unsigned<SrcSampleV, bits32f> :
+    public std::unary_function<SrcSampleV, bits32f>
+{
+    bits32f operator () (SrcSampleV x) const
+    {
+	return bits32f (x / float (sample_traits<SrcSampleV>::max_value ()));
+    }
+};
+
+template <>
+struct sample_converter_unsigned<bits32f, bits32f> :
+    public std::unary_function<bits32f, bits32f>
+{
+    bits32f operator() (bits32f x) const { return x; }
+};
+
+
+/** \brief 32 bit <-> float sample conversion */
+template <>
+struct sample_converter_unsigned<bits32, bits32f> :
+    public std::unary_function<bits32, bits32f>
+{
+    bits32f operator () (bits32 x) const
+    { 
+        // unfortunately without an explicit check it is possible to
+        // get a round-off error. We must ensure that max_value of
+        // bits32 matches max_value of bits32f
+        if (x >= sample_traits<bits32>::max_value ())
+	    return sample_traits<bits32f>::max_value ();
+        return float (x) / float (sample_traits<bits32>::max_value ());
+    }
+};
+
+/** \brief 32 bit <-> float sample conversion */
+template <> struct sample_converter_unsigned<bits32f, bits32> :
+    public std::unary_function<bits32f, bits32>
+{
+    bits32 operator () (bits32f x) const
+    { 
+        // unfortunately without an explicit check it is possible to
+        // get a round-off error. We must ensure that max_value of
+        // bits32 matches max_value of bits32f
+        if (x >= sample_traits<bits32f>::max_value ())
+	    return sample_traits<bits32>::max_value();
+        return bits32 (x * sample_traits<bits32>::max_value () + 0.5f); 
     }
 };
 
 /// @} 
 
-namespace detail {
-// Converting from signed to unsigned integral channel. 
-// It is both a unary function, and a metafunction (thus requires the 'type' nested typedef, which equals result_type)
-template <typename ChannelValue>     // Model ChannelValueConcept
-struct channel_convert_to_unsigned : public detail::identity<ChannelValue> {
-    typedef ChannelValue type;
+namespace detail
+{
+
+/*
+  Converting from signed to unsigned integral sample. 
+  It is both a unary function, and a metafunction (thus requires the
+  'type' nested typedef, which equals result_type)
+*/
+template <typename SampleValue> // Model SampleValueConcept
+struct sample_convert_to_unsigned : public detail::identity<SampleValue>
+{
+    typedef SampleValue type;
 };
 
-template <> struct channel_convert_to_unsigned<bits8s> : public std::unary_function<bits8s,bits8> { 
+template <>
+struct sample_convert_to_unsigned<bits8s> : public std::unary_function<bits8s, bits8>
+{ 
     typedef bits8 type;
-    type operator()(bits8s  val) const { return val+128; } 
+    type operator () (bits8s val) const { return val + 128; } 
 };
 
-template <> struct channel_convert_to_unsigned<bits16s> : public std::unary_function<bits16s,bits16> { 
+template <>
+struct sample_convert_to_unsigned <bits16s> : public std::unary_function<bits16s, bits16>
+{ 
     typedef bits16 type;
-    type operator()(bits16s  val) const { return val+32768; } 
+    type operator () (bits16s  val) const { return val + 32768; } 
 };
 
-template <> struct channel_convert_to_unsigned<bits32s> : public std::unary_function<bits32s,bits32> {
+template <> struct sample_convert_to_unsigned<bits32s> :
+	public std::unary_function<bits32s, bits32>
+{
     typedef bits32 type;
-    type operator()(bits32s x) const { return static_cast<bits32>(x+(1<<31)); }
+    type operator () (bits32s x) const { return static_cast<bits32>(x + (1 << 31)); }
 };
 
 
-// Converting from unsigned to signed integral channel
-// It is both a unary function, and a metafunction (thus requires the 'type' nested typedef, which equals result_type)
-template <typename ChannelValue>     // Model ChannelValueConcept
-struct channel_convert_from_unsigned : public detail::identity<ChannelValue> {
-    typedef ChannelValue type;
+/*
+  Converting from unsigned to signed integral sample
+  It is both a unary function, and a metafunction (thus requires the
+  'type' nested typedef, which equals result_type)
+*/
+template <typename SampleValue>  // Model SampleValueConcept
+struct sample_convert_from_unsigned : public detail::identity<SampleValue>
+{
+    typedef SampleValue type;
 };
 
-template <> struct channel_convert_from_unsigned<bits8s> : public std::unary_function<bits8,bits8s> { 
+template <>
+struct sample_convert_from_unsigned<bits8s> : public std::unary_function<bits8, bits8s>
+{ 
     typedef bits8s type;
-    type  operator()(bits8  val) const { return val-128; } 
+    type  operator () (bits8  val) const { return val-128; } 
 };
 
-template <> struct channel_convert_from_unsigned<bits16s> : public std::unary_function<bits16,bits16s> { 
+template <>
+struct sample_convert_from_unsigned<bits16s> : public std::unary_function<bits16,bits16s>
+{ 
     typedef bits16s type;
-    type operator()(bits16 val) const { return val-32768; } 
+    type operator () (bits16 val) const { return val-32768; } 
 };
 
-template <> struct channel_convert_from_unsigned<bits32s> : public std::unary_function<bits32,bits32s> {
+template <>
+struct sample_convert_from_unsigned<bits32s> : public std::unary_function<bits32, bits32s>
+{
     typedef bits32s type;
-    type operator()(bits32 x) const { return static_cast<bits32s>(x-(1<<31)); }
+    type operator () (bits32 x) const { return static_cast<bits32s>(x-(1<<31)); }
 };
 
-}   // namespace detail
+}  /* namespace detail */
 
-/// \ingroup ChannelConvertAlgorithm
-/// \brief A unary function object converting between channel types
-template <typename SrcChannelV, typename DstChannelV> // Model ChannelValueConcept
-struct channel_converter : public std::unary_function<SrcChannelV,DstChannelV> {
-    DstChannelV operator()(const SrcChannelV& src) const {
-        typedef detail::channel_convert_to_unsigned<SrcChannelV> to_unsigned;
-        typedef detail::channel_convert_from_unsigned<DstChannelV>   from_unsigned;
-        typedef channel_converter_unsigned<typename to_unsigned::result_type, typename from_unsigned::argument_type> converter_unsigned;
-        return from_unsigned()(converter_unsigned()(to_unsigned()(src))); 
+/**
+   \ingroup SampleConvertAlgorithm
+   \brief A unary function object converting between sample types
+*/
+template <typename SrcSampleV, typename DstSampleV> // Model SampleValueConcept
+struct sample_converter : public std::unary_function<SrcSampleV, DstSampleV>
+{
+    DstSampleV operator () (const SrcSampleV& src) const
+    {
+        typedef detail::sample_convert_to_unsigned<SrcSampleV> to_unsigned;
+        typedef detail::sample_convert_from_unsigned<DstSampleV> from_unsigned;
+        typedef sample_converter_unsigned<typename to_unsigned::result_type,
+					  typename from_unsigned::argument_type>
+	    converter_unsigned;
+        return from_unsigned () (converter_unsigned () (to_unsigned () (src))); 
     }
 };
 
-/// \ingroup ChannelConvertAlgorithm
-/// \brief Converting from one channel type to another.
-template <typename DstChannel, typename SrcChannel> // Model ChannelConcept (could be channel references)
-inline typename channel_traits<DstChannel>::value_type channel_convert(const SrcChannel& src) { 
-    return channel_converter<typename channel_traits<SrcChannel>::value_type,
-                             typename channel_traits<DstChannel>::value_type>()(src); 
+/**
+   \ingroup SampleConvertAlgorithm
+   \brief Converting from one sample type to another.
+*/
+template <typename DstSample, typename SrcSample>
+// Model SampleConcept (could be sample references)
+inline typename sample_traits<DstSample>::value_type
+sample_convert(const SrcSample& src)
+{ 
+    return sample_converter<typename sample_traits<SrcSample>::value_type,
+                             typename sample_traits<DstSample>::value_type> ()( src); 
 }
 
-/// \ingroup ChannelConvertAlgorithm
-/// \brief Same as channel_converter, except it takes the destination channel by reference, which allows 
-///        us to move the templates from the class level to the method level. This is important when invoking it
-///        on heterogeneous pixels.
-struct default_channel_converter {
+/**
+   \ingroup SampleConvertAlgorithm
+
+   \brief Same as sample_converter, except it takes the destination
+   sample by reference, which allows us to move the templates from the
+   class level to the method level. This is important when invoking it
+   on heterogeneous pixels.
+*/
+
+struct default_sample_converter
+{
     template <typename Ch1, typename Ch2>
-    void operator()(const Ch1& src, Ch2& dst) const {
-        dst=channel_convert<Ch2>(src);
+    void operator () (const Ch1& src, Ch2& dst) const
+    {
+        dst = sample_convert<Ch2> (src);
     }
 };
 
-namespace detail {
-    // fast integer division by 255
-    inline uint32_t div255(uint32_t in) { uint32_t tmp=in+128; return (tmp + (tmp>>8))>>8; }
+namespace detail
+{
 
-    // fast integer divison by 32768
-    inline uint32_t div32768(uint32_t in) { return (in+16384)>>15; }
+/* fast integer division by 255 */
+inline uint32_t div255 (uint32_t in)
+{
+    uint32_t tmp = in + 128;
+    return (tmp + (tmp >> 8)) >> 8;
 }
 
-/**
-\defgroup ChannelMultiplyAlgorithm channel_multiply
-\ingroup ChannelAlgorithm
-\brief Multiplying unsigned channel values of the same type. Performs scaled multiplication result = a * b / max_value
-
-Example:
-\code
-bits8 x=128;
-bits8 y=128;
-bits8 mul = channel_multiply(x,y);
-assert(mul == 64);    // 64 = 128 * 128 / 255
-\endcode
-*/
-/// @{
-
-/// \brief This is the default implementation. Performance specializatons are provided
-template <typename ChannelValue>
-struct channel_multiplier_unsigned : public std::binary_function<ChannelValue,ChannelValue,ChannelValue> {
-    ChannelValue operator()(ChannelValue a, ChannelValue b) const {
-        return ChannelValue(a / double(channel_traits<ChannelValue>::max_value()) * b);
-    }
-};
-
-/// \brief Specialization of channel_multiply for 8-bit unsigned channels
-template<> struct channel_multiplier_unsigned<bits8> : public std::binary_function<bits8,bits8,bits8> {
-    bits8 operator()(bits8 a, bits8 b) const { return bits8(detail::div255(uint32_t(a) * uint32_t(b))); }
-};
-
-/// \brief Specialization of channel_multiply for 16-bit unsigned channels
-template<> struct channel_multiplier_unsigned<bits16> : public std::binary_function<bits16,bits16,bits16> {
-    bits16 operator()(bits16 a, bits16 b) const { return bits16((uint32_t(a) * uint32_t(b))/65535); }
-};
-
-/// \brief Specialization of channel_multiply for float 0..1 channels
-template<> struct channel_multiplier_unsigned<bits32f> : public std::binary_function<bits32f,bits32f,bits32f> {
-    bits32f operator()(bits32f a, bits32f b) const { return a*b; }
-};
-
-/// \brief A function object to multiply two channels. result = a * b / max_value
-template <typename ChannelValue>
-struct channel_multiplier : public std::binary_function<ChannelValue, ChannelValue, ChannelValue> {
-    ChannelValue operator()(ChannelValue a, ChannelValue b) const {
-        typedef detail::channel_convert_to_unsigned<ChannelValue> to_unsigned;
-        typedef detail::channel_convert_from_unsigned<ChannelValue>   from_unsigned;
-        typedef channel_multiplier_unsigned<typename to_unsigned::result_type> multiplier_unsigned;
-        return from_unsigned()(multiplier_unsigned()(to_unsigned()(a), to_unsigned()(b))); 
-    }
-};
-
-/// \brief A function multiplying two channels. result = a * b / max_value
-template <typename Channel> // Models ChannelConcept (could be a channel reference)
-inline typename channel_traits<Channel>::value_type channel_multiply(Channel a, Channel b) { 
-    return channel_multiplier<typename channel_traits<Channel>::value_type>()(a,b);
+/* fast integer divison by 32768 */
+inline uint32_t div32768 (uint32_t in)
+{
+    return (in + 16384) >> 15;
 }
-/// @} 
+
+} /* namespace detail */
 
 /**
-\defgroup ChannelInvertAlgorithm channel_invert
-\ingroup ChannelAlgorithm
-\brief Returns the inverse of a channel. result = max_value - x + min_value
+   \defgroup SampleMultiplyAlgorithm sample_multiply
+   \ingroup SampleAlgorithm
 
-Example:
-\code
-// bits8 == uint8_t == unsigned char
-bits8 x=255;
-bits8 inv = channel_invert(x);
-assert(inv == 0);
-\endcode
+    \brief Multiplying unsigned sample values of the same
+    type. Performs scaled multiplication result = a * b / max_value
+
+    Example:
+    \code
+    bits8 x=128;
+    bits8 y=128;
+    bits8 mul = sample_multiply(x,y);
+    assert(mul == 64);    // 64 = 128 * 128 / 255
+    \endcode
+*
+/
+
+/** @{
+\brief This is the default implementation. Performance specializatons
+are provided
 */
 
-/// \brief Default implementation. Provide overloads for performance
-/// \ingroup ChannelInvertAlgorithm channel_invert
-template <typename Channel> // Models ChannelConcept (could be a channel reference)
-inline typename channel_traits<Channel>::value_type channel_invert(Channel x) { 
-    return channel_traits<Channel>::max_value()-x + channel_traits<Channel>::min_value(); 
+template <typename SampleValue>
+struct sample_multiplier_unsigned :
+    public std::binary_function<SampleValue,SampleValue,SampleValue>
+{
+    SampleValue operator () (SampleValue a, SampleValue b) const
+    {
+        return SampleValue (a / double (sample_traits<SampleValue>::max_value()) * b);
+    }
+};
+
+/**
+   \brief Specialization of sample_multiply for 8-bit unsigned samples
+*/
+template<>
+struct sample_multiplier_unsigned<bits8> : public std::binary_function<bits8, bits8, bits8>
+{
+    bits8 operator () (bits8 a, bits8 b) const
+    {
+	return bits8 (detail::div255 (uint32_t (a) * uint32_t (b)));
+    }
+};
+
+/**
+   \brief Specialization of sample_multiply for 16-bit unsigned
+   samples
+*/
+template<>
+struct sample_multiplier_unsigned<bits16> :
+    public std::binary_function<bits16,bits16,bits16>
+{
+    bits16 operator () (bits16 a, bits16 b) const
+    {
+	return bits16 ((uint32_t (a) * uint32_t (b)) / 65535);
+    }
+};
+
+/**
+   \brief Specialization of sample_multiply for float 0..1 samples
+*/
+template<>
+struct sample_multiplier_unsigned<bits32f> :
+    public std::binary_function<bits32f, bits32f, bits32f>
+{
+    bits32f operator () (bits32f a, bits32f b) const { return a * b; }
+};
+
+/**
+   \brief A function object to multiply two samples. result = a * b /
+   max_value
+*/
+template <typename SampleValue>
+struct sample_multiplier :
+    public std::binary_function<SampleValue, SampleValue, SampleValue>
+{
+    SampleValue operator () (SampleValue a, SampleValue b) const
+    {
+        typedef detail::sample_convert_to_unsigned<SampleValue> to_unsigned;
+        typedef detail::sample_convert_from_unsigned<SampleValue> from_unsigned;
+        typedef sample_multiplier_unsigned<typename to_unsigned::result_type>
+	    multiplier_unsigned;
+        return from_unsigned () (multiplier_unsigned () (
+				     to_unsigned () (a), to_unsigned () (b))); 
+    }
+};
+
+/**
+   \brief A function multiplying two samples. result = a * b /
+   max_value
+*/
+template <typename Sample> // Models SampleConcept (could be a sample reference)
+inline typename sample_traits<Sample>::value_type sample_multiply (Sample a, Sample b)
+{ 
+    return sample_multiplier<typename sample_traits<Sample>::value_type> () (a, b);
+}
+
+/** @} */
+
+/**
+   \defgroup SampleInvertAlgorithm sample_invert
+   \ingroup SampleAlgorithm
+   \brief Returns the inverse of a sample. result = max_value - x +
+   min_value
+
+   Example:
+   \code
+   // bits8 == uint8_t == unsigned char
+   bits8 x=255;
+   bits8 inv = sample_invert(x);
+   assert(inv == 0);
+   \endcode
+*/
+
+/**
+   \brief Default implementation. Provide overloads for performance
+   \ingroup SampleInvertAlgorithm sample_invert
+*/
+template <typename Sample> // Models SampleConcept (could be a sample reference)
+inline typename sample_traits<Sample>::value_type sample_invert (Sample x)
+{ 
+    return sample_traits<Sample>::max_value() - x + sample_traits<Sample>::min_value(); 
 }
 
 //#ifdef _MSC_VER
 //#pragma warning(pop)
 //#endif
 
-} }  // namespace boost::gil
+}  /* namespace sound */
+}  /* namespace psynth */
 
 #endif

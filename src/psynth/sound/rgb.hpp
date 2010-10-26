@@ -51,6 +51,7 @@ typedef layout<rgb_t> rgb_layout_t;
 /// \ingroup LayoutModel
 typedef layout<rgb_t, mpl::vector3_c<int,2,1,0> > bgr_layout_t;
 
+
 /// \ingroup ImageViewConstructors
 /// \brief from raw RGB planar data
 template <typename IC>

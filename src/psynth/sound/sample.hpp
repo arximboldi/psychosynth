@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-10-25 21:00:52 raskolnikov>
+ *  Time-stamp:  <2010-10-26 17:59:18 raskolnikov>
  *
  *  @file        sample.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -444,16 +444,16 @@ protected:
     {
         bitfield_t ret;
         static_copy_bytes<sizeof(bitfield_t)> ()(
-	    gil_reinterpret_cast_c<const unsigned char*>(_data_ptr),
-	    gil_reinterpret_cast<unsigned char*>(&ret));
+	    psynth_reinterpret_cast_c<const unsigned char*>(_data_ptr),
+	    psynth_reinterpret_cast<unsigned char*>(&ret));
         return ret;
     }
     
     void set_data(const bitfield_t& val) const
     {
         static_copy_bytes<sizeof(bitfield_t)> ()(
-	    gil_reinterpret_cast_c<const unsigned char*>(&val),
-	    gil_reinterpret_cast<unsigned char*>(_data_ptr));
+	    psynth_reinterpret_cast_c<const unsigned char*>(&val),
+	    psynth_reinterpret_cast<unsigned char*>(_data_ptr));
     }
 #endif
 
@@ -729,183 +729,317 @@ namespace sound
    uint16_t data=0;
    bits2_dynamic_ref_t sample_ref(&data,1);
    sample_ref = sample_traits<bits2_dynamic_ref_t>::max_value();     // == 3
-   assert(data == 6);                                                  // == (3<<1) == 6
+   assert(data == 6);               // == (3<<1) == 6
 \endcode
 */
 
-/// \brief Models a constant subbyte sample reference whose bit offset is a runtime parameter. Models SampleConcept
-///        Same as packed_sample_reference, except that the offset is a runtime parameter
-/// \ingroup PackedSampleDynamicReferenceModel
+/**
+   \brief Models a constant subbyte sample reference whose bit offset
+   is a runtime parameter. Models SampleConcept
+   
+   Same as packed_sample_reference, except that the offset is a
+   runtime parameter
+   
+ \ingroup PackedSampleDynamicReferenceModel
+*/
 template <typename BitField, int NumBits> 
 class packed_dynamic_sample_reference<BitField,NumBits,false>
-   : public detail::packed_sample_reference_base<packed_dynamic_sample_reference<BitField,NumBits,false>,BitField,NumBits,false> {
-    typedef detail::packed_sample_reference_base<packed_dynamic_sample_reference<BitField,NumBits,false>,BitField,NumBits,false> parent_t;
-    friend class packed_dynamic_sample_reference<BitField,NumBits,true>;
+   : public detail::packed_sample_reference_base<
+    packed_dynamic_sample_reference<BitField, NumBits, false>,
+    BitField, NumBits, false>
+{
+    typedef detail::packed_sample_reference_base<
+	packed_dynamic_sample_reference<BitField, NumBits, false>,
+	BitField,NumBits,false> parent_t;
+    friend class packed_dynamic_sample_reference<BitField, NumBits, true>;
 
     unsigned _first_bit;     // 0..7
 
-    void operator=(const packed_dynamic_sample_reference&);
+    void operator= (const packed_dynamic_sample_reference&);
+
 public:
-    typedef const packed_dynamic_sample_reference<BitField,NumBits,false> const_reference;
-    typedef const packed_dynamic_sample_reference<BitField,NumBits,true>  mutable_reference;
-    typedef typename parent_t::integer_t                          integer_t;
+    typedef const packed_dynamic_sample_reference<BitField, NumBits, false>
+    const_reference;
+    typedef const packed_dynamic_sample_reference<BitField,NumBits,true>
+    mutable_reference;
+    typedef typename parent_t::integer_t
+    integer_t;
 
-    packed_dynamic_sample_reference(const void* data_ptr, unsigned first_bit) : parent_t(data_ptr), _first_bit(first_bit) {}
-    packed_dynamic_sample_reference(const const_reference&   ref) : parent_t(ref._data_ptr), _first_bit(ref._first_bit) {}
-    packed_dynamic_sample_reference(const mutable_reference& ref) : parent_t(ref._data_ptr), _first_bit(ref._first_bit) {}
+    packed_dynamic_sample_reference (const void* data_ptr, unsigned first_bit)
+	: parent_t(data_ptr)
+	, _first_bit(first_bit) {}
+    
+    packed_dynamic_sample_reference (const const_reference& ref)
+	: parent_t (ref._data_ptr)
+	, _first_bit(ref._first_bit) {}
+    
+    packed_dynamic_sample_reference (const mutable_reference& ref)
+	: parent_t (ref._data_ptr)
+	, _first_bit (ref._first_bit) {}
 
-    unsigned first_bit() const { return _first_bit; }
+    unsigned first_bit () const { return _first_bit; }
 
-    integer_t get() const { 
-        const BitField sample_mask = parent_t::max_val<<_first_bit;
-        return ( static_cast< integer_t >( this->get_data()&sample_mask ) >> _first_bit );
+    integer_t get () const
+    { 
+        const BitField sample_mask = parent_t::max_val << _first_bit;
+        return (static_cast<integer_t>(this->get_data () & sample_mask ) >>
+		_first_bit);
     }
 };
 
-/// \brief Models a mutable subbyte sample reference whose bit offset is a runtime parameter. Models SampleConcept
-///        Same as packed_sample_reference, except that the offset is a runtime parameter
-/// \ingroup PackedSampleDynamicReferenceModel
+/**
+   \brief Models a mutable subbyte sample reference whose bit offset
+   is a runtime parameter. Models SampleConcept
+   
+   Same as packed_sample_reference, except that the offset is a
+   runtime parameter
+   
+   \ingroup PackedSampleDynamicReferenceModel
+*/
 template <typename BitField, int NumBits> 
-class packed_dynamic_sample_reference<BitField,NumBits,true>
-   : public detail::packed_sample_reference_base<packed_dynamic_sample_reference<BitField,NumBits,true>,BitField,NumBits,true> {
-    typedef detail::packed_sample_reference_base<packed_dynamic_sample_reference<BitField,NumBits,true>,BitField,NumBits,true> parent_t;
-    friend class packed_dynamic_sample_reference<BitField,NumBits,false>;
+class packed_dynamic_sample_reference<BitField, NumBits, true>
+   : public detail::packed_sample_reference_base<
+    packed_dynamic_sample_reference<BitField, NumBits, true>,
+    BitField, NumBits, true>
+{
+    typedef detail::packed_sample_reference_base<
+	packed_dynamic_sample_reference<BitField, NumBits, true>,
+	BitField, NumBits, true> parent_t;
+    
+    friend class packed_dynamic_sample_reference<BitField, NumBits, false>;
 
     unsigned _first_bit;
 
 public:
-    typedef const packed_dynamic_sample_reference<BitField,NumBits,false> const_reference;
-    typedef const packed_dynamic_sample_reference<BitField,NumBits,true>  mutable_reference;
-    typedef typename parent_t::integer_t                          integer_t;
+    typedef const packed_dynamic_sample_reference<BitField,NumBits, false>
+    const_reference;
+    
+    typedef const packed_dynamic_sample_reference<BitField,NumBits, true>
+    mutable_reference;
 
-    packed_dynamic_sample_reference(void* data_ptr, unsigned first_bit) : parent_t(data_ptr), _first_bit(first_bit) {}
-    packed_dynamic_sample_reference(const packed_dynamic_sample_reference& ref) : parent_t(ref._data_ptr), _first_bit(ref._first_bit) {}
+    typedef typename parent_t::integer_t integer_t;
 
-    const packed_dynamic_sample_reference& operator=(integer_t value) const { assert(value<=parent_t::max_val); set_unsafe(value); return *this; }
-    const packed_dynamic_sample_reference& operator=(const mutable_reference& ref) const {  set_unsafe(ref.get()); return *this; }
-    const packed_dynamic_sample_reference& operator=(const const_reference&   ref) const {  set_unsafe(ref.get()); return *this; }
+    packed_dynamic_sample_reference (void* data_ptr, unsigned first_bit)
+	: parent_t (data_ptr)
+	, _first_bit (first_bit) {}
+    
+    packed_dynamic_sample_reference (const packed_dynamic_sample_reference& ref)
+	: parent_t(ref._data_ptr)
+	, _first_bit (ref._first_bit) {}
+
+    const packed_dynamic_sample_reference&
+    operator= (integer_t value) const
+    {
+	assert (value <= parent_t::max_val);
+	set_unsafe (value);
+	return *this;
+    }
+    
+    const packed_dynamic_sample_reference&
+    operator= (const mutable_reference& ref) const
+    {
+	set_unsafe (ref.get());
+	return *this;
+    }
+    
+    const packed_dynamic_sample_reference&
+    operator= (const const_reference& ref) const
+    {
+	set_unsafe (ref.get ());
+	return *this;
+    }
 
     template <typename BitField1, int FirstBit1, bool Mutable1>
-    const packed_dynamic_sample_reference& operator=(const packed_sample_reference<BitField1, FirstBit1, NumBits, Mutable1>& ref) const 
-        {  set_unsafe(ref.get()); return *this; }
-
-    unsigned first_bit() const { return _first_bit; }
-
-    integer_t get() const { 
-        const BitField sample_mask = parent_t::max_val<<_first_bit;
-        return ( static_cast< integer_t >( this->get_data()&sample_mask ) >> _first_bit );
+    const packed_dynamic_sample_reference& operator= (
+	const packed_sample_reference<BitField1, FirstBit1,
+				      NumBits, Mutable1>& ref) const 
+    {
+	set_unsafe (ref.get());
+	return *this;
     }
-    void set_unsafe(integer_t value) const { 
+
+    unsigned first_bit () const { return _first_bit; }
+
+    integer_t get() const
+    { 
         const BitField sample_mask = parent_t::max_val<<_first_bit;
-        this->set_data((this->get_data() & ~sample_mask) | value<<_first_bit); 
+        return (static_cast<integer_t>(this->get_data() & sample_mask ) >>
+		_first_bit);
+    }
+    
+    void set_unsafe(integer_t value) const
+    { 
+        const BitField sample_mask = parent_t::max_val << _first_bit;
+        this->set_data ((this->get_data() & ~sample_mask) | value << _first_bit); 
     }
 };
-} }  // namespace boost::gil
 
-namespace std {
-// We are forced to define swap inside std namespace because on some platforms (Visual Studio 8) STL calls swap qualified.
-// swap with 'left bias': 
-// - swap between proxy and anything
-// - swap between value type and proxy
-// - swap between proxy and proxy
+} /* namespace sound */
+} /* namespace psynth */
 
+namespace std
+{
 
-/// \ingroup PackedSampleDynamicReferenceModel
-/// \brief swap for packed_dynamic_sample_reference
+/*
+  We are forced to define swap inside std namespace because on some
+  platforms (Visual Studio 8) STL calls swap qualified.
+  
+  swap with 'left bias': 
+  - swap between proxy and anything
+  - swap between value type and proxy
+  - swap between proxy and proxy
+*/
+
+/**
+   \ingroup PackedSampleDynamicReferenceModel
+   \brief swap for packed_dynamic_sample_reference
+*/
 template <typename BF, int NB, bool M, typename R> inline
-void swap(const boost::gil::packed_dynamic_sample_reference<BF,NB,M> x, R& y) { 
-    boost::gil::swap_proxy<typename boost::gil::packed_dynamic_sample_reference<BF,NB,M>::value_type>(x,y); 
+void swap(const psynth::sound::packed_dynamic_sample_reference<BF,NB,M> x, R& y)
+{ 
+    psynth::sound::swap_proxy<
+	typename psynth::sound::packed_dynamic_sample_reference<
+	    BF,NB,M>::value_type> (x, y); 
 }
 
 
-/// \ingroup PackedSampleDynamicReferenceModel
-/// \brief swap for packed_dynamic_sample_reference
+/**
+   \ingroup PackedSampleDynamicReferenceModel
+   \brief swap for packed_dynamic_sample_reference
+*/
 template <typename BF, int NB, bool M> inline
-void swap(typename boost::gil::packed_dynamic_sample_reference<BF,NB,M>::value_type& x, const boost::gil::packed_dynamic_sample_reference<BF,NB,M> y) { 
-    boost::gil::swap_proxy<typename boost::gil::packed_dynamic_sample_reference<BF,NB,M>::value_type>(x,y); 
+void swap (typename psynth::sound::packed_dynamic_sample_reference<BF,NB,M>::value_type& x,
+	   const psynth::sound::packed_dynamic_sample_reference<BF,NB,M> y)
+{ 
+    psynth::sound::swap_proxy<
+	typename psynth::sound::packed_dynamic_sample_reference<BF,NB,M>::value_type> (x,y); 
 }
 
-
-/// \ingroup PackedSampleDynamicReferenceModel
-/// \brief swap for packed_dynamic_sample_reference
+/**
+   \ingroup PackedSampleDynamicReferenceModel
+   \brief swap for packed_dynamic_sample_reference
+*/
 template <typename BF, int NB, bool M> inline
-void swap(const boost::gil::packed_dynamic_sample_reference<BF,NB,M> x, const boost::gil::packed_dynamic_sample_reference<BF,NB,M> y) { 
-    boost::gil::swap_proxy<typename boost::gil::packed_dynamic_sample_reference<BF,NB,M>::value_type>(x,y); 
+void swap(const psynth::sound::packed_dynamic_sample_reference<BF,NB,M> x,
+	  const psynth::sound::packed_dynamic_sample_reference<BF,NB,M> y)
+{ 
+    psynth::sound::swap_proxy<
+	typename psynth::sound::packed_dynamic_sample_reference<BF,NB,M>::value_type> (x,y); 
 }
-}   // namespace std
 
-namespace boost { namespace gil {
-///////////////////////////////////////////
-////
-////  Built-in sample models
-////
-///////////////////////////////////////////
+} /* namespace std */
 
-/// \defgroup bits8 bits8
-/// \ingroup SampleModel
-/// \brief 8-bit unsigned integral sample type (typedef from uint8_t). Models SampleValueConcept
 
-/// \ingroup bits8
-typedef uint8_t  bits8;
+namespace psynth
+{
+namespace sound
+{
 
-/// \defgroup bits16 bits16
-/// \ingroup SampleModel
-/// \brief 16-bit unsigned integral sample type (typedef from uint16_t). Models SampleValueConcept
+/*
+ *
+ *    Built-in sample models
+ *
+ */
 
-/// \ingroup bits16
-typedef uint16_t bits16;
+/**
+   \defgroup bits8 bits8
+   \ingroup SampleModel
+   \brief 8-bit unsigned integral sample type (typedef from
+   uint8_t). Models SampleValueConcept
+   \ingroup bits8
+*/
+typedef boost::uint8_t  bits8;
 
-/// \defgroup bits32 bits32
-/// \ingroup SampleModel
-/// \brief 32-bit unsigned integral sample type  (typedef from uint32_t). Models SampleValueConcept
+/**
+   \defgroup bits16 bits16
+   \ingroup SampleModel
+   \brief 16-bit unsigned integral sample type (typedef from
+   uint16_t). Models SampleValueConcept
+   \ingroup bits16
+*/
+typedef boost::uint16_t bits16;
 
-/// \ingroup bits32
-typedef uint32_t bits32;
+/**
+   \defgroup bits32 bits32
+   \ingroup SampleModel
+   \brief 32-bit unsigned integral sample type  (typedef from
+   uint32_t). Models SampleValueConcept
+   \ingroup bits32
+*/
+typedef boost::uint32_t bits32;
 
-/// \defgroup bits8s bits8s
-/// \ingroup SampleModel
-/// \brief 8-bit signed integral sample type (typedef from int8_t). Models SampleValueConcept
+/**
+   \defgroup bits8s bits8s
+   \ingroup SampleModel
+   \brief 8-bit signed integral sample type (typedef from
+   int8_t). Models SampleValueConcept
+   \ingroup bits8s
+*/
+typedef boost::int8_t   bits8s;
 
-/// \ingroup bits8s
-typedef int8_t   bits8s;
+/**
+   \defgroup bits16s bits16s
+   \ingroup SampleModel
+   \brief 16-bit signed integral sample type (typedef from
+   int16_t). Models SampleValueConcept
+   \ingroup bits16s
+*/
+typedef boost::int16_t  bits16s;
 
-/// \defgroup bits16s bits16s
-/// \ingroup SampleModel
-/// \brief 16-bit signed integral sample type (typedef from int16_t). Models SampleValueConcept
+/**
+   \defgroup bits32s bits32s
+   \ingroup SampleModel
+   \brief 32-bit signed integral sample type (typedef from
+   int32_t). Models SampleValueConcept
+   \ingroup bits32s
+*/
+typedef boost::int32_t  bits32s;
 
-/// \ingroup bits16s
-typedef int16_t  bits16s;
+/**
+   \defgroup bits32f bits32f
+   \ingroup SampleModel
+   \brief 32-bit floating point sample type with range [0.0f
+   ... 1.0f]. Models SampleValueConcept
+   \ingroup bits32f
+*/
+typedef scoped_sample_value<float, float_zero, float_one> bits32f;
 
-/// \defgroup bits32s bits32s
-/// \ingroup SampleModel
-/// \brief 32-bit signed integral sample type (typedef from int32_t). Models SampleValueConcept
+/**
+   \defgroup bits32fs bits32fs
+   \ingroup SampleModel
+   \brief 32-bit floating point sample type with range [-1.0f
+   ... 1.0f]. Models SampleValueConcept
+   \ingroup bits32fs
+*/
+typedef scoped_sample_value<float, float_minus_one, float_one> bits32fs;
 
-/// \ingroup bits32s
-typedef int32_t  bits32s;
+} /* namespace sound */
+} /* namespace psynth */
 
-/// \defgroup bits32f bits32f
-/// \ingroup SampleModel
-/// \brief 32-bit floating point sample type with range [0.0f ... 1.0f]. Models SampleValueConcept
+namespace boost
+{
 
-/// \ingroup bits32f
-typedef scoped_sample_value<float,float_zero,float_one> bits32f;
-
-} }  // namespace boost::gil
-
-namespace boost {
+/**
+ * @todo Integrate in C++0x type_traits?
+ */
 
 template <int NumBits>
-struct is_integral<gil::packed_sample_value<NumBits> > : public mpl::true_ {};
+struct is_integral<psynth::packed_sample_value<NumBits> > : public mpl::true_ {};
 
 template <typename BitField, int FirstBit, int NumBits, bool IsMutable>
-struct is_integral<gil::packed_sample_reference<BitField,FirstBit,NumBits,IsMutable> > : public mpl::true_ {};
+struct is_integral<psynth::packed_sample_reference<
+		       BitField, FirstBit, NumBits, IsMutable> > :
+	public mpl::true_ {};
 
 template <typename BitField, int NumBits, bool IsMutable>
-struct is_integral<gil::packed_dynamic_sample_reference<BitField,NumBits,IsMutable> > : public mpl::true_ {};
+struct is_integral<psynth::sound::packed_dynamic_sample_reference<
+		       BitField,NumBits,IsMutable> > :
+	public mpl::true_ {};
 
 template <typename BaseSampleValue, typename MinVal, typename MaxVal> 
-struct is_integral<gil::scoped_sample_value<BaseSampleValue,MinVal,MaxVal> > : public is_integral<BaseSampleValue> {};
+struct is_integral<psynth::sound::scoped_sample_value<BaseSampleValue,MinVal,MaxVal> > :
+	public is_integral<BaseSampleValue> {};
 
-}
+} /* namespace boost */
 
-#endif
+#endif /* PSYNTH_SAMPLE_HPP_ */
