@@ -20,6 +20,9 @@ processing. The changes include:
    Color Tag: name_t   => Channel Tag: name_channel
    Color Space: name_t => Channel Space: name_space
    Color Layout: name_layout_t => Channel Layout: name_layout
+- removed position_iterator, locator, virtual_locator, point2d
+- TODO: position_iterator can inspire time handling!!!
+- TODO: implement virtual_iterator from virtual_locator?
 
 Please, remember to check diffs between GIL releases to fix bugs and
 add functionallity to our version.

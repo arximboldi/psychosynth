@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-10-26 18:08:11 raskolnikov>
+ *  Time-stamp:  <2010-10-28 21:03:07 raskolnikov>
  *
  *  @file        sample_algorithm.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -97,7 +97,8 @@ struct unsigned_integral_max_value<uint32_t> :
 
 template <int K>
 struct unsigned_integral_max_value<packed_sample_value<K> >
-    : public mpl::integral_c<typename packed_sample_value<K>::integer_t, (1 << K) - 1> {};
+    : public mpl::integral_c<
+    typename packed_sample_value<K>::integer_t, (1 << K) - 1> {};
 
 /**
  * unsigned_integral_num_bits - given an unsigned integral sample
@@ -105,7 +106,8 @@ struct unsigned_integral_max_value<packed_sample_value<K> >
  */
 
 template <typename UnsignedIntegralSample>
-struct unsigned_integral_num_bits : public mpl::int_<sizeof(UnsignedIntegralSample)*8> {};
+struct unsigned_integral_num_bits :
+	public mpl::int_<sizeof(UnsignedIntegralSample)*8> {};
 
 template <int K>
 struct unsigned_integral_num_bits<packed_sample_value<K> >
@@ -181,8 +183,10 @@ namespace detail
    \brief This is the default implementation. Performance
    specializatons are provided
 */
-template <typename SrcSampleV, typename DstSampleV, bool SrcIsIntegral, bool DstIsIntegral> 
-struct sample_converter_unsigned_impl : public std::unary_function <DstSampleV, SrcSampleV>
+template <typename SrcSampleV, typename DstSampleV,
+	  bool SrcIsIntegral, bool DstIsIntegral> 
+struct sample_converter_unsigned_impl :
+	public std::unary_function <DstSampleV, SrcSampleV>
 {
     DstSampleV operator () (SrcSampleV src) const
     { 
@@ -201,7 +205,8 @@ private:
     }
 };
 
-// When both the source and the destination are integral samples, perform a faster conversion
+// When both the source and the destination are integral samples,
+// perform a faster conversion
 template <typename SrcSampleV, typename DstSampleV> 
 struct sample_converter_unsigned_impl<SrcSampleV, DstSampleV, true, true>
     : public sample_converter_unsigned_integral<SrcSampleV, DstSampleV,
@@ -242,7 +247,8 @@ struct sample_converter_unsigned_integral_impl<SrcSampleV, DstSampleV, true, tru
 {
     DstSampleV operator () (SrcSampleV src) const
     { 
-        typedef typename unsigned_integral_max_value<DstSampleV>::value_type integer_t;
+        typedef typename unsigned_integral_max_value<DstSampleV>::value_type
+	    integer_t;
         static const integer_t mul =
 	    unsigned_integral_max_value<DstSampleV>::value /
 	    unsigned_integral_max_value<SrcSampleV>::value;
@@ -260,7 +266,8 @@ struct sample_converter_unsigned_integral_impl<SrcSampleV,DstSampleV, false, tru
 {
     DstSampleV operator () (SrcSampleV src) const
     { 
-        typedef typename unsigned_integral_max_value<SrcSampleV>::value_type integer_t;
+        typedef typename unsigned_integral_max_value<SrcSampleV>::value_type
+	    integer_t;
         static const integer_t div =
 	    unsigned_integral_max_value<SrcSampleV>::value /
 	    unsigned_integral_max_value<DstSampleV>::value;
@@ -310,7 +317,8 @@ struct sample_converter_unsigned_integral_impl<SrcSampleV, DstSampleV,
   src_max fits in an integer
 */
 template <typename SrcSampleV, typename DstSampleV> 
-struct sample_converter_unsigned_integral_nondivisible<SrcSampleV, DstSampleV, true, false>
+struct sample_converter_unsigned_integral_nondivisible<
+    SrcSampleV, DstSampleV, true, false>
 {
     DstSampleV operator () (SrcSampleV src) const
     {
@@ -331,7 +339,8 @@ struct sample_converter_unsigned_integral_nondivisible<SrcSampleV, DstSampleV, t
   src_max cannot fit in an integer (overflows). Use a double
 */
 template <typename SrcSampleV, typename DstSampleV> 
-struct sample_converter_unsigned_integral_nondivisible <SrcSampleV, DstSampleV, true, true>
+struct sample_converter_unsigned_integral_nondivisible <
+    SrcSampleV, DstSampleV, true, true>
 {
     DstSampleV operator () (SrcSampleV src) const
     {
@@ -353,7 +362,8 @@ struct sample_converter_unsigned_integral_nondivisible<
 {
     DstSampleV operator () (SrcSampleV src) const
     { 
-        typedef typename unsigned_integral_max_value<SrcSampleV>::value_type integer_t;
+        typedef typename unsigned_integral_max_value<SrcSampleV>::value_type
+	    integer_t;
         static const double div =
 	    unsigned_integral_max_value<SrcSampleV>::value /
 	    double (unsigned_integral_max_value<DstSampleV>::value);
@@ -446,14 +456,16 @@ struct sample_convert_to_unsigned : public detail::identity<SampleValue>
 };
 
 template <>
-struct sample_convert_to_unsigned<bits8s> : public std::unary_function<bits8s, bits8>
+struct sample_convert_to_unsigned<bits8s> :
+	public std::unary_function<bits8s, bits8>
 { 
     typedef bits8 type;
     type operator () (bits8s val) const { return val + 128; } 
 };
 
 template <>
-struct sample_convert_to_unsigned <bits16s> : public std::unary_function<bits16s, bits16>
+struct sample_convert_to_unsigned <bits16s> :
+    public std::unary_function<bits16s, bits16>
 { 
     typedef bits16 type;
     type operator () (bits16s  val) const { return val + 32768; } 
@@ -463,7 +475,8 @@ template <> struct sample_convert_to_unsigned<bits32s> :
 	public std::unary_function<bits32s, bits32>
 {
     typedef bits32 type;
-    type operator () (bits32s x) const { return static_cast<bits32>(x + (1 << 31)); }
+    type operator () (bits32s x) const
+    { return static_cast<bits32>(x + (1 << 31)); }
 };
 
 
@@ -479,21 +492,24 @@ struct sample_convert_from_unsigned : public detail::identity<SampleValue>
 };
 
 template <>
-struct sample_convert_from_unsigned<bits8s> : public std::unary_function<bits8, bits8s>
+struct sample_convert_from_unsigned<bits8s> :
+    public std::unary_function<bits8, bits8s>
 { 
     typedef bits8s type;
     type  operator () (bits8  val) const { return val-128; } 
 };
 
 template <>
-struct sample_convert_from_unsigned<bits16s> : public std::unary_function<bits16,bits16s>
+struct sample_convert_from_unsigned<bits16s> :
+    public std::unary_function<bits16,bits16s>
 { 
     typedef bits16s type;
     type operator () (bits16 val) const { return val-32768; } 
 };
 
 template <>
-struct sample_convert_from_unsigned<bits32s> : public std::unary_function<bits32, bits32s>
+struct sample_convert_from_unsigned<bits32s> :
+    public std::unary_function<bits32, bits32s>
 {
     typedef bits32s type;
     type operator () (bits32 x) const { return static_cast<bits32s>(x-(1<<31)); }
@@ -528,8 +544,9 @@ template <typename DstSample, typename SrcSample>
 inline typename sample_traits<DstSample>::value_type
 sample_convert(const SrcSample& src)
 { 
-    return sample_converter<typename sample_traits<SrcSample>::value_type,
-                             typename sample_traits<DstSample>::value_type> ()( src); 
+    return sample_converter<
+	typename sample_traits<SrcSample>::value_type,
+	typename sample_traits<DstSample>::value_type>() (src); 
 }
 
 /**
@@ -596,7 +613,8 @@ struct sample_multiplier_unsigned :
 {
     SampleValue operator () (SampleValue a, SampleValue b) const
     {
-        return SampleValue (a / double (sample_traits<SampleValue>::max_value()) * b);
+        return SampleValue (
+	    a / double (sample_traits<SampleValue>::max_value()) * b);
     }
 };
 
@@ -604,7 +622,8 @@ struct sample_multiplier_unsigned :
    \brief Specialization of sample_multiply for 8-bit unsigned samples
 */
 template<>
-struct sample_multiplier_unsigned<bits8> : public std::binary_function<bits8, bits8, bits8>
+struct sample_multiplier_unsigned<bits8> :
+    public std::binary_function<bits8, bits8, bits8>
 {
     bits8 operator () (bits8 a, bits8 b) const
     {
@@ -660,7 +679,8 @@ struct sample_multiplier :
    max_value
 */
 template <typename Sample> // Models SampleConcept (could be a sample reference)
-inline typename sample_traits<Sample>::value_type sample_multiply (Sample a, Sample b)
+inline typename sample_traits<Sample>::value_type
+sample_multiply (Sample a, Sample b)
 { 
     return sample_multiplier<typename sample_traits<Sample>::value_type> () (a, b);
 }
@@ -689,7 +709,9 @@ inline typename sample_traits<Sample>::value_type sample_multiply (Sample a, Sam
 template <typename Sample> // Models SampleConcept (could be a sample reference)
 inline typename sample_traits<Sample>::value_type sample_invert (Sample x)
 { 
-    return sample_traits<Sample>::max_value() - x + sample_traits<Sample>::min_value(); 
+    return
+	sample_traits<Sample>::max_value() - x +
+	sample_traits<Sample>::min_value(); 
 }
 
 //#ifdef _MSC_VER
