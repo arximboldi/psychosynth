@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2009-04-27 16:40:13 raskolnikov>
+ *  Time-stamp:  <2010-10-19 18:16:30 raskolnikov>
  *
  *  @file        pointer.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -36,16 +36,18 @@
 
 namespace psynth
 {
+namespace base
+{
 
 /**
  * Functor for the delete operator, usefull to clear pointer containers with
  * for_each.
  */
 template <class PtrT>
-class deleter
+struct deleter
 {
-public:
-    void operator () (PtrT ptr) {
+    void operator () (PtrT ptr)
+    {
 	delete ptr;
     }
 };
@@ -445,6 +447,18 @@ public:
     }
 };
 
+} /* namespace base */
 } /* namespace psynth*/
+
+namespace std
+{
+
+template <typename T>
+struct remove_pointer<psynth::base::null_ptr<T>>
+{
+    typedef T type;
+};
+
+} /* namespace std */
 
 #endif /* PSYNTH_POINTER_HPP */

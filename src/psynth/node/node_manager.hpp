@@ -37,11 +37,11 @@ namespace psynth
 class node_manager
 {
 public:
-    typedef base::map_iterator <int, mgr_ptr<node> > iterator;
-    typedef base::map_const_iterator <int, mgr_ptr<node> > const_iterator;
+    typedef base::map_iterator <int, base::mgr_ptr<node>> iterator;
+    typedef base::map_const_iterator <int, base::mgr_ptr<node>> const_iterator;
 
 private:
-    mgr_assoc <std::map <int, mgr_ptr <node> > > m_node_map;
+    base::mgr_assoc <std::map <int, base::mgr_ptr <node>>> m_node_map;
     std::list <node_output*> m_outputs;
     std::list <node*> m_delete_list;
     
@@ -53,7 +53,7 @@ public:
     node_manager ();
     ~node_manager ();
 	
-    bool add_node (mgr_ptr<node> obj, int id);
+    bool add_node (base::mgr_ptr<node> obj, int id);
 
     bool delete_node (int id);
     void delete_node (iterator it);

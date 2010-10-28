@@ -243,7 +243,7 @@ class world : public world_subject,
 {    
     audio_info m_info;
 
-    mgr_auto_ptr<patcher> m_patcher;
+    base::mgr_auto_ptr<patcher> m_patcher;
     
     node_manager m_node_mgr;
     node_output* m_output;
@@ -324,7 +324,7 @@ public:
 	m_output->detach_passive_output (out);
     };
 
-    void set_patcher (mgr_ptr<patcher> pat);
+    void set_patcher (base::mgr_ptr<patcher> pat);
 
     void unset_patcher ();
     

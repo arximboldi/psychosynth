@@ -37,7 +37,7 @@ node_manager::~node_manager ()
 {
 }
 
-bool node_manager::add_node (mgr_ptr<node> obj, int id)
+bool node_manager::add_node (base::mgr_ptr<node> obj, int id)
 {
     if (!m_node_map.insert(make_pair (id, obj)).second)
 	return false;
@@ -74,7 +74,7 @@ void node_manager::do_delete_node (iterator it)
 
 bool node_manager::delete_node (int id)
 {
-    map<int, mgr_ptr<node> >::iterator iter;
+    map<int, base::mgr_ptr<node> >::iterator iter;
     iter = m_node_map.find (id);
     
     if (iter == m_node_map.end())
@@ -100,7 +100,7 @@ void node_manager::set_info (const audio_info& info)
 {
     boost::mutex::scoped_lock lock (m_update_mutex);
 
-    map<int, mgr_ptr<node> >::iterator map_iter;
+    map<int, base::mgr_ptr<node> >::iterator map_iter;
     for (map_iter = m_node_map.begin();
 	 map_iter != m_node_map.end();
 	 ++map_iter)
@@ -113,7 +113,7 @@ void node_manager::update()
 {
     boost::mutex::scoped_lock lock (m_update_mutex);
     
-    map<int, mgr_ptr<node> >::iterator map_iter;
+    map<int, base::mgr_ptr<node> >::iterator map_iter;
     for (map_iter = m_node_map.begin();
 	 map_iter != m_node_map.end();
 	 ++map_iter)

@@ -71,8 +71,7 @@ node::node(const audio_info& info, int type,
 
 node::~node()
 {
-    for_each(m_params.begin(), m_params.end(), deleter<node_param*>());
-//    cout << "Deleting object.\n";
+    for_each(m_params.begin(), m_params.end(), base::deleter<node_param*>());
 }
 
 void node::set_envelopes_deltas()
