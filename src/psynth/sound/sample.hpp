@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-10-26 17:59:18 raskolnikov>
+ *  Time-stamp:  <2010-10-28 19:39:53 raskolnikov>
  *
  *  @file        sample.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -44,7 +44,7 @@
 #include <boost/cstdint.hpp>
 
 #include <psynth/base/compat.hpp>
-#include <psynth/sound/utilities.hpp>
+#include <psynth/sound/util.hpp>
 
 namespace psynth
 {
@@ -586,10 +586,11 @@ public:
     const_reference;
     typedef const packed_sample_reference<BitField,FirstBit,NumBits,true>
     mutable_reference;
-    typedef typename parent_t::integer_t                           integer_t;
+    typedef typename parent_t::integer_t integer_t;
 
     explicit packed_sample_reference (void* data_ptr)
 	: parent_t (data_ptr) {}
+
     packed_sample_reference (const packed_sample_reference& ref)
 	: parent_t (ref._data_ptr) {}
 
@@ -912,7 +913,8 @@ void swap (typename psynth::sound::packed_dynamic_sample_reference<BF,NB,M>::val
 	   const psynth::sound::packed_dynamic_sample_reference<BF,NB,M> y)
 { 
     psynth::sound::swap_proxy<
-	typename psynth::sound::packed_dynamic_sample_reference<BF,NB,M>::value_type> (x,y); 
+	typename psynth::sound::packed_dynamic_sample_reference<
+	    BF, NB, M>::value_type> (x,y); 
 }
 
 /**
@@ -1033,11 +1035,12 @@ struct is_integral<psynth::packed_sample_reference<
 
 template <typename BitField, int NumBits, bool IsMutable>
 struct is_integral<psynth::sound::packed_dynamic_sample_reference<
-		       BitField,NumBits,IsMutable> > :
+		       BitField, NumBits, IsMutable> > :
 	public mpl::true_ {};
 
 template <typename BaseSampleValue, typename MinVal, typename MaxVal> 
-struct is_integral<psynth::sound::scoped_sample_value<BaseSampleValue,MinVal,MaxVal> > :
+struct is_integral<psynth::sound::scoped_sample_value<
+		       BaseSampleValue, MinVal, MaxVal> > :
 	public is_integral<BaseSampleValue> {};
 
 } /* namespace boost */

@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-10-25 19:15:19 raskolnikov>
+ *  Time-stamp:  <2010-10-28 14:28:24 raskolnikov>
  *
  *  @file        buffer.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -36,8 +36,8 @@
  *  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt).
  */
 
-#ifndef PSYNTH_BUFFER_H
-#define PSYNTH_BUFFER_H
+#ifndef PSYNTH_SOUND_BUFFER_H
+#define PSYNTH_SOUND_BUFFER_H
 
 #include <cstddef>
 #include <memory>
@@ -402,4 +402,4 @@ struct is_planar<buffer<Frame,IsPlanar,Alloc> > :
 } /* namespace sound */
 } /* namespace psynth */
 
-#endif
+#endif /* PSYNTH_SOUND_BUFFER */

@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-10-25 19:08:39 raskolnikov>
+ *  Time-stamp:  <2010-10-28 19:39:38 raskolnikov>
  *
  *  @file        frame.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -46,21 +46,21 @@
 #include <boost/type_traits.hpp>
 
 #include <psynth/base/compat.hpp"
-#include "channel_base.hpp"
-#include "gil_concept.hpp"
-#include "sample.hpp"
-#include "metafunctions.hpp"
-#include "utilities.hpp"
-#include "channel_base_algorithm.hpp"
+#include <psynth/sound/channel_base.hpp>
+#include <psynth/sound/concept.hpp>
+#include <psynth/sound/sample.hpp>
+#include <psynth/sound/metafunctions.hpp>
+#include <psynth/sound/util.hpp>
+#include <psynth/sound/channel_base_algorithm.hpp>
 
 namespace psynth
 {
 namespace sound
 {
 
-/* Forward-declare gray_t */
-struct gray_channel_t;
-typedef mpl::vector1<gray_channel_t> gray_t;
+/* Forward-declare mono_t */
+struct mono_channel;
+typedef mpl::vector1<mono_channel> mono_space;
 
 template <typename FrameBased> struct channel_space_type;
 template <typename FrameBased> struct sample_mapping_type;
@@ -138,13 +138,13 @@ BOOST_STATIC_ASSERT((is_same<sample_type<bgr8_frame_t>::type, bits8>::value));
    assigned to an 8-bit BGR frame, or to an 8-bit planar
    reference. The samples are properly paired semantically.
 
-   The single-sample (grayscale) instantiation of the class frame,
-   (i.e. \p frame<T,gray_layout_t>) is also convertible to/from a
-   sample value.  This allows grayscale frames to be used in simpler
-   expressions like *gray_pix1 = *gray_pix2 instead of more
-   complicated at_c<0>(gray_pix1) = at_c<0>(gray_pix2) or
-   get_channel<gray_channel_t>(gray_pix1) =
-   get_channel<gray_channel_t>(gray_pix2)
+   The single-sample (monoscale) instantiation of the class frame,
+   (i.e. \p frame<T,mono_layout_t>) is also convertible to/from a
+   sample value.  This allows monoscale frames to be used in simpler
+   expressions like *mono_pix1 = *mono_pix2 instead of more
+   complicated at_c<0>(mono_pix1) = at_c<0>(mono_pix2) or
+   get_channel<mono_channel_t>(mono_pix1) =
+   get_channel<mono_channel_t>(mono_pix2)
 */
 template <typename SampleValue, typename Layout>
 // = mpl::range_c<int, 0, ChannelSpace::size> >
@@ -232,17 +232,17 @@ public:
 	return dynamic_at_c (*this, i);
     }
 
-    /* Grayscale support */
+    /* Monoscale support */
     frame&  operator= (sample_t chan)
     {
-	check_gray();
+	check_mono();
 	sound::at_c<0>(*this) = chan;
 	return *this;
     }
     
     bool operator== (sample_t chan) const
     {
-	check_gray ();
+	check_mono ();
 	return sound::at_c<0>(*this) == chan;
     }
     
@@ -264,29 +264,29 @@ private:
     template <typename Frame>
     void check_compatible() const
     {
-	gil_function_requires<FramesCompatibleConcept<Frame,frame> >();
+	gil_function_requires<FramesCompatibleConcept<Frame, frame> >();
     }
 
     /* Support for assignment/equality comparison of a sample with a
-     * grayscale frame */
+     * monoscale frame */
 
-    static void check_gray()
+    static void check_mono()
     {
 	BOOST_STATIC_ASSERT(
-	    (is_same<typename Layout::channel_space_t, gray_t>::value));
+	    (is_same<typename Layout::channel_space_type, mono_space>::value));
     }
     
     template <typename Sample>
     void assign (const Sample& chan, mpl::false_)
     {
-	check_gray ();
+	check_mono ();
 	gil::at_c<0> (*this) = chan;
     }
     
     template <typename Sample>
     bool equal (const Sample& chan, mpl::false_) const
     {
-	check_gray();
+	check_mono ();
 	return gil::at_c<0>(*this)==chan;
     }
 };

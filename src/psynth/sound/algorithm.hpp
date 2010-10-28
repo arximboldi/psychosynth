@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-10-20 19:57:40 raskolnikov>
+ *  Time-stamp:  <2010-10-28 12:22:14 raskolnikov>
  *
  *  @file        algorithm.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -36,8 +36,8 @@
  *  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt).
  */
 
-#ifndef PSYNTH_ALGORITHM_HPP
-#define PSYNTH_ALGORITHM_HPP
+#ifndef PSYNTH_SOUND_ALGORITHM_HPP
+#define PSYNTH_SOUND_ALGORITHM_HPP
 
 #include <cassert>
 #include <cstddef>
@@ -46,18 +46,19 @@
 #include <iterator>
 #include <memory>
 #include <typeinfo>
+
 #include <psynth/base/compat.hpp>
 #include <psynth/base/concept.hpp>
 #include <psynth/sound/concept.hpp>
-#include "color_base_algorithm.hpp"
-#include "image_view.hpp"
-#include "image_view_factory.hpp"
-#include "bit_aligned_pixel_iterator.hpp"
+#include <psynth/sound/channel_base_algorithm.hpp>
+#include <psynth/sound/buffer_view.hpp>
+#include <psynth/sound/buffer_view_factory.hpp>
+#include <psynth/sound/bit_aligned_frame_iterator.hpp>
 
 //#ifdef _MSC_VER
 //#pragma warning(push)
 //#pragma warning(disable : 4244)
-// conversion from 'gil::image<V,Alloc>::coord_t' to 'int', possible
+// conversion from 'psynth::image<V,Alloc>::coord_t' to 'int', possible
 // loss of data (visual studio compiler doesn't realize that the two
 // types are the same)
 //#endif
@@ -265,7 +266,7 @@ copy (psynth::sound::planar_pixel_iterator<IC1,Cs> first,
       psynth::sound::planar_pixel_iterator<IC1,Cs> last,
       psynth::sound::planar_pixel_iterator<IC2,Cs> dst)
 { 
-    psynth::sound::gil_function_requires <
+    psynth::sound::psynth_function_requires <
 	psynth::sound::ChannelsCompatibleConcept<
 	    typename std::iterator_traits<IC1>::value_type,
 	    typename std::iterator_traits<IC2>::value_type> >();
@@ -312,8 +313,8 @@ struct copier_n <iterator_from_2d<IL>,O>
     PSYNTH_FORCEINLINE
     void operator () (iterator_from_2d<IL> src, diff_t n, O dst) const
     {
-        gil_function_requires<PixelLocatorConcept<IL> > ();
-        gil_function_requires<MutablePixelIteratorConcept<O> >();
+        psynth_function_requires<PixelLocatorConcept<IL> > ();
+        psynth_function_requires<MutablePixelIteratorConcept<O> >();
         while (n > 0) {
             typedef typename iterator_from_2d<IL>::difference_type diff_t;
             diff_t l = src.width () - src.x_pos ();
@@ -336,8 +337,8 @@ struct copier_n<I,iterator_from_2d<OL> >
     PSYNTH_FORCEINLINE
     void operator () (I src, diff_t n, iterator_from_2d<OL> dst) const
     {
-        gil_function_requires<PixelIteratorConcept<I> >();
-        gil_function_requires<MutablePixelLocatorConcept<OL> >();
+        psynth_function_requires<PixelIteratorConcept<I> >();
+        psynth_function_requires<MutablePixelLocatorConcept<OL> >();
         while (n>0) {
             diff_t l = dst.width() - dst.x_pos();
             diff_t num_to_copy = (n < l ? n : l);
@@ -359,8 +360,8 @@ struct copier_n<iterator_from_2d<IL>,iterator_from_2d<OL> >
    void operator() (iterator_from_2d<IL> src, diff_t n,
 		    iterator_from_2d<OL> dst) const
     {
-        gil_function_requires<PixelLocatorConcept<IL> >();
-        gil_function_requires<MutablePixelLocatorConcept<OL> >();
+        psynth_function_requires<PixelLocatorConcept<IL> >();
+        psynth_function_requires<MutablePixelLocatorConcept<OL> >();
         if (src.x_pos() != dst.x_pos() || src.width() != dst.width()) {
             while (n-- > 0) {
                 *dst++=*src++;
@@ -543,7 +544,7 @@ template <typename IL, typename V>
 void fill (psynth::sound::iterator_from_2d<IL> first,
 	   psynth::sound::iterator_from_2d<IL> last, const V& val)
 {
-    psynth::sound::gil_function_requires<psynth::sound::MutablePixelLocatorConcept<IL> >();
+    psynth::sound::psynth_function_requires<psynth::sound::MutablePixelLocatorConcept<IL> >();
 
     if (first.is_1d_traversable()) {
         std::fill(first.x(), last.x(), val);
@@ -1102,8 +1103,8 @@ struct equal_n_fn<psynth::sound::iterator_from_2d<Loc>,I2>
     PSYNTH_FORCEINLINE
     bool operator()(psynth::sound::iterator_from_2d<Loc> i1,
 		    std::ptrdiff_t n, I2 i2) const {
-        gil_function_requires<psynth::sound::PixelLocatorConcept<Loc> >();
-        gil_function_requires<psynth::sound::PixelIteratorConcept<I2> >();
+        psynth_function_requires<psynth::sound::PixelLocatorConcept<Loc> >();
+        psynth_function_requires<psynth::sound::PixelIteratorConcept<I2> >();
         while (n > 0) {
             std::ptrdiff_t num = std::min<const std::ptrdiff_t> (
 		n, i1.width() - i1.x_pos());
@@ -1126,8 +1127,8 @@ struct equal_n_fn<I1,psynth::sound::iterator_from_2d<Loc> >
     bool operator() (I1 i1, std::ptrdiff_t n,
 		     psynth::sound::iterator_from_2d<Loc> i2) const
     {
-        gil_function_requires<psynth::sound::PixelIteratorConcept<I1> >();
-        gil_function_requires<psynth::sound::PixelLocatorConcept<Loc> >();
+        psynth_function_requires<psynth::sound::PixelIteratorConcept<I1> >();
+        psynth_function_requires<psynth::sound::PixelLocatorConcept<Loc> >();
         while (n>0) {
             std::ptrdiff_t num = std::min<const std::ptrdiff_t> (
 		n, i2.width() - i2.x_pos());
@@ -1152,8 +1153,8 @@ struct equal_n_fn <psynth::sound::iterator_from_2d<Loc1>,
 		     std::ptrdiff_t n,
 		     psynth::sound::iterator_from_2d<Loc2> i2) const
     {
-        gil_function_requires<psynth::sound::PixelLocatorConcept<Loc1> >();
-        gil_function_requires<psynth::sound::PixelLocatorConcept<Loc2> >();
+        psynth_function_requires<psynth::sound::PixelLocatorConcept<Loc1> >();
+        psynth_function_requires<psynth::sound::PixelLocatorConcept<Loc2> >();
         if (i1.x_pos () != i2.x_pos () || i1.width () != i2.width ()) {
             while (n-- > 0) {
                 if (*i1++!=*i2++) return false;
@@ -1205,9 +1206,9 @@ bool equal (psynth::sound::iterator_from_2d<Loc1> first,
 	    psynth::sound::iterator_from_2d<Loc1> last,
 	    psynth::sound::iterator_from_2d<Loc2> first2)
 {
-    psynth::sound::gil_function_requires<
+    psynth::base::psynth_function_requires<
 	psynth::sound::PixelLocatorConcept<Loc1> >();
-    psynth::sound::gil_function_requires<
+    psynth::base::psynth_function_requires<
 	psynth::sound::PixelLocatorConcept<Loc2> >();
     std::ptrdiff_t n = last - first;
     

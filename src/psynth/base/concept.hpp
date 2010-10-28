@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-10-21 13:31:07 raskolnikov>
+ *  Time-stamp:  <2010-10-28 14:22:22 raskolnikov>
  *
  *  @file        concept.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -187,21 +187,6 @@ struct Metafunction
 
 } /* namespace base */
 } /* namespace psynth */
-
-/**
- * @note To understand this better, please refer to:
- *    http://stlab.adobe.com/gil/html/gildesignguide.html
- * And use this terminology mapping terminology mapping:
- *
- *   Color          = Channel
- *   Color Space    = Channel Space = Set of Colors
- *   Color Base     = Channel Base  = Set of Colors + Layout
- *   Channel Value  = Sample        = Where we store the color,
- *   Channel        = Channel
- *   Pixel          = Frame
- *   Image          = Buffer
- *   Image View     = Buffer View
- */
 
 #endif /* PSYNTH_CONCEPT_H_ */
 
