@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-10-28 19:17:25 raskolnikov>
+ *  Time-stamp:  <2010-10-29 13:50:34 raskolnikov>
  *
  *  @file        bit_aligned_frame_reference.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -219,7 +219,7 @@ struct bit_aligned_frame_reference
 					 mpl::plus<mpl::_1, mpl::_2>
 					 >::type::value));
     
-    typedef boost::gil::bit_range<bit_size, IsMutable> bit_range_type;
+    typedef psynth::sound::bit_range<bit_size, IsMutable> bit_range_type;
     typedef BitField  bitfield_type;
     typedef typename mpl::if_c<IsMutable,
 			       unsigned char*,

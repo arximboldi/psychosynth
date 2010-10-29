@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-10-28 14:28:24 raskolnikov>
+ *  Time-stamp:  <2010-10-29 12:56:59 raskolnikov>
  *
  *  @file        buffer.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -54,7 +54,7 @@ namespace sound
 //#ifdef _MSC_VER
 //#pragma warning(push)
 //#pragma warning(disable : 4244)
-// conversion from 'sound::buffer<V,Alloc>::coord_t' to 'int', possible
+// conversion from 'sound::buffer<V,Alloc>::size_type' to 'int', possible
 // loss of data (visual studio compiler doesn't realize that the two
 // types are the same)
 //#endif
@@ -81,13 +81,12 @@ class buffer
 {
 public:
     typedef typename Alloc::template rebind<unsigned char>::other allocator_type;
-    typedef typename view_type_from_frame<Frame, IsPlanar>::type view_t;
-
-    typedef typename view_t::const_t     const_view_t;
-    typedef typename view_t::coord_t     coord_t;
+    typedef typename view_type_from_frame<Frame, IsPlanar>::type view;
+    typedef typename view_t::const_type  const_view;
+    typedef typename view_t::size_type   size_type;
     typedef typename view_t::value_type  value_type;
     
-    const coord_t& size () const
+    const size_type& size () const
     {
 	return _view.size ();
     }
@@ -101,7 +100,7 @@ public:
 
     /* Create with size and optional initial value and
      * alignment */
-    buffer (coord_t& size,
+    buffer (size_type& size,
 	    std::size_t alignment = 0,
 	    const Alloc alloc_in = Alloc())
 	: _memory (0)
@@ -111,7 +110,7 @@ public:
         allocate_and_default_construct (size);
     }
     
-    buffer (const coord_t& size, 
+    buffer (const size_type& size, 
 	    const Frame& frame_in,
 	    std::size_t alignment,
 	    const Alloc alloc_in = Alloc())
@@ -181,7 +180,7 @@ public:
         swap (_alloc,          buf._alloc);
     }    
 
-    void recreate (const coord_t& size,
+    void recreate (const size_type& size,
 		   std::size_t alignment=0,
 		   const Alloc alloc_in = Alloc ())
     {
@@ -194,7 +193,7 @@ public:
         }
     }
     
-    void recreate (const coord_t& size, 
+    void recreate (const size_type& size, 
 		   const Frame& frame_in,
 		   std::size_t alignment,
 		   const Alloc alloc_in = Alloc())
@@ -271,7 +270,7 @@ private:
 	// add extra padding in case we need to align the first buffer frame
     }
 
-    std::size_t get_row_size_in_memunits (x_coord_t width) const
+    std::size_t get_row_size_in_memunits (size_type width) const
     {
 	// number of units per row
         std::size_t size_in_memunits =
@@ -285,7 +284,7 @@ private:
         return size_in_memunits;
     }
     
-    void allocate_ (const coord_t& size, mpl::false_)
+    void allocate_ (const size_type& size, mpl::false_)
     {
 	// if it throws and _memory!=0 the client must deallocate _memory
         _memory = _alloc.allocate (total_allocated_size_in_bytes (size));

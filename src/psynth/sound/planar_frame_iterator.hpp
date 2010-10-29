@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-10-28 15:11:48 raskolnikov>
+ *  Time-stamp:  <2010-10-29 12:07:03 raskolnikov>
  *
  *  @file        planar_frame_iterator.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -397,12 +397,12 @@ memunit_advanced_ref (const planar_frame_iterator<SamplePtr, ChannelSpace>& ptr,
 
 /*
  *
- *    HasDynamicXStepTypeConcept
+ *    HasDynamicStepTypeConcept
  *
  */
 
 template <typename IC, typename C>
-struct dynamic_x_step_type<planar_frame_iterator<IC,C> >
+struct dynamic_step_type<planar_frame_iterator<IC,C> >
 {
     typedef memory_based_step_iterator<planar_frame_iterator<IC,C> > type;
 };

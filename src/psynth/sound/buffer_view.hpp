@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-10-25 19:16:11 raskolnikov>
+ *  Time-stamp:  <2010-10-29 13:18:16 raskolnikov>
  *
  *  @file        buffer_view.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -101,23 +101,17 @@ template <typename Iterator>
 class buffer_view
 {
 public:
-    typedef typename Iterator::value_type                 value_type;
-    typedef typename Iterator::reference                  reference;
-    // result of dereferencing
-    typedef typename Iterator::coord_t                    coord_t;
-    // 1D difference type (same for all dimensions)
-    typedef coord_t                                       difference_type;
-    // result of operator-(1d_iterator,1d_iterator)
-    typedef typename Iterator::point_t                    point_t;
-    typedef Iterator                                      locator;
-    typedef buffer_view<typename Iterator::const_t>       const_t;
-    // same as this type, but over const values
+    /** @todo Use iterator_traits ?? */
+    typedef typename Iterator::value_type                value_type;
+    typedef typename Iterator::reference                 reference;
+    typedef typename Iterator::difference_type           difference_type;
+    typedef buffer_view<typename Iterator::const_type>   const_type;
+    typedef Iterator                                     iterator;
+    typedef std::reverse_iterator<iterator>              reverse_iterator;
+    typedef std::size_t                                  size_type;
 
-    typedef Iterator                                 iterator;
-    typedef std::reverse_iterator<iterator>          reverse_iterator;
-    typedef std::size_t                              size_type;
-
-    template <typename Deref> struct add_deref
+    template <typename Deref>
+    struct add_deref
     {
         typedef buffer_view <typename Iterator::template add_deref<Deref>::type>
 	type;
@@ -125,8 +119,8 @@ public:
 	static type make (const buffer_view<Iterator>& bv, const Deref& d)
 	{
 	    return type (
-		bv.size(),
-		Iterator::template add_deref<Deref>::make (iv.frames(), d));
+		bv.size (),
+		Iterator::template add_deref<Deref>::make (iv.frames (), d));
 	}
     };
 
@@ -178,6 +172,16 @@ public:
     const point_t&   size () const
     {
 	return _size;
+    }
+
+    iterator& frames ()
+    {
+	return _frames;
+    }
+
+    std::size_t frame_size ()
+    {
+	return memunit_step (begin ());
     }
     
     std::size_t num_samples () const

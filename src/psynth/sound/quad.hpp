@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-10-28 18:09:13 raskolnikov>
+ *  Time-stamp:  <2010-10-29 04:01:10 raskolnikov>
  *
  *  @file        quad.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>

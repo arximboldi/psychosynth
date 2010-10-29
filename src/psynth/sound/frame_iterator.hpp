@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-10-28 14:28:33 raskolnikov>
+ *  Time-stamp:  <2010-10-29 12:06:27 raskolnikov>
  *
  *  @file        frame_iterator.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -136,20 +136,20 @@ template <typename T> struct iterator_is_mutable<const T*> : public mpl::false_ 
 
 /*
  *
- *    HasDynamicXStepTypeConcept
+ *    HasDynamicStepTypeConcept
  *
  */
 
 /** \ingroup FrameIteratorModelInterleavedPtr */
 template <typename Frame>
-struct dynamic_x_step_type<Frame*>
+struct dynamic_step_type<Frame*>
 {
     typedef memory_based_step_iterator<Frame*> type;
 };
 
 /** \ingroup FrameIteratorModelInterleavedPtr */
 template <typename Frame>
-struct dynamic_x_step_type<const Frame*>
+struct dynamic_step_type<const Frame*>
 {
     typedef memory_based_step_iterator<const Frame*> type;
 };

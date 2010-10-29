@@ -1,537 +1,677 @@
+/**
+ *  Time-stamp:  <2010-10-29 13:50:49 raskolnikov>
+ *
+ *  @file        buffer_view_factory.hpp
+ *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
+ *  @date        Fri Oct 29 11:55:36 2010
+ *
+ *  View factories.  Methods for creating shallow image views from raw
+ *  pixel data or from other image views - flipping horizontally or
+ *  vertically, axis-aligned rotation, a subimage, subsampled or n-th
+ *  channel image view. Derived image views are shallow copies and are
+ *  fast to construct.
+ */
+
+
 /*
-    Copyright 2005-2007 Adobe Systems Incorporated
-   
-    Use, modification and distribution are subject to the Boost Software License,
-    Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
-    http://www.boost.org/LICENSE_1_0.txt).
+ *  Copyright (C) 2010 Juan Pedro Bolivar Puente
+ *
+ *  This file is part of Psychosynth.
+ *   
+ *  Psychosynth is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  Psychosynth is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
 
-    See http://opensource.adobe.com/gil for most recent version including documentation.
-*/
+/*
+ *  Copyright 2005-2007 Adobe Systems Incorporated
+ * 
+ *  Use, modification and distribution are subject to the Boost
+ *  Software License, Version 1.0. (See accompanying file
+ *  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt).
+ */
 
-/*************************************************************************************************/
-
-#ifndef GIL_IMAGE_VIEW_FACTORY_HPP
-#define GIL_IMAGE_VIEW_FACTORY_HPP
-
-/*!
-/// \file               
-/// \brief Methods for constructing image views from raw data or other image views
-/// \author Lubomir Bourdev and Hailin Jin \n
-///         Adobe Systems Incorporated
-/// \date   2005-2007 \n Last updated on March 9, 2007
-/// Methods for creating shallow image views from raw pixel data or from other image views - 
-/// flipping horizontally or vertically, axis-aligned rotation, a subimage, subsampled 
-/// or n-th channel image view. Derived image views are shallow copies and are fast to construct.
-*/
+#ifndef PSYNTH_SOUND_BUFFER_VIEW_FACTORY_HPP
+#define PSYNTH_SOUND_BUFFER_VIEW_FACTORY_HPP
 
 #include <cassert>
 #include <cstddef>
-#include "gil_config.hpp"
-#include "metafunctions.hpp"
-#include "gray.hpp"
-#include "color_convert.hpp"
 
-/// \defgroup ImageViewConstructors Image View From Raw Data
-/// \ingroup ImageViewAlgorithm
-/// \brief Methods for constructing image views from raw data and for getting raw data from views
+#include <psynth/base/compat.hpp>
+#include <psynth/sound/metafunctions.hpp>
+#include <psynth/sound/mono.hpp>
+#include <psynth/sound/channel_convert.hpp>
 
-/// \defgroup ImageViewTransformations Image View Transformations
-/// \ingroup ImageViewAlgorithm
-/// \brief Methods for constructing one image view from another
+/**
+   \defgroup BufferViewConstructors Buffer View From Raw Data
+   \ingroup BufferViewAlgorithm
+   \brief Methods for constructing buffer views from raw data and for
+   getting raw data from views
+*/
 
-namespace boost { namespace gil {
-struct default_color_converter;
+/**
+   \defgroup BufferViewTransformations Buffer View Transformations
+   \ingroup BufferViewAlgorithm
+   \brief Methods for constructing one buffer view from another
+*/
 
-template <typename T> struct dynamic_x_step_type;
-template <typename T> struct dynamic_y_step_type;
+namespace psynth
+{
+namespace sound
+{
+struct default_channel_converter;
+
+template <typename T> struct dynamic_step_type;
 template <typename T> struct transposed_type;
 
-/// \brief Returns the type of a view that has a dynamic step along both X and Y
-/// \ingroup ImageViewTransformations
-template <typename View> 
-struct dynamic_xy_step_type : public dynamic_y_step_type<typename dynamic_x_step_type<View>::type> {};
-
-/// \brief Returns the type of a transposed view that has a dynamic step along both X and Y
-/// \ingroup ImageViewTransformations
-template <typename View> 
-struct dynamic_xy_step_transposed_type : public dynamic_xy_step_type<typename transposed_type<View>::type> {};
-
-
-/// \ingroup ImageViewConstructors
-/// \brief Constructing image views from raw interleaved pixel data
+/**
+   \ingroup BufferViewConstructors
+   \brief Constructing buffer views from raw interleaved frame data
+*/
 template <typename Iterator>
-typename type_from_x_iterator<Iterator>::view_t
-interleaved_view(std::size_t width, std::size_t height,
-                 Iterator pixels, std::ptrdiff_t rowsize_in_bytes) {
-    typedef typename type_from_x_iterator<Iterator>::view_t RView;
-    return RView(width, height, typename RView::locator(pixels, rowsize_in_bytes));
+typename type_from_iterator<Iterator>::view;
+interleaved_view (std::size_t size, Iterator frames)
+{
+    typedef typename type_from_iterator<Iterator>::view RView;
+    return RView (size, typename RView::iterator (frames));
 }
 
-/// \ingroup ImageViewConstructors
-/// \brief Constructing image views from raw interleaved pixel data
-template <typename Iterator>
-typename type_from_x_iterator<Iterator>::view_t
-interleaved_view(point2<std::size_t> dim,
-                 Iterator pixels, std::ptrdiff_t rowsize_in_bytes) {
-    typedef typename type_from_x_iterator<Iterator>::view_t RView;
-    return RView(dim, typename RView::locator(pixels, rowsize_in_bytes));
-}
+/**
+   interleaved_view_get_raw_data, planar_view_get_raw_data - return
+   pointers to the raw data (the samples) of a basic homogeneous view.
+*/
 
-/////////////////////////////
-//  interleaved_view_get_raw_data, planar_view_get_raw_data - return pointers to the raw data (the channels) of a basic homogeneous view.
-/////////////////////////////
+namespace detail
+{
 
-namespace detail {
-    template <typename View, bool IsMutable> struct channel_pointer_type_impl;
+template <typename View, bool IsMutable>
+struct sample_pointer_type_impl;
 
-    template <typename View> struct channel_pointer_type_impl<View, true> {
-        typedef       typename channel_type<View>::type* type;
-    };
-    template <typename View> struct channel_pointer_type_impl<View, false> {
-        typedef const typename channel_type<View>::type* type;
-    };
+template <typename View> struct sample_pointer_type_impl<View, true>
+{
+    typedef typename sample_type<View>::type* type;
+};
 
-    template <typename View> struct channel_pointer_type
-        : public channel_pointer_type_impl<View, view_is_mutable<View>::value> {};
-} // namespace detail
+template <typename View> struct sample_pointer_type_impl<View, false>
+{
+    typedef const typename sample_type<View>::type* type;
+};
 
-/// \ingroup ImageViewConstructors
-/// \brief Returns C pointer to the the channels of an interleaved homogeneous view.
+template <typename View> struct sample_pointer_type
+    : public sample_pointer_type_impl<View, view_is_mutable<View>::value> {};
+
+} /* namespace detail */
+
+
+/**
+   \ingroup BufferViewConstructors
+   \brief Returns C pointer to the the samples of an interleaved
+   homogeneous view.
+*/
 template <typename HomogeneousView>
-typename detail::channel_pointer_type<HomogeneousView>::type interleaved_view_get_raw_data(const HomogeneousView& view) {
-    BOOST_STATIC_ASSERT((!is_planar<HomogeneousView>::value && view_is_basic<HomogeneousView>::value));
-    BOOST_STATIC_ASSERT((boost::is_pointer<typename HomogeneousView::x_iterator>::value));
+typename detail::sample_pointer_type<HomogeneousView>::type
+interleaved_view_get_raw_data(const HomogeneousView& view)
+{
+    BOOST_STATIC_ASSERT((!is_planar<HomogeneousView>::value &&
+			 view_is_basic<HomogeneousView>::value));
+    BOOST_STATIC_ASSERT((boost::is_pointer<
+			     typename HomogeneousView::iterator>::value));
 
-    return &gil::at_c<0>(view(0,0));
+    return &psynth::sound::at_c<0>(view [0]);
 }
 
-/// \ingroup ImageViewConstructors
-/// \brief Returns C pointer to the the channels of a given color plane of a planar homogeneous view.
+/**
+   \ingroup BufferViewConstructors
+   \brief Returns C pointer to the the samples of a given channel
+   plane of a planar homogeneous view.
+*/
 template <typename HomogeneousView>
-typename detail::channel_pointer_type<HomogeneousView>::type planar_view_get_raw_data(const HomogeneousView& view, int plane_index) {
-    BOOST_STATIC_ASSERT((is_planar<HomogeneousView>::value && view_is_basic<HomogeneousView>::value));
-    return dynamic_at_c(view.row_begin(0),plane_index);
+typename detail::sample_pointer_type<HomogeneousView>::type
+planar_view_get_raw_data(const HomogeneousView& view, int plane_index)
+{
+    BOOST_STATIC_ASSERT((is_planar<HomogeneousView>::value &&
+			 view_is_basic<HomogeneousView>::value));
+    return dynamic_at_c (view.begin (), plane_index);
 }
 
 
-/// \defgroup ImageViewTransformationsColorConvert color_converted_view
-/// \ingroup ImageViewTransformations
-/// \brief Color converted view of another view
+/**
+   \defgroup BufferViewTransformationsChannelConvert channel_converted_view
+   \ingroup BufferViewTransformations
+   \brief Channel converted view of another view
 
-/// \ingroup ImageViewTransformationsColorConvert PixelDereferenceAdaptorModel
-/// \brief Function object that given a source pixel, returns it converted to a given color space and channel depth. Models: PixelDereferenceAdaptorConcept
-///
-/// Useful in constructing a color converted view over a given image view
-template <typename SrcConstRefP, typename DstP, typename CC=default_color_converter >        // const_reference to the source pixel and destination pixel value
-class color_convert_deref_fn : public deref_base<color_convert_deref_fn<SrcConstRefP,DstP,CC>, DstP, DstP, const DstP&, SrcConstRefP, DstP, false> {
-private:
-    CC _cc;                     // color-converter
+   \ingroup BufferViewTransformationsChannelConvert FrameDereferenceAdaptorModel
+   \brief Function object that given a source frame, returns it converted to a given channel space and sample depth. Models: FrameDereferenceAdaptorConcept
+   
+   Useful in constructing a channel converted view over a given buffer view
+*/
+
+template <typename SrcConstRefP, typename DstP,
+	  typename CC=default_channel_converter>
+// const_reference to the source frame and destination frame value
+class channel_convert_deref_fn :
+    public deref_base<channel_convert_deref_fn<SrcConstRefP, DstP, CC>,
+		      DstP, DstP, const DstP&, SrcConstRefP, DstP, false>
+{
 public:
-    color_convert_deref_fn() {}
-    color_convert_deref_fn(CC cc_in) : _cc(cc_in) {}
+    channel_convert_deref_fn () {}
+    channel_convert_deref_fn (CC cc_in) : _cc (cc_in) {}
 
-    DstP operator()(SrcConstRefP srcP) const {
+    DstP operator () (SrcConstRefP srcP) const
+    {
         DstP dstP;
-        _cc(srcP,dstP);
+        _cc (srcP, dstP);
         return dstP;
+    }
+    
+private:
+    CC _cc; // channel-converter
+};
+
+
+namespace detail
+{
+
+// Add channel converter upon dereferencing
+template <typename SrcView, typename CC, typename DstP, typename SrcP>
+struct channel_converted_view_type_impl
+{
+private:
+    typedef channel_convert_deref_fn<
+    typename SrcView::const_t::reference,DstP,CC> deref_t;
+    typedef typename SrcView::template add_deref<deref_t> add_ref_t;
+    
+public:
+    typedef typename add_ref_t::type type;
+        static type make (const SrcView& sv,CC cc)
+    {
+	return add_ref_t::make (sv, deref_t (cc));
     }
 };
 
-namespace detail {
-    // Add color converter upon dereferencing
-    template <typename SrcView, typename CC, typename DstP, typename SrcP>
-    struct _color_converted_view_type {
-    private:
-        typedef color_convert_deref_fn<typename SrcView::const_t::reference,DstP,CC> deref_t;
-        typedef typename SrcView::template add_deref<deref_t> add_ref_t;
-    public:
-        typedef typename add_ref_t::type type;
-        static type make(const SrcView& sv,CC cc) {return add_ref_t::make(sv,deref_t(cc));}
-    };
+/* If the Src view has the same frame type as the target, there is
+   no need for channel conversion */
+template <typename SrcView, typename CC, typename DstP>
+struct channel_converted_view_type_impl<SrcView,CC,DstP,DstP>
+{
+    typedef SrcView type;
+    static type make (const SrcView& sv, CC)
+    { return sv; }
+};
 
-    // If the Src view has the same pixel type as the target, there is no need for color conversion
-    template <typename SrcView, typename CC, typename DstP>
-    struct _color_converted_view_type<SrcView,CC,DstP,DstP> {
-        typedef SrcView type;
-        static type make(const SrcView& sv,CC) {return sv;}
-    };
-} // namespace detail
+} /* namespace detail */
 
 
-/// \brief Returns the type of a view that does color conversion upon dereferencing its pixels 
-/// \ingroup ImageViewTransformationsColorConvert
-template <typename SrcView, typename DstP, typename CC=default_color_converter>
-struct color_converted_view_type : public detail::_color_converted_view_type<SrcView,
-                                                                             CC,
-                                                                             DstP,
-                                                                             typename SrcView::value_type> {
-    GIL_CLASS_REQUIRE(DstP, boost::gil, MutablePixelConcept)//why does it have to be mutable???
+/**
+   \brief Returns the type of a view that does channel conversion upon
+   dereferencing its frames
+   
+   \ingroup BufferViewTransformationsChannelConvert
+*/
+template <typename SrcView, typename DstP, typename CC=default_channel_converter>
+struct channel_converted_view_type :
+    public detail::channel_converted_view_type_impl<SrcView,
+						    CC,
+						    DstP,
+						    typename SrcView::value_type>
+{
+    GIL_CLASS_REQUIRE(DstP, psynth::sound, MutableFrameConcept)
+    // Why does it have to be mutable???
 };
 
 
-/// \ingroup ImageViewTransformationsColorConvert
-/// \brief view of a different color space with a user defined color-converter
+/**
+   \ingroup BufferViewTransformationsChannelConvert
+   \brief view of a different channel space with a user defined
+   channel-converter
+*/
 template <typename DstP, typename View, typename CC>
-inline typename color_converted_view_type<View,DstP,CC>::type color_converted_view(const View& src,CC cc) {
-    return color_converted_view_type<View,DstP,CC>::make(src,cc);
+inline typename channel_converted_view_type<View,DstP,CC>::type
+channel_converted_view (const View& src, CC cc)
+{
+    return channel_converted_view_type<View,DstP,CC>::make(src,cc);
 }
 
-/// \ingroup ImageViewTransformationsColorConvert
-/// \brief overload of generic color_converted_view with the default color-converter
+/**
+   \ingroup BufferViewTransformationsChannelConvert
+   \brief overload of generic channel_converted_view with the default
+   channel-converter
+*/
 template <typename DstP, typename View>
-inline typename color_converted_view_type<View,DstP>::type
-color_converted_view(const View& src) {
-    return color_converted_view<DstP>(src,default_color_converter());
+inline typename channel_converted_view_type<View,DstP>::type
+channel_converted_view(const View& src)
+{
+    return channel_converted_view<DstP>(src, default_channel_converter());
 }
 
-/// \defgroup ImageViewTransformationsFlipUD flipped_up_down_view
-/// \ingroup ImageViewTransformations
-/// \brief view of a view flipped up-to-down
 
-/// \ingroup ImageViewTransformationsFlipUD
+/**
+   \defgroup BufferViewTransformationsFlipLR flipped_left_right_view
+   \ingroup BufferViewTransformations
+   \brief view of a view flipped left-to-right
+
+   \ingroup BufferViewTransformationsFlipLR
+*/
+template <typename View> 
+inline typename dynamic_step_type<View>::type flipped_view(const View& src)
+{
+    typedef typename dynamic_step_type<View>::type RView;
+    return RView (src.size (), typename RView::iterator (src.end () - 1, -1));
+}
+
+/**
+   \defgroup BufferViewTransformationsSubbuffer subbuffer_view
+   \ingroup BufferViewTransformations
+   \brief view of an axis-aligned rectangular area within an buffer_view
+
+   \ingroup BufferViewTransformationsSubbuffer
+*/
+template <typename View> 
+inline View sub_buffer_view (const View& src,
+			     const typename View::size_type start,
+			     const typename View::size_type size)
+{
+    return View (size, src.at (topleft));
+}
+
+/**
+   \defgroup BufferViewTransformationsSubsampled subsampled_view
+   \ingroup BufferViewTransformations
+   \brief view of a subsampled version of an buffer_view, stepping
+   over a number of samples in X and number of rows in Y
+
+   \ingroup BufferViewTransformationsSubsampled
+*/
+template <typename View> 
+inline typename dynamic_step_type<View>::type
+subsampled_view (const View& src, typename View::size_type step)
+{
+    assert (step > 0);
+    typedef typename dynamic_step_type<View>::type RView;
+    return RView ((src.size () + (step - 1)) / step,
+		  typename RView::iterator (src.at (0), step));
+}
+
+
+/**
+   \defgroup BufferViewTransformationsNthSample nth_sample_view
+   \ingroup BufferViewTransformations
+   \brief single-sample (grayscale) view of the N-th sample of a given
+   buffer_view
+*/
+
+namespace detail
+{
+template <typename View, bool AreSamplesTogether>
+struct nth_sample_view_basic_impl;
+
+/**
+   nth_sample_view when the samples are not adjacent in memory. This
+   can happen for multi-sample interleaved buffers or buffers with a
+   step
+*/
 template <typename View>
-inline typename dynamic_y_step_type<View>::type flipped_up_down_view(const View& src) { 
-    typedef typename dynamic_y_step_type<View>::type RView;
-    return RView(src.dimensions(),typename RView::xy_locator(src.xy_at(0,src.height()-1),-1));
-}
+struct nth_sample_view_basic_impl<View, false>
+{
+    typedef typename view_type<typename sample_type<View>::type,
+			       mono_layout, false, true,
+			       view_is_mutable<View>::value>::type type;
 
-/// \defgroup ImageViewTransformationsFlipLR flipped_left_right_view
-/// \ingroup ImageViewTransformations
-/// \brief view of a view flipped left-to-right
+    static type make (const View& src, int n)
+    {
+	typedef typename type::iterator iterator;
+	typedef typename iterator_adaptor_get_base <iterator>::type iterator_base;
+	
+	return type (src.size (),
+		     iterator (iterator_base (& (src [0] [n])),
+			       src.frame_size ()));
+    }
+};
 
-/// \ingroup ImageViewTransformationsFlipLR
-template <typename View> 
-inline typename dynamic_x_step_type<View>::type flipped_left_right_view(const View& src) {
-    typedef typename dynamic_x_step_type<View>::type RView;
-    return RView(src.dimensions(),typename RView::xy_locator(src.xy_at(src.width()-1,0),-1,1));
-}
-
-/// \defgroup ImageViewTransformationsTransposed transposed_view
-/// \ingroup ImageViewTransformations
-/// \brief view of a view transposed
-
-/// \ingroup ImageViewTransformationsTransposed
+/*
+  nth_sample_view when the samples are together in memory (true for
+  simple grayscale or planar buffers)
+*/
 template <typename View>
-inline typename dynamic_xy_step_transposed_type<View>::type transposed_view(const View& src) {
-    typedef typename dynamic_xy_step_transposed_type<View>::type RView;
-    return RView(src.height(),src.width(),typename RView::xy_locator(src.xy_at(0,0),1,1,true));
-}
+struct nth_sample_view_basic_impl<View, true>
+{
+    typedef typename view_type<typename sample_type<View>::type,
+			       mono_layout, false, false,
+			       view_is_mutable<View>::value>::type type;
 
-/// \defgroup ImageViewTransformations90CW rotated90cw_view
-/// \ingroup ImageViewTransformations
-/// \brief view of a view rotated 90 degrees clockwise
+    static type make (const View& src, int n)
+    {
+	typedef typename type::iterator iterator;
+	return interleaved_view (src.size (), (iterator) &(src [0][n]));
+    }
+};
 
-/// \ingroup ImageViewTransformations90CW
-template <typename View> 
-inline typename dynamic_xy_step_transposed_type<View>::type rotated90cw_view(const View& src) {
-    typedef typename dynamic_xy_step_transposed_type<View>::type RView;
-    return RView(src.height(),src.width(),typename RView::xy_locator(src.xy_at(0,src.height()-1),-1,1,true));
-}
+template <typename View, bool IsBasic>
+struct nth_sample_view_impl;
 
-/// \defgroup ImageViewTransformations90CCW rotated90ccw_view
-/// \ingroup ImageViewTransformations
-/// \brief view of a view rotated 90 degrees counter-clockwise
-
-/// \ingroup ImageViewTransformations90CCW
-template <typename View> 
-inline typename dynamic_xy_step_transposed_type<View>::type rotated90ccw_view(const View& src) {
-    typedef typename dynamic_xy_step_transposed_type<View>::type RView;
-    return RView(src.height(),src.width(),typename RView::xy_locator(src.xy_at(src.width()-1,0),1,-1,true));
-}
-
-/// \defgroup ImageViewTransformations180 rotated180_view
-/// \ingroup ImageViewTransformations
-/// \brief view of a view rotated 180 degrees
-
-/// \ingroup ImageViewTransformations180
-template <typename View> 
-inline typename dynamic_xy_step_type<View>::type rotated180_view(const View& src) {
-    typedef typename dynamic_xy_step_type<View>::type RView;
-    return RView(src.dimensions(),typename RView::xy_locator(src.xy_at(src.width()-1,src.height()-1),-1,-1));
-}
-
-/// \defgroup ImageViewTransformationsSubimage subimage_view
-/// \ingroup ImageViewTransformations
-/// \brief view of an axis-aligned rectangular area within an image_view
-
-/// \ingroup ImageViewTransformationsSubimage
-template <typename View> 
-inline View subimage_view(const View& src, const typename View::point_t& topleft, const typename View::point_t& dimensions) {
-    return View(dimensions,src.xy_at(topleft));
-}
-
-/// \ingroup ImageViewTransformationsSubimage
-template <typename View> 
-inline View subimage_view(const View& src, int xMin, int yMin, int width, int height) {
-    return View(width,height,src.xy_at(xMin,yMin));
-}
-
-/// \defgroup ImageViewTransformationsSubsampled subsampled_view
-/// \ingroup ImageViewTransformations
-/// \brief view of a subsampled version of an image_view, stepping over a number of channels in X and number of rows in Y
-
-/// \ingroup ImageViewTransformationsSubsampled
-template <typename View> 
-inline typename dynamic_xy_step_type<View>::type subsampled_view(const View& src, typename View::coord_t xStep, typename View::coord_t yStep) {
-    assert(xStep>0 && yStep>0);
-    typedef typename dynamic_xy_step_type<View>::type RView;
-    return RView((src.width()+(xStep-1))/xStep,(src.height()+(yStep-1))/yStep,
-                                          typename RView::xy_locator(src.xy_at(0,0),xStep,yStep));
-}
-
-/// \ingroup ImageViewTransformationsSubsampled
-template <typename View> 
-inline typename dynamic_xy_step_type<View>::type subsampled_view(const View& src, const typename View::point_t& step) { 
-    return subsampled_view(src,step.x,step.y);
-}
-
-/// \defgroup ImageViewTransformationsNthChannel nth_channel_view
-/// \ingroup ImageViewTransformations
-/// \brief single-channel (grayscale) view of the N-th channel of a given image_view
-
-namespace detail {
-    template <typename View, bool AreChannelsTogether> struct __nth_channel_view_basic;
-
-    // nth_channel_view when the channels are not adjacent in memory. This can happen for multi-channel interleaved images 
-    // or images with a step
-    template <typename View>
-    struct __nth_channel_view_basic<View,false> {
-        typedef typename view_type<typename channel_type<View>::type, gray_layout_t, false, true, view_is_mutable<View>::value>::type type;
-
-        static type make(const View& src, int n) {
-            typedef typename type::xy_locator                             locator_t;
-            typedef typename type::x_iterator                            x_iterator_t;
-            typedef typename iterator_adaptor_get_base<x_iterator_t>::type x_iterator_base_t;
-            x_iterator_t sit(x_iterator_base_t(&(src(0,0)[n])),src.pixels().pixel_size());
-            return type(src.dimensions(),locator_t(sit, src.pixels().row_size()));
-        }
-    };
-
-    // nth_channel_view when the channels are together in memory (true for simple grayscale or planar images)
-    template <typename View>
-    struct __nth_channel_view_basic<View,true> {
-        typedef typename view_type<typename channel_type<View>::type, gray_layout_t, false, false, view_is_mutable<View>::value>::type type;
-        static type make(const View& src, int n) {
-            typedef typename type::x_iterator x_iterator_t;
-            return interleaved_view(src.width(),src.height(),(x_iterator_t)&(src(0,0)[n]), src.pixels().row_size());
-        }
-    };
-
-    template <typename View, bool IsBasic> struct __nth_channel_view;
-
-    // For basic (memory-based) views dispatch to __nth_channel_view_basic
-    template <typename View> struct __nth_channel_view<View,true> {
-    private:
-        typedef typename View::x_iterator src_x_iterator;
-
-        // Determines whether the channels of a given pixel iterator are adjacent in memory.
-        // Planar and grayscale iterators have channels adjacent in memory, whereas multi-channel interleaved and iterators with non-fundamental step do not.
-        BOOST_STATIC_CONSTANT(bool, adjacent=
-                              !iterator_is_step<src_x_iterator>::value &&
-                              (is_planar<src_x_iterator>::value ||
-                              num_channels<View>::value==1));
-    public:
-        typedef typename __nth_channel_view_basic<View,adjacent>::type type;
-
-        static type make(const View& src, int n) {
-            return __nth_channel_view_basic<View,adjacent>::make(src,n);
-        }
-    };
-
-    /// \brief Function object that returns a grayscale reference of the N-th channel of a given reference. Models: PixelDereferenceAdaptorConcept.
-    /// \ingroup PixelDereferenceAdaptorModel
-    ///
-    /// If the input is a pixel value or constant reference, the function object is immutable. Otherwise it is mutable (and returns non-const reference to the n-th channel)
-    template <typename SrcP>        // SrcP is a reference to PixelConcept (could be pixel value or const/non-const reference)
-                                    // Examples: pixel<T,L>, pixel<T,L>&, const pixel<T,L>&, planar_pixel_reference<T&,L>, planar_pixel_reference<const T&,L>
-    struct nth_channel_deref_fn {
-        BOOST_STATIC_CONSTANT(bool, is_mutable=pixel_is_reference<SrcP>::value && pixel_reference_is_mutable<SrcP>::value);
-    private:
-        typedef typename remove_reference<SrcP>::type src_pixel_t;
-        typedef typename channel_type<src_pixel_t>::type channel_t;
-        typedef typename src_pixel_t::const_reference const_ref_t;
-        typedef typename pixel_reference_type<channel_t,gray_layout_t,false,is_mutable>::type ref_t;
-    public:
-        typedef nth_channel_deref_fn<const_ref_t>                                        const_t;
-        typedef typename pixel_value_type<channel_t,gray_layout_t>::type                 value_type;
-        typedef typename pixel_reference_type<channel_t,gray_layout_t,false,false>::type const_reference;
-        typedef SrcP                                                                     argument_type;
-        typedef typename mpl::if_c<is_mutable, ref_t, value_type>::type                  reference;
-        typedef reference                                                                result_type;
-
-        nth_channel_deref_fn(int n=0) : _n(n) {}
-        template <typename P> nth_channel_deref_fn(const nth_channel_deref_fn<P>& d) : _n(d._n) {}
-
-        int _n;        // the channel to use
-
-        result_type operator()(argument_type srcP) const { 
-            return result_type(srcP[_n]); 
-        }
-    };
-
-    template <typename View> struct __nth_channel_view<View,false> {
-    private:
-        typedef nth_channel_deref_fn<typename View::reference> deref_t;
-        typedef typename View::template add_deref<deref_t>   AD;
-    public:
-        typedef typename AD::type type;
-        static type make(const View& src, int n) {
-            return AD::make(src, deref_t(n));
-        }
-    };
-} // namespace detail
-
-/// \brief Given a source image view type View, returns the type of an image view over a single channel of View
-/// \ingroup ImageViewTransformationsNthChannel
-///
-/// If the channels in the source view are adjacent in memory (such as planar non-step view or single-channel view) then the
-/// return view is a single-channel non-step view.
-/// If the channels are non-adjacent (interleaved and/or step view) then the return view is a single-channel step view.
-template <typename View>
-struct nth_channel_view_type {
+// For basic (memory-based) views dispatch to nth_sample_view_basic_impl
+template <typename View> struct nth_sample_view_impl<View,true>
+{
 private:
-    GIL_CLASS_REQUIRE(View, boost::gil, ImageViewConcept)
-    typedef detail::__nth_channel_view<View,view_is_basic<View>::value> VB;
+    typedef typename View::iterator src_iterator;
+
+    // Determines whether the samples of a given frame iterator are
+    // adjacent in memory.  Planar and grayscale iterators have
+    // samples adjacent in memory, whereas multi-sample interleaved
+    // and iterators with non-fundamental step do not.
+    BOOST_STATIC_CONSTANT(bool, adjacent=
+			  !iterator_is_step<src_iterator>::value &&
+			  (is_planar<src_iterator>::value ||
+			   num_samples<View>::value==1));
+public:
+    typedef typename nth_sample_view_basic_impl <View, adjacent>::type type;
+
+    static type make (const View& src, int n)
+    {
+	return nth_sample_view_basic_impl <View,adjacent>::make (src,n);
+    }
+};
+
+/**
+   \brief Function object that returns a grayscale reference of the
+   N-th sample of a given reference. Models:
+   FrameDereferenceAdaptorConcept.
+   
+   \ingroup FrameDereferenceAdaptorModel
+
+   If the input is a frame value or constant reference, the function
+   object is immutable. Otherwise it is mutable (and returns non-const
+   reference to the n-th sample)
+*/
+
+template <typename SrcP>
+// SrcP is a reference to FrameConcept (could be frame value or
+// const/non-const reference) Examples: frame<T,L>, frame<T,L>&, const
+// frame<T,L>&, planar_frame_reference<T&,L>,
+// planar_frame_reference<const T&,L>
+struct nth_sample_deref_fn
+{
+    BOOST_STATIC_CONSTANT(bool, is_mutable=frame_is_reference<SrcP>::value &&
+			  frame_reference_is_mutable<SrcP>::value);
+
+private:
+    typedef typename remove_reference<SrcP>::type       src_frame_t;
+    typedef typename sample_type<src_frame_t>::type     sample_t;
+    typedef typename src_frame_t::const_reference       const_ref_t;
+    typedef typename frame_reference_type<
+	sample_t, mono_layout, false, is_mutable>::type ref_t;
+
+    int _n;        // the sample to use
+    
+public:
+    typedef nth_sample_deref_fn<const_ref_t>       const_t;
+    typedef typename frame_value_type<
+	sample_t, mono_layout>::type               value_type;
+    typedef typename frame_reference_type<
+	sample_t,mono_layout,false,false>::type  const_reference;
+    typedef SrcP                                   argument_type;
+    typedef typename mpl::if_c<
+	is_mutable, ref_t, value_type>::type       reference;
+    typedef reference                              result_type;
+
+    nth_sample_deref_fn (int n = 0)
+	: _n(n)
+    {}
+
+    template <typename P>
+    nth_sample_deref_fn (const nth_sample_deref_fn<P>& d)
+	: _n(d._n) {}
+
+    result_type operator () (argument_type src_f) const { 
+	return result_type (src_f[_n]); 
+    }
+};
+
+template <typename View>
+struct nth_sample_view_impl<View,false>
+{
+private:
+    typedef nth_sample_deref_fn<typename View::reference> deref_t;
+    typedef typename View::template add_deref<deref_t>    AD;
+    
+public:
+    typedef typename AD::type type;
+    static type make(const View& src, int n)
+    {
+	return AD::make(src, deref_t(n));
+    }
+};
+
+} /* namespace detail */
+
+/**
+   \brief Given a source buffer view type View, returns the type of an
+   buffer view over a single sample of View
+   \ingroup BufferViewTransformationsNthSample
+   
+   If the samples in the source view are adjacent in memory (such as
+   planar non-step view or single-sample view) then the return view is
+   a single-sample non-step view.  If the samples are non-adjacent
+   (interleaved and/or step view) then the return view is a
+   single-sample step view.
+*/
+template <typename View>
+struct nth_sample_view_type
+{
+private:
+    GIL_CLASS_REQUIRE(View, psynth::sound, BufferViewConcept)
+    typedef detail::nth_sample_view_impl<View, view_is_basic<View>::value> VB;
+
 public:
     typedef typename VB::type type;
     static type make(const View& src, int n) { return VB::make(src,n); }
 };
 
 
-/// \ingroup ImageViewTransformationsNthChannel
+/**
+   \ingroup BufferViewTransformationsNthSample
+*/
 template <typename View>
-typename nth_channel_view_type<View>::type nth_channel_view(const View& src, int n) {
-    return nth_channel_view_type<View>::make(src,n);
+typename nth_sample_view_type<View>::type
+nth_sample_view (const View& src, int n)
+{
+    return nth_sample_view_type<View>::make (src,n);
 }
 
 
+/**
+   \defgroup BufferViewTransformationsKthSample kth_sample_view
+   \ingroup BufferViewTransformations
+   \brief single-sample (grayscale) view of the K-th sample of a given
+   buffer_view. The sample index is a template parameter
+*/
 
+namespace detail
+{
 
+template <int K, typename View, bool AreSamplesTogether>
+struct kth_sample_view_basic_impl;
 
-
-
-/// \defgroup ImageViewTransformationsKthChannel kth_channel_view
-/// \ingroup ImageViewTransformations
-/// \brief single-channel (grayscale) view of the K-th channel of a given image_view. The channel index is a template parameter
-
-namespace detail {
-    template <int K, typename View, bool AreChannelsTogether> struct __kth_channel_view_basic;
-
-    // kth_channel_view when the channels are not adjacent in memory. This can happen for multi-channel interleaved images 
-    // or images with a step
-    template <int K, typename View>
-    struct __kth_channel_view_basic<K,View,false> {
-    private:
-        typedef typename kth_element_type<typename View::value_type,K>::type channel_t;
-    public:
-        typedef typename view_type<channel_t, gray_layout_t, false, true, view_is_mutable<View>::value>::type type;
-
-        static type make(const View& src) {
-            typedef typename type::xy_locator                             locator_t;
-            typedef typename type::x_iterator                            x_iterator_t;
-            typedef typename iterator_adaptor_get_base<x_iterator_t>::type x_iterator_base_t;
-            x_iterator_t sit(x_iterator_base_t(&gil::at_c<K>(src(0,0))),src.pixels().pixel_size());
-            return type(src.dimensions(),locator_t(sit, src.pixels().row_size()));
-        }
-    };
-
-    // kth_channel_view when the channels are together in memory (true for simple grayscale or planar images)
-    template <int K, typename View>
-    struct __kth_channel_view_basic<K,View,true> {
-    private:
-        typedef typename kth_element_type<typename View::value_type, K>::type channel_t;
-    public:
-        typedef typename view_type<channel_t, gray_layout_t, false, false, view_is_mutable<View>::value>::type type;
-        static type make(const View& src) {
-            typedef typename type::x_iterator x_iterator_t;
-            return interleaved_view(src.width(),src.height(),(x_iterator_t)&gil::at_c<K>(src(0,0)), src.pixels().row_size());
-        }
-    };
-
-    template <int K, typename View, bool IsBasic> struct __kth_channel_view;
-
-    // For basic (memory-based) views dispatch to __kth_channel_view_basic
-    template <int K, typename View> struct __kth_channel_view<K,View,true> {
-    private:
-        typedef typename View::x_iterator src_x_iterator;
-
-        // Determines whether the channels of a given pixel iterator are adjacent in memory.
-        // Planar and grayscale iterators have channels adjacent in memory, whereas multi-channel interleaved and iterators with non-fundamental step do not.
-        BOOST_STATIC_CONSTANT(bool, adjacent=
-                              !iterator_is_step<src_x_iterator>::value &&
-                              (is_planar<src_x_iterator>::value ||
-                              num_channels<View>::value==1));
-    public:
-        typedef typename __kth_channel_view_basic<K,View,adjacent>::type type;
-
-        static type make(const View& src) {
-            return __kth_channel_view_basic<K,View,adjacent>::make(src);
-        }
-    };
-
-    /// \brief Function object that returns a grayscale reference of the K-th channel (specified as a template parameter) of a given reference. Models: PixelDereferenceAdaptorConcept.
-    /// \ingroup PixelDereferenceAdaptorModel
-    ///
-    /// If the input is a pixel value or constant reference, the function object is immutable. Otherwise it is mutable (and returns non-const reference to the k-th channel)
-    template <int K, typename SrcP>        // SrcP is a reference to PixelConcept (could be pixel value or const/non-const reference)
-                                    // Examples: pixel<T,L>, pixel<T,L>&, const pixel<T,L>&, planar_pixel_reference<T&,L>, planar_pixel_reference<const T&,L>
-    struct kth_channel_deref_fn {
-        BOOST_STATIC_CONSTANT(bool, is_mutable=pixel_is_reference<SrcP>::value && pixel_reference_is_mutable<SrcP>::value);
-    private:
-        typedef typename remove_reference<SrcP>::type src_pixel_t;
-        typedef typename kth_element_type<src_pixel_t, K>::type channel_t;
-        typedef typename src_pixel_t::const_reference const_ref_t;
-        typedef typename pixel_reference_type<channel_t,gray_layout_t,false,is_mutable>::type ref_t;
-    public:
-        typedef kth_channel_deref_fn<K,const_ref_t>                               const_t;
-        typedef typename pixel_value_type<channel_t,gray_layout_t>::type          value_type;
-        typedef typename pixel_reference_type<channel_t,gray_layout_t,false,false>::type const_reference;
-        typedef SrcP                                                              argument_type;
-        typedef typename mpl::if_c<is_mutable, ref_t, value_type>::type           reference;
-        typedef reference                                                         result_type;
-
-        kth_channel_deref_fn() {}
-        template <typename P> kth_channel_deref_fn(const kth_channel_deref_fn<K,P>&) {}
-
-        result_type operator()(argument_type srcP) const { 
-            return result_type(gil::at_c<K>(srcP));
-        }
-    };
-
-    template <int K, typename View> struct __kth_channel_view<K,View,false> {
-    private:
-        typedef kth_channel_deref_fn<K,typename View::reference> deref_t;
-        typedef typename View::template add_deref<deref_t>   AD;
-    public:
-        typedef typename AD::type type;
-        static type make(const View& src) {
-            return AD::make(src, deref_t());
-        }
-    };
-} // namespace detail
-
-/// \brief Given a source image view type View, returns the type of an image view over a given channel of View.
-/// \ingroup ImageViewTransformationsKthChannel
-///
-/// If the channels in the source view are adjacent in memory (such as planar non-step view or single-channel view) then the
-/// return view is a single-channel non-step view.
-/// If the channels are non-adjacent (interleaved and/or step view) then the return view is a single-channel step view.
+/*
+  kth_sample_view when the samples are not adjacent in memory. This
+  can happen for multi-sample interleaved buffers or buffers with a
+  step
+*/
 template <int K, typename View>
-struct kth_channel_view_type {
+struct kth_sample_view_basic_impl <K, View, false>
+{
 private:
-    GIL_CLASS_REQUIRE(View, boost::gil, ImageViewConcept)
-    typedef detail::__kth_channel_view<K,View,view_is_basic<View>::value> VB;
+    typedef typename kth_element_type<typename View::value_type,K>::type sample_t;
+
 public:
-    typedef typename VB::type type;
-    static type make(const View& src) { return VB::make(src); }
+    typedef typename view_type<sample_t, mono_layout, false, true,
+			       view_is_mutable<View>::value>::type type;
+
+    static type make(const View& src)
+    {
+	typedef typename type::iterator iterator;
+	typedef typename iterator_adaptor_get_base<iterator>::type iterator_base;
+	return type(src.size (),
+		    iterator (iterator_base (&at_c<K> (src [0])),
+			      src.frames().frame_size()));
+    }
 };
 
-/// \ingroup ImageViewTransformationsKthChannel
+/*
+  kth_sample_view when the samples are together in memory (true for
+  simple grayscale or planar buffers)
+*/
 template <int K, typename View>
-typename kth_channel_view_type<K,View>::type kth_channel_view(const View& src) {
-    return kth_channel_view_type<K,View>::make(src);
+struct kth_sample_view_basic_impl <K, View, true>
+{
+private:
+    typedef typename kth_element_type<typename View::value_type, K>::type sample_t;
+
+public:
+    typedef typename view_type<
+    sample_t, mono_layout, false, false, view_is_mutable<View>::value>::type type;
+
+    static type make (const View& src)
+    {
+	typedef typename type::iterator iterator;
+	return interleaved_view (src.size (), (iterator) &at_c<K> (src[0]));
+    }
+};
+
+template <int K, typename View, bool IsBasic>
+struct kth_sample_view_impl;
+
+/* For basic (memory-based) views dispatch to __kth_sample_view_basic */
+template <int K, typename View>
+struct kth_sample_view_impl <K, View, true>
+{
+private:
+    typedef typename View::iterator src_iterator;
+
+    // Determines whether the samples of a given frame iterator are
+    // adjacent in memory.  Planar and grayscale iterators have
+    // samples adjacent in memory, whereas multi-sample interleaved
+    // and iterators with non-fundamental step do not.
+    BOOST_STATIC_CONSTANT(bool, adjacent=
+			  !iterator_is_step<src_iterator>::value &&
+			  (is_planar<src_iterator>::value ||
+			   num_samples<View>::value==1));
+
+public:
+    typedef typename kth_sample_view_basic_impl <K, View, adjacent>::type type;
+
+    static type make (const View& src)
+    {
+	return kth_sample_view_basic_impl <K, View, adjacent>::make (src);
+    }
+};
+
+/**
+   \brief Function object that returns a grayscale reference of the
+   K-th sample (specified as a template parameter) of a given
+   reference. Models: FrameDereferenceAdaptorConcept.
+   
+   \ingroup FrameDereferenceAdaptorModel
+
+   If the input is a frame value or constant reference, the function
+   object is immutable. Otherwise it is mutable (and returns non-const
+   reference to the k-th sample)
+*/
+template <int K, typename SrcP>
+// SrcP is a reference to FrameConcept (could be frame value or
+// const/non-const reference) Examples: frame<T,L>, frame<T,L>&, const
+// frame<T,L>&, planar_frame_reference<T&,L>,
+// planar_frame_reference<const T&,L>
+struct kth_sample_deref_fn
+{
+    BOOST_STATIC_CONSTANT(bool, is_mutable = frame_is_reference<SrcP>::value &&
+			  frame_reference_is_mutable<SrcP>::value);
+
+private:
+        typedef typename remove_reference<SrcP>::type src_frame_t;
+        typedef typename kth_element_type<src_frame_t, K>::type sample_t;
+        typedef typename src_frame_t::const_reference const_ref_t;
+        typedef typename frame_reference_type<
+	    sample_t, mono_layout, false, is_mutable>::type ref_t;
+
+public:
+    typedef kth_sample_deref_fn<K,const_ref_t>    const_t;
+    typedef typename frame_value_type<
+	sample_t, mono_layout>::type              value_type;
+    typedef typename frame_reference_type<
+	sample_t, mono_layout,false,false>::type  const_reference;
+    typedef SrcP                                  argument_type;
+        typedef typename mpl::if_c<
+	    is_mutable, ref_t, value_type>::type      reference;
+    typedef reference                             result_type;
+    
+    kth_sample_deref_fn () {}
+    template <typename P>
+    kth_sample_deref_fn (const kth_sample_deref_fn<K, P>&) {}
+    
+    result_type operator () (argument_type srcframe) const
+    { 
+	return result_type (at_c<K>(srcframe));
+    }
+};
+
+template <int K, typename View>
+struct kth_sample_view<K,View,false>
+{
+private:
+    typedef kth_sample_deref_fn<K,typename View::reference> deref_t;
+    typedef typename View::template add_deref<deref_t>   AD;
+
+public:
+    typedef typename AD::type type;
+    static type make (const View& src) { return AD::make (src, deref_t ()); }
+};
+
+} /* namespace detail */
+
+/**
+   \brief Given a source buffer view type View, returns the type of an
+   buffer view over a given sample of View.
+   
+   \ingroup BufferViewTransformationsKthSample
+   
+   If the samples in the source view are adjacent in memory (such as
+   planar non-step view or single-sample view) then the return view is
+   a single-sample non-step view.  If the samples are non-adjacent
+   (interleaved and/or step view) then the return view is a
+   single-sample step view.
+*/
+template <int K, typename View>
+struct kth_sample_view_type
+{
+private:
+    GIL_CLASS_REQUIRE(View, psynth::sound, BufferViewConcept)
+    typedef detail::kth_sample_view_impl<K, View, view_is_basic<View>::value> VB;
+
+public:
+    typedef typename VB::type type;
+    static type make (const View& src) { return VB::make(src); }
+};
+
+/** \ingroup BufferViewTransformationsKthSample */
+template <int K, typename View>
+typename kth_sample_view_type<K,View>::type
+kth_sample_view(const View& src)
+{
+    return kth_sample_view_type<K,View>::make(src);
 }
 
-} }  // namespace boost::gil
+}  /* namespace sound */
+}  /* namespace psynth */
 
-#endif
+#endif /* PSYNTH_SOUND_BUFFER_VIEW_FACTORY */

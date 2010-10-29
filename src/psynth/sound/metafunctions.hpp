@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-10-28 21:51:01 raskolnikov>
+ *  Time-stamp:  <2010-10-29 12:06:36 raskolnikov>
  *
  *  @file        metafunctions.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -216,7 +216,7 @@ template <typename I> struct iterator_is_step
     : public detail::iterator_is_step_impl<
     I, 
     !is_iterator_adaptor<I>::type::value,
-    is_same<I,typename dynamic_x_step_type<I>::type>::value > {};
+    is_same<I,typename dynamic_step_type<I>::type>::value > {};
 
 
 /**

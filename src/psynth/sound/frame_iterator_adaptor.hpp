@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-10-28 18:33:20 raskolnikov>
+ *  Time-stamp:  <2010-10-29 12:06:02 raskolnikov>
  *
  *  @file        frame_iterator_adaptor.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -269,15 +269,15 @@ memunit_advanced_ref (
 
 /*
  *
- *    HasDynamicXStepTypeConcept
+ *    HasDynamicStepTypeConcept
  *
  */
 
 template <typename Iterator, typename DFn>
-struct dynamic_x_step_type<dereference_iterator_adaptor<Iterator,DFn> >
+struct dynamic_step_type<dereference_iterator_adaptor<Iterator,DFn> >
 {
     typedef dereference_iterator_adaptor<
-	typename dynamic_x_step_type<Iterator>::type, DFn> type;
+	typename dynamic_step_type<Iterator>::type, DFn> type;
 };
 
 /**

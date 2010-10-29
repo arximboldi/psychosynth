@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-10-28 20:23:46 raskolnikov>
+ *  Time-stamp:  <2010-10-29 13:52:31 raskolnikov>
  *
  *  @file        step_iterator.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -247,7 +247,7 @@ class memory_based_step_iterator :
 					 Iterator, 
 					 memunit_step_fn<Iterator> >
 {
-    PSYNTH_CLASS_REQUIRE(Iterator, boost::gil, MemoryBasedIteratorConcept)
+    PSYNTH_CLASS_REQUIRE(Iterator, psynth::sound, MemoryBasedIteratorConcept)
 
     public:
     typedef detail::step_iterator_adaptor<memory_based_step_iterator<Iterator>, 
@@ -393,12 +393,12 @@ memunit_advanced_ref (
 
 /*
  *
- *    HasDynamicXStepTypeConcept
+ *    HasDynamicStepTypeConcept
  *
  */
 
 template <typename Iterator>
-struct dynamic_x_step_type<memory_based_step_iterator<Iterator> >
+struct dynamic_step_type<memory_based_step_iterator<Iterator> >
 {
     typedef memory_based_step_iterator<Iterator> type;
 };
@@ -407,7 +407,7 @@ struct dynamic_x_step_type<memory_based_step_iterator<Iterator> >
 template <typename Iterator, typename Deref>
 struct iterator_add_deref<memory_based_step_iterator<Iterator>, Deref>
 {
-    PSYNTH_CLASS_REQUIRE(Deref, boost::gil, FrameDereferenceAdaptorConcept)
+    PSYNTH_CLASS_REQUIRE(Deref, psynth::sound, FrameDereferenceAdaptorConcept)
 
     typedef memory_based_step_iterator<
 	typename iterator_add_deref<Iterator, Deref>::type> type;
@@ -428,7 +428,7 @@ struct iterator_add_deref<memory_based_step_iterator<Iterator>, Deref>
  */
 
 template <typename I>
-typename dynamic_x_step_type<I>::type
+typename dynamic_step_type<I>::type
 make_step_iterator(const I& it, std::ptrdiff_t step);
 
 namespace detail
@@ -437,7 +437,7 @@ namespace detail
 /* if the iterator is a plain base iterator (non-adaptor), wraps it in
    memory_based_step_iterator */
 template <typename I> 
-typename dynamic_x_step_type<I>::type make_step_iterator_impl (
+typename dynamic_step_type<I>::type make_step_iterator_impl (
     const I& it, std::ptrdiff_t step, mpl::false_)
 {
     return memory_based_step_iterator<I> (it, step);
@@ -445,7 +445,7 @@ typename dynamic_x_step_type<I>::type make_step_iterator_impl (
 
 // If the iterator is compound, put the step in its base
 template <typename I> 
-typename dynamic_x_step_type<I>::type make_step_iterator_impl (
+typename dynamic_step_type<I>::type make_step_iterator_impl (
     const I& it, std::ptrdiff_t step, mpl::true_)
 {
     return make_step_iterator (it.base (), step);
@@ -464,25 +464,25 @@ memory_based_step_iterator<BaseIt> make_step_iterator_impl(
 /**
    \brief Constructs a step iterator from a base iterator and a step.
 
- To construct a step iterator from a given iterator Iterator and a
- given step, if Iterator does not already have a dynamic step, we wrap
- it in a memory_based_step_iterator. Otherwise we do a compile-time
- traversal of the chain of iterator adaptors to locate the step
- iterator and then set it step to the new one.
+   To construct a step iterator from a given iterator Iterator and a
+   given step, if Iterator does not already have a dynamic step, we
+   wrap it in a memory_based_step_iterator. Otherwise we do a
+   compile-time traversal of the chain of iterator adaptors to locate
+   the step iterator and then set it step to the new one.
 
- The step iterator of Iterator is not always
- memory_based_step_iterator<Iterator>. For example, Iterator may
- already be a memory_based_step_iterator, in which case it will be
- inefficient to stack them; we can obtain the same result by
- multiplying their steps. Note that for Iterator to be a step iterator
- it does not necessarily have to have the form
- memory_based_step_iterator<J>.  The step iterator can be wrapped
- inside another iterator. Also, it may not have the type
- memory_based_step_iterator, but it could be a user-provided type.
+   The step iterator of Iterator is not always
+   memory_based_step_iterator<Iterator>. For example, Iterator may
+   already be a memory_based_step_iterator, in which case it will be
+   inefficient to stack them; we can obtain the same result by
+   multiplying their steps. Note that for Iterator to be a step
+   iterator it does not necessarily have to have the form
+   memory_based_step_iterator<J>.  The step iterator can be wrapped
+   inside another iterator. Also, it may not have the type
+   memory_based_step_iterator, but it could be a user-provided type.
 */
 template <typename I>
 // Models MemoryBasedIteratorConcept, HasDynamicXStepTypeConcept
-typename dynamic_x_step_type<I>::type
+typename dynamic_step_type<I>::type
 make_step_iterator (const I& it, std::ptrdiff_t step)
 {
     return detail::make_step_iterator_impl (
