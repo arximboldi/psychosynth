@@ -105,25 +105,25 @@ void psychosynth_3d::print_version ()
 
 void psychosynth_3d::prepare (arg_parser& arg_parser)
 {
-    conf_node& conf = config::self ().get_child ("psynth3d");
+    conf_node& conf = config::self ().child ("psynth3d");
     
     arg_parser.add ('W', "width",
-		    new option_conf<int>(conf.get_child ("screen_width")));
+		    new option_conf<int>(conf.child ("screen_width")));
     arg_parser.add ('H', "height",
-		    new option_conf<int>(conf.get_child ("screen_height")));
+		    new option_conf<int>(conf.child ("screen_height")));
     arg_parser.add ('f', "fullscreen",
-		    new option_conf_value<int>(1, conf.get_child ("fullscreen")));
+		    new option_conf_value<int>(1, conf.child ("fullscreen")));
     arg_parser.add ('w', "window",
-		    new option_conf_value<int>(0, conf.get_child ("fullscreen")));
+		    new option_conf_value<int>(0, conf.child ("fullscreen")));
     arg_parser.add ('F', "fps",
-		    new option_conf<int>(conf.get_child ("fps")));
+		    new option_conf<int>(conf.child ("fps")));
 }
 
 int psychosynth_3d::execute()
 {
     logger::self () ("gui", log::info, "Loading settings.");
      
-    conf_node& conf = config::self ().get_child ("psynth3d");
+    conf_node& conf = config::self ().child ("psynth3d");
     setup_settings (conf);
     
     logger::self () ("gui", log::info, "Initializing Ogre.");
@@ -216,7 +216,7 @@ void psychosynth_3d::setup_settings (conf_node& conf)
     try
     {
 #ifdef PSYNTH_HAVE_XML
-	conf.attach_backend (
+	conf.set_backend (
 	    new_conf_backend_xml (
 		(get_config_path() / "psynth3d.xml").file_string ()));
 #endif
@@ -228,15 +228,15 @@ void psychosynth_3d::setup_settings (conf_node& conf)
 	logger::self () ("gui", log::error, error.what ());
     }
     
-    conf.get_child ("screen_width").def (DEFAULT_SCREEN_WIDTH);
-    conf.get_child ("screen_height").def (DEFAULT_SCREEN_HEIGHT);
-    conf.get_child ("fullscreen").def (DEFAULT_FULLSCREEN);
-    conf.get_child ("fps").def (DEFAULT_FPS);
+    conf.child ("screen_width").def (DEFAULT_SCREEN_WIDTH);
+    conf.child ("screen_height").def (DEFAULT_SCREEN_HEIGHT);
+    conf.child ("fullscreen").def (DEFAULT_FULLSCREEN);
+    conf.child ("fps").def (DEFAULT_FPS);
 	
     /* Is it dangerous to have this set before the gui is initialized? */
     conf.on_nudge.connect
 	(sigc::mem_fun (*this, &psychosynth_3d::on_config_change));
-    conf.get_child ("fps").on_change.connect
+    conf.child ("fps").on_change.connect
 	(sigc::mem_fun (*this, &psychosynth_3d::on_fps_change));
     
 }
@@ -248,10 +248,10 @@ void psychosynth_3d::setup_ogre (conf_node& conf)
     int fullscreen;
     int fps;
 
-    conf.get_child ("screen_width").get (screen_width);
-    conf.get_child ("screen_height").get (screen_height);
-    conf.get_child ("fullscreen").get (fullscreen);
-    conf.get_child ("fps").get (fps);
+    conf.child ("screen_width").get (screen_width);
+    conf.child ("screen_height").get (screen_height);
+    conf.child ("fullscreen").get (fullscreen);
+    conf.child ("fps").get (fps);
     
     (new LogManager)->createLog
 	((get_config_path() / "gui3d/psynth3d_Ogre.log").file_string (),
@@ -297,7 +297,7 @@ void psychosynth_3d::setup_ogre (conf_node& conf)
 void psychosynth_3d::setup_input ()
 {
     int fullscreen; /* I prefer not using the singleton here. */
-    config::self ().get_path("psynth3d.fullscreen").get(fullscreen);
+    config::self ().path("psynth3d.fullscreen").get(fullscreen);
     
     OIS::ParamList pl;
     size_t window_hnd = 0;
@@ -469,8 +469,8 @@ void psychosynth_3d::setup_menus ()
     m_windowlist->add_window ("ConfWindowButton.imageset",
 			      "ConfWindowButton.layout",
 			      "Configure the program settings.",
-			      new conf_window (config::self ().get_child ("psynth3d"),
-					       config::self ().get_child ("psychosynth")),
+			      new conf_window (config::self ().child ("psynth3d"),
+					       config::self ().child ("psychosynth")),
 			      OIS::KC_UNASSIGNED);
     m_windowlist->add_window ("InfoWindowButton.imageset",
 			      "InfoWindowButton.layout",
@@ -530,10 +530,10 @@ void psychosynth_3d::on_config_change (conf_node& conf)
     int sc_fullscreen;
     int fps;
 
-    conf.get_child ("screen_width").get(sc_width);
-    conf.get_child ("screen_height").get(sc_height);
-    conf.get_child ("fullscreen").get(sc_fullscreen);
-    conf.get_child ("fps").get(fps);
+    conf.child ("screen_width").get(sc_width);
+    conf.child ("screen_height").get(sc_height);
+    conf.child ("fullscreen").get(sc_fullscreen);
+    conf.child ("fps").get(fps);
 
     m_timer.force_fps(fps);
     m_window->setFullscreen(sc_fullscreen,

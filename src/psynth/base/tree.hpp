@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-10-18 17:51:45 raskolnikov>
+ *  Time-stamp:  <2010-11-03 00:21:32 raskolnikov>
  *
  *  @file        tree.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -70,7 +70,7 @@ struct tree_node_traits<std::string>
 /**
  * Exception for this type.
  */
-PSYNTH_DECLARE_ERROR (base_error, tree_node_error);
+PSYNTH_DECLARE_ERROR (error, tree_node_error);
 
 /**
  * A tree node. This class in intended to be used by inheriting from it,
@@ -94,6 +94,7 @@ PSYNTH_DECLARE_ERROR (base_error, tree_node_error);
  *
  * @todo Fix copy operations.
  * @todo Fix string operations to be more generic.
+ * @todo Add [] operator?
  */
 template <class Node,
 	  class Key = std::string,
@@ -167,7 +168,7 @@ public:
      * Returns a pointer to the parent of this node or @c null if this is a root
      * node.
      */
-    const Node* get_parent () const
+    const Node* parent () const
     {
 	tree_lock lock (this);
 	return m_parent;
@@ -177,7 +178,7 @@ public:
      * Returns a pointer to the parent of this node or @c null if this is a root
      * node.
      */
-    Node* get_parent ()
+    Node* parent ()
     {
 	tree_lock lock (this);
 	return m_parent;
@@ -186,7 +187,7 @@ public:
     /**
      * Returns the name of this node.
      */
-    const Key& get_name () const
+    const Key& name () const
     {
 	tree_lock lock (this);
 	return m_name;
@@ -257,7 +258,7 @@ public:
     /**
      * Returns the path of this node from the root to the node.
      */
-    Key get_path_name () const;
+    Key path_name () const;
     
     /**
      * Deletes a child of this node.
@@ -276,14 +277,14 @@ public:
      * is created if it does not exist yet.
      * @param name The name of the child.
      */
-    Node& get_child (const Key& name);
+    Node& child (const Key& name);
 
     /**
      * Returns a reference to the child of this node mathing a name,
      * throwing an exception if the node does not exist.
      * @param name The name of the child.
      */
-    Node& get_existing_child (const Key& name);
+    Node& existing_child (const Key& name);
 
 
     /**
@@ -291,27 +292,27 @@ public:
      * throwing an exception if the node does not exist.
      * @param name The name of the child.
      */
-    const Node& get_existing_child (const Key& name) const;
+    const Node& existing_child (const Key& name) const;
     
     /**
      * Returns a reference to the child matching a path. All nodes
      * in the path are created if they do not exist.
      */
-    Node& get_path (const Key& name);
+    Node& path (const Key& name);
     
     /**
      * Returns a reference to the child matching a path, an
      * exception is thrown if the path does not exist.
      * @param name The path to find.
      */
-    Node& get_existing_path (const Key& name);
+    Node& existing_path (const Key& name);
 
     /**
      * Returns a reference to the child matching a path, an
      * exception is thrown if the path does not exist.
      * @param name The path to find.
      */
-    const Node& get_existing_path (const Key& name) const;
+    const Node& existing_path (const Key& name) const;
 
 protected:    
     virtual void on_new_child (Node& node) {}
@@ -329,17 +330,17 @@ private:
     static void find_base (InputIterator& base_b, InputIterator& base_e);
 
     const Node&
-    get_existing_path (typename Key::const_iterator begin,
+    existing_path (typename Key::const_iterator begin,
 		       typename Key::const_iterator end) const;
 
     Node&
-    get_existing_path (typename Key::const_iterator begin,
+    existing_path (typename Key::const_iterator begin,
 		       typename Key::const_iterator end);
 
-    Node& get_path (typename Key::const_iterator begin,
+    Node& path (typename Key::const_iterator begin,
 		    typename Key::const_iterator end);
     
-    void get_path_name (Key& prefix) const;
+    void path_name (Key& prefix) const;
 
     bool is_init() const
     {

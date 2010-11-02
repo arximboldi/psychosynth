@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-10-18 17:45:55 raskolnikov>
+ *  Time-stamp:  <2010-11-02 22:41:50 raskolnikov>
  *
  *  @file        exception.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -42,100 +42,119 @@ namespace psynth
 namespace base
 {
 
+/**
+ * Base class for all the exceptions inside the framework.
+ */
 class exception : public std::exception
 {
 public:
     virtual ~exception () throw () {}
-    
+
+    /**
+     * Logs the exception somewhere. Probably this somewhere is:
+     * @code
+     *   logger::self ().path (where ())
+     * @endcode
+     */
     virtual void log () const {}
+
+    /**
+     * Returns a message in natural language describing the
+     * exception and/or its context.
+     */
     virtual const char* what () const throw () = 0;
+
+    /**
+     * Returns the module where the exception was produced.
+     */
     virtual const char* where () const throw () = 0;
+
+    /**
+     * Returns the severity of the exception.
+     */
+    virtual int level () const throw () = 0;
 };
 
-class error : public exception
+/**
+ * A base clase for the errors defined with PSYNTH_DECLARE_ERROR and
+ * alike preprocessor commands.
+ */
+class error_base : public exception
 {
 public:
-    virtual ~error () throw () {}
+    /** Constructor */
+    error_base ()
+    {}
 
+    /** Constructor specifying the error message. */
+    error_base (const std::string& what)
+	: _what (what)
+    {}
+    
+    virtual ~error_base () throw () {}
+
+    /** Writes the exception into the global log. */
     virtual void log () const;
     
     virtual const char* what () const throw ()
     {
-	return m_what.c_str ();
+	return _what.empty () ? default_what () : _what.c_str ();
     }
 
     virtual const char* where () const throw ()
     {
-	return m_where.c_str ();
+	return "psynth";
     }
 
-protected:    
-    error (const std::string& where, const std::string& what) throw ();
-    std::string default_error ();
-    
+    virtual int level () const throw ();
+
+protected:
+    /**
+     * Returns a default message for the exception.
+     */
+    virtual const char* default_what () const throw ();
+
 private:
-    std::string m_what;
-    std::string m_where;
+    std::string _what;
 };
     
 #define PSYNTH_DECLARE_ERROR(d_parent, d_error)				\
     class d_error : public d_parent					\
     {									\
     public:								\
-	typedef d_parent base;						\
-	d_error (const std::string& what);				\
-	d_error ();							\
-									\
+	typedef d_parent base_type;					\
+	d_error () {}							\
+	d_error (const std::string& s) : base_type (s) {}		\
+	virtual const char* where () const throw ();			\
     protected:								\
-	d_error (const std::string& where, const std::string& what);	\
+	virtual const char* default_what () const throw ();		\
     };
 
 #define PSYNTH_DEFINE_ERROR_WHERE_WHAT(d_error, d_where, d_what)	\
-    d_error::d_error (const std::string& where, const std::string& what) \
-	: base (d_where + std::string (".") + where, what)		\
-    {}									\
-    d_error::d_error (const std::string& what)				\
-	: base (d_where, what)						\
-    {}									\
-    d_error::d_error ()							\
-	: base (d_where, d_what)					\
-    {}
+    const char* d_error::where () const	throw ()			\
+    { return d_where; }							\
+    const char* d_error::default_what () const throw ()			\
+    { return d_what; }
 
 #define PSYNTH_DEFINE_ERROR_WHERE(d_error, d_where)			\
-    d_error::d_error (const std::string& where, const std::string& what) \
-	: base (d_where + std::string (".") + where, what)		\
-    {}									\
-    d_error::d_error (const std::string& what)				\
-	: base (d_where, what)						\
-    {}									\
-    d_error::d_error ()							\
-	: base (d_where, default_error ())				\
-    {}
+    const char* d_error::default_what () const throw ()			\
+    { return base_type::default_what (); }				\
+    const char* d_error::where () const	throw ()			\
+    { return d_where; }							\
 
 #define PSYNTH_DEFINE_ERROR_WHAT(d_error, d_what)			\
-    d_error::d_error (const std::string& where, const std::string& what) \
-	: base (where, what)						\
-    {}									\
-    d_error::d_error (const std::string& what)				\
-	: base (what)							\
-    {}									\
-    d_error::d_error ()							\
-	: base (d_what)							\
-    {}
+    const char* d_error::default_what () const throw ()			\
+    { return d_what; }							\
+    const char* d_error::where () const	throw ()			\
+    { return PSYNTH_MODULE_NAME; }
 
 #define PSYNTH_DEFINE_ERROR(d_error)					\
-    d_error::d_error (const std::string& where, const std::string& what) \
-	: base (where, what)						\
-    {}									\
-    d_error::d_error (const std::string& what)				\
-	: base (what)							\
-    {}									\
-    d_error::d_error ()							\
-	: base ()							\
-    {}
+    const char* d_error::default_what () const	throw ()		\
+    { return base_type::default_what (); }				\
+    const char* d_error::where () const	throw ()			\
+    { return PSYNTH_MODULE_NAME; }
 
-PSYNTH_DECLARE_ERROR (error, psynth_error);
-PSYNTH_DECLARE_ERROR (psynth_error, base_error);
+PSYNTH_DECLARE_ERROR (error_base, error);
 
 } /* namespace base */
 } /* namespace psynth */

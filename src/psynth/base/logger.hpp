@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-10-17 19:56:06 raskolnikov>
+ *  Time-stamp:  <2010-11-03 00:53:11 raskolnikov>
  *
  *  @file        logger.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -39,13 +39,99 @@
 
 #include <psynth/base/singleton.hpp>
 #include <psynth/base/tree.hpp>
+#include <psynth/base/compat.hpp>
+#include <psynth/base/logger_def.hpp>
 
 namespace psynth
 {
 namespace base
 {
 
-class log;
+/**
+ * Type for the end message constant;
+ */
+struct log_msg_type {};
+
+/**
+ * Use to send a message through a log_stream_adapter
+ */
+const log_msg_type log_msg = {};
+
+/**
+ * A iostreams alike adapter for a log.
+ */
+class log_stream_adapter
+{
+public:
+    /**
+     * Constructor.
+     * @param l The log where to output. Its lifetime should be
+     * longer than the one of the log_stream_adapter
+     */
+    inline log_stream_adapter (log& l);
+
+    /** Destructor. */
+    inline ~log_stream_adapter ();
+
+    /** Sets the level. */
+    void set_level (int level)
+    { _level = level; } 
+    
+private:
+    log&               _log;
+    int                _level;
+    std::ostringstream _str;
+
+    template <typename T>
+    friend log_stream_adapter& operator<< (log_stream_adapter&, const T&);
+    friend log_stream_adapter& operator<< (log_stream_adapter&, log_msg_type);
+};
+
+/**
+ * This allow to wrap the log_stream_adapter into a wrapper that
+ * flushes the log_stream when the last copy is destroyed.
+ */
+class log_stream_adapter_wrapper : public boost::noncopyable
+{
+public:
+    /** Constructor */
+    log_stream_adapter_wrapper (log_stream_adapter& s)
+	: _stream (s)
+	, _last (false)
+    {}
+
+    /** Move constructor */
+    log_stream_adapter_wrapper (log_stream_adapter_wrapper&& s)
+	: _stream (s._stream)
+	, _last (true)
+    {
+	s._last = false;
+    }
+
+    /** Destructor. Flushes message. */
+    ~log_stream_adapter_wrapper ()
+    {
+	if (_last)
+	    _stream << log_msg;
+    }
+
+    /** Returns the wrapped object. */
+    log_stream_adapter& wrapped ()
+    {
+	return _stream;
+    }
+    
+private:
+    log_stream_adapter& _stream;
+    bool                _last;
+};
+
+template<typename T> inline
+log_stream_adapter_wrapper operator<< (log_stream_adapter_wrapper s, T p)
+{
+    s.wrapped () << p;
+    return std::move (s);
+}
 
 /**
  * Interface of a log sink. A log sink is an object that implements how log
@@ -82,6 +168,7 @@ class log : public tree_node <log>,
 public:
     /**
      * The message relevance.
+     * @todo Make it easier to add custom levels.
      */
     enum level
     {
@@ -112,7 +199,9 @@ public:
     };
 
     /** Constructor. */
-    log () {}
+    log ()
+	: _stream (*this)
+    {}
     
     /** Destructor. */
     ~log ();
@@ -121,20 +210,20 @@ public:
      * Attachs a sink to this node.
      * @param d The sink that we want to dump this log's messages.
      */
-    void attach_sink (log_sink* d)
+    void add_sink (log_sink_ptr d)
     {
 	lock lock (this);
-	m_dumpers.push_back(d);
+	_dumpers.push_back (d);
     }
 
     /**
      * Dettachs a sink from this node.
      * @param d The sink we don't want to dump massages of this log anymore.
      */
-    void dattach_sink (log_sink* d)
+    void del_sink (log_sink_ptr d)
     {
 	lock lock (this);
-	m_dumpers.remove(d);
+	_dumpers.remove (d);
     }
 
     /**
@@ -146,7 +235,7 @@ public:
     void operator () (const std::string& child, int level, const std::string& msg)
     {
 	lock lock (this);
-	get_path (child) (level, msg);
+	path (child) (level, msg);
     }
 
     /**
@@ -160,6 +249,15 @@ public:
 	operator () (*this, level, msg);
     };
 
+    /**
+     * Returns a stream object that can be used to send messages to
+     * the log in a iostreams fashion.
+     */
+    log_stream_adapter_wrapper stream ()
+    {
+	return log_stream_adapter_wrapper (_stream);
+    }
+    
 private:
     /**
      * Log a message into this node which has been propagated from
@@ -170,14 +268,16 @@ private:
      */
     void operator () (log& log, int level, const std::string& msg);
 
-    std::list<log_sink*> m_dumpers;
+    log_stream_adapter      _stream; // TODO: We want to avoid the
+				     // ostringstream instance here :(
+    std::list<log_sink_ptr> _dumpers;
 };
 
 /**
  * Root singleton @c Log to log global messages.
  */
-typedef singleton_holder<log> logger;
-
+struct logger : public singleton_holder<log> {};
+    
 /**
  * Simple log sink that logs messages to @c cout and @c cerr.
  *
@@ -200,7 +300,7 @@ public:
     {
 	(level > log::info ? std::cerr : std::cout)
 	    << '['
-	    << l.get_path_name ()
+	    << l.path_name ()
 	    << "] "
 	    << log::level_name (level)
 	    << ": "
@@ -246,7 +346,7 @@ public:
 	if (_output)
 	    *(_output)
 		<< '['
-		<< l.get_path_name ()
+		<< l.path_name ()
 		<< "] "
 		<< log::level_name (level)
 		<< ": "
@@ -281,6 +381,47 @@ public:
 private:
     std::ofstream _file;
 };
+
+inline
+log_stream_adapter& operator<< (log_stream_adapter& s, log_msg_type)
+{
+    s._log (s._level, s._str.str ());
+    return s;
+}
+
+inline
+log_stream_adapter& operator<< (log_stream_adapter& s, log::level x)
+{
+    s.set_level (x);
+    return s;
+}
+
+template <class T> inline
+log_stream_adapter& operator<< (log_stream_adapter& s, const T& x)
+{
+    s._str << x;
+    return s;
+}
+
+log_stream_adapter::log_stream_adapter (log& l)
+    : _log (l)
+    , _level (log::info)
+{}
+
+log_stream_adapter::~log_stream_adapter ()
+{
+    // *this << log_msg;
+}
+
+#define PSYNTH_LOG logger::self ().path (PSYNTH_MODULE_NAME).stream ()
+
+#if PSYNTH_DEBUG
+#define PSYNTH_LOG_DEBUG \
+    psynth::base::logger::self ().path (PSYNTH_MODULE_NAME).stream () \
+    << log::debug
+#else
+#define PSYNTH_LOG_DEBUG psynth::base::nop_ostream ()
+#endif
 
 } /* namespace base */
 } /* namespace psynth */

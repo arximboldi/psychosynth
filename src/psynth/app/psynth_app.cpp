@@ -68,25 +68,25 @@ void psynth_app::generate_paths ()
 bool psynth_app::parse_args (int argc, const char* argv[])
 {
     base::arg_parser ap;
-    base::conf_node& conf = base::config::self ().get_child ("psychosynth");
+    base::conf_node& conf = base::config::self ().child ("psychosynth");
     bool show_help = false;
     bool show_version = false;
     
     ap.add('h', "help", &show_help);
     ap.add('v', "version", &show_version);
-    ap.add('s', "sample-rate", new base::option_conf<int>(conf.get_child ("sample_rate")));
-    ap.add('b', "buffer-size", new base::option_conf<int>(conf.get_child ("block_size")));
-    ap.add('c', "channels", new base::option_conf<int>(conf.get_child ("num_channels")));
-    ap.add('o', "output", new base::option_conf<string>(conf.get_child ("output")));
+    ap.add('s', "sample-rate", new base::option_conf<int>(conf.child ("sample_rate")));
+    ap.add('b', "buffer-size", new base::option_conf<int>(conf.child ("block_size")));
+    ap.add('c', "channels", new base::option_conf<int>(conf.child ("num_channels")));
+    ap.add('o', "output", new base::option_conf<string>(conf.child ("output")));
 
 #ifdef PSYNTH_HAVE_ALSA
-    ap.add(0, "alsa-device", new base::option_conf<string>(conf.get_path ("alsa.out_device")));
+    ap.add(0, "alsa-device", new base::option_conf<string>(conf.path ("alsa.out_device")));
 #endif
 #ifdef PSYNTH_HAVE_OSS
-    ap.add(0, "oss-device", new base::option_conf<string>(conf.get_path ("oss.out_device")));
+    ap.add(0, "oss-device", new base::option_conf<string>(conf.path ("oss.out_device")));
 #endif
 #ifdef PSYNTH_HAVE_JACK
-    ap.add(0, "jack-server", new base::option_conf<string>(conf.get_path ("jack.server")));
+    ap.add(0, "jack-server", new base::option_conf<string>(conf.path ("jack.server")));
 #endif
 
     prepare (ap);
@@ -139,7 +139,7 @@ void psynth_app::print_base_options (ostream& out)
 
 void psynth_app::setup_synth()
 {
-    m_director.start (base::config::self  ().get_child ("psychosynth"),
+    m_director.start (base::config::self  ().child ("psychosynth"),
 		      get_config_path ());
 }
     
@@ -153,8 +153,8 @@ int psynth_app::run (int argc, const char* argv[])
     int ret_val = 0;
 
     try {
-	base::conf_node& conf = base::config::self ().get_child ("psychosynth");
-	base::logger::self ().attach_sink (new base::log_std_sink);
+	base::conf_node& conf = base::config::self ().child ("psychosynth");
+	base::logger::self ().add_sink (base::new_log_std_sink ());
 	
 	if (!parse_args (argc, argv))
 	    return ERR_GENERIC;
@@ -163,7 +163,7 @@ int psynth_app::run (int argc, const char* argv[])
 
 	try {
 #ifdef PSYNTH_HAVE_XML
-	    conf.attach_backend (
+	    conf.set_backend (
 		base::new_conf_backend_xml (
 		    (get_config_path () / "psychosynth.xml").file_string ()));
 #endif

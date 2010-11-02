@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-10-20 19:48:45 raskolnikov>
+ *  Time-stamp:  <2010-11-02 20:22:11 raskolnikov>
  *
  *  @file        compat.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -29,8 +29,8 @@
  *
  */
 
-#ifndef PSYNTH_COMPAT_H_
-#define PSYNTH_COMPAT_H_
+#ifndef PSYNTH_BASE_COMPAT_H_
+#define PSYNTH_BASE_COMPAT_H_
 
 #ifdef _DEBUG
 #    define PSYNTH_FORCEINLINE inline
@@ -59,4 +59,10 @@
 #    define PSYNTH_NONWORD_POINTER_ALIGNMENT_SUPPORTED
 #endif
 
-#endif /* PSYNTH_COMPAT_H_ */
+#ifdef NDEBUG
+#define PSYNTH_DEBUG 0
+#else
+#define PSYNTH_DEBUG 1
+#endif
+
+#endif /* PSYNTH_BASE_COMPAT_H_ */

@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-10-19 18:18:48 raskolnikov>
+ *  Time-stamp:  <2010-11-03 00:17:17 raskolnikov>
  *
  *  @file        director.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -69,12 +69,12 @@ void director::start_output ()
 {
     std::string out_name;
 
-    m_config->get_child ("output").get (out_name);
+    m_config->child ("output").get (out_name);
     
     odf_map::iterator i = m_outdir.find(out_name);
     if (i != m_outdir.end()) {
 	m_output = i->second->create_output_director();
-	m_output->start (m_config->get_child (i->second->get_name()));
+	m_output->start (m_config->child (i->second->get_name()));
 
 	m_world->attach_output (m_output->get_output());
 
@@ -82,7 +82,7 @@ void director::start_output ()
 	m_output->get_output()->open();
 	m_output->get_output()->start();
     } else {
-	m_config->get_child ("output").set (string (PSYNTH_DEFAULT_OUTPUT));
+	m_config->child ("output").set (string (PSYNTH_DEFAULT_OUTPUT));
     }
 
     m_old_output = out_name;
@@ -90,10 +90,10 @@ void director::start_output ()
 
 void director::register_config ()
 {
-    m_config->get_child ("sample_rate") .def (int (PSYNTH_DEFAULT_SAMPLE_RATE));
-    m_config->get_child ("block_size")  .def (int (PSYNTH_DEFAULT_BLOCK_SIZE));
-    m_config->get_child ("num_channels").def (int (PSYNTH_DEFAULT_NUM_CHANNELS));
-    m_config->get_child ("output")      .def (string (PSYNTH_DEFAULT_OUTPUT));
+    m_config->child ("sample_rate") .def (int (PSYNTH_DEFAULT_SAMPLE_RATE));
+    m_config->child ("block_size")  .def (int (PSYNTH_DEFAULT_BLOCK_SIZE));
+    m_config->child ("num_channels").def (int (PSYNTH_DEFAULT_NUM_CHANNELS));
+    m_config->child ("output")      .def (string (PSYNTH_DEFAULT_OUTPUT));
 
     m_config->on_nudge.connect (sigc::mem_fun (*this, &director::on_config_nudge));
 }
@@ -107,20 +107,20 @@ void director::start (base::conf_node& conf, const boost::filesystem::path& home
 {
     m_config = &conf;
 
-    m_filemgr.start (conf.get_child ("file_manager"), home_path);
+    m_filemgr.start (conf.child ("file_manager"), home_path);
     
     /* A bit dirty... */
     for (odf_map::iterator i = m_outdir.begin(); i != m_outdir.end(); ++i) {
 	output_director* od = i->second->create_output_director();
-	od->defaults(m_config->get_child (i->first));
+	od->defaults(m_config->child (i->first));
 	delete od;
     }
     
     register_config();
 
-    m_info.sample_rate = conf.get_child ("sample_rate").get<int> ();
-    m_info.num_channels = conf.get_child ("num_channels").get<int> ();
-    m_info.block_size = conf.get_child ("block_size").get<int> ();
+    m_info.sample_rate = conf.child ("sample_rate").get<int> ();
+    m_info.num_channels = conf.child ("num_channels").get<int> ();
+    m_info.block_size = conf.child ("block_size").get<int> ();
 
     m_world = new world (m_info);
     m_world->set_patcher (base::manage (new patcher_dynamic));
@@ -158,10 +158,10 @@ void director::on_config_nudge (base::conf_node& node)
 {
     string out;
     
-    m_info.sample_rate  = node.get_child ("sample_rate").get<int> ();
-    m_info.block_size   = node.get_child ("block_size").get<int> ();
-    m_info.num_channels = node.get_child ("num_channels").get<int> ();
-    node.get_child ("output").get (out);
+    m_info.sample_rate  = node.child ("sample_rate").get<int> ();
+    m_info.block_size   = node.child ("block_size").get<int> ();
+    m_info.num_channels = node.child ("num_channels").get<int> ();
+    node.child ("output").get (out);
     
     m_world->set_info (m_info);
 

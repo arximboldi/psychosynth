@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-10-18 15:37:49 raskolnikov>
+ *  Time-stamp:  <2010-11-02 22:44:06 raskolnikov>
  *
  *  @file        config.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -26,6 +26,8 @@
  *
  */
 
+#define PSYNTH_MODULE_NAME "psynth.base.config"
+
 #include "config.hpp"
 
 using namespace std;
@@ -35,7 +37,7 @@ namespace psynth
 namespace base
 {
 
-PSYNTH_DEFINE_ERROR_WHERE (config_error, "config");
+PSYNTH_DEFINE_ERROR (config_error);
 PSYNTH_DEFINE_ERROR_WHAT  (config_type_error, "Config node type mismatch.");
 PSYNTH_DEFINE_ERROR_WHAT  (config_backend_error, "Config node has no backend.");
 
@@ -85,17 +87,17 @@ void conf_node::def_load ()
 	throw config_backend_error ();
 }
 
-void conf_node::attach_backend (conf_backend_ptr backend)
+void conf_node::set_backend (conf_backend_ptr backend)
 {
     lock lock (this);
     
     if (_backend)
-	datach_backend ();
+	unset_backend ();
     _backend = backend;
     _backend->attach (*this);
 }
 
-void conf_node::datach_backend ()
+void conf_node::unset_backend ()
 {
     lock lock (this);
     

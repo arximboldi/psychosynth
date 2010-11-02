@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-10-18 17:45:31 raskolnikov>
+ *  Time-stamp:  <2010-11-03 00:20:50 raskolnikov>
  *
  *  @file        tree.tpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -99,17 +99,17 @@ void tree_node <N, K, T, P>::clear_childs ()
 }
 
 template <class N, class K, class T, class P>
-K tree_node <N, K, T, P>::get_path_name () const
+K tree_node <N, K, T, P>::path_name () const
 {
     tree_lock lock (this);
     
     K prefix;
-    get_path_name (prefix);
+    path_name (prefix);
     return prefix;
 }
 
 template <class N, class K, class T, class P>
-N& tree_node <N, K, T, P>::get_child (const K& name)
+N& tree_node <N, K, T, P>::child (const K& name)
 {
     tree_lock lock (this);
     
@@ -125,7 +125,7 @@ N& tree_node <N, K, T, P>::get_child (const K& name)
 }
 
 template <class N, class K, class T, class P>
-N& tree_node <N, K, T, P>::get_existing_child (const K& name)
+N& tree_node <N, K, T, P>::existing_child (const K& name)
 {
     tree_lock lock (this);
     
@@ -138,21 +138,21 @@ N& tree_node <N, K, T, P>::get_existing_child (const K& name)
 }
 
 template <class N, class K, class T, class P>
-N& tree_node <N, K, T, P>::get_path (const K& path)
+N& tree_node <N, K, T, P>::path (const K& p)
 {
-    return get_path (path.begin (), path.end ());
+    return path (p.begin (), p.end ());
 }
 
 template <class N, class K, class T, class P>
-const N& tree_node <N, K, T, P>::get_existing_path (const K& path) const
+const N& tree_node <N, K, T, P>::existing_path (const K& p) const
 {
-    return get_existing_path (path.begin (), path.end ());
+    return existing_path (p.begin (), p.end ());
 }
 
 template <class N, class K, class T, class P>
-N& tree_node <N, K, T, P>::get_existing_path (const K& path)
+N& tree_node <N, K, T, P>::existing_path (const K& p)
 {
-    return get_existing_path (path.begin (), path.end ());
+    return existing_path (p.begin (), p.end ());
 }
 
 /*
@@ -160,14 +160,14 @@ N& tree_node <N, K, T, P>::get_existing_path (const K& path)
 */
 
 template <class N, class K, class T, class P>
-void tree_node <N, K, T, P>::get_path_name (K& prefix) const
+void tree_node <N, K, T, P>::path_name (K& prefix) const
 {
     tree_lock lock (this);
     
     if (m_parent)
     {
 	if (m_parent->m_parent) {
-	    m_parent->get_path_name (prefix);
+	    m_parent->path_name (prefix);
 	    prefix.insert (prefix.end (), T::separator);
 	}
 	prefix.insert (prefix.end (), m_name.begin (), m_name.end ());
@@ -175,7 +175,7 @@ void tree_node <N, K, T, P>::get_path_name (K& prefix) const
 }
 
 template <class N, class K, class T, class P>
-N& tree_node <N, K, T, P>::get_path (typename K::const_iterator begin,
+N& tree_node <N, K, T, P>::path (typename K::const_iterator begin,
 				  typename K::const_iterator end)
 {
     typename K::const_iterator base_end = end;
@@ -186,13 +186,13 @@ N& tree_node <N, K, T, P>::get_path (typename K::const_iterator begin,
     rest_begin ++;
     
     return base_end == end ?
-	get_child (K (begin, base_end)) :
-	get_child (K (begin, base_end)).get_path (rest_begin, end);
+	child (K (begin, base_end)) :
+	child (K (begin, base_end)).path (rest_begin, end);
 }
 
 template <class N, class K, class T, class P>
 N& tree_node <N, K, T, P>::
-get_existing_path (typename K::const_iterator begin,
+existing_path (typename K::const_iterator begin,
 		   typename K::const_iterator end)
 {
     typename K::const_iterator base_end = end;
@@ -203,14 +203,14 @@ get_existing_path (typename K::const_iterator begin,
     rest_begin ++;
     
     return base_end == end ?
-	get_existing_child (K (begin, base_end)) :
-	get_existing_child (K (begin, base_end))
-	.get_existing_path (rest_begin, end);
+	existing_child (K (begin, base_end)) :
+	existing_child (K (begin, base_end))
+	.existing_path (rest_begin, end);
 }
 
 template <class N, class K, class T, class P>
 const N& tree_node <N, K, T, P>::
-get_existing_path (typename K::const_iterator begin,
+existing_path (typename K::const_iterator begin,
 		   typename K::const_iterator end) const
 {   
     typename K::const_iterator base_end = end;
@@ -221,9 +221,9 @@ get_existing_path (typename K::const_iterator begin,
     rest_begin ++;
     
     return base_end == end ?
-	get_existing_child (K (begin, base_end)) :
-	get_existing_child (K (begin, base_end))
-	.get_existing_path (rest_begin, end);
+	existing_child (K (begin, base_end)) :
+	existing_child (K (begin, base_end))
+	.existing_path (rest_begin, end);
 }
 
 template <class N, class K, class T, class P>

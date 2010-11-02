@@ -50,7 +50,7 @@ public:
     CEGUI::Window* create_window(psynth::base::conf_node& node);
 
     void apply () {
-	m_node->get_path(m_conf_path).set<std::string>(m_value->getText().c_str ());
+	m_node->path(m_conf_path).set<std::string>(m_value->getText().c_str ());
     };
 };
 

@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-02 13:15:37 raskolnikov>
+ *  Time-stamp:  <2010-11-03 00:27:00 raskolnikov>
  *
  *  @file        tree_node_test.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -53,8 +53,8 @@ struct tree_node_fixture
     
     tree_node_fixture ()
     {
-	root.get_path ("1.2.3.4").value = -1;
-	root.get_path ("...").value = -1;
+	root.path ("1.2.3.4").value = -1;
+	root.path ("...").value = -1;
     }
 
     ~tree_node_fixture () {}
@@ -64,93 +64,93 @@ BOOST_FIXTURE_TEST_SUITE(tree_node_test_suite_0, tree_node_fixture)
 
 BOOST_AUTO_TEST_CASE(tree_node_test_0)
 {
-    BOOST_CHECK_EQUAL (root.get_child ("1").value, 0);
-    BOOST_CHECK_EQUAL (root.get_child ("").value, 0);
-    BOOST_CHECK_EQUAL (root.get_child ("").get_child ("")
-			.get_child ("").get_child ("").value, -1);
-    BOOST_CHECK_EQUAL (root.get_child ("1").get_child ("2")
-			.get_child ("3").get_child ("4").value, -1);
+    BOOST_CHECK_EQUAL (root.child ("1").value, 0);
+    BOOST_CHECK_EQUAL (root.child ("").value, 0);
+    BOOST_CHECK_EQUAL (root.child ("").child ("")
+			.child ("").child ("").value, -1);
+    BOOST_CHECK_EQUAL (root.child ("1").child ("2")
+			.child ("3").child ("4").value, -1);
 }
 
 BOOST_AUTO_TEST_CASE(tree_node_test_1)
 {
-    root.get_child ("1").value = 1;
-    root.get_child ("2").value = 2;
-    root.get_child ("").get_child ("")
-	.get_child ("").get_child ("").value = 1;
+    root.child ("1").value = 1;
+    root.child ("2").value = 2;
+    root.child ("").child ("")
+	.child ("").child ("").value = 1;
 
-    BOOST_CHECK_EQUAL (root.get_child ("1").value, 1);
-    BOOST_CHECK_EQUAL (root.get_child ("2").value, 2);
-    BOOST_CHECK_EQUAL (root.get_child ("").get_child ("")
-			.get_child ("").get_child ("").value, 1);
+    BOOST_CHECK_EQUAL (root.child ("1").value, 1);
+    BOOST_CHECK_EQUAL (root.child ("2").value, 2);
+    BOOST_CHECK_EQUAL (root.child ("").child ("")
+			.child ("").child ("").value, 1);
 }
 
 BOOST_AUTO_TEST_CASE(tree_node_test_2)
 {
-    BOOST_CHECK_EQUAL (root.get_path ("1").value, 0);
-    BOOST_CHECK_EQUAL (root.get_path ("").value, 0);
-    BOOST_CHECK_EQUAL (root.get_path ("...").value, -1);
-    BOOST_CHECK_EQUAL (root.get_path ("1.2.3.4").value, -1);
+    BOOST_CHECK_EQUAL (root.path ("1").value, 0);
+    BOOST_CHECK_EQUAL (root.path ("").value, 0);
+    BOOST_CHECK_EQUAL (root.path ("...").value, -1);
+    BOOST_CHECK_EQUAL (root.path ("1.2.3.4").value, -1);
 }
 
 BOOST_AUTO_TEST_CASE(tree_node_test_3)
 {
-    root.get_path ("1").value = 1;
-    root.get_path ("2").value = 2;
-    root.get_path ("...").value = 1;
+    root.path ("1").value = 1;
+    root.path ("2").value = 2;
+    root.path ("...").value = 1;
 
-    BOOST_CHECK_EQUAL (root.get_path ("1").value, 1);
-    BOOST_CHECK_EQUAL (root.get_path ("2").value, 2);
-    BOOST_CHECK_EQUAL (root.get_path ("...").value, 1);
+    BOOST_CHECK_EQUAL (root.path ("1").value, 1);
+    BOOST_CHECK_EQUAL (root.path ("2").value, 2);
+    BOOST_CHECK_EQUAL (root.path ("...").value, 1);
 }
 
 BOOST_AUTO_TEST_CASE(tree_node_test_4)
 {
-    BOOST_CHECK_EQUAL (root.get_path ("...").get_path_name (), "...");
-    BOOST_CHECK_EQUAL (root.get_child ("").get_child("").get_path_name (), ".");
+    BOOST_CHECK_EQUAL (root.path ("...").path_name (), "...");
+    BOOST_CHECK_EQUAL (root.child ("").child("").path_name (), ".");
 }
 
 BOOST_AUTO_TEST_CASE(tree_node_test_5)
 {
-    BOOST_CHECK_EQUAL (root.get_path ("...").get_path_name (), "...");
-    BOOST_CHECK_EQUAL (root.get_child ("").get_child("").get_path_name (), ".");
+    BOOST_CHECK_EQUAL (root.path ("...").path_name (), "...");
+    BOOST_CHECK_EQUAL (root.child ("").child("").path_name (), ".");
 }
 
 BOOST_AUTO_TEST_CASE(tree_node_test_7)
 {
-    BOOST_CHECK_THROW (root.get_existing_child ("node"),
+    BOOST_CHECK_THROW (root.existing_child ("node"),
 		       psynth::base::tree_node_error);
-    BOOST_CHECK_NO_THROW (root.get_existing_child ("1"));
+    BOOST_CHECK_NO_THROW (root.existing_child ("1"));
 
-    BOOST_CHECK_THROW (root.get_existing_path ("...."),
+    BOOST_CHECK_THROW (root.existing_path ("...."),
 		       psynth::base::tree_node_error);
-    BOOST_CHECK_THROW (root.get_existing_path ("1.2.3.4.5"),
+    BOOST_CHECK_THROW (root.existing_path ("1.2.3.4.5"),
 		       psynth::base::tree_node_error);
-    BOOST_CHECK_NO_THROW (root.get_existing_path ("1.2.3.4"));
-    BOOST_CHECK_NO_THROW (root.get_existing_path ("..."));
+    BOOST_CHECK_NO_THROW (root.existing_path ("1.2.3.4"));
+    BOOST_CHECK_NO_THROW (root.existing_path ("..."));
 }
 
 BOOST_AUTO_TEST_CASE(tree_node_test_6)
 {   
     value_node<int>& ref1 = root.detach (std::string ("1"));
-    BOOST_CHECK_EQUAL (ref1.get_path ("2.3.4").value, -1);
-    BOOST_CHECK_EQUAL (ref1.get_name (), "");
-    BOOST_CHECK_THROW (root.get_existing_path ("1.2.3.4"),
+    BOOST_CHECK_EQUAL (ref1.path ("2.3.4").value, -1);
+    BOOST_CHECK_EQUAL (ref1.name (), "");
+    BOOST_CHECK_THROW (root.existing_path ("1.2.3.4"),
 		       psynth::base::tree_node_error);
     
     BOOST_CHECK_EQUAL (root.attach ("1", ref1), true);
-    BOOST_CHECK_NO_THROW (root.get_existing_path ("1.2.3.4"));
-    BOOST_CHECK_EQUAL (root.get_path ("1.2.3.4").value, -1);
+    BOOST_CHECK_NO_THROW (root.existing_path ("1.2.3.4"));
+    BOOST_CHECK_EQUAL (root.path ("1.2.3.4").value, -1);
 
     value_node<int> node;
     node.value = 1;
-    BOOST_CHECK_EQUAL (root.get_path ("1.2.3").attach ("5", node), true);
-    BOOST_CHECK_EQUAL (root.get_path ("1.2.3.5").value, 1);
-    BOOST_CHECK_THROW (root.get_path ("1.2.3").detach (std::string ("")),
+    BOOST_CHECK_EQUAL (root.path ("1.2.3").attach ("5", node), true);
+    BOOST_CHECK_EQUAL (root.path ("1.2.3.5").value, 1);
+    BOOST_CHECK_THROW (root.path ("1.2.3").detach (std::string ("")),
 		       psynth::base::tree_node_error);
-    BOOST_CHECK_NO_THROW (root.get_path ("1.2.3").detach (std::string ("5")));
+    BOOST_CHECK_NO_THROW (root.path ("1.2.3").detach (std::string ("5")));
 	
-    value_node<int>& ref2 = root.get_path ("1.2.3").detach (std::string ("4"));
+    value_node<int>& ref2 = root.path ("1.2.3").detach (std::string ("4"));
     BOOST_CHECK_EQUAL (ref2.value, -1);
     delete &ref2;
 }

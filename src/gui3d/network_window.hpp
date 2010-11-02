@@ -31,9 +31,9 @@
 #include "gui3d/gui_log_sink.hpp"
 #include "gui3d/toggable_window.hpp"
 
-class client_tab : public psynth::osc_client_listener
+class client_tab : public psynth::osc_client_listener,
+		   public std::enable_shared_from_this<client_tab>
 {
-    gui_log_sink m_logsink;
     psynth::osc_client_logger m_logger;
     
     psynth::osc_client* m_client;
@@ -45,6 +45,8 @@ class client_tab : public psynth::osc_client_listener
     CEGUI::Spinner* m_lport;
     CEGUI::Spinner* m_rport;
     CEGUI::Editbox* m_host;
+
+    std::shared_ptr<gui_log_sink> m_logsink;
     
     bool handle_client_accept (psynth::osc_client* client) { return false; }
     bool handle_client_connect (psynth::osc_client* client);
@@ -65,9 +67,9 @@ public:
     }
 };
 
-class server_tab : public psynth::osc_server_listener
+class server_tab : public psynth::osc_server_listener,
+		   public std::enable_shared_from_this<server_tab>
 {
-    gui_log_sink m_logsink;
     psynth::osc_server_logger m_logger;
     psynth::osc_server* m_server;
     bool m_listening;
@@ -77,6 +79,8 @@ class server_tab : public psynth::osc_server_listener
     CEGUI::Window* m_ext_disable;
     CEGUI::Spinner* m_lport;
 
+    std::shared_ptr<gui_log_sink> m_logsink;
+    
     bool handle_server_start_listening(psynth::osc_server* server);
     bool handle_server_stop_listening(psynth::osc_server* server,
 				   psynth::osc_server_error err);
@@ -104,8 +108,8 @@ public:
     
 class network_window : public toggable_window
 {
-    client_tab* m_client_tab;
-    server_tab* m_server_tab;
+    std::shared_ptr<client_tab> m_client_tab;
+    std::shared_ptr<server_tab> m_server_tab;
 
     virtual CEGUI::FrameWindow* create_window ();
 public:
