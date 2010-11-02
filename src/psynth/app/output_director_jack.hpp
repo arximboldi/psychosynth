@@ -55,9 +55,9 @@ class output_director_jack : public output_director
     virtual output* do_start (base::conf_node& conf) {
 	std::string server;
 
-     	conf.get_child ("server").get(server);
+     	conf.child ("server").get(server);
 	m_on_server_change_slot =
-	    conf.get_child ("server").on_change.connect
+	    conf.child ("server").on_change.connect
 	    (sigc::mem_fun (*this, &output_director_jack::on_server_change));
 	
 	m_output = new output_jack;
@@ -76,7 +76,7 @@ class output_director_jack : public output_director
 
 public:
     void defaults (base::conf_node& conf) {
-	conf.get_child ("server").def (std::string (PSYNTH_DEFAULT_JACK_SERVER));
+	conf.child ("server").def (std::string (PSYNTH_DEFAULT_JACK_SERVER));
     }
 
     output_director_jack () :

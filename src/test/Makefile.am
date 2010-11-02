@@ -18,7 +18,7 @@
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-if HAVE_BOOST_UNIT_TEST_FRAMEWORK
+if HAVE_BOOST_TEST
 
 TESTS = psynth_unit_test
 

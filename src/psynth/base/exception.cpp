@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-10-17 19:48:11 raskolnikov>
+ *  Time-stamp:  <2010-11-02 22:44:31 raskolnikov>
  *
  *  @file        exception.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -31,28 +31,28 @@
 #include "base/exception.hpp"
 #include "base/logger.hpp"
 
+#define PSYNTH_MODULE_NAME "psynth.base.exception"
+
 namespace psynth
 {
 namespace base
 {
 
-PSYNTH_DEFINE_ERROR_WHERE (base_error,   "base");
-PSYNTH_DEFINE_ERROR_WHERE (psynth_error, "psynth");
+PSYNTH_DEFINE_ERROR (error);
 
-error::error (const std::string& where, const std::string& what) throw ()
-    : m_what (what)
-    , m_where (where)
+int error_base::level () const throw ()
 {
+    return log::error;
 }
 
-std::string error::default_error ()
+const char* error_base::default_what () const throw ()
 {
-    return "unknown message";
+    return "unknown error";
 }
 
-void error::log () const
+void error_base::log () const
 {
-    logger::self  () (m_where, log::error, m_what);
+    logger::self  () (where (), level (), what ());
 }
 
 } /* namespace base */

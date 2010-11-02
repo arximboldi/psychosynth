@@ -58,9 +58,9 @@ class output_director_oss : public output_director
     {
 	std::string device;
 	
-	conf.get_child ("out_device").get (device);
+	conf.child ("out_device").get (device);
 	m_on_device_change_slot =
-	    conf.get_child ("out_device").on_change.connect
+	    conf.child ("out_device").on_change.connect
 	    (sigc::mem_fun (*this, &output_director_oss::on_device_change));
 
 	m_output = new output_oss;
@@ -79,7 +79,8 @@ class output_director_oss : public output_director
 public:
     void defaults(base::conf_node& conf)
     {
-	conf.get_child ("out_device").def (std::string (PSYNTH_DEFAULT_OSS_OUT_DEVICE));
+	conf.child ("out_device").def (
+	    std::string (PSYNTH_DEFAULT_OSS_OUT_DEVICE));
     }
 
     output_director_oss() :

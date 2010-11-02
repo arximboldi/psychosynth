@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-10-17 19:45:42 raskolnikov>
+ *  Time-stamp:  <2010-11-03 00:25:43 raskolnikov>
  *
  *  @file        conf_backend_xml.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -28,10 +28,11 @@
  *
  */
 
+#define PSYNTH_MODULE_NAME "psynth.base.xml"
+
 #include <sstream>
 #include <boost/lexical_cast.hpp>
 
-#include "logger.hpp"
 #include "misc.hpp"
 #include "conf_backend_xml.hpp"
 
@@ -41,6 +42,9 @@ using namespace std;
 static const int         default_int    = 0;
 static const int         default_float  = 0;
 static const std::string default_string = "";
+
+namespace
+{
 
 static inline const char*
 char_cast (const xmlChar* str)
@@ -84,12 +88,14 @@ private:
     dispose_func_t _f;
 };
 
+} /* namespace */
+
 namespace psynth
 {
 namespace base
 {
 
-PSYNTH_DEFINE_ERROR_WHERE (config_xml_error,      "xml")
+PSYNTH_DEFINE_ERROR (config_xml_error)
 PSYNTH_DEFINE_ERROR_WHAT  (config_xml_type_error, "Wrong type.")
 PSYNTH_DEFINE_ERROR_WHAT  (config_xml_io_error,   "Could not open file.")
 
@@ -100,14 +106,14 @@ conf_node* conf_backend_xml::process_new_element (xmlTextReaderPtr reader,
     
     if (xmlTextReaderDepth (reader) == 0)
     {
-	if ((node->get_name ().empty() &&
+	if ((node->name ().empty() &&
 	     xmlStrcmp (xmlTextReaderConstName(reader), xml_cast ("root"))) ||
-	    (!node->get_name ().empty() &&
-	     xmlStrcmp (xmlTextReaderConstName(reader), xml_cast (node->get_name ().c_str()))))
+	    (!node->name ().empty() &&
+	     xmlStrcmp (xmlTextReaderConstName(reader), xml_cast (node->name ().c_str()))))
 	    return 0;
     }
     else if (!xmlTextReaderIsEmptyElement(reader))
-	node = &node->get_child (char_cast (xmlTextReaderConstName(reader)));
+	node = &node->child (char_cast (xmlTextReaderConstName(reader)));
 
     type = xmlTextReaderGetAttribute (reader, xml_cast ("type"));
 
@@ -132,7 +138,7 @@ conf_node* conf_backend_xml::process_end_element (xmlTextReaderPtr reader,
 						  conf_node* node)
 
 {
-    return node->get_parent();
+    return node->parent();
 }
 
 conf_node* conf_backend_xml::process_text (xmlTextReaderPtr reader,
@@ -213,9 +219,9 @@ void conf_backend_xml::expand_value (xmlTextWriterPtr writer, conf_node& node)
 	repr = lexical_cast<string> (val);
 	
 	if (xmlTextWriterWriteAttribute (writer, xml_cast ("type"), xml_cast ("int")))
-	    throw config_xml_error ("Error while writing node: " + node.get_path_name ());
+	    throw config_xml_error ("Error while writing node: " + node.path_name ());
 	if (xmlTextWriterWriteString (writer, xml_cast (repr.c_str ())))
-	    throw config_xml_error ("Error while writing node: " + node.get_path_name ());
+	    throw config_xml_error ("Error while writing node: " + node.path_name ());
     }
     else if (node.type () == typeid (float))
     {
@@ -225,9 +231,9 @@ void conf_backend_xml::expand_value (xmlTextWriterPtr writer, conf_node& node)
 	repr = lexical_cast<string> (val);
 	
 	if (xmlTextWriterWriteAttribute (writer, xml_cast ("type"), xml_cast ("float")))
-	    throw config_xml_error ("Error while writing node: " + node.get_path_name ());
+	    throw config_xml_error ("Error while writing node: " + node.path_name ());
 	if (xmlTextWriterWriteString (writer, xml_cast (repr.c_str ())))
-	    throw config_xml_error ("Error while writing node: " + node.get_path_name ());
+	    throw config_xml_error ("Error while writing node: " + node.path_name ());
     }
     else if (node.type () == typeid (std::string))
     {
@@ -235,9 +241,9 @@ void conf_backend_xml::expand_value (xmlTextWriterPtr writer, conf_node& node)
 	node.get (repr);
 	
 	if (xmlTextWriterWriteAttribute (writer, xml_cast ("type"), xml_cast ("string")))
-	    throw config_xml_error ("Error while writing node: " + node.get_path_name ());
+	    throw config_xml_error ("Error while writing node: " + node.path_name ());
 	if (xmlTextWriterWriteString (writer, xml_cast (repr.c_str ())))
-	    throw config_xml_error ("Error while writing node: " + node.get_path_name ());
+	    throw config_xml_error ("Error while writing node: " + node.path_name ());
     }
     else if (!node.empty ())
 	throw config_xml_type_error ();    
@@ -253,19 +259,19 @@ void conf_backend_xml::expand_childs (xmlTextWriterPtr writer, conf_node& node)
 
 void conf_backend_xml::expand (xmlTextWriterPtr writer, conf_node& node)
 {
-    if (node.get_name ().empty()) {
+    if (node.name ().empty()) {
 	if (xmlTextWriterStartElement (writer, xml_cast ("root")) < 0)
-	    throw config_xml_error ("Error while expanding node: " + node.get_path_name ());
+	    throw config_xml_error ("Error while expanding node: " + node.path_name ());
     } else {
-	if (xmlTextWriterStartElement (writer, xml_cast (node.get_name ().c_str())) < 0)
-	    throw config_xml_error ("Error while expanding node: " + node.get_path_name ());
+	if (xmlTextWriterStartElement (writer, xml_cast (node.name ().c_str())) < 0)
+	    throw config_xml_error ("Error while expanding node: " + node.path_name ());
     }
     
     expand_value  (writer, node);
     expand_childs (writer, node);
     
     if (xmlTextWriterEndElement (writer) < 0)
-	throw config_xml_error ("Error while ending node: " + node.get_path_name ());
+	throw config_xml_error ("Error while ending node: " + node.path_name ());
 }
 
 void conf_backend_xml::save (conf_node& node)

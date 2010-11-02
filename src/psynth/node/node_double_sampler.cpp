@@ -79,9 +79,7 @@ void node_double_sampler::on_file_one_change (node_param& par)
     boost::filesystem::path path;
     
     par.get (val);
-    path = base::file_manager::self ().get_path("psychosynth.samples").find (val);
-
-    cout << path << endl;
+    path = base::file_manager::self ().path("psychosynth.samples").find (val);
     
     m_update_mutex.lock();
 
@@ -103,10 +101,8 @@ void node_double_sampler::on_file_two_change (node_param& par)
     boost::filesystem::path path;
     
     par.get (val);
-    path = base::file_manager::self ().get_path("psynth.samples").find (val);
-    
-    cout << path << endl;
-    
+    path = base::file_manager::self ().path("psynth.samples").find (val);
+        
     m_update_mutex.lock();
 
     if (m_fetcher_two.is_open ())

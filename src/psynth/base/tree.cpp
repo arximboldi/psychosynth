@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-10-17 20:41:46 raskolnikov>
+ *  Time-stamp:  <2010-11-02 22:02:28 raskolnikov>
  *
  *  @file        tree.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -28,6 +28,8 @@
  *
  */
 
+#define PSYNTH_MODULE_NAME "psynth.base.tree"
+
 #include "base/tree.hpp"
 
 namespace psynth
@@ -35,7 +37,7 @@ namespace psynth
 namespace base
 {
 
-PSYNTH_DEFINE_ERROR_WHERE (tree_node_error, "tree_node");
+PSYNTH_DEFINE_ERROR (tree_node_error);
 
 } /* namespace base */
 } /* namespace psynth */

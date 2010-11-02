@@ -82,9 +82,7 @@ void node_sampler::on_file_change (node_param& par)
     boost::filesystem::path path;
     
     par.get (val);
-    path = base::file_manager::self ().get_path("psychosynth.samples").find (val);
-
-    cout << path << endl;
+    path = base::file_manager::self ().path("psychosynth.samples").find (val);
     
     m_update_mutex.lock();
 

@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-10-18 16:11:41 raskolnikov>
+ *  Time-stamp:  <2010-11-02 22:37:00 raskolnikov>
  *
  *  @file        arg_parser.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -28,6 +28,7 @@
  *
  */
 
+#define PSYNTH_MODULE_NAME "psynth.base.arg_parser"
 
 #include <cstring>
 #include <cstdlib>
@@ -43,9 +44,10 @@ namespace psynth
 namespace base
 {
 
-PSYNTH_DEFINE_ERROR_WHERE (arg_parser_error, "arg_parser")
-PSYNTH_DEFINE_ERROR_WHAT  (unknown_option_error, "Unknown option.")
-PSYNTH_DEFINE_ERROR_WHAT  (parse_option_error,   "Error while parsing option parameter.")
+PSYNTH_DEFINE_ERROR (arg_parser_error)
+PSYNTH_DEFINE_ERROR_WHAT (unknown_option_error, "Unknown option.")
+PSYNTH_DEFINE_ERROR_WHAT (parse_option_error,
+			  "Error while parsing option parameter.")
 
 namespace
 {
@@ -113,7 +115,8 @@ void arg_parser::parse (int argc, const char *argv[])
 		break;
 	    }
 	}
-    } catch (parse_error)
+    }
+    catch (parse_error)
     {
 	throw parse_option_error (std::string ("Error while parsing option: ")
 				  + *argv);
@@ -148,8 +151,7 @@ const char** arg_parser::parse_long (const char** argv, const char** argv_end)
 {
     const char** argv_next = argv + 1;
 
-    map <const char *, list <option*> >::iterator opt
-	= _long.find (*argv + 2);
+    auto opt = _long.find (*argv + 2);
 
     if (opt == _long.end ())
 	throw unknown_option_error (std::string ("Unknown option: ") +

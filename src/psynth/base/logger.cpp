@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-10-17 19:57:19 raskolnikov>
+ *  Time-stamp:  <2010-11-03 00:22:31 raskolnikov>
  *
  *  @file        logger.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -40,23 +40,17 @@ namespace base
 
 log::~log()
 {
-    for (list<log_sink*>::iterator it = m_dumpers.begin();
-	 it != m_dumpers.end(); ++it)
-    {
-	delete *it;
-    }
 }
 
 void log::operator () (log& l, int level, const string& msg)
 {
-    for (list<log_sink*>::iterator it = m_dumpers.begin();
-	 it != m_dumpers.end(); ++it)
+    for (auto it = _dumpers.begin(); it != _dumpers.end(); ++it)
     {
 	(*it)->dump (l, level, msg);
     }
 
-    if (get_parent ())
-	get_parent ()->operator () (l, level, msg);
+    if (parent ())
+	parent ()->operator () (l, level, msg);
 }
 
 } /* namespace base */

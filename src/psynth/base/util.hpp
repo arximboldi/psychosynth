@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-10-18 16:10:48 raskolnikov>
+ *  Time-stamp:  <2010-11-02 22:08:50 raskolnikov>
  *
  *  @file        util.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -27,9 +27,10 @@
  *
  */
 
-#ifndef PSYNTH_UTIL_H_
-#define PSYNTH_UTIL_H_
+#ifndef PSYNTH_BASE_UTIL_H_
+#define PSYNTH_BASE_UTIL_H_
 
+#include <psynth/base/compat.hpp>
 #include <boost/utility.hpp>
 
 namespace psynth
@@ -53,8 +54,12 @@ struct tpl_bind_fst
     {};
 };
 
+struct nop_ostream {};
+template <typename T> PSYNTH_FORCEINLINE
+nop_ostream& operator<< (nop_ostream& s, const T&) { return s; }
+
 } /* namespace base */
 } /* namespace psynth */
 
 
-#endif /* PSYNTH_UTIL_H_ */
+#endif /* PSYNTH_BASE_UTIL_H_ */

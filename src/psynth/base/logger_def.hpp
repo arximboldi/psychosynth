@@ -1,11 +1,11 @@
 /**
- *  Time-stamp:  <2010-11-02 23:54:57 raskolnikov>
+ *  Time-stamp:  <2010-11-02 22:36:19 raskolnikov>
  *
- *  @file        declare.hpp
+ *  @file        logger_def.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
- *  @date        Mon Oct 18 15:11:23 2010
+ *  @date        Tue Nov  2 20:31:31 2010
  *
- *  Aiding in forward declaring types.
+ *  Forward declarations for the logger.
  */
 
 /*
@@ -28,27 +28,27 @@
  *
  */
 
-#include <memory>
+#ifndef PSYNTH_BASE_LOGGER_DEF_H_
+#define PSYNTH_BASE_LOGGER_DEF_H_
+
+#include <psynth/base/declare.hpp>
 
 namespace psynth
 {
 namespace base
 {
 
-#define PSYNTH_DECLARE_SHARED_POINTER(type_name)		\
-    typedef std::shared_ptr<type_name> type_name ## _ptr;	\
-    template <typename... Args>					\
-    type_name ## _ptr new_ ## type_name (Args && ... args)	\
-    {								\
-	return std::make_shared <type_name> (args ...);		\
-    }
-
-#define PSYNTH_DECLARE_TYPE(type_name)		\
-    struct type_name;
-
-#define PSYNTH_DECLARE_SHARED_TYPE(type_name)	\
-    PSYNTH_DECLARE_TYPE (type_name)		\
-    PSYNTH_DECLARE_SHARED_POINTER (type_name)
+PSYNTH_DECLARE_SHARED_TYPE (log_sink);
+PSYNTH_DECLARE_SHARED_TYPE (log_stream_sink);
+PSYNTH_DECLARE_SHARED_TYPE (log_file_sink);
+PSYNTH_DECLARE_SHARED_TYPE (log_std_sink);
+PSYNTH_DECLARE_TYPE (log);
+PSYNTH_DECLARE_TYPE (log_stream_adapter);
+PSYNTH_DECLARE_TYPE (logger);
 
 } /* namespace base */
 } /* namespace psynth */
+
+#endif /* PSYNTH_BASE_LOGGER_DEF_H_ */
+
+

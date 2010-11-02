@@ -2,7 +2,7 @@
  *  File:       singleton.hpp
  *  Author:     Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
  *  Date:       2007
- *  Time-stamp: <2010-10-19 01:29:13 raskolnikov>
+ *  Time-stamp: <2010-11-02 22:10:15 raskolnikov>
  *
  *  This file implements a policy-based generic singleton. It is a
  *  simplification (less policy implementations are provided) of
@@ -206,7 +206,7 @@ typedef void (*destroy_func_t)();
  * The error that lifetime policies should throw in case of dead
  * reference access.
  */
-PSYNTH_DECLARE_ERROR (base_error, singleton_error);
+PSYNTH_DECLARE_ERROR (error, singleton_error);
 
 /**
  * Lifetime singleton policy that destroys the singleton in the

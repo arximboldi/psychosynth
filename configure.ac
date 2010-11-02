@@ -25,7 +25,7 @@ AC_PREREQ(2.61)
 AC_INIT([psychosynth], [0.1.7], [raskolnikov@es.gnu.org])
 AC_CONFIG_MACRO_DIR([m4])
 
-AM_INIT_AUTOMAKE
+AM_INIT_AUTOMAKE([--warnings=no-portability])
 AM_CONFIG_HEADER(config.h)
 
 AC_LANG(C++)
@@ -37,6 +37,8 @@ psynth_config_ok="yes"
 dnl  Options
 dnl ======================================================================
 
+CXXFLAGS="${CXXFLAGS} -std=c++0x"
+
 AC_ARG_ENABLE([gprof], 
 		[AC_HELP_STRING([--enable-gprof],
 	        [enable fprof [default=disabled] ])],
@@ -46,7 +48,7 @@ AC_ARG_ENABLE([debug],
 		[AC_HELP_STRING([--enable-debug],
 	        [enable debug [default=disabled] ])],
 		[CXXFLAGS="${CXXFLAGS} -g -O0"], 
-		[CXXFLAGS="${CXXFLAGS} -DNDEBUG -std=c++0x"])
+		[CXXFLAGS="${CXXFLAGS} -DNDEBUG"])
 
 dnl  Compulsory libraries
 dnl ======================================================================

@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-10-18 16:14:48 raskolnikov>
+ *  Time-stamp:  <2010-11-02 22:35:46 raskolnikov>
  *
  *  @file        arg_parser.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -50,7 +50,7 @@ namespace base
 /**
  * A parsing error.
  */
-PSYNTH_DECLARE_ERROR (base_error, arg_parser_error)
+PSYNTH_DECLARE_ERROR (error, arg_parser_error)
 PSYNTH_DECLARE_ERROR (arg_parser_error, unknown_option_error)
 PSYNTH_DECLARE_ERROR (arg_parser_error, parse_option_error)
 

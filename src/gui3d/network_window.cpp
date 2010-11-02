@@ -36,12 +36,13 @@ const int NW_WIDTH  = 300;
 
 client_tab::client_tab (osc_client* client) :
     m_client(client),
-    m_connected(false)
+    m_connected(false),
+    m_logsink (new gui_log_sink)
 {
     m_client->add_listener(this);
     m_client->add_listener(&m_logger);
     
-    logger::self ().get_child ("oscclient").attach_sink (&m_logsink);
+    logger::self ().child ("oscclient").add_sink (m_logsink);
 }
 
 client_tab::~client_tab ()
@@ -49,8 +50,8 @@ client_tab::~client_tab ()
     m_client->delete_listener(this);
     m_client->delete_listener(&m_logger);
  
-    logger::self ().get_child ("oscclient").dattach_sink (&m_logsink);
-    m_logsink.set_window (0);
+    logger::self ().child ("oscclient").del_sink (m_logsink);
+    m_logsink->set_window (0);
 }
 
 Window* client_tab::create_window ()
@@ -108,7 +109,7 @@ Window* client_tab::create_window ()
     log_viewer->setPosition(UVector2(UDim(0, 0), UDim(0, 100)));
     log_viewer->setSize    (UVector2(UDim(1, 0), UDim(1, -100)));
     log_viewer->setReadOnly(true);
-    m_logsink.set_window (log_viewer);
+    m_logsink->set_window (log_viewer);
     
     m_disable->addChildWindow(host_label);
     m_disable->addChildWindow(m_host);
@@ -171,12 +172,13 @@ bool client_tab::handle_client_disconnect (osc_client* client, osc_client_error 
 
 server_tab::server_tab (osc_server* server) :
     m_server(server),
-    m_listening(false)
+    m_listening(false),
+    m_logsink (new gui_log_sink)
 {
     m_server->add_listener(this);
     m_server->add_listener(&m_logger);
  
-    logger::self ().get_child ("oscserver").attach_sink (&m_logsink);
+    logger::self ().child ("oscserver").add_sink (m_logsink);
 }
 
 server_tab::~server_tab ()
@@ -184,8 +186,8 @@ server_tab::~server_tab ()
     m_server->delete_listener(this);
     m_server->delete_listener(&m_logger);
     
-    logger::self ().get_child ("oscserver").dattach_sink (&m_logsink);
-    m_logsink.set_window (0);
+    logger::self ().child ("oscserver").del_sink (m_logsink);
+    m_logsink->set_window (0);
 }
 
 Window* server_tab::create_window ()
@@ -223,7 +225,7 @@ Window* server_tab::create_window ()
     log_viewer->setPosition(UVector2(UDim(0, 0), UDim(0, 50)));
     log_viewer->setSize    (UVector2(UDim(1, 0), UDim(1, -50)));
     log_viewer->setReadOnly(true);
-    m_logsink.set_window (log_viewer);
+    m_logsink->set_window (log_viewer);
     
     m_disable->addChildWindow(lport_label);
     m_disable->addChildWindow(m_lport);
@@ -283,8 +285,6 @@ network_window::network_window(osc_client* client, osc_server* server) :
 
 network_window::~network_window()
 {
-    delete m_server_tab;
-    delete m_client_tab;
 }
 
 FrameWindow* network_window::create_window ()

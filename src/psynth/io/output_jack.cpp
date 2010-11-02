@@ -26,6 +26,8 @@
 #include "base/logger.hpp"
 #include "io/output_jack.hpp"
 
+#define PSYNTH_MODULE_NAME "psynth.io.jack"
+
 using namespace std;
 using namespace psynth::base;
 
@@ -63,32 +65,36 @@ bool output_jack::open()
 
 	m_client = jack_client_new(m_serv_name.c_str());
 	if (!m_client) {
-	    logger::self () ("jack", log::error,
-				"Could not connect to jackd, maybe it's not running"
-				"or the client name is duplicated.");
+	    PSYNTH_LOG
+		<< log::error
+		<< "Could not connect to jackd, maybe it's not running"
+		<< "or the client name is duplicated.";
 	    return false;
 	}
 
 	jack_set_process_callback(m_client, &output_jack::jack_process_cb, this);
-	jack_set_sample_rate_callback(m_client, &output_jack::jack_sample_rate_cb, this);
+	jack_set_sample_rate_callback (
+	    m_client, &output_jack::jack_sample_rate_cb, this);
 	jack_on_shutdown(m_client, &output_jack::jack_shutdown_cb, this);
 	
 	m_actual_rate = jack_get_sample_rate(m_client);
 	if (m_actual_rate != (size_t)get_info ().sample_rate) {
-	    logger::self () ("jack", log::warning,
-				"Jackd sample rate and application sample rate mismatch."
-				"Better sound quality is achieved if both are the same.");
+	    PSYNTH_LOG
+		<< log::warning
+		<< "Jackd sample rate and application sample rate mismatch."
+		<< "Better sound quality is achieved if both are the same.";
 	}
 
 	if (get_info ().num_channels != m_out_ports.size())
 	    m_out_ports.resize(get_info ().num_channels);
 	
 	for (size_t i = 0; i < m_out_ports.size(); ++i)
-	    m_out_ports[i] = jack_port_register(m_client,
-						(string("out_") + itoa(i, 10)).c_str(),
-						JACK_DEFAULT_AUDIO_TYPE,
-						JackPortIsOutput,
-						0);
+	    m_out_ports[i] = jack_port_register (
+		m_client,
+		(string("out_") + itoa(i, 10)).c_str(),
+		JACK_DEFAULT_AUDIO_TYPE,
+		JackPortIsOutput,
+		0);
 
 	set_state(IDLE);
 
@@ -115,9 +121,9 @@ bool output_jack::put(const audio_buffer& in_buf, size_t nframes)
 {
     if (in_buf.get_info().num_channels != get_info ().num_channels ||
 	in_buf.get_info().sample_rate != get_info ().sample_rate) {
-	logger::self () ("jack", log::warning,
-			    "Cant send data to the device:"
-			    "data and output system properties missmatch.");
+	PSYNTH_LOG << log::warning
+		   << "Cant send data to the device:"
+		   << "data and output system properties missmatch.";
 	
 	return false;
     }
@@ -138,7 +144,8 @@ void output_jack::connect_ports()
     ports = jack_get_ports (m_client, 0, 0, JackPortIsPhysical | JackPortIsInput);
 
     if (!ports) {
-	logger::self () ("jack", log::warning, "There are no phisical output ports.");
+	PSYNTH_LOG << log::warning << "There are no phisical output ports."
+		   << log_msg;
 	return;
     }
 

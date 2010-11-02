@@ -58,9 +58,9 @@ class output_director_alsa : public output_director
     {
 	std::string device;
 	
-	conf.get_child ("out_device").get (device);
+	conf.child ("out_device").get (device);
 	m_on_device_change_slot =
-	    conf.get_child ("out_device").on_change.connect
+	    conf.child ("out_device").on_change.connect
 	    (sigc::mem_fun (*this, &output_director_alsa::on_device_change));
 
 	m_output = new output_alsa;
@@ -82,7 +82,8 @@ class output_director_alsa : public output_director
 public:
     void defaults (base::conf_node& conf)
     {
-	conf.get_child ("out_device").def (std::string (PSYNTH_DEFAULT_ALSA_OUT_DEVICE));
+	conf.child ("out_device").def (
+	    std::string (PSYNTH_DEFAULT_ALSA_OUT_DEVICE));
     }
     
     output_director_alsa () :

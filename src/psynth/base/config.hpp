@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-10-18 15:30:36 raskolnikov>
+ *  Time-stamp:  <2010-11-03 00:16:53 raskolnikov>
  *
  *  @file        config.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -50,7 +50,7 @@ namespace psynth
 namespace base
 {
 
-PSYNTH_DECLARE_ERROR (base_error,   config_error);
+PSYNTH_DECLARE_ERROR (error,        config_error);
 PSYNTH_DECLARE_ERROR (config_error, config_type_error);
 PSYNTH_DECLARE_ERROR (config_error, config_backend_error);
 
@@ -273,12 +273,12 @@ public:
      * attached it is datached.
      * @param backend The backend to attach.
      */
-    void attach_backend (conf_backend_ptr backend);
+    void set_backend (conf_backend_ptr backend);
 
     /**
      * Dataches the currently attached backend to the node.
      */
-    void datach_backend ();
+    void unset_backend ();
     
 private:
     boost::any       _element;
@@ -287,8 +287,8 @@ private:
     void on_init ()
     {
 	_backend.reset ();
-	if (get_parent ())
-	    _backend = get_parent ()->_backend;
+	if (parent ())
+	    _backend = parent ()->_backend;
     }
 
     void on_uninit ()

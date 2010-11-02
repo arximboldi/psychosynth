@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-10-18 02:50:35 raskolnikov>
+ *  Time-stamp:  <2010-11-03 00:28:41 raskolnikov>
  *
  *  @file        default_selector_populator.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -79,7 +79,7 @@ void default_selector_populator::populate_samples (selector_window::category* ca
 #endif
     
     base::file_manager::self  ()
-	.get_path ("psychosynth.samples")
+	.path ("psychosynth.samples")
 	.find_if (make_has_extension (valid_ext.begin(), valid_ext.end()), files);
 
     files.sort ();
@@ -96,7 +96,7 @@ void default_selector_populator::populate(selector_window* sel)
 {
     m_selector = sel;
     config::self ()
-	.get_path ("psychosynth.file_manager.samples").on_nudge.connect
+	.path ("psychosynth.file_manager.samples").on_nudge.connect
 	(sigc::mem_fun (*this, &default_selector_populator::on_samples_conf_nudge));
     
     selector_window::category* cat = NULL;
@@ -209,8 +209,8 @@ void default_selector_populator::populate(selector_window* sel)
     
     cat = sel->add_category ("Samples");
     /* FIXME: populate_samples (cat); */
-    config::self ().get_path ("psychosynth.file_manager.samples").nudge ();
-    //config::self ().get_path ("psychosynth.file_manager.samples").nudge ();
+    config::self ().path ("psychosynth.file_manager.samples").nudge ();
+    //config::self ().path ("psychosynth.file_manager.samples").nudge ();
     
     creat.clear ();
     cat = sel->add_category ("Bi-Samples");
