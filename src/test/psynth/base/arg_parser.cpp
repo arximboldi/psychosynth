@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-10-17 20:56:18 raskolnikov>
+ *  Time-stamp:  <2010-11-02 13:14:36 raskolnikov>
  *
  *  @file        arg_parser_test.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -33,16 +33,20 @@
 #include <boost/test/unit_test.hpp>
 #include <psynth/base/arg_parser.hpp>
 
-static const char* argv_0 []  = {"cmd", "-a", "hola", "-b", "asd", "--bold", "-123"};
+static const char* argv_0 []  =
+{"cmd", "-a", "hola", "-b", "asd", "--bold", "-123"};
 static const int   argc_0 = 7;
 
-static const char* argv_1 []  = {"cmd", "-a", "hola", "-b", "1E2", "--cold", "-123"};
+static const char* argv_1 []  =
+{"cmd", "-a", "hola", "-b", "1E2", "--cold", "-123"};
 static const int   argc_1 = 7;
 
-static const char* argv_2 []  = {"cmd", "-t", "-anb", "1", "2"};
+static const char* argv_2 []  =
+{"cmd", "-t", "-anb", "1", "2"};
 static const int   argc_2 = 6;
 
-static const char* argv_3 []  = {"cmd", "-t", "-anb", "1", "2", "-t"};
+static const char* argv_3 []  =
+{"cmd", "-t", "-anb", "1", "2", "-t"};
 static const int   argc_3 = 7;
 
 

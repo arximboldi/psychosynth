@@ -43,6 +43,7 @@ bin_PROGRAMS += psynth-cli
 endif
 
 #  psynth-cli compilation
+#  TODO: Write separate Makefile.am for these.
 # ======================================================================
 
 psynth_cli_CXXFLAGS = $(SIGC_CFLAGS)

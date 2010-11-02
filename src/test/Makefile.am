@@ -2,7 +2,7 @@
 #   PSYCHOSYNTH
 #   ===========
 #              
-#   Copyright (C) 2007, 2008 by Juan Pedro Bolivar Puente
+#   Copyright (C) 2007, 2008, 2010 by Juan Pedro Bolivar Puente
 #                                                        
 #   This program is free software: you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -18,15 +18,15 @@
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-if HAVE_BOOST_TEST
+if HAVE_BOOST_UNIT_TEST_FRAMEWORK
 
 TESTS = psynth_unit_test
 
 noinst_PROGRAMS = $(TESTS)
 
 psynth_unit_test_SOURCES = \
-	unit/tree_node_test.cpp \
-	unit/arg_parser_test.cpp \
+	psynth/base/tree_node.cpp \
+	psynth/base/arg_parser.cpp \
 	psynth_unit_test.cpp
 
 AM_CPPFLAGS = -Wall $(BOOST_CPPFLAGS) -I..

@@ -1,0 +1,28 @@
+
+This namespace includes and adaptation of Boost.GIL for sound
+processing. The changes include:
+
+- Factor out concepts.hpp so it is partly defined in psynth::base
+- gil_config.hpp is replaced by psynth/base/compat.hpp
+- The terminology have been changed in this way:
+   *   Color          = Channel
+   *   Color Space    = Channel Space
+   *   Color Base     = Channel Base
+   *   Channel Value  = Sample
+   *   Channel        = Sample
+   *   Pixel          = Frame
+   *   Image          = Buffer
+   *   Image View     = Buffer View
+- rgb.hpp, cmyk.hpp, rgba.hpp, removed.
+- Added mono.hpp, stereo.hpp, quad.hpp, surround.hpp.
+  http://en.wikipedia.org/wiki/Surround_sound#Standard_speaker_channels
+- Some naming conventions have changed:
+   Color Tag: name_t   => Channel Tag: name_channel
+   Color Space: name_t => Channel Space: name_space
+   Color Layout: name_layout_t => Channel Layout: name_layout
+- removed position_iterator, locator, virtual_locator, point2d
+- TODO: position_iterator can inspire time handling!!!
+- TODO: implement virtual_iterator from virtual_locator?
+
+Please, remember to check diffs between GIL releases to fix bugs and
+add functionallity to our version.

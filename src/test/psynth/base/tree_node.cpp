@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-10-17 20:54:34 raskolnikov>
+ *  Time-stamp:  <2010-11-02 13:15:37 raskolnikov>
  *
  *  @file        tree_node_test.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -118,11 +118,14 @@ BOOST_AUTO_TEST_CASE(tree_node_test_5)
 
 BOOST_AUTO_TEST_CASE(tree_node_test_7)
 {
-    BOOST_CHECK_THROW (root.get_existing_child ("node"), psynth::base::tree_node_error);
+    BOOST_CHECK_THROW (root.get_existing_child ("node"),
+		       psynth::base::tree_node_error);
     BOOST_CHECK_NO_THROW (root.get_existing_child ("1"));
 
-    BOOST_CHECK_THROW (root.get_existing_path ("...."), psynth::base::tree_node_error);
-    BOOST_CHECK_THROW (root.get_existing_path ("1.2.3.4.5"), psynth::base::tree_node_error);
+    BOOST_CHECK_THROW (root.get_existing_path ("...."),
+		       psynth::base::tree_node_error);
+    BOOST_CHECK_THROW (root.get_existing_path ("1.2.3.4.5"),
+		       psynth::base::tree_node_error);
     BOOST_CHECK_NO_THROW (root.get_existing_path ("1.2.3.4"));
     BOOST_CHECK_NO_THROW (root.get_existing_path ("..."));
 }
