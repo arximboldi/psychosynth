@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-10-29 12:06:27 raskolnikov>
+ *  Time-stamp:  <2010-11-02 11:07:48 raskolnikov>
  *
  *  @file        frame_iterator.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -57,7 +57,7 @@ namespace sound
 template <typename Iterator>
 class memory_based_step_iterator;
 
-template <typename Iterator> struct dynamic_x_step_type;
+template <typename Iterator> struct dynamic_step_type;
 
 /**
    \brief metafunction predicate determining whether the given

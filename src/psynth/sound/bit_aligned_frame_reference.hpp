@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-10-29 13:50:34 raskolnikov>
+ *  Time-stamp:  <2010-11-02 11:48:53 raskolnikov>
  *
  *  @file        bit_aligned_frame_reference.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -183,7 +183,7 @@ public:
    // for red, 2 bits for green, 3 bits for blue)
    
    typedef const bit_aligned_frame_reference<
-       unsigned char, mpl::vector3_c<int,1,2,3>, rgb_layout_t, true>
+       unsigned char, mpl::vector3_c<int,1,2,3>, rgb_layout, true>
    rgb123_ref_t;
 
    // create the frame reference at bit offset 2
@@ -224,7 +224,7 @@ struct bit_aligned_frame_reference
     typedef typename mpl::if_c<IsMutable,
 			       unsigned char*,
 			       const unsigned char*>::type data_ptr_type;
-    typedef Layout layout_type;
+    typedef Layout layout;
 
     typedef typename packed_frame_type<
 	bitfield_type, SampleBitSizes,Layout>::type value_type;
@@ -312,7 +312,7 @@ private:
     template <typename Frame>
     static void check_compatible()
     {
-	gil_function_requires<FramesCompatibleConcept<
+	psynth_function_requires<FramesCompatibleConcept<
 	    Frame, bit_aligned_frame_reference> >();
     }
 

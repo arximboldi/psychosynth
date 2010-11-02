@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-10-29 15:14:04 raskolnikov>
+ *  Time-stamp:  <2010-11-02 11:00:11 raskolnikov>
  *
  *  @file        channel_base_algorithm.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -81,7 +81,7 @@ namespace sound
    \ingroup ChannelBaseAlgorithmSize
 */
 template <typename ChannelBase>
-struct size : public mpl::size<typename ChannelBase::layout_t::channel_space_t> {};
+struct size : public mpl::size<typename ChannelBase::layout::channel_space_t> {};
 
 
 /*
@@ -113,7 +113,7 @@ struct size : public mpl::size<typename ChannelBase::layout_t::channel_space_t> 
     // bits for the red sample and 7 unused bits
 
     typedef packed_frame_type<uint16_t,
-    mpl::vector3_c<unsigned,4,3,2>, bgr_layout_t>::type
+    mpl::vector3_c<unsigned,4,3,2>, bgr_layout>::type
     bgr432_frame_t;
     
 
@@ -141,7 +141,7 @@ struct kth_semantic_element_type
 {
     BOOST_STATIC_CONSTANT(
 	int, semantic_index = (
-	    mpl::at_c<typename ChannelBase::layout_t::sample_mapping_t,
+	    mpl::at_c<typename ChannelBase::layout::sample_mapping,
 		      K>::type::value));
     typedef typename kth_element_type <ChannelBase, semantic_index>::type type;
 };
@@ -156,7 +156,7 @@ struct kth_semantic_element_reference_type
 {
     BOOST_STATIC_CONSTANT(
 	int, semantic_index = (
-	    mpl::at_c<typename ChannelBase::layout_t::sample_mapping_t,
+	    mpl::at_c<typename ChannelBase::layout::sample_mapping,
 		      K>::type::value));
     typedef typename kth_element_reference_type<
 	ChannelBase, semantic_index>::type type;
@@ -179,7 +179,7 @@ struct kth_semantic_element_const_reference_type
 {
     BOOST_STATIC_CONSTANT(
 	int, semantic_index = (
-	    mpl::at_c<typename ChannelBase::layout_t::sample_mapping_t,
+	    mpl::at_c<typename ChannelBase::layout::sample_mapping,
 		      K>::type::value));
     typedef typename kth_element_const_reference_type<
 	ChannelBase, semantic_index>::type type;

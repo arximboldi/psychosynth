@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-10-29 12:06:36 raskolnikov>
+ *  Time-stamp:  <2010-11-02 11:07:58 raskolnikov>
  *
  *  @file        metafunctions.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -191,7 +191,7 @@ namespace detail
 template <typename It, bool IsBase, bool EqualsStepType>
 struct iterator_is_step_impl;
 
-// iterator that has the same type as its dynamic_x_step_type must be
+// iterator that has the same type as its dynamic_step_type must be
 // a step iterator
 template <typename It, bool IsBase>
 struct iterator_is_step_impl<It,IsBase,true> : public mpl::true_{};
@@ -766,7 +766,7 @@ class derived_frame_reference_type
     typedef typename  mpl::if_<
 	is_same<L, use_default>, 
 	layout<typename channel_space_type<frame_t>::type,
-	       typename sample_mapping_type<frame_t>::type>, L>::type layout_type;
+	       typename sample_mapping_type<frame_t>::type>, L>::type layout;
 
     static const bool mut = mpl::if_<
 	is_same<IsMutable,use_default>,
@@ -780,7 +780,7 @@ class derived_frame_reference_type
 
 public:
     typedef typename frame_reference_type<
-    sample_type, layout_type, planar, mut>::type type;
+    sample_type, layout, planar, mut>::type type;
 };
 
 
@@ -804,7 +804,7 @@ class derived_iterator_type
     typedef typename  mpl::if_<
 	is_same<L,use_default>, 
 	layout<typename color_space_type<Iterator>::type,
-	       typename sample_mapping_type<Iterator>::type>, L>::type layout_t;
+	       typename sample_mapping_type<Iterator>::type>, L>::type layout;
 
     static const bool mut    = mpl::if_<
 	is_same<IsMutable, use_default>,
@@ -823,7 +823,7 @@ class derived_iterator_type
     
 public:
     typedef typename iterator_type<
-    sample_t, layout_t, planar, step, mut>::type type;
+    sample_t, layout, planar, step, mut>::type type;
 };
 
 
@@ -848,7 +848,7 @@ class derived_view_type
     typedef typename  mpl::if_<
 	is_same<L,use_default>, 
 	layout<typename color_space_type<View>::type,
-	       typename sample_mapping_type<View>::type>, L>::type layout_t;
+	       typename sample_mapping_type<View>::type>, L>::type layout;
 
     static const bool mut    = mpl::if_<
 	is_same<IsMutable,use_default>,
@@ -865,7 +865,7 @@ class derived_view_type
 	view_is_step_in_x<View>,StepX>::type::value;
 
 public:
-    typedef typename view_type<sample_t, layout_t, planar, step, mut>::type type;
+    typedef typename view_type<sample_t, layout, planar, step, mut>::type type;
 };
 
 
@@ -890,7 +890,7 @@ class derived_buffer_type
 	is_same<L,use_default>, 
 	layout<typename color_space_type<Buffer>::type,
 	       typename sample_mapping_type<Buffer>::type>,
-	L>::type layout_t;
+	L>::type layout;
 
     static const bool planar = mpl::if_<
 	is_same<IsPlanar,use_default>,
@@ -898,7 +898,7 @@ class derived_buffer_type
 	IsPlanar>::type::value;
 
 public:
-    typedef typename buffer_type<sample_t, layout_t, planar>::type type;
+    typedef typename buffer_type<sample_t, layout, planar>::type type;
 };
 
 } /* namespace psynth::sound */

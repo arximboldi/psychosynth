@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-10-28 19:39:53 raskolnikov>
+ *  Time-stamp:  <2010-11-02 10:38:05 raskolnikov>
  *
  *  @file        sample.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -82,6 +82,7 @@ struct sample_traits_impl<T, true>
     BOOST_STATIC_CONSTANT(bool, is_mutable = T::is_mutable);
     static value_type min_value () { return T::min_value(); }
     static value_type max_value () { return T::max_value(); }
+    static value_type zero_value () { return T (0) }
 };
 
 /* sample traits implementation for built-in integral or floating

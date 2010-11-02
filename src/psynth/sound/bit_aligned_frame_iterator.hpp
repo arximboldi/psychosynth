@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-10-28 19:33:21 raskolnikov>
+ *  Time-stamp:  <2010-11-02 11:07:37 raskolnikov>
  *
  *  @file        bit_aligned_frame_iterator.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -262,12 +262,12 @@ NonAlignedFrameReference memunit_advanced_ref(
 
 /*
  *
- *    HasDynamicXStepTypeConcept
+ *    HasDynamicStepTypeConcept
  *
  */
 
 template <typename NonAlignedFrameReference>
-struct dynamic_x_step_type<bit_aligned_frame_iterator<NonAlignedFrameReference> >
+struct dynamic_step_type<bit_aligned_frame_iterator<NonAlignedFrameReference> >
 {
     typedef memory_based_step_iterator<
 	bit_aligned_frame_iterator<NonAlignedFrameReference> > type;

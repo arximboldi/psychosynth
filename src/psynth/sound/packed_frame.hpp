@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-10-28 12:23:17 raskolnikov>
+ *  Time-stamp:  <2010-11-02 11:01:40 raskolnikov>
  *
  *  @file        packed_frame.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -72,7 +72,7 @@ namespace sound
    \code
    typedef packed_frame_type<uint16_t,
                              mpl::vector3_c<unsigned,5,6,5>,
-			     rgb_layout_t>::type rgb565_frame_t;
+			     rgb_layout>::type rgb565_frame_t;
    BOOST_STATIC_ASSERT((sizeof(rgb565_frame_t)==2));
 
    rgb565_frame_t r565;
@@ -102,13 +102,13 @@ template <typename BitField,
 	  // packed_sample_reference
           typename Layout
 	  // Layout defining the channel space and ordering of the
-	  // samples. Example value: rgb_layout_t
+	  // samples. Example value: rgb_layout
 	  >
 struct packed_frame
 {
     BitField _bitfield;
 
-    typedef Layout                layout_t;
+    typedef Layout                layout;
     typedef packed_frame          value_type;
     typedef value_type&           reference;
     typedef const value_type&     const_reference;

@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-10-25 19:13:31 raskolnikov>
+ *  Time-stamp:  <2010-11-02 11:47:28 raskolnikov>
  *
  *  @file        concept.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -37,8 +37,8 @@
  */
 
 
-#ifndef GIL_CONCEPT_H
-#define GIL_CONCEPT_H
+#ifndef PSYNTH_SOUND_CONCEPT_H
+#define PSYNTH_SOUND_CONCEPT_H
 
 #include <psynth/base/concepts.hpp>
 
@@ -60,11 +60,6 @@ template <typename P> struct is_frame;
 template <typename dstT, typename srcT>
 
 typename sample_traits<dstT>::value_type sample_convert (const srcT& val);
-template <typename T> class point2;
-template <std::size_t K, typename T>
-const T& axis_value(const point2<T>& p);
-template <std::size_t K, typename T>
-T& axis_value(point2<T>& p);
 
 template <typename ChannelBase, int K> struct
 kth_element_type;
@@ -94,8 +89,10 @@ template <typename It> struct iterator_adaptor_get_base;
 /* forward-declare at_c */
 namespace detail
 {
+
 template <typename Element, typename Layout, int K>
 struct homogeneous_channel_base;
+
 } /* namespace detail */
 
 template <int K, typename E, typename L, int N>
@@ -136,100 +133,24 @@ template <int K, typename ChannelBase>
 typename kth_semantic_element_const_reference_type<ChannelBase,K>::type
 semantic_at_c(const ChannelBase& p);
 
-template <typename T> struct dynamic_x_step_type;
-template <typename T> struct dynamic_y_step_type;
-template <typename T> struct transposed_type;
-
 namespace detail
 {
+
 template <typename T>
 void initialize_it (T& x) {}
+
 } /* namespace detail */
 
 template <typename T>
 struct remove_const_and_reference :
 	public remove_const<typename remove_reference<T>::type> {};
 
+
 /*
  *
- *  Point concepts.
+ *       Extra iterator concepts.
  *
  */
-
-/**
-   \brief N-dimensional point concept
-   \ingroup PointConcept
-*/
-/**
-\code
-concept PointNDConcept<typename T> : Regular<T> {    
-    // the type of a coordinate along each axis
-    template <size_t K> struct axis; where Metafunction<axis>;
-            
-    const size_t num_dimensions;
-    
-    // accessor/modifier of the value of each axis.
-    template <size_t K> const typename axis<K>::type& T::axis_value() const;
-    template <size_t K>       typename axis<K>::type& T::axis_value();
-};
-\endcode
-*/
-
-template <typename P>
-struct PointNDConcept
-{
-    void constraints() {
-        gil_function_requires< Regular<P> >();
-
-        typedef typename P::value_type value_type;
-        static const std::size_t N = P::num_dimensions;
-	ignore_unused_variable_warning (N);
-        typedef typename P::template axis<0>::coord_t FT;
-        typedef typename P::template axis<N-1>::coord_t LT;
-        FT ft=gil::axis_value<0>(point);
-        axis_value<0>(point)=ft;
-        LT lt=axis_value<N-1>(point);
-        axis_value<N-1> (point) = lt;
-    
-        value_type v = point[0];
-	ignore_unused_variable_warning (v);
-        point[0] = point[0];
-    }
-    P point;
-};
-
-/**
-   \brief 2-dimensional point concept
-   \ingroup PointConcept
-*/
-/**
-\code
-concept Point2DConcept<typename T> : PointNDConcept<T> {    
-    where num_dimensions == 2;
-    where SameType<axis<0>::type, axis<1>::type>;
-
-    typename value_type = axis<0>::type;
-
-    const value_type& operator[](const T&, size_t i);
-          value_type& operator[](      T&, size_t i);
-
-    value_type x,y;
-};
-\endcode
-*/
-
-template <typename P>
-struct Point2DConcept
-{
-    void constraints() {
-        gil_function_requires< PointNDConcept<P> >();
-        BOOST_STATIC_ASSERT(P::num_dimensions == 2);
-        point.x=point.y;
-        point[0]=point[1];
-    }
-    P point;
-};
-
 
 namespace detail
 {
@@ -250,7 +171,7 @@ template <class TT>
 struct BidirectionalIteratorIsMutableConcept
 {
     void constraints() {
-	gil_function_requires< ForwardIteratorIsMutableConcept<TT> >();
+	psynth_function_requires< ForwardIteratorIsMutableConcept<TT> >();
 	*i-- = *i;                  // require postdecrement and assignment
     }
     TT i;
@@ -262,7 +183,7 @@ template <class TT>
 struct RandomAccessIteratorIsMutableConcept
 {
     void constraints() {
-	gil_function_requires< BidirectionalIteratorIsMutableConcept<TT> >();
+	psynth_function_requires< BidirectionalIteratorIsMutableConcept<TT> >();
 	typename std::iterator_traits<TT>::difference_type n=0;
 	ignore_unused_variable_warning(n);
 	i[n] = *i;
@@ -300,8 +221,10 @@ struct ChannelSpaceConcept
     }
 };
 
-template <typename ChannelSpace1, typename ChannelSpace2>  // Models ChannelSpaceConcept
-struct channel_spaces_are_compatible : public is_same<ChannelSpace1,ChannelSpace2> {};
+template <typename ChannelSpace1, typename ChannelSpace2>
+// Models ChannelSpaceConcept
+struct channel_spaces_are_compatible :
+    public is_same<ChannelSpace1,ChannelSpace2> {};
 
 /**
    \brief Two channel spaces are compatible if they are the same
@@ -397,7 +320,7 @@ template <typename T>
 struct SampleConcept
 {
     void constraints() {
-        gil_function_requires< boost::EqualityComparableConcept<T> >(); 
+        psynth_function_requires< boost::EqualityComparableConcept<T> >(); 
         
         typedef typename sample_traits<T>::value_type v;
         typedef typename sample_traits<T>::reference r;
@@ -405,8 +328,11 @@ struct SampleConcept
         typedef typename sample_traits<T>::const_reference cr;
         typedef typename sample_traits<T>::const_pointer cp;
 
-        sample_traits<T>::min_value();
-        sample_traits<T>::max_value();
+        sample_traits<T>::min_value ();
+        sample_traits<T>::max_value ();
+	sample_traits<T>::zero_value (); // Added for sound. It is
+					 // important to know which is
+					 // the stable central value.
     }
 
      T c;
@@ -414,17 +340,19 @@ struct SampleConcept
 
 namespace detail
 {
-    // Preconditions: T models SampleConcept
-    template <typename T>
-    struct SampleIsMutableConcept
-    {
-        void constraints() {
-            c=c;
-            using std::swap;
-            swap(c,c);
-        }
-        T c;
-    };
+
+// Preconditions: T models SampleConcept
+template <typename T>
+struct SampleIsMutableConcept
+{
+    void constraints() {
+	c=c;
+	using std::swap;
+	swap(c,c);
+    }
+    T c;
+};
+
 } /* namespace detail*/
 
 /**
@@ -440,8 +368,8 @@ template <typename T>
 struct MutableSampleConcept
 {
     void constraints() {
-        gil_function_requires<SampleConcept<T> >();
-        gil_function_requires<detail::SampleIsMutableConcept<T> >();
+        psynth_function_requires<SampleConcept<T> >();
+        psynth_function_requires<detail::SampleIsMutableConcept<T> >();
     }
 };
 
@@ -458,8 +386,8 @@ template <typename T>
 struct SampleValueConcept
 {
     void constraints() {
-        gil_function_requires<SampleConcept<T> >();
-        gil_function_requires<Regular<T> >();
+        psynth_function_requires<SampleConcept<T> >();
+        psynth_function_requires<Regular<T> >();
     }
 };
 
@@ -524,8 +452,8 @@ template <typename SrcSample, typename DstSample>
 struct SampleConvertibleConcept
 {
     void constraints() {
-        gil_function_requires<SampleConcept<SrcSample> >();
-        gil_function_requires<MutableSampleConcept<DstSample> >();
+        psynth_function_requires<SampleConcept<SrcSample> >();
+        psynth_function_requires<MutableSampleConcept<DstSample> >();
         dst = sample_convert<DstSample, SrcSample>(src);
 	ignore_unused_variable_warning(dst);
     }
@@ -604,20 +532,20 @@ template <typename ChannelBase>
 struct ChannelBaseConcept
 {
     void constraints() {
-        gil_function_requires< CopyConstructible<ChannelBase> >();
-        gil_function_requires< EqualityComparable<ChannelBase> >();
+        psynth_function_requires< CopyConstructible<ChannelBase> >();
+        psynth_function_requires< EqualityComparable<ChannelBase> >();
 
-        typedef typename ChannelBase::layout_t::channel_space_t channel_space_t;
-        gil_function_requires<ChannelSpaceConcept<channel_space_t> >();
+        typedef typename ChannelBase::layout::channel_space channel_space;
+        psynth_function_requires<ChannelSpaceConcept<channel_space> >();
 
-        typedef typename ChannelBase::layout_t::sample_mapping_t sample_mapping_t;
+        typedef typename ChannelBase::layout_t::sample_mapping sample_mapping;
         // TODO: sample_mapping_t must be an MPL RandomAccessSequence
 
         static const std::size_t num_elements = size<ChannelBase>::value;
 
         typedef typename kth_element_type<ChannelBase,num_elements-1>::type TN; 
         typedef typename kth_element_const_reference_type<
-	    ChannelBase,num_elements-1>::type CR; 
+	    ChannelBase, num_elements-1>::type CR; 
 
 #if !defined(_MSC_VER) || _MSC_VER > 1310
         CR cr = at_c<num_elements-1>(cb);
@@ -659,9 +587,9 @@ template <typename ChannelBase>
 struct MutableChannelBaseConcept
 {
     void constraints() {
-        gil_function_requires< ChannelBaseConcept<ChannelBase> >();
-        gil_function_requires< Assignable<ChannelBase> >();
-        gil_function_requires< Swappable<ChannelBase> >();
+        psynth_function_requires< ChannelBaseConcept<ChannelBase> >();
+        psynth_function_requires< Assignable<ChannelBase> >();
+        psynth_function_requires< Swappable<ChannelBase> >();
 
         typedef typename kth_element_reference_type<ChannelBase, 0>::type CR; 
 
@@ -690,8 +618,8 @@ template <typename ChannelBase>
 struct ChannelBaseValueConcept
 {
     void constraints() {
-        gil_function_requires< MutableChannelBaseConcept<ChannelBase> >();
-        gil_function_requires< Regular<ChannelBase> >();
+        psynth_function_requires< MutableChannelBaseConcept<ChannelBase> >();
+        psynth_function_requires< Regular<ChannelBase> >();
     }
 };
 
@@ -714,7 +642,7 @@ template <typename ChannelBase>
 struct HomogeneousChannelBaseConcept
 {
     void constraints() {
-        gil_function_requires< ChannelBaseConcept<ChannelBase> >();
+        psynth_function_requires< ChannelBaseConcept<ChannelBase> >();
 
         static const std::size_t num_elements = size<ChannelBase>::value;
 
@@ -722,7 +650,8 @@ struct HomogeneousChannelBaseConcept
         typedef typename kth_element_type<ChannelBase,num_elements-1>::type TN; 
 
         BOOST_STATIC_ASSERT((is_same<T0,TN>::value));   // better than nothing
-        typedef typename kth_element_const_reference_type<ChannelBase,0>::type CRef0; 
+        typedef typename kth_element_const_reference_type<
+	    ChannelBase,0>::type CRef0; 
         CRef0 e0=dynamic_at_c(cb,0);
     }
     ChannelBase cb;
@@ -747,8 +676,8 @@ template <typename ChannelBase>
 struct MutableHomogeneousChannelBaseConcept
 {
     void constraints() {
-        gil_function_requires< ChannelBaseConcept<ChannelBase> >();
-        gil_function_requires< HomogeneousChannelBaseConcept<ChannelBase> >();
+        psynth_function_requires< ChannelBaseConcept<ChannelBase> >();
+        psynth_function_requires< HomogeneousChannelBaseConcept<ChannelBase> >();
         typedef typename kth_element_reference_type<ChannelBase, 0>::type R0;
         R0 x = dynamic_at_c (cb, 0);
         dynamic_at_c(cb,0) = dynamic_at_c (cb, 0);
@@ -774,8 +703,9 @@ template <typename ChannelBase>
 struct HomogeneousChannelBaseValueConcept
 {
     void constraints() {
-        gil_function_requires< MutableHomogeneousChannelBaseConcept<ChannelBase> >();
-        gil_function_requires< Regular<ChannelBase> >();
+        psynth_function_requires<
+	    MutableHomogeneousChannelBaseConcept<ChannelBase> >();
+        psynth_function_requires< Regular<ChannelBase> >();
     }
 };
 
@@ -799,7 +729,8 @@ concept ChannelBasesCompatibleConcept<ChannelBaseConcept C1, ChannelBaseConcept 
 \endcode
 */
 template <typename ChannelBase1, typename ChannelBase2>
-struct ChannelBasesCompatibleConcept {
+struct ChannelBasesCompatibleConcept
+{
     void constraints() {
         BOOST_STATIC_ASSERT(
 	    (is_same<typename ChannelBase1::layout_t::channel_space_t, 
@@ -842,10 +773,11 @@ template <typename P>
 struct FrameBasedConcept
 {
     void constraints() {
-        typedef typename channel_space_type<P>::type channel_space_t;
-        gil_function_requires<ChannelSpaceConcept<channel_space_t> >();
-        typedef typename sample_mapping_type<P>::type sample_mapping_t;
-        gil_function_requires<SampleMappingConcept<sample_mapping_t> >();
+        typedef typename channel_space_type<P>::type channel_space;
+        psynth_function_requires<ChannelSpaceConcept<channel_space> >();
+
+        typedef typename sample_mapping_type<P>::type sample_mapping;
+        psynth_function_requires<SampleMappingConcept<sample_mapping> >();
 
         static const bool planar = is_planar<P>::type::value;
 	ignore_unused_variable_warning(planar);
@@ -873,10 +805,12 @@ concept HomogeneousFrameBasedConcept<FrameBasedConcept T> {
 template <typename P>
 struct HomogeneousFrameBasedConcept
 {
-    void constraints() {
-        gil_function_requires<FrameBasedConcept<P> >();
-        typedef typename sample_type<P>::type sample_t;
-        gil_function_requires<SampleConcept<sample_t> >();        
+    void constraints()
+    {
+        psynth_function_requires<FrameBasedConcept<P> >();
+
+	typedef typename sample_type<P>::type sample;
+        psynth_function_requires<SampleConcept<sample> >();        
     }
 };
 
@@ -887,7 +821,8 @@ struct HomogeneousFrameBasedConcept
 */
 /**
 \code
-concept FrameConcept<typename P> : ChannelBaseConcept<P>, FrameBasedConcept<P> {    
+concept FrameConcept<typename P> :
+            ChannelBaseConcept<P>, FrameBasedConcept<P> {    
     where is_frame<P>::type::value==true;
     // where for each K [0..size<P>::value-1]:
     //      SampleConcept<kth_element_type<P,K> >;
@@ -911,22 +846,22 @@ template <typename P>
 struct FrameConcept
 {
     void constraints() {
-        gil_function_requires<ChannelBaseConcept<P> >();
-        gil_function_requires<FrameBasedConcept<P> >();
+        psynth_function_requires<ChannelBaseConcept<P> >();
+        psynth_function_requires<FrameBasedConcept<P> >();
 
         BOOST_STATIC_ASSERT((is_frame<P>::value));
         static const bool is_mutable = P::is_mutable;
 	ignore_unused_variable_warning(is_mutable);
 
         typedef typename P::value_type      value_type;
-//      gil_function_requires<FrameValueConcept<value_type> >();
+//      psynth_function_requires<FrameValueConcept<value_type> >();
 
         typedef typename P::reference       reference;
-        gil_function_requires<
+        psynth_function_requires<
 	    FrameConcept<typename remove_const_and_reference<reference>::type> >();
 
         typedef typename P::const_reference const_reference;
-        gil_function_requires<
+        psynth_function_requires<
 	    FrameConcept<
 		typename remove_const_and_reference<const_reference>::type> >();
     }
@@ -937,6 +872,7 @@ struct FrameConcept
    \brief Frame concept that allows for changing its samples
    \ingroup FrameConcept
 */
+
 /**
 \code
 concept MutableFrameConcept<FrameConcept P> : MutableChannelBaseConcept<P> {
@@ -948,7 +884,7 @@ template <typename P>
 struct MutableFrameConcept
 {
     void constraints() {
-        gil_function_requires<FrameConcept<P> >();
+        psynth_function_requires<FrameConcept<P> >();
         BOOST_STATIC_ASSERT(P::is_mutable);
     }
 };
@@ -970,9 +906,9 @@ template <typename P>
 struct HomogeneousFrameConcept
 {
     void constraints() {
-        gil_function_requires<FrameConcept<P> >();
-        gil_function_requires<HomogeneousChannelBaseConcept<P> >();
-        gil_function_requires<HomogeneousFrameBasedConcept<P> >();
+        psynth_function_requires<FrameConcept<P> >();
+        psynth_function_requires<HomogeneousChannelBaseConcept<P> >();
+        psynth_function_requires<HomogeneousFrameBasedConcept<P> >();
         p[0];
     }
     P p;
@@ -996,8 +932,8 @@ template <typename P>
 struct MutableHomogeneousFrameConcept
 {
     void constraints() {
-        gil_function_requires<HomogeneousFrameConcept<P> >();
-        gil_function_requires<MutableHomogeneousChannelBaseConcept<P> >();
+        psynth_function_requires<HomogeneousFrameConcept<P> >();
+        psynth_function_requires<MutableHomogeneousChannelBaseConcept<P> >();
         p[0] = p[0];
     }
     P p;
@@ -1015,10 +951,11 @@ concept FrameValueConcept<FrameConcept P> : Regular<P> {
 \endcode
 */
 template <typename P>
-struct FrameValueConcept {
+struct FrameValueConcept
+{
     void constraints() {
-        gil_function_requires<FrameConcept<P> >();
-        gil_function_requires<Regular<P> >();
+        psynth_function_requires<FrameConcept<P> >();
+        psynth_function_requires<Regular<P> >();
     }
 };
 
@@ -1037,8 +974,8 @@ template <typename P>
 struct HomogeneousFrameValueConcept
 {
     void constraints() {
-        gil_function_requires<HomogeneousFrameConcept<P> >();
-        gil_function_requires<Regular<P> >();
+        psynth_function_requires<HomogeneousFrameConcept<P> >();
+        psynth_function_requires<Regular<P> >();
         BOOST_STATIC_ASSERT((is_same<P, typename P::value_type>::value));
     }
 };
@@ -1122,13 +1059,14 @@ template <typename SrcP, typename DstP>
 struct FrameConvertibleConcept
 {
     void constraints() {
-        gil_function_requires<FrameConcept<SrcP> >();
-        gil_function_requires<MutableFrameConcept<DstP> >();
+        psynth_function_requires<FrameConcept<SrcP> >();
+        psynth_function_requires<MutableFrameConcept<DstP> >();
         channel_convert(src,dst);
     }
     SrcP src;
     DstP dst;
 };
+
 
 /*
  *
@@ -1165,21 +1103,21 @@ template <typename D>
 struct FrameDereferenceAdaptorConcept
 {
     void constraints() {
-        gil_function_requires< boost::UnaryFunctionConcept<D, 
+        psynth_function_requires< boost::UnaryFunctionConcept<D, 
             typename remove_const_and_reference<typename D::result_type>::type, 
             typename D::argument_type> >();
-        gil_function_requires< boost::DefaultConstructibleConcept<D> >();
-        gil_function_requires< boost::CopyConstructibleConcept<D> >();
-        gil_function_requires< boost::AssignableConcept<D> >();
+        psynth_function_requires< boost::DefaultConstructibleConcept<D> >();
+        psynth_function_requires< boost::CopyConstructibleConcept<D> >();
+        psynth_function_requires< boost::AssignableConcept<D> >();
 
-        gil_function_requires<FrameConcept<
+        psynth_function_requires<FrameConcept<
 	    typename remove_const_and_reference<
 		typename D::result_type>::type> >();
 
         typedef typename D::const_t const_t;
-        gil_function_requires<FrameDereferenceAdaptorConcept<const_t> >();
+        psynth_function_requires<FrameDereferenceAdaptorConcept<const_t> >();
         typedef typename D::value_type value_type;
-        gil_function_requires<FrameValueConcept<value_type> >();
+        psynth_function_requires<FrameValueConcept<value_type> >();
         typedef typename D::reference reference;
 	// == FrameConcept (if you remove const and reference)
         typedef typename D::const_reference const_reference;
@@ -1225,56 +1163,10 @@ concept HasDynamicXStepTypeConcept<typename T> {
 \endcode
 */
 template <typename T>
-struct HasDynamicXStepTypeConcept
+struct HasDynamicStepTypeConcept
 {   
-    void constraints() {
-        typedef typename dynamic_x_step_type<T>::type type;
-    }
-};
-
-/**
-   \brief Concept for locators and views that can define a type just
-   like the given locator or view, except it supports runtime
-   specified step along the Y navigation
-   
-   \ingroup FrameLocatorConcept
-*/
-/**
-\code
-concept HasDynamicYStepTypeConcept<typename T> {
-    typename dynamic_y_step_type<T>;
-        where Metafunction<dynamic_y_step_type<T> >;
-};
-\endcode
-*/
-template <typename T>
-struct HasDynamicYStepTypeConcept
-{   
-    void constraints() {
-        typedef typename dynamic_y_step_type<T>::type type;
-    }
-};
-
-
-/**
-   \brief Concept for locators and views that can define a type just
-   like the given locator or view, except X and Y is swapped
-   
-   \ingroup FrameLocatorConcept
-*/
-/**
-\code
-concept HasTransposedTypeConcept<typename T> {
-    typename transposed_type<T>;
-        where Metafunction<transposed_type<T> >;
-};
-\endcode
-*/
-template <typename T>
-struct HasTransposedTypeConcept
-{   
-    void constraints() {
-        typedef typename transposed_type<T>::type type;
+    void constraints () {
+        typedef typename dynamic_step_type<T>::type type;
     }
 };
 
@@ -1316,12 +1208,12 @@ struct FrameIteratorConcept
 {   
     void constraints()
     {
-        gil_function_requires<
+        psynth_function_requires<
 	    boost_concepts::RandomAccessTraversalConcept<Iterator> >();
-        gil_function_requires<FrameBasedConcept<Iterator> >();
+        psynth_function_requires<FrameBasedConcept<Iterator> >();
         
         typedef typename std::iterator_traits<Iterator>::value_type value_type;
-        gil_function_requires<FrameValueConcept<value_type> >();
+        psynth_function_requires<FrameValueConcept<value_type> >();
  
         typedef typename const_iterator_type<Iterator>::type const_t;
         static const bool is_mut = iterator_is_mutable<Iterator>::type::value;
@@ -1336,10 +1228,11 @@ struct FrameIteratorConcept
     }
     
     void check_base(mpl::false_) {}
+
     void check_base(mpl::true_)
     {
         typedef typename iterator_adaptor_get_base<Iterator>::type base_t;
-        gil_function_requires<FrameIteratorConcept<base_t> >();
+        psynth_function_requires<FrameIteratorConcept<base_t> >();
     }
 
     Iterator it;
@@ -1353,12 +1246,12 @@ namespace detail
     {
         void constraints()
 	{
-            gil_function_requires<
+            psynth_function_requires<
 		detail::RandomAccessIteratorIsMutableConcept<Iterator> >();
             typedef typename remove_reference<
 		typename std::iterator_traits<Iterator>::reference>::type ref;
             typedef typename element_type<ref>::type sample_t;
-            gil_function_requires<detail::SampleIsMutableConcept<sample_t> >();
+            psynth_function_requires<detail::SampleIsMutableConcept<sample_t> >();
         }
     };
 }
@@ -1379,12 +1272,15 @@ struct MutableFrameIteratorConcept
 {
     void constraints()
     {
-        gil_function_requires<FrameIteratorConcept<Iterator> >();
-        gil_function_requires<detail::FrameIteratorIsMutableConcept<Iterator> >();
+        psynth_function_requires<FrameIteratorConcept<Iterator> >();
+        psynth_function_requires<
+	    detail::FrameIteratorIsMutableConcept<Iterator> >();
     }
 };
 
-namespace detail {
+namespace detail
+{
+
 /*
   Iterators that can be used as the base of memory_based_step_iterator
   require some additional functions
@@ -1405,6 +1301,7 @@ struct RandomAccessIteratorIsMemoryBasedConcept
     }
     Iterator it;
 };
+
 } /* namespace detail */
 
 /**
@@ -1438,9 +1335,9 @@ struct MemoryBasedIteratorConcept
 {
     void constraints ()
     {
-        gil_function_requires<
+        psynth_function_requires<
 	    boost_concepts::RandomAccessTraversalConcept<Iterator> >();
-        gil_function_requires<
+        psynth_function_requires<
 	    detail::RandomAccessIteratorIsMemoryBasedConcept<Iterator> >();
     }
 };
@@ -1458,12 +1355,13 @@ concept StepIteratorConcept<boost_concepts::ForwardTraversalConcept Iterator> {
 };
 \endcode
 */
+
 template <typename Iterator>
 struct StepIteratorConcept
 {
     void constraints()
     {
-        gil_function_requires<
+        psynth_function_requires<
 	    boost_concepts::ForwardTraversalConcept<Iterator> >();
         it.set_step(0);
     }
@@ -1486,8 +1384,8 @@ struct MutableStepIteratorConcept
 {
     void constraints()
     {
-        gil_function_requires<StepIteratorConcept<Iterator> >();
-        gil_function_requires<
+        psynth_function_requires<StepIteratorConcept<Iterator> >();
+        psynth_function_requires<
 	    detail::ForwardIteratorIsMutableConcept<Iterator> >();
     }
 };
@@ -1534,11 +1432,12 @@ struct IteratorAdaptorConcept
 {
     void constraints()
     {
-        gil_function_requires<
+        psynth_function_requires<
 	    boost_concepts::ForwardTraversalConcept<Iterator> >();
 
         typedef typename iterator_adaptor_get_base<Iterator>::type base_t;
-        gil_function_requires<boost_concepts::ForwardTraversalConcept<base_t> >();
+        psynth_function_requires<
+	    boost_concepts::ForwardTraversalConcept<base_t> >();
 
         BOOST_STATIC_ASSERT(is_iterator_adaptor<Iterator>::value);
         typedef typename iterator_adaptor_rebind<Iterator, void*>::type rebind_t;
@@ -1564,55 +1463,62 @@ struct MutableIteratorAdaptorConcept
 {
     void constraints()
     {
-        gil_function_requires<IteratorAdaptorConcept<Iterator> >();
-        gil_function_requires<
+        psynth_function_requires<IteratorAdaptorConcept<Iterator> >();
+        psynth_function_requires<
 	    detail::ForwardIteratorIsMutableConcept<Iterator> >();
     }
 };
 
 
-////////////////////////////////////////////////////////////////////////////////////////
-///
-///         BUFFER VIEW CONCEPTS
-///
-////////////////////////////////////////////////////////////////////////////////////////
+/*
+ *
+ *             BUFFER VIEW CONCEPTS
+ *
+ */
 
-/// \defgroup BufferViewNDConcept BufferViewNDLocatorConcept
-/// \ingroup BufferViewConcept
-/// \brief N-dimensional range
-
-/// \defgroup BufferView2DConcept BufferView2DConcept
-/// \ingroup BufferViewConcept
-/// \brief 2-dimensional range
-
-/// \defgroup FrameBufferViewConcept BufferViewConcept
-/// \ingroup BufferViewConcept
-/// \brief 2-dimensional range over frame data
-
-/// \ingroup BufferViewNDConcept
-/// \brief N-dimensional view over immutable values
 /**
+   \defgroup BufferViewConcept BufferViewConcept
+   \ingroup BufferViewConcept
+   \brief 1-dimensional range
+
+   \defgroup FrameBufferViewConcept BufferViewConcept
+   \ingroup BufferViewConcept
+   \brief 1-dimensional range over frame data
+   
+   \ingroup BufferViewConcept
+   \brief N-dimensional view over immutable values
+*/
+
+ /**
 \code
-concept RandomAccessNDBufferViewConcept<Regular View> {
+concept RandomAccessBufferViewConcept<Regular View> {
     typename value_type;
     typename reference;       // result of dereferencing
-    typename difference_type; // result of operator-(iterator,iterator) (1-dimensional!)
-    typename const_t;  where RandomAccessNDBufferViewConcept<View>; // same as View, but over immutable values
+    typename difference_type;
+    // result of operator-(iterator,iterator) (1-dimensional!)
+    typename const_t;  where RandomAccessNDBufferViewConcept<View>;
+    // same as View, but over immutable values
     typename point_t;  where PointNDConcept<point_t>; // N-dimensional point
-    typename locator;  where RandomAccessNDLocatorConcept<locator>; // N-dimensional locator.
-    typename iterator; where RandomAccessTraversalConcept<iterator>; // 1-dimensional iterator over all values
-    typename reverse_iterator; where RandomAccessTraversalConcept<reverse_iterator>; 
+    typename locator;  where RandomAccessNDLocatorConcept<locator>;
+    // N-dimensional locator.
+    typename iterator; where RandomAccessTraversalConcept<iterator>;
+    // 1-dimensional iterator over all values
+    typename reverse_iterator;
+    where RandomAccessTraversalConcept<reverse_iterator>; 
     typename size_type;       // the return value of size()
 
     // Equivalent to RandomAccessNDLocatorConcept::axis
     template <size_t D> struct axis {
         typename coord_t = point_t::axis<D>::coord_t;
-        typename iterator; where RandomAccessTraversalConcept<iterator>;   // iterator along D-th axis.
+        typename iterator; where
+    RandomAccessTraversalConcept<iterator>;
+    // iterator along D-th axis.
         where SameType<coord_t, iterator::difference_type>;
         where SameType<iterator::value_type,value_type>;
     };
 
-    // Defines the type of a view similar to this type, except it invokes Deref upon dereferencing
+    // Defines the type of a view similar to this type, except it
+    // invokes Deref upon dereferencing
     template <FrameDereferenceAdaptorConcept Deref> struct add_deref {
         typename type;        where RandomAccessNDBufferViewConcept<type>;
         static type make(const View& v, const Deref& deref);
@@ -1624,7 +1530,8 @@ concept RandomAccessNDBufferViewConcept<Regular View> {
     View::View(const locator&, const point_type&);
     
     size_type        View::size()       const; // total number of elements
-    reference        operator[](View, const difference_type&) const; // 1-dimensional reference
+    reference        operator[](View, const difference_type&) const;
+    // 1-dimensional reference
     iterator         View::begin()      const;
     iterator         View::end()        const;
     reverse_iterator View::rbegin()     const;
@@ -1641,159 +1548,56 @@ concept RandomAccessNDBufferViewConcept<Regular View> {
 \endcode
 */
 template <typename View>
-struct RandomAccessNDBufferViewConcept {
+struct RandomAccessBufferViewConcept
+{
     void constraints() {
-        gil_function_requires< Regular<View> >();
+        psynth_function_requires< Regular<View> >();
 
         typedef typename View::value_type       value_type;
-        typedef typename View::reference        reference;       // result of dereferencing
-        typedef typename View::difference_type  difference_type; // result of operator-(1d_iterator,1d_iterator)
-        typedef typename View::const_t          const_t;         // same as this type, but over const values
-        typedef typename View::point_t          point_t;         // N-dimensional point
-        typedef typename View::locator          locator;         // N-dimensional locator
-        typedef typename View::iterator         iterator;
+        typedef typename View::reference        reference;
+	// result of dereferencing
+        typedef typename View::difference_type  difference_type;
+	// result of operator-(1d_iterator,1d_iterator)
+
+	typedef typename View::iterator         iterator;
         typedef typename View::reverse_iterator reverse_iterator;
         typedef typename View::size_type        size_type;
-        static const std::size_t N=View::num_dimensions;
-    
-        gil_function_requires<RandomAccessNDLocatorConcept<locator> >();
-        gil_function_requires<boost_concepts::RandomAccessTraversalConcept<iterator> >();
-        gil_function_requires<boost_concepts::RandomAccessTraversalConcept<reverse_iterator> >();
+            
+	psynth_function_requires<
+	    boost_concepts::RandomAccessTraversalConcept<iterator> >();
+        psynth_function_requires<
+	    boost_concepts::RandomAccessTraversalConcept<reverse_iterator> >();
 
-        typedef typename View::template axis<0>::iterator   first_it_type;
-        typedef typename View::template axis<N-1>::iterator last_it_type;
-        gil_function_requires<boost_concepts::RandomAccessTraversalConcept<first_it_type> >();
-        gil_function_requires<boost_concepts::RandomAccessTraversalConcept<last_it_type> >();
-
-//        BOOST_STATIC_ASSERT((typename std::iterator_traits<first_it_type>::difference_type, typename point_t::template axis<0>::coord_t>::value));
-//        BOOST_STATIC_ASSERT((typename std::iterator_traits< last_it_type>::difference_type, typename point_t::template axis<N-1>::coord_t>::value));
-
-        // point_t must be an N-dimensional point, each dimension of which must have the same type as difference_type of the corresponding iterator
-        gil_function_requires<PointNDConcept<point_t> >();
-        BOOST_STATIC_ASSERT(point_t::num_dimensions==N);
-        BOOST_STATIC_ASSERT((is_same<typename std::iterator_traits<first_it_type>::difference_type, typename point_t::template axis<0>::coord_t>::value));
-        BOOST_STATIC_ASSERT((is_same<typename std::iterator_traits<last_it_type>::difference_type, typename point_t::template axis<N-1>::coord_t>::value));
-
-        point_t p;
-        locator lc;
         iterator it;
         reverse_iterator rit;
-        difference_type d; detail::initialize_it(d); ignore_unused_variable_warning(d);
+        difference_type d;
+	size_type sz;
+	detail::initialize_it(d); ignore_unused_variable_warning(d);
 
-        View(p,lc); // view must be constructible from a locator and a point
+        View(sz, it); // view must be constructible from a locator and a point
 
-        p=view.dimensions();
-        lc=view.frames();
-        size_type sz=view.size();  ignore_unused_variable_warning(sz);
-        bool is_contiguous=view.is_1d_traversable(); ignore_unused_variable_warning(is_contiguous);
-
+        sz = view.size();  ignore_unused_variable_warning(sz);
+        it = view.frames();
+        
         it=view.begin();
         it=view.end();
         rit=view.rbegin();
         rit=view.rend();
 
         reference r1=view[d]; ignore_unused_variable_warning(r1);    // 1D access 
-        reference r2=view(p); ignore_unused_variable_warning(r2);    // 2D access
-
-        // get 1-D iterator of any dimension at a given frame location
-        first_it_type fi=view.template axis_iterator<0>(p); ignore_unused_variable_warning(fi);
-        last_it_type li=view.template axis_iterator<N-1>(p); ignore_unused_variable_warning(li);
-
-        typedef FrameDereferenceAdaptorArchetype<typename View::value_type> deref_t;
+        
+        typedef FrameDereferenceAdaptorArchetype<typename View::value_type>
+	    deref_t;
         typedef typename View::template add_deref<deref_t>::type dtype;
     }
     View view;
 };
 
-/// \ingroup BufferView2DConcept
-/// \brief 2-dimensional view over immutable values
+
 /**
-\code
-concept RandomAccess2DBufferViewConcept<RandomAccessNDBufferViewConcept View> {
-    where num_dimensions==2;
-
-    typename x_iterator = axis<0>::iterator;
-    typename y_iterator = axis<1>::iterator;
-    typename x_coord_t  = axis<0>::coord_t;
-    typename y_coord_t  = axis<1>::coord_t;
-    typename xy_locator = locator;
-    
-    x_coord_t View::width()  const;
-    y_coord_t View::height() const;
-    
-    // X-navigation
-    x_iterator View::x_at(const point_t&) const;
-    x_iterator View::row_begin(y_coord_t) const;
-    x_iterator View::row_end  (y_coord_t) const;
-
-    // Y-navigation
-    y_iterator View::y_at(const point_t&) const;
-    y_iterator View::col_begin(x_coord_t) const;
-    y_iterator View::col_end  (x_coord_t) const;
-       
-    // navigating in 2D
-    xy_locator View::xy_at(const point_t&) const;
-
-    // (x,y) versions of all methods taking point_t    
-    View::View(x_coord_t,y_coord_t,const locator&);
-    iterator View::at(x_coord_t,y_coord_t) const;
-    reference operator()(View,x_coord_t,y_coord_t) const;
-    xy_locator View::xy_at(x_coord_t,y_coord_t) const;
-    x_iterator View::x_at(x_coord_t,y_coord_t) const;
-    y_iterator View::y_at(x_coord_t,y_coord_t) const;
-};
-\endcode
+   \ingroup FrameBufferViewConcept
+   \brief GIL's 2-dimensional view over immutable GIL frames
 */
-template <typename View>
-struct RandomAccess2DBufferViewConcept {
-    void constraints() {
-        gil_function_requires<RandomAccessNDBufferViewConcept<View> >();
-        BOOST_STATIC_ASSERT(View::num_dimensions==2);
-
-        // TODO: This executes the requirements for RandomAccessNDLocatorConcept again. Fix it to improve compile time
-        gil_function_requires<RandomAccess2DLocatorConcept<typename View::locator> >();
-
-        typedef typename dynamic_x_step_type<View>::type  dynamic_x_step_t;
-        typedef typename dynamic_y_step_type<View>::type  dynamic_y_step_t;
-        typedef typename transposed_type<View>::type      transposed_t;
-
-        typedef typename View::x_iterator x_iterator;
-        typedef typename View::y_iterator y_iterator;
-        typedef typename View::x_coord_t  x_coord_t;
-        typedef typename View::y_coord_t  y_coord_t;
-        typedef typename View::xy_locator xy_locator;
-
-        x_coord_t xd=0; ignore_unused_variable_warning(xd);
-        y_coord_t yd=0; ignore_unused_variable_warning(yd);
-        x_iterator xit;
-        y_iterator yit;
-        typename View::point_t d;
-
-        View(xd,yd,xy_locator());       // constructible with width, height, 2d_locator
-
-        xy_locator lc=view.xy_at(xd,yd);
-        lc=view.xy_at(d);
-
-        typename View::reference r=view(xd,yd);  ignore_unused_variable_warning(r);
-        xd=view.width();
-        yd=view.height();
-
-        xit=view.x_at(d);
-        xit=view.x_at(xd,yd);
-        xit=view.row_begin(xd);
-        xit=view.row_end(xd);
-
-        yit=view.y_at(d);
-        yit=view.y_at(xd,yd);
-        yit=view.col_begin(xd);
-        yit=view.col_end(xd);
-    }
-    View view;
-};
-
-
-/// \ingroup FrameBufferViewConcept
-/// \brief GIL's 2-dimensional view over immutable GIL frames
 /**
 \code
 concept BufferViewConcept<RandomAccess2DBufferViewConcept View> {
@@ -1811,116 +1615,109 @@ concept BufferViewConcept<RandomAccess2DBufferViewConcept View> {
 template <typename View>
 struct BufferViewConcept {
     void constraints() {
-        gil_function_requires<RandomAccess2DBufferViewConcept<View> >();
+        psynth_function_requires<RandomAccessBufferViewConcept<View> >();
 
-        // TODO: This executes the requirements for RandomAccess2DLocatorConcept again. Fix it to improve compile time
-        gil_function_requires<FrameLocatorConcept<typename View::xy_locator> >();
-        
-        BOOST_STATIC_ASSERT((is_same<typename View::x_coord_t, typename View::y_coord_t>::value));
-
-        typedef typename View::coord_t           coord_t;      // 1D difference type (same for all dimensions)
-        std::size_t num_chan = view.num_samples(); ignore_unused_variable_warning(num_chan);
+        std::size_t num_chan = view.num_samples ();
+	ignore_unused_variable_warning (num_chan);
     }
     View view;
 };
 
 
 namespace detail {
-    template <typename View>    // Preconditions: View Models RandomAccessNDBufferViewConcept
-    struct RandomAccessNDBufferViewIsMutableConcept {
-        void constraints() {
-            gil_function_requires<detail::RandomAccessNDLocatorIsMutableConcept<typename View::locator> >();
 
-            gil_function_requires<detail::RandomAccessIteratorIsMutableConcept<typename View::iterator> >();
-            gil_function_requires<detail::RandomAccessIteratorIsMutableConcept<typename View::reverse_iterator> >();
-            gil_function_requires<detail::RandomAccessIteratorIsMutableConcept<typename View::template axis<0>::iterator> >();
-            gil_function_requires<detail::RandomAccessIteratorIsMutableConcept<typename View::template axis<View::num_dimensions-1>::iterator> >();
+template <typename View>
+// Preconditions: View Models RandomAccessNDBufferViewConcept
+struct RandomAccessBufferViewIsMutableConcept
+{
+    void constraints() {
+	psynth_function_requires<
+	    detail::RandomAccessIteratorIsMutableConcept<
+		typename View::iterator> >();
+	psynth_function_requires<
+	    detail::RandomAccessIteratorIsMutableConcept<
+		typename View::reverse_iterator> >();
+	
+	typename View::difference_type diff;
+	initialize_it(diff); ignore_unused_variable_warning(diff);
+	typename View::value_type v; initialize_it(v);
+	
+	view[diff]=v;
+    }
+    View view;
+};
 
-            typename View::difference_type diff; initialize_it(diff); ignore_unused_variable_warning(diff);
-            typename View::point_t pt;
-            typename View::value_type v; initialize_it(v);
+template <typename View>    // preconditions: View Models BufferViewConcept
+struct FrameBufferViewIsMutableConcept
+{
+    void constraints() {        
+	psynth_function_requires<
+	    detail::RandomAccessBufferViewIsMutableConcept<View> >();
+    }
+};
 
-            view[diff]=v;
-            view(pt)=v;
-        }
-        View view;
-    };
+} /* namespace detail */
 
-    template <typename View>    // preconditions: View Models RandomAccessNDBufferViewConcept
-    struct RandomAccess2DBufferViewIsMutableConcept {
-        void constraints() {        
-            gil_function_requires<detail::RandomAccessNDBufferViewIsMutableConcept<View> >();
-            typename View::x_coord_t xd=0; ignore_unused_variable_warning(xd);
-            typename View::y_coord_t yd=0; ignore_unused_variable_warning(yd);
-            typename View::value_type v; initialize_it(v);
-            view(xd,yd)=v;
-        }
-        View view;
-    };
-
-    template <typename View>    // preconditions: View Models BufferViewConcept
-    struct FrameBufferViewIsMutableConcept {
-        void constraints() {        
-            gil_function_requires<detail::RandomAccess2DBufferViewIsMutableConcept<View> >();
-        }
-    };
-}
-
-/// \ingroup BufferViewNDConcept
-/// \brief N-dimensional view over mutable values
 /**
-\code
-concept MutableRandomAccessNDBufferViewConcept<RandomAccessNDBufferViewConcept View> {
+   \ingroup BufferViewNDConcept
+   \brief N-dimensional view over mutable values
+*/
+/**
+   \code
+concept MutableRandomAccessNDBufferViewConcept<
+   RandomAccessNDBufferViewConcept View> {
     where Mutable<reference>;
 };
 \endcode
 */
 template <typename View>
-struct MutableRandomAccessNDBufferViewConcept {
+struct MutableRandomAccessBufferViewConcept
+{
     void constraints() {
-        gil_function_requires<RandomAccessNDBufferViewConcept<View> >();
-        gil_function_requires<detail::RandomAccessNDBufferViewIsMutableConcept<View> >();
+        psynth_function_requires<RandomAccessNDBufferViewConcept<View> >();
+        psynth_function_requires<
+	    detail::RandomAccessBufferViewIsMutableConcept<View> >();
     }
 };
 
-/// \ingroup BufferView2DConcept
-/// \brief 2-dimensional view over mutable values
 /**
-\code
-concept MutableRandomAccess2DBufferViewConcept<RandomAccess2DBufferViewConcept View> : MutableRandomAccessNDBufferViewConcept<View> {};
+   \ingroup FrameBufferViewConcept
+   \brief GIL's 2-dimensional view over mutable GIL frames
+*/
+/**
+   \code
+   concept MutableBufferViewConcept<BufferViewConcept View> :
+         MutableRandomAccess2DBufferViewConcept<View> {};
 \endcode
 */
 template <typename View>
-struct MutableRandomAccess2DBufferViewConcept {
+struct MutableBufferViewConcept
+{
     void constraints() {
-        gil_function_requires<RandomAccess2DBufferViewConcept<View> >();
-        gil_function_requires<detail::RandomAccess2DBufferViewIsMutableConcept<View> >();
+        psynth_function_requires<BufferViewConcept<View> >();
+        psynth_function_requires<detail::FrameBufferViewIsMutableConcept<View> >();
     }
 };
 
-/// \ingroup FrameBufferViewConcept
-/// \brief GIL's 2-dimensional view over mutable GIL frames
 /**
-\code
-concept MutableBufferViewConcept<BufferViewConcept View> : MutableRandomAccess2DBufferViewConcept<View> {};
-\endcode
+   \brief Returns whether two views are compatible
+   
+   Views are compatible if their frames are compatible. Compatible
+   views can be assigned and copy constructed from one another.
 */
-template <typename View>
-struct MutableBufferViewConcept {
-    void constraints() {
-        gil_function_requires<BufferViewConcept<View> >();
-        gil_function_requires<detail::FrameBufferViewIsMutableConcept<View> >();
-    }
-};
-
-/// \brief Returns whether two views are compatible
-///
-/// Views are compatible if their frames are compatible. Compatible views can be assigned and copy constructed from one another.
 template <typename V1, typename V2>  // Model BufferViewConcept
-struct views_are_compatible : public frames_are_compatible<typename V1::value_type, typename V2::value_type> {};
+struct views_are_compatible :
+    public frames_are_compatible<typename V1::value_type,
+				 typename V2::value_type> {};
 
-/// \brief Views are compatible if they have the same channel spaces and compatible sample values. Constness and layout are not important for compatibility
-/// \ingroup BufferViewConcept
+
+/**
+   \brief Views are compatible if they have the same channel spaces
+   and compatible sample values. Constness and layout are not
+   important for compatibility
+   
+   \ingroup BufferViewConcept
+*/
 /**
 \code
 concept ViewsCompatibleConcept<BufferViewConcept V1, BufferViewConcept V2> {
@@ -1929,22 +1726,24 @@ concept ViewsCompatibleConcept<BufferViewConcept V1, BufferViewConcept V2> {
 \endcode
 */
 template <typename V1, typename V2>
-struct ViewsCompatibleConcept {
+struct ViewsCompatibleConcept
+{
     void constraints() {
         BOOST_STATIC_ASSERT((views_are_compatible<V1,V2>::value));
     }
 };
 
 
-////////////////////////////////////////////////////////////////////////////////////////
-///
-///         BUFFER CONCEPTS
-///
-////////////////////////////////////////////////////////////////////////////////////////
+/*
+ *
+ *            BUFFER CONCEPTS
+ *
+ */
 
-
-/// \ingroup BufferConcept
-/// \brief N-dimensional container of values
+/**
+   \ingroup BufferConcept
+   \brief N-dimensional container of values
+*/
 /**
 \code
 concept RandomAccessNDBufferConcept<typename Buf> : Regular<Buf> {
@@ -1967,27 +1766,25 @@ concept RandomAccessNDBufferConcept<typename Buf> : Regular<Buf> {
 \endcode
 */
 template <typename Buf>
-struct RandomAccessNDBufferConcept {
+struct RandomAccessBufferConcept
+{
     void constraints() {
-        gil_function_requires<Regular<Buf> >();
+        psynth_function_requires<Regular<Buf> >();
 
-        typedef typename Buf::view_t       view_t;
-        gil_function_requires<MutableRandomAccessNDBufferViewConcept<view_t> >();
+        typedef typename Buf::view       view_t;
+        psynth_function_requires<MutableRandomAccessBufferViewConcept<view> >();
 
-        typedef typename Buf::const_view_t const_view_t;
+        typedef typename Buf::const_view const_view_t;
         typedef typename Buf::value_type   frame_t;
-
-        typedef typename Buf::point_t        point_t;
-        gil_function_requires<PointNDConcept<point_t> >();
 
         const_view_t cv = const_view(buf); ignore_unused_variable_warning(cv);
         view_t       v  = view(buf);       ignore_unused_variable_warning(v);
 
         frame_t fill_value;
-        point_t pt=buf.dimensions();
-        Buf im1(pt);
-        Buf im2(pt,1);
-        Buf im3(pt,fill_value,1);
+        typename Buf::size_type pt = buf.size ();
+        Buf im1 (pt);
+        Buf im2 (pt,1);
+        Buf im3 (pt, fill_value, 1);
         buf.recreate(pt);
         buf.recreate(pt,1);
         buf.recreate(pt,fill_value,1);
@@ -1996,50 +1793,11 @@ struct RandomAccessNDBufferConcept {
 };
 
 
-/// \ingroup BufferConcept
-/// \brief 2-dimensional container of values
 /**
-\code
-concept RandomAccess2DBufferConcept<RandomAccessNDBufferConcept Buf> {
-    typename x_coord_t = const_view_t::x_coord_t;
-    typename y_coord_t = const_view_t::y_coord_t;
-    
-    Buf::Buf(x_coord_t width, y_coord_t height, std::size_t alignment=1);
-    Buf::Buf(x_coord_t width, y_coord_t height, value_type fill_value, std::size_t alignment);
-
-    x_coord_t Buf::width() const;
-    y_coord_t Buf::height() const;
-    
-    void Buf::recreate(x_coord_t width, y_coord_t height, std::size_t alignment=1);
-    void Buf::recreate(x_coord_t width, y_coord_t height, value_type fill_value, std::size_t alignment);
-};
-\endcode
+   \ingroup BufferConcept
+   \brief 2-dimensional buffer whose value type models
+   FrameValueConcept
 */
-template <typename Buf>
-struct RandomAccess2DBufferConcept {
-    void constraints() {
-        gil_function_requires<RandomAccessNDBufferConcept<Buf> >();
-        typedef typename Buf::x_coord_t  x_coord_t;
-        typedef typename Buf::y_coord_t  y_coord_t;
-        typedef typename Buf::value_type value_t;
-
-        gil_function_requires<MutableRandomAccess2DBufferViewConcept<typename Buf::view_t> >();
-
-        x_coord_t w=buf.width();
-        y_coord_t h=buf.height();
-        value_t fill_value;
-        Buf im1(w,h);
-        Buf im2(w,h,1);
-        Buf im3(w,h,fill_value,1);
-        buf.recreate(w,h);
-        buf.recreate(w,h,1);
-        buf.recreate(w,h,fill_value,1);
-    }
-    Buf buf;
-};
-
-/// \ingroup BufferConcept
-/// \brief 2-dimensional buffer whose value type models FrameValueConcept
 /**
 \code 
 concept BufferConcept<RandomAccess2DBufferConcept Buf> {
@@ -2049,20 +1807,22 @@ concept BufferConcept<RandomAccess2DBufferConcept Buf> {
 \endcode
 */
 template <typename Buf>
-struct BufferConcept {
+struct BufferConcept
+{
     void constraints() {
-        gil_function_requires<RandomAccess2DBufferConcept<Buf> >();
-        gil_function_requires<MutableBufferViewConcept<typename Buf::view_t> >();
-        typedef typename Buf::coord_t        coord_t;
-        BOOST_STATIC_ASSERT(num_samples<Buf>::value == mpl::size<typename channel_space_type<Buf>::type>::value);
-
-        BOOST_STATIC_ASSERT((is_same<coord_t, typename Buf::x_coord_t>::value));
-        BOOST_STATIC_ASSERT((is_same<coord_t, typename Buf::y_coord_t>::value));
+        psynth_function_requires<RandomAccessBufferConcept<Buf> >();
+        psynth_function_requires<MutableBufferViewConcept<
+	    typename Buf::view> >();
+	
+        BOOST_STATIC_ASSERT(num_samples<Buf>::value ==
+			    mpl::size<
+				typename channel_space_type<Buf>::type>::value);
     }
     Buf buf;
 };
 
 
-} }  // namespace boost::gil
+} /* namespace sound */
+} /* namespace psynth */
 
-#endif
+#endif /* PSYNTH_SOUND_CONCEPT */

@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-10-28 19:39:38 raskolnikov>
+ *  Time-stamp:  <2010-11-02 11:03:06 raskolnikov>
  *
  *  @file        frame.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -139,7 +139,7 @@ BOOST_STATIC_ASSERT((is_same<sample_type<bgr8_frame_t>::type, bits8>::value));
    reference. The samples are properly paired semantically.
 
    The single-sample (monoscale) instantiation of the class frame,
-   (i.e. \p frame<T,mono_layout_t>) is also convertible to/from a
+   (i.e. \p frame<T,mono_layout>) is also convertible to/from a
    sample value.  This allows monoscale frames to be used in simpler
    expressions like *mono_pix1 = *mono_pix2 instead of more
    complicated at_c<0>(mono_pix1) = at_c<0>(mono_pix2) or
@@ -149,12 +149,12 @@ BOOST_STATIC_ASSERT((is_same<sample_type<bgr8_frame_t>::type, bits8>::value));
 template <typename SampleValue, typename Layout>
 // = mpl::range_c<int, 0, ChannelSpace::size> >
 struct frame : public detail::homogeneous_channel_base<
-    SampleValue, Layout, mpl::size<typename Layout::channel_space_t>::value>
+    SampleValue, Layout, mpl::size<typename Layout::channel_space>::value>
 {
 private:
     typedef SampleValue sample_t;
     typedef detail::homogeneous_channel_base<
-	SampleValue, Layout, mpl::size<typename Layout::channel_space_t>::value>
+	SampleValue, Layout, mpl::size<typename Layout::channel_space>::value>
     parent_t;
 
 public:
@@ -273,7 +273,7 @@ private:
     static void check_mono()
     {
 	BOOST_STATIC_ASSERT(
-	    (is_same<typename Layout::channel_space_type, mono_space>::value));
+	    (is_same<typename Layout::channel_space, mono_space>::value));
     }
     
     template <typename Sample>
@@ -339,13 +339,13 @@ struct is_frame<frame<SampleValue,Layout> > : public mpl::true_{};
 template <typename SampleValue, typename Layout>
 struct channel_space_type<frame<SampleValue,Layout> >
 {
-    typedef typename Layout::channel_space_t type;
+    typedef typename Layout::channel_space type;
 }; 
 
 template <typename SampleValue, typename Layout>
 struct sample_mapping_type<frame<SampleValue,Layout> >
 {
-    typedef typename Layout::sample_mapping_t type;
+    typedef typename Layout::sample_mapping type;
 }; 
 
 template <typename SampleValue, typename Layout>

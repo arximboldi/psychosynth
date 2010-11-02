@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-10-28 19:49:42 raskolnikov>
+ *  Time-stamp:  <2010-11-02 11:49:01 raskolnikov>
  *
  *  @file        util.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -155,7 +155,7 @@ OutPtr psynth_reinterpret_cast (In* p)
 }
 
 template <typename OutPtr, typename In> GIL_FORCEINLINE
-const OutPtr gil_reinterpret_cast_c(const In* p)
+const OutPtr psynth_reinterpret_cast_c(const In* p)
 {
     return static_cast<const OutPtr>(static_cast<const void*>(p));
 }
