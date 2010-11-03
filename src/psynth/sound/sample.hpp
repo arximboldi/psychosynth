@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-02 10:38:05 raskolnikov>
+ *  Time-stamp:  <2010-11-03 13:57:46 raskolnikov>
  *
  *  @file        sample.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -82,7 +82,7 @@ struct sample_traits_impl<T, true>
     BOOST_STATIC_CONSTANT(bool, is_mutable = T::is_mutable);
     static value_type min_value () { return T::min_value(); }
     static value_type max_value () { return T::max_value(); }
-    static value_type zero_value () { return T (0) }
+    static value_type zero_value () { return T::zero_value(); }
 };
 
 /* sample traits implementation for built-in integral or floating
@@ -98,6 +98,7 @@ struct sample_traits_impl<T, false>
     BOOST_STATIC_CONSTANT(bool, is_mutable=true);
     static value_type min_value () { return (std::numeric_limits<T>::min) (); }
     static value_type max_value () { return (std::numeric_limits<T>::max) (); }
+    static value_type zero_value () { return T(0); }
 };
 
 /* sample traits implementation for constant built-in scalar or
@@ -135,7 +136,7 @@ struct sample_traits {
 */
 template <typename T>
 struct sample_traits :
-    public detail::sample_traits_impl<T, is_class<T>::value> {};
+	public detail::sample_traits_impl<T, std::is_class<T>::value> {};
 
 // Sample traits for C++ reference type - remove the reference
 template <typename T>
@@ -185,7 +186,8 @@ assert(y == 65535);
 template <typename BaseSampleValue,
 	  // base sample (models SampleValueConcept)
           typename MinVal,
-	  typename MaxVal
+	  typename MaxVal,
+	  typename ZeroVal
 	  // classes with a static apply() function returning the
 	  // minimum/maximum sample values
 	  >
@@ -203,6 +205,7 @@ struct scoped_sample_value
 
     static value_type min_value () { return MinVal::apply (); }
     static value_type max_value () { return MaxVal::apply (); }
+    static value_type zero_value () { return ZeroVal::apply (); }
 
     scoped_sample_value () {}
     scoped_sample_value (const scoped_sample_value& c) : _value(c._value) {}
@@ -246,6 +249,7 @@ private:
 struct float_zero { static float apply () { return 0.0f; } };
 struct float_one  { static float apply () { return 1.0f; } };
 struct float_minus_one  { static float apply () { return -1.0f; } };
+struct float_half  { static float apply () { return 0.5f; } };
 
 
 
@@ -276,13 +280,13 @@ namespace detail
    least NumBits bits */
 template <int NumBits>
 struct min_fast_uint :
-	public mpl::if_c<
+	public boost::mpl::if_c<
     (NumBits<=8), 
 	uint_least8_t, 
-	typename mpl::if_c<
+	typename boost::mpl::if_c<
 	(NumBits<=16), 
 	    uint_least16_t, 
-	    typename mpl::if_c<
+	    typename boost::mpl::if_c<
 	    (NumBits<=32), 
 		uint_least32_t, 
 		uintmax_t
@@ -328,6 +332,7 @@ public:
     typedef const value_type*     const_pointer;
 
     static value_type min_value () { return value_type (0); }
+    static value_type zero_value () { return min_value () / 2 + max_value () / 2; }
     static value_type max_value () { return value_type (num_values - 1); }
     BOOST_STATIC_CONSTANT(bool, is_mutable = true);
 
@@ -367,7 +372,7 @@ template <typename Derived, typename BitField, int NumBits, bool Mutable>
 class packed_sample_reference_base
 {
 protected:
-    typedef typename mpl::if_c<Mutable, void*, const void*>::type data_ptr_t;
+    typedef typename boost::mpl::if_c<Mutable, void*, const void*>::type data_ptr_t;
 
 public:
     typedef packed_sample_value<NumBits>   value_type;
@@ -385,6 +390,11 @@ public:
     static value_type max_value ()
     {
 	return sample_traits<value_type>::max_value();
+    }
+
+    static value_type zero_value ()
+    {
+	return sample_traits<value_type>::zero_value();
     }
 
     typedef BitField                       bitfield_t;
@@ -515,7 +525,7 @@ template <typename BitField,
           int NumBits,
 	  // Defines the sequence of bits in the data value that
 	  // contain the sample
-          bool Mutable,
+          bool Mutable
 	  // true if the reference is mutable
 	  >
 class packed_dynamic_sample_reference;
@@ -1005,7 +1015,7 @@ typedef boost::int32_t  bits32s;
    ... 1.0f]. Models SampleValueConcept
    \ingroup bits32f
 */
-typedef scoped_sample_value<float, float_zero, float_one> bits32f;
+typedef scoped_sample_value<float, float_zero, float_one, float_half> bits32f;
 
 /**
    \defgroup bits32fs bits32fs
@@ -1014,7 +1024,7 @@ typedef scoped_sample_value<float, float_zero, float_one> bits32f;
    ... 1.0f]. Models SampleValueConcept
    \ingroup bits32fs
 */
-typedef scoped_sample_value<float, float_minus_one, float_one> bits32fs;
+typedef scoped_sample_value<float, float_minus_one, float_one, float_zero> bits32fs;
 
 } /* namespace sound */
 } /* namespace psynth */
@@ -1027,21 +1037,23 @@ namespace boost
  */
 
 template <int NumBits>
-struct is_integral<psynth::packed_sample_value<NumBits> > : public mpl::true_ {};
+struct is_integral<psynth::sound::packed_sample_value<NumBits> > :
+	public boost::mpl::true_ {};
 
 template <typename BitField, int FirstBit, int NumBits, bool IsMutable>
-struct is_integral<psynth::packed_sample_reference<
+struct is_integral<psynth::sound::packed_sample_reference<
 		       BitField, FirstBit, NumBits, IsMutable> > :
-	public mpl::true_ {};
+	public boost::mpl::true_ {};
 
 template <typename BitField, int NumBits, bool IsMutable>
 struct is_integral<psynth::sound::packed_dynamic_sample_reference<
 		       BitField, NumBits, IsMutable> > :
-	public mpl::true_ {};
+	public boost::mpl::true_ {};
 
-template <typename BaseSampleValue, typename MinVal, typename MaxVal> 
+template <typename BaseSampleValue,
+	  typename MinVal, typename MaxVal, typename ZeroVal> 
 struct is_integral<psynth::sound::scoped_sample_value<
-		       BaseSampleValue, MinVal, MaxVal> > :
+		       BaseSampleValue, MinVal, MaxVal, ZeroVal> > :
 	public is_integral<BaseSampleValue> {};
 
 } /* namespace boost */

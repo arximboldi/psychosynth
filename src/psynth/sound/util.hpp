@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-02 11:49:01 raskolnikov>
+ *  Time-stamp:  <2010-11-03 14:06:29 raskolnikov>
  *
  *  @file        util.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -148,13 +148,13 @@ public:
 };
 
 /* reinterpret_cast is implementation-defined. Static cast is not. */
-template <typename OutPtr, typename In> GIL_FORCEINLINE
+template <typename OutPtr, typename In> PSYNTH_FORCEINLINE
 OutPtr psynth_reinterpret_cast (In* p)
 {
     return static_cast<OutPtr> (static_cast<void*> (p));
 }
 
-template <typename OutPtr, typename In> GIL_FORCEINLINE
+template <typename OutPtr, typename In> PSYNTH_FORCEINLINE
 const OutPtr psynth_reinterpret_cast_c(const In* p)
 {
     return static_cast<const OutPtr>(static_cast<const void*>(p));
@@ -241,23 +241,24 @@ struct dec : public std::unary_function<T,T>
 */
 template <typename Types, typename T>
 struct type_to_index 
-    : public mpl::distance<typename mpl::begin<Types>::type, 
-                                  typename mpl::find<Types,T>::type>::type {};
+    : public boost::mpl::distance<
+    typename boost::mpl::begin<Types>::type, 
+    typename boost::mpl::find<Types,T>::type>::type {};
 
 } /* namespace detail */
 
 
 /**
-   \ingroup ColorSpaceAndLayoutModel
-   \brief Represents a color space and ordering of channels in memory
+   \ingroup ChannelSpaceAndLayoutModel
+   \brief Represents a channel space and ordering of samples in memory
 */
-template <typename ColorSpace,
-	  typename ChannelMapping = mpl::range_c<
-	      int, 0, mpl::size<ColorSpace>::value> >
+template <typename ChannelSpace,
+	  typename SampleMapping = boost::mpl::range_c<
+	      int, 0, boost::mpl::size<ChannelSpace>::value> >
 struct layout
 {
-    typedef ColorSpace      color_space_t;
-    typedef ChannelMapping  channel_mapping_t;
+    typedef ChannelSpace   channel_space;
+    typedef SampleMapping  sample_mapping;
 };
 
 /**

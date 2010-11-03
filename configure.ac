@@ -25,10 +25,7 @@ AC_PREREQ(2.61)
 AC_INIT([psychosynth], [0.1.7], [raskolnikov@es.gnu.org])
 AC_CONFIG_MACRO_DIR([m4])
 
-<<<<<<< TREE
 dnl TODO: Make portable makefiles.
-=======
->>>>>>> MERGE-SOURCE
 AM_INIT_AUTOMAKE([--warnings=no-portability])
 AM_CONFIG_HEADER(config.h)
 

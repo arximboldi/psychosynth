@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-10-28 16:02:28 raskolnikov>
+ *  Time-stamp:  <2010-11-03 13:41:20 raskolnikov>
  *
  *  @file        planar_frame_reference.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -82,10 +82,10 @@ namespace sound
 template <typename SampleReference, typename ChannelSpace>
 // SampleReference is a sample reference (const or mutable)
 struct planar_frame_reference  : public detail::homogeneous_channel_base<
-    SampleReference, layout<ChannelSpace>, mpl::size<ChannelSpace>::value>
+    SampleReference, layout<ChannelSpace>, boost::mpl::size<ChannelSpace>::value>
 {
     typedef detail::homogeneous_channel_base<
-	SampleReference, layout<ChannelSpace>, mpl::size<ChannelSpace>::value>
+	SampleReference, layout<ChannelSpace>, boost::mpl::size<ChannelSpace>::value>
     parent_type;
     
 private:
@@ -215,7 +215,7 @@ private:
     template <typename Frame>
     static void check_compatible()
     {
-	psynth_function_requires<FramesCompatibleConcept<
+	base::psynth_function_requires<FramesCompatibleConcept<
 	    Frame, planar_frame_reference> >();
     }
 };
@@ -243,7 +243,7 @@ struct kth_element_reference_type<
 template <typename SampleReference, typename ChannelSpace, int K>  
 struct kth_element_const_reference_type<planar_frame_reference<
 					    SampleReference,ChannelSpace>, K> 
-    : public add_reference<typename add_const<SampleReference>::type> 
+    : public boost::add_reference<typename std::add_const<SampleReference>::type> 
 {
 //    typedef typename sample_traits<SampleReference>::const_reference type;
 };
@@ -262,7 +262,7 @@ struct kth_element_const_reference_type<planar_frame_reference<
 */
 template <typename SampleReference, typename ChannelSpace>  
 struct is_frame< planar_frame_reference<SampleReference,ChannelSpace> >
-    : public mpl::true_{};
+    : public boost::mpl::true_{};
 
 
 /*
@@ -303,7 +303,7 @@ struct sample_mapping_type<planar_frame_reference<SampleReference, ChannelSpace>
 */
 template <typename SampleReference, typename ChannelSpace>  
 struct is_planar<planar_frame_reference<SampleReference,ChannelSpace> > :
-    mpl::true_ {};
+    boost::mpl::true_ {};
 
 /**
    \brief Specifies the channel space type of a planar frame

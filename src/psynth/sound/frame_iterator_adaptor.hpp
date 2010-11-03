@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-10-29 12:06:02 raskolnikov>
+ *  Time-stamp:  <2010-11-03 13:37:33 raskolnikov>
  *
  *  @file        frame_iterator_adaptor.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -72,24 +72,24 @@ template <typename Iterator,
 	  // iterator of type Iterator
 	  >
 class dereference_iterator_adaptor :
-	public iterator_adaptor<dereference_iterator_adaptor<Iterator, DFn>,
-				Iterator,
-				typename DFn::value_type,
-				typename std::iterator_traits<
-				    Iterator>::iterator_category,
-				typename DFn::reference,
-				use_default>
+	public boost::iterator_adaptor<dereference_iterator_adaptor<Iterator, DFn>,
+				       Iterator,
+				       typename DFn::value_type,
+				       typename std::iterator_traits<
+					   Iterator>::iterator_category,
+				       typename DFn::reference,
+				       boost::use_default>
 {
     DFn _deref_fn;
 
 public:
-    typedef iterator_adaptor<dereference_iterator_adaptor<Iterator,DFn>,
-			     Iterator,
-			     typename DFn::value_type,
-			     typename std::iterator_traits<
-				 Iterator>::iterator_category,
-			     typename DFn::reference,
-			     use_default> parent_type;
+    typedef boost::iterator_adaptor<dereference_iterator_adaptor<Iterator,DFn>,
+				    Iterator,
+				    typename DFn::value_type,
+				    typename std::iterator_traits<
+					Iterator>::iterator_category,
+				    typename DFn::reference,
+				    boost::use_default> parent_type;
     typedef typename DFn::result_type  reference;
     typedef typename std::iterator_traits<Iterator>::difference_type
     difference_type;
@@ -169,12 +169,12 @@ struct const_iterator_type<dereference_iterator_adaptor<I,DFn> >
 
 template <typename I, typename DFn> 
 struct iterator_is_mutable<dereference_iterator_adaptor<I, DFn> > :
-	public mpl::bool_<DFn::is_mutable> {};
+	public boost::mpl::bool_<DFn::is_mutable> {};
 
 
 template <typename I, typename DFn>
 struct is_iterator_adaptor<dereference_iterator_adaptor<I,DFn> > :
-    public mpl::true_ {};
+    public boost::mpl::true_ {};
 
 template <typename I, typename DFn>
 struct iterator_adaptor_get_base<dereference_iterator_adaptor<I,DFn> >
@@ -289,7 +289,7 @@ struct dynamic_step_type<dereference_iterator_adaptor<Iterator,DFn> >
 template <typename Iterator, typename Deref>
 struct iterator_add_deref
 {
-    GIL_CLASS_REQUIRE(Deref, boost::gil, FrameDereferenceAdaptorConcept)
+    PSYNTH_CLASS_REQUIRE(Deref, psynth::sound, FrameDereferenceAdaptorConcept)
 
     typedef dereference_iterator_adaptor<Iterator, Deref> type;
 
@@ -307,7 +307,7 @@ template <typename Iterator, typename PrevDeref, typename Deref>
 struct iterator_add_deref<
     dereference_iterator_adaptor<Iterator, PrevDeref>, Deref>
 {
-    //    GIL_CLASS_REQUIRE(Deref, boost::gil, FrameDereferenceAdaptorConcept)
+    // PSYNTH_CLASS_REQUIRE(Deref, psynth::sound, FrameDereferenceAdaptorConcept)
 
     typedef dereference_iterator_adaptor<
 	Iterator, deref_compose<Deref, PrevDeref> > type;
@@ -317,7 +317,7 @@ struct iterator_add_deref<
 	const Deref& d)
     { 
         return type (it.base(),
-		     deref_compose<Deref, PrevDerev>(d, it.deref_fn ())); 
+		     deref_compose<Deref, PrevDeref>(d, it.deref_fn ())); 
     }
 };
 

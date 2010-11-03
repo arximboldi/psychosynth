@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-03 00:27:00 raskolnikov>
+ *  Time-stamp:  <2010-11-03 01:09:04 raskolnikov>
  *
  *  @file        tree_node_test.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -60,7 +60,7 @@ struct tree_node_fixture
     ~tree_node_fixture () {}
 };
 
-BOOST_FIXTURE_TEST_SUITE(tree_node_test_suite_0, tree_node_fixture)
+BOOST_FIXTURE_TEST_SUITE(tree_node_test_suite, tree_node_fixture)
 
 BOOST_AUTO_TEST_CASE(tree_node_test_0)
 {

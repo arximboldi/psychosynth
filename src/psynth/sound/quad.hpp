@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-10-29 04:01:10 raskolnikov>
+ *  Time-stamp:  <2010-11-03 13:45:02 raskolnikov>
  *
  *  @file        quad.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -59,8 +59,9 @@ struct back_right_channel {};
 /** \} */
 
 /** \ingroup ChannelSpaceModel */
-typedef mpl::vector4<left_channel,      right_channel,
-		     back_left_channel, back_right_channel> quad_space;
+typedef boost::mpl::vector4<
+    left_channel,      right_channel,
+    back_left_channel, back_right_channel> quad_space;
 
 /** \ingroup LayoutModel */
 typedef layout<quad_space> quad_layout;
@@ -70,12 +71,12 @@ typedef layout<quad_space> quad_layout;
    \brief from raw quad planar data
 */
 template <typename IC>
-inline typename type_from_x_iterator<
-    planar_frame_iterator<IC, quad_space> >::view_t
+inline typename type_from_iterator<
+    planar_frame_iterator<IC, quad_space> >::view
 planar_quad_view (std::size_t size, IC l, IC r, IC bl, IC br)
 {
-    typedef typename type_from_x_iterator<
-	planar_frame_iterator<IC, quad_space> >::view_t RView;
+    typedef typename type_from_iterator<
+	planar_frame_iterator<IC, quad_space> >::view RView;
 
     return RView (size, planar_frame_iterator<IC, quad_space> (l, r, bl, br));
 }

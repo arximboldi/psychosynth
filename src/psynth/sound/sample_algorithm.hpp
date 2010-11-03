@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-10-28 21:03:07 raskolnikov>
+ *  Time-stamp:  <2010-11-03 13:56:38 raskolnikov>
  *
  *  @file        sample_algorithm.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -83,21 +83,21 @@ struct sample_converter_unsigned_integral_nondivisible;
 
 template <typename UnsignedIntegralSample>
 struct unsigned_integral_max_value :
-	public mpl::integral_c<UnsignedIntegralSample, -1> {};
+	public boost::mpl::integral_c<UnsignedIntegralSample, -1> {};
 
 template <>
 struct unsigned_integral_max_value<uint8_t> :
-	public mpl::integral_c<uint32_t, 0xFF> {};
+	public boost::mpl::integral_c<uint32_t, 0xFF> {};
 template <>
 struct unsigned_integral_max_value<uint16_t> :
-	public mpl::integral_c<uint32_t, 0xFFFF> {};
+	public boost::mpl::integral_c<uint32_t, 0xFFFF> {};
 template <>
 struct unsigned_integral_max_value<uint32_t> :
-	public mpl::integral_c<uintmax_t, 0xFFFFFFFF> {};
+	public boost::mpl::integral_c<uintmax_t, 0xFFFFFFFF> {};
 
 template <int K>
 struct unsigned_integral_max_value<packed_sample_value<K> >
-    : public mpl::integral_c<
+    : public boost::mpl::integral_c<
     typename packed_sample_value<K>::integer_t, (1 << K) - 1> {};
 
 /**
@@ -107,11 +107,11 @@ struct unsigned_integral_max_value<packed_sample_value<K> >
 
 template <typename UnsignedIntegralSample>
 struct unsigned_integral_num_bits :
-	public mpl::int_<sizeof(UnsignedIntegralSample)*8> {};
+	public boost::mpl::int_<sizeof(UnsignedIntegralSample)*8> {};
 
 template <int K>
 struct unsigned_integral_num_bits<packed_sample_value<K> >
-    : public mpl::int_<K> {};
+    : public boost::mpl::int_<K> {};
 
 } /* namespace detail */
 
@@ -164,7 +164,8 @@ template <typename SrcSampleV, typename DstSampleV>
 struct sample_converter_unsigned
     : public detail::sample_converter_unsigned_impl<
     SrcSampleV, DstSampleV,
-    is_integral<SrcSampleV>::value,is_integral<DstSampleV>::value>
+    std::is_integral<SrcSampleV>::value,
+    std::is_integral<DstSampleV>::value>
 {};
 
 /** \brief Converting a sample to itself - identity operation */
@@ -210,7 +211,7 @@ private:
 template <typename SrcSampleV, typename DstSampleV> 
 struct sample_converter_unsigned_impl<SrcSampleV, DstSampleV, true, true>
     : public sample_converter_unsigned_integral<SrcSampleV, DstSampleV,
-    mpl::less<unsigned_integral_max_value<SrcSampleV>,
+    boost::mpl::less<unsigned_integral_max_value<SrcSampleV>,
 	      unsigned_integral_max_value<DstSampleV> >::value > {};
 
 
@@ -303,8 +304,8 @@ struct sample_converter_unsigned_integral_impl<SrcSampleV, DstSampleV,
     : public sample_converter_unsigned_integral_nondivisible<
     SrcSampleV, DstSampleV,
     SrcLessThanDst,
-    mpl::greater<
-        mpl::plus<unsigned_integral_num_bits<SrcSampleV>,
+    boost::mpl::greater<
+        boost::mpl::plus<unsigned_integral_num_bits<SrcSampleV>,
 		  unsigned_integral_num_bits<DstSampleV> >,
         unsigned_integral_num_bits<uintmax_t> >::value>
 {};
@@ -599,8 +600,7 @@ inline uint32_t div32768 (uint32_t in)
     bits8 mul = sample_multiply(x,y);
     assert(mul == 64);    // 64 = 128 * 128 / 255
     \endcode
-*
-/
+*/
 
 /** @{
 \brief This is the default implementation. Performance specializatons

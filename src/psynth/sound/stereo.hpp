@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-10-28 14:00:26 raskolnikov>
+ *  Time-stamp:  <2010-11-03 13:51:55 raskolnikov>
  *
  *  @file        stereo.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -58,13 +58,13 @@ struct right_channel {};
 /** \} */
 
 /** \ingroup ChannelSpaceModel */
-typedef mpl::vector3 <left_channel, right_channel> stereo_space;
+typedef boost::mpl::vector2 <left_channel, right_channel> stereo_space;
 
 /** \ingroup LayoutModel */
 typedef layout<stereo_space> stereo_layout;
 
 /** \ingroup LayoutModel */
-typedef layout<stereo_space, mpl::vector3_c<int, 1, 0> > rl_stereo_layout;
+typedef layout<stereo_space, boost::mpl::vector2_c<int, 1, 0> > rlstereo_layout;
 
 
 /**
@@ -73,13 +73,13 @@ typedef layout<stereo_space, mpl::vector3_c<int, 1, 0> > rl_stereo_layout;
 */
 template <typename IC>
 inline
-typename type_from_x_iterator<planar_frame_iterator<IC, stereo_space> >::view_t
+typename type_from_iterator<planar_frame_iterator<IC, stereo_space> >::view
 planar_stereo_view (std::size_t size,
 		    IC l, IC r,
 		    std::ptrdiff_t rowsize_in_bytes)
 {
-    typedef typename type_from_x_iterator<
-	planar_pixel_iterator<IC,rgb_t> >::view_t RView;
+    typedef typename type_from_iterator<
+	planar_frame_iterator<IC, stereo_space> >::view RView;
     return RView (size, planar_frame_iterator<IC, stereo_space> (l, r));
 }
 

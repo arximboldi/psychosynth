@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-02 11:48:53 raskolnikov>
+ *  Time-stamp:  <2010-11-03 14:54:13 raskolnikov>
  *
  *  @file        bit_aligned_frame_reference.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -70,7 +70,7 @@ template <int RangeSize, bool Mutable>
 class bit_range
 {
 public:
-    typedef typename mpl::if_c<Mutable,
+    typedef typename boost::mpl::if_c<Mutable,
 			       unsigned char,
 			       const unsigned char>::type byte_type;
     
@@ -183,7 +183,7 @@ public:
    // for red, 2 bits for green, 3 bits for blue)
    
    typedef const bit_aligned_frame_reference<
-       unsigned char, mpl::vector3_c<int,1,2,3>, rgb_layout, true>
+       unsigned char, boost::mpl::vector3_c<int,1,2,3>, rgb_layout, true>
    rgb123_ref_t;
 
    // create the frame reference at bit offset 2
@@ -215,13 +215,13 @@ template <typename BitField,
 struct bit_aligned_frame_reference
 {
     BOOST_STATIC_CONSTANT(
-	int, bit_size = (mpl::accumulate<SampleBitSizes, mpl::int_<0>,
-					 mpl::plus<mpl::_1, mpl::_2>
+	int, bit_size = (boost::mpl::accumulate<SampleBitSizes, boost::mpl::int_<0>,
+					 boost::mpl::plus<boost::mpl::_1, boost::mpl::_2>
 					 >::type::value));
     
     typedef psynth::sound::bit_range<bit_size, IsMutable> bit_range_type;
     typedef BitField  bitfield_type;
-    typedef typename mpl::if_c<IsMutable,
+    typedef typename boost::mpl::if_c<IsMutable,
 			       unsigned char*,
 			       const unsigned char*>::type data_ptr_type;
     typedef Layout layout;
@@ -267,8 +267,8 @@ struct bit_aligned_frame_reference
     
     template <typename BF, typename CR>
     bit_aligned_frame_reference (packed_frame<BF,CR,Layout>& p)
-	: _bit_range (static_cast<data_ptr_type>(&gil::at_c<0>( p)),
-		      gil::at_c<0> (p).first_bit ())
+	: _bit_range (static_cast<data_ptr_type>(&sound::at_c<0>( p)),
+		      sound::at_c<0> (p).first_bit ())
     {
         check_compatible<packed_frame<BF,CR,Layout> >();
     }
@@ -283,14 +283,14 @@ struct bit_aligned_frame_reference
     template <typename P>
     const bit_aligned_frame_reference& operator= (const P& p) const
     {
-	assign (p, mpl::bool_<is_frame<P>::value>());
+	assign (p, boost::mpl::bool_<is_frame<P>::value>());
 	return *this;
     } 
 
     template <typename P>
     bool operator== (const P& p) const
     {
-	return equal (p, mpl::bool_<is_frame<P>::value>());
+	return equal (p, boost::mpl::bool_<is_frame<P>::value>());
     }
     
     template <typename P>
@@ -312,19 +312,19 @@ private:
     template <typename Frame>
     static void check_compatible()
     {
-	psynth_function_requires<FramesCompatibleConcept<
+	base::psynth_function_requires<FramesCompatibleConcept<
 	    Frame, bit_aligned_frame_reference> >();
     }
 
     template <typename Frame>
-    void assign (const Frame& p, mpl::true_) const
+    void assign (const Frame& p, boost::mpl::true_) const
     {
 	check_compatible<Frame>();
 	static_copy (p, *this);
     }
     
     template <typename Frame>
-    bool equal (const Frame& p, mpl::true_) const
+    bool equal (const Frame& p, boost::mpl::true_) const
     {
 	check_compatible<Frame>();
 	return static_equal (*this, p);
@@ -332,23 +332,23 @@ private:
 
     static void check_mono ()
     {
-	BOOST_STATIC_ASSERT((is_same<
+	BOOST_STATIC_ASSERT((std::is_same<
 			     typename Layout::channel_space_type,
 			     mono_space>::value));
     }
     
     template <typename Sample>
-    void assign (const Sample& chan, mpl::false_) const
+    void assign (const Sample& chan, boost::mpl::false_) const
     {
 	check_mono ();
-	at_c<0>(*this) = chan;
+	sound::at_c<0>(*this) = chan;
     }
     
     template <typename Sample>
-    bool equal (const Sample& chan, mpl::false_) const
+    bool equal (const Sample& chan, boost::mpl::false_) const
     {
 	check_mono ();
-	return at_c<0>(*this)==chan;
+	return sound::at_c<0>(*this)==chan;
     }
 };
 
@@ -365,7 +365,7 @@ struct kth_element_type<bit_aligned_frame_reference<
 {
 public:
     typedef const packed_dynamic_sample_reference<
-    BitField, mpl::at_c<SampleBitSizes, K>::type::value, IsMutable> type;
+    BitField, boost::mpl::at_c<SampleBitSizes, K>::type::value, IsMutable> type;
 };
 
 template <typename B, typename C, typename L, bool M, int K>  
@@ -383,11 +383,11 @@ namespace detail
 // returns sum of IntegralVector[0] ... IntegralVector[K-1]
 template <typename IntegralVector, int K> 
 struct sum_k :
-	public mpl::plus<sum_k<IntegralVector, K-1>,
-			 typename mpl::at_c<IntegralVector, K-1>::type > {};
+	public boost::mpl::plus<sum_k<IntegralVector, K-1>,
+			 typename boost::mpl::at_c<IntegralVector, K-1>::type > {};
 
 template <typename IntegralVector>
-struct sum_k<IntegralVector, 0> : public mpl::int_<0> {};
+struct sum_k<IntegralVector, 0> : public boost::mpl::int_<0> {};
 
 } /* namespace detail */
 
@@ -419,7 +419,7 @@ at_c (const bit_aligned_frame_reference<BitField,SampleBitSizes,L,Mutable>& p)
    model of FrameConcept. Required by FrameConcept
 */
 template <typename B, typename C, typename L, bool M>  
-struct is_frame<bit_aligned_frame_reference<B,C,L,M> > : public mpl::true_{};
+struct is_frame<bit_aligned_frame_reference<B,C,L,M> > : public boost::mpl::true_{};
 
 /*
  *
@@ -430,17 +430,17 @@ struct is_frame<bit_aligned_frame_reference<B,C,L,M> > : public mpl::true_{};
 template <typename B, typename C, typename L, bool M>
 struct channel_space_type<bit_aligned_frame_reference<B,C,L,M> >
 {
-    typedef typename L::channel_space_type type;
+    typedef typename L::channel_space type;
 }; 
 
 template <typename B, typename C, typename L, bool M>
 struct sample_mapping_type<bit_aligned_frame_reference<B,C,L,M> >
 {
-    typedef typename L::sample_mapping_type type;
+    typedef typename L::sample_mapping type;
 }; 
 
 template <typename B, typename C, typename L, bool M>
-struct is_planar<bit_aligned_frame_reference<B,C,L,M> > : mpl::false_ {}; 
+struct is_planar<bit_aligned_frame_reference<B,C,L,M> > : boost::mpl::false_ {}; 
 
 
 /*
@@ -458,11 +458,11 @@ struct k_copies;
 
 template <typename T> struct k_copies<0,T>
 {
-    typedef mpl::vector0<> type;
+    typedef boost::mpl::vector0<> type;
 };
 
 template <unsigned K, typename T>
-struct k_copies : public mpl::push_back<typename k_copies<K-1,T>::type, T> {};
+struct k_copies : public boost::mpl::push_back<typename k_copies<K-1,T>::type, T> {};
 
 } /* namespace detail */
 
@@ -475,11 +475,11 @@ struct frame_reference_type<const packed_dynamic_sample_reference<
 				BitField,NumBits,false>, Layout, false, false>
 {
 private:
-    typedef typename mpl::size<typename Layout::channel_space_type>::type
+    typedef typename boost::mpl::size<typename Layout::channel_space_type>::type
     size_type;
 
     typedef typename detail::k_copies<
-	size_type::value, mpl::integral_c<unsigned,NumBits> >::type
+	size_type::value, boost::mpl::integral_c<unsigned,NumBits> >::type
     sample_bit_sizes_type;
 
 public:
@@ -497,11 +497,11 @@ struct frame_reference_type<const packed_dynamic_sample_reference<
 				BitField,NumBits,true>, Layout, false, true>
 {
 private:
-    typedef typename mpl::size<typename Layout::channel_space_type>::type
+    typedef typename boost::mpl::size<typename Layout::channel_space_type>::type
     size_type;
 
     typedef typename detail::k_copies<
-	size_type::value, mpl::integral_c<unsigned, NumBits> >::type
+	size_type::value, boost::mpl::integral_c<unsigned, NumBits> >::type
     sample_bit_sizes_type;
     
 public:

@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-10-29 12:07:03 raskolnikov>
+ *  Time-stamp:  <2010-11-03 13:40:36 raskolnikov>
  *
  *  @file        planar_frame_iterator.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -91,33 +91,34 @@ struct planar_frame_reference;
 */
 template <typename SamplePtr, typename ChannelSpace>
 struct planar_frame_iterator
-    : public iterator_facade<planar_frame_iterator<SamplePtr,ChannelSpace>,
-			     frame<typename std::iterator_traits<
-				       SamplePtr>::value_type,
-				   layout<ChannelSpace> >,
-			     std::random_access_iterator_tag,
-			     const planar_frame_reference<
-				 typename std::iterator_traits<
-				     SamplePtr>::reference,
-				 ChannelSpace> >
+    : public boost::iterator_facade<planar_frame_iterator<SamplePtr,ChannelSpace>,
+				    frame<typename std::iterator_traits<
+					      SamplePtr>::value_type,
+					  layout<ChannelSpace> >,
+				    std::random_access_iterator_tag,
+				    const planar_frame_reference<
+					typename std::iterator_traits<
+					    SamplePtr>::reference,
+					ChannelSpace> >
     , public detail::homogeneous_channel_base<SamplePtr,
 					      layout<ChannelSpace>,
-					      mpl::size<ChannelSpace>::value >
+					      boost::mpl::size<ChannelSpace>::value >
 {
 private:
     typedef
-    iterator_facade<planar_frame_iterator<SamplePtr,ChannelSpace>,
-		    frame<typename std::iterator_traits<SamplePtr>::value_type,
-			  layout<ChannelSpace> >,
-		    std::random_access_iterator_tag,
-		    const planar_frame_reference<
-			typename std::iterator_traits<SamplePtr>::reference,
-			ChannelSpace> >
+    boost::iterator_facade<
+    planar_frame_iterator<SamplePtr,ChannelSpace>,
+    frame<typename std::iterator_traits<SamplePtr>::value_type,
+	  layout<ChannelSpace> >,
+	      std::random_access_iterator_tag,
+	      const planar_frame_reference<
+		  typename std::iterator_traits<SamplePtr>::reference,
+		  ChannelSpace> >
     parent_type;
 
     typedef detail::homogeneous_channel_base<
 	SamplePtr, layout<ChannelSpace>,
-	mpl::size<ChannelSpace>::value>
+	boost::mpl::size<ChannelSpace>::value>
     channel_base_parent_type;
 
     typedef typename std::iterator_traits<SamplePtr>::value_type sample_type;
@@ -168,7 +169,7 @@ public:
     planar_frame_iterator(P* pix)
 	: channel_base_parent_type(pix, true)
     {
-        function_requires<FramesCompatibleConcept<P,value_type> >();
+	boost::function_requires<FramesCompatibleConcept<P,value_type> >();
     }
 
     struct address_of
@@ -263,9 +264,9 @@ namespace detail
 {
 
 template <typename IC>
-struct sample_iterator_is_mutable : public mpl::true_ {};
+struct sample_iterator_is_mutable : public boost::mpl::true_ {};
 template <typename T>
-struct sample_iterator_is_mutable<const T*> : public mpl::false_ {};
+struct sample_iterator_is_mutable<const T*> : public boost::mpl::false_ {};
 
 } /* namespace detail */
 
@@ -277,7 +278,7 @@ private:
 
 public:
     typedef
-    planar_frame_iterator<typename sample_typeraits<sample_type>::const_pointer,
+    planar_frame_iterator<typename sample_traits<sample_type>::const_pointer,
 			  C> type; 
 };
 
@@ -303,11 +304,11 @@ struct kth_element_type<planar_frame_iterator<IC, C>, K>
 
 template <typename IC, typename C, int K>  
 struct kth_element_reference_type<planar_frame_iterator<IC,C>, K> :
-    public add_reference<IC> {};
+    public boost::add_reference<IC> {};
 
 template <typename IC, typename C, int K>  
 struct kth_element_const_reference_type<planar_frame_iterator<IC, C>, K> :
-    public add_reference<typename add_const<IC>::type> {};
+    public boost::add_reference<typename std::add_const<IC>::type> {};
 
 
 /*
@@ -328,7 +329,7 @@ struct sample_mapping_type<planar_frame_iterator<IC,C> > :
     typename planar_frame_iterator<IC,C>::value_type> {};
 
 template <typename IC, typename C>
-struct is_planar<planar_frame_iterator<IC,C> > : public mpl::true_ {};
+struct is_planar<planar_frame_iterator<IC,C> > : public boost::mpl::true_ {};
 
 template <typename IC, typename C>
 struct sample_type<planar_frame_iterator<IC,C> >
