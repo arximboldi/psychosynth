@@ -23,6 +23,11 @@ processing. The changes include:
 - removed position_iterator, locator, virtual_locator, point2d
 - TODO: position_iterator can inspire time handling!!!
 - TODO: implement virtual_iterator from virtual_locator?
+- For the dynamic_image we do: any_* => dynamic_*
+    - Importamos todo en el raiz y los ficheros que se llaman igual
+      que otros les ponemos dynamic_* en el nombre. 
+    - We import everything in the root of psynth::sound and the files
+      that are named like another are prepended dynamic_*
 
 Please, remember to check diffs between GIL releases to fix bugs and
 add functionallity to our version.
