@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-03 00:53:11 raskolnikov>
+ *  Time-stamp:  <2010-11-03 02:28:16 raskolnikov>
  *
  *  @file        logger.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -29,8 +29,8 @@
  *
  */
 
-#ifndef PSYNTH_LOGGER_H
-#define PSYNTH_LOGGER_H
+#ifndef PSYNTH_BASE_LOGGER_H
+#define PSYNTH_BASE_LOGGER_H
 
 #include <map>
 #include <list>
@@ -46,16 +46,6 @@ namespace psynth
 {
 namespace base
 {
-
-/**
- * Type for the end message constant;
- */
-struct log_msg_type {};
-
-/**
- * Use to send a message through a log_stream_adapter
- */
-const log_msg_type log_msg = {};
 
 /**
  * A iostreams alike adapter for a log.
@@ -76,6 +66,9 @@ public:
     /** Sets the level. */
     void set_level (int level)
     { _level = level; } 
+
+    /** Sends the message. */
+    inline void flush ();
     
 private:
     log&               _log;
@@ -84,8 +77,19 @@ private:
 
     template <typename T>
     friend log_stream_adapter& operator<< (log_stream_adapter&, const T&);
-    friend log_stream_adapter& operator<< (log_stream_adapter&, log_msg_type);
+    template <typename T>
+    friend log_stream_adapter& operator<< (
+	log_stream_adapter&, log_stream_adapter&(*)(log_stream_adapter&));
 };
+
+/**
+ * Manipulator for flushing the stream.
+ */
+inline log_stream_adapter& flush (log_stream_adapter& s)
+{
+    s.flush ();
+    return s;
+}
 
 /**
  * This allow to wrap the log_stream_adapter into a wrapper that
@@ -96,34 +100,31 @@ class log_stream_adapter_wrapper : public boost::noncopyable
 public:
     /** Constructor */
     log_stream_adapter_wrapper (log_stream_adapter& s)
-	: _stream (s)
-	, _last (false)
+	: _stream (&s)
     {}
 
     /** Move constructor */
     log_stream_adapter_wrapper (log_stream_adapter_wrapper&& s)
 	: _stream (s._stream)
-	, _last (true)
     {
-	s._last = false;
+	s._stream = 0;
     }
 
     /** Destructor. Flushes message. */
     ~log_stream_adapter_wrapper ()
     {
-	if (_last)
-	    _stream << log_msg;
+	if (_stream)
+	    *_stream << flush;
     }
 
     /** Returns the wrapped object. */
     log_stream_adapter& wrapped ()
     {
-	return _stream;
+	return *_stream;
     }
     
 private:
-    log_stream_adapter& _stream;
-    bool                _last;
+    log_stream_adapter* _stream;
 };
 
 template<typename T> inline
@@ -382,11 +383,9 @@ private:
     std::ofstream _file;
 };
 
-inline
-log_stream_adapter& operator<< (log_stream_adapter& s, log_msg_type)
+void log_stream_adapter::flush ()
 {
-    s._log (s._level, s._str.str ());
-    return s;
+    _log (_level, _str.str ());
 }
 
 inline
@@ -426,4 +425,4 @@ log_stream_adapter::~log_stream_adapter ()
 } /* namespace base */
 } /* namespace psynth */
 
-#endif /* PSYNTH_LOGGER_H */
+#endif /* PSYNTH_BASE_LOGGER_H */

@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-03 00:16:53 raskolnikov>
+ *  Time-stamp:  <2010-11-03 02:28:37 raskolnikov>
  *
  *  @file        config.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -27,8 +27,8 @@
  *
  */
 
-#ifndef PSYNTH_CONFIG_H
-#define PSYNTH_CONFIG_H
+#ifndef PSYNTH_BASE_CONFIG_H
+#define PSYNTH_BASE_CONFIG_H
 
 #include <list>
 #include <map>
@@ -355,4 +355,4 @@ void conf_node::set (const T& val, bool overwrite)
 } /* namespace base */
 } /* namespace psynth */
 
-#endif /* PSYNTH_CONFIG_H */
+#endif /* PSYNTH_BASE_CONFIG_H */
