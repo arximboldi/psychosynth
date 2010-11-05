@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-03 14:37:46 raskolnikov>
+ *  Time-stamp:  <2010-11-05 12:01:57 raskolnikov>
  *
  *  @file        channel_base_algorithm.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -198,7 +198,7 @@ struct kth_semantic_element_const_reference_type
 */
 template <int K, typename ChannelBase> inline
 typename boost::disable_if<
-    std::is_const<ChannelBase>,
+    boost::is_const<ChannelBase>,
     typename kth_semantic_element_reference_type<ChannelBase,K>::type>::type
 semantic_at_c (ChannelBase& p)
 { 
@@ -723,7 +723,7 @@ PSYNTH_FORCEINLINE
 typename element_reference_type<P>::type       static_min (P& p)
 { return detail::min_max_recur<size<P>::value>::min_(p); }
 
-/// \}
+/** \} */
 
 /**
    \defgroup ChannelBaseAlgorithmEqual static_equal 
@@ -747,7 +747,7 @@ PSYNTH_FORCEINLINE
 bool static_equal (const P1& p1, const P2& p2)
 { return detail::element_recursion<size<P1>::value>::static_equal(p1,p2); }
 
-/// \}
+/** \} */
 
 /**
    \defgroup ChannelBaseAlgorithmCopy static_copy 
@@ -771,7 +771,7 @@ PSYNTH_FORCEINLINE
 void static_copy(const Src& src, Dst& dst)
 {  detail::element_recursion<size<Dst>::value>::static_copy(src,dst); }
 
-/// \}
+/** \} */
 
 /**
    \defgroup ChannelBaseAlgorithmFill static_fill 
@@ -790,7 +790,7 @@ template <typename P,typename V>
 PSYNTH_FORCEINLINE
 void static_fill (P& p, const V& v)
 {  detail::element_recursion<size<P>::value>::static_fill(p,v); }
-/// \}
+/** \} */
 
 /**
    \defgroup ChannelBaseAlgorithmGenerate static_generate 
@@ -1028,8 +1028,7 @@ Op static_for_each(const P1& p1,const P2& p2,const P3& p3,Op op)
 { return detail::element_recursion<size<P1>::value>::static_for_each (
 	p1,p2,p3,op);
 }
-
-///\}
+/** \} */
 
 } /* namespace sound */
 } /* namespace psynth */

@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-03 14:57:01 raskolnikov>
+ *  Time-stamp:  <2010-11-05 12:07:01 raskolnikov>
  *
  *  @file        concept.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -105,7 +105,7 @@ typename boost::add_reference<E>::type at_c (
     detail::homogeneous_channel_base<E,L,N>& p);
 
 template <int K, typename E, typename L, int N>
-typename boost::add_reference<typename std::add_const<E>::type>::type at_c (
+typename boost::add_reference<typename boost::add_const<E>::type>::type at_c (
     const detail::homogeneous_channel_base<E,L,N>& p);
 
 #if !defined(_MSC_VER)  || _MSC_VER > 1310
@@ -130,7 +130,7 @@ at_c(const bit_aligned_frame_reference<B,C,L,M>& p);
 /* Forward-declare semantic_at_c */
 template <int K, typename ChannelBase>
 typename boost::disable_if<
-    std::is_const<ChannelBase>,
+    boost::is_const<ChannelBase>,
     typename kth_semantic_element_reference_type<ChannelBase,K>::type>::type
 semantic_at_c (ChannelBase& p);
 
@@ -148,7 +148,7 @@ void initialize_it (T& x) {}
 
 template <typename T>
 struct remove_const_and_reference :
-	public std::remove_const<typename std::remove_reference<T>::type> {};
+	public boost::remove_const<typename boost::remove_reference<T>::type> {};
 
 
 /*
@@ -229,7 +229,7 @@ struct ChannelSpaceConcept
 template <typename ChannelSpace1, typename ChannelSpace2>
 // Models ChannelSpaceConcept
 struct channel_spaces_are_compatible :
-    public std::is_same<ChannelSpace1, ChannelSpace2> {};
+    public boost::is_same<ChannelSpace1, ChannelSpace2> {};
 
 /**
    \brief Two channel spaces are compatible if they are the same
@@ -413,8 +413,8 @@ BOOST_STATIC_ASSERT((samples_are_compatible<bits8, const bits8&>::value));
 */
 template <typename T1, typename T2>  // Models GIL Frame
 struct samples_are_compatible 
-    : public std::is_same<typename sample_traits<T1>::value_type,
-			  typename sample_traits<T2>::value_type> {};
+    : public boost::is_same<typename sample_traits<T1>::value_type,
+			    typename sample_traits<T2>::value_type> {};
 
 /**
    \brief Samples are compatible if their associated value types
@@ -654,7 +654,8 @@ struct HomogeneousChannelBaseConcept
         typedef typename kth_element_type<ChannelBase,0>::type T0; 
         typedef typename kth_element_type<ChannelBase,num_elements-1>::type TN; 
 
-        BOOST_STATIC_ASSERT((std::is_same<T0,TN>::value));   // better than nothing
+        BOOST_STATIC_ASSERT((boost::is_same<T0,TN>::value));
+	// better than nothing
         typedef typename kth_element_const_reference_type<
 	    ChannelBase,0>::type CRef0; 
         CRef0 e0=dynamic_at_c(cb,0);
@@ -738,8 +739,8 @@ struct ChannelBasesCompatibleConcept
 {
     void constraints() {
         BOOST_STATIC_ASSERT(
-	    (std::is_same<typename ChannelBase1::layout_t::channel_space_t, 
-	     typename ChannelBase2::layout_t::channel_space_t>::value));
+	    (boost::is_same<typename ChannelBase1::layout_type::channel_space, 
+	     typename ChannelBase2::layout_type::channel_space>::value));
 //        typedef typename kth_semantic_element_type<ChannelBase1,0>::type e1;
 //        typedef typename kth_semantic_element_type<ChannelBase2,0>::type e2;
 //        "e1 is convertible to e2"
@@ -981,7 +982,7 @@ struct HomogeneousFrameValueConcept
     void constraints() {
         base::psynth_function_requires<HomogeneousFrameConcept<P> >();
         base::psynth_function_requires<base::Regular<P> >();
-        BOOST_STATIC_ASSERT((std::is_same<P, typename P::value_type>::value));
+        BOOST_STATIC_ASSERT((boost::is_same<P, typename P::value_type>::value));
     }
 };
 
@@ -1140,7 +1141,7 @@ template <typename P>
 struct FrameDereferenceAdaptorArchetype : public std::unary_function<P, P>
 {
     typedef FrameDereferenceAdaptorArchetype const_t;
-    typedef typename std::remove_reference<P>::type value_type;
+    typedef typename boost::remove_reference<P>::type value_type;
     typedef typename boost::add_reference<P>::type reference;
     typedef reference const_reference;
     static const bool is_mutable=false;
@@ -1255,7 +1256,7 @@ namespace detail
 	{
             base::psynth_function_requires<
 		detail::RandomAccessIteratorIsMutableConcept<Iterator> >();
-            typedef typename std::remove_reference<
+            typedef typename boost::remove_reference<
 		typename std::iterator_traits<Iterator>::reference>::type ref;
             typedef typename element_type<ref>::type sample_t;
             base::psynth_function_requires<detail::SampleIsMutableConcept<sample_t> >();

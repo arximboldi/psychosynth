@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-03 13:52:07 raskolnikov>
+ *  Time-stamp:  <2010-11-04 13:08:19 raskolnikov>
  *
  *  @file        typedefs.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -121,7 +121,7 @@ struct float_one;
 typedef scoped_sample_value<
     float, float_zero, float_one, float_half> bits32f;
 typedef scoped_sample_value<
-    float, float_minus_one, float_one, float_zero> bits32fs;
+    float, float_minus_one, float_one, float_zero> bits32sf;
 typedef uint8_t  bits8;
 typedef uint16_t bits16;
 typedef uint32_t bits32;
@@ -136,7 +136,7 @@ PSYNTH_SOUND_DEFINE_BASE_TYPEDEFS(16s,  mono)
 PSYNTH_SOUND_DEFINE_BASE_TYPEDEFS(32 ,  mono)
 PSYNTH_SOUND_DEFINE_BASE_TYPEDEFS(32s,  mono)
 PSYNTH_SOUND_DEFINE_BASE_TYPEDEFS(32f,  mono)
-PSYNTH_SOUND_DEFINE_BASE_TYPEDEFS(32fs, mono)
+PSYNTH_SOUND_DEFINE_BASE_TYPEDEFS(32sf, mono)
 PSYNTH_SOUND_DEFINE_BASE_TYPEDEFS(8,    stereo)
 PSYNTH_SOUND_DEFINE_BASE_TYPEDEFS(8s,   stereo)
 PSYNTH_SOUND_DEFINE_BASE_TYPEDEFS(16,   stereo)
@@ -144,7 +144,7 @@ PSYNTH_SOUND_DEFINE_BASE_TYPEDEFS(16s,  stereo)
 PSYNTH_SOUND_DEFINE_BASE_TYPEDEFS(32 ,  stereo)
 PSYNTH_SOUND_DEFINE_BASE_TYPEDEFS(32s,  stereo)
 PSYNTH_SOUND_DEFINE_BASE_TYPEDEFS(32f,  stereo)
-PSYNTH_SOUND_DEFINE_BASE_TYPEDEFS(32fs, stereo)
+PSYNTH_SOUND_DEFINE_BASE_TYPEDEFS(32sf, stereo)
 PSYNTH_SOUND_DEFINE_BASE_TYPEDEFS(8,    rlstereo)
 PSYNTH_SOUND_DEFINE_BASE_TYPEDEFS(8s,   rlstereo)
 PSYNTH_SOUND_DEFINE_BASE_TYPEDEFS(16,   rlstereo)
@@ -152,7 +152,7 @@ PSYNTH_SOUND_DEFINE_BASE_TYPEDEFS(16s,  rlstereo)
 PSYNTH_SOUND_DEFINE_BASE_TYPEDEFS(32 ,  rlstereo)
 PSYNTH_SOUND_DEFINE_BASE_TYPEDEFS(32s,  rlstereo)
 PSYNTH_SOUND_DEFINE_BASE_TYPEDEFS(32f,  rlstereo)
-PSYNTH_SOUND_DEFINE_BASE_TYPEDEFS(32fs, rlstereo)
+PSYNTH_SOUND_DEFINE_BASE_TYPEDEFS(32sf, rlstereo)
 PSYNTH_SOUND_DEFINE_BASE_TYPEDEFS(8,    quad)
 PSYNTH_SOUND_DEFINE_BASE_TYPEDEFS(8s,   quad)
 PSYNTH_SOUND_DEFINE_BASE_TYPEDEFS(16,   quad)
@@ -160,7 +160,7 @@ PSYNTH_SOUND_DEFINE_BASE_TYPEDEFS(16s,  quad)
 PSYNTH_SOUND_DEFINE_BASE_TYPEDEFS(32,   quad)
 PSYNTH_SOUND_DEFINE_BASE_TYPEDEFS(32s,  quad)
 PSYNTH_SOUND_DEFINE_BASE_TYPEDEFS(32f,  quad)
-PSYNTH_SOUND_DEFINE_BASE_TYPEDEFS(32fs, quad)
+PSYNTH_SOUND_DEFINE_BASE_TYPEDEFS(32sf, quad)
 PSYNTH_SOUND_DEFINE_BASE_TYPEDEFS(8,    surround)
 PSYNTH_SOUND_DEFINE_BASE_TYPEDEFS(8s,   surround)
 PSYNTH_SOUND_DEFINE_BASE_TYPEDEFS(16,   surround)
@@ -168,7 +168,7 @@ PSYNTH_SOUND_DEFINE_BASE_TYPEDEFS(16s,  surround)
 PSYNTH_SOUND_DEFINE_BASE_TYPEDEFS(32 ,  surround)
 PSYNTH_SOUND_DEFINE_BASE_TYPEDEFS(32s,  surround)
 PSYNTH_SOUND_DEFINE_BASE_TYPEDEFS(32f,  surround)
-PSYNTH_SOUND_DEFINE_BASE_TYPEDEFS(32fs, surround)
+PSYNTH_SOUND_DEFINE_BASE_TYPEDEFS(32sf, surround)
 
 PSYNTH_SOUND_DEFINE_ALL_TYPEDEFS(8,    stereo)
 PSYNTH_SOUND_DEFINE_ALL_TYPEDEFS(8s,   stereo)
@@ -177,7 +177,7 @@ PSYNTH_SOUND_DEFINE_ALL_TYPEDEFS(16s,  stereo)
 PSYNTH_SOUND_DEFINE_ALL_TYPEDEFS(32 ,  stereo)
 PSYNTH_SOUND_DEFINE_ALL_TYPEDEFS(32s,  stereo)
 PSYNTH_SOUND_DEFINE_ALL_TYPEDEFS(32f,  stereo)
-PSYNTH_SOUND_DEFINE_ALL_TYPEDEFS(32fs, stereo)
+PSYNTH_SOUND_DEFINE_ALL_TYPEDEFS(32sf, stereo)
 PSYNTH_SOUND_DEFINE_ALL_TYPEDEFS(8,    quad)
 PSYNTH_SOUND_DEFINE_ALL_TYPEDEFS(8s,   quad)
 PSYNTH_SOUND_DEFINE_ALL_TYPEDEFS(16,   quad)
@@ -185,7 +185,7 @@ PSYNTH_SOUND_DEFINE_ALL_TYPEDEFS(16s,  quad)
 PSYNTH_SOUND_DEFINE_ALL_TYPEDEFS(32 ,  quad)
 PSYNTH_SOUND_DEFINE_ALL_TYPEDEFS(32s,  quad)
 PSYNTH_SOUND_DEFINE_ALL_TYPEDEFS(32f,  quad)
-PSYNTH_SOUND_DEFINE_ALL_TYPEDEFS(32fs, quad)
+PSYNTH_SOUND_DEFINE_ALL_TYPEDEFS(32sf, quad)
 PSYNTH_SOUND_DEFINE_ALL_TYPEDEFS(8,    surround)
 PSYNTH_SOUND_DEFINE_ALL_TYPEDEFS(8s,   surround)
 PSYNTH_SOUND_DEFINE_ALL_TYPEDEFS(16,   surround)
@@ -193,7 +193,7 @@ PSYNTH_SOUND_DEFINE_ALL_TYPEDEFS(16s,  surround)
 PSYNTH_SOUND_DEFINE_ALL_TYPEDEFS(32 ,  surround)
 PSYNTH_SOUND_DEFINE_ALL_TYPEDEFS(32s,  surround)
 PSYNTH_SOUND_DEFINE_ALL_TYPEDEFS(32f,  surround)
-PSYNTH_SOUND_DEFINE_ALL_TYPEDEFS(32fs, surround)
+PSYNTH_SOUND_DEFINE_ALL_TYPEDEFS(32sf, surround)
 
 
 template <int N> struct devicen_space;
@@ -205,7 +205,7 @@ PSYNTH_SOUND_DEFINE_ALL_TYPEDEFS_INTERNAL(16s,  dev2n, devicen_space<2>, devicen
 PSYNTH_SOUND_DEFINE_ALL_TYPEDEFS_INTERNAL(32 ,  dev2n, devicen_space<2>, devicen_layout<2>)
 PSYNTH_SOUND_DEFINE_ALL_TYPEDEFS_INTERNAL(32s,  dev2n, devicen_space<2>, devicen_layout<2>)
 PSYNTH_SOUND_DEFINE_ALL_TYPEDEFS_INTERNAL(32f,  dev2n, devicen_space<2>, devicen_layout<2>)
-PSYNTH_SOUND_DEFINE_ALL_TYPEDEFS_INTERNAL(32fs,  dev2n, devicen_space<2>, devicen_layout<2>)
+PSYNTH_SOUND_DEFINE_ALL_TYPEDEFS_INTERNAL(32sf,  dev2n, devicen_space<2>, devicen_layout<2>)
 
 PSYNTH_SOUND_DEFINE_ALL_TYPEDEFS_INTERNAL(8,    dev3n, devicen_space<3>, devicen_layout<3>)
 PSYNTH_SOUND_DEFINE_ALL_TYPEDEFS_INTERNAL(8s,   dev3n, devicen_space<3>, devicen_layout<3>)
@@ -214,7 +214,7 @@ PSYNTH_SOUND_DEFINE_ALL_TYPEDEFS_INTERNAL(16s,  dev3n, devicen_space<3>, devicen
 PSYNTH_SOUND_DEFINE_ALL_TYPEDEFS_INTERNAL(32 ,  dev3n, devicen_space<3>, devicen_layout<3>)
 PSYNTH_SOUND_DEFINE_ALL_TYPEDEFS_INTERNAL(32s,  dev3n, devicen_space<3>, devicen_layout<3>)
 PSYNTH_SOUND_DEFINE_ALL_TYPEDEFS_INTERNAL(32f,  dev3n, devicen_space<3>, devicen_layout<3>)
-PSYNTH_SOUND_DEFINE_ALL_TYPEDEFS_INTERNAL(32fs,  dev3n, devicen_space<3>, devicen_layout<3>)
+PSYNTH_SOUND_DEFINE_ALL_TYPEDEFS_INTERNAL(32sf,  dev3n, devicen_space<3>, devicen_layout<3>)
 
 PSYNTH_SOUND_DEFINE_ALL_TYPEDEFS_INTERNAL(8,    dev4n, devicen_space<4>, devicen_layout<4>)
 PSYNTH_SOUND_DEFINE_ALL_TYPEDEFS_INTERNAL(8s,   dev4n, devicen_space<4>, devicen_layout<4>)
@@ -223,7 +223,7 @@ PSYNTH_SOUND_DEFINE_ALL_TYPEDEFS_INTERNAL(16s,  dev4n, devicen_space<4>, devicen
 PSYNTH_SOUND_DEFINE_ALL_TYPEDEFS_INTERNAL(32 ,  dev4n, devicen_space<4>, devicen_layout<4>)
 PSYNTH_SOUND_DEFINE_ALL_TYPEDEFS_INTERNAL(32s,  dev4n, devicen_space<4>, devicen_layout<4>)
 PSYNTH_SOUND_DEFINE_ALL_TYPEDEFS_INTERNAL(32f,  dev4n, devicen_space<4>, devicen_layout<4>)
-PSYNTH_SOUND_DEFINE_ALL_TYPEDEFS_INTERNAL(32fs,  dev4n, devicen_space<4>, devicen_layout<4>)
+PSYNTH_SOUND_DEFINE_ALL_TYPEDEFS_INTERNAL(32sf,  dev4n, devicen_space<4>, devicen_layout<4>)
 
 PSYNTH_SOUND_DEFINE_ALL_TYPEDEFS_INTERNAL(8,    dev5n, devicen_space<5>, devicen_layout<5>)
 PSYNTH_SOUND_DEFINE_ALL_TYPEDEFS_INTERNAL(8s,   dev5n, devicen_space<5>, devicen_layout<5>)
@@ -232,7 +232,7 @@ PSYNTH_SOUND_DEFINE_ALL_TYPEDEFS_INTERNAL(16s,  dev5n, devicen_space<5>, devicen
 PSYNTH_SOUND_DEFINE_ALL_TYPEDEFS_INTERNAL(32 ,  dev5n, devicen_space<5>, devicen_layout<5>)
 PSYNTH_SOUND_DEFINE_ALL_TYPEDEFS_INTERNAL(32s,  dev5n, devicen_space<5>, devicen_layout<5>)
 PSYNTH_SOUND_DEFINE_ALL_TYPEDEFS_INTERNAL(32f,  dev5n, devicen_space<5>, devicen_layout<5>)
-PSYNTH_SOUND_DEFINE_ALL_TYPEDEFS_INTERNAL(32fs,  dev5n, devicen_space<5>, devicen_layout<5>)
+PSYNTH_SOUND_DEFINE_ALL_TYPEDEFS_INTERNAL(32sf,  dev5n, devicen_space<5>, devicen_layout<5>)
 
 } /* namespace sound */
 } /* namespace psynth */

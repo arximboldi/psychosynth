@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-03 15:16:04 raskolnikov>
+ *  Time-stamp:  <2010-11-04 14:51:59 raskolnikov>
  *
  *  @file        frame.cpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -394,7 +394,7 @@ BOOST_AUTO_TEST_CASE (test_packed_frame_1)
 
     typedef stereo11_ref::value_type stereo11_frame;
 
-    stereo11_frame p11;
+    stereo11_frame p11 (0);
     do_basic_test <reference_core<rlstereo11_ref, 0>,
 		   reference_core<stereo11_ref, 1> >(p11).test_heterogeneous();
     do_basic_test<value_core<stereo11_frame, 0>,

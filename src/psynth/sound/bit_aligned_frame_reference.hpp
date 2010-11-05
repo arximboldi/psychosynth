@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-03 14:54:13 raskolnikov>
+ *  Time-stamp:  <2010-11-05 12:09:05 raskolnikov>
  *
  *  @file        bit_aligned_frame_reference.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -332,7 +332,7 @@ private:
 
     static void check_mono ()
     {
-	BOOST_STATIC_ASSERT((std::is_same<
+	BOOST_STATIC_ASSERT((boost::is_same<
 			     typename Layout::channel_space_type,
 			     mono_space>::value));
     }
@@ -475,7 +475,7 @@ struct frame_reference_type<const packed_dynamic_sample_reference<
 				BitField,NumBits,false>, Layout, false, false>
 {
 private:
-    typedef typename boost::mpl::size<typename Layout::channel_space_type>::type
+    typedef typename boost::mpl::size<typename Layout::channel_space>::type
     size_type;
 
     typedef typename detail::k_copies<
@@ -497,7 +497,7 @@ struct frame_reference_type<const packed_dynamic_sample_reference<
 				BitField,NumBits,true>, Layout, false, true>
 {
 private:
-    typedef typename boost::mpl::size<typename Layout::channel_space_type>::type
+    typedef typename boost::mpl::size<typename Layout::channel_space>::type
     size_type;
 
     typedef typename detail::k_copies<

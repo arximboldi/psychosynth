@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-03 14:20:31 raskolnikov>
+ *  Time-stamp:  <2010-11-05 12:04:58 raskolnikov>
  *
  *  @file        frame.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -43,7 +43,6 @@
 #include <boost/utility/enable_if.hpp>
 #include <boost/mpl/bool.hpp>
 #include <boost/mpl/front.hpp>
-#include <boost/type_traits.hpp>
 
 #include <psynth/base/compat.hpp>
 #include <psynth/sound/channel_base.hpp>
@@ -274,7 +273,7 @@ private:
     static void check_mono()
     {
 	BOOST_STATIC_ASSERT(
-	    (std::is_same<typename Layout::channel_space, mono_space>::value));
+	    (boost::is_same<typename Layout::channel_space, mono_space>::value));
     }
     
     template <typename Sample>

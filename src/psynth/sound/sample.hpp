@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-03 13:57:46 raskolnikov>
+ *  Time-stamp:  <2010-11-05 13:39:47 raskolnikov>
  *
  *  @file        sample.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -136,7 +136,7 @@ struct sample_traits {
 */
 template <typename T>
 struct sample_traits :
-	public detail::sample_traits_impl<T, std::is_class<T>::value> {};
+	public detail::sample_traits_impl<T, boost::is_class<T>::value> {};
 
 // Sample traits for C++ reference type - remove the reference
 template <typename T>
@@ -198,10 +198,11 @@ struct scoped_sample_value
     typedef value_type*            pointer;
     typedef const value_type&      const_reference;
     typedef const value_type*      const_pointer;
+    
     BOOST_STATIC_CONSTANT(bool, is_mutable =
 			  sample_traits<BaseSampleValue>::is_mutable);
 
-    typedef BaseSampleValue base_sample_t;
+    typedef BaseSampleValue base_sample;
 
     static value_type min_value () { return MinVal::apply (); }
     static value_type max_value () { return MaxVal::apply (); }
@@ -1018,13 +1019,14 @@ typedef boost::int32_t  bits32s;
 typedef scoped_sample_value<float, float_zero, float_one, float_half> bits32f;
 
 /**
-   \defgroup bits32fs bits32fs
+   \defgroup bits32sf bits32sf
    \ingroup SampleModel
    \brief 32-bit floating point sample type with range [-1.0f
    ... 1.0f]. Models SampleValueConcept
    \ingroup bits32fs
 */
-typedef scoped_sample_value<float, float_minus_one, float_one, float_zero> bits32fs;
+typedef scoped_sample_value<float, float_minus_one, float_one, float_zero>
+bits32sf;
 
 } /* namespace sound */
 } /* namespace psynth */

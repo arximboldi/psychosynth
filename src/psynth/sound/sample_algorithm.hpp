@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-03 13:56:38 raskolnikov>
+ *  Time-stamp:  <2010-11-05 12:04:25 raskolnikov>
  *
  *  @file        sample_algorithm.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -164,8 +164,8 @@ template <typename SrcSampleV, typename DstSampleV>
 struct sample_converter_unsigned
     : public detail::sample_converter_unsigned_impl<
     SrcSampleV, DstSampleV,
-    std::is_integral<SrcSampleV>::value,
-    std::is_integral<DstSampleV>::value>
+    boost::is_integral<SrcSampleV>::value,
+    boost::is_integral<DstSampleV>::value>
 {};
 
 /** \brief Converting a sample to itself - identity operation */
@@ -440,7 +440,7 @@ template <> struct sample_converter_unsigned<bits32f, bits32> :
     }
 };
 
-/// @} 
+/** @} */
 
 namespace detail
 {

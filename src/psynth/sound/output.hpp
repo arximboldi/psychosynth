@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-03 14:54:11 raskolnikov>
+ *  Time-stamp:  <2010-11-05 12:26:03 raskolnikov>
  *
  *  @file        output.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -40,10 +40,13 @@ namespace sound
 
 template<typename S, typename L> struct frame;
 template<typename S, typename L> struct planar_frame_reference;
+template<typename S, typename L> struct planar_frame_iterator;
 template<typename P, typename C, typename L>
 struct packed_frame;
 template <typename B, typename C, typename L, bool M>
 struct bit_aligned_frame_reference;
+template <typename Ref>
+struct bit_aligned_frame_iterator;
 
 template <typename S, typename L>
 std::ostream& operator<< (std::ostream& os, const frame<S, L>& f)
@@ -60,6 +63,14 @@ std::ostream& operator<< (std::ostream& os,
     return os;
 }
 
+template <typename Ref>
+std::ostream& operator<< (std::ostream& os,
+			  const bit_aligned_frame_iterator<Ref>& f)
+{
+    os << "[bit_aligned_frame_iterator]";
+    return os;
+}
+
 template <typename P, typename C, typename L>
 std::ostream& operator<< (std::ostream& os,
 			  const packed_frame<P, C, L>& f)
@@ -73,6 +84,15 @@ std::ostream& operator<< (std::ostream& os,
 			  const planar_frame_reference<S, L>& f)
 {
     os << "[planar_frame_reference]";
+    return os;
+}
+
+
+template <typename S, typename L>
+std::ostream& operator<< (std::ostream& os,
+			  const planar_frame_iterator<S, L>& f)
+{
+    os << "[planar_frame_iterator]";
     return os;
 }
 

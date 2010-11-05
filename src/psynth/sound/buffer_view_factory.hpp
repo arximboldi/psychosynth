@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-10-29 13:50:49 raskolnikov>
+ *  Time-stamp:  <2010-11-05 12:08:26 raskolnikov>
  *
  *  @file        buffer_view_factory.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -7,7 +7,7 @@
  *
  *  View factories.  Methods for creating shallow image views from raw
  *  pixel data or from other image views - flipping horizontally or
- *  vertically, axis-aligned rotation, a subimage, subsampled or n-th
+ *  vertically, axis-aligned rotation, a subimage, sub_sampled or n-th
  *  channel image view. Derived image views are shallow copies and are
  *  fast to construct.
  */
@@ -79,7 +79,7 @@ template <typename T> struct transposed_type;
    \brief Constructing buffer views from raw interleaved frame data
 */
 template <typename Iterator>
-typename type_from_iterator<Iterator>::view;
+typename type_from_iterator<Iterator>::view
 interleaved_view (std::size_t size, Iterator frames)
 {
     typedef typename type_from_iterator<Iterator>::view RView;
@@ -188,7 +188,7 @@ struct channel_converted_view_type_impl
 {
 private:
     typedef channel_convert_deref_fn<
-    typename SrcView::const_t::reference,DstP,CC> deref_t;
+    typename SrcView::const_type::reference,DstP,CC> deref_t;
     typedef typename SrcView::template add_deref<deref_t> add_ref_t;
     
 public:
@@ -225,7 +225,7 @@ struct channel_converted_view_type :
 						    DstP,
 						    typename SrcView::value_type>
 {
-    GIL_CLASS_REQUIRE(DstP, psynth::sound, MutableFrameConcept)
+    PSYNTH_CLASS_REQUIRE(DstP, psynth::sound, MutableFrameConcept)
     // Why does it have to be mutable???
 };
 
@@ -263,10 +263,10 @@ channel_converted_view(const View& src)
    \ingroup BufferViewTransformationsFlipLR
 */
 template <typename View> 
-inline typename dynamic_step_type<View>::type flipped_view(const View& src)
+inline typename dynamic_step_type<View>::type flipped_view (const View& src)
 {
     typedef typename dynamic_step_type<View>::type RView;
-    return RView (src.size (), typename RView::iterator (src.end () - 1, -1));
+    return RView (src.size (), make_step_iterator (src.end () - 1, -1));
 }
 
 /**
@@ -281,25 +281,25 @@ inline View sub_buffer_view (const View& src,
 			     const typename View::size_type start,
 			     const typename View::size_type size)
 {
-    return View (size, src.at (topleft));
+    return View (size, src.at (start));
 }
 
 /**
-   \defgroup BufferViewTransformationsSubsampled subsampled_view
+   \defgroup BufferViewTransformationsSub_Sampled sub_sampled_view
    \ingroup BufferViewTransformations
-   \brief view of a subsampled version of an buffer_view, stepping
+   \brief view of a sub_sampled version of an buffer_view, stepping
    over a number of samples in X and number of rows in Y
 
-   \ingroup BufferViewTransformationsSubsampled
+   \ingroup BufferViewTransformationsSub_Sampled
 */
 template <typename View> 
 inline typename dynamic_step_type<View>::type
-subsampled_view (const View& src, typename View::size_type step)
+sub_sampled_view (const View& src, typename View::size_type step)
 {
     assert (step > 0);
     typedef typename dynamic_step_type<View>::type RView;
     return RView ((src.size () + (step - 1)) / step,
-		  typename RView::iterator (src.at (0), step));
+		  make_step_iterator (src.begin (), step));
 }
 
 
@@ -405,7 +405,7 @@ struct nth_sample_deref_fn
 			  frame_reference_is_mutable<SrcP>::value);
 
 private:
-    typedef typename remove_reference<SrcP>::type       src_frame_t;
+    typedef typename boost::remove_reference<SrcP>::type       src_frame_t;
     typedef typename sample_type<src_frame_t>::type     sample_t;
     typedef typename src_frame_t::const_reference       const_ref_t;
     typedef typename frame_reference_type<
@@ -414,13 +414,13 @@ private:
     int _n;        // the sample to use
     
 public:
-    typedef nth_sample_deref_fn<const_ref_t>       const_t;
+    typedef nth_sample_deref_fn<const_ref_t>       const_type;
     typedef typename frame_value_type<
 	sample_t, mono_layout>::type               value_type;
     typedef typename frame_reference_type<
-	sample_t,mono_layout,false,false>::type  const_reference;
+	sample_t,mono_layout,false,false>::type    const_reference;
     typedef SrcP                                   argument_type;
-    typedef typename mpl::if_c<
+    typedef typename boost::mpl::if_c<
 	is_mutable, ref_t, value_type>::type       reference;
     typedef reference                              result_type;
 
@@ -469,7 +469,7 @@ template <typename View>
 struct nth_sample_view_type
 {
 private:
-    GIL_CLASS_REQUIRE(View, psynth::sound, BufferViewConcept)
+    PSYNTH_CLASS_REQUIRE(View, psynth::sound, BufferViewConcept)
     typedef detail::nth_sample_view_impl<View, view_is_basic<View>::value> VB;
 
 public:
@@ -522,8 +522,8 @@ public:
 	typedef typename type::iterator iterator;
 	typedef typename iterator_adaptor_get_base<iterator>::type iterator_base;
 	return type(src.size (),
-		    iterator (iterator_base (&at_c<K> (src [0])),
-			      src.frames().frame_size()));
+		    iterator (iterator_base (&sound::at_c<K> (src [0])),
+			      src.frame_size ()));
     }
 };
 
@@ -544,7 +544,7 @@ public:
     static type make (const View& src)
     {
 	typedef typename type::iterator iterator;
-	return interleaved_view (src.size (), (iterator) &at_c<K> (src[0]));
+	return interleaved_view (src.size (), (iterator) &sound::at_c<K> (src[0]));
     }
 };
 
@@ -598,21 +598,21 @@ struct kth_sample_deref_fn
 			  frame_reference_is_mutable<SrcP>::value);
 
 private:
-        typedef typename remove_reference<SrcP>::type src_frame_t;
-        typedef typename kth_element_type<src_frame_t, K>::type sample_t;
-        typedef typename src_frame_t::const_reference const_ref_t;
-        typedef typename frame_reference_type<
+    typedef typename boost::remove_reference<SrcP>::type src_frame_t;
+    typedef typename kth_element_type<src_frame_t, K>::type sample_t;
+    typedef typename src_frame_t::const_reference const_ref_t;
+    typedef typename frame_reference_type<
 	    sample_t, mono_layout, false, is_mutable>::type ref_t;
 
 public:
-    typedef kth_sample_deref_fn<K,const_ref_t>    const_t;
+    typedef kth_sample_deref_fn<K,const_ref_t>    const_type;
     typedef typename frame_value_type<
 	sample_t, mono_layout>::type              value_type;
     typedef typename frame_reference_type<
 	sample_t, mono_layout,false,false>::type  const_reference;
     typedef SrcP                                  argument_type;
-        typedef typename mpl::if_c<
-	    is_mutable, ref_t, value_type>::type      reference;
+        typedef typename boost::mpl::if_c<
+	    is_mutable, ref_t, value_type>::type  reference;
     typedef reference                             result_type;
     
     kth_sample_deref_fn () {}
@@ -621,12 +621,12 @@ public:
     
     result_type operator () (argument_type srcframe) const
     { 
-	return result_type (at_c<K>(srcframe));
+	return result_type (sound::at_c<K>(srcframe));
     }
 };
 
 template <int K, typename View>
-struct kth_sample_view<K,View,false>
+struct kth_sample_view_impl<K,View,false>
 {
 private:
     typedef kth_sample_deref_fn<K,typename View::reference> deref_t;
@@ -655,7 +655,7 @@ template <int K, typename View>
 struct kth_sample_view_type
 {
 private:
-    GIL_CLASS_REQUIRE(View, psynth::sound, BufferViewConcept)
+    PSYNTH_CLASS_REQUIRE(View, psynth::sound, BufferViewConcept)
     typedef detail::kth_sample_view_impl<K, View, view_is_basic<View>::value> VB;
 
 public:

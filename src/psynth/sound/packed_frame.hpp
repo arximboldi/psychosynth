@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-03 14:15:56 raskolnikov>
+ *  Time-stamp:  <2010-11-05 12:05:15 raskolnikov>
  *
  *  @file        packed_frame.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -120,7 +120,7 @@ struct packed_frame
     packed_frame () {}
     
     explicit packed_frame (const BitField& bitfield)
-	: _bitfield(bitfield) {}
+	: _bitfield (bitfield) {}
 
     // Construct from another compatible frame type
     packed_frame (const packed_frame& p)
@@ -138,38 +138,38 @@ struct packed_frame
 	: _bitfield(0)
     { 
         BOOST_STATIC_ASSERT((num_samples<packed_frame>::value == 2)); 
-        at_c<0>(*this) = chan0;
-	at_c<1>(*this) = chan1; 
+        sound::at_c<0>(*this) = chan0;
+	sound::at_c<1>(*this) = chan1; 
     }
     
     packed_frame (int chan0, int chan1, int chan2)
 	: _bitfield(0)
     { 
         BOOST_STATIC_ASSERT((num_samples<packed_frame>::value == 3)); 
-        at_c<0>(*this) = chan0;
-	at_c<1>(*this) = chan1;
-	at_c<2>(*this) = chan2; 
+        sound::at_c<0>(*this) = chan0;
+	sound::at_c<1>(*this) = chan1;
+	sound::at_c<2>(*this) = chan2; 
     }
     
     packed_frame(int chan0, int chan1, int chan2, int chan3)
 	: _bitfield (0)
     { 
         BOOST_STATIC_ASSERT((num_samples<packed_frame>::value==4)); 
-        at_c<0>(*this) = chan0;
-	at_c<1>(*this) = chan1;
-	at_c<2>(*this) = chan2;
-	at_c<3>(*this) = chan3; 
+        sound::at_c<0>(*this) = chan0;
+	sound::at_c<1>(*this) = chan1;
+	sound::at_c<2>(*this) = chan2;
+	sound::at_c<3>(*this) = chan3; 
     }
     
     packed_frame(int chan0, int chan1, int chan2, int chan3, int chan4)
 	: _bitfield(0)
     { 
         BOOST_STATIC_ASSERT((num_samples<packed_frame>::value == 5)); 
-        at_c<0>(*this) = chan0;
-	at_c<1>(*this) = chan1;
-	at_c<2>(*this) = chan2;
-	at_c<3>(*this) = chan3;
-	at_c<4>(*this) = chan4;
+        sound::at_c<0>(*this) = chan0;
+	sound::at_c<1>(*this) = chan1;
+	sound::at_c<2>(*this) = chan2;
+	sound::at_c<3>(*this) = chan3;
+	sound::at_c<4>(*this) = chan4;
     } 
 
     packed_frame& operator= (const packed_frame& p)
@@ -200,14 +200,14 @@ struct packed_frame
     packed_frame& operator= (int chan)
     {
 	check_mono ();
-	at_c<0>(*this) = chan;
+	sound::at_c<0>(*this) = chan;
 	return *this;
     }
     
     bool operator== (int chan) const
     {
 	check_mono ();
-	return at_c<0>(*this) == chan;
+	return sound::at_c<0>(*this) == chan;
     }
     
 private:    
@@ -236,7 +236,7 @@ private:
     // monoscale frame
     static void check_mono ()
     {
-	BOOST_STATIC_ASSERT((std::is_same<typename Layout::channel_space,
+	BOOST_STATIC_ASSERT((boost::is_same<typename Layout::channel_space,
 			     mono_space>::value));
     }
     
@@ -244,14 +244,14 @@ private:
     void assign (const Sample& chan, boost::mpl::false_)
     {
 	check_mono ();
-	at_c<0>(*this) = chan;
+	sound::at_c<0>(*this) = chan;
     }
     
     template <typename Sample>
     bool equal (const Sample& chan, boost::mpl::false_) const
     {
 	check_mono ();
-	return at_c<0>(*this) == chan;
+	return sound::at_c<0>(*this) == chan;
     }
 };
 

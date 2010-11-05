@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-03 21:02:02 raskolnikov>
+ *  Time-stamp:  <2010-11-05 13:54:13 raskolnikov>
  *
  *  @file        apply_operation_base.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -116,17 +116,17 @@ namespace sound
 
 #define PSYNTH_FWD_CONST_CASE(z, N, SUM)				\
     case N: return op(							\
-	*gil_reinterpret_cast_c<const typename boost::mpl::deref<T##N>::type*>(	\
+	*psynth_reinterpret_cast_c<const typename boost::mpl::deref<T##N>::type*>( \
 	    &bits));
 
 #define PSYNTH_FWD_CASE_WITH_INFO(z, N, SUM)				\
     case N: return op(							\
-	*gil_reinterpret_cast<typename boost::mpl::deref<T##N>::type*>(	\
+	*psynth_reinterpret_cast<typename boost::mpl::deref<T##N>::type*>( \
 	    &bits), info);
 
 #define PSYNTH_FWD_CONST_CASE_WITH_INFO(z, N, SUM)			\
     case N: return op(							\
-	*gil_reinterpret_cast_c<const typename boost::mpl::deref<T##N>::type*>( \
+	*psynth_reinterpret_cast_c<const typename boost::mpl::deref<T##N>::type*>( \
 	    &bits), info);
 
 #define PSYNTH_APPLY_FWD_OP(z, N, text)					\
@@ -197,7 +197,7 @@ template <std::size_t N>
 struct apply_operation_fwd_fn {};
 
 // Create specializations of apply_operation_fn for each N 0..100
-PSYNTH_GENERATE_APPLY_FWD_OPS(99)
+PSYNTH_GENERATE_APPLY_FWD_OPS(10)
 
 } /* namespace detail */
 

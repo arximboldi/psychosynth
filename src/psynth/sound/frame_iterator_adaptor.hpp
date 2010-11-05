@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-03 13:37:33 raskolnikov>
+ *  Time-stamp:  <2010-11-05 02:37:03 raskolnikov>
  *
  *  @file        frame_iterator_adaptor.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -164,7 +164,7 @@ template <typename I, typename DFn>
 struct const_iterator_type<dereference_iterator_adaptor<I,DFn> >
 { 
     typedef dereference_iterator_adaptor<
-	typename const_iterator_type<I>::type,typename DFn::const_t> type; 
+	typename const_iterator_type<I>::type,typename DFn::const_type> type; 
 };
 
 template <typename I, typename DFn> 

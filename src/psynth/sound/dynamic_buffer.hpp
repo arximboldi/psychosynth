@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-03 19:24:37 raskolnikov>
+ *  Time-stamp:  <2010-11-05 13:51:45 raskolnikov>
  *
  *  @file        dynamic_buffer.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -39,8 +39,9 @@
 #ifndef PSYNTH_SOUND_DYNAMIC_BUFFER_HPP
 #define PSYNTH_SOUND_DYNAMIC_BUFFER_HPP
 
-#include <psynth/sound/dynamic_buffer_view.hpp>
 #include <psynth/sound/buffer.hpp>
+#include <psynth/sound/dynamic_buffer_view.hpp>
+#include <psynth/sound/apply_operation.hpp>
 
 //#ifdef _MSC_VER
 //#pragma warning(push)
@@ -82,11 +83,11 @@ struct buffers_get_const_views_type :
 struct recreate_buffer_fnobj
 {
     typedef void result_type;
-    std::size_t _dimensions;
+    std::size_t _size;
     unsigned    _alignment;
 
-    recreate_buffer_fnobj (std::size_t dims, unsigned alignment)
-	: _size (dims)
+    recreate_buffer_fnobj (std::size_t size, unsigned alignment)
+	: _size (size)
 	, _alignment (alignment)
     {}
 
@@ -101,18 +102,24 @@ template <typename AnyView>  // Models AnyViewConcept
 struct dynamic_buffer_get_view
 {
     typedef AnyView result_type;
+
     template <typename Buffer>
     result_type operator() (Buffer& img) const
-    { return result_type (view (img)); }
+    {
+	return result_type (view (img));
+    }
 };
 
 template <typename AnyConstView>  // Models AnyConstViewConcept
 struct dynamic_buffer_get_const_view
 {
     typedef AnyConstView result_type;
+        
     template <typename Buffer>
     result_type operator () (const Buffer& img) const
-    { return result_type (const_view (img)); }
+    {
+	return result_type (const_view (img));
+    }
 };
 
 } /* namespace detail */
@@ -146,7 +153,7 @@ public:
     const_view;
 
     typedef dynamic_buffer_view<
-	typename detail::buffers_get_views_t<BufferTypes>::type>
+	typename detail::buffers_get_views_type<BufferTypes>::type>
     view;
 
     typedef std::ptrdiff_t size_type;
@@ -188,7 +195,7 @@ public:
 	return apply_operation (*this, detail::dynamic_type_get_num_samples ());
     }
 
-    point_t size () const
+    size_type size () const
     {
 	return apply_operation (*this, detail::dynamic_type_get_dimensions ());
     }

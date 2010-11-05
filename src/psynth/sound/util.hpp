@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-03 14:06:29 raskolnikov>
+ *  Time-stamp:  <2010-11-05 03:20:33 raskolnikov>
  *
  *  @file        util.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -51,7 +51,6 @@
 #include <iterator>
 
 #include <boost/static_assert.hpp>
-#include <boost/type_traits.hpp>
 #include <boost/mpl/size.hpp>
 #include <boost/mpl/distance.hpp>
 #include <boost/mpl/begin.hpp>
@@ -65,7 +64,7 @@ namespace psynth
 namespace sound
 {
 
-inline std::ptrdiff_t iround (float x )
+inline std::ptrdiff_t iround (float x)
 { return static_cast<std::ptrdiff_t>(x + (x < 0.0f ? -0.5f : 0.5f)); }
 inline std::ptrdiff_t iround (double x)
 { return static_cast<std::ptrdiff_t>(x + (x < 0.0 ? -0.5 : 0.5)); }
@@ -115,10 +114,13 @@ struct deref_base : public std::unary_function<ArgType, ResultType>
 */
 template <typename D1, typename D2>
 class deref_compose : public deref_base<
-    deref_compose<typename D1::const_t, typename D2::const_t>,
-    typename D1::value_type, typename D1::reference,
+    deref_compose<typename D1::const_type,
+		  typename D2::const_type>,
+    typename D1::value_type,
+    typename D1::reference,
     typename D1::const_reference, 
-    typename D2::argument_type, typename D1::result_type,
+    typename D2::argument_type,
+    typename D1::result_type,
     D1::is_mutable && D2::is_mutable>
 {
     D1 _fn1;

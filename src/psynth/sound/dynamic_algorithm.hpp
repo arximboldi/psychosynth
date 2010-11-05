@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-03 20:36:19 raskolnikov>
+ *  Time-stamp:  <2010-11-05 03:26:27 raskolnikov>
  *
  *  @file        dynamic_algorithm.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -60,7 +60,7 @@ namespace detail
 
 struct equal_frames_fn : public binary_operation_obj<equal_frames_fn, bool>
 {
-    template <typename V1, typename V2> GIL_FORCEINLINE
+    template <typename V1, typename V2> PSYNTH_FORCEINLINE
     bool apply_compatible (const V1& v1, const V2& v2) const
     {
 	return equal_frames (v1, v2);
@@ -112,7 +112,7 @@ namespace detail
 
 struct copy_frames_fn : public binary_operation_obj<copy_frames_fn>
 {
-    template <typename View1, typename View2> GIL_FORCEINLINE
+    template <typename View1, typename View2> PSYNTH_FORCEINLINE
     void apply_compatible(const View1& src, const View2& dst) const
     {
 	copy_frames(src,dst);
@@ -157,9 +157,9 @@ void copy_frames (const dynamic_buffer_view<Types1>& src,
  *
  */
 
-// forward declaration for default_color_converter (see full
-// definition in color_convert.hpp)
-struct default_color_converter;
+// forward declaration for default_channel_converter (see full
+// definition in channel_convert.hpp)
+struct default_channel_converter;
 
 /** \ingroup BufferViewSTLAlgorithmsCopyAndConvertFrames */
 template <typename Types1,  // Model MPL Random Access Container of
@@ -182,7 +182,7 @@ void copy_and_convert_frames (const dynamic_buffer_view<Types1>& src,
 {
     apply_operation (
 	src, boost::bind (
-	    detail::copy_and_convert_frames_fn<default_color_converter>(),
+	    detail::copy_and_convert_frames_fn<default_channel_converter>(),
 	    _1, dst));
 }
 
@@ -208,7 +208,7 @@ void copy_and_convert_frames (const View1& src,
 {
     apply_operation (
 	dst, boost::bind (
-	    detail::copy_and_convert_frames_fn<default_color_converter>(),
+	    detail::copy_and_convert_frames_fn<default_channel_converter>(),
 	    src, _1));
 }
 
@@ -235,7 +235,7 @@ void copy_and_convert_frames (const dynamic_buffer_view<Types1>& src,
 {
     apply_operation (
 	src, dst,
-	detail::copy_and_convert_frames_fn<default_color_converter>());
+	detail::copy_and_convert_frames_fn<default_channel_converter>());
 }
 
 

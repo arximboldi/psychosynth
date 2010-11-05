@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-03 13:41:20 raskolnikov>
+ *  Time-stamp:  <2010-11-05 12:05:51 raskolnikov>
  *
  *  @file        planar_frame_reference.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -243,7 +243,8 @@ struct kth_element_reference_type<
 template <typename SampleReference, typename ChannelSpace, int K>  
 struct kth_element_const_reference_type<planar_frame_reference<
 					    SampleReference,ChannelSpace>, K> 
-    : public boost::add_reference<typename std::add_const<SampleReference>::type> 
+    : public boost::add_reference<
+    typename boost::add_const<SampleReference>::type> 
 {
 //    typedef typename sample_traits<SampleReference>::const_reference type;
 };

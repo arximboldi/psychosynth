@@ -28,6 +28,7 @@ processing. The changes include:
       que otros les ponemos dynamic_* en el nombre. 
     - We import everything in the root of psynth::sound and the files
       that are named like another are prepended dynamic_*
+- NOTE: It is not a good idea to mix boost type_traits and the ones of stl.
 
 Please, remember to check diffs between GIL releases to fix bugs and
 add functionallity to our version.

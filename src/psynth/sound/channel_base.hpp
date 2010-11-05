@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-03 14:55:10 raskolnikov>
+ *  Time-stamp:  <2010-11-05 12:05:35 raskolnikov>
  *
  *  @file        channel_base.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -47,7 +47,6 @@
 #include <boost/mpl/range_c.hpp>
 #include <boost/mpl/size.hpp>
 #include <boost/mpl/vector_c.hpp>
-#include <boost/type_traits.hpp>
 #include <boost/utility/enable_if.hpp>
 
 #include <psynth/base/compat.hpp>
@@ -66,7 +65,7 @@ P* memunit_advanced(const P* p, std::ptrdiff_t diff);
 // Forward-declare semantic_at_c
 template <int K, typename ChannelBase>
 typename boost::disable_if<
-    std::is_const <ChannelBase>,
+    boost::is_const <ChannelBase>,
     typename kth_semantic_element_reference_type<ChannelBase,K>::type>::type
 semantic_at_c(ChannelBase& p);
 
@@ -590,7 +589,7 @@ struct kth_element_reference_type<
 template <typename Element, typename Layout, int K1, int K> 
 struct kth_element_const_reference_type<
     detail::homogeneous_channel_base<Element,Layout,K1>, K> :
-    public boost::add_reference<typename std::add_const<Element>::type> {};
+    public boost::add_reference<typename boost::add_const<Element>::type> {};
 
 /**
    \brief Provides mutable access to the K-th element, in physical order
@@ -609,7 +608,7 @@ at_c (detail::homogeneous_channel_base<E,L,N>& p)
    \ingroup ChannelBaseModelHomogeneous
 */
 template <int K, typename E, typename L, int N> inline
-typename boost::add_reference<typename std::add_const<E>::type>::type
+typename boost::add_reference<typename boost::add_const<E>::type>::type
 at_c (const detail::homogeneous_channel_base<E,L,N>& p)
 {
     return p.at (boost::mpl::int_<K>());

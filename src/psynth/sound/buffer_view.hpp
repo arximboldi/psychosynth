@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-10-29 13:18:16 raskolnikov>
+ *  Time-stamp:  <2010-11-05 13:34:56 raskolnikov>
  *
  *  @file        buffer_view.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -36,13 +36,14 @@
  *  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt).
  */
 
-#ifndef PSYNTH_BUFFER_VIEW_H_
-#define PSYNTH_BUFFER_VIEW_H_
+#ifndef PSYNTH_SOUND_BUFFER_VIEW_H_
+#define PSYNTH_SOUND_BUFFER_VIEW_H_
 
 #include <cstddef>
 #include <iterator>
+
 #include <psynth/base/compat.hpp>
-#include "iterator_from_2d.hpp"
+#include <psynth/sound/frame.hpp>
 
 //#ifdef _MSC_VER
 //#pragma warning(push)
@@ -102,10 +103,18 @@ class buffer_view
 {
 public:
     /** @todo Use iterator_traits ?? */
-    typedef typename Iterator::value_type                value_type;
-    typedef typename Iterator::reference                 reference;
-    typedef typename Iterator::difference_type           difference_type;
-    typedef buffer_view<typename Iterator::const_type>   const_type;
+    typedef typename std::iterator_traits<Iterator>::value_type
+    value_type;
+
+    typedef typename std::iterator_traits<Iterator>::reference
+    reference;
+
+    typedef typename std::iterator_traits<Iterator>::difference_type
+    difference_type;
+
+    typedef buffer_view<typename const_iterator_type<Iterator>::type>
+    const_type;
+
     typedef Iterator                                     iterator;
     typedef std::reverse_iterator<iterator>              reverse_iterator;
     typedef std::size_t                                  size_type;
@@ -113,28 +122,27 @@ public:
     template <typename Deref>
     struct add_deref
     {
-        typedef buffer_view <typename Iterator::template add_deref<Deref>::type>
-	type;
-
+	typedef buffer_view <
+	    typename iterator_add_deref<Iterator, Deref>::type> type;
 	static type make (const buffer_view<Iterator>& bv, const Deref& d)
 	{
-	    return type (
-		bv.size (),
-		Iterator::template add_deref<Deref>::make (iv.frames (), d));
+	    return type (bv.size (),
+			 iterator_add_deref<Iterator, Deref>::make (
+			     bv.frames (), d));
 	}
     };
 
     buffer_view ()
-	: _size (0, 0)
+	: _size (0)
     {}
     
     template <typename View>
     buffer_view (const View& bv)
 	: _size (bv.size ())
-	, _frames(bv.frames()) {}
+	, _frames (bv.frames ()) {}
 
     template <typename I2>
-    buffer_view (const coord_t& sz, const I2& it)
+    buffer_view (const size_type& sz, const I2& it)
 	: _size (sz)
 	, _frames (it)
     {}
@@ -169,24 +177,24 @@ public:
     template <typename L2>
     friend void swap (buffer_view<L2>& x, buffer_view<L2>& y);
 
-    const point_t&   size () const
+    const size_type& size () const
     {
 	return _size;
     }
 
-    iterator& frames ()
+    const iterator& frames () const
     {
 	return _frames;
     }
-
-    std::size_t frame_size ()
+    
+    std::size_t frame_size () const
     {
 	return memunit_step (begin ());
     }
     
     std::size_t num_samples () const
     {
-	return sound::num_samples<value_type>::value;
+	return psynth::sound::num_samples<value_type>::value;
     }
 
     iterator begin () const
@@ -223,8 +231,8 @@ public:
 private:
     template <typename L2> friend class buffer_view;
 
-    point_t   _size;
-    iterator  _frames;
+    size_type   _size;
+    iterator    _frames;
 };
 
 template <typename I2> 
@@ -252,6 +260,19 @@ struct sample_mapping_type<buffer_view<I> > : public sample_mapping_type<I> {};
 
 template <typename I>
 struct is_planar<buffer_view<I> > : public is_planar<I> {}; 
+
+/*
+ *
+ *      HasDynamicXStepTypeConcept
+ *
+ */
+
+template <typename L>
+struct dynamic_step_type<buffer_view<L> >
+{
+    typedef buffer_view<typename dynamic_step_type<L>::type> type;
+};
+
 
 } /* namespace sound */
 } /* namespace psynth */

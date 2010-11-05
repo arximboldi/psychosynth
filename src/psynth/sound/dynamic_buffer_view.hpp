@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-03 19:33:58 raskolnikov>
+ *  Time-stamp:  <2010-11-04 18:04:27 raskolnikov>
  *
  *  @file        dynamic_buffer_view.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -39,8 +39,8 @@
 #ifndef PSYNTH_SOUND_DYNAMIC_BUFFER_VIEW_HPP
 #define PSYNTH_SOUND_DYNAMIC_BUFFER_VIEW_HPP
 
-#include <psynth/sound/variant.hpp>
 #include <psynth/sound/buffer_view.hpp>
+#include <psynth/sound/variant.hpp>
 #include <psynth/sound/buffer.hpp>
 
 namespace psynth
@@ -59,7 +59,7 @@ struct get_const_type
 
 template <typename Views>
 struct views_get_const_type :
-	public boost::mpl::transform<Views, get_const_t<boost::mpl::_1> > {};
+	public boost::mpl::transform<Views, get_const_type<boost::mpl::_1> > {};
 
 } /* namespace detail */
 
@@ -79,10 +79,10 @@ struct dynamic_type_get_num_samples
 
 struct dynamic_type_get_dimensions
 {   // works for both buffer_view and buffer
-    typedef point2<std::ptrdiff_t> result_type;
+    typedef std::ptrdiff_t result_type;
     template <typename T>
     result_type operator () (const T& v) const
-    { return v.dimensions(); }
+    { return v.size (); }
 };
 
 } /* namespace detail */
@@ -171,7 +171,7 @@ struct dynamic_step_type<dynamic_buffer_view<IVTypes> >
 {
     typedef dynamic_buffer_view<
 	typename boost::mpl::transform<
-	    IVTypes, dynamic_x_step_type<boost::mpl::_1> >::type> type;
+	    IVTypes, dynamic_step_type<boost::mpl::_1> >::type> type;
 };
 
 } /* namespace sound */

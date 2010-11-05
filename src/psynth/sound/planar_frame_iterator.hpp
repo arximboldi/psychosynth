@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-03 13:40:36 raskolnikov>
+ *  Time-stamp:  <2010-11-05 12:07:19 raskolnikov>
  *
  *  @file        planar_frame_iterator.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -216,12 +216,12 @@ public:
     // PERFORMANCE_CHECK: Remove?
     bool operator< (const planar_frame_iterator& ptr) const
     {
-	return at_c<0>(*this) < at_c<0>(ptr);
+	return sound::at_c<0>(*this) < sound::at_c<0>(ptr);
     }
     
     bool operator!= (const planar_frame_iterator& ptr) const
     {
-	return at_c<0>(*this) != at_c<0>(ptr);
+	return sound::at_c<0>(*this) != sound::at_c<0>(ptr);
     }
     
 private:
@@ -251,12 +251,12 @@ private:
 
     ptrdiff_t distance_to (const planar_frame_iterator& it) const
     {
-	return at_c<0>(it) - at_c<0>(*this);
+	return sound::at_c<0>(it) - sound::at_c<0>(*this);
     }
     
     bool equal (const planar_frame_iterator& it) const
     {
-	return at_c<0>(*this) == at_c<0>(it);
+	return sound::at_c<0>(*this) == sound::at_c<0>(it);
     }
 };
 
@@ -308,7 +308,7 @@ struct kth_element_reference_type<planar_frame_iterator<IC,C>, K> :
 
 template <typename IC, typename C, int K>  
 struct kth_element_const_reference_type<planar_frame_iterator<IC, C>, K> :
-    public boost::add_reference<typename std::add_const<IC>::type> {};
+    public boost::add_reference<typename boost::add_const<IC>::type> {};
 
 
 /*
@@ -354,7 +354,7 @@ template <typename IC, typename C>
 inline std::ptrdiff_t memunit_distance (const planar_frame_iterator<IC,C>& p1,
 					const planar_frame_iterator<IC,C>& p2)
 { 
-    return memunit_distance (at_c<0>(p1), at_c<0>(p2)); 
+    return memunit_distance (sound::at_c<0>(p1), sound::at_c<0>(p2)); 
 }
 
 template <typename IC>

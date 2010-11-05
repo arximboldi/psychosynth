@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-03 13:38:29 raskolnikov>
+ *  Time-stamp:  <2010-11-05 11:47:10 raskolnikov>
  *
  *  @file        step_iterator.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
