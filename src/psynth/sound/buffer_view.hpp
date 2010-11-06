@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-05 13:34:56 raskolnikov>
+ *  Time-stamp:  <2010-11-06 03:37:08 raskolnikov>
  *
  *  @file        buffer_view.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -117,7 +117,7 @@ public:
 
     typedef Iterator                                     iterator;
     typedef std::reverse_iterator<iterator>              reverse_iterator;
-    typedef std::size_t                                  size_type;
+    typedef std::ptrdiff_t                               size_type;
 
     template <typename Deref>
     struct add_deref
@@ -157,15 +157,15 @@ public:
     
     buffer_view& operator= (const buffer_view& bv)
     {
-	_frames = bv.frames();
-	_size   = bv.size();
+	_frames = bv.frames ();
+	_size   = bv.size ();
 	return *this;
     }
 
     template <typename View>
     bool operator== (const View& v) const
     {
-	return frames () == v.frames() && size () == v.size();
+	return frames () == v.frames () && size () == v.size();
     }
     
     template <typename View>

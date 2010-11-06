@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-03 15:05:02 raskolnikov>
+ *  Time-stamp:  <2010-11-06 02:45:44 raskolnikov>
  *
  *  @file        sample.cpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>

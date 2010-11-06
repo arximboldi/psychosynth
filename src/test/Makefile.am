@@ -20,6 +20,8 @@
 
 if HAVE_BOOST_TEST
 
+TESTS_ENVIRONMENT = ./utf_test_driver
+
 TESTS = psynth_unit_test
 
 noinst_PROGRAMS = $(TESTS)
@@ -31,6 +33,7 @@ psynth_unit_test_SOURCES = \
 	psynth/sound/frame.cpp \
 	psynth/sound/sample_buffer.cpp \
 	psynth/sound/buffer.cpp \
+	psynth/sound/performance.cpp \
 	psynth_unit_test.cpp
 
 AM_CPPFLAGS = -Wall $(BOOST_CPPFLAGS) -I..
