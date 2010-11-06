@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-01 18:38:15 raskolnikov>
+ *  Time-stamp:  <2010-11-03 14:02:15 raskolnikov>
  *
  *  @file        device_n.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -68,45 +68,49 @@ struct devicen_space;
    \ingroup ColorSpaceModel
 */
 template <>
-struct devicen_space<1> : public mpl::vector1<devicen_channel<0> > {};
+struct devicen_space<1> : public boost::mpl::vector1<devicen_channel<0> > {};
 
 /**
    \brief unnamed color space of two channels
    \ingroup ColorSpaceModel
 */
 template <>
-struct devicen_space<2> : public mpl::vector2<devicen_channel<0>,
-					      devicen_channel<1> > {};
+struct devicen_space<2> : public boost::mpl::vector2<
+    devicen_channel<0>,
+    devicen_channel<1> > {};
 
 /**
    \brief unnamed color space of three channels
    \ingroup ColorSpaceModel
 */
 template <>
-struct devicen_space<3> : public mpl::vector3<devicen_channel<0>,
-					      devicen_channel<1>,
-					      devicen_channel<2> > {};
+struct devicen_space<3> : public boost::mpl::vector3<
+    devicen_channel<0>,
+    devicen_channel<1>,
+    devicen_channel<2> > {};
 
 /**
    \brief unnamed color space of four channels
    \ingroup ColorSpaceModel
 */
 template <>
-struct devicen_space<4> : public mpl::vector4<devicen_channel<0>,
-					      devicen_channel<1>,
-					      devicen_channel<2>,
-					      devicen_channel<3> > {};
+struct devicen_space<4> : public boost::mpl::vector4<
+    devicen_channel<0>,
+    devicen_channel<1>,
+    devicen_channel<2>,
+    devicen_channel<3> > {};
 
 /**
    \brief unnamed color space of five channels
    \ingroup ColorSpaceModel
 */
 template <>
-struct devicen_space<5> : public mpl::vector5<devicen_channel<0>,
-					      devicen_channel<1>,
-					      devicen_channel<2>,
-					      devicen_channel<3>,
-					      devicen_channel<4> > {};
+struct devicen_space<5> : public boost::mpl::vector5<
+    devicen_channel<0>,
+    devicen_channel<1>,
+    devicen_channel<2>,
+    devicen_channel<3>,
+    devicen_channel<4> > {};
 
 /**
    \brief unnamed color layout of up to five channels
@@ -120,10 +124,10 @@ template <int N> struct devicen_layout : public layout<devicen_space<N> > {};
 */
 template <typename IC>
 inline typename type_from_iterator<
-    planar_pixel_iterator<IC,devicen_space<2> > >::view
+    planar_frame_iterator<IC,devicen_space<2> > >::view
 planar_devicen_view (std::size_t size, IC c0, IC c1)
 {
-    typedef typename type_from_iterator<planar_pixel_iterator<
+    typedef typename type_from_iterator<planar_frame_iterator<
 	IC, devicen_space<2> > >::view view;
     return view (size, typename view::iterator (c0, c1));
 }
@@ -131,5 +135,8 @@ planar_devicen_view (std::size_t size, IC c0, IC c1)
 /**
    @todo Implement view factories for more dimensions.
  */
+
+} /* namespace sound */
+} /* namespace psynth */
 
 #endif /* PSYNTH_SOUND_DEVICEN */

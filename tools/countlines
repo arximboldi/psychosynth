@@ -5,15 +5,18 @@ DIRS="\
 src \
 src/gui3d \
 src/cli \
-psynth/base \
-psynth/synth \
-psynth/io \
-psynth/node \
-psynth/world \
-psynth/psynth \
-psynth/net \
-test \
-test/unit
+src/psynth/base \
+src/psynth/sound \
+src/psynth/synth \
+src/psynth/io \
+src/psynth/node \
+src/psynth/world \
+src/psynth/psynth \
+src/psynth/net \
+src/test \
+src/test/unit \
+src/test/unit/psynth/sound \
+src/test/unit/psynth/base \
 "
 
 PATTERNS=""

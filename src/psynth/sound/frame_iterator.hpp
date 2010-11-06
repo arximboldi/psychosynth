@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-02 11:07:48 raskolnikov>
+ *  Time-stamp:  <2010-11-03 13:35:35 raskolnikov>
  *
  *  @file        frame_iterator.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -67,7 +67,7 @@ template <typename Iterator> struct dynamic_step_type;
    iterator adaptor.
 */
 template <typename It>
-struct is_iterator_adaptor : public mpl::false_{};
+struct is_iterator_adaptor : public boost::mpl::false_{};
 
 /**
    \brief returns the base iterator for a given iterator
@@ -120,8 +120,8 @@ struct iterator_is_mutable{};
    The default implementation when the iterator is a C pointer is to
    use the standard constness semantics
 */
-template <typename T> struct iterator_is_mutable<      T*> : public mpl::true_ {};
-template <typename T> struct iterator_is_mutable<const T*> : public mpl::false_ {};
+template <typename T> struct iterator_is_mutable<      T*> : public boost::mpl::true_ {};
+template <typename T> struct iterator_is_mutable<const T*> : public boost::mpl::false_ {};
 
 /**
    \defgroup FrameIteratorModelInterleavedPtr C pointer to a frame
@@ -202,7 +202,7 @@ struct sample_type<const Frame*> : public sample_type<Frame> {};
  */
 
 template <typename T>
-struct byte_to_memunit : public mpl::int_<1> {};
+struct byte_to_memunit : public boost::mpl::int_<1> {};
 
 template <typename P>
 inline std::ptrdiff_t memunit_step (const P*)

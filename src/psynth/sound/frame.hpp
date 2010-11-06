@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-02 11:03:06 raskolnikov>
+ *  Time-stamp:  <2010-11-05 12:04:58 raskolnikov>
  *
  *  @file        frame.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -43,9 +43,8 @@
 #include <boost/utility/enable_if.hpp>
 #include <boost/mpl/bool.hpp>
 #include <boost/mpl/front.hpp>
-#include <boost/type_traits.hpp>
 
-#include <psynth/base/compat.hpp"
+#include <psynth/base/compat.hpp>
 #include <psynth/sound/channel_base.hpp>
 #include <psynth/sound/concept.hpp>
 #include <psynth/sound/sample.hpp>
@@ -60,7 +59,7 @@ namespace sound
 
 /* Forward-declare mono_t */
 struct mono_channel;
-typedef mpl::vector1<mono_channel> mono_space;
+typedef boost::mpl::vector1<mono_channel> mono_space;
 
 template <typename FrameBased> struct channel_space_type;
 template <typename FrameBased> struct sample_mapping_type;
@@ -78,7 +77,7 @@ template <typename FrameBased> struct is_planar<const FrameBased> :
 	public is_planar<FrameBased> {};
 
 
-template <typename T> struct is_frame : public mpl::false_{};
+template <typename T> struct is_frame : public boost::mpl::false_{};
 template <typename T> struct is_frame<const T> : public is_frame<T> {};
 
 /**
@@ -88,7 +87,7 @@ template <typename T> struct is_frame<const T> : public is_frame<T> {};
 */
 template <typename FrameBased>
 struct num_samples :
-	public mpl::size<typename channel_space_type<FrameBased>::type> {}; 
+	public boost::mpl::size<typename channel_space_type<FrameBased>::type> {}; 
 
 /**
 \addtogroup FrameBasedAlgorithm
@@ -147,14 +146,15 @@ BOOST_STATIC_ASSERT((is_same<sample_type<bgr8_frame_t>::type, bits8>::value));
    get_channel<mono_channel_t>(mono_pix2)
 */
 template <typename SampleValue, typename Layout>
-// = mpl::range_c<int, 0, ChannelSpace::size> >
+// = boost::mpl::range_c<int, 0, ChannelSpace::size> >
 struct frame : public detail::homogeneous_channel_base<
-    SampleValue, Layout, mpl::size<typename Layout::channel_space>::value>
+    SampleValue, Layout, boost::mpl::size<typename Layout::channel_space>::value>
 {
 private:
     typedef SampleValue sample_t;
     typedef detail::homogeneous_channel_base<
-	SampleValue, Layout, mpl::size<typename Layout::channel_space>::value>
+	SampleValue, Layout,
+	boost::mpl::size<typename Layout::channel_space>::value>
     parent_t;
 
 public:
@@ -194,7 +194,7 @@ public:
     /* Construct from another compatible frame type */
     template <typename Frame>
     frame (const Frame& p,
-	   typename enable_if_c<is_frame<Frame>::value>::type* dummy = 0)
+	   typename boost::enable_if_c<is_frame<Frame>::value>::type* dummy = 0)
 	: parent_t (p)
     { 
         check_compatible<Frame>();
@@ -203,14 +203,14 @@ public:
     template <typename P>
     frame& operator= (const P& p)
     {
-	assign (p, mpl::bool_<is_frame<P>::value>());
+	assign (p, boost::mpl::bool_<is_frame<P>::value>());
 	return *this;
     }
     
     template <typename P>
     bool operator == (const P& p) const
     {
-	return equal (p, mpl::bool_<is_frame<P>::value>());
+	return equal (p, boost::mpl::bool_<is_frame<P>::value>());
     } 
 
     template <typename P>
@@ -248,14 +248,14 @@ public:
     
 private:
     template <typename Frame>
-    void assign (const Frame& p, mpl::true_)
+    void assign (const Frame& p, boost::mpl::true_)
     {
 	check_compatible<Frame>();
 	static_copy (p, *this);
     }
     
     template <typename Frame>
-    bool equal (const Frame& p, mpl::true_) const
+    bool equal (const Frame& p, boost::mpl::true_) const
     {
 	check_compatible<Frame>();
 	return static_equal(*this, p);
@@ -264,7 +264,7 @@ private:
     template <typename Frame>
     void check_compatible() const
     {
-	gil_function_requires<FramesCompatibleConcept<Frame, frame> >();
+	base::psynth_function_requires<FramesCompatibleConcept<Frame, frame> >();
     }
 
     /* Support for assignment/equality comparison of a sample with a
@@ -273,21 +273,21 @@ private:
     static void check_mono()
     {
 	BOOST_STATIC_ASSERT(
-	    (is_same<typename Layout::channel_space, mono_space>::value));
+	    (boost::is_same<typename Layout::channel_space, mono_space>::value));
     }
     
     template <typename Sample>
-    void assign (const Sample& chan, mpl::false_)
+    void assign (const Sample& chan, boost::mpl::false_)
     {
 	check_mono ();
-	gil::at_c<0> (*this) = chan;
+	sound::at_c<0> (*this) = chan;
     }
     
     template <typename Sample>
-    bool equal (const Sample& chan, mpl::false_) const
+    bool equal (const Sample& chan, boost::mpl::false_) const
     {
 	check_mono ();
-	return gil::at_c<0>(*this)==chan;
+	return sound::at_c<0>(*this)==chan;
     }
 };
 
@@ -328,7 +328,7 @@ struct kth_element_const_reference_type<frame<SampleValue,Layout>, K>
  */
 
 template <typename SampleValue, typename Layout> 
-struct is_frame<frame<SampleValue,Layout> > : public mpl::true_{};
+struct is_frame<frame<SampleValue,Layout> > : public boost::mpl::true_{};
 
 /*
  *
@@ -350,7 +350,7 @@ struct sample_mapping_type<frame<SampleValue,Layout> >
 
 template <typename SampleValue, typename Layout>
 struct is_planar<frame<SampleValue,Layout> > :
-    public mpl::false_ {};
+    public boost::mpl::false_ {};
 
 template <typename SampleValue, typename Layout>
 struct sample_type<frame<SampleValue,Layout> >

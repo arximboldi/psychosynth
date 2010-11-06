@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-02 11:47:28 raskolnikov>
+ *  Time-stamp:  <2010-11-05 12:07:01 raskolnikov>
  *
  *  @file        concept.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -40,12 +40,15 @@
 #ifndef PSYNTH_SOUND_CONCEPT_H
 #define PSYNTH_SOUND_CONCEPT_H
 
-#include <psynth/base/concepts.hpp>
+#include <psynth/base/concept.hpp>
 
-#include <functional>
+/**
+ * @todo Why add_reference in std is not working? GCC bug?
+ */
+#include <type_traits>
 #include <boost/type_traits.hpp>
+#include <functional>
 #include <boost/utility/enable_if.hpp>
-#include <boost/concept_check.hpp>
 #include <boost/iterator/iterator_concepts.hpp>
 #include <boost/mpl/and.hpp>
 #include <boost/mpl/size.hpp>
@@ -54,6 +57,8 @@ namespace psynth
 {
 namespace sound
 {
+
+template <typename T> struct dynamic_step_type;
 
 template <typename T> struct sample_traits;
 template <typename P> struct is_frame;
@@ -96,11 +101,11 @@ struct homogeneous_channel_base;
 } /* namespace detail */
 
 template <int K, typename E, typename L, int N>
-typename add_reference<E>::type at_c (
+typename boost::add_reference<E>::type at_c (
     detail::homogeneous_channel_base<E,L,N>& p);
 
 template <int K, typename E, typename L, int N>
-typename add_reference<typename add_const<E>::type>::type at_c (
+typename boost::add_reference<typename boost::add_const<E>::type>::type at_c (
     const detail::homogeneous_channel_base<E,L,N>& p);
 
 #if !defined(_MSC_VER)  || _MSC_VER > 1310
@@ -124,8 +129,8 @@ at_c(const bit_aligned_frame_reference<B,C,L,M>& p);
 
 /* Forward-declare semantic_at_c */
 template <int K, typename ChannelBase>
-typename disable_if<
-    is_const<ChannelBase>,
+typename boost::disable_if<
+    boost::is_const<ChannelBase>,
     typename kth_semantic_element_reference_type<ChannelBase,K>::type>::type
 semantic_at_c (ChannelBase& p);
 
@@ -143,7 +148,7 @@ void initialize_it (T& x) {}
 
 template <typename T>
 struct remove_const_and_reference :
-	public remove_const<typename remove_reference<T>::type> {};
+	public boost::remove_const<typename boost::remove_reference<T>::type> {};
 
 
 /*
@@ -171,7 +176,7 @@ template <class TT>
 struct BidirectionalIteratorIsMutableConcept
 {
     void constraints() {
-	psynth_function_requires< ForwardIteratorIsMutableConcept<TT> >();
+	base::psynth_function_requires< ForwardIteratorIsMutableConcept<TT> >();
 	*i-- = *i;                  // require postdecrement and assignment
     }
     TT i;
@@ -183,7 +188,7 @@ template <class TT>
 struct RandomAccessIteratorIsMutableConcept
 {
     void constraints() {
-	psynth_function_requires< BidirectionalIteratorIsMutableConcept<TT> >();
+	base::psynth_function_requires< BidirectionalIteratorIsMutableConcept<TT> >();
 	typename std::iterator_traits<TT>::difference_type n=0;
 	ignore_unused_variable_warning(n);
 	i[n] = *i;
@@ -224,7 +229,7 @@ struct ChannelSpaceConcept
 template <typename ChannelSpace1, typename ChannelSpace2>
 // Models ChannelSpaceConcept
 struct channel_spaces_are_compatible :
-    public is_same<ChannelSpace1,ChannelSpace2> {};
+    public boost::is_same<ChannelSpace1, ChannelSpace2> {};
 
 /**
    \brief Two channel spaces are compatible if they are the same
@@ -320,7 +325,7 @@ template <typename T>
 struct SampleConcept
 {
     void constraints() {
-        psynth_function_requires< boost::EqualityComparableConcept<T> >(); 
+        base::psynth_function_requires< boost::EqualityComparableConcept<T> >(); 
         
         typedef typename sample_traits<T>::value_type v;
         typedef typename sample_traits<T>::reference r;
@@ -368,8 +373,8 @@ template <typename T>
 struct MutableSampleConcept
 {
     void constraints() {
-        psynth_function_requires<SampleConcept<T> >();
-        psynth_function_requires<detail::SampleIsMutableConcept<T> >();
+        base::psynth_function_requires<SampleConcept<T> >();
+        base::psynth_function_requires<detail::SampleIsMutableConcept<T> >();
     }
 };
 
@@ -386,8 +391,8 @@ template <typename T>
 struct SampleValueConcept
 {
     void constraints() {
-        psynth_function_requires<SampleConcept<T> >();
-        psynth_function_requires<Regular<T> >();
+        base::psynth_function_requires<SampleConcept<T> >();
+        base::psynth_function_requires<base::Regular<T> >();
     }
 };
 
@@ -408,8 +413,8 @@ BOOST_STATIC_ASSERT((samples_are_compatible<bits8, const bits8&>::value));
 */
 template <typename T1, typename T2>  // Models GIL Frame
 struct samples_are_compatible 
-    : public is_same<typename sample_traits<T1>::value_type,
-		     typename sample_traits<T2>::value_type> {};
+    : public boost::is_same<typename sample_traits<T1>::value_type,
+			    typename sample_traits<T2>::value_type> {};
 
 /**
    \brief Samples are compatible if their associated value types
@@ -452,8 +457,8 @@ template <typename SrcSample, typename DstSample>
 struct SampleConvertibleConcept
 {
     void constraints() {
-        psynth_function_requires<SampleConcept<SrcSample> >();
-        psynth_function_requires<MutableSampleConcept<DstSample> >();
+        base::psynth_function_requires<SampleConcept<SrcSample> >();
+        base::psynth_function_requires<MutableSampleConcept<DstSample> >();
         dst = sample_convert<DstSample, SrcSample>(src);
 	ignore_unused_variable_warning(dst);
     }
@@ -532,11 +537,11 @@ template <typename ChannelBase>
 struct ChannelBaseConcept
 {
     void constraints() {
-        psynth_function_requires< CopyConstructible<ChannelBase> >();
-        psynth_function_requires< EqualityComparable<ChannelBase> >();
+        base::psynth_function_requires< base::CopyConstructible<ChannelBase> >();
+        base::psynth_function_requires< base::EqualityComparable<ChannelBase> >();
 
         typedef typename ChannelBase::layout::channel_space channel_space;
-        psynth_function_requires<ChannelSpaceConcept<channel_space> >();
+        base::psynth_function_requires<ChannelSpaceConcept<channel_space> >();
 
         typedef typename ChannelBase::layout_t::sample_mapping sample_mapping;
         // TODO: sample_mapping_t must be an MPL RandomAccessSequence
@@ -587,9 +592,9 @@ template <typename ChannelBase>
 struct MutableChannelBaseConcept
 {
     void constraints() {
-        psynth_function_requires< ChannelBaseConcept<ChannelBase> >();
-        psynth_function_requires< Assignable<ChannelBase> >();
-        psynth_function_requires< Swappable<ChannelBase> >();
+        base::psynth_function_requires< ChannelBaseConcept<ChannelBase> >();
+        base::psynth_function_requires< base::Assignable<ChannelBase> >();
+        base::psynth_function_requires< base::Swappable<ChannelBase> >();
 
         typedef typename kth_element_reference_type<ChannelBase, 0>::type CR; 
 
@@ -618,8 +623,8 @@ template <typename ChannelBase>
 struct ChannelBaseValueConcept
 {
     void constraints() {
-        psynth_function_requires< MutableChannelBaseConcept<ChannelBase> >();
-        psynth_function_requires< Regular<ChannelBase> >();
+        base::psynth_function_requires< MutableChannelBaseConcept<ChannelBase> >();
+        base::psynth_function_requires< base::Regular<ChannelBase> >();
     }
 };
 
@@ -642,14 +647,15 @@ template <typename ChannelBase>
 struct HomogeneousChannelBaseConcept
 {
     void constraints() {
-        psynth_function_requires< ChannelBaseConcept<ChannelBase> >();
+        base::psynth_function_requires< ChannelBaseConcept<ChannelBase> >();
 
         static const std::size_t num_elements = size<ChannelBase>::value;
 
         typedef typename kth_element_type<ChannelBase,0>::type T0; 
         typedef typename kth_element_type<ChannelBase,num_elements-1>::type TN; 
 
-        BOOST_STATIC_ASSERT((is_same<T0,TN>::value));   // better than nothing
+        BOOST_STATIC_ASSERT((boost::is_same<T0,TN>::value));
+	// better than nothing
         typedef typename kth_element_const_reference_type<
 	    ChannelBase,0>::type CRef0; 
         CRef0 e0=dynamic_at_c(cb,0);
@@ -676,8 +682,8 @@ template <typename ChannelBase>
 struct MutableHomogeneousChannelBaseConcept
 {
     void constraints() {
-        psynth_function_requires< ChannelBaseConcept<ChannelBase> >();
-        psynth_function_requires< HomogeneousChannelBaseConcept<ChannelBase> >();
+        base::psynth_function_requires< ChannelBaseConcept<ChannelBase> >();
+        base::psynth_function_requires< HomogeneousChannelBaseConcept<ChannelBase> >();
         typedef typename kth_element_reference_type<ChannelBase, 0>::type R0;
         R0 x = dynamic_at_c (cb, 0);
         dynamic_at_c(cb,0) = dynamic_at_c (cb, 0);
@@ -688,13 +694,13 @@ struct MutableHomogeneousChannelBaseConcept
 /**
    \ingroup ChannelBaseConcept
    \brief Homogeneous channel base that also has a default
-   constructor. Refines Regular.
+   constructor. Refines base::Regular.
 */
 /** 
 
 \code
 concept HomogeneousChannelBaseValueConcept<typename T> :
-         MutableHomogeneousChannelBaseConcept<T>, Regular<T>
+         MutableHomogeneousChannelBaseConcept<T>, base::Regular<T>
 { };
 \endcode
 */
@@ -703,9 +709,9 @@ template <typename ChannelBase>
 struct HomogeneousChannelBaseValueConcept
 {
     void constraints() {
-        psynth_function_requires<
+        base::psynth_function_requires<
 	    MutableHomogeneousChannelBaseConcept<ChannelBase> >();
-        psynth_function_requires< Regular<ChannelBase> >();
+        base::psynth_function_requires< base::Regular<ChannelBase> >();
     }
 };
 
@@ -733,8 +739,8 @@ struct ChannelBasesCompatibleConcept
 {
     void constraints() {
         BOOST_STATIC_ASSERT(
-	    (is_same<typename ChannelBase1::layout_t::channel_space_t, 
-	     typename ChannelBase2::layout_t::channel_space_t>::value));
+	    (boost::is_same<typename ChannelBase1::layout_type::channel_space, 
+	     typename ChannelBase2::layout_type::channel_space>::value));
 //        typedef typename kth_semantic_element_type<ChannelBase1,0>::type e1;
 //        typedef typename kth_semantic_element_type<ChannelBase2,0>::type e2;
 //        "e1 is convertible to e2"
@@ -774,18 +780,18 @@ struct FrameBasedConcept
 {
     void constraints() {
         typedef typename channel_space_type<P>::type channel_space;
-        psynth_function_requires<ChannelSpaceConcept<channel_space> >();
+        base::psynth_function_requires<ChannelSpaceConcept<channel_space> >();
 
         typedef typename sample_mapping_type<P>::type sample_mapping;
-        psynth_function_requires<SampleMappingConcept<sample_mapping> >();
+        base::psynth_function_requires<SampleMappingConcept<sample_mapping> >();
 
         static const bool planar = is_planar<P>::type::value;
-	ignore_unused_variable_warning(planar);
+	boost::ignore_unused_variable_warning(planar);
 
 
         // This is not part of the concept, but should still work
         static const std::size_t nc = num_samples<P>::value;
-        ignore_unused_variable_warning(nc);
+        boost::ignore_unused_variable_warning(nc);
     }
 };
 
@@ -807,10 +813,10 @@ struct HomogeneousFrameBasedConcept
 {
     void constraints()
     {
-        psynth_function_requires<FrameBasedConcept<P> >();
+        base::psynth_function_requires<FrameBasedConcept<P> >();
 
 	typedef typename sample_type<P>::type sample;
-        psynth_function_requires<SampleConcept<sample> >();        
+        base::psynth_function_requires<SampleConcept<sample> >();        
     }
 };
 
@@ -846,22 +852,22 @@ template <typename P>
 struct FrameConcept
 {
     void constraints() {
-        psynth_function_requires<ChannelBaseConcept<P> >();
-        psynth_function_requires<FrameBasedConcept<P> >();
+        base::psynth_function_requires<ChannelBaseConcept<P> >();
+        base::psynth_function_requires<FrameBasedConcept<P> >();
 
         BOOST_STATIC_ASSERT((is_frame<P>::value));
         static const bool is_mutable = P::is_mutable;
-	ignore_unused_variable_warning(is_mutable);
+	boost::ignore_unused_variable_warning(is_mutable);
 
         typedef typename P::value_type      value_type;
-//      psynth_function_requires<FrameValueConcept<value_type> >();
+//      base::psynth_function_requires<FrameValueConcept<value_type> >();
 
         typedef typename P::reference       reference;
-        psynth_function_requires<
+        base::psynth_function_requires<
 	    FrameConcept<typename remove_const_and_reference<reference>::type> >();
 
         typedef typename P::const_reference const_reference;
-        psynth_function_requires<
+        base::psynth_function_requires<
 	    FrameConcept<
 		typename remove_const_and_reference<const_reference>::type> >();
     }
@@ -884,7 +890,7 @@ template <typename P>
 struct MutableFrameConcept
 {
     void constraints() {
-        psynth_function_requires<FrameConcept<P> >();
+        base::psynth_function_requires<FrameConcept<P> >();
         BOOST_STATIC_ASSERT(P::is_mutable);
     }
 };
@@ -906,9 +912,9 @@ template <typename P>
 struct HomogeneousFrameConcept
 {
     void constraints() {
-        psynth_function_requires<FrameConcept<P> >();
-        psynth_function_requires<HomogeneousChannelBaseConcept<P> >();
-        psynth_function_requires<HomogeneousFrameBasedConcept<P> >();
+        base::psynth_function_requires<FrameConcept<P> >();
+        base::psynth_function_requires<HomogeneousChannelBaseConcept<P> >();
+        base::psynth_function_requires<HomogeneousFrameBasedConcept<P> >();
         p[0];
     }
     P p;
@@ -932,20 +938,20 @@ template <typename P>
 struct MutableHomogeneousFrameConcept
 {
     void constraints() {
-        psynth_function_requires<HomogeneousFrameConcept<P> >();
-        psynth_function_requires<MutableHomogeneousChannelBaseConcept<P> >();
+        base::psynth_function_requires<HomogeneousFrameConcept<P> >();
+        base::psynth_function_requires<MutableHomogeneousChannelBaseConcept<P> >();
         p[0] = p[0];
     }
     P p;
 };
 
 /**
-   \brief Frame concept that is a Regular type
+   \brief Frame concept that is a base::Regular type
    \ingroup FrameConcept
 */
 /**
 \code
-concept FrameValueConcept<FrameConcept P> : Regular<P> {
+concept FrameValueConcept<FrameConcept P> : base::Regular<P> {
     where SameType<value_type,P>;
 };    
 \endcode
@@ -954,18 +960,18 @@ template <typename P>
 struct FrameValueConcept
 {
     void constraints() {
-        psynth_function_requires<FrameConcept<P> >();
-        psynth_function_requires<Regular<P> >();
+        base::psynth_function_requires<FrameConcept<P> >();
+        base::psynth_function_requires<base::Regular<P> >();
     }
 };
 
 /**
-   \brief Homogeneous frame concept that is a Regular type
+   \brief Homogeneous frame concept that is a base::Regular type
    \ingroup FrameConcept
 */
 /**
 \code
-concept HomogeneousFrameValueConcept<HomogeneousFrameConcept P> : Regular<P> {
+concept HomogeneousFrameValueConcept<HomogeneousFrameConcept P> : base::Regular<P> {
     where SameType<value_type,P>;
 }; 
 \endcode
@@ -974,9 +980,9 @@ template <typename P>
 struct HomogeneousFrameValueConcept
 {
     void constraints() {
-        psynth_function_requires<HomogeneousFrameConcept<P> >();
-        psynth_function_requires<Regular<P> >();
-        BOOST_STATIC_ASSERT((is_same<P, typename P::value_type>::value));
+        base::psynth_function_requires<HomogeneousFrameConcept<P> >();
+        base::psynth_function_requires<base::Regular<P> >();
+        BOOST_STATIC_ASSERT((boost::is_same<P, typename P::value_type>::value));
     }
 };
 
@@ -984,14 +990,16 @@ namespace detail
 {
     template <typename P1, typename P2, int K>
     struct samples_are_pairwise_compatible : public 
-        mpl::and_<samples_are_pairwise_compatible<P1,P2,K-1>,
-		  samples_are_compatible<
-		      typename kth_semantic_element_reference_type<P1,K>::type,
-		      typename kth_semantic_element_reference_type<P2,K>::type> >
+        boost::mpl::and_<
+	samples_are_pairwise_compatible<P1,P2,K-1>,
+	samples_are_compatible<
+	    typename kth_semantic_element_reference_type<P1,K>::type,
+	    typename kth_semantic_element_reference_type<P2,K>::type> >
     {};
                                                  
     template <typename P1, typename P2>
-    struct samples_are_pairwise_compatible<P1,P2,-1> : public mpl::true_ {};
+    struct samples_are_pairwise_compatible<P1, P2, -1> :
+	public boost::mpl::true_ {};
 } /* namespace detail */
 
 /**
@@ -1005,11 +1013,11 @@ namespace detail
 */
 template <typename P1, typename P2>  // Models GIL Frame
 struct frames_are_compatible 
-    : public mpl::and_<typename channel_spaces_are_compatible<
-			   typename channel_space_type<P1>::type, 
-			   typename channel_space_type<P2>::type>::type, 
-                       detail::samples_are_pairwise_compatible<
-			   P1, P2, num_samples<P1>::value-1> > {};
+    : public boost::mpl::and_<typename channel_spaces_are_compatible<
+				  typename channel_space_type<P1>::type, 
+				  typename channel_space_type<P2>::type>::type, 
+			      detail::samples_are_pairwise_compatible<
+				  P1, P2, num_samples<P1>::value-1> > {};
 
 /**
    \brief  Concept for frame compatibility
@@ -1059,8 +1067,8 @@ template <typename SrcP, typename DstP>
 struct FrameConvertibleConcept
 {
     void constraints() {
-        psynth_function_requires<FrameConcept<SrcP> >();
-        psynth_function_requires<MutableFrameConcept<DstP> >();
+        base::psynth_function_requires<FrameConcept<SrcP> >();
+        base::psynth_function_requires<MutableFrameConcept<DstP> >();
         channel_convert(src,dst);
     }
     SrcP src;
@@ -1086,7 +1094,7 @@ struct FrameConvertibleConcept
 /**
 \code
 concept FrameDereferenceAdaptorConcept<boost::UnaryFunctionConcept D>
-  : DefaultConstructibleConcept<D>, CopyConstructibleConcept<D>,
+  : DefaultConstructibleConcept<D>, base::CopyConstructibleConcept<D>,
     AssignableConcept<D>  {
     typename const_t;         where FrameDereferenceAdaptorConcept<const_t>;
     typename value_type;      where FrameValueConcept<value_type>;
@@ -1103,28 +1111,28 @@ template <typename D>
 struct FrameDereferenceAdaptorConcept
 {
     void constraints() {
-        psynth_function_requires< boost::UnaryFunctionConcept<D, 
+        base::psynth_function_requires< boost::UnaryFunctionConcept<D, 
             typename remove_const_and_reference<typename D::result_type>::type, 
             typename D::argument_type> >();
-        psynth_function_requires< boost::DefaultConstructibleConcept<D> >();
-        psynth_function_requires< boost::CopyConstructibleConcept<D> >();
-        psynth_function_requires< boost::AssignableConcept<D> >();
+        base::psynth_function_requires< boost::DefaultConstructibleConcept<D> >();
+        base::psynth_function_requires< boost::CopyConstructibleConcept<D> >();
+        base::psynth_function_requires< boost::AssignableConcept<D> >();
 
-        psynth_function_requires<FrameConcept<
+        base::psynth_function_requires<FrameConcept<
 	    typename remove_const_and_reference<
 		typename D::result_type>::type> >();
 
         typedef typename D::const_t const_t;
-        psynth_function_requires<FrameDereferenceAdaptorConcept<const_t> >();
+        base::psynth_function_requires<FrameDereferenceAdaptorConcept<const_t> >();
         typedef typename D::value_type value_type;
-        psynth_function_requires<FrameValueConcept<value_type> >();
+        base::psynth_function_requires<FrameValueConcept<value_type> >();
         typedef typename D::reference reference;
 	// == FrameConcept (if you remove const and reference)
         typedef typename D::const_reference const_reference;
 	// == FrameConcept (if you remove const and reference)
 
         const bool is_mutable = D::is_mutable;
-	ignore_unused_variable_warning (is_mutable);
+	boost::ignore_unused_variable_warning (is_mutable);
     }
     D d;
 };
@@ -1133,8 +1141,8 @@ template <typename P>
 struct FrameDereferenceAdaptorArchetype : public std::unary_function<P, P>
 {
     typedef FrameDereferenceAdaptorArchetype const_t;
-    typedef typename remove_reference<P>::type value_type;
-    typedef typename add_reference<P>::type reference;
+    typedef typename boost::remove_reference<P>::type value_type;
+    typedef typename boost::add_reference<P>::type reference;
     typedef reference const_reference;
     static const bool is_mutable=false;
     P operator()(P x) const { throw; }
@@ -1208,31 +1216,31 @@ struct FrameIteratorConcept
 {   
     void constraints()
     {
-        psynth_function_requires<
+        base::psynth_function_requires<
 	    boost_concepts::RandomAccessTraversalConcept<Iterator> >();
-        psynth_function_requires<FrameBasedConcept<Iterator> >();
+        base::psynth_function_requires<FrameBasedConcept<Iterator> >();
         
         typedef typename std::iterator_traits<Iterator>::value_type value_type;
-        psynth_function_requires<FrameValueConcept<value_type> >();
+        base::psynth_function_requires<FrameValueConcept<value_type> >();
  
         typedef typename const_iterator_type<Iterator>::type const_t;
         static const bool is_mut = iterator_is_mutable<Iterator>::type::value;
-	ignore_unused_variable_warning (is_mut);
+	boost::ignore_unused_variable_warning (is_mut);
 
         const_t const_it(it);
-	ignore_unused_variable_warning(const_it);
+	boost::ignore_unused_variable_warning(const_it);
         // immutable iterator must be constructible from (possibly
 	// mutable) iterator
 
         check_base (typename is_iterator_adaptor<Iterator>::type ());
     }
     
-    void check_base(mpl::false_) {}
+    void check_base(boost::mpl::false_) {}
 
-    void check_base(mpl::true_)
+    void check_base(boost::mpl::true_)
     {
         typedef typename iterator_adaptor_get_base<Iterator>::type base_t;
-        psynth_function_requires<FrameIteratorConcept<base_t> >();
+        base::psynth_function_requires<FrameIteratorConcept<base_t> >();
     }
 
     Iterator it;
@@ -1246,12 +1254,12 @@ namespace detail
     {
         void constraints()
 	{
-            psynth_function_requires<
+            base::psynth_function_requires<
 		detail::RandomAccessIteratorIsMutableConcept<Iterator> >();
-            typedef typename remove_reference<
+            typedef typename boost::remove_reference<
 		typename std::iterator_traits<Iterator>::reference>::type ref;
             typedef typename element_type<ref>::type sample_t;
-            psynth_function_requires<detail::SampleIsMutableConcept<sample_t> >();
+            base::psynth_function_requires<detail::SampleIsMutableConcept<sample_t> >();
         }
     };
 }
@@ -1272,8 +1280,8 @@ struct MutableFrameIteratorConcept
 {
     void constraints()
     {
-        psynth_function_requires<FrameIteratorConcept<Iterator> >();
-        psynth_function_requires<
+        base::psynth_function_requires<FrameIteratorConcept<Iterator> >();
+        base::psynth_function_requires<
 	    detail::FrameIteratorIsMutableConcept<Iterator> >();
     }
 };
@@ -1291,10 +1299,10 @@ struct RandomAccessIteratorIsMemoryBasedConcept
 {
     void constraints()
     {
-	std::ptrdiff_t bs=memunit_step(it);  ignore_unused_variable_warning(bs);
+	std::ptrdiff_t bs=memunit_step(it);  boost::ignore_unused_variable_warning(bs);
 	it=memunit_advanced(it,3);
 	std::ptrdiff_t bd=memunit_distance(it,it);
-	ignore_unused_variable_warning(bd);
+	boost::ignore_unused_variable_warning(bd);
 	memunit_advance(it,3);
 	// for performace you may also provide a customized
 	// implementation of memunit_advanced_ref
@@ -1335,9 +1343,9 @@ struct MemoryBasedIteratorConcept
 {
     void constraints ()
     {
-        psynth_function_requires<
+        base::psynth_function_requires<
 	    boost_concepts::RandomAccessTraversalConcept<Iterator> >();
-        psynth_function_requires<
+        base::psynth_function_requires<
 	    detail::RandomAccessIteratorIsMemoryBasedConcept<Iterator> >();
     }
 };
@@ -1361,7 +1369,7 @@ struct StepIteratorConcept
 {
     void constraints()
     {
-        psynth_function_requires<
+        base::psynth_function_requires<
 	    boost_concepts::ForwardTraversalConcept<Iterator> >();
         it.set_step(0);
     }
@@ -1384,8 +1392,8 @@ struct MutableStepIteratorConcept
 {
     void constraints()
     {
-        psynth_function_requires<StepIteratorConcept<Iterator> >();
-        psynth_function_requires<
+        base::psynth_function_requires<StepIteratorConcept<Iterator> >();
+        base::psynth_function_requires<
 	    detail::ForwardIteratorIsMutableConcept<Iterator> >();
     }
 };
@@ -1402,7 +1410,7 @@ struct MutableStepIteratorConcept
 /**
    In addition to GIL iterator requirements, GIL iterator adaptors
    must provide the following metafunctions:
- - \p is_iterator_adaptor<Iterator>:             Returns \p mpl::true_
+ - \p is_iterator_adaptor<Iterator>:             Returns \p boost::mpl::true_
  - \p iterator_adaptor_get_base<Iterator>:       Returns the base iterator type
  - \p iterator_adaptor_rebind<Iterator,NewBase>: Replaces the base
                                                  iterator with the new one
@@ -1412,7 +1420,7 @@ struct MutableStepIteratorConcept
    
 \code
 concept IteratorAdaptorConcept<boost_concepts::ForwardTraversalConcept Iterator> {
-    where SameType<is_iterator_adaptor<Iterator>::type, mpl::true_>;
+    where SameType<is_iterator_adaptor<Iterator>::type, boost::mpl::true_>;
 
     typename iterator_adaptor_get_base<Iterator>;
         where Metafunction<iterator_adaptor_get_base<Iterator> >;
@@ -1432,17 +1440,17 @@ struct IteratorAdaptorConcept
 {
     void constraints()
     {
-        psynth_function_requires<
+        base::psynth_function_requires<
 	    boost_concepts::ForwardTraversalConcept<Iterator> >();
 
         typedef typename iterator_adaptor_get_base<Iterator>::type base_t;
-        psynth_function_requires<
+        base::psynth_function_requires<
 	    boost_concepts::ForwardTraversalConcept<base_t> >();
 
         BOOST_STATIC_ASSERT(is_iterator_adaptor<Iterator>::value);
         typedef typename iterator_adaptor_rebind<Iterator, void*>::type rebind_t;
 
-        base_t base=it.base();  ignore_unused_variable_warning(base);
+        base_t base=it.base();  boost::ignore_unused_variable_warning(base);
     }
     Iterator it;
 };
@@ -1463,8 +1471,8 @@ struct MutableIteratorAdaptorConcept
 {
     void constraints()
     {
-        psynth_function_requires<IteratorAdaptorConcept<Iterator> >();
-        psynth_function_requires<
+        base::psynth_function_requires<IteratorAdaptorConcept<Iterator> >();
+        base::psynth_function_requires<
 	    detail::ForwardIteratorIsMutableConcept<Iterator> >();
     }
 };
@@ -1491,7 +1499,7 @@ struct MutableIteratorAdaptorConcept
 
  /**
 \code
-concept RandomAccessBufferViewConcept<Regular View> {
+concept RandomAccessBufferViewConcept<base::Regular View> {
     typename value_type;
     typename reference;       // result of dereferencing
     typename difference_type;
@@ -1551,7 +1559,7 @@ template <typename View>
 struct RandomAccessBufferViewConcept
 {
     void constraints() {
-        psynth_function_requires< Regular<View> >();
+        base::psynth_function_requires< base::Regular<View> >();
 
         typedef typename View::value_type       value_type;
         typedef typename View::reference        reference;
@@ -1563,20 +1571,20 @@ struct RandomAccessBufferViewConcept
         typedef typename View::reverse_iterator reverse_iterator;
         typedef typename View::size_type        size_type;
             
-	psynth_function_requires<
+	base::psynth_function_requires<
 	    boost_concepts::RandomAccessTraversalConcept<iterator> >();
-        psynth_function_requires<
+        base::psynth_function_requires<
 	    boost_concepts::RandomAccessTraversalConcept<reverse_iterator> >();
 
         iterator it;
         reverse_iterator rit;
         difference_type d;
 	size_type sz;
-	detail::initialize_it(d); ignore_unused_variable_warning(d);
+	detail::initialize_it(d); boost::ignore_unused_variable_warning(d);
 
         View(sz, it); // view must be constructible from a locator and a point
 
-        sz = view.size();  ignore_unused_variable_warning(sz);
+        sz = view.size();  boost::ignore_unused_variable_warning(sz);
         it = view.frames();
         
         it=view.begin();
@@ -1584,7 +1592,8 @@ struct RandomAccessBufferViewConcept
         rit=view.rbegin();
         rit=view.rend();
 
-        reference r1=view[d]; ignore_unused_variable_warning(r1);    // 1D access 
+        reference r1=view[d]; boost::ignore_unused_variable_warning(r1);
+	// 1D access 
         
         typedef FrameDereferenceAdaptorArchetype<typename View::value_type>
 	    deref_t;
@@ -1615,10 +1624,10 @@ concept BufferViewConcept<RandomAccess2DBufferViewConcept View> {
 template <typename View>
 struct BufferViewConcept {
     void constraints() {
-        psynth_function_requires<RandomAccessBufferViewConcept<View> >();
+        base::psynth_function_requires<RandomAccessBufferViewConcept<View> >();
 
         std::size_t num_chan = view.num_samples ();
-	ignore_unused_variable_warning (num_chan);
+	boost::ignore_unused_variable_warning (num_chan);
     }
     View view;
 };
@@ -1631,15 +1640,15 @@ template <typename View>
 struct RandomAccessBufferViewIsMutableConcept
 {
     void constraints() {
-	psynth_function_requires<
+	base::psynth_function_requires<
 	    detail::RandomAccessIteratorIsMutableConcept<
 		typename View::iterator> >();
-	psynth_function_requires<
+	base::psynth_function_requires<
 	    detail::RandomAccessIteratorIsMutableConcept<
 		typename View::reverse_iterator> >();
 	
 	typename View::difference_type diff;
-	initialize_it(diff); ignore_unused_variable_warning(diff);
+	initialize_it(diff); boost::ignore_unused_variable_warning(diff);
 	typename View::value_type v; initialize_it(v);
 	
 	view[diff]=v;
@@ -1651,7 +1660,7 @@ template <typename View>    // preconditions: View Models BufferViewConcept
 struct FrameBufferViewIsMutableConcept
 {
     void constraints() {        
-	psynth_function_requires<
+	base::psynth_function_requires<
 	    detail::RandomAccessBufferViewIsMutableConcept<View> >();
     }
 };
@@ -1674,8 +1683,8 @@ template <typename View>
 struct MutableRandomAccessBufferViewConcept
 {
     void constraints() {
-        psynth_function_requires<RandomAccessNDBufferViewConcept<View> >();
-        psynth_function_requires<
+        base::psynth_function_requires<RandomAccessBufferViewConcept<View> >();
+        base::psynth_function_requires<
 	    detail::RandomAccessBufferViewIsMutableConcept<View> >();
     }
 };
@@ -1694,8 +1703,9 @@ template <typename View>
 struct MutableBufferViewConcept
 {
     void constraints() {
-        psynth_function_requires<BufferViewConcept<View> >();
-        psynth_function_requires<detail::FrameBufferViewIsMutableConcept<View> >();
+        base::psynth_function_requires<BufferViewConcept<View> >();
+        base::psynth_function_requires<
+	    detail::FrameBufferViewIsMutableConcept<View> >();
     }
 };
 
@@ -1746,8 +1756,8 @@ struct ViewsCompatibleConcept
 */
 /**
 \code
-concept RandomAccessNDBufferConcept<typename Buf> : Regular<Buf> {
-    typename view_t; where MutableRandomAccessNDBufferViewConcept<view_t>;
+concept RandomAccessBufferConcept<typename Buf> : base::Regular<Buf> {
+    typename view_t; where MutableRandomAccessBufferViewConcept<view_t>;
     typename const_view_t = view_t::const_t;
     typename point_t      = view_t::point_t;
     typename value_type   = view_t::value_type;
@@ -1769,16 +1779,19 @@ template <typename Buf>
 struct RandomAccessBufferConcept
 {
     void constraints() {
-        psynth_function_requires<Regular<Buf> >();
+        base::psynth_function_requires<base::Regular<Buf> >();
 
         typedef typename Buf::view       view_t;
-        psynth_function_requires<MutableRandomAccessBufferViewConcept<view> >();
+        base::psynth_function_requires<
+	    MutableRandomAccessBufferViewConcept<view_t> >();
 
         typedef typename Buf::const_view const_view_t;
         typedef typename Buf::value_type   frame_t;
 
-        const_view_t cv = const_view(buf); ignore_unused_variable_warning(cv);
-        view_t       v  = view(buf);       ignore_unused_variable_warning(v);
+        const_view_t cv = const_view(buf);
+	boost::ignore_unused_variable_warning(cv);
+        view_t       v  = view(buf);
+	boost::ignore_unused_variable_warning(v);
 
         frame_t fill_value;
         typename Buf::size_type pt = buf.size ();
@@ -1810,12 +1823,12 @@ template <typename Buf>
 struct BufferConcept
 {
     void constraints() {
-        psynth_function_requires<RandomAccessBufferConcept<Buf> >();
-        psynth_function_requires<MutableBufferViewConcept<
+        base::psynth_function_requires<RandomAccessBufferConcept<Buf> >();
+        base::psynth_function_requires<MutableBufferViewConcept<
 	    typename Buf::view> >();
 	
         BOOST_STATIC_ASSERT(num_samples<Buf>::value ==
-			    mpl::size<
+			    boost::mpl::size<
 				typename channel_space_type<Buf>::type>::value);
     }
     Buf buf;

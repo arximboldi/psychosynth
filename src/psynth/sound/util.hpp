@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-02 11:49:01 raskolnikov>
+ *  Time-stamp:  <2010-11-05 03:20:33 raskolnikov>
  *
  *  @file        util.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -51,7 +51,6 @@
 #include <iterator>
 
 #include <boost/static_assert.hpp>
-#include <boost/type_traits.hpp>
 #include <boost/mpl/size.hpp>
 #include <boost/mpl/distance.hpp>
 #include <boost/mpl/begin.hpp>
@@ -65,7 +64,7 @@ namespace psynth
 namespace sound
 {
 
-inline std::ptrdiff_t iround (float x )
+inline std::ptrdiff_t iround (float x)
 { return static_cast<std::ptrdiff_t>(x + (x < 0.0f ? -0.5f : 0.5f)); }
 inline std::ptrdiff_t iround (double x)
 { return static_cast<std::ptrdiff_t>(x + (x < 0.0 ? -0.5 : 0.5)); }
@@ -115,10 +114,13 @@ struct deref_base : public std::unary_function<ArgType, ResultType>
 */
 template <typename D1, typename D2>
 class deref_compose : public deref_base<
-    deref_compose<typename D1::const_t, typename D2::const_t>,
-    typename D1::value_type, typename D1::reference,
+    deref_compose<typename D1::const_type,
+		  typename D2::const_type>,
+    typename D1::value_type,
+    typename D1::reference,
     typename D1::const_reference, 
-    typename D2::argument_type, typename D1::result_type,
+    typename D2::argument_type,
+    typename D1::result_type,
     D1::is_mutable && D2::is_mutable>
 {
     D1 _fn1;
@@ -148,13 +150,13 @@ public:
 };
 
 /* reinterpret_cast is implementation-defined. Static cast is not. */
-template <typename OutPtr, typename In> GIL_FORCEINLINE
+template <typename OutPtr, typename In> PSYNTH_FORCEINLINE
 OutPtr psynth_reinterpret_cast (In* p)
 {
     return static_cast<OutPtr> (static_cast<void*> (p));
 }
 
-template <typename OutPtr, typename In> GIL_FORCEINLINE
+template <typename OutPtr, typename In> PSYNTH_FORCEINLINE
 const OutPtr psynth_reinterpret_cast_c(const In* p)
 {
     return static_cast<const OutPtr>(static_cast<const void*>(p));
@@ -241,23 +243,24 @@ struct dec : public std::unary_function<T,T>
 */
 template <typename Types, typename T>
 struct type_to_index 
-    : public mpl::distance<typename mpl::begin<Types>::type, 
-                                  typename mpl::find<Types,T>::type>::type {};
+    : public boost::mpl::distance<
+    typename boost::mpl::begin<Types>::type, 
+    typename boost::mpl::find<Types,T>::type>::type {};
 
 } /* namespace detail */
 
 
 /**
-   \ingroup ColorSpaceAndLayoutModel
-   \brief Represents a color space and ordering of channels in memory
+   \ingroup ChannelSpaceAndLayoutModel
+   \brief Represents a channel space and ordering of samples in memory
 */
-template <typename ColorSpace,
-	  typename ChannelMapping = mpl::range_c<
-	      int, 0, mpl::size<ColorSpace>::value> >
+template <typename ChannelSpace,
+	  typename SampleMapping = boost::mpl::range_c<
+	      int, 0, boost::mpl::size<ChannelSpace>::value> >
 struct layout
 {
-    typedef ColorSpace      color_space_t;
-    typedef ChannelMapping  channel_mapping_t;
+    typedef ChannelSpace   channel_space;
+    typedef SampleMapping  sample_mapping;
 };
 
 /**

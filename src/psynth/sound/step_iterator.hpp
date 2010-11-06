@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-10-29 13:52:31 raskolnikov>
+ *  Time-stamp:  <2010-11-05 11:47:10 raskolnikov>
  *
  *  @file        step_iterator.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -82,14 +82,15 @@ template <typename Derived,  // type of the derived class
                              // of type Iterator a given number of
                              // Iterator's units
 	  >
-class step_iterator_adaptor : public iterator_adaptor<
-    Derived, Iterator, use_default, use_default, use_default,
+class step_iterator_adaptor : public boost::iterator_adaptor<
+    Derived, Iterator, boost::use_default, boost::use_default, boost::use_default,
     typename SFn::difference_type>
 {
 public:
-    typedef iterator_adaptor<Derived, Iterator,
-			     use_default, use_default, use_default,
-			     typename SFn::difference_type> parent_type;
+    typedef boost::iterator_adaptor<Derived, Iterator,
+				    boost::use_default, boost::use_default,
+				    boost::use_default,
+				    typename SFn::difference_type> parent_type;
 
     typedef typename std::iterator_traits<Iterator>::difference_type
     base_difference_type;
@@ -304,7 +305,7 @@ struct iterator_is_mutable<memory_based_step_iterator<Iterator> >
 
 template <typename Iterator>
 struct is_iterator_adaptor<memory_based_step_iterator<Iterator> > :
-    public mpl::true_{};
+    public boost::mpl::true_{};
 
 template <typename Iterator>
 struct iterator_adaptor_get_base<memory_based_step_iterator<Iterator> >
@@ -438,7 +439,7 @@ namespace detail
    memory_based_step_iterator */
 template <typename I> 
 typename dynamic_step_type<I>::type make_step_iterator_impl (
-    const I& it, std::ptrdiff_t step, mpl::false_)
+    const I& it, std::ptrdiff_t step, boost::mpl::false_)
 {
     return memory_based_step_iterator<I> (it, step);
 }
@@ -446,7 +447,7 @@ typename dynamic_step_type<I>::type make_step_iterator_impl (
 // If the iterator is compound, put the step in its base
 template <typename I> 
 typename dynamic_step_type<I>::type make_step_iterator_impl (
-    const I& it, std::ptrdiff_t step, mpl::true_)
+    const I& it, std::ptrdiff_t step, boost::mpl::true_)
 {
     return make_step_iterator (it.base (), step);
 }
@@ -455,7 +456,7 @@ typename dynamic_step_type<I>::type make_step_iterator_impl (
 template <typename BaseIt> 
 memory_based_step_iterator<BaseIt> make_step_iterator_impl(
     const memory_based_step_iterator<BaseIt>& it,
-    std::ptrdiff_t step, mpl::true_)
+    std::ptrdiff_t step, boost::mpl::true_)
 {
     return memory_based_step_iterator<BaseIt> (it.base(), step);
 }

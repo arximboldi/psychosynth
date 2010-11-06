@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-02 11:07:58 raskolnikov>
+ *  Time-stamp:  <2010-11-05 14:57:02 raskolnikov>
  *
  *  @file        metafunctions.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -49,6 +49,7 @@
 #include <boost/mpl/push_back.hpp>
 #include <boost/mpl/transform.hpp>
 #include <boost/mpl/vector.hpp>
+#include <boost/mpl/print.hpp>
 #include <boost/type_traits.hpp>
 
 #include <psynth/base/compat.hpp>
@@ -105,17 +106,17 @@ struct bit_aligned_frame_reference;
 */
 
 template <typename FrameRef>
-struct frame_reference_is_basic  : public mpl::false_ {};
+struct frame_reference_is_basic  : public boost::mpl::false_ {};
 template <typename T,  typename L>
-struct frame_reference_is_basic<frame<T, L>&> : public mpl::true_ {};
+struct frame_reference_is_basic<frame<T, L>&> : public boost::mpl::true_ {};
 template <typename T,  typename L>
-struct frame_reference_is_basic<const frame<T,L>&> : public mpl::true_ {};
+struct frame_reference_is_basic<const frame<T,L>&> : public boost::mpl::true_ {};
 template <typename TR, typename Cs>
 struct frame_reference_is_basic<planar_frame_reference<TR,Cs> > :
-	public mpl::true_ {};
+	public boost::mpl::true_ {};
 template <typename TR, typename Cs>
 struct frame_reference_is_basic<const planar_frame_reference<TR,Cs> > :
-	public mpl::true_ {};
+	public boost::mpl::true_ {};
 
 
 /**
@@ -129,31 +130,31 @@ struct frame_reference_is_basic<const planar_frame_reference<TR,Cs> > :
    \ingroup GILIsBasic
 */
 template <typename Iterator>
-struct iterator_is_basic : public mpl::false_ {};
+struct iterator_is_basic : public boost::mpl::false_ {};
 template <typename T, typename L>  // mutable   interleaved
-struct iterator_is_basic<      frame<T,L>*      > : public mpl::true_ {};
+struct iterator_is_basic<      frame<T,L>*      > : public boost::mpl::true_ {};
 template <typename T, typename L>  // immutable interleaved
-struct iterator_is_basic<const frame<T,L>*      > : public mpl::true_ {};
+struct iterator_is_basic<const frame<T,L>*      > : public boost::mpl::true_ {};
 template <typename T, typename Cs>  // mutable   planar
 struct iterator_is_basic<planar_frame_iterator<      T*,Cs> > :
-	public mpl::true_ {};
+	public boost::mpl::true_ {};
 template <typename T, typename Cs>    // immutable planar
 struct iterator_is_basic<planar_frame_iterator<const T*,Cs> > :
-	public mpl::true_ {};
+	public boost::mpl::true_ {};
 template <typename T, typename L>  // mutable   interleaved step
 struct iterator_is_basic<memory_based_step_iterator<      frame<T,L>*> > :
-	public mpl::true_ {};
+	public boost::mpl::true_ {};
 template <typename T, typename L>  // immutable interleaved step
 struct iterator_is_basic<memory_based_step_iterator<const frame<T,L>*> > :
-	public mpl::true_ {};
+	public boost::mpl::true_ {};
 template <typename T, typename Cs>  // mutable   planar step
 struct iterator_is_basic<
     memory_based_step_iterator<planar_frame_iterator<      T*,Cs> > > :
-	public mpl::true_ {};
+	public boost::mpl::true_ {};
 template <typename T, typename Cs>    // immutable planar step
 struct iterator_is_basic<
     memory_based_step_iterator<planar_frame_iterator<const T*,Cs> > > :
-	public mpl::true_ {};
+	public boost::mpl::true_ {};
 
 
 /**
@@ -161,7 +162,7 @@ struct iterator_is_basic<
    \brief Basic views must be over basic locators
 */
 template <typename View>
-struct view_is_basic : public mpl::false_ {};
+struct view_is_basic : public boost::mpl::false_ {};
 template <typename Loc>
 struct view_is_basic<buffer_view<Loc> > : public iterator_is_basic<Loc> {};
 
@@ -171,9 +172,9 @@ struct view_is_basic<buffer_view<Loc> > : public iterator_is_basic<Loc> {};
    char
 */
 template <typename Img>
-struct buffer_is_basic : public mpl::false_ {};
+struct buffer_is_basic : public boost::mpl::false_ {};
 template <typename Frame, bool IsPlanar, typename Alloc>
-struct buffer_is_basic<buffer<Frame,IsPlanar,Alloc> > : public mpl::true_ {};
+struct buffer_is_basic<buffer<Frame,IsPlanar,Alloc> > : public boost::mpl::true_ {};
 
 
 /**
@@ -194,11 +195,11 @@ struct iterator_is_step_impl;
 // iterator that has the same type as its dynamic_step_type must be
 // a step iterator
 template <typename It, bool IsBase>
-struct iterator_is_step_impl<It,IsBase,true> : public mpl::true_{};
+struct iterator_is_step_impl<It,IsBase,true> : public boost::mpl::true_{};
 
 // base iterator can never be a step iterator
 template <typename It>
-struct iterator_is_step_impl<It,true,false> : public mpl::false_{};
+struct iterator_is_step_impl<It,true,false> : public boost::mpl::false_{};
 
 // for an iterator adaptor, see if its base is step
 template <typename It> struct iterator_is_step_impl<It,false,false> 
@@ -216,7 +217,16 @@ template <typename I> struct iterator_is_step
     : public detail::iterator_is_step_impl<
     I, 
     !is_iterator_adaptor<I>::type::value,
-    is_same<I,typename dynamic_step_type<I>::type>::value > {};
+    boost::is_same<I,typename dynamic_step_type<I>::type>::value > {};
+
+
+/**
+   \ingroup GILIsStep
+   \brief Determines if the given locator has a step that can be set
+   dynamically.
+*/
+template <typename V> struct view_is_step :
+	public iterator_is_step<typename V::iterator> {}; 
 
 
 /**
@@ -227,8 +237,8 @@ template <typename I> struct iterator_is_step
 */
 template <typename FrameReference>
 struct frame_reference_is_proxy
-    : public mpl::not_<
-    is_same<typename remove_const_and_reference<FrameReference>::type,
+    : public boost::mpl::not_<
+    boost::is_same<typename remove_const_and_reference<FrameReference>::type,
 	    typename remove_const_and_reference<
 		FrameReference>::type::value_type> > {};
 
@@ -240,7 +250,7 @@ struct frame_reference_is_proxy
 */
 template <typename Frame>
 struct frame_is_reference :
-    public mpl::or_<is_reference<Frame>,
+    public boost::mpl::or_<boost::is_reference<Frame>,
 		    frame_reference_is_proxy<Frame> > {};
 
 /**
@@ -261,11 +271,11 @@ struct frame_is_reference :
 */
 template <typename R>
 struct frame_reference_is_mutable :
-    public mpl::bool_<remove_reference<R>::type::is_mutable> {};
+	public boost::mpl::bool_<boost::remove_reference<R>::type::is_mutable> {};
 
 template <typename R>
 struct frame_reference_is_mutable<const R&>
-    : public mpl::and_<frame_reference_is_proxy<R>,
+    : public boost::mpl::and_<frame_reference_is_proxy<R>,
 		       frame_reference_is_mutable<R> > {};
 
 /**
@@ -383,22 +393,32 @@ struct iterator_type_from_frame<Frame,IsPlanar,true,IsMutable>
 */
 template <typename T, typename L,
 	  bool IsPlanar=false, bool IsStep=false, bool IsMutable=true>
-struct iterator_type{};
+struct iterator_type {};
 
 template <typename T, typename L>
-struct iterator_type<T,L,false,false,true > { typedef frame<T,L>* type; };
+struct iterator_type<T,L,false,false,true >
+{
+    typedef frame<T,L>* type;
+};
 
 template <typename T, typename L>
-struct iterator_type<T,L,false,false,false> { typedef const frame<T,L>* type; };
+struct iterator_type<T,L,false,false,false>
+{
+    typedef const frame<T,L>* type;
+};
 
 template <typename T, typename L>
 struct iterator_type<T,L,true,false,true>
-{ typedef planar_frame_iterator<T*,typename L::channel_space_t> type; };
+{
+    typedef planar_frame_iterator<T*,typename L::channel_space> type;
+};
 // TODO: Assert M=identity
 
 template <typename T, typename L>
 struct iterator_type<T,L,true,false,false>
-{ typedef planar_frame_iterator<const T*,typename L::channel_space_t> type; };
+{
+    typedef planar_frame_iterator<const T*,typename L::channel_space> type;
+};
 // TODO: Assert M=identity
 
 template <typename T, typename L, bool IsPlanar, bool IsMutable>
@@ -417,11 +437,11 @@ struct iterator_type<T,L,IsPlanar,true,IsMutable>
    \ingroup TypeFactory
    @see boost::gil::type_from_x_iterator
 */   
-template <typename XIterator> 
+template <typename Iterator> 
 struct type_from_iterator
 {
     typedef memory_based_step_iterator<Iterator>  step_iterator;
-    typedef buffer_view<XIterator>                view;
+    typedef buffer_view<Iterator>                 view;
 };
 
 namespace detail
@@ -437,19 +457,19 @@ struct packed_sample_reference_type
 template <typename BitField, typename SampleBitSizesVector>
 class packed_sample_references_vector_type
 {
-    // If SampleBitSizesVector is mpl::vector<int,7,7,2> Then
-    // first_bits_vector will be mpl::vector<int,0,7,14,16>
-    typedef typename mpl::accumulate<
+    // If SampleBitSizesVector is boost::mpl::vector<int,7,7,2> Then
+    // first_bits_vector will be boost::mpl::vector<int,0,7,14,16>
+    typedef typename boost::mpl::accumulate<
 	SampleBitSizesVector,
-	mpl::vector1<mpl::int_<0> >, 
-	mpl::push_back<mpl::_1, mpl::plus<mpl::back<mpl::_1>, mpl::_2> >
+	boost::mpl::vector1<boost::mpl::int_<0> >, 
+	boost::mpl::push_back<boost::mpl::_1, boost::mpl::plus<boost::mpl::back<boost::mpl::_1>, boost::mpl::_2> >
 	>::type first_bits_vector;
 
 public:
-    typedef typename mpl::transform<
-    typename mpl::pop_back<first_bits_vector>::type,
+    typedef typename boost::mpl::transform<
+    typename boost::mpl::pop_back<first_bits_vector>::type,
     SampleBitSizesVector,
-    packed_sample_reference_type<BitField, mpl::_1,mpl::_2> >::type type;
+    packed_sample_reference_type<BitField, boost::mpl::_1,boost::mpl::_2> >::type type;
 };
 
 } /* namespace detail */
@@ -515,7 +535,7 @@ struct packed_buffer_type
 template <typename BitField, unsigned Size1, typename Layout,
 	  typename Alloc=std::allocator<unsigned char> >
 struct packed_buffer1_type :
-    public packed_buffer_type<BitField, mpl::vector1_c<unsigned, Size1>,
+    public packed_buffer_type<BitField, boost::mpl::vector1_c<unsigned, Size1>,
 			      Layout, Alloc> {};
 
 /**
@@ -526,7 +546,7 @@ struct packed_buffer1_type :
 template <typename BitField, unsigned Size1, unsigned Size2, typename Layout,
 	  typename Alloc=std::allocator<unsigned char> >
 struct packed_buffer2_type :
-    public packed_buffer_type<BitField, mpl::vector2_c<unsigned, Size1, Size2>,
+    public packed_buffer_type<BitField, boost::mpl::vector2_c<unsigned, Size1, Size2>,
 			      Layout, Alloc> {};
 
 /**
@@ -539,7 +559,7 @@ template <typename BitField, unsigned Size1, unsigned Size2,
 	  typename Alloc=std::allocator<unsigned char> >
 struct packed_buffer3_type :
     public packed_buffer_type<
-    BitField, mpl::vector3_c<unsigned, Size1, Size2, Size3>, Layout, Alloc> {};
+    BitField, boost::mpl::vector3_c<unsigned, Size1, Size2, Size3>, Layout, Alloc> {};
 
 /**
    \ingroup TypeFactoryPacked
@@ -552,7 +572,7 @@ template <typename BitField, unsigned Size1, unsigned Size2,
 struct packed_buffer4_type :
     public packed_buffer_type<
     BitField,
-    mpl::vector4_c<unsigned, Size1, Size2, Size3, Size4>,
+    boost::mpl::vector4_c<unsigned, Size1, Size2, Size3, Size4>,
     Layout, Alloc> {};
 
 /**
@@ -565,7 +585,7 @@ template <typename BitField, unsigned Size1, unsigned Size2, unsigned Size3,
 	  typename Alloc=std::allocator<unsigned char> >
 struct packed_buffer5_type :
     public packed_buffer_type<
-    BitField, mpl::vector5_c<
+    BitField, boost::mpl::vector5_c<
 		  unsigned, Size1, Size2, Size3, Size4, Size5>,
     Layout, Alloc> {};
 
@@ -588,9 +608,11 @@ struct bit_aligned_buffer_type
 private:
     BOOST_STATIC_CONSTANT(
 	int,
-	bit_size = (mpl::accumulate<SampleBitSizeVector,
-				    mpl::int_<0>,
-				    mpl::plus<mpl::_1, mpl::_2> >::type::value));
+	bit_size = (boost::mpl::accumulate<
+			SampleBitSizeVector,
+			boost::mpl::int_<0>,
+			boost::mpl::plus<boost::mpl::_1,
+					 boost::mpl::_2> >::type::value));
     typedef typename detail::min_fast_uint<
 	bit_size + 7>::type bitfield_t;  
     typedef const bit_aligned_frame_reference<
@@ -608,7 +630,7 @@ public:
 template <unsigned Size1, typename Layout,
 	  typename Alloc=std::allocator<unsigned char> >
 struct bit_aligned_buffer1_type :
-    public bit_aligned_buffer_type<mpl::vector1_c<unsigned, Size1>,
+    public bit_aligned_buffer_type<boost::mpl::vector1_c<unsigned, Size1>,
 				   Layout, Alloc> {};
 
 /**
@@ -620,7 +642,7 @@ template <unsigned Size1, unsigned Size2, typename Layout,
 	  typename Alloc=std::allocator<unsigned char> >
 struct bit_aligned_buffer2_type :
     public bit_aligned_buffer_type<
-    mpl::vector2_c<unsigned, Size1, Size2>, Layout, Alloc> {};
+    boost::mpl::vector2_c<unsigned, Size1, Size2>, Layout, Alloc> {};
 
 /**
    \ingroup TypeFactoryPacked
@@ -631,7 +653,7 @@ template <unsigned Size1, unsigned Size2, unsigned Size3,
 	  typename Layout, typename Alloc=std::allocator<unsigned char> >
 struct bit_aligned_buffer3_type :
     public bit_aligned_buffer_type<
-    mpl::vector3_c<unsigned, Size1, Size2, Size3>, Layout, Alloc> {};
+    boost::mpl::vector3_c<unsigned, Size1, Size2, Size3>, Layout, Alloc> {};
 
 /**
    \ingroup TypeFactoryPacked
@@ -642,7 +664,7 @@ template <unsigned Size1, unsigned Size2, unsigned Size3, unsigned Size4,
 	  typename Layout, typename Alloc=std::allocator<unsigned char> >
 struct bit_aligned_buffer4_type :
     public bit_aligned_buffer_type<
-    mpl::vector4_c<unsigned, Size1, Size2, Size3, Size4>, Layout, Alloc> {};
+    boost::mpl::vector4_c<unsigned, Size1, Size2, Size3, Size4>, Layout, Alloc> {};
 
 /**
    \ingroup TypeFactoryPacked
@@ -654,7 +676,8 @@ template <unsigned Size1, unsigned Size2, unsigned Size3, unsigned Size4,
 	  typename Alloc=std::allocator<unsigned char> >
 struct bit_aligned_buffer5_type :
     public bit_aligned_buffer_type<
-    mpl::vector5_c<unsigned, Size1, Size2, Size3, Size4, Size5>, Layout, Alloc> {};
+    boost::mpl::vector5_c<unsigned, Size1, Size2, Size3, Size4, Size5>,
+    Layout, Alloc> {};
 
 
 
@@ -675,32 +698,32 @@ template <typename BitField, int NumBits, bool IsMutable, typename Layout>
 struct frame_value_type<packed_dynamic_sample_reference<
 			    BitField,NumBits,IsMutable>,Layout> :
     public packed_frame_type<BitField,
-			     mpl::vector1_c<unsigned,NumBits>, Layout> {};
+			     boost::mpl::vector1_c<unsigned,NumBits>, Layout> {};
 
 template <typename BitField, int NumBits, bool IsMutable, typename Layout> 
 struct frame_value_type<const packed_dynamic_sample_reference<
 			    BitField,NumBits,IsMutable>,Layout> :
     public packed_frame_type<BitField,
-			     mpl::vector1_c<unsigned,NumBits>, Layout> {};
+			     boost::mpl::vector1_c<unsigned,NumBits>, Layout> {};
 
 template <typename BitField, int FirstBit, int NumBits, bool IsMutable,
 	  typename Layout> 
 struct frame_value_type<packed_sample_reference<
 			    BitField,FirstBit,NumBits,IsMutable>,Layout> :
     public packed_frame_type<BitField,
-			     mpl::vector1_c<unsigned,NumBits>, Layout> {};
+			     boost::mpl::vector1_c<unsigned,NumBits>, Layout> {};
 
 template <typename BitField, int FirstBit, int NumBits, bool IsMutable,
 	  typename Layout> 
 struct frame_value_type<const packed_sample_reference<
 			    BitField,FirstBit,NumBits,IsMutable>,Layout> :
     public packed_frame_type<BitField,
-			     mpl::vector1_c<unsigned,NumBits>, Layout> {};
+			     boost::mpl::vector1_c<unsigned,NumBits>, Layout> {};
 
 template <int NumBits, typename Layout> 
 struct frame_value_type<packed_sample_value<NumBits>,Layout> :
     public packed_frame_type<typename detail::min_fast_uint<NumBits>::type,
-			     mpl::vector1_c<unsigned,NumBits>, Layout> {};
+			     boost::mpl::vector1_c<unsigned,NumBits>, Layout> {};
 
 
 /**
@@ -714,8 +737,8 @@ template <typename T, typename L, bool IsPlanar=false,
 struct view_type
 {
     typedef typename type_from_iterator<
-	typename iterator_type<T,L,IsPlanar,IsStepX,IsMutable>::type>::view_type
-    type;
+	typename iterator_type<
+	    T,L,IsPlanar,IsStepX,IsMutable>::type>::view type;
 };
 
 /**
@@ -741,7 +764,7 @@ struct view_type_from_frame
 {
     typedef typename type_from_iterator<
 	typename iterator_type_from_frame<
-	    Frame,IsPlanar,IsStepX,IsMutable>::type>::view_type type;
+	    Frame,IsPlanar,IsStepX,IsMutable>::type>::view type;
 };
 
 
@@ -753,34 +776,37 @@ struct view_type_from_frame
    Use use_default for the properties of the source view that you want
    to keep
 */
-template <typename Ref, typename T=use_default, typename L=use_default,
-	  typename IsPlanar=use_default, typename IsMutable=use_default>
+template <typename Ref,
+	  typename T=boost::use_default,
+	  typename L=boost::use_default,
+	  typename IsPlanar=boost::use_default,
+	  typename IsMutable=boost::use_default>
 class derived_frame_reference_type
 {
-    typedef typename remove_reference<Ref>::type frame_type;
+    typedef typename boost::remove_reference<Ref>::type frame_t;
 
-    typedef typename  mpl::if_<is_same<T, use_default>,
+    typedef typename  boost::mpl::if_<boost::is_same<T, boost::use_default>,
 			       typename sample_type<frame_t>::type,
 			       T>::type sample_type;
     
-    typedef typename  mpl::if_<
-	is_same<L, use_default>, 
+    typedef typename  boost::mpl::if_<
+	boost::is_same<L, boost::use_default>, 
 	layout<typename channel_space_type<frame_t>::type,
-	       typename sample_mapping_type<frame_t>::type>, L>::type layout;
+	       typename sample_mapping_type<frame_t>::type>, L>::type layout_type;
 
-    static const bool mut = mpl::if_<
-	is_same<IsMutable,use_default>,
+    static const bool mut = boost::mpl::if_<
+	boost::is_same<IsMutable,boost::use_default>,
 	frame_reference_is_mutable<Ref>,
 	IsMutable>::type::value;
 
-    static const bool planar = mpl::if_<
-	is_same<IsPlanar,use_default>,
+    static const bool planar = boost::mpl::if_<
+	boost::is_same<IsPlanar,boost::use_default>,
 	is_planar<frame_t>,
 	IsPlanar>::type::value;
 
 public:
     typedef typename frame_reference_type<
-    sample_type, layout, planar, mut>::type type;
+    sample_type, layout_type, planar, mut>::type type;
 };
 
 
@@ -789,41 +815,44 @@ public:
    iterator type by changing some of the properties.
    
    \ingroup TypeFactoryDerived
-   Use use_default for the properties of the source view that you want
+   Use boost::use_default for the properties of the source view that you want
    to keep
 */
-template <typename Iterator, typename T=use_default, typename L=use_default,
-	  typename IsPlanar=use_default, typename IsStep=use_default,
-	  typename IsMutable=use_default>
+template <typename Iterator,
+	  typename T=boost::use_default,
+	  typename L=boost::use_default,
+	  typename IsPlanar=boost::use_default,
+	  typename IsStep=boost::use_default,
+	  typename IsMutable=boost::use_default>
 class derived_iterator_type
 {
-    typedef typename  mpl::if_<
-	is_same<T ,use_default>,
+    typedef typename  boost::mpl::if_<
+	boost::is_same<T ,boost::use_default>,
 	typename sample_type<Iterator>::type, T >::type sample_t;
 
-    typedef typename  mpl::if_<
-	is_same<L,use_default>, 
-	layout<typename color_space_type<Iterator>::type,
-	       typename sample_mapping_type<Iterator>::type>, L>::type layout;
+    typedef typename  boost::mpl::if_<
+	boost::is_same<L,boost::use_default>, 
+	layout<typename channel_space_type<Iterator>::type,
+	       typename sample_mapping_type<Iterator>::type>, L>::type layout_t;
 
-    static const bool mut    = mpl::if_<
-	is_same<IsMutable, use_default>,
+    static const bool mut    = boost::mpl::if_<
+	boost::is_same<IsMutable, boost::use_default>,
 	iterator_is_mutable<Iterator>,
 	IsMutable>::type::value;
 
-    static const bool planar = mpl::if_<
-	is_same<IsPlanar, use_default>,
+    static const bool planar = boost::mpl::if_<
+	boost::is_same<IsPlanar, boost::use_default>,
 	is_planar<Iterator>,
 	IsPlanar>::type::value;
 
-    static const bool step   = mpl::if_<
-	is_same<IsStep, use_default>,
+    static const bool step   = boost::mpl::if_<
+	boost::is_same<IsStep, boost::use_default>,
 	iterator_is_step<Iterator>,
 	IsStep>::type::value;
     
 public:
     typedef typename iterator_type<
-    sample_t, layout, planar, step, mut>::type type;
+    sample_t, layout_t, planar, step, mut>::type type;
 };
 
 
@@ -832,40 +861,43 @@ public:
    changing some of the properties.
    
    \ingroup TypeFactoryDerived
-   Use use_default for the properties of the source view that you want
+   Use boost::use_default for the properties of the source view that you want
    to keep
 */
-template <typename View, typename T=use_default, typename L=use_default,
-	  typename IsPlanar=use_default, typename StepX=use_default,
-	  typename IsMutable=use_default>
+template <typename View, typename T=boost::use_default,
+	  typename L=boost::use_default,
+	  typename IsPlanar=boost::use_default,
+	  typename StepX=boost::use_default,
+	  typename IsMutable=boost::use_default>
 class derived_view_type
 {
-    typedef typename  mpl::if_<
-	is_same<T ,use_default>,
+    typedef typename  boost::mpl::if_<
+	boost::is_same<T ,boost::use_default>,
 	typename sample_type<View>::type,
 	T>::type sample_t;
 
-    typedef typename  mpl::if_<
-	is_same<L,use_default>, 
-	layout<typename color_space_type<View>::type,
-	       typename sample_mapping_type<View>::type>, L>::type layout;
+    typedef typename  boost::mpl::if_<
+	boost::is_same<L,boost::use_default>, 
+	layout<typename channel_space_type<View>::type,
+	       typename sample_mapping_type<View>::type>,
+	L>::type layout_t;
 
-    static const bool mut    = mpl::if_<
-	is_same<IsMutable,use_default>,
+    static const bool mut    = boost::mpl::if_<
+	boost::is_same<IsMutable,boost::use_default>,
 	view_is_mutable<View>,
 	IsMutable>::type::value;
 
-    static const bool planar = mpl::if_<
-	is_same<IsPlanar,use_default>,
+    static const bool planar = boost::mpl::if_<
+	boost::is_same<IsPlanar,boost::use_default>,
 	is_planar<View>,
 	IsPlanar>::type::value;
     
-    static const bool step   = mpl::if_<
-	is_same<StepX ,use_default>,
-	view_is_step_in_x<View>,StepX>::type::value;
+    static const bool step   = boost::mpl::if_<
+	boost::is_same<StepX ,boost::use_default>,
+	view_is_step<View>, StepX>::type::value;
 
 public:
-    typedef typename view_type<sample_t, layout, planar, step, mut>::type type;
+    typedef typename view_type<sample_t, layout_t, planar, step, mut>::type type;
 };
 
 
@@ -874,31 +906,32 @@ public:
    type by changing some of the properties.
    
    \ingroup TypeFactoryDerived
-   Use use_default for the properties of the source buffer that you
+   Use boost::use_default for the properties of the source buffer that you
    want to keep
 */
-template <typename Buffer, typename T=use_default, typename L=use_default,
-	  typename IsPlanar=use_default>
+template <typename Buffer, typename T=boost::use_default,
+	  typename L=boost::use_default,
+	  typename IsPlanar=boost::use_default>
 class derived_buffer_type
 {
-    typedef typename  mpl::if_<
-	is_same<T ,use_default>,
+    typedef typename  boost::mpl::if_<
+	boost::is_same<T ,boost::use_default>,
 	typename sample_type<Buffer>::type,
 	T >::type sample_t;
 
-    typedef typename  mpl::if_<
-	is_same<L,use_default>, 
-	layout<typename color_space_type<Buffer>::type,
+    typedef typename  boost::mpl::if_<
+	boost::is_same<L,boost::use_default>, 
+	layout<typename channel_space_type<Buffer>::type,
 	       typename sample_mapping_type<Buffer>::type>,
-	L>::type layout;
+	L>::type layout_t;
 
-    static const bool planar = mpl::if_<
-	is_same<IsPlanar,use_default>,
+    static const bool planar = boost::mpl::if_<
+	boost::is_same<IsPlanar,boost::use_default>,
 	is_planar<Buffer>,
 	IsPlanar>::type::value;
 
 public:
-    typedef typename buffer_type<sample_t, layout, planar>::type type;
+    typedef typename buffer_type<sample_t, layout_t, planar>::type type;
 };
 
 } /* namespace psynth::sound */

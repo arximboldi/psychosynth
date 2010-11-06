@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-01 19:23:31 raskolnikov>
+ *  Time-stamp:  <2010-11-05 12:05:35 raskolnikov>
  *
  *  @file        channel_base.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -42,10 +42,11 @@
 #define PSYNTH_SOUND_CHANNEL_BASE_HPP
 
 #include <cassert>
+#include <type_traits>
+
 #include <boost/mpl/range_c.hpp>
 #include <boost/mpl/size.hpp>
 #include <boost/mpl/vector_c.hpp>
-#include <boost/type_traits.hpp>
 #include <boost/utility/enable_if.hpp>
 
 #include <psynth/base/compat.hpp>
@@ -63,8 +64,8 @@ P* memunit_advanced(const P* p, std::ptrdiff_t diff);
 
 // Forward-declare semantic_at_c
 template <int K, typename ChannelBase>
-typename disable_if<
-    is_const<ChannelBase>,
+typename boost::disable_if<
+    boost::is_const <ChannelBase>,
     typename kth_semantic_element_reference_type<ChannelBase,K>::type>::type
 semantic_at_c(ChannelBase& p);
 
@@ -99,10 +100,10 @@ namespace detail
 
 template <typename DstLayout, typename SrcLayout, int K>
 struct mapping_transform 
-    : public mpl::at<typename SrcLayout::sample_mapping_t, 
+    : public boost::mpl::at<typename SrcLayout::sample_mapping, 
                      typename detail::type_to_index<
-			 typename DstLayout::sample_mapping_t,
-			 mpl::integral_c<int, K> >::type
+			 typename DstLayout::sample_mapping,
+			 boost::mpl::integral_c<int, K> >::type
                            >::type {};
 
 /**
@@ -130,10 +131,10 @@ public:
     typedef Layout layout;
 
     typename element_reference_type<homogeneous_channel_base>::type
-    at (mpl::int_<0>) { return _v0; }
+    at (boost::mpl::int_<0>) { return _v0; }
 
     typename element_const_reference_type<homogeneous_channel_base>::type
-    at (mpl::int_<0>) const { return _v0; }
+    at (boost::mpl::int_<0>) const { return _v0; }
 
     homogeneous_channel_base () {}
     homogeneous_channel_base (Element v) : _v0(v) {}
@@ -162,16 +163,16 @@ public:
     typedef Layout layout;
 
     typename element_reference_type<homogeneous_channel_base>::type
-    at (mpl::int_<0>)       { return _v0; }
+    at (boost::mpl::int_<0>)       { return _v0; }
 
     typename element_const_reference_type<homogeneous_channel_base>::type
-    at (mpl::int_<0>) const { return _v0; }
+    at (boost::mpl::int_<0>) const { return _v0; }
 
     typename element_reference_type<homogeneous_channel_base>::type
-    at (mpl::int_<1>)       { return _v1; }
+    at (boost::mpl::int_<1>)       { return _v1; }
 
     typename element_const_reference_type<homogeneous_channel_base>::type
-    at (mpl::int_<1>) const { return _v1; }
+    at (boost::mpl::int_<1>) const { return _v1; }
 
     homogeneous_channel_base () {}
     explicit homogeneous_channel_base (Element v)
@@ -182,14 +183,14 @@ public:
 
     template <typename E2, typename L2>
     homogeneous_channel_base (const homogeneous_channel_base<E2,L2,2>& c)
-	: _v0 (at_c<mapping_transform<Layout, L2, 0>::value>(c))
-	, _v1 (at_c<mapping_transform<Layout, L2, 1>::value>(c)) {}
+	: _v0 (sound::at_c<mapping_transform<Layout, L2, 0>::value>(c))
+	, _v1 (sound::at_c<mapping_transform<Layout, L2, 1>::value>(c)) {}
 
     // Support for l-value reference proxy copy construction
     template <typename E2, typename L2>
     homogeneous_channel_base (homogeneous_channel_base<E2,L2,2>& c)
-	: _v0(at_c<mapping_transform<Layout,L2,0>::value>(c))
-	, _v1(at_c<mapping_transform<Layout,L2,1>::value>(c)) {}
+	: _v0(sound::at_c<mapping_transform<Layout,L2,0>::value>(c))
+	, _v1(sound::at_c<mapping_transform<Layout,L2,1>::value>(c)) {}
 
     // Support for planar_frame_iterator construction and dereferencing
     template <typename P> homogeneous_channel_base(P* p,bool)
@@ -233,22 +234,22 @@ public:
     typedef Layout layout;
 
     typename element_reference_type<homogeneous_channel_base>::type
-    at (mpl::int_<0>)       { return _v0; }
+    at (boost::mpl::int_<0>)       { return _v0; }
 
     typename element_const_reference_type<homogeneous_channel_base>::type
-    at (mpl::int_<0>) const { return _v0; }
+    at (boost::mpl::int_<0>) const { return _v0; }
 
     typename element_reference_type<homogeneous_channel_base>::type
-    at (mpl::int_<1>)       { return _v1; }
+    at (boost::mpl::int_<1>)       { return _v1; }
 
     typename element_const_reference_type<homogeneous_channel_base>::type
-    at (mpl::int_<1>) const { return _v1; }
+    at (boost::mpl::int_<1>) const { return _v1; }
 
     typename element_reference_type<homogeneous_channel_base>::type
-    at (mpl::int_<2>)       { return _v2; }
+    at (boost::mpl::int_<2>)       { return _v2; }
 
     typename element_const_reference_type<homogeneous_channel_base>::type
-    at (mpl::int_<2>) const { return _v2; }
+    at (boost::mpl::int_<2>) const { return _v2; }
 
     homogeneous_channel_base () {}
 
@@ -260,16 +261,16 @@ public:
 
     template <typename E2, typename L2>
     homogeneous_channel_base (const homogeneous_channel_base<E2,L2,3>& c)
-	: _v0(gil::at_c<mapping_transform<Layout,L2,0>::value>(c))
-	, _v1(gil::at_c<mapping_transform<Layout,L2,1>::value>(c))
-	, _v2(gil::at_c<mapping_transform<Layout,L2,2>::value>(c)) {}
+	: _v0(sound::at_c<mapping_transform<Layout,L2,0>::value>(c))
+	, _v1(sound::at_c<mapping_transform<Layout,L2,1>::value>(c))
+	, _v2(sound::at_c<mapping_transform<Layout,L2,2>::value>(c)) {}
 
     // Support for l-value reference proxy copy construction
     template <typename E2, typename L2>
     homogeneous_channel_base(      homogeneous_channel_base<E2,L2,3>& c) 
-	: _v0(gil::at_c<mapping_transform<Layout,L2,0>::value>(c))
-	, _v1(gil::at_c<mapping_transform<Layout,L2,1>::value>(c))
-	, _v2(gil::at_c<mapping_transform<Layout,L2,2>::value>(c)) {}
+	: _v0(sound::at_c<mapping_transform<Layout,L2,0>::value>(c))
+	, _v1(sound::at_c<mapping_transform<Layout,L2,1>::value>(c))
+	, _v2(sound::at_c<mapping_transform<Layout,L2,2>::value>(c)) {}
 
     // Support for planar_frame_iterator construction and dereferencing
     template <typename P> homogeneous_channel_base(P* p,bool)
@@ -320,28 +321,28 @@ public:
     typedef Layout layout;
 
     typename element_reference_type<homogeneous_channel_base>::type
-    at (mpl::int_<0>)       { return _v0; }
+    at (boost::mpl::int_<0>)       { return _v0; }
 
     typename element_const_reference_type<homogeneous_channel_base>::type
-    at (mpl::int_<0>) const { return _v0; }
+    at (boost::mpl::int_<0>) const { return _v0; }
 
     typename element_reference_type<homogeneous_channel_base>::type
-    at (mpl::int_<1>)       { return _v1; }
+    at (boost::mpl::int_<1>)       { return _v1; }
 
     typename element_const_reference_type<homogeneous_channel_base>::type
-    at (mpl::int_<1>) const { return _v1; }
+    at (boost::mpl::int_<1>) const { return _v1; }
 
     typename element_reference_type<homogeneous_channel_base>::type
-    at (mpl::int_<2>)       { return _v2; }
+    at (boost::mpl::int_<2>)       { return _v2; }
 
     typename element_const_reference_type<homogeneous_channel_base>::type
-    at (mpl::int_<2>) const { return _v2; }
+    at (boost::mpl::int_<2>) const { return _v2; }
 
     typename element_reference_type<homogeneous_channel_base>::type
-    at (mpl::int_<3>)       { return _v3; }
+    at (boost::mpl::int_<3>)       { return _v3; }
 
     typename element_const_reference_type<homogeneous_channel_base>::type
-    at (mpl::int_<3>) const { return _v3; }
+    at (boost::mpl::int_<3>) const { return _v3; }
 
     homogeneous_channel_base () {}
 
@@ -353,18 +354,18 @@ public:
 
     template <typename E2, typename L2>
     homogeneous_channel_base (const homogeneous_channel_base<E2,L2,4>& c)
-	: _v0(at_c<mapping_transform<Layout,L2,0>::value>(c)) 
-        , _v1(at_c<mapping_transform<Layout,L2,1>::value>(c)) 
-        , _v2(at_c<mapping_transform<Layout,L2,2>::value>(c))
-        , _v3(at_c<mapping_transform<Layout,L2,3>::value>(c)) {}
+	: _v0(sound::at_c<mapping_transform<Layout,L2,0>::value>(c)) 
+        , _v1(sound::at_c<mapping_transform<Layout,L2,1>::value>(c)) 
+        , _v2(sound::at_c<mapping_transform<Layout,L2,2>::value>(c))
+        , _v3(sound::at_c<mapping_transform<Layout,L2,3>::value>(c)) {}
 
     // Support for l-value reference proxy copy construction
     template <typename E2, typename L2>
     homogeneous_channel_base (homogeneous_channel_base<E2,L2,4>& c)
-	: _v0(at_c<mapping_transform<Layout,L2,0>::value>(c)) 
-        , _v1(at_c<mapping_transform<Layout,L2,1>::value>(c)) 
-        , _v2(at_c<mapping_transform<Layout,L2,2>::value>(c))
-        , _v3(at_c<mapping_transform<Layout,L2,3>::value>(c)) {}
+	: _v0(sound::at_c<mapping_transform<Layout,L2,0>::value>(c)) 
+        , _v1(sound::at_c<mapping_transform<Layout,L2,1>::value>(c)) 
+        , _v2(sound::at_c<mapping_transform<Layout,L2,2>::value>(c))
+        , _v3(sound::at_c<mapping_transform<Layout,L2,3>::value>(c)) {}
 
     // Support for planar_frame_iterator construction and dereferencing
     template <typename P> homogeneous_channel_base(P* p,bool)
@@ -419,34 +420,34 @@ public:
     typedef Layout layout;
 
     typename element_reference_type<homogeneous_channel_base>::type
-    at(mpl::int_<0>)       { return _v0; }
+    at(boost::mpl::int_<0>)       { return _v0; }
 
     typename element_const_reference_type<homogeneous_channel_base>::type
-    at(mpl::int_<0>) const { return _v0; }
+    at(boost::mpl::int_<0>) const { return _v0; }
 
     typename element_reference_type<homogeneous_channel_base>::type
-    at(mpl::int_<1>)       { return _v1; }
+    at(boost::mpl::int_<1>)       { return _v1; }
 
     typename element_const_reference_type<homogeneous_channel_base>::type
-    at(mpl::int_<1>) const { return _v1; }
+    at(boost::mpl::int_<1>) const { return _v1; }
 
     typename element_reference_type<homogeneous_channel_base>::type
-    at(mpl::int_<2>)       { return _v2; }
+    at(boost::mpl::int_<2>)       { return _v2; }
 
     typename element_const_reference_type<homogeneous_channel_base>::type
-    at(mpl::int_<2>) const { return _v2; }
+    at(boost::mpl::int_<2>) const { return _v2; }
 
     typename element_reference_type<homogeneous_channel_base>::type
-    at(mpl::int_<3>)       { return _v3; }
+    at(boost::mpl::int_<3>)       { return _v3; }
 
     typename element_const_reference_type<homogeneous_channel_base>::type
-    at(mpl::int_<3>) const { return _v3; }
+    at(boost::mpl::int_<3>) const { return _v3; }
 
     typename element_reference_type<homogeneous_channel_base>::type
-    at(mpl::int_<4>)       { return _v4; }
+    at(boost::mpl::int_<4>)       { return _v4; }
 
     typename element_const_reference_type<homogeneous_channel_base>::type
-    at(mpl::int_<4>) const { return _v4; }
+    at(boost::mpl::int_<4>) const { return _v4; }
 
     homogeneous_channel_base() {}
 
@@ -459,20 +460,20 @@ public:
 
     template <typename E2, typename L2>
     homogeneous_channel_base (const homogeneous_channel_base<E2,L2,5>& c)
-        : _v0(at_c<mapping_transform<Layout,L2,0>::value>(c)) 
-        , _v1(at_c<mapping_transform<Layout,L2,1>::value>(c))
-        , _v2(at_c<mapping_transform<Layout,L2,2>::value>(c))
-        , _v3(at_c<mapping_transform<Layout,L2,3>::value>(c))
-        , _v4(at_c<mapping_transform<Layout,L2,4>::value>(c)) {}
+        : _v0(sound::at_c<mapping_transform<Layout,L2,0>::value>(c)) 
+        , _v1(sound::at_c<mapping_transform<Layout,L2,1>::value>(c))
+        , _v2(sound::at_c<mapping_transform<Layout,L2,2>::value>(c))
+        , _v3(sound::at_c<mapping_transform<Layout,L2,3>::value>(c))
+        , _v4(sound::at_c<mapping_transform<Layout,L2,4>::value>(c)) {}
 
     // Support for l-value reference proxy copy construction
     template <typename E2, typename L2>
     homogeneous_channel_base (homogeneous_channel_base<E2,L2,5>& c)
-        : _v0(at_c<mapping_transform<Layout,L2,0>::value>(c)) 
-        , _v1(at_c<mapping_transform<Layout,L2,1>::value>(c))
-        , _v2(at_c<mapping_transform<Layout,L2,2>::value>(c))
-        , _v3(at_c<mapping_transform<Layout,L2,3>::value>(c))
-        , _v4(at_c<mapping_transform<Layout,L2,4>::value>(c)) {}
+        : _v0(sound::at_c<mapping_transform<Layout,L2,0>::value>(c)) 
+        , _v1(sound::at_c<mapping_transform<Layout,L2,1>::value>(c))
+        , _v2(sound::at_c<mapping_transform<Layout,L2,2>::value>(c))
+        , _v3(sound::at_c<mapping_transform<Layout,L2,3>::value>(c))
+        , _v4(sound::at_c<mapping_transform<Layout,L2,4>::value>(c)) {}
 	
     // Support for planar_frame_iterator construction and dereferencing
     template <typename P> homogeneous_channel_base(P* p,bool)
@@ -583,33 +584,34 @@ struct kth_element_type<detail::homogeneous_channel_base<Element,Layout,K1>, K>
 template <typename Element, typename Layout, int K1, int K> 
 struct kth_element_reference_type<
     detail::homogeneous_channel_base<Element,Layout,K1>, K> :
-    public add_reference<Element> {};
+    public boost::add_reference<Element> {};
 
 template <typename Element, typename Layout, int K1, int K> 
 struct kth_element_const_reference_type<
     detail::homogeneous_channel_base<Element,Layout,K1>, K> :
-    public add_reference<typename add_const<Element>::type> {};
+    public boost::add_reference<typename boost::add_const<Element>::type> {};
 
 /**
    \brief Provides mutable access to the K-th element, in physical order
    \ingroup ChannelBaseModelHomogeneous
 */
 template <int K, typename E, typename L, int N> inline
-typename add_reference<E>::type
+typename boost::add_reference<E>::type
 at_c (detail::homogeneous_channel_base<E,L,N>& p)
 {
-    return p.at (mpl::int_<K>());
+    return p.at (boost::mpl::int_<K>());
 }
 
+/** TODO: Check why this results into ambiguous. */
 /**
    \brief Provides constant access to the K-th element, in physical order
    \ingroup ChannelBaseModelHomogeneous
 */
 template <int K, typename E, typename L, int N> inline
-typename add_reference<typename add_const<E>::type>::type
-at_c(const detail::homogeneous_channel_base<E,L,N>& p)
+typename boost::add_reference<typename boost::add_const<E>::type>::type
+at_c (const detail::homogeneous_channel_base<E,L,N>& p)
 {
-    return p.at (mpl::int_<K>());
+    return p.at (boost::mpl::int_<K>());
 }
 
 namespace detail

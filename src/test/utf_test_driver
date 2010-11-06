@@ -1,0 +1,2 @@
+#! /bin/sh
+exec $1 # --report_level=detailed --log_level=message

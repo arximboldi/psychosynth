@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-02 11:00:11 raskolnikov>
+ *  Time-stamp:  <2010-11-05 12:01:57 raskolnikov>
  *
  *  @file        channel_base_algorithm.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -81,7 +81,8 @@ namespace sound
    \ingroup ChannelBaseAlgorithmSize
 */
 template <typename ChannelBase>
-struct size : public mpl::size<typename ChannelBase::layout::channel_space_t> {};
+struct size : public boost::mpl::size<
+    typename ChannelBase::layout::channel_space> {};
 
 
 /*
@@ -113,7 +114,7 @@ struct size : public mpl::size<typename ChannelBase::layout::channel_space_t> {}
     // bits for the red sample and 7 unused bits
 
     typedef packed_frame_type<uint16_t,
-    mpl::vector3_c<unsigned,4,3,2>, bgr_layout>::type
+    boost::mpl::vector3_c<unsigned,4,3,2>, bgr_layout>::type
     bgr432_frame_t;
     
 
@@ -141,7 +142,7 @@ struct kth_semantic_element_type
 {
     BOOST_STATIC_CONSTANT(
 	int, semantic_index = (
-	    mpl::at_c<typename ChannelBase::layout::sample_mapping,
+	    boost::mpl::at_c<typename ChannelBase::layout::sample_mapping,
 		      K>::type::value));
     typedef typename kth_element_type <ChannelBase, semantic_index>::type type;
 };
@@ -156,14 +157,14 @@ struct kth_semantic_element_reference_type
 {
     BOOST_STATIC_CONSTANT(
 	int, semantic_index = (
-	    mpl::at_c<typename ChannelBase::layout::sample_mapping,
+	    boost::mpl::at_c<typename ChannelBase::layout::sample_mapping,
 		      K>::type::value));
     typedef typename kth_element_reference_type<
 	ChannelBase, semantic_index>::type type;
 
     static type get (ChannelBase& cb)
     {
-	return gil::at_c<semantic_index>(cb);
+	return sound::at_c<semantic_index>(cb);
     }
 };
 
@@ -179,14 +180,14 @@ struct kth_semantic_element_const_reference_type
 {
     BOOST_STATIC_CONSTANT(
 	int, semantic_index = (
-	    mpl::at_c<typename ChannelBase::layout::sample_mapping,
+	    boost::mpl::at_c<typename ChannelBase::layout::sample_mapping,
 		      K>::type::value));
     typedef typename kth_element_const_reference_type<
 	ChannelBase, semantic_index>::type type;
 
     static type get (const ChannelBase& cb)
     {
-	return gil::at_c<semantic_index> (cb);
+	return sound::at_c<semantic_index> (cb);
     }
 };
 
@@ -196,8 +197,8 @@ struct kth_semantic_element_const_reference_type
    \ingroup ChannelBaseAlgorithmSemanticAtC
 */
 template <int K, typename ChannelBase> inline
-typename disable_if<
-    is_const<ChannelBase>,
+typename boost::disable_if<
+    boost::is_const<ChannelBase>,
     typename kth_semantic_element_reference_type<ChannelBase,K>::type>::type
 semantic_at_c (ChannelBase& p)
 { 
@@ -255,7 +256,7 @@ semantic_at_c (const ChannelBase& p)
 */
 template <typename ChannelBase, typename Channel>
 struct contains_channel :
-    public mpl::contains<typename ChannelBase::layout::channel_space,
+    public boost::mpl::contains<typename ChannelBase::layout::channel_space,
 			 Channel> {};
 
 template <typename ChannelBase, typename Channel>
@@ -349,7 +350,7 @@ struct element_type : public kth_element_type<ChannelBase, 0> {};
 
 /**
    \brief Specifies the return type of the mutable element accessor
-   at_c of a homogeneous channel base
+   sound::at_c of a homogeneous channel base
    
    \ingroup ChannelBaseAlgorithmHomogeneous
 */
@@ -359,7 +360,7 @@ struct element_reference_type :
 
 /**
    \brief Specifies the return type of the constant element accessor
-   at_c of a homogeneous channel base
+   sound::at_c of a homogeneous channel base
    
    \ingroup ChannelBaseAlgorithmHomogeneous
 */
@@ -722,7 +723,7 @@ PSYNTH_FORCEINLINE
 typename element_reference_type<P>::type       static_min (P& p)
 { return detail::min_max_recur<size<P>::value>::min_(p); }
 
-/// \}
+/** \} */
 
 /**
    \defgroup ChannelBaseAlgorithmEqual static_equal 
@@ -746,7 +747,7 @@ PSYNTH_FORCEINLINE
 bool static_equal (const P1& p1, const P2& p2)
 { return detail::element_recursion<size<P1>::value>::static_equal(p1,p2); }
 
-/// \}
+/** \} */
 
 /**
    \defgroup ChannelBaseAlgorithmCopy static_copy 
@@ -770,7 +771,7 @@ PSYNTH_FORCEINLINE
 void static_copy(const Src& src, Dst& dst)
 {  detail::element_recursion<size<Dst>::value>::static_copy(src,dst); }
 
-/// \}
+/** \} */
 
 /**
    \defgroup ChannelBaseAlgorithmFill static_fill 
@@ -789,7 +790,7 @@ template <typename P,typename V>
 PSYNTH_FORCEINLINE
 void static_fill (P& p, const V& v)
 {  detail::element_recursion<size<P>::value>::static_fill(p,v); }
-/// \}
+/** \} */
 
 /**
    \defgroup ChannelBaseAlgorithmGenerate static_generate 
@@ -1027,8 +1028,7 @@ Op static_for_each(const P1& p1,const P2& p2,const P3& p3,Op op)
 { return detail::element_recursion<size<P1>::value>::static_for_each (
 	p1,p2,p3,op);
 }
-
-///\}
+/** \} */
 
 } /* namespace sound */
 } /* namespace psynth */

@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-10-29 12:56:59 raskolnikov>
+ *  Time-stamp:  <2010-11-05 14:49:52 raskolnikov>
  *
  *  @file        buffer.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -82,26 +82,29 @@ class buffer
 public:
     typedef typename Alloc::template rebind<unsigned char>::other allocator_type;
     typedef typename view_type_from_frame<Frame, IsPlanar>::type view;
-    typedef typename view_t::const_type  const_view;
-    typedef typename view_t::size_type   size_type;
-    typedef typename view_t::value_type  value_type;
+    typedef typename view::const_type  const_view;
+    typedef typename view::size_type   size_type;
+    typedef typename view::value_type  value_type;
     
     const size_type& size () const
     {
 	return _view.size ();
     }
 
+    #if 0
+    // TODO: Is an alternative necesary or should we rely on recreate?
     explicit buffer (std::size_t alignment = 0,
 		     const Alloc alloc_in  = Alloc())
 	: _memory (0)
 	, _align_in_bytes (alignment)
 	, _alloc (alloc_in)
     {}
-
+    #endif
+    
     /* Create with size and optional initial value and
      * alignment */
-    buffer (size_type& size,
-	    std::size_t alignment = 0,
+    explicit buffer (size_type size = 0,
+		     std::size_t alignment = 0,
 	    const Alloc alloc_in = Alloc())
 	: _memory (0)
 	, _align_in_bytes (alignment)
@@ -110,7 +113,7 @@ public:
         allocate_and_default_construct (size);
     }
     
-    buffer (const size_type& size, 
+    buffer (size_type size, 
 	    const Frame& frame_in,
 	    std::size_t alignment,
 	    const Alloc alloc_in = Alloc())
@@ -180,7 +183,7 @@ public:
         swap (_alloc,          buf._alloc);
     }    
 
-    void recreate (const size_type& size,
+    void recreate (size_type size,
 		   std::size_t alignment=0,
 		   const Alloc alloc_in = Alloc ())
     {
@@ -188,17 +191,17 @@ public:
 	    _align_in_bytes != alignment ||
 	    alloc_in != _alloc)
 	{
-            buffer tmp (dims, alignment, alloc_in);
+            buffer tmp (size, alignment, alloc_in);
             swap (tmp);
         }
     }
     
-    void recreate (const size_type& size, 
+    void recreate (size_type size, 
 		   const Frame& frame_in,
 		   std::size_t alignment,
 		   const Alloc alloc_in = Alloc())
     {
-        if (dims != _view.size() ||
+        if (size != _view.size() ||
 	    _align_in_bytes != alignment ||
 	    alloc_in != _alloc)
 	{
@@ -208,7 +211,15 @@ public:
     }
     
 private:
-    view_t         _view;
+    template <typename F, bool P, typename A> friend 
+    const typename buffer<F, P, A>::view&
+    view (buffer<F, P, A>& buf);
+
+    template <typename F, bool P, typename A> friend 
+    const typename buffer<F, P, A>::const_view
+    const_view (const buffer<F, P, A>& buf);
+    
+    view           _view;
     // contains pointer to the frames, the buffer size and ways to
     // navigate frames
     
@@ -216,10 +227,10 @@ private:
     std::size_t    _align_in_bytes;
     allocator_type _alloc;
 
-    void allocate_and_default_construct (const point_t& size)
+    void allocate_and_default_construct (size_type size)
     { 
         try {
-            allocate_ (size, mpl::bool_<IsPlanar>());
+            allocate_ (size, boost::mpl::bool_<IsPlanar>());
             default_construct_frames (_view);
         } catch (...) {
 	    deallocate (size);
@@ -227,10 +238,10 @@ private:
 	}
     }
 
-    void allocate_and_fill (const point_t& size, const Frame& frame_in)
+    void allocate_and_fill (size_type size, const Frame& frame_in)
     {
         try {
-            allocate_ (size, mpl::bool_<IsPlanar>());
+            allocate_ (size, boost::mpl::bool_<IsPlanar>());
             uninitialized_fill_frames (_view, frame_in);
         } catch(...) {
 	    deallocate(size);
@@ -239,10 +250,10 @@ private:
     }
 
     template <typename View>
-    void allocate_and_copy (const point_t& size, const View& v)
+    void allocate_and_copy (size_type size, const View& v)
     { 
         try {
-            allocate_ (size, mpl::bool_<IsPlanar>());
+            allocate_ (size, boost::mpl::bool_<IsPlanar>());
             uninitialized_copy_frames (v, _view);
         } catch(...) {
 	    deallocate(size);
@@ -250,41 +261,42 @@ private:
 	}
     }
 
-    void deallocate (const point_t& size)
+    void deallocate (size_type size)
     { 
         if (_memory)
 	    _alloc.deallocate (_memory, total_allocated_size_in_bytes (size));
     }
 
-    std::size_t total_allocated_size_in_bytes (const point_t& size) const
+    std::size_t total_allocated_size_in_bytes (size_type size) const
     {
-        std::size_t size_in_units = size ()
+        std::size_t size_in_units = size * memunit_step (
+	    typename view::iterator ());
         if (IsPlanar)
-            size_in_units = size_in_units * num_samples<view_t>::value;
+            size_in_units = size_in_units * num_samples<view>::value;
 	
         // return the size rounded up to the nearest byte
         return (size_in_units +
-		byte_to_memunit<typename view_t::x_iterator>::value - 1) /
-	    byte_to_memunit<typename view_t::x_iterator>::value
+		byte_to_memunit<typename view::iterator>::value - 1) /
+	    byte_to_memunit<typename view::iterator>::value
             + (_align_in_bytes > 0 ? _align_in_bytes - 1 : 0);
 	// add extra padding in case we need to align the first buffer frame
     }
 
-    std::size_t get_row_size_in_memunits (size_type width) const
+    std::size_t get_size_in_memunits (size_type size) const
     {
 	// number of units per row
-        std::size_t size_in_memunits =
-	    width * memunit_step (typename view_t::x_iterator ());
+        size_type size_in_memunits =
+	    size * memunit_step (typename view::iterator ());
         if (_align_in_bytes > 0) {
             std::size_t alignment_in_memunits =
 		_align_in_bytes *
-		byte_to_memunit<typename view_t::x_iterator>::value;
+		byte_to_memunit<typename view::iterator>::value;
             return align (size_in_memunits, alignment_in_memunits);
         }
         return size_in_memunits;
     }
     
-    void allocate_ (const size_type& size, mpl::false_)
+    void allocate_ (const size_type& size, boost::mpl::false_)
     {
 	// if it throws and _memory!=0 the client must deallocate _memory
         _memory = _alloc.allocate (total_allocated_size_in_bytes (size));
@@ -292,29 +304,28 @@ private:
 	unsigned char* tmp = (_align_in_bytes > 0) ?
 	    (unsigned char*) align ((std::size_t) _memory, _align_in_bytes) :
 	    _memory;
-        _view = view_t (size, typename view_t::locator (
-			    typename view_t::x_iterator (tmp),
-			    get_row_size_in_memunits (size.x)));
+	
+        _view = view (size, typename view::iterator (tmp));
     }
 
-    void allocate_ (const point_t& size, mpl::true_)
+    void allocate_ (size_type size, boost::mpl::true_)
     {
         // if it throws and _memory!=0 the client must deallocate _memory
-        std::size_t row_size = get_row_size_in_memunits (size.x);
-        std::size_t plane_size = row_size * size.y;
+        std::size_t plane_size = get_size_in_memunits (size);
         _memory = _alloc.allocate (total_allocated_size_in_bytes (size));
 	
         unsigned char* tmp = (_align_in_bytes > 0) ?
 	    (unsigned char*) align ((std::size_t)_memory, _align_in_bytes) :
 	    _memory;
 	
-        typename view_t::x_iterator first; 
-        for (int i = 0; i < num_samples<view_t>::value; ++i)
+        typename view::iterator first; 
+        for (int i = 0; i < num_samples<view>::value; ++i)
 	{
-            dynamic_at_c (first, i) = (typename sample_type<view_t>::type *) tmp;
+            dynamic_at_c (first, i) = (typename sample_type<view>::type *) tmp;
             memunit_advance (dynamic_at_c (first, i), plane_size * i);
         }
-        _view = view_t (size, typename view_t::locator (first, row_size));
+	
+        _view = view (size, first);
     }
 };
 
@@ -340,9 +351,9 @@ bool operator == (const buffer<Frame1, IsPlanar1, Alloc1>& buf1,
 template <typename Frame1, bool IsPlanar1, typename Alloc1,
 	  typename Frame2, bool IsPlanar2, typename Alloc2>
 bool operator != (const buffer<Frame1, IsPlanar1, Alloc1>& buf1,
-		  const buffer<Frame2, IsPlanar2, Alloc2>& im2)
+		  const buffer<Frame2, IsPlanar2, Alloc2>& buf2)
 {
-    return !(im1==im2);
+    return !(buf1 == buf2);
 }
 
 /**@{
@@ -354,7 +365,7 @@ bool operator != (const buffer<Frame1, IsPlanar1, Alloc1>& buf1,
    \brief Returns the non-constant-frame view of an buffer
 */
 template <typename Frame, bool IsPlanar, typename Alloc> inline 
-const typename buffer<Frame, IsPlanar, Alloc>::view_t&
+const typename buffer<Frame, IsPlanar, Alloc>::view&
 view (buffer<Frame, IsPlanar, Alloc>& buf)
 {
     return buf._view;
@@ -364,11 +375,11 @@ view (buffer<Frame, IsPlanar, Alloc>& buf)
    \brief Returns the constant-frame view of an buffer
 */
 template <typename Frame, bool IsPlanar, typename Alloc> inline 
-const typename buffer <Frame, IsPlanar, Alloc>::const_view_t
+const typename buffer <Frame, IsPlanar, Alloc>::const_view
 const_view(const buffer<Frame,IsPlanar,Alloc>& buf)
 { 
     return static_cast<
-	const typename buffer<Frame,IsPlanar,Alloc>::const_view_t> (buf._view); 
+	const typename buffer<Frame,IsPlanar,Alloc>::const_view> (buf._view); 
 }
 /** @} */
 
@@ -392,7 +403,7 @@ struct sample_mapping_type<buffer<Frame,IsPlanar,Alloc> > :
 
 template <typename Frame, bool IsPlanar, typename Alloc>
 struct is_planar<buffer<Frame,IsPlanar,Alloc> > :
-    public mpl::bool_<IsPlanar> {};
+    public boost::mpl::bool_<IsPlanar> {};
 
 //#ifdef _MSC_VER
 //#pragma warning(pop)

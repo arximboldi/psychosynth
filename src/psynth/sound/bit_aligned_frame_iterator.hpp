@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-02 11:07:37 raskolnikov>
+ *  Time-stamp:  <2010-11-04 19:01:11 raskolnikov>
  *
  *  @file        bit_aligned_frame_iterator.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -43,8 +43,8 @@
 #include <boost/iterator/iterator_facade.hpp>
 
 #include <psynth/base/compat.hpp>
-#include <psynth/base/bit_aligned_frame_reference.hpp>
-#include <psynth/base/frame_iterator.hpp>
+#include <psynth/sound/bit_aligned_frame_reference.hpp>
+#include <psynth/sound/frame_iterator.hpp>
 
 namespace psynth
 {
@@ -73,9 +73,8 @@ namespace sound
    \ingroup FrameIteratorNonAlignedFrameIterator FrameBasedModel
 */
 template <typename NonAlignedFrameReference>
-struct bit_aligned_frame_iterator : public iterator_facade<
-    bit_aligned_frame_iterator<
-	NonAlignedFrameReference>,
+struct bit_aligned_frame_iterator : public boost::iterator_facade<
+    bit_aligned_frame_iterator<NonAlignedFrameReference>,
     typename NonAlignedFrameReference::value_type,
     std::random_access_iterator_tag,
     const NonAlignedFrameReference,
@@ -83,7 +82,7 @@ struct bit_aligned_frame_iterator : public iterator_facade<
 {
 private:
     typedef
-    iterator_facade<
+    boost::iterator_facade<
     bit_aligned_frame_iterator<NonAlignedFrameReference>,
     typename NonAlignedFrameReference::value_type,
     std::random_access_iterator_tag,
@@ -176,12 +175,12 @@ struct const_iterator_type<bit_aligned_frame_iterator<NonAlignedFrameReference> 
 template <typename NonAlignedFrameReference> 
 struct iterator_is_mutable<
     bit_aligned_frame_iterator<NonAlignedFrameReference> > :
-	public mpl::bool_<NonAlignedFrameReference::is_mutable> {};
+	public boost::mpl::bool_<NonAlignedFrameReference::is_mutable> {};
 
 template <typename NonAlignedFrameReference> 
 struct is_iterator_adaptor<
     bit_aligned_frame_iterator<NonAlignedFrameReference> > :
-	public mpl::false_ {};
+	public boost::mpl::false_ {};
 
 /*
  *
@@ -212,7 +211,7 @@ struct is_planar<bit_aligned_frame_iterator<NonAlignedFrameReference> > :
 
 template <typename NonAlignedFrameReference>
 struct byte_to_memunit<bit_aligned_frame_iterator<NonAlignedFrameReference> > :
-    public mpl::int_<8> {};
+    public boost::mpl::int_<8> {};
 
 template <typename NonAlignedFrameReference>
 inline std::ptrdiff_t memunit_step (

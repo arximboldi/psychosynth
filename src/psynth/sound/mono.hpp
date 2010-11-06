@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-10-28 13:51:47 raskolnikov>
+ *  Time-stamp:  <2010-11-03 13:43:19 raskolnikov>
  *
  *  @file        mono.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -52,7 +52,7 @@ struct mono_channel {};
 /**
    \ingroup ChannelSpaceModel
 */
-typedef mpl::vector1<mono_channel> mono_space;
+typedef boost::mpl::vector1<mono_channel> mono_space;
 
 /**
    \ingroup LayoutModel

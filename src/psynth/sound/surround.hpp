@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-10-28 18:17:19 raskolnikov>
+ *  Time-stamp:  <2010-11-03 13:47:18 raskolnikov>
  *
  *  @file        surround.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -48,9 +48,10 @@ namespace sound
 */
 struct center_channel {};    
 
-typedef mpl::vector4<left_channel, right_channel,
-		     center_channel,
-		     back_right_channel, back_left_channel> surround_space;
+typedef boost::mpl::vector5<
+    left_channel, right_channel,
+    center_channel,
+    back_right_channel, back_left_channel> surround_space;
 
 /** \ingroup LayoutModel */
 typedef layout<surround_space> surround_layout;
@@ -60,14 +61,13 @@ typedef layout<surround_space> surround_layout;
    \brief from raw surround planar data
 */
 template <typename IC> inline
-typename type_from_x_iterator<planar_frame_iterator<IC,rgba_t> >::view_t
+typename type_from_iterator<planar_frame_iterator<IC, surround_space> >::view
 planar_surround_view (std::size_t size, IC l, IC r, IC c, IC bl, IC br)
 {
-    typedef typename type_from_x_iterator<
-	planar_pixel_iterator<IC,rgba_t> >::view_t RView;
-    return RView(width, height,
-                 typename RView::locator(planar_pixel_iterator<IC,rgba_t>(r,g,b,a),
-                                         rowsize_in_bytes));
+    typedef typename type_from_iterator<
+	planar_frame_iterator<IC, surround_space> >::view RView;
+    return RView (size, planar_frame_iterator<IC, surround_space>(
+		      l, r, c, bl, br));
 }
 
 } /* namespace sound */

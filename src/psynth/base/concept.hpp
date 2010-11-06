@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-10-28 14:22:22 raskolnikov>
+ *  Time-stamp:  <2010-11-03 11:29:16 raskolnikov>
  *
  *  @file        concept.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -28,8 +28,10 @@
  *
  */
 
-#ifndef PSYNTH_CONCEPT_H_
-#define PSYNTH_CONCEPT_H_
+#ifndef PSYNTH_BASE_CONCEPT_H_
+#define PSYNTH_BASE_CONCEPT_H_
+
+#include <boost/concept_check.hpp>
 
 namespace psynth
 {
@@ -77,7 +79,7 @@ template <typename T>
 struct CopyConstructible
 {
     void constraints () {
-        function_requires<boost::CopyConstructibleConcept<T> >();
+	boost::function_requires<boost::CopyConstructibleConcept<T> >();
     }
 };
 
@@ -94,7 +96,7 @@ template <typename T>
 struct Assignable
 {
     void constraints() {
-        function_requires<boost::AssignableConcept<T> >();
+        boost::function_requires<boost::AssignableConcept<T> >();
     }
 };
 
@@ -111,7 +113,7 @@ template <typename T>
 struct EqualityComparable
 {
     void constraints() {
-        function_requires<boost::EqualityComparableConcept<T> >();
+        boost::function_requires<boost::EqualityComparableConcept<T> >();
     }
 };
 
@@ -160,12 +162,12 @@ template <typename T>
 struct Regular
 {
     void constraints() {
-        gil_function_requires< boost::DefaultConstructibleConcept<T> >();
-        gil_function_requires< boost::CopyConstructibleConcept<T> >();
+        psynth_function_requires< boost::DefaultConstructibleConcept<T> >();
+        psynth_function_requires< boost::CopyConstructibleConcept<T> >();
 	// ==, !=
-        gil_function_requires< boost::EqualityComparableConcept<T> >(); 
-        gil_function_requires< boost::AssignableConcept<T> >();
-        gil_function_requires< Swappable<T> >();
+        psynth_function_requires< boost::EqualityComparableConcept<T> >(); 
+        psynth_function_requires< boost::AssignableConcept<T> >();
+        psynth_function_requires< Swappable<T> >();
     }
 };
 
@@ -188,5 +190,5 @@ struct Metafunction
 } /* namespace base */
 } /* namespace psynth */
 
-#endif /* PSYNTH_CONCEPT_H_ */
+#endif /* PSYNTH_BASE_CONCEPT_H_ */
 

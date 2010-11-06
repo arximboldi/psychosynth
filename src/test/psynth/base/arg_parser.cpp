@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-02 13:14:36 raskolnikov>
+ *  Time-stamp:  <2010-11-03 01:08:44 raskolnikov>
  *
  *  @file        arg_parser_test.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -50,7 +50,7 @@ static const char* argv_3 []  =
 static const int   argc_3 = 7;
 
 
-BOOST_AUTO_TEST_SUITE (arg_parser_test_suite_0)
+BOOST_AUTO_TEST_SUITE (arg_parser_test_suite)
 
 BOOST_AUTO_TEST_CASE (arg_paser_test_0)
 {
