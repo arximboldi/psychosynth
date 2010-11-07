@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-05 12:05:51 raskolnikov>
+ *  Time-stamp:  <2010-11-07 16:09:05 raskolnikov>
  *
  *  @file        planar_frame_reference.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -85,7 +85,8 @@ struct planar_frame_reference  : public detail::homogeneous_channel_base<
     SampleReference, layout<ChannelSpace>, boost::mpl::size<ChannelSpace>::value>
 {
     typedef detail::homogeneous_channel_base<
-	SampleReference, layout<ChannelSpace>, boost::mpl::size<ChannelSpace>::value>
+	SampleReference, layout<ChannelSpace>,
+	boost::mpl::size<ChannelSpace>::value>
     parent_type;
     
 private:
@@ -105,15 +106,15 @@ public:
     const_reference;
 
     planar_frame_reference (SampleReference v0, SampleReference v1)
-	: parent_type(v0,v1) {}
+	: parent_type (v0,v1) {}
 
     planar_frame_reference (SampleReference v0, SampleReference v1,
 			    SampleReference v2)
-	: parent_type(v0,v1,v2) {}
+	: parent_type (v0,v1,v2) {}
 
     planar_frame_reference (SampleReference v0, SampleReference v1,
 			    SampleReference v2, SampleReference v3)
-	: parent_type(v0,v1,v2,v3) {}
+	: parent_type (v0,v1,v2,v3) {}
 
     planar_frame_reference (SampleReference v0, SampleReference v1,
 			    SampleReference v2, SampleReference v3,
@@ -126,14 +127,14 @@ public:
 	: parent_type (v0,v1,v2,v3,v4,v5) {}
 
     template <typename P>
-    planar_frame_reference(const P& p)
+    planar_frame_reference (const P& p)
 	: parent_type(p)
     { check_compatible<P>(); }
 
     // PERFORMANCE_CHECK: Is this constructor necessary?
     template <typename SampleV, typename Mapping>           
     planar_frame_reference (frame<SampleV,layout<ChannelSpace,Mapping> >& p)
-	: parent_type(p)
+	: parent_type (p)
     { check_compatible<frame<SampleV,layout<ChannelSpace,Mapping> > >();}
 
     // Construct at offset from a given location
@@ -141,7 +142,7 @@ public:
     planar_frame_reference (
 	const planar_frame_iterator<SamplePtr,ChannelSpace>& p,
 	std::ptrdiff_t diff)
-	: parent_type (p,diff) {}
+	: parent_type (p, diff) {}
 
     const planar_frame_reference&
     operator= (const planar_frame_reference& p) const
@@ -189,7 +190,7 @@ public:
 #endif /* BOOST_WORKAROUND */
 
     template <typename P>
-    bool operator==(const P& p) const
+    bool operator== (const P& p) const
     {
 	check_compatible<P>();
 	return static_equal (*this, p);

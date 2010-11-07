@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-05 12:05:35 raskolnikov>
+ *  Time-stamp:  <2010-11-07 16:00:59 raskolnikov>
  *
  *  @file        channel_base.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -193,9 +193,11 @@ public:
 	, _v1(sound::at_c<mapping_transform<Layout,L2,1>::value>(c)) {}
 
     // Support for planar_frame_iterator construction and dereferencing
-    template <typename P> homogeneous_channel_base(P* p,bool)
-	: _v0(&semantic_at_c<0>(*p))
-	, _v1(&semantic_at_c<1>(*p)) {}
+    template <typename P> homogeneous_channel_base(P* p, bool)
+	: _v0 (&semantic_at_c<0>(*p))
+	, _v1 (&semantic_at_c<1>(*p))
+    {
+    }
 
     template <typename Ref> Ref deref () const
     { 

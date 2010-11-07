@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-05 13:42:24 raskolnikov>
+ *  Time-stamp:  <2010-11-07 14:32:37 raskolnikov>
  *
  *  @file        sample_buffe.cpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -8,6 +8,7 @@
  *  A sample buffer.
  */
 
+#include <iostream>
 #include <cmath>
 #include <psynth/sound/stereo.hpp>
 #include <psynth/sound/planar_frame_reference.hpp>

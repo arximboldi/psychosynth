@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-05 12:07:01 raskolnikov>
+ *  Time-stamp:  <2010-11-07 15:40:43 raskolnikov>
  *
  *  @file        concept.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -1299,7 +1299,8 @@ struct RandomAccessIteratorIsMemoryBasedConcept
 {
     void constraints()
     {
-	std::ptrdiff_t bs=memunit_step(it);  boost::ignore_unused_variable_warning(bs);
+	std::ptrdiff_t bs=memunit_step(it);
+	boost::ignore_unused_variable_warning (bs);
 	it=memunit_advanced(it,3);
 	std::ptrdiff_t bd=memunit_distance(it,it);
 	boost::ignore_unused_variable_warning(bd);
