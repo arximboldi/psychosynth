@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-05 12:01:57 raskolnikov>
+ *  Time-stamp:  <2010-11-07 15:59:33 raskolnikov>
  *
  *  @file        channel_base_algorithm.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -202,7 +202,7 @@ typename boost::disable_if<
     typename kth_semantic_element_reference_type<ChannelBase,K>::type>::type
 semantic_at_c (ChannelBase& p)
 { 
-    return kth_semantic_element_reference_type<ChannelBase, K>::get(p);
+    return kth_semantic_element_reference_type<ChannelBase, K>::get (p);
 }
 
 /**
@@ -543,8 +543,8 @@ struct element_recursion
     template <typename P1,typename Dst,typename Op> 
     static Op static_transform (P1& src, Dst& dst, Op op)
     {
-        Op op2(element_recursion<N-1>::static_transform(src,dst,op));
-        semantic_at_c<N-1>(dst)=op2(semantic_at_c<N-1>(src));
+        Op op2 (element_recursion<N-1>::static_transform (src,dst,op));
+        semantic_at_c<N-1> (dst) = op2 (semantic_at_c<N-1> (src));
         return op2;
     }
     
@@ -854,15 +854,15 @@ PSYNTH_FORCEINLINE void static_generate(P1& dst,Op op)
 //static_transform with one source
 template <typename Src,typename Dst,typename Op>
 PSYNTH_FORCEINLINE
-Op static_transform(Src& src,Dst& dst,Op op)
+Op static_transform (Src& src, Dst& dst,Op op)
 {
-    return detail::element_recursion<size<Dst>::value>::static_transform(
+    return detail::element_recursion<size<Dst>::value>::static_transform (
 	src, dst, op);
 }
 
 template <typename Src,typename Dst,typename Op>
 PSYNTH_FORCEINLINE
-Op static_transform(const Src& src,Dst& dst,Op op)
+Op static_transform (const Src& src, Dst& dst, Op op)
 {
     return detail::element_recursion<size<Dst>::value>::static_transform (
 	src, dst, op);

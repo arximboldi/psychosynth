@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-06 11:52:11 raskolnikov>
+ *  Time-stamp:  <2010-11-07 14:05:05 raskolnikov>
  *
  *  @file        performance.cpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>

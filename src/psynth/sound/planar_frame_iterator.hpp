@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-05 12:07:19 raskolnikov>
+ *  Time-stamp:  <2010-11-07 16:07:07 raskolnikov>
  *
  *  @file        planar_frame_iterator.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -91,18 +91,21 @@ struct planar_frame_reference;
 */
 template <typename SamplePtr, typename ChannelSpace>
 struct planar_frame_iterator
-    : public boost::iterator_facade<planar_frame_iterator<SamplePtr,ChannelSpace>,
-				    frame<typename std::iterator_traits<
-					      SamplePtr>::value_type,
-					  layout<ChannelSpace> >,
-				    std::random_access_iterator_tag,
-				    const planar_frame_reference<
-					typename std::iterator_traits<
-					    SamplePtr>::reference,
-					ChannelSpace> >
-    , public detail::homogeneous_channel_base<SamplePtr,
-					      layout<ChannelSpace>,
-					      boost::mpl::size<ChannelSpace>::value >
+    : public boost::iterator_facade<
+    planar_frame_iterator<SamplePtr,ChannelSpace>,
+    frame<typename std::iterator_traits<
+	      SamplePtr>::value_type,
+	  layout<ChannelSpace> >,
+    std::random_access_iterator_tag,
+    const planar_frame_reference<
+	typename std::iterator_traits<
+	    SamplePtr>::reference,
+	ChannelSpace> >
+
+    , public detail::homogeneous_channel_base<
+    SamplePtr,
+    layout<ChannelSpace>,
+    boost::mpl::size<ChannelSpace>::value >
 {
 private:
     typedef
@@ -166,8 +169,8 @@ public:
        we should not override operator& that's the best we can do.
     */
     template <typename P> 
-    planar_frame_iterator(P* pix)
-	: channel_base_parent_type(pix, true)
+    planar_frame_iterator (P* pix)
+	: channel_base_parent_type (pix, true)
     {
 	boost::function_requires<FramesCompatibleConcept<P,value_type> >();
     }
@@ -181,10 +184,17 @@ public:
     template <typename P> 
     planar_frame_iterator& operator= (P* pix)
     {
-	boost::function_requires<FramesCompatibleConcept<P, value_type> >();
-        static_transform (*pix, *this, address_of());
-
-        /*
+	/*
+	  HACK HACK HACK! TODO!:
+	  Without this it seems that the next statement is optimized
+	  away by the compiler. For some reason it feels that it has
+	  no side effects or something. Why? I do not know...
+	  See in unit tests hack_planar_frame_iterator_copy
+	 */
+	boost::function_requires<FramesCompatibleConcept<P, value_type> >();	
+	static_transform (*pix, *this, address_of ());
+		
+	/*
 	  PERFORMANCE_CHECK: Compare to this:
 	  this->template semantic_at_c<0>()=&pix->template
 	  semantic_at_c<0>();
