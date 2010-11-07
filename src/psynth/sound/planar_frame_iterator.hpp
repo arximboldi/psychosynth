@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-07 16:07:07 raskolnikov>
+ *  Time-stamp:  <2010-11-07 16:32:26 raskolnikov>
  *
  *  @file        planar_frame_iterator.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -185,17 +185,16 @@ public:
     planar_frame_iterator& operator= (P* pix)
     {
 	/*
-	  HACK HACK HACK! TODO!:
-	  Without this it seems that the next statement is optimized
-	  away by the compiler. For some reason it feels that it has
-	  no side effects or something. Why? I do not know...
-	  See in unit tests hack_planar_frame_iterator_copy
+	  TODO:
+	  It seems that the following statements are optimized away by
+	  GCC in some strange cases...
 	 */
 	boost::function_requires<FramesCompatibleConcept<P, value_type> >();	
 	static_transform (*pix, *this, address_of ());
 		
 	/*
-	  PERFORMANCE_CHECK: Compare to this:
+	  TODO:
+	  Performance compare to this:
 	  this->template semantic_at_c<0>()=&pix->template
 	  semantic_at_c<0>();
 	  this->template semantic_at_c<1>()=&pix->template
