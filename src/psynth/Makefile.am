@@ -51,9 +51,9 @@ nobase_libpsynthinc_HEADERS = \
         base/iterator.hpp \
 	base/misc.hpp \
 	base/logger.hpp \
-	base/logger_def.hpp \
+	base/logger_fwd.hpp \
 	base/config.hpp \
-	base/config_def.hpp \
+	base/config_fwd.hpp \
 	base/option_conf.hpp \
 	base/timer.hpp \
 	base/vector_2d.hpp\
@@ -189,7 +189,7 @@ libpsynth_la_SOURCES += \
 	base/conf_backend_xml.cpp
 nobase_libpsynthinc_HEADERS += \
 	base/conf_backend_xml.hpp \
-	base/conf_backend_xml_def.hpp
+	base/conf_backend_xml_fwd.hpp
 endif
 
 if HAVE_LIBLO

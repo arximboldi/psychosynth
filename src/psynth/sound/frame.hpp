@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-05 12:04:58 raskolnikov>
+ *  Time-stamp:  <2010-11-09 02:58:27 raskolnikov>
  *
  *  @file        frame.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -94,7 +94,7 @@ struct num_samples :
 
 Example:
 \code
-BOOST_STATIC_ASSERT((num_samples<rgb8_view_t>::value==3));
+BOOST_STATIC_ASSERT((num_samples<rgb8_range_t>::value==3));
 BOOST_STATIC_ASSERT((num_samples<cmyk16_planar_ptr_t>::value==4));
 
 BOOST_STATIC_ASSERT((is_planar<rgb16_planar_image_t>::value));
@@ -126,7 +126,7 @@ BOOST_STATIC_ASSERT((is_same<sample_type<bgr8_frame_t>::type, bits8>::value));
    a simple, homogeneous frame value. It is used to store the value of
    a channel. The built-in C++ references to \p frame, \p frame& and \p
    const \p frame& are used to represent a reference to a frame inside
-   an interleaved image view (a view in which all samples are
+   an interleaved image range (a range in which all samples are
    together in memory). Similarly, built-in pointer types \p frame*
    and \p const \p frame* are used as the standard iterator over a row
    of interleaved homogeneous frames.

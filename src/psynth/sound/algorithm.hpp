@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-05 12:01:02 raskolnikov>
+ *  Time-stamp:  <2010-11-09 13:27:32 raskolnikov>
  *
  *  @file        algorithm.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -55,8 +55,8 @@
 #include <psynth/base/concept.hpp>
 #include <psynth/sound/concept.hpp>
 #include <psynth/sound/channel_base_algorithm.hpp>
-#include <psynth/sound/buffer_view.hpp>
-#include <psynth/sound/buffer_view_factory.hpp>
+#include <psynth/sound/buffer_range.hpp>
+#include <psynth/sound/buffer_range_factory.hpp>
 #include <psynth/sound/bit_aligned_frame_iterator.hpp>
 
 //#ifdef _MSC_VER
@@ -81,24 +81,24 @@ class memory_based_step_iterator;
 struct error_type {};
 
 /**
-   \defgroup ImageViewSTLAlgorithms STL-like Algorithms
-   \ingroup ImageViewAlgorithm
-   \brief Image view-equivalents of STL algorithms
+   \defgroup ImageRangeSTLAlgorithms STL-like Algorithms
+   \ingroup ImageRangeAlgorithm
+   \brief Image range-equivalents of STL algorithms
    
-   Image views provide 1D iteration of their frames via \p begin() and
+   Image ranges provide 1D iteration of their frames via \p begin() and
    \p end() methods, which makes it possible to use STL algorithms
    with them. However, using nested loops over X and Y is in many
    cases more efficient. The algorithms in this section resemble STL
-   algorithms, but they abstract away the nested loops and take views
+   algorithms, but they abstract away the nested loops and take ranges
    (as opposed to ranges) as input.
 
-   Most algorithms check whether the image views are 1D-traversable. A
-   1D-traversable image view has no gaps at the end of the rows. In
-   other words, if an x_iterator of that view is advanced past the
+   Most algorithms check whether the image ranges are 1D-traversable. A
+   1D-traversable image range has no gaps at the end of the rows. In
+   other words, if an x_iterator of that range is advanced past the
    last frame in a row it will move to the first frame of the next
-   row. When image views are 1D-traversable, the algorithms use a
+   row. When image ranges are 1D-traversable, the algorithms use a
    single loop and run more efficiently. If one or more of the input
-   views are not 1D-traversable, the algorithms fall-back to an X-loop
+   ranges are not 1D-traversable, the algorithms fall-back to an X-loop
    nested inside a Y-loop.
 
    The algorithms typically delegate the work to their corresponding STL
@@ -113,25 +113,25 @@ struct error_type {};
    which STL typically implements via \p memmove.
 
    As a result \p copy_frames may result in a single call to \p memmove
-   for interleaved 1D-traversable views, or one per each plane of planar
-   1D-traversable views, or one per each row of interleaved
+   for interleaved 1D-traversable ranges, or one per each plane of planar
+   1D-traversable ranges, or one per each row of interleaved
    non-1D-traversable images, etc.  */
 
 /**
    \defgroup STLOptimizations  Performance overloads of STL algorithms
-   \ingroup ImageViewAlgorithm
+   \ingroup ImageRangeAlgorithm
 
    \brief overloads of STL algorithms allowing more efficient
    implementation when used with PSYNTH constructs
 */
 
 /**
-   \brief A generic binary operation on views
-   \ingroup ImageViewSTLAlgorithms
+   \brief A generic binary operation on ranges
+   \ingroup ImageRangeSTLAlgorithms
 
    Use this class as a convenience superclass when defining an
-   operation for any image views.  Many operations have different
-   behavior when the two views are compatible. This class checks for
+   operation for any image ranges.  Many operations have different
+   behavior when the two ranges are compatible. This class checks for
    compatibility and invokes apply_compatible(V1,V2) or
    apply_incompatible(V1,V2) of the subclass.  You must provide
    apply_compatible(V1,V2) method in your subclass, but
@@ -148,13 +148,13 @@ struct binary_operation_obj
     result_type operator () (const std::pair<const V1*, const V2*>& p) const
     {
         return apply (*p.first, *p.second,
-		      typename views_are_compatible<V1,V2>::type());
+		      typename ranges_are_compatible<V1,V2>::type());
     }
 
     template <typename V1, typename V2> PSYNTH_FORCEINLINE
     result_type operator () (const V1& v1, const V2& v2) const
     {
-        return apply (v1, v2, typename views_are_compatible<V1,V2>::type ());
+        return apply (v1, v2, typename ranges_are_compatible<V1,V2>::type ());
     }
 
     result_type operator () (const error_type&) const
@@ -191,9 +191,9 @@ private:
 
 
 /**
-   \defgroup ImageViewSTLAlgorithmsCopyFrames copy_frames
-   \ingroup ImageViewSTLAlgorithms
-   \brief std::copy for image views
+   \defgroup ImageRangeSTLAlgorithmsCopyFrames copy_frames
+   \ingroup ImageRangeSTLAlgorithms
+   \brief std::copy for image ranges
 */
 
 namespace std
@@ -286,26 +286,26 @@ namespace sound
 {
 
 /**
-   \ingroup ImageViewSTLAlgorithmsCopyFrames
-   \brief std::copy for image views
+   \ingroup ImageRangeSTLAlgorithmsCopyFrames
+   \brief std::copy for image ranges
 */
-template <typename View1, typename View2> PSYNTH_FORCEINLINE
-void copy_frames (const View1& src, const View2& dst)
+template <typename Range1, typename Range2> PSYNTH_FORCEINLINE
+void copy_frames (const Range1& src, const Range2& dst)
 { 
     assert (src.size () == dst.size ());
     std::copy (src.begin(), src.end(), dst.begin());
 }
 
 /**
-   \defgroup ImageViewSTLAlgorithmsCopyAndConvertFrames
+   \defgroup ImageRangeSTLAlgorithmsCopyAndConvertFrames
    copy_and_convert_frames
 
-   \ingroup ImageViewSTLAlgorithms
+   \ingroup ImageRangeSTLAlgorithms
 
-   \brief copies src view into dst view, channel converting if
+   \brief copies src range into dst range, channel converting if
    necessary.
 
-   Versions taking static and runtime views are provided. Versions
+   Versions taking static and runtime ranges are provided. Versions
    taking user-defined channel convered are provided.
 */
 namespace detail
@@ -334,7 +334,7 @@ public:
     template <typename V1, typename V2> PSYNTH_FORCEINLINE 
     result_type apply_incompatible (const V1& src, const V2& dst) const
     {
-        copy_frames (channel_converted_view<typename V2::value_type>(src, _cc),
+        copy_frames (channel_converted_range<typename V2::value_type>(src, _cc),
 		     dst);
     }
 
@@ -350,7 +350,7 @@ public:
 } /* namespace detail */
 
 /**
-   \ingroup ImageViewSTLAlgorithmsCopyAndConvertFrames
+   \ingroup ImageRangeSTLAlgorithmsCopyAndConvertFrames
 */
 template <typename V1, typename V2,typename CC> 
 PSYNTH_FORCEINLINE 
@@ -363,14 +363,14 @@ void copy_and_convert_frames (const V1& src, const V2& dst, CC cc)
 struct default_channel_converter;
 
 /**
-   \ingroup ImageViewSTLAlgorithmsCopyAndConvertFrames
+   \ingroup ImageRangeSTLAlgorithmsCopyAndConvertFrames
 */
-template <typename View1, typename View2> 
+template <typename Range1, typename Range2> 
 PSYNTH_FORCEINLINE 
-void copy_and_convert_frames (const View1& src, const View2& dst)
+void copy_and_convert_frames (const Range1& src, const Range2& dst)
 { 
     detail::copy_and_convert_frames_fn<default_channel_converter> ccp;
-    ccp (src,dst);
+    ccp (src, dst);
 }
 
 }  /* namespace sound */
@@ -378,9 +378,9 @@ void copy_and_convert_frames (const View1& src, const View2& dst)
 
 
 /**
-   \defgroup ImageViewSTLAlgorithmsFillFrames fill_frames
-   \ingroup ImageViewSTLAlgorithms
-   \brief std::fill for image views
+   \defgroup ImageRangeSTLAlgorithmsFillFrames fill_frames
+   \ingroup ImageRangeSTLAlgorithms
+   \brief std::fill for image ranges
 
    @note It seems that for buffers std::fill sufices.
    @note Optimize for planar buffers?
@@ -423,14 +423,14 @@ void fill_aux(It first, It last, const P& p, boost::mpl::false_)
 } /* namespace detail */
 
 /**
-   \ingroup ImageViewSTLAlgorithmsFillFrames
-   \brief std::fill for image views
+   \ingroup ImageRangeSTLAlgorithmsFillFrames
+   \brief std::fill for image ranges
 */
-template <typename View, typename Value> PSYNTH_FORCEINLINE 
-void fill_frames (const View& buf_view, const Value& val)
+template <typename Range, typename Value> PSYNTH_FORCEINLINE 
+void fill_frames (const Range& buf_range, const Value& val)
 {
-    detail::fill_aux (buf_view.begin (), buf_view.end (), 
-		      val, is_planar<View>());
+    detail::fill_aux (buf_range.begin (), buf_range.end (), 
+		      val, is_planar<Range>());
 }
 
 
@@ -485,22 +485,22 @@ void destruct_aux (It first, It last, boost::mpl::false_)
 } /* namespace detail */
 
 /**
-   \ingroup ImageViewSTLAlgorithmsDestructFrames
-   \brief Invokes the in-place destructor on every frame of the view
+   \ingroup ImageRangeSTLAlgorithmsDestructFrames
+   \brief Invokes the in-place destructor on every frame of the range
 */
-template <typename View> PSYNTH_FORCEINLINE 
-void destruct_frames (const View& buf_view)
+template <typename Range> PSYNTH_FORCEINLINE 
+void destruct_frames (const Range& buf_range)
 {
-    detail::destruct_aux (buf_view.begin (), buf_view.end (), is_planar<View>());
+    detail::destruct_aux (buf_range.begin (), buf_range.end (), is_planar<Range>());
 }
 
 
 /**
-   \defgroup ImageViewSTLAlgorithmsUninitializedFillFrames
+   \defgroup ImageRangeSTLAlgorithmsUninitializedFillFrames
    uninitialized_fill_frames
    
-   \ingroup ImageViewSTLAlgorithms
-   \brief std::uninitialized_fill for image views
+   \ingroup ImageRangeSTLAlgorithms
+   \brief std::uninitialized_fill for image ranges
 */
 
 namespace detail
@@ -550,27 +550,27 @@ void uninitialized_fill_aux (It first, It last,
 } /* namespace detail */
 
 /**
-   \ingroup ImageViewSTLAlgorithmsUninitializedFillFrames
-   \brief std::uninitialized_fill for image views.
-   Does not support planar heterogeneous views.
+   \ingroup ImageRangeSTLAlgorithmsUninitializedFillFrames
+   \brief std::uninitialized_fill for image ranges.
+   Does not support planar heterogeneous ranges.
    If an exception is thrown destructs any in-place copy-constructed
    frames
 */
-template <typename View, typename Value> 
-void uninitialized_fill_frames (const View& buf_view, const Value& val)
+template <typename Range, typename Value> 
+void uninitialized_fill_frames (const Range& buf_range, const Value& val)
 {
-    detail::uninitialized_fill_aux (buf_view.begin(),
-				    buf_view.end(), 
-				    val, is_planar<View>());
+    detail::uninitialized_fill_aux (buf_range.begin(),
+				    buf_range.end(), 
+				    val, is_planar<Range>());
 }
 
 /**
-   \defgroup ImageViewSTLAlgorithmsDefaultConstructFrames
+   \defgroup ImageRangeSTLAlgorithmsDefaultConstructFrames
    default_construct_frames
    
-   \ingroup ImageViewSTLAlgorithms
+   \ingroup ImageRangeSTLAlgorithms
    \brief invokes the default constructor on every frame of an image
-   view
+   range
 */
 
 namespace detail
@@ -630,36 +630,36 @@ void default_construct_aux (It first, It last, boost::mpl::false_)
     default_construct_range (first, last);
 }
 
-template <typename View, bool IsPlanar>
+template <typename Range, bool IsPlanar>
 struct has_trivial_frame_constructor :
-    public boost::has_trivial_constructor <typename View::value_type> {};
+    public boost::has_trivial_constructor <typename Range::value_type> {};
 
-template <typename View>
-struct has_trivial_frame_constructor<View, true> :
+template <typename Range>
+struct has_trivial_frame_constructor<Range, true> :
     public boost::has_trivial_constructor <
-    typename sample_type<View>::type> {};
+    typename sample_type<Range>::type> {};
 
 } /* namespace detail */
 
 /**
-   \ingroup ImageViewSTLAlgorithmsDefaultConstructFrames
+   \ingroup ImageRangeSTLAlgorithmsDefaultConstructFrames
    \brief Invokes the in-place default constructor on every frame of
-   the (uninitialized) view.
+   the (uninitialized) range.
    
-   Does not support planar heterogeneous views.
+   Does not support planar heterogeneous ranges.
    If an exception is thrown destructs any in-place
    default-constructed frames
 */
-template <typename View> 
-void default_construct_frames (const View& buf_view)
+template <typename Range> 
+void default_construct_frames (const Range& buf_range)
 {
     if (detail::has_trivial_frame_constructor<
-	    View, is_planar<View>::value>::value)
+	    Range, is_planar<Range>::value>::value)
         return;
  
-    detail::default_construct_aux (buf_view.begin (),
-				   buf_view.end (),
-				   is_planar<View>());
+    detail::default_construct_aux (buf_range.begin (),
+				   buf_range.end (),
+				   is_planar<Range>());
 }
 
 namespace detail
@@ -702,27 +702,27 @@ void uninitialized_copy_aux (It1 first1, It1 last1,
 } /* namespace detail */
 
 /**
-   \ingroup ImageViewSTLAlgorithmsUninitializedCopyFrames
-   \brief std::uninitialized_copy for image views.
-   Does not support planar heterogeneous views.
+   \ingroup ImageRangeSTLAlgorithmsUninitializedCopyFrames
+   \brief std::uninitialized_copy for image ranges.
+   Does not support planar heterogeneous ranges.
    If an exception is thrown destructs any in-place copy-constructed
    objects
 */
-template <typename View1, typename View2> 
-void uninitialized_copy_frames (const View1& view1, const View2& view2)
+template <typename Range1, typename Range2> 
+void uninitialized_copy_frames (const Range1& range1, const Range2& range2)
 {
-    typedef boost::mpl::bool_<is_planar<View1>::value &&
-		       is_planar<View2>::value> is_planar;
-    assert (view1.size () == view2.size ());
+    typedef boost::mpl::bool_<is_planar<Range1>::value &&
+			      is_planar<Range2>::value> is_planar;
+    assert (range1.size () == range2.size ());
     
-    detail::uninitialized_copy_aux (view1.begin (), view1.end (), 
-				    view2.begin (), is_planar ());
+    detail::uninitialized_copy_aux (range1.begin (), range1.end (), 
+				    range2.begin (), is_planar ());
 }
 
 /**
-   \defgroup ImageViewSTLAlgorithmsForEachFrame for_each_frame
-   \ingroup ImageViewSTLAlgorithms
-   \brief std::for_each for image views
+   \defgroup ImageRangeSTLAlgorithmsForEachFrame for_each_frame
+   \ingroup ImageRangeSTLAlgorithms
+   \brief std::for_each for image ranges
    
    For contiguous images (i.e. images that have no alignment gap at
    the end of each row) it is more efficient to use the underlying
@@ -730,7 +730,7 @@ void uninitialized_copy_frames (const View1& view1, const View2& view2)
    non-contiguous images for_each_frame resolves to for_each of each
    row using the underlying frame iterator, which is still faster
 
-   \ingroup ImageViewSTLAlgorithmsForEachFrame
+   \ingroup ImageRangeSTLAlgorithmsForEachFrame
 */
 template <typename V, typename F>
 F for_each_frame (const V& buf, F fun)
@@ -739,18 +739,18 @@ F for_each_frame (const V& buf, F fun)
 }
 
 /**
-   \defgroup ImageViewSTLAlgorithmsForEachFramePosition
+   \defgroup ImageRangeSTLAlgorithmsForEachFramePosition
    for_each_frame_position
    
-   \ingroup ImageViewSTLAlgorithms
-   \brief adobe::for_each_position for image views (passes locators,
+   \ingroup ImageRangeSTLAlgorithms
+   \brief adobe::for_each_position for image ranges (passes locators,
    instead of frame references, to the function object)
    
-   \ingroup ImageViewSTLAlgorithmsForEachFramePosition
+   \ingroup ImageRangeSTLAlgorithmsForEachFramePosition
 */
 
-template <typename View, typename F>
-F for_each_frame_position (const View& buf, F fun)
+template <typename Range, typename F>
+F for_each_frame_position (const Range& buf, F fun)
 {
     for (auto loc = buf.begin (); loc != buf.end (); ++loc)
 	fun (loc);
@@ -759,23 +759,23 @@ F for_each_frame_position (const View& buf, F fun)
 }
 
 /**
-   \defgroup ImageViewSTLAlgorithmsGenerateFrames generate_frames
-   \ingroup ImageViewSTLAlgorithms
-   \brief std::generate for image views
+   \defgroup ImageRangeSTLAlgorithmsGenerateFrames generate_frames
+   \ingroup ImageRangeSTLAlgorithms
+   \brief std::generate for image ranges
 
-   \ingroup ImageViewSTLAlgorithmsGenerateFrames
-   \brief std::generate for image views
+   \ingroup ImageRangeSTLAlgorithmsGenerateFrames
+   \brief std::generate for image ranges
 */
-template <typename View, typename F>
-void generate_frames (const View& v, F fun)
+template <typename Range, typename F>
+void generate_frames (const Range& v, F fun)
 {
     std::generate (v.begin (), v.end (), fun);
 }
 
 /**
-   \defgroup ImageViewSTLAlgorithmsEqualFrames equal_frames
-   \ingroup ImageViewSTLAlgorithms
-   \brief std::equal for image views
+   \defgroup ImageRangeSTLAlgorithmsEqualFrames equal_frames
+   \ingroup ImageRangeSTLAlgorithms
+   \brief std::equal for image ranges
 */
 template <typename I1, typename I2> PSYNTH_FORCEINLINE
 bool equal_n (I1 i1, std::ptrdiff_t n, I2 i2);
@@ -811,7 +811,7 @@ struct equal_n_fn<const frame<T,Cs>*, const frame<T,Cs>*>
 
 template<typename T, typename Cs>
 struct equal_n_fn<frame<T,Cs>*, frame<T,Cs>*> :
-	equal_n_fn<const frame<T,Cs>*, const frame<T,Cs>*> {};
+    equal_n_fn<const frame<T,Cs>*, const frame<T,Cs>*> {};
 
 /**
    EqualFrames
@@ -881,11 +881,11 @@ namespace sound
 {
 
 /**
-   \ingroup ImageViewSTLAlgorithmsEqualFrames
-   \brief std::equal for image views
+   \ingroup ImageRangeSTLAlgorithmsEqualFrames
+   \brief std::equal for image ranges
 */
-template <typename View1, typename View2> PSYNTH_FORCEINLINE 
-bool equal_frames (const View1& v1, const View2& v2)
+template <typename Range1, typename Range2> PSYNTH_FORCEINLINE 
+bool equal_frames (const Range1& v1, const Range2& v2)
 {
     assert (v1.size() == v2.size());
     return std::equal (v1.begin (), v1.end (), v2.begin ());
@@ -895,17 +895,17 @@ bool equal_frames (const View1& v1, const View2& v2)
 }
 
 /**
-   \defgroup ImageViewSTLAlgorithmsTransformFrames transform_frames
-   \ingroup ImageViewSTLAlgorithms
-   \brief std::transform for image views
+   \defgroup ImageRangeSTLAlgorithmsTransformFrames transform_frames
+   \ingroup ImageRangeSTLAlgorithms
+   \brief std::transform for image ranges
 
-   \ingroup ImageViewSTLAlgorithmsTransformFrames
-   \brief std::transform for image views
+   \ingroup ImageRangeSTLAlgorithmsTransformFrames
+   \brief std::transform for image ranges
 
    @todo Implement with STL?
 */
-template <typename View1, typename View2, typename F> PSYNTH_FORCEINLINE 
-F transform_frames (const View1& src, const View2& dst, F fun)
+template <typename Range1, typename Range2, typename F> PSYNTH_FORCEINLINE 
+F transform_frames (const Range1& src, const Range2& dst, F fun)
 {
     assert (src.size() == dst.size());
     for (std::ptrdiff_t x = 0; x < src.size (); ++x)
@@ -914,13 +914,13 @@ F transform_frames (const View1& src, const View2& dst, F fun)
 }
 
 /**
-   \ingroup ImageViewSTLAlgorithmsTransformFrames
+   \ingroup ImageRangeSTLAlgorithmsTransformFrames
    \brief transform_frames with two sources
 */
-template <typename View1, typename View2, typename View3, typename F>
+template <typename Range1, typename Range2, typename Range3, typename F>
 PSYNTH_FORCEINLINE 
-F transform_frames (const View1& src1, const View2& src2,
-		    const View3& dst, F fun)
+F transform_frames (const Range1& src1, const Range2& src2,
+		    const Range3& dst, F fun)
 {
     assert (src1.size () == dst.size() &&
 	    src2.size () == dst.size ());
@@ -930,21 +930,21 @@ F transform_frames (const View1& src1, const View2& src2,
 }
 
 /**
-   \defgroup ImageViewSTLAlgorithmsTransformFramePositions
+   \defgroup ImageRangeSTLAlgorithmsTransformFramePositions
    transform_frame_positions
-   \ingroup ImageViewSTLAlgorithms
-   \brief adobe::transform_positions for image views (passes locators,
+   \ingroup ImageRangeSTLAlgorithms
+   \brief adobe::transform_positions for image ranges (passes locators,
    instead of frame references, to the function object)
    
-   \ingroup ImageViewSTLAlgorithmsTransformFramePositions
+   \ingroup ImageRangeSTLAlgorithmsTransformFramePositions
    \brief Like transform_frames but passes to the function object
    frame locators instead of frame references
 */ 
-template <typename View1, typename View2, typename F> PSYNTH_FORCEINLINE 
-F transform_frame_positions (const View1& src,const View2& dst, F fun)
+template <typename Range1, typename Range2, typename F> PSYNTH_FORCEINLINE 
+F transform_frame_positions (const Range1& src,const Range2& dst, F fun)
 {
     assert (src.size () == dst.size ());
-    typename View1::iterator loc = src.begin ();
+    typename Range1::iterator loc = src.begin ();
 
     for (std::ptrdiff_t x = 0; x < src.size (); ++x, ++loc)
 	dst [x] = fun (loc);
@@ -953,19 +953,19 @@ F transform_frame_positions (const View1& src,const View2& dst, F fun)
 }
 
 /**
-   \ingroup ImageViewSTLAlgorithmsTransformFramePositions
+   \ingroup ImageRangeSTLAlgorithmsTransformFramePositions
    \brief transform_frame_positions with two sources
 */
-template <typename View1, typename View2, typename View3, typename F>
+template <typename Range1, typename Range2, typename Range3, typename F>
 PSYNTH_FORCEINLINE 
-F transform_frame_positions (const View1& src1,
-			     const View2& src2,
-			     const View3& dst, F fun)
+F transform_frame_positions (const Range1& src1,
+			     const Range2& src2,
+			     const Range3& dst, F fun)
 {
     assert (src1.size () == dst.size ());
     assert (src2.size () == dst.size ());
-    typename View1::iterator loc1 = src1.begin ();
-    typename View2::iterator loc2 = src2.begin ();
+    typename Range1::iterator loc1 = src1.begin ();
+    typename Range2::iterator loc2 = src2.begin ();
     for (std::ptrdiff_t x = 0; x < src1.width();
 	 ++x, ++loc1, ++loc2)
 	dst [x] = fun (loc1, loc2);

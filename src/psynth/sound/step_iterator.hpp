@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-05 11:47:10 raskolnikov>
+ *  Time-stamp:  <2010-11-09 03:01:43 raskolnikov>
  *
  *  @file        step_iterator.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -200,7 +200,7 @@ bool operator!= (const step_iterator_adaptor<D,Iterator,SFn>& p1,
    non-adjacent frames.  Common use is a vertical traversal, where the
    step is the row stride.
 
-   Another application is as a sub-sample view. For example, a red
+   Another application is as a sub-sample range. For example, a red
    intensity image over interleaved RGB data would use a step iterator
    adaptor with step sizeof(sample_t)*3 In the latter example the step
    size could be fixed at compile time for efficiency.  Compile-time

@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-03 13:47:18 raskolnikov>
+ *  Time-stamp:  <2010-11-09 03:02:26 raskolnikov>
  *
  *  @file        surround.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -57,16 +57,16 @@ typedef boost::mpl::vector5<
 typedef layout<surround_space> surround_layout;
 
 /**
-   \ingroup BufferViewConstructors
+   \ingroup BufferRangeConstructors
    \brief from raw surround planar data
 */
 template <typename IC> inline
-typename type_from_iterator<planar_frame_iterator<IC, surround_space> >::view
-planar_surround_view (std::size_t size, IC l, IC r, IC c, IC bl, IC br)
+typename type_from_iterator<planar_frame_iterator<IC, surround_space> >::range
+planar_surround_range (std::size_t size, IC l, IC r, IC c, IC bl, IC br)
 {
     typedef typename type_from_iterator<
-	planar_frame_iterator<IC, surround_space> >::view RView;
-    return RView (size, planar_frame_iterator<IC, surround_space>(
+	planar_frame_iterator<IC, surround_space> >::range RRange;
+    return RRange (size, planar_frame_iterator<IC, surround_space>(
 		      l, r, c, bl, br));
 }
 

@@ -29,62 +29,62 @@
 namespace psynth
 {
 
-  /**
-   * Base ring buffer class. Defines some common elements and behavour among
-   * ring buffers.
-   */
-  class ring_buffer
-  {
-  public:
+/**
+ * Base ring buffer class. Defines some common elements and behavour among
+ * ring buffers.
+ */
+class ring_buffer
+{
+public:
     /**
      * A pointer a reader can use to read data from the buffer.
      */
     class read_ptr
     {
-      friend class ring_buffer;
+	friend class ring_buffer;
 		
-      size_t m_pos;
-      size_t m_count;
+	size_t m_pos;
+	size_t m_count;
     public:
-      /**
-       * Constructor.
-       * @param pos Starting position in the buffer.
-       * @param count Number of samples read.
-       */
-      read_ptr(size_t pos = 0, size_t count = 0) :
-	m_pos(pos),
-	m_count(count)
-      {}
+	/**
+	 * Constructor.
+	 * @param pos Starting position in the buffer.
+	 * @param count Number of samples read.
+	 */
+	read_ptr(size_t pos = 0, size_t count = 0) :
+	    m_pos(pos),
+	    m_count(count)
+	{}
 
-      /**
-       * Returns the total number of elements read.
-       */
-      size_t get_count() {
-	return m_count;
-      };
+	/**
+	 * Returns the total number of elements read.
+	 */
+	size_t get_count() {
+	    return m_count;
+	};
     };
 
     /**
      * Error codes for a read pointer.
      */
     enum error {
-      /** No error. */
-      ERR_NONE,
-      /**
-       * An underrun has ocurred. This means that there has been too much
-       * data written overwritting data thas has not been previously read.
-       */
-      ERR_UNDERRUN,
-      /**
-       * An overrun has ocurred. This means that the reader has read more data
-       * that the one actually in the buffer.
-       */
-      ERR_OVERRUN,
-      /** Number of error codes.*/
-      ERR_CODES
+	/** No error. */
+	ERR_NONE,
+	/**
+	 * An underrun has ocurred. This means that there has been too much
+	 * data written overwritting data thas has not been previously read.
+	 */
+	ERR_UNDERRUN,
+	/**
+	 * An overrun has ocurred. This means that the reader has read more data
+	 * that the one actually in the buffer.
+	 */
+	ERR_OVERRUN,
+	/** Number of error codes.*/
+	ERR_CODES
     };
 
-  protected:
+protected:
     bool m_backwards;    /**< @c true if we are reading and writting the
 			    ringbuffer backwards. */
     size_t m_startpos;   /**< The new starting position of the ring buffer. */
@@ -99,7 +99,7 @@ namespace psynth
      * @param r The read_ptr to consult.
      */
     size_t& position (read_ptr& r) const {
-      return r.m_pos;
+	return r.m_pos;
     };
 
     /**
@@ -107,7 +107,7 @@ namespace psynth
      * @param r The read_ptr to consult.
      */
     size_t& count (read_ptr& r) const {
-      return r.m_count;
+	return r.m_count;
     }
 
     /**
@@ -116,15 +116,15 @@ namespace psynth
      * @param n The number of elements to advance.
      */
     void advance (read_ptr& r, size_t n) const {
-      if (n >= 0) {
-	r.m_pos = (r.m_pos + n) % m_size;
-	r.m_count += n;
-      } else {
-	r.m_pos += n;
-	while(r.m_pos < 0)
-	  r.m_pos += m_size;
-	r.m_count -= n;
-      }
+	if (n >= 0) {
+	    r.m_pos = (r.m_pos + n) % m_size;
+	    r.m_count += n;
+	} else {
+	    r.m_pos += n;
+	    while(r.m_pos < 0)
+		r.m_pos += m_size;
+	    r.m_count -= n;
+	}
     }
 
     /**
@@ -132,15 +132,15 @@ namespace psynth
      * @param n The number of elements to advance.
      */
     void advance (size_t n) {
-      if (n >= 0) {
-	m_writepos = (m_writepos + n) % m_size;
-	m_writecount += n;
-      } else {
-	m_writepos += n;
-	while(m_writepos < 0)
-	  m_writepos += m_size;
-	m_writecount -= n;
-      }
+	if (n >= 0) {
+	    m_writepos = (m_writepos + n) % m_size;
+	    m_writecount += n;
+	} else {
+	    m_writepos += n;
+	    while(m_writepos < 0)
+		m_writepos += m_size;
+	    m_writecount -= n;
+	}
     }
 
     /**
@@ -148,47 +148,47 @@ namespace psynth
      * @param size The size of the buffer, defaults to zero.
      */
     ring_buffer (size_t size = 0)
-      : m_backwards (false)
-      , m_startpos (0)
-      , m_size (size)
-      , m_writepos(0)
-      , m_writecount(0)
+	: m_backwards (false)
+	, m_startpos (0)
+	, m_size (size)
+	, m_writepos(0)
+	, m_writecount(0)
     {}
 
     /** Copy constructor */
     ring_buffer (const ring_buffer& buf)
-      : m_backwards(buf.m_backwards)
-      , m_startpos(0)
-      , m_size(buf.m_size)
-      , m_writepos(buf.m_writepos)
-      , m_writecount(buf.m_writecount)
+	: m_backwards(buf.m_backwards)
+	, m_startpos(0)
+	, m_size(buf.m_size)
+	, m_writepos(buf.m_writepos)
+	, m_writecount(buf.m_writecount)
     {}
     
-  public:
+public:
     
     /**
      * Returns the size of the buffer.
      */
     size_t size () const {
-      return m_size;
+	return m_size;
     }
 
     /**
      * Returns a read pointer to the beginning of the availible data.
      */
     read_ptr begin () const {
-      if (m_writecount < m_size)
-	return read_ptr (m_startpos, 0);
-      else
-	return read_ptr (m_writepos,
-			 m_writecount - m_size);
+	if (m_writecount < m_size)
+	    return read_ptr (m_startpos, 0);
+	else
+	    return read_ptr (m_writepos,
+			     m_writecount - m_size);
     };
 
     /**
      * Returns a read pointer to the end of the availible data.
      */
     read_ptr end () const {
-      return read_ptr (m_writepos, m_writecount);
+	return read_ptr (m_writepos, m_writecount);
     };
 
     /**
@@ -196,25 +196,25 @@ namespace psynth
      * @param r The read pointer to test for availible data.
      */
     size_t availible (const read_ptr& r) const {
-      return m_writecount - r.m_count;
+	return m_writecount - r.m_count;
     }
 
     /**
      * Checks a read_ptr for error states.
      */
     int error (const read_ptr& reader) const {
-      if (reader.m_count < m_writecount - m_size)
-	return ERR_UNDERRUN;
-      if (reader.m_count > m_writecount)
-	return ERR_OVERRUN;
-      return ERR_NONE;
+	if (reader.m_count < m_writecount - m_size)
+	    return ERR_UNDERRUN;
+	if (reader.m_count > m_writecount)
+	    return ERR_OVERRUN;
+	return ERR_NONE;
     }
 
     /**
      * Returns wether this buffer is being written backwards.
      */
     bool is_backwards () const {
-      return m_backwards;
+	return m_backwards;
     }
     
     /**
@@ -226,9 +226,9 @@ namespace psynth
      * @see sync()
      */
     void backwards () {
-      m_backwards = !m_backwards;
-      if (m_writecount < m_size)
-	std::swap(m_startpos, m_writepos);
+	m_backwards = !m_backwards;
+	if (m_writecount < m_size)
+	    std::swap(m_startpos, m_writepos);
     }
 
     /**
@@ -239,20 +239,20 @@ namespace psynth
      * the @c backwards() function.
      */
     read_ptr sync (const read_ptr& r) {
-      if (!m_backwards)
-	return read_ptr (r.m_pos,
-			 m_writecount -
-			 (r.m_pos <= m_writepos ?
-			  m_writepos - r.m_pos :
-			  m_size - r.m_pos + m_writepos));
-      else
-	return read_ptr (r.m_pos,
-			 m_writecount -
-			 (r.m_pos >= m_writepos ?
-			  r.m_pos - m_writepos :
-			  m_size - m_writepos + r.m_pos));
+	if (!m_backwards)
+	    return read_ptr (r.m_pos,
+			     m_writecount -
+			     (r.m_pos <= m_writepos ?
+			      m_writepos - r.m_pos :
+			      m_size - r.m_pos + m_writepos));
+	else
+	    return read_ptr (r.m_pos,
+			     m_writecount -
+			     (r.m_pos >= m_writepos ?
+			      r.m_pos - m_writepos :
+			      m_size - m_writepos + r.m_pos));
     }
-  };
+};
 
 } /* namespace psynth */
 

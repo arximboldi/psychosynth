@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-07 14:32:37 raskolnikov>
+ *  Time-stamp:  <2010-11-09 03:08:25 raskolnikov>
  *
  *  @file        sample_buffe.cpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -13,7 +13,7 @@
 #include <psynth/sound/stereo.hpp>
 #include <psynth/sound/planar_frame_reference.hpp>
 #include <psynth/sound/planar_frame_iterator.hpp>
-#include <psynth/sound/buffer_view.hpp>
+#include <psynth/sound/buffer_range.hpp>
 #include <psynth/sound/typedefs.hpp>
 #include <psynth/sound/algorithm.hpp>
 
@@ -22,7 +22,7 @@ using namespace psynth::sound;
 const size_t sinusoid_size = 1024;
 
 static bits32sf sinusoid [2][sinusoid_size];
-stereo32sf_planar_view sample_view = planar_stereo_view (
+stereo32sf_planar_range sample_range = planar_stereo_range (
     sinusoid_size, sinusoid [0], sinusoid [1]);
 
 static struct sinusoid_generator_type
@@ -32,7 +32,7 @@ static struct sinusoid_generator_type
     sinusoid_generator_type ()
 	: _index (0)
     {
-	generate_frames (sample_view, *this);
+	generate_frames (sample_range, *this);
     }
 
     stereo32sf_frame operator () ()

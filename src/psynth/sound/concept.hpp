@@ -1,11 +1,13 @@
 /**
- *  Time-stamp:  <2010-11-07 15:40:43 raskolnikov>
+ *  Time-stamp:  <2010-11-09 13:20:40 raskolnikov>
  *
  *  @file        concept.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
  *  @date        Wed Oct 20 20:01:23 2010
  *
  *  Concepts of the sound library.
+ *  @todo Buffer Views are, actually, a range. We have boost
+ *  range. Should we use that instead of this confusing thing?
  */
 
 /*
@@ -35,7 +37,6 @@
  *  Software License, Version 1.0. (See accompanying file
  *  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt).
  */
-
 
 #ifndef PSYNTH_SOUND_CONCEPT_H
 #define PSYNTH_SOUND_CONCEPT_H
@@ -756,7 +757,7 @@ struct ChannelBasesCompatibleConcept
 
 /**
    \brief Concept for all frame-based GIL constructs, such as frames,
-   iterators, locators, views and buffers whose value type is a frame
+   iterators, locators, ranges and buffers whose value type is a frame
    
    \ingroup FrameBasedConcept
 */
@@ -1156,8 +1157,8 @@ struct FrameDereferenceAdaptorArchetype : public std::unary_function<P, P>
  */
 
 /**
-   \brief Concept for iterators, locators and views that can define a
-   type just like the given iterator/locator/view, except it supports
+   \brief Concept for iterators, locators and ranges that can define a
+   type just like the given iterator/locator/range, except it supports
    runtime specified step along the X navigation
    
    \ingroup FrameIteratorConcept
@@ -1481,32 +1482,32 @@ struct MutableIteratorAdaptorConcept
 
 /*
  *
- *             BUFFER VIEW CONCEPTS
+ *             BUFFER RANGE CONCEPTS
  *
  */
 
 /**
-   \defgroup BufferViewConcept BufferViewConcept
-   \ingroup BufferViewConcept
+   \defgroup BufferRangeConcept BufferRangeConcept
+   \ingroup BufferRangeConcept
    \brief 1-dimensional range
 
-   \defgroup FrameBufferViewConcept BufferViewConcept
-   \ingroup BufferViewConcept
+   \defgroup FrameBufferRangeConcept BufferRangeConcept
+   \ingroup BufferRangeConcept
    \brief 1-dimensional range over frame data
    
-   \ingroup BufferViewConcept
-   \brief N-dimensional view over immutable values
+   \ingroup BufferRangeConcept
+   \brief N-dimensional range over immutable values
 */
 
  /**
 \code
-concept RandomAccessBufferViewConcept<base::Regular View> {
+concept RandomAccessBufferRangeConcept<base::Regular Range> {
     typename value_type;
     typename reference;       // result of dereferencing
     typename difference_type;
     // result of operator-(iterator,iterator) (1-dimensional!)
-    typename const_t;  where RandomAccessNDBufferViewConcept<View>;
-    // same as View, but over immutable values
+    typename const_t;  where RandomAccessNDBufferRangeConcept<Range>;
+    // same as Range, but over immutable values
     typename point_t;  where PointNDConcept<point_t>; // N-dimensional point
     typename locator;  where RandomAccessNDLocatorConcept<locator>;
     // N-dimensional locator.
@@ -1526,51 +1527,52 @@ concept RandomAccessBufferViewConcept<base::Regular View> {
         where SameType<iterator::value_type,value_type>;
     };
 
-    // Defines the type of a view similar to this type, except it
+    // Defines the type of a range similar to this type, except it
     // invokes Deref upon dereferencing
     template <FrameDereferenceAdaptorConcept Deref> struct add_deref {
-        typename type;        where RandomAccessNDBufferViewConcept<type>;
-        static type make(const View& v, const Deref& deref);
+        typename type;        where RandomAccessNDBufferRangeConcept<type>;
+        static type make(const Range& v, const Deref& deref);
     };
 
     static const size_t num_dimensions = point_t::num_dimensions;
     
     // Create from a locator at the top-left corner and dimensions
-    View::View(const locator&, const point_type&);
+    Range::Range(const locator&, const point_type&);
     
-    size_type        View::size()       const; // total number of elements
-    reference        operator[](View, const difference_type&) const;
+    size_type        Range::size()       const; // total number of elements
+    reference        operator[](Range, const difference_type&) const;
     // 1-dimensional reference
-    iterator         View::begin()      const;
-    iterator         View::end()        const;
-    reverse_iterator View::rbegin()     const;
-    reverse_iterator View::rend()       const;
-    iterator         View::at(const point_t&);
-    point_t          View::dimensions() const; // number of elements along each dimension
-    bool             View::is_1d_traversable() const;   // can an iterator over the first dimension visit each value? I.e. are there gaps between values?
+    iterator         Range::begin()      const;
+    iterator         Range::end()        const;
+    reverse_iterator Range::rbegin()     const;
+    reverse_iterator Range::rend()       const;
+    iterator         Range::at(const point_t&);
+    point_t          Range::dimensions() const; // number of elements along each dimension
+    bool             Range::is_1d_traversable() const;   // can an iterator over the first dimension visit each value? I.e. are there gaps between values?
 
     // iterator along a given dimension starting at a given point
-    template <size_t D> View::axis<D>::iterator View::axis_iterator(const point_t&) const;
+    template <size_t D> Range::axis<D>::iterator Range::axis_iterator(const point_t&) const;
 
-    reference operator()(View,const point_t&) const;
+    reference operator()(Range,const point_t&) const;
 };
 \endcode
 */
-template <typename View>
-struct RandomAccessBufferViewConcept
+template <typename Range>
+struct RandomAccessBufferRangeConcept
 {
-    void constraints() {
-        base::psynth_function_requires< base::Regular<View> >();
+    void constraints ()
+    {
+        base::psynth_function_requires< base::Regular<Range> >();
 
-        typedef typename View::value_type       value_type;
-        typedef typename View::reference        reference;
+        typedef typename Range::value_type       value_type;
+        typedef typename Range::reference        reference;
 	// result of dereferencing
-        typedef typename View::difference_type  difference_type;
+        typedef typename Range::difference_type  difference_type;
 	// result of operator-(1d_iterator,1d_iterator)
 
-	typedef typename View::iterator         iterator;
-        typedef typename View::reverse_iterator reverse_iterator;
-        typedef typename View::size_type        size_type;
+	typedef typename Range::iterator         iterator;
+        typedef typename Range::reverse_iterator reverse_iterator;
+        typedef typename Range::size_type        size_type;
             
 	base::psynth_function_requires<
 	    boost_concepts::RandomAccessTraversalConcept<iterator> >();
@@ -1581,36 +1583,37 @@ struct RandomAccessBufferViewConcept
         reverse_iterator rit;
         difference_type d;
 	size_type sz;
-	detail::initialize_it(d); boost::ignore_unused_variable_warning(d);
+	detail::initialize_it (d); boost::ignore_unused_variable_warning(d);
 
-        View(sz, it); // view must be constructible from a locator and a point
+        Range (sz, it); // range must be constructible from a locator and a point
 
-        sz = view.size();  boost::ignore_unused_variable_warning(sz);
-        it = view.frames();
+	// TODO: Should we minimize this interface to match Boost.Range?
+        sz = range.size ();  boost::ignore_unused_variable_warning(sz);
+        it = range.frames ();
         
-        it=view.begin();
-        it=view.end();
-        rit=view.rbegin();
-        rit=view.rend();
+        it  = range.begin ();
+        it  = range.end ();
+        rit = range.rbegin ();
+        rit = range.rend ();
 
-        reference r1=view[d]; boost::ignore_unused_variable_warning(r1);
+        reference r1=range[d]; boost::ignore_unused_variable_warning(r1);
 	// 1D access 
         
-        typedef FrameDereferenceAdaptorArchetype<typename View::value_type>
+        typedef FrameDereferenceAdaptorArchetype<typename Range::value_type>
 	    deref_t;
-        typedef typename View::template add_deref<deref_t>::type dtype;
+        typedef typename Range::template add_deref<deref_t>::type dtype;
     }
-    View view;
+    Range range;
 };
 
 
 /**
-   \ingroup FrameBufferViewConcept
-   \brief GIL's 2-dimensional view over immutable GIL frames
+   \ingroup FrameBufferRangeConcept
+   \brief GIL's 2-dimensional range over immutable GIL frames
 */
 /**
 \code
-concept BufferViewConcept<RandomAccess2DBufferViewConcept View> {
+concept BufferRangeConcept<RandomAccess2DBufferRangeConcept Range> {
     where FrameValueConcept<value_type>;
     where FrameIteratorConcept<x_iterator>;        
     where FrameIteratorConcept<y_iterator>;
@@ -1618,129 +1621,129 @@ concept BufferViewConcept<RandomAccess2DBufferViewConcept View> {
     
     typename coord_t = x_coord_t;
 
-    std::size_t View::num_samples() const;
+    std::size_t Range::num_samples() const;
 };
 \endcode
 */
-template <typename View>
-struct BufferViewConcept {
+template <typename Range>
+struct BufferRangeConcept {
     void constraints() {
-        base::psynth_function_requires<RandomAccessBufferViewConcept<View> >();
+        base::psynth_function_requires<RandomAccessBufferRangeConcept<Range> >();
 
-        std::size_t num_chan = view.num_samples ();
+        std::size_t num_chan = range.num_samples ();
 	boost::ignore_unused_variable_warning (num_chan);
     }
-    View view;
+    Range range;
 };
 
 
 namespace detail {
 
-template <typename View>
-// Preconditions: View Models RandomAccessNDBufferViewConcept
-struct RandomAccessBufferViewIsMutableConcept
+template <typename Range>
+// Preconditions: Range Models RandomAccessNDBufferRangeConcept
+struct RandomAccessBufferRangeIsMutableConcept
 {
     void constraints() {
 	base::psynth_function_requires<
 	    detail::RandomAccessIteratorIsMutableConcept<
-		typename View::iterator> >();
+		typename Range::iterator> >();
 	base::psynth_function_requires<
 	    detail::RandomAccessIteratorIsMutableConcept<
-		typename View::reverse_iterator> >();
+		typename Range::reverse_iterator> >();
 	
-	typename View::difference_type diff;
+	typename Range::difference_type diff;
 	initialize_it(diff); boost::ignore_unused_variable_warning(diff);
-	typename View::value_type v; initialize_it(v);
+	typename Range::value_type v; initialize_it(v);
 	
-	view[diff]=v;
+	range[diff]=v;
     }
-    View view;
+    Range range;
 };
 
-template <typename View>    // preconditions: View Models BufferViewConcept
-struct FrameBufferViewIsMutableConcept
+template <typename Range>    // preconditions: Range Models BufferRangeConcept
+struct FrameBufferRangeIsMutableConcept
 {
     void constraints() {        
 	base::psynth_function_requires<
-	    detail::RandomAccessBufferViewIsMutableConcept<View> >();
+	    detail::RandomAccessBufferRangeIsMutableConcept<Range> >();
     }
 };
 
 } /* namespace detail */
 
 /**
-   \ingroup BufferViewNDConcept
-   \brief N-dimensional view over mutable values
+   \ingroup BufferRangeNDConcept
+   \brief N-dimensional range over mutable values
 */
 /**
    \code
-concept MutableRandomAccessNDBufferViewConcept<
-   RandomAccessNDBufferViewConcept View> {
+concept MutableRandomAccessNDBufferRangeConcept<
+   RandomAccessNDBufferRangeConcept Range> {
     where Mutable<reference>;
 };
 \endcode
 */
-template <typename View>
-struct MutableRandomAccessBufferViewConcept
+template <typename Range>
+struct MutableRandomAccessBufferRangeConcept
 {
     void constraints() {
-        base::psynth_function_requires<RandomAccessBufferViewConcept<View> >();
+        base::psynth_function_requires<RandomAccessBufferRangeConcept<Range> >();
         base::psynth_function_requires<
-	    detail::RandomAccessBufferViewIsMutableConcept<View> >();
+	    detail::RandomAccessBufferRangeIsMutableConcept<Range> >();
     }
 };
 
 /**
-   \ingroup FrameBufferViewConcept
-   \brief GIL's 2-dimensional view over mutable GIL frames
+   \ingroup FrameBufferRangeConcept
+   \brief GIL's 2-dimensional range over mutable GIL frames
 */
 /**
    \code
-   concept MutableBufferViewConcept<BufferViewConcept View> :
-         MutableRandomAccess2DBufferViewConcept<View> {};
+   concept MutableBufferRangeConcept<BufferRangeConcept Range> :
+         MutableRandomAccess2DBufferRangeConcept<Range> {};
 \endcode
 */
-template <typename View>
-struct MutableBufferViewConcept
+template <typename Range>
+struct MutableBufferRangeConcept
 {
     void constraints() {
-        base::psynth_function_requires<BufferViewConcept<View> >();
+        base::psynth_function_requires<BufferRangeConcept<Range> >();
         base::psynth_function_requires<
-	    detail::FrameBufferViewIsMutableConcept<View> >();
+	    detail::FrameBufferRangeIsMutableConcept<Range> >();
     }
 };
 
 /**
-   \brief Returns whether two views are compatible
+   \brief Returns whether two ranges are compatible
    
-   Views are compatible if their frames are compatible. Compatible
-   views can be assigned and copy constructed from one another.
+   Ranges are compatible if their frames are compatible. Compatible
+   ranges can be assigned and copy constructed from one another.
 */
-template <typename V1, typename V2>  // Model BufferViewConcept
-struct views_are_compatible :
+template <typename V1, typename V2>  // Model BufferRangeConcept
+struct ranges_are_compatible :
     public frames_are_compatible<typename V1::value_type,
 				 typename V2::value_type> {};
 
 
 /**
-   \brief Views are compatible if they have the same channel spaces
+   \brief Ranges are compatible if they have the same channel spaces
    and compatible sample values. Constness and layout are not
    important for compatibility
    
-   \ingroup BufferViewConcept
+   \ingroup BufferRangeConcept
 */
 /**
 \code
-concept ViewsCompatibleConcept<BufferViewConcept V1, BufferViewConcept V2> {
+concept RangesCompatibleConcept<BufferRangeConcept V1, BufferRangeConcept V2> {
     where FramesCompatibleConcept<V1::value_type, P2::value_type>;
 };
 \endcode
 */
 template <typename V1, typename V2>
-struct ViewsCompatibleConcept
+struct RangesCompatibleConcept
 {
-    void constraints() {
-        BOOST_STATIC_ASSERT((views_are_compatible<V1,V2>::value));
+    void constraints () {
+        BOOST_STATIC_ASSERT((ranges_are_compatible<V1,V2>::value));
     }
 };
 
@@ -1758,10 +1761,10 @@ struct ViewsCompatibleConcept
 /**
 \code
 concept RandomAccessBufferConcept<typename Buf> : base::Regular<Buf> {
-    typename view_t; where MutableRandomAccessBufferViewConcept<view_t>;
-    typename const_view_t = view_t::const_t;
-    typename point_t      = view_t::point_t;
-    typename value_type   = view_t::value_type;
+    typename range_t; where MutableRandomAccessBufferRangeConcept<range_t>;
+    typename const_range_t = range_t::const_t;
+    typename point_t      = range_t::point_t;
+    typename value_type   = range_t::value_type;
     typename allocator_type;
 
     Buf::Buf(point_t dims, std::size_t alignment=1);
@@ -1771,8 +1774,8 @@ concept RandomAccessBufferConcept<typename Buf> : base::Regular<Buf> {
     void Buf::recreate(point_t new_dims, value_type fill_value, std::size_t alignment);
 
     const point_t&        Buf::dimensions() const;
-    const const_view_t&   const_view(const Buf&);
-    const view_t&         view(Buf&);
+    const const_range_t&   const_range(const Buf&);
+    const range_t&         range(Buf&);
 };
 \endcode
 */
@@ -1782,16 +1785,16 @@ struct RandomAccessBufferConcept
     void constraints() {
         base::psynth_function_requires<base::Regular<Buf> >();
 
-        typedef typename Buf::view       view_t;
+        typedef typename Buf::range       range_t;
         base::psynth_function_requires<
-	    MutableRandomAccessBufferViewConcept<view_t> >();
+	    MutableRandomAccessBufferRangeConcept<range_t> >();
 
-        typedef typename Buf::const_view const_view_t;
+        typedef typename Buf::const_range const_range_t;
         typedef typename Buf::value_type   frame_t;
 
-        const_view_t cv = const_view(buf);
+        const_range_t cv = const_range(buf);
 	boost::ignore_unused_variable_warning(cv);
-        view_t       v  = view(buf);
+        range_t       v  = range(buf);
 	boost::ignore_unused_variable_warning(v);
 
         frame_t fill_value;
@@ -1815,8 +1818,8 @@ struct RandomAccessBufferConcept
 /**
 \code 
 concept BufferConcept<RandomAccess2DBufferConcept Buf> {
-    where MutableBufferViewConcept<view_t>;
-    typename coord_t  = view_t::coord_t;
+    where MutableBufferRangeConcept<range_t>;
+    typename coord_t  = range_t::coord_t;
 };
 \endcode
 */
@@ -1825,8 +1828,8 @@ struct BufferConcept
 {
     void constraints() {
         base::psynth_function_requires<RandomAccessBufferConcept<Buf> >();
-        base::psynth_function_requires<MutableBufferViewConcept<
-	    typename Buf::view> >();
+        base::psynth_function_requires<MutableBufferRangeConcept<
+	    typename Buf::range> >();
 	
         BOOST_STATIC_ASSERT(num_samples<Buf>::value ==
 			    boost::mpl::size<
