@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-03 02:28:16 raskolnikov>
+ *  Time-stamp:  <2010-11-11 23:13:18 raskolnikov>
  *
  *  @file        logger.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -40,7 +40,7 @@
 #include <psynth/base/singleton.hpp>
 #include <psynth/base/tree.hpp>
 #include <psynth/base/compat.hpp>
-#include <psynth/base/logger_def.hpp>
+#include <psynth/base/logger_fwd.hpp>
 
 namespace psynth
 {

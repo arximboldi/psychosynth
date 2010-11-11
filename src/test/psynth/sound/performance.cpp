@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-07 14:05:05 raskolnikov>
+ *  Time-stamp:  <2010-11-09 18:44:21 raskolnikov>
  *
  *  @file        performance.cpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -64,7 +64,7 @@
 #include <psynth/sound/planar_frame_reference.hpp>
 #include <psynth/sound/step_iterator.hpp>
 #include <psynth/sound/stereo.hpp>
-#include <psynth/sound/buffer_view.hpp>
+#include <psynth/sound/buffer_range.hpp>
 #include <psynth/sound/buffer.hpp>
 #include <psynth/sound/typedefs.hpp>
 #include <psynth/sound/algorithm.hpp>
@@ -85,34 +85,34 @@ double measure_time (Op op, std::size_t num_loops)
 // buffer dimension
 std::size_t buffer_size = 1024;
 
-// macros for standard GIL views
-#define STEREO_VIEW(T) \
-    buffer_view<frame<T,stereo_layout>*>
+// macros for standard GIL ranges
+#define STEREO_RANGE(T) \
+    buffer_range<frame<T,stereo_layout>*>
 
-#define RLSTEREO_VIEW(T) \
-    buffer_view<frame<T,rlstereo_layout>*>
+#define RLSTEREO_RANGE(T) \
+    buffer_range<frame<T,rlstereo_layout>*>
 
-#define STEREO_PLANAR_VIEW(T) \
-    buffer_view<planar_frame_iterator<T*,stereo_space> >
+#define STEREO_PLANAR_RANGE(T) \
+    buffer_range<planar_frame_iterator<T*,stereo_space> >
 
 
-template <typename View>
-void fill_view_max (const View& v)
+template <typename Range>
+void fill_range_max (const Range& v)
 {
     fill_frames (
-	v, typename View::value_type (
+	v, typename Range::value_type (
 	    sample_traits<
 		typename element_reference_type <
-		    typename View::value_type>::type>::max_value ()));
+		    typename Range::value_type>::type>::max_value ()));
 }
 
-template <typename View, typename P>
+template <typename Range, typename P>
 struct fill_psynth
 {
-    View _v;
+    Range _v;
     P _p;
 
-    fill_psynth (const View& v_in, const P& p_in)
+    fill_psynth (const Range& v_in, const P& p_in)
 	: _v(v_in)
 	, _p(p_in) {}
 
@@ -122,17 +122,17 @@ struct fill_psynth
     }
 };
 
-template <typename View, typename P>
+template <typename Range, typename P>
 struct fill_nonpsynth;
 
 template <typename T, typename P>
-struct fill_nonpsynth<STEREO_VIEW(T), P>
+struct fill_nonpsynth<STEREO_RANGE(T), P>
 {
-    typedef STEREO_VIEW(T) View;
-    View _v;
+    typedef STEREO_RANGE(T) Range;
+    Range _v;
     P _p;
 
-    fill_nonpsynth(const View& v_in, const P& p_in)
+    fill_nonpsynth(const Range& v_in, const P& p_in)
 	: _v(v_in)
 	, _p(p_in) {}
 
@@ -150,14 +150,14 @@ struct fill_nonpsynth<STEREO_VIEW(T), P>
 };
 
 template <typename T1, typename T2>
-struct fill_nonpsynth<STEREO_VIEW(T1), frame<T2,rlstereo_layout> >
+struct fill_nonpsynth<STEREO_RANGE(T1), frame<T2,rlstereo_layout> >
 {
-    typedef STEREO_VIEW(T1) View;
+    typedef STEREO_RANGE(T1) Range;
     typedef frame<T2,rlstereo_layout> P;
-    View _v;
+    Range _v;
     P _p;
 
-    fill_nonpsynth (const View& v_in, const P& p_in)
+    fill_nonpsynth (const Range& v_in, const P& p_in)
 	: _v(v_in)
 	, _p(p_in) {}
     
@@ -175,14 +175,14 @@ struct fill_nonpsynth<STEREO_VIEW(T1), frame<T2,rlstereo_layout> >
 };
 
 template <typename T1, typename T2>
-struct fill_nonpsynth<STEREO_PLANAR_VIEW(T1), frame<T2,stereo_layout> >
+struct fill_nonpsynth<STEREO_PLANAR_RANGE(T1), frame<T2,stereo_layout> >
 {
-    typedef STEREO_PLANAR_VIEW(T1) View;
+    typedef STEREO_PLANAR_RANGE(T1) Range;
     typedef frame<T2,stereo_layout> P;
-    View _v;
+    Range _v;
     P _p;
     
-    fill_nonpsynth (const View& v_in, const P& p_in)
+    fill_nonpsynth (const Range& v_in, const P& p_in)
 	: _v(v_in)
 	, _p(p_in) {}
 
@@ -198,14 +198,14 @@ struct fill_nonpsynth<STEREO_PLANAR_VIEW(T1), frame<T2,stereo_layout> >
 };
 
 template <typename T1, typename T2>
-struct fill_nonpsynth<STEREO_PLANAR_VIEW(T1), frame<T2,rlstereo_layout> >
+struct fill_nonpsynth<STEREO_PLANAR_RANGE(T1), frame<T2,rlstereo_layout> >
 {
-    typedef STEREO_PLANAR_VIEW(T1) View;
+    typedef STEREO_PLANAR_RANGE(T1) Range;
     typedef frame<T2, rlstereo_layout> P;
-    View _v;
+    Range _v;
     P _p;
     
-    fill_nonpsynth (const View& v_in, const P& p_in)
+    fill_nonpsynth (const Range& v_in, const P& p_in)
 	: _v(v_in), _p(p_in) {}
 
     void operator () () const
@@ -219,25 +219,25 @@ struct fill_nonpsynth<STEREO_PLANAR_VIEW(T1), frame<T2,rlstereo_layout> >
     }
 };
 
-template <typename View, typename P>
+template <typename Range, typename P>
 void test_fill (std::size_t trials)
 {
-    buffer<typename View::value_type, is_planar<View>::value> bufp (buffer_size);
-    buffer<typename View::value_type, is_planar<View>::value> bufn (buffer_size);
+    buffer<typename Range::value_type, is_planar<Range>::value> bufp (buffer_size);
+    buffer<typename Range::value_type, is_planar<Range>::value> bufn (buffer_size);
 
-    fill_view_max (view (bufp));
-    fill_view_max (view (bufn));
+    fill_range_max (range (bufp));
+    fill_range_max (range (bufn));
     
     BOOST_TEST_MESSAGE (
 	"psynth: " << measure_time (
-	    fill_psynth<View,P> (view (bufp), P()), trials));
+	    fill_psynth<Range,P> (range (bufp), P()), trials));
 
     BOOST_TEST_MESSAGE (
 	"non-psynth: "<< measure_time (
-	    fill_nonpsynth<View,P> (view (bufn), P()), trials));
+	    fill_nonpsynth<Range,P> (range (bufn), P()), trials));
 
-    BOOST_CHECK (view (bufp) [0] == P());
-    BOOST_CHECK (equal_frames (view (bufp), view (bufn)));
+    BOOST_CHECK (range (bufp) [0] == P());
+    BOOST_CHECK (equal_frames (range (bufp), range (bufn)));
 };
 
 template <typename T>
@@ -256,13 +256,13 @@ struct stereo_fr_t
     }
 };
 
-template <typename View, typename F>
+template <typename Range, typename F>
 struct for_each_psynth
 {
-    View _v;
+    Range _v;
     F _f;
 
-    for_each_psynth (const View& v_in, const F& f_in)
+    for_each_psynth (const Range& v_in, const F& f_in)
 	: _v(v_in), _f(f_in) {}
     void operator () () const
     {
@@ -270,16 +270,16 @@ struct for_each_psynth
     }
 };
 
-template <typename View, typename F> struct for_each_nonpsynth;
+template <typename Range, typename F> struct for_each_nonpsynth;
 template <typename T, typename T2>
-struct for_each_nonpsynth<STEREO_VIEW(T), stereo_fr_t<T2> >
+struct for_each_nonpsynth<STEREO_RANGE(T), stereo_fr_t<T2> >
 {
-    typedef STEREO_VIEW(T) View;
+    typedef STEREO_RANGE(T) Range;
     typedef stereo_fr_t<T2> F;
-    View _v;
+    Range _v;
     F _f;
 
-    for_each_nonpsynth (const View& v_in, const F& f_in)
+    for_each_nonpsynth (const Range& v_in, const F& f_in)
 	: _v (v_in)
 	, _f (f_in) {}
 
@@ -296,14 +296,14 @@ struct for_each_nonpsynth<STEREO_VIEW(T), stereo_fr_t<T2> >
 };
 
 template <typename T1, typename T2>
-struct for_each_nonpsynth<STEREO_PLANAR_VIEW(T1), stereo_fr_t<T2> >
+struct for_each_nonpsynth<STEREO_PLANAR_RANGE(T1), stereo_fr_t<T2> >
 {
-    typedef STEREO_PLANAR_VIEW(T1) View;
+    typedef STEREO_PLANAR_RANGE(T1) Range;
     typedef stereo_fr_t<T2> F;
-    View _v;
+    Range _v;
     F _f;
 
-    for_each_nonpsynth (const View& v_in, const F& f_in)
+    for_each_nonpsynth (const Range& v_in, const F& f_in)
 	: _v (v_in)
 	, _f (f_in) {}
 
@@ -322,51 +322,51 @@ struct for_each_nonpsynth<STEREO_PLANAR_VIEW(T1), stereo_fr_t<T2> >
     }
 };
 
-template <typename View, typename F>
+template <typename Range, typename F>
 void test_for_each (std::size_t trials)
 {
-    buffer<typename View::value_type, is_planar<View>::value> bufp (buffer_size);
-    buffer<typename View::value_type, is_planar<View>::value> bufn (buffer_size);
+    buffer<typename Range::value_type, is_planar<Range>::value> bufp (buffer_size);
+    buffer<typename Range::value_type, is_planar<Range>::value> bufn (buffer_size);
 
-    fill_view_max (view (bufp));
-    fill_view_max (view (bufn));
+    fill_range_max (range (bufp));
+    fill_range_max (range (bufn));
     
     BOOST_TEST_MESSAGE (
 	"psynth: " << measure_time (
-	    for_each_psynth<View, F> (view (bufp), F ()), trials));
+	    for_each_psynth<Range, F> (range (bufp), F ()), trials));
 
     BOOST_TEST_MESSAGE (
 	"non-psynth: " << measure_time (
-	    for_each_nonpsynth<View, F> (view (bufn), F ()), trials));
+	    for_each_nonpsynth<Range, F> (range (bufn), F ()), trials));
 
-    BOOST_CHECK (equal_frames (view (bufp), view (bufn)));
+    BOOST_CHECK (equal_frames (range (bufp), range (bufn)));
 }
 
 // copy
-template <typename View1, typename View2>
+template <typename Range1, typename Range2>
 struct copy_psynth
 {
-    View1 _v1;
-    View2 _v2;
-    copy_psynth (const View1& v1_in, const View2& v2_in)
+    Range1 _v1;
+    Range2 _v2;
+    copy_psynth (const Range1& v1_in, const Range2& v2_in)
 	: _v1(v1_in), _v2(v2_in) {}
     void operator () () const {
 	copy_frames (_v1, _v2);
     }
 };
 
-template <typename View1, typename View2>
+template <typename Range1, typename Range2>
 struct copy_nonpsynth;
 
 template <typename T1, typename T2>
-struct copy_nonpsynth<STEREO_VIEW(T1),STEREO_VIEW(T2)>
+struct copy_nonpsynth<STEREO_RANGE(T1),STEREO_RANGE(T2)>
 {
-    typedef STEREO_VIEW(T1) View1;
-    typedef STEREO_VIEW(T2) View2;
-    View1 _v1;
-    View2 _v2;
+    typedef STEREO_RANGE(T1) Range1;
+    typedef STEREO_RANGE(T2) Range2;
+    Range1 _v1;
+    Range2 _v2;
 
-    copy_nonpsynth (const View1& v1_in, const View2& v2_in)
+    copy_nonpsynth (const Range1& v1_in, const Range2& v2_in)
 	: _v1 (v1_in)
 	, _v2 (v2_in) {}
 
@@ -380,14 +380,14 @@ struct copy_nonpsynth<STEREO_VIEW(T1),STEREO_VIEW(T2)>
 };
 
 template <typename T1, typename T2>
-struct copy_nonpsynth<STEREO_VIEW(T1), RLSTEREO_VIEW(T2)>
+struct copy_nonpsynth<STEREO_RANGE(T1), RLSTEREO_RANGE(T2)>
 {
-    typedef STEREO_VIEW(T1) View1;
-    typedef RLSTEREO_VIEW(T2) View2;
-    View1 _v1;
-    View2 _v2;
+    typedef STEREO_RANGE(T1) Range1;
+    typedef RLSTEREO_RANGE(T2) Range2;
+    Range1 _v1;
+    Range2 _v2;
 
-    copy_nonpsynth (const View1& v1_in, const View2& v2_in)
+    copy_nonpsynth (const Range1& v1_in, const Range2& v2_in)
 	: _v1 (v1_in)
 	, _v2 (v2_in) {}
     
@@ -406,14 +406,14 @@ struct copy_nonpsynth<STEREO_VIEW(T1), RLSTEREO_VIEW(T2)>
     }
 };
 template <typename T1, typename T2>
-struct copy_nonpsynth<STEREO_PLANAR_VIEW(T1),STEREO_PLANAR_VIEW(T2)>
+struct copy_nonpsynth<STEREO_PLANAR_RANGE(T1),STEREO_PLANAR_RANGE(T2)>
 {
-    typedef STEREO_PLANAR_VIEW(T1) View1;
-    typedef STEREO_PLANAR_VIEW(T2) View2;
-    View1 _v1;
-    View2 _v2;
+    typedef STEREO_PLANAR_RANGE(T1) Range1;
+    typedef STEREO_PLANAR_RANGE(T2) Range2;
+    Range1 _v1;
+    Range2 _v2;
 
-    copy_nonpsynth (const View1& v1_in, const View2& v2_in)
+    copy_nonpsynth (const Range1& v1_in, const Range2& v2_in)
 	: _v1 (v1_in)
 	, _v2(v2_in) {}
 
@@ -432,14 +432,14 @@ struct copy_nonpsynth<STEREO_PLANAR_VIEW(T1),STEREO_PLANAR_VIEW(T2)>
 };
 
 template <typename T1, typename T2>
-struct copy_nonpsynth<STEREO_VIEW(T1),STEREO_PLANAR_VIEW(T2)>
+struct copy_nonpsynth<STEREO_RANGE(T1),STEREO_PLANAR_RANGE(T2)>
 {
-    typedef STEREO_VIEW(T1) View1;
-    typedef STEREO_PLANAR_VIEW(T2) View2;
-    View1 _v1;
-    View2 _v2;
+    typedef STEREO_RANGE(T1) Range1;
+    typedef STEREO_PLANAR_RANGE(T2) Range2;
+    Range1 _v1;
+    Range2 _v2;
 
-    copy_nonpsynth (const View1& v1_in, const View2& v2_in)
+    copy_nonpsynth (const Range1& v1_in, const Range2& v2_in)
 	: _v1(v1_in), _v2(v2_in) {}
 
     void operator()() const
@@ -459,15 +459,15 @@ struct copy_nonpsynth<STEREO_VIEW(T1),STEREO_PLANAR_VIEW(T2)>
 };
 
 template <typename T1, typename T2>
-struct copy_nonpsynth<STEREO_PLANAR_VIEW(T1),STEREO_VIEW(T2)>
+struct copy_nonpsynth<STEREO_PLANAR_RANGE(T1),STEREO_RANGE(T2)>
 {
-    typedef STEREO_PLANAR_VIEW(T1) View1;
-    typedef STEREO_VIEW(T2) View2;
+    typedef STEREO_PLANAR_RANGE(T1) Range1;
+    typedef STEREO_RANGE(T2) Range2;
 
-    View1 _v1;
-    View2 _v2;
+    Range1 _v1;
+    Range2 _v2;
 
-    copy_nonpsynth (const View1& v1_in, const View2& v2_in)
+    copy_nonpsynth (const Range1& v1_in, const Range2& v2_in)
 	: _v1(v1_in), _v2(v2_in) {}
 
     void operator()() const
@@ -485,29 +485,29 @@ struct copy_nonpsynth<STEREO_PLANAR_VIEW(T1),STEREO_VIEW(T2)>
     }
 };
 
-template <typename View1, typename View2>
+template <typename Range1, typename Range2>
 void test_copy (std::size_t trials)
 {
-    buffer<typename View1::value_type,is_planar<View1>::value> bufp1 (buffer_size);
-    buffer<typename View2::value_type,is_planar<View2>::value> bufp2 (buffer_size);
-    buffer<typename View1::value_type,is_planar<View1>::value> bufn1 (buffer_size);
-    buffer<typename View2::value_type,is_planar<View2>::value> bufn2 (buffer_size);
+    buffer<typename Range1::value_type,is_planar<Range1>::value> bufp1 (buffer_size);
+    buffer<typename Range2::value_type,is_planar<Range2>::value> bufp2 (buffer_size);
+    buffer<typename Range1::value_type,is_planar<Range1>::value> bufn1 (buffer_size);
+    buffer<typename Range2::value_type,is_planar<Range2>::value> bufn2 (buffer_size);
 
-    fill_view_max (view (bufp1));
-    fill_view_max (view (bufn1));
+    fill_range_max (range (bufp1));
+    fill_range_max (range (bufn1));
     
     BOOST_TEST_MESSAGE (
 	"psynth: " << measure_time (
-	    copy_psynth<View1,View2> (view(bufp1), view (bufp2)), trials));
+	    copy_psynth<Range1,Range2> (range(bufp1), range (bufp2)), trials));
 
     BOOST_TEST_MESSAGE (
 	"non-psynth: " << measure_time (
-	    copy_nonpsynth<View1,View2> (view (bufn1), view (bufn2)), trials));
+	    copy_nonpsynth<Range1,Range2> (range (bufn1), range (bufn2)), trials));
 
-    BOOST_CHECK (equal_frames (view (bufp1), view (bufp2)));
-    BOOST_CHECK (equal_frames (view (bufn1), view (bufn2)));
-    BOOST_CHECK (equal_frames (view (bufp1), view (bufn1)));
-    BOOST_CHECK (equal_frames (view (bufp2), view (bufn2)));
+    BOOST_CHECK (equal_frames (range (bufp1), range (bufp2)));
+    BOOST_CHECK (equal_frames (range (bufn1), range (bufn2)));
+    BOOST_CHECK (equal_frames (range (bufp1), range (bufn1)));
+    BOOST_CHECK (equal_frames (range (bufp2), range (bufn2)));
 }
 
 // transform()
@@ -522,14 +522,14 @@ struct rlstereo_to_stereo
     }
 };
 
-template <typename View1, typename View2, typename F>
+template <typename Range1, typename Range2, typename F>
 struct transform_psynth
 {
-    View1 _v1;
-    View2 _v2;
+    Range1 _v1;
+    Range2 _v2;
     F _f;
 
-    transform_psynth(const View1& v1_in, const View2& v2_in, const F& f_in)
+    transform_psynth(const Range1& v1_in, const Range2& v2_in, const F& f_in)
 	: _v1(v1_in), _v2(v2_in), _f(f_in) {}
 
     void operator() () const
@@ -538,17 +538,17 @@ struct transform_psynth
     }
 };
 
-template <typename View1, typename View2, typename F> struct transform_nonpsynth;
+template <typename Range1, typename Range2, typename F> struct transform_nonpsynth;
 template <typename T1, typename T2, typename F>
-struct transform_nonpsynth<STEREO_VIEW(T1), STEREO_VIEW(T2),F>
+struct transform_nonpsynth<STEREO_RANGE(T1), STEREO_RANGE(T2),F>
 {
-    typedef STEREO_VIEW(T1) View1;
-    typedef STEREO_VIEW(T2) View2;
-    View1 _v1;
-    View2 _v2;
+    typedef STEREO_RANGE(T1) Range1;
+    typedef STEREO_RANGE(T2) Range2;
+    Range1 _v1;
+    Range2 _v2;
     F _f;
 
-    transform_nonpsynth (const View1& v1_in, const View2& v2_in, const F& f_in)
+    transform_nonpsynth (const Range1& v1_in, const Range2& v2_in, const F& f_in)
 	: _v1(v1_in), _v2(v2_in), _f(f_in) {}
 
     void operator ()() const
@@ -566,15 +566,15 @@ struct transform_nonpsynth<STEREO_VIEW(T1), STEREO_VIEW(T2),F>
 };
 
 template <typename T1, typename T2, typename F>
-struct transform_nonpsynth<STEREO_PLANAR_VIEW(T1),STEREO_PLANAR_VIEW(T2),F>
+struct transform_nonpsynth<STEREO_PLANAR_RANGE(T1),STEREO_PLANAR_RANGE(T2),F>
 {
-    typedef STEREO_PLANAR_VIEW(T1) View1;
-    typedef STEREO_PLANAR_VIEW(T2) View2;
-    View1 _v1;
-    View2 _v2;
+    typedef STEREO_PLANAR_RANGE(T1) Range1;
+    typedef STEREO_PLANAR_RANGE(T2) Range2;
+    Range1 _v1;
+    Range2 _v2;
     F _f;
     
-    transform_nonpsynth (const View1& v1_in, const View2& v2_in, const F& f_in)
+    transform_nonpsynth (const Range1& v1_in, const Range2& v2_in, const F& f_in)
 	: _v1(v1_in), _v2(v2_in), _f(f_in) {}
 
     void operator()() const
@@ -593,15 +593,15 @@ struct transform_nonpsynth<STEREO_PLANAR_VIEW(T1),STEREO_PLANAR_VIEW(T2),F>
 };
 
 template <typename T1, typename T2, typename F>
-struct transform_nonpsynth<STEREO_VIEW(T1),STEREO_PLANAR_VIEW(T2),F>
+struct transform_nonpsynth<STEREO_RANGE(T1),STEREO_PLANAR_RANGE(T2),F>
 {
-    typedef STEREO_VIEW(T1) View1;
-    typedef STEREO_PLANAR_VIEW(T2) View2;
-    View1 _v1;
-    View2 _v2;
+    typedef STEREO_RANGE(T1) Range1;
+    typedef STEREO_PLANAR_RANGE(T2) Range2;
+    Range1 _v1;
+    Range2 _v2;
     F _f;
 
-    transform_nonpsynth (const View1& v1_in,const View2& v2_in,const F& f_in)
+    transform_nonpsynth (const Range1& v1_in,const Range2& v2_in,const F& f_in)
 	: _v1 (v1_in), _v2(v2_in), _f(f_in) {}
 
     void operator()() const
@@ -620,14 +620,14 @@ struct transform_nonpsynth<STEREO_VIEW(T1),STEREO_PLANAR_VIEW(T2),F>
 };
 
 template <typename T1, typename T2, typename F>
-struct transform_nonpsynth<STEREO_PLANAR_VIEW(T1),STEREO_VIEW(T2),F> {
-    typedef STEREO_PLANAR_VIEW(T1) View1;
-    typedef STEREO_VIEW(T2) View2;
-    View1 _v1;
-    View2 _v2;
+struct transform_nonpsynth<STEREO_PLANAR_RANGE(T1),STEREO_RANGE(T2),F> {
+    typedef STEREO_PLANAR_RANGE(T1) Range1;
+    typedef STEREO_RANGE(T2) Range2;
+    Range1 _v1;
+    Range2 _v2;
     F _f;
 
-    transform_nonpsynth(const View1& v1_in,const View2& v2_in,const F& f_in)
+    transform_nonpsynth(const Range1& v1_in,const Range2& v2_in,const F& f_in)
 	: _v1(v1_in),_v2(v2_in),_f(f_in) {}
 
     void operator()() const
@@ -645,31 +645,31 @@ struct transform_nonpsynth<STEREO_PLANAR_VIEW(T1),STEREO_VIEW(T2),F> {
     }
 };
 
-template <typename View1, typename View2, typename F>
+template <typename Range1, typename Range2, typename F>
 void test_transform (std::size_t trials)
 {
-    buffer<typename View1::value_type,is_planar<View1>::value> bufp1 (buffer_size);
-    buffer<typename View2::value_type,is_planar<View2>::value> bufp2 (buffer_size);
-    buffer<typename View1::value_type,is_planar<View1>::value> bufn1 (buffer_size);
-    buffer<typename View2::value_type,is_planar<View2>::value> bufn2 (buffer_size);
+    buffer<typename Range1::value_type,is_planar<Range1>::value> bufp1 (buffer_size);
+    buffer<typename Range2::value_type,is_planar<Range2>::value> bufp2 (buffer_size);
+    buffer<typename Range1::value_type,is_planar<Range1>::value> bufn1 (buffer_size);
+    buffer<typename Range2::value_type,is_planar<Range2>::value> bufn2 (buffer_size);
 
-    fill_view_max (view (bufp1));
-    fill_view_max (view (bufp2));
-    fill_view_max (view (bufn1));
-    fill_view_max (view (bufn2));
+    fill_range_max (range (bufp1));
+    fill_range_max (range (bufp2));
+    fill_range_max (range (bufn1));
+    fill_range_max (range (bufn2));
     
     BOOST_TEST_MESSAGE (
 	"psynth: " << measure_time (
-	    transform_psynth<View1, View2, F>(
-		view (bufp1), view(bufp2), F()), trials));
+	    transform_psynth<Range1, Range2, F>(
+		bufp1, bufp2, F()), trials));
 
     BOOST_TEST_MESSAGE (
 	"non-psynth: "<< measure_time (
-	    transform_nonpsynth<View1,View2,F>(
-		view(bufn1), view(bufn2), F()), trials));
+	    transform_nonpsynth<Range1,Range2,F>(
+		range(bufn1), range(bufn2), F()), trials));
 
-    BOOST_CHECK (equal_frames (view (bufp1), view (bufn1)));
-    BOOST_CHECK (equal_frames (view (bufp2), view (bufn2)));
+    BOOST_CHECK (equal_frames (range (bufp1), range (bufn1)));
+    BOOST_CHECK (equal_frames (range (bufp2), range (bufn2)));
 }
 
 #ifdef NDEBUG
@@ -684,52 +684,52 @@ BOOST_AUTO_TEST_CASE (test_fill_frames_performance)
 {
     BOOST_TEST_MESSAGE (
 	"Test fill_frames() on stereo8_buffer with stereo8_frame");
-    test_fill<stereo8_view, stereo8_frame>(num_trials);
+    test_fill<stereo8_range, stereo8_frame>(num_trials);
     
     BOOST_TEST_MESSAGE (
 	"Test fill_frames() on stereo8_planar_buffer with stereo8_frame");
-    test_fill<stereo8_planar_view, stereo8_frame>(num_trials);
+    test_fill<stereo8_planar_range, stereo8_frame>(num_trials);
 
     BOOST_TEST_MESSAGE (
 	"Test fill_frames() on stereo8_buffer with rlstereo8_frame");
-    test_fill<stereo8_view, rlstereo8_frame>(num_trials);
+    test_fill<stereo8_range, rlstereo8_frame>(num_trials);
     
     BOOST_TEST_MESSAGE (
 	"Test fill_frames() on stereo8_planar_buffer with rlstereo8_frame");
-    test_fill<stereo8_planar_view, rlstereo8_frame>(num_trials);
+    test_fill<stereo8_planar_range, rlstereo8_frame>(num_trials);
 }
 
 BOOST_AUTO_TEST_CASE (test_for_each_frame_performance)
 {
     BOOST_TEST_MESSAGE ("Test for_each_frame() on stereo8_buffer");
-    test_for_each<stereo8_view, stereo_fr_t<bits8> >(num_trials);
+    test_for_each<stereo8_range, stereo_fr_t<bits8> >(num_trials);
 
     BOOST_TEST_MESSAGE ("Test for_each_frame() on stereo8_planar_buffer");
-    test_for_each<stereo8_planar_view, stereo_fr_t<bits8> >(num_trials);
+    test_for_each<stereo8_planar_range, stereo_fr_t<bits8> >(num_trials);
 }
 
 BOOST_AUTO_TEST_CASE (test_copy_frames_performance)
 {
     BOOST_TEST_MESSAGE (
 	"Test copy_frames() between stereo8_buffer and stereo8_buffer");
-    test_copy<stereo8_view,stereo8_view>(num_trials);
+    test_copy<stereo8_range,stereo8_range>(num_trials);
     
     BOOST_TEST_MESSAGE (
 	"Test copy_frames() between stereo8_buffer and rlstereo8_buffer");
-    test_copy<stereo8_view,rlstereo8_view>(num_trials);
+    test_copy<stereo8_range,rlstereo8_range>(num_trials);
     
     BOOST_TEST_MESSAGE (
 	"Test copy_frames() between stereo8_planar_buffer and "
 	"stereo8_planar_buffer");
-    test_copy<stereo8_planar_view,stereo8_planar_view>(num_trials);
+    test_copy<stereo8_planar_range,stereo8_planar_range>(num_trials);
     
     BOOST_TEST_MESSAGE (
 	"Test copy_frames() between stereo8_buffer and stereo8_planar_buffer");
-    test_copy<stereo8_view,stereo8_planar_view>(num_trials);
+    test_copy<stereo8_range,stereo8_planar_range>(num_trials);
     
     BOOST_TEST_MESSAGE (
 	"Test copy_frames() between stereo8_planar_buffer and stereo8_buffer");
-    test_copy<stereo8_planar_view,stereo8_view>(num_trials);
+    test_copy<stereo8_planar_range,stereo8_range>(num_trials);
 }
 
 BOOST_AUTO_TEST_CASE (test_transform_frames_performance)
@@ -737,16 +737,16 @@ BOOST_AUTO_TEST_CASE (test_transform_frames_performance)
     BOOST_TEST_MESSAGE (
 	"Test transform_frames() between stereo8_buffer and stereo8_buffer");
     test_transform<
-	stereo8_view,
-	stereo8_view,
+	stereo8_range,
+	stereo8_range,
 	rlstereo_to_stereo<bits8,frame<bits8,stereo_layout> > >(num_trials);
     
     BOOST_TEST_MESSAGE (
 	"Test transform_frames() between stereo8_planar_buffer and "
 	"stereo8_planar_buffer");
     test_transform<
-	stereo8_planar_view,
-	stereo8_planar_view,
+	stereo8_planar_range,
+	stereo8_planar_range,
 	rlstereo_to_stereo<
 	    bits8, planar_frame_reference<bits8,stereo_space> > >(num_trials);
     
@@ -754,16 +754,16 @@ BOOST_AUTO_TEST_CASE (test_transform_frames_performance)
 	"Test transform_frames() between stereo8_buffer and "
 	"stereo8_planar_buffer");
     test_transform<
-	stereo8_view,
-	stereo8_planar_view,
+	stereo8_range,
+	stereo8_planar_range,
 	rlstereo_to_stereo<bits8,frame<bits8,stereo_layout> > >(num_trials);
     
     BOOST_TEST_MESSAGE (
 	"Test transform_frames() between stereo8_planar_buffer and "
 	"stereo8_buffer");
     test_transform<
-	stereo8_planar_view,
-	stereo8_view,
+	stereo8_planar_range,
+	stereo8_range,
 	rlstereo_to_stereo<
 	    bits8,planar_frame_reference<bits8,stereo_space> > >(num_trials);   
 }

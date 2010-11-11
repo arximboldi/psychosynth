@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-03 13:45:02 raskolnikov>
+ *  Time-stamp:  <2010-11-09 02:58:53 raskolnikov>
  *
  *  @file        quad.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -72,13 +72,13 @@ typedef layout<quad_space> quad_layout;
 */
 template <typename IC>
 inline typename type_from_iterator<
-    planar_frame_iterator<IC, quad_space> >::view
-planar_quad_view (std::size_t size, IC l, IC r, IC bl, IC br)
+    planar_frame_iterator<IC, quad_space> >::range
+planar_quad_range (std::size_t size, IC l, IC r, IC bl, IC br)
 {
     typedef typename type_from_iterator<
-	planar_frame_iterator<IC, quad_space> >::view RView;
+	planar_frame_iterator<IC, quad_space> >::range RRange;
 
-    return RView (size, planar_frame_iterator<IC, quad_space> (l, r, bl, br));
+    return RRange (size, planar_frame_iterator<IC, quad_space> (l, r, bl, br));
 }
 
 } /* namespace sound */

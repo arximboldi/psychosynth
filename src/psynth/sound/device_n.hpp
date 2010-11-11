@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-03 14:02:15 raskolnikov>
+ *  Time-stamp:  <2010-11-11 21:25:33 raskolnikov>
  *
  *  @file        device_n.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -124,16 +124,16 @@ template <int N> struct devicen_layout : public layout<devicen_space<N> > {};
 */
 template <typename IC>
 inline typename type_from_iterator<
-    planar_frame_iterator<IC,devicen_space<2> > >::view
-planar_devicen_view (std::size_t size, IC c0, IC c1)
+    planar_frame_iterator<IC,devicen_space<2> > >::range
+planar_devicen_range (std::size_t size, IC c0, IC c1)
 {
     typedef typename type_from_iterator<planar_frame_iterator<
-	IC, devicen_space<2> > >::view view;
-    return view (size, typename view::iterator (c0, c1));
+	IC, devicen_space<2> > >::range range;
+    return range (size, typename range::iterator (c0, c1));
 }
 
 /**
-   @todo Implement view factories for more dimensions.
+   @todo Implement range factories for more dimensions.
  */
 
 } /* namespace sound */

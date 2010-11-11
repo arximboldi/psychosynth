@@ -1,11 +1,11 @@
 /**
- *  Time-stamp:  <2010-11-06 03:37:08 raskolnikov>
+ *  Time-stamp:  <2010-11-10 12:27:28 raskolnikov>
  *
- *  @file        buffer_view.hpp
+ *  @file        buffer_range.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
  *  @date        Thu Oct 21 12:41:26 2010
  *
- *  Buffer views.
+ *  Buffer ranges.
  */
 
 /*
@@ -36,14 +36,18 @@
  *  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt).
  */
 
-#ifndef PSYNTH_SOUND_BUFFER_VIEW_H_
-#define PSYNTH_SOUND_BUFFER_VIEW_H_
+#ifndef PSYNTH_SOUND_BUFFER_RANGE_H_
+#define PSYNTH_SOUND_BUFFER_RANGE_H_
 
 #include <cstddef>
 #include <iterator>
 
 #include <psynth/base/compat.hpp>
 #include <psynth/sound/frame.hpp>
+#include <psynth/sound/frame_iterator_adaptor.hpp>
+#include <psynth/sound/step_iterator.hpp>
+#include <psynth/sound/planar_frame_reference.hpp>
+#include <psynth/sound/planar_frame_iterator.hpp>
 
 //#ifdef _MSC_VER
 //#pragma warning(push)
@@ -59,26 +63,26 @@ namespace sound
 {
 
 /**
-   \class buffer_view
-   \ingroup BufferViewModel FrameBasedModel
+   \class buffer_range
+   \ingroup BufferRangeModel FrameBasedModel
 
    \brief A lightweight object that interprets memory as a 1D array of
-   frames. Models BufferViewConcept, FrameBasedConcept,
+   frames. Models BufferRangeConcept, FrameBasedConcept,
    HasDynamicXStepTypeConcept, HasDynamicYStepTypeConcept,
    HasTransposedTypeConcept
 
-   Buffer view consists of a frame iterator and the buffer size.
+   Buffer range consists of a frame iterator and the buffer size.
 
-   Buffer views to buffers are what ranges are to STL containers. They
+   Buffer ranges to buffers are what ranges are to STL containers. They
    are lightweight objects, that don't own the frames. It is the
    user's responsibility that the underlying data remains valid for
-   the lifetime of the buffer view.
+   the lifetime of the buffer range.
 
-   Similar to iterators and ranges, constness of views does not extend
-   to constness of frames.  A const \p buffer_view does not allow
+   Similar to iterators and ranges, constness of ranges does not extend
+   to constness of frames.  A const \p buffer_range does not allow
    changing its location in memory (resizing, moving) but does not
    prevent one from changing the frames. The latter requires an buffer
-   view whose value_type is const.
+   range whose value_type is const.
 
    Buffers have interfaces consistent with STL 1D random access
    containers, so they can be used directly in STL algorithms like:
@@ -90,16 +94,16 @@ namespace sound
    In addition, horizontal, vertical and 2D random access iterators
    are provided.
 
-   Note also that \p buffer_view does not require that its element
+   Note also that \p buffer_range does not require that its element
    type be a frame. It could be instantiated with a locator whose \p
-   value_type models only \p Regular. In this case the buffer view
-   models the weaker RandomAccess2DBufferViewConcept, and does not
+   value_type models only \p Regular. In this case the buffer range
+   models the weaker RandomAccess2DBufferRangeConcept, and does not
    model FrameBasedConcept.  Many generic algorithms don't require the
    elements to be frames.
 */
 template <typename Iterator>
 // Models 1D Frame Iterator
-class buffer_view
+class buffer_range
 {
 public:
     /** @todo Use iterator_traits ?? */
@@ -111,20 +115,20 @@ public:
 
     typedef typename std::iterator_traits<Iterator>::difference_type
     difference_type;
-
-    typedef buffer_view<typename const_iterator_type<Iterator>::type>
+    
+    typedef buffer_range<typename const_iterator_type<Iterator>::type>
     const_type;
 
-    typedef Iterator                                     iterator;
-    typedef std::reverse_iterator<iterator>              reverse_iterator;
-    typedef std::ptrdiff_t                               size_type;
+    typedef Iterator                               iterator;
+    typedef std::reverse_iterator<iterator>        reverse_iterator;
+    typedef std::ptrdiff_t                         size_type;
 
     template <typename Deref>
     struct add_deref
     {
-	typedef buffer_view <
+	typedef buffer_range <
 	    typename iterator_add_deref<Iterator, Deref>::type> type;
-	static type make (const buffer_view<Iterator>& bv, const Deref& d)
+	static type make (const buffer_range<Iterator>& bv, const Deref& d)
 	{
 	    return type (bv.size (),
 			 iterator_add_deref<Iterator, Deref>::make (
@@ -132,52 +136,58 @@ public:
 	}
     };
 
-    buffer_view ()
+    buffer_range ()
 	: _size (0)
     {}
-    
-    template <typename View>
-    buffer_view (const View& bv)
+
+    /** We need a non const constructor to copy from buffers. */
+    template <typename Range>
+    buffer_range (Range& bv)
+	: _size (bv.size ())
+	, _frames (bv.frames ()) {}
+
+    template <typename Range>
+    buffer_range (const Range& bv)
 	: _size (bv.size ())
 	, _frames (bv.frames ()) {}
 
     template <typename I2>
-    buffer_view (const size_type& sz, const I2& it)
+    buffer_range (const size_type& sz, const I2& it)
 	: _size (sz)
 	, _frames (it)
     {}
     
-    template <typename View>
-    buffer_view& operator= (const View& bv)
+    template <typename Range>
+    buffer_range& operator= (const Range& bv)
     {
 	_frames = bv.frames ();
 	_size   = bv.size ();
 	return *this;
     }
     
-    buffer_view& operator= (const buffer_view& bv)
+    buffer_range& operator= (const buffer_range& bv)
     {
 	_frames = bv.frames ();
 	_size   = bv.size ();
 	return *this;
     }
 
-    template <typename View>
-    bool operator== (const View& v) const
+    template <typename Range>
+    bool operator== (const Range& v) const
     {
 	return frames () == v.frames () && size () == v.size();
     }
     
-    template <typename View>
-    bool operator!= (const View& v) const
+    template <typename Range>
+    bool operator!= (const Range& v) const
     {
 	return !(*this == v);
     }
 
     template <typename L2>
-    friend void swap (buffer_view<L2>& x, buffer_view<L2>& y);
+    friend void swap (buffer_range<L2>& x, buffer_range<L2>& y);
 
-    const size_type& size () const
+    size_type size () const
     {
 	return _size;
     }
@@ -229,14 +239,14 @@ public:
     //\}@
 
 private:
-    template <typename L2> friend class buffer_view;
+    template <typename L2> friend class buffer_range;
 
     size_type   _size;
     iterator    _frames;
 };
 
 template <typename I2> 
-inline void swap (buffer_view<I2>& x, buffer_view<I2>& y)
+inline void swap (buffer_range<I2>& x, buffer_range<I2>& y)
 { 
     using std::swap;
     swap (x._size, y._size); 
@@ -250,27 +260,27 @@ inline void swap (buffer_view<I2>& x, buffer_view<I2>& y)
  */
 
 template <typename I>
-struct sample_type<buffer_view<I> > : public sample_type<I> {}; 
+struct sample_type<buffer_range<I> > : public sample_type<I> {}; 
 
 template <typename I>
-struct channel_space_type<buffer_view<I> > : public channel_space_type<I> {}; 
+struct channel_space_type<buffer_range<I> > : public channel_space_type<I> {}; 
 
 template <typename I>
-struct sample_mapping_type<buffer_view<I> > : public sample_mapping_type<I> {}; 
+struct sample_mapping_type<buffer_range<I> > : public sample_mapping_type<I> {}; 
 
 template <typename I>
-struct is_planar<buffer_view<I> > : public is_planar<I> {}; 
+struct is_planar<buffer_range<I> > : public is_planar<I> {}; 
 
 /*
  *
- *      HasDynamicXStepTypeConcept
+ *      HasDynamicStepTypeConcept
  *
  */
 
 template <typename L>
-struct dynamic_step_type<buffer_view<L> >
+struct dynamic_step_type<buffer_range<L> >
 {
-    typedef buffer_view<typename dynamic_step_type<L>::type> type;
+    typedef buffer_range<typename dynamic_step_type<L>::type> type;
 };
 
 
@@ -281,4 +291,4 @@ struct dynamic_step_type<buffer_view<L> >
 //#pragma warning(pop)
 //#endif
 
-#endif /* PSYNTH_BUFFER_VIEW_H_ */
+#endif /* PSYNTH_BUFFER_RANGE_H_ */

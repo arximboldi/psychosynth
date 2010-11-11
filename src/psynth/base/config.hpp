@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-03 02:28:37 raskolnikov>
+ *  Time-stamp:  <2010-11-11 23:13:04 raskolnikov>
  *
  *  @file        config.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -43,7 +43,7 @@
 #include <psynth/base/exception.hpp>
 #include <psynth/base/observer.hpp>
 
-#include <psynth/base/config_def.hpp>
+#include <psynth/base/config_fwd.hpp>
 
 namespace psynth
 {

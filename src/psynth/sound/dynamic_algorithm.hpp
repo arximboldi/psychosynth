@@ -1,12 +1,12 @@
 /**
- *  Time-stamp:  <2010-11-05 03:26:27 raskolnikov>
+ *  Time-stamp:  <2010-11-10 14:06:57 raskolnikov>
  *
  *  @file        dynamic_algorithm.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
  *  @date        Wed Nov  3 19:34:10 2010
  *
  *   Some basic STL-style algorithms when applied to runtime type
- *   specified image views
+ *   specified buffer ranges
  */
 
 /*
@@ -69,33 +69,43 @@ struct equal_frames_fn : public binary_operation_obj<equal_frames_fn, bool>
 
 } /* namespace detail */
 
-/** \ingroup BufferViewSTLAlgorithmsEqualFrames */
+/** \ingroup BufferRangeSTLAlgorithmsEqualFrames */
 template <typename Types1,  // Model MPL Random Access Container of
-			    // models of BufferViewConcept
-          typename View2>   // Model MutableBufferViewConcept
-bool equal_frames (const dynamic_buffer_view<Types1>& src, const View2& dst)
+			    // models of BufferRangeConcept
+          typename Range2>   // Model MutableBufferRangeConcept
+bool equal_frames (const dynamic_buffer_range<Types1>& src, const Range2& dst)
 {
     return apply_operation (
 	src, boost::bind (detail::equal_frames_fn(), _1, dst));
 }
 
-/** \ingroup BufferViewSTLAlgorithmsEqualFrames */
-template <typename View1,   // Model BufferViewConcept
+/** \ingroup BufferRangeSTLAlgorithmsEqualFrames */
+template <typename Types1,  // Model MPL Random Access Container of
+			    // models of BufferRangeConcept
+          typename Range2>   // Model MutableBufferRangeConcept
+bool equal_frames (const dynamic_buffer<Types1>& src, const Range2& dst)
+{
+    return apply_operation (
+	src, boost::bind (detail::equal_frames_fn (), _1, dst));
+}
+
+/** \ingroup BufferRangeSTLAlgorithmsEqualFrames */
+template <typename Range1,   // Model BufferRangeConcept
           typename Types2>  // Model MPL Random Access Container of
-			    // models of MutableBufferViewConcept
-bool equal_frames (const View1& src, const dynamic_buffer_view<Types2>& dst)
+			    // models of MutableBufferRangeConcept
+bool equal_frames (const Range1& src, const dynamic_buffer_range<Types2>& dst)
 {
     return apply_operation (
 	dst, boost::bind (detail::equal_frames_fn(), src, _1));
 }
 
-/** \ingroup BufferViewSTLAlgorithmsEqualFrames */
+/** \ingroup BufferRangeSTLAlgorithmsEqualFrames */
 template <typename Types1,  // Model MPL Random Access Container of
-			    // models of BufferViewConcept
+			    // models of BufferRangeConcept
           typename Types2>  // Model MPL Random Access Container of
-			    // models of MutableBufferViewConcept
-bool equal_frames(const dynamic_buffer_view<Types1>& src,
-		  const dynamic_buffer_view<Types2>& dst)
+			    // models of MutableBufferRangeConcept
+bool equal_frames(const dynamic_buffer_range<Types1>& src,
+		  const dynamic_buffer_range<Types2>& dst)
 {
     return apply_operation (src, dst, detail::equal_frames_fn());
 }
@@ -112,8 +122,8 @@ namespace detail
 
 struct copy_frames_fn : public binary_operation_obj<copy_frames_fn>
 {
-    template <typename View1, typename View2> PSYNTH_FORCEINLINE
-    void apply_compatible(const View1& src, const View2& dst) const
+    template <typename Range1, typename Range2> PSYNTH_FORCEINLINE
+    void apply_compatible (const Range1& src, const Range2& dst) const
     {
 	copy_frames(src,dst);
     }
@@ -121,31 +131,31 @@ struct copy_frames_fn : public binary_operation_obj<copy_frames_fn>
 
 } /* namespace detail */
 
-/** \ingroup BufferViewSTLAlgorithmsCopyFrames */
+/** \ingroup BufferRangeSTLAlgorithmsCopyFrames */
 template <typename Types1,  // Model MPL Random Access Container of
-			    // models of BufferViewConcept
-          typename View2>   // Model MutableBufferViewConcept
-void copy_frames (const dynamic_buffer_view<Types1>& src, const View2& dst)
+			    // models of BufferRangeConcept
+          typename Range2>   // Model MutableBufferRangeConcept
+void copy_frames (const dynamic_buffer_range<Types1>& src, const Range2& dst)
 {
     apply_operation (src, boost::bind (detail::copy_frames_fn(), _1, dst));
 }
 
-/** \ingroup BufferViewSTLAlgorithmsCopyFrames */
-template <typename View1,   // Model BufferViewConcept
+/** \ingroup BufferRangeSTLAlgorithmsCopyFrames */
+template <typename Range1,   // Model BufferRangeConcept
           typename Types2>  // Model MPL Random Access Container of
-			    // models of MutableBufferViewConcept
-void copy_frames (const View1& src, const dynamic_buffer_view<Types2>& dst)
+			    // models of MutableBufferRangeConcept
+void copy_frames (const Range1& src, const dynamic_buffer_range<Types2>& dst)
 {
     apply_operation (dst, boost::bind (detail::copy_frames_fn(), src, _1));
 }
 
-/** \ingroup BufferViewSTLAlgorithmsCopyFrames */
+/** \ingroup BufferRangeSTLAlgorithmsCopyFrames */
 template <typename Types1,  // Model MPL Random Access Container of
-			    // models of BufferViewConcept
+			    // models of BufferRangeConcept
           typename Types2>  // Model MPL Random Access Container of
-			    // models of MutableBufferViewConcept
-void copy_frames (const dynamic_buffer_view<Types1>& src,
-		  const dynamic_buffer_view<Types2>& dst)
+			    // models of MutableBufferRangeConcept
+void copy_frames (const dynamic_buffer_range<Types1>& src,
+		  const dynamic_buffer_range<Types2>& dst)
 {
     apply_operation (src, dst, detail::copy_frames_fn());
 }
@@ -161,24 +171,24 @@ void copy_frames (const dynamic_buffer_view<Types1>& src,
 // definition in channel_convert.hpp)
 struct default_channel_converter;
 
-/** \ingroup BufferViewSTLAlgorithmsCopyAndConvertFrames */
+/** \ingroup BufferRangeSTLAlgorithmsCopyAndConvertFrames */
 template <typename Types1,  // Model MPL Random Access Container of
-			    // models of BufferViewConcept
-          typename View2,   // Model MutableBufferViewConcept
+			    // models of BufferRangeConcept
+          typename Range2,   // Model MutableBufferRangeConcept
           typename CC>      // Model ColorConverterConcept
-void copy_and_convert_frames (const dynamic_buffer_view<Types1>& src,
-			      const View2& dst, CC cc)
+void copy_and_convert_frames (const dynamic_buffer_range<Types1>& src,
+			      const Range2& dst, CC cc)
 {
     apply_operation (src, boost::bind (
 			 detail::copy_and_convert_frames_fn<CC>(cc), _1, dst));
 }
 
-/**  \ingroup BufferViewSTLAlgorithmsCopyAndConvertFrames */
+/**  \ingroup BufferRangeSTLAlgorithmsCopyAndConvertFrames */
 template <typename Types1,  // Model MPL Random Access Container of
-			    // models of BufferViewConcept
-          typename View2>   // Model MutableBufferViewConcept
-void copy_and_convert_frames (const dynamic_buffer_view<Types1>& src,
-			      const View2& dst)
+			    // models of BufferRangeConcept
+          typename Range2>   // Model MutableBufferRangeConcept
+void copy_and_convert_frames (const dynamic_buffer_range<Types1>& src,
+			      const Range2& dst)
 {
     apply_operation (
 	src, boost::bind (
@@ -186,25 +196,25 @@ void copy_and_convert_frames (const dynamic_buffer_view<Types1>& src,
 	    _1, dst));
 }
 
-/** \ingroup BufferViewSTLAlgorithmsCopyAndConvertFrames */
-template <typename View1,   // Model BufferViewConcept
+/** \ingroup BufferRangeSTLAlgorithmsCopyAndConvertFrames */
+template <typename Range1,   // Model BufferRangeConcept
           typename Types2,  // Model MPL Random Access Container of
-			    // models of MutableBufferViewConcept
+			    // models of MutableBufferRangeConcept
           typename CC>      // Model ColorConverterConcept
-void copy_and_convert_frames (const View1& src,
-			      const dynamic_buffer_view<Types2>& dst,
+void copy_and_convert_frames (const Range1& src,
+			      const dynamic_buffer_range<Types2>& dst,
 			      CC cc)
 {
     apply_operation (
 	dst, boost::bind (detail::copy_and_convert_frames_fn<CC> (cc), src, _1));
 }
 
-/** \ingroup BufferViewSTLAlgorithmsCopyAndConvertFrames */
-template <typename View1,   // Model BufferViewConcept
+/** \ingroup BufferRangeSTLAlgorithmsCopyAndConvertFrames */
+template <typename Range1,   // Model BufferRangeConcept
           typename Types2>  // Model MPL Random Access Container of
-			    // models of MutableBufferViewConcept
-void copy_and_convert_frames (const View1& src,
-			      const dynamic_buffer_view<Types2>& dst)
+			    // models of MutableBufferRangeConcept
+void copy_and_convert_frames (const Range1& src,
+			      const dynamic_buffer_range<Types2>& dst)
 {
     apply_operation (
 	dst, boost::bind (
@@ -212,26 +222,26 @@ void copy_and_convert_frames (const View1& src,
 	    src, _1));
 }
 
-/** \ingroup BufferViewSTLAlgorithmsCopyAndConvertFrames */
+/** \ingroup BufferRangeSTLAlgorithmsCopyAndConvertFrames */
 template <typename Types1,  // Model MPL Random Access Container of
-			    // models of BufferViewConcept
+			    // models of BufferRangeConcept
           typename Types2,  // Model MPL Random Access Container of
-			    // models of MutableBufferViewConcept
+			    // models of MutableBufferRangeConcept
           typename CC>      // Model ColorConverterConcept
-void copy_and_convert_frames (const dynamic_buffer_view<Types1>& src,
-			      const dynamic_buffer_view<Types2>& dst,
+void copy_and_convert_frames (const dynamic_buffer_range<Types1>& src,
+			      const dynamic_buffer_range<Types2>& dst,
 			      CC cc)
 {
     apply_operation (src, dst, detail::copy_and_convert_frames_fn<CC>(cc));
 }
 
-/** \ingroup BufferViewSTLAlgorithmsCopyAndConvertFrames */
+/** \ingroup BufferRangeSTLAlgorithmsCopyAndConvertFrames */
 template <typename Types1,  // Model MPL Random Access Container of
-			    // models of BufferViewConcept
+			    // models of BufferRangeConcept
           typename Types2>  // Model MPL Random Access Container of
-			    // models of MutableBufferViewConcept
-void copy_and_convert_frames (const dynamic_buffer_view<Types1>& src,
-			      const dynamic_buffer_view<Types2>& dst)
+			    // models of MutableBufferRangeConcept
+void copy_and_convert_frames (const dynamic_buffer_range<Types1>& src,
+			      const dynamic_buffer_range<Types2>& dst)
 {
     apply_operation (
 	src, dst,
@@ -276,11 +286,11 @@ struct fill_frames_fn
 
     typedef void result_type;
     template <typename V>
-    result_type operator ()(const V& img_view) const
+    result_type operator ()(const V& img_range) const
     {
         fill_frames_fn1 <
 	    frames_are_compatible<
-		typename V::value_type, Value>::value>::apply (img_view,_val);
+		typename V::value_type, Value>::value>::apply (img_range,_val);
     }
     Value _val;
 };
@@ -288,16 +298,29 @@ struct fill_frames_fn
 } /* namespace detail */
 
 /**
- * \ingroup BufferViewSTLAlgorithmsFillFrames
- * \brief fill_frames for any buffer view. The frame to fill with must
- * be compatible with the current view
+ * \ingroup BufferRangeSTLAlgorithmsFillFrames
+ * \brief fill_frames for any buffer range. The frame to fill with must
+ * be compatible with the current range
  */
 template <typename Types, // Model MPL Random Access Container of
-			  // models of MutableBufferViewConcept
+			  // models of MutableBufferRangeConcept
           typename Value>
-void fill_frames (const dynamic_buffer_view<Types>& view, const Value& val)
+void fill_frames (const dynamic_buffer_range<Types>& range, const Value& val)
 {
-    apply_operation (view, detail::fill_frames_fn<Value>(val));
+    apply_operation (range, detail::fill_frames_fn<Value>(val));
+}
+
+/**
+ * \ingroup BufferRangeSTLAlgorithmsFillFrames
+ * \brief fill_frames for any buffer range. The frame to fill with must
+ * be compatible with the current range
+ */
+template <typename Types, // Model MPL Random Access Container of
+			  // models of MutableBufferRangeConcept
+          typename Value>
+void fill_frames (dynamic_buffer<Types>& range, const Value& val)
+{
+    apply_operation (range, detail::fill_frames_fn<Value>(val));
 }
 
 } /* namespace sound */

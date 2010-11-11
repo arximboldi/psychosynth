@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-05 14:57:02 raskolnikov>
+ *  Time-stamp:  <2010-11-09 19:17:01 raskolnikov>
  *
  *  @file        metafunctions.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -49,6 +49,7 @@
 #include <boost/mpl/push_back.hpp>
 #include <boost/mpl/transform.hpp>
 #include <boost/mpl/vector.hpp>
+#include <boost/mpl/vector_c.hpp>
 #include <boost/mpl/print.hpp>
 #include <boost/type_traits.hpp>
 
@@ -69,7 +70,7 @@ template <typename T, typename C> struct planar_frame_reference;
 template <typename IC, typename C> struct planar_frame_iterator;
 template <typename I> class memory_based_step_iterator;
 template <typename I> class memory_based_2d_locator;
-template <typename L> class buffer_view;
+template <typename L> class buffer_range;
 template <typename Frame, bool IsPlanar, typename Alloc> class buffer;
 template <typename T> struct sample_type;
 template <typename T> struct channel_space_type;
@@ -93,7 +94,7 @@ struct bit_aligned_frame_reference;
 
  \brief Determines if GIL constructs are basic.  Basic constructs are
  the ones that can be generated with the type factory methods
- frame_reference_type, iterator_type, locator_type, view_type and
+ frame_reference_type, iterator_type, locator_type, range_type and
  buffer_type They can be mutable/immutable, planar/interleaved,
  step/nonstep. They must use GIL-provided models.
 
@@ -159,16 +160,16 @@ struct iterator_is_basic<
 
 /**
    \ingroup GILIsBasic
-   \brief Basic views must be over basic locators
+   \brief Basic ranges must be over basic locators
 */
-template <typename View>
-struct view_is_basic : public boost::mpl::false_ {};
+template <typename Range>
+struct range_is_basic : public boost::mpl::false_ {};
 template <typename Loc>
-struct view_is_basic<buffer_view<Loc> > : public iterator_is_basic<Loc> {};
+struct range_is_basic<buffer_range<Loc> > : public iterator_is_basic<Loc> {};
 
 /**
    \ingroup GILIsBasic
-   \brief Basic buffers must use basic views and std::allocator of
+   \brief Basic buffers must use basic ranges and std::allocator of
    char
 */
 template <typename Img>
@@ -180,7 +181,7 @@ struct buffer_is_basic<buffer<Frame,IsPlanar,Alloc> > : public boost::mpl::true_
 /**
    \defgroup GILIsStep xxx_is_step
    \ingroup TypeAnalysis
-   \brief Determines if the given iterator/locator/view has a step
+   \brief Determines if the given iterator/locator/range has a step
    that could be set dynamically
 */
 
@@ -225,7 +226,7 @@ template <typename I> struct iterator_is_step
    \brief Determines if the given locator has a step that can be set
    dynamically.
 */
-template <typename V> struct view_is_step :
+template <typename V> struct range_is_step :
 	public iterator_is_step<typename V::iterator> {}; 
 
 
@@ -257,7 +258,7 @@ struct frame_is_reference :
    \defgroup GILIsMutable xxx_is_mutable
    \ingroup TypeAnalysis
    / \brief Determines if the given frame
-   reference/iterator/locator/view is mutable (i.e. its frames can be
+   reference/iterator/locator/range is mutable (i.e. its frames can be
    changed)
 */
 
@@ -280,11 +281,11 @@ struct frame_reference_is_mutable<const R&>
 
 /**
    \ingroup GILIsMutable
-   \brief Determines if the given view is mutable (i.e. its frames can
+   \brief Determines if the given range is mutable (i.e. its frames can
    be changed)
 */
 template <typename V>
-struct view_is_mutable : public iterator_is_mutable<typename V::iterator> {};
+struct range_is_mutable : public iterator_is_mutable<typename V::iterator> {};
 
 
 /*
@@ -432,7 +433,7 @@ struct iterator_type<T,L,IsPlanar,true,IsMutable>
 /**
    \brief Given a frame iterator defining access to frames along a
    row, returns the types of the corresponding built-in step_iterator,
-   xy_locator, buffer_view
+   xy_locator, buffer_range
    
    \ingroup TypeFactory
    @see boost::gil::type_from_x_iterator
@@ -441,7 +442,7 @@ template <typename Iterator>
 struct type_from_iterator
 {
     typedef memory_based_step_iterator<Iterator>  step_iterator;
-    typedef buffer_view<Iterator>                 view;
+    typedef buffer_range<Iterator>                 range;
 };
 
 namespace detail
@@ -728,17 +729,17 @@ struct frame_value_type<packed_sample_value<NumBits>,Layout> :
 
 /**
    \ingroup TypeFactoryFromElements
-   \brief Returns the type of a homogeneous view given the sample
+   \brief Returns the type of a homogeneous range given the sample
    type, layout, whether it operates on planar data and whether it has
    a step horizontally
 */
 template <typename T, typename L, bool IsPlanar=false,
 	  bool IsStepX=false, bool IsMutable=true> 
-struct view_type
+struct range_type
 {
     typedef typename type_from_iterator<
 	typename iterator_type<
-	    T,L,IsPlanar,IsStepX,IsMutable>::type>::view type;
+	    T,L,IsPlanar,IsStepX,IsMutable>::type>::range type;
 };
 
 /**
@@ -755,16 +756,16 @@ struct buffer_type
 
 /**
    \ingroup TypeFactoryFromFrame
-   \brief Returns the type of a view the frame type, whether it
+   \brief Returns the type of a range the frame type, whether it
    operates on planar data and whether it has a step horizontally
 */
 template <typename Frame, bool IsPlanar=false, bool IsStepX=false,
 	  bool IsMutable=true> 
-struct view_type_from_frame
+struct range_type_from_frame
 {
     typedef typename type_from_iterator<
 	typename iterator_type_from_frame<
-	    Frame,IsPlanar,IsStepX,IsMutable>::type>::view type;
+	    Frame,IsPlanar,IsStepX,IsMutable>::type>::range type;
 };
 
 
@@ -773,7 +774,7 @@ struct view_type_from_frame
    reference type by changing some of the properties.
    
    \ingroup TypeFactoryDerived
-   Use use_default for the properties of the source view that you want
+   Use use_default for the properties of the source range that you want
    to keep
 */
 template <typename Ref,
@@ -815,7 +816,7 @@ public:
    iterator type by changing some of the properties.
    
    \ingroup TypeFactoryDerived
-   Use boost::use_default for the properties of the source view that you want
+   Use boost::use_default for the properties of the source range that you want
    to keep
 */
 template <typename Iterator,
@@ -857,47 +858,47 @@ public:
 
 
 /**
-   \brief Constructs an buffer view type from a source view type by
+   \brief Constructs an buffer range type from a source range type by
    changing some of the properties.
    
    \ingroup TypeFactoryDerived
-   Use boost::use_default for the properties of the source view that you want
+   Use boost::use_default for the properties of the source range that you want
    to keep
 */
-template <typename View, typename T=boost::use_default,
+template <typename Range, typename T=boost::use_default,
 	  typename L=boost::use_default,
 	  typename IsPlanar=boost::use_default,
 	  typename StepX=boost::use_default,
 	  typename IsMutable=boost::use_default>
-class derived_view_type
+class derived_range_type
 {
     typedef typename  boost::mpl::if_<
 	boost::is_same<T ,boost::use_default>,
-	typename sample_type<View>::type,
+	typename sample_type<Range>::type,
 	T>::type sample_t;
 
     typedef typename  boost::mpl::if_<
 	boost::is_same<L,boost::use_default>, 
-	layout<typename channel_space_type<View>::type,
-	       typename sample_mapping_type<View>::type>,
+	layout<typename channel_space_type<Range>::type,
+	       typename sample_mapping_type<Range>::type>,
 	L>::type layout_t;
 
     static const bool mut    = boost::mpl::if_<
 	boost::is_same<IsMutable,boost::use_default>,
-	view_is_mutable<View>,
+	range_is_mutable<Range>,
 	IsMutable>::type::value;
 
     static const bool planar = boost::mpl::if_<
 	boost::is_same<IsPlanar,boost::use_default>,
-	is_planar<View>,
+	is_planar<Range>,
 	IsPlanar>::type::value;
     
     static const bool step   = boost::mpl::if_<
 	boost::is_same<StepX ,boost::use_default>,
-	view_is_step<View>, StepX>::type::value;
+	range_is_step<Range>, StepX>::type::value;
 
 public:
-    typedef typename view_type<sample_t, layout_t, planar, step, mut>::type type;
+    typedef typename range_type<sample_t, layout_t, planar, step, mut>::type type;
 };
 
 
@@ -934,7 +935,23 @@ public:
     typedef typename buffer_type<sample_t, layout_t, planar>::type type;
 };
 
-} /* namespace psynth::sound */
+/**
+ * Returns the buffer_range type of a Range. This is the range itself
+ * for most ranges but it is its buffer_range for buffers.
+ */
+template <class Range>
+struct buffer_range_type
+{
+    typedef Range type;
+};
+
+template <class Frame, bool Planar, class Alloc>
+struct buffer_range_type<buffer<Frame, Planar, Alloc>>
+{
+    typedef typename buffer<Frame, Planar, Alloc>::range type;
+};
+
+} /* namespace sound */
 } /* namespace psynth */
 
 #endif /* PSYNTH_SOUND_METAFUNCTIONS */

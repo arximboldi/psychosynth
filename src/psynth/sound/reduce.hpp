@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-05 02:16:39 raskolnikov>
+ *  Time-stamp:  <2010-11-09 02:59:33 raskolnikov>
  *
  *  @file        reduce.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -609,7 +609,7 @@ namespace sound
 {
 
 template <typename Types, typename T> struct type_to_index;
-template <typename V> struct view_is_basic;
+template <typename V> struct range_is_basic;
 
 struct stereo_space;
 struct mono_space;
@@ -633,20 +633,20 @@ struct reduce
 
 /**
  *
- * Unary reduce_view operation. Splits into basic and non-basic views.
- * Algorithm-specific reduce should specialize for basic views
+ * Unary reduce_range operation. Splits into basic and non-basic ranges.
+ * Algorithm-specific reduce should specialize for basic ranges
  *
  */
-template <typename Op, typename View, bool IsBasic>
-struct reduce_view_basic
+template <typename Op, typename Range, bool IsBasic>
+struct reduce_range_basic
 {
-    typedef View type;
+    typedef Range type;
 };
 
 template <typename Op, typename Loc>
-struct reduce<Op, buffer_view<Loc> > 
-    : public reduce_view_basic<Op, buffer_view<Loc>,
-			       view_is_basic<buffer_view<Loc> >::value> {};
+struct reduce<Op, buffer_range<Loc> > 
+    : public reduce_range_basic<Op, buffer_range<Loc>,
+			       range_is_basic<buffer_range<Loc> >::value> {};
  
 /**
  *
@@ -668,25 +668,25 @@ struct reduce<Op, buffer<V,Alloc> > :
 
 /**
  *
- * Binary reduce_view operation. Splits into basic and non-basic views.
- * Algorithm-specific reduce should specialize for basic views
+ * Binary reduce_range operation. Splits into basic and non-basic ranges.
+ * Algorithm-specific reduce should specialize for basic ranges
  *
  */
 
 template <typename Op, typename V1, typename V2, bool AreBasic>
-struct reduce_views_basic
+struct reduce_ranges_basic
 {
     typedef std::pair<const V1*, const V2*> type;
 };
 
 template <typename Op, typename L1, typename L2>
-struct reduce<Op, std::pair<const buffer_view<L1>*, const buffer_view<L2>*> > 
-    : public reduce_views_basic<Op,
-				buffer_view<L1>,
-				buffer_view<L2>,
+struct reduce<Op, std::pair<const buffer_range<L1>*, const buffer_range<L2>*> > 
+    : public reduce_ranges_basic<Op,
+				buffer_range<L1>,
+				buffer_range<L2>,
 				boost::mpl::and_<
-				    view_is_basic<buffer_view<L1> >,
-				    view_is_basic<buffer_view<L2> > >::value >
+				    range_is_basic<buffer_range<L1> >,
+				    range_is_basic<buffer_range<L2> > >::value >
     {};
 
 
@@ -857,21 +857,21 @@ struct copy_frames_fn;
 // 1D reduce for copy_frames reduces the sample to mutable and the
 // channel space to its base with same dimensions
 
-    template <typename View>
-    struct reduce_view_basic<copy_frames_fn,View,true> {
+    template <typename Range>
+    struct reduce_range_basic<copy_frames_fn,Range,true> {
     private:
         typedef typename reduce_channel_space<
-	    typename View::channel_space_t>::type Cs;
+	    typename Range::channel_space_t>::type Cs;
 	    // reduce the channel space
-        typedef layout<Cs, typename View::sample_mapping_t> layout_t;
+        typedef layout<Cs, typename Range::sample_mapping_t> layout_t;
     public:
-        typedef typename derived_view_type<
-	        View, use_default, layout_t, use_default,
+        typedef typename derived_range_type<
+	        Range, use_default, layout_t, use_default,
 		use_default, boost::mpl::true_>::type type;
     };
 */
 
-// Incompatible views cannot be used in copy_frames - will throw
+// Incompatible ranges cannot be used in copy_frames - will throw
 // std::bad_cast
 template <typename V1, typename V2, bool Compatible> 
 struct reduce_copy_pixop_compat
@@ -879,7 +879,7 @@ struct reduce_copy_pixop_compat
     typedef error_type type;
 };
     
-// For compatible basic views, reduce their channel spaces based on
+// For compatible basic ranges, reduce their channel spaces based on
 // their sample mapping.  Make the source immutable and the
 // destination mutable (they should already be that way)
 template <typename V1, typename V2>
@@ -893,11 +893,11 @@ struct reduce_copy_pixop_compat<V1, V2, true>
      typedef typename reduce_channel_layouts<layout1,layout2>::first_t L1;
      typedef typename reduce_channel_layouts<layout1,layout2>::second_t L2;
 
-     typedef typename derived_view_type<
+     typedef typename derived_range_type<
 	 V1, use_default, L1, use_default, use_default,
 	 use_default, boost::mpl::false_>::type DV1;
 
-     typedef typename derived_view_type<
+     typedef typename derived_range_type<
 	 V2, use_default, L2, use_default, use_default,
 	 use_default, boost::mpl::true_ >::type DV2;
         
@@ -905,43 +905,43 @@ struct reduce_copy_pixop_compat<V1, V2, true>
 };
 
 // The general 2D version branches into compatible and incompatible
-// views
+// ranges
 template <typename V1, typename V2>
-struct reduce_views_basic<copy_frames_fn, V1, V2, true>
+struct reduce_ranges_basic<copy_frames_fn, V1, V2, true>
     : public reduce_copy_pixop_compat<
-    V1, V2, boost::mpl::and_<views_are_compatible<V1,V2>,
-			     view_is_mutable<V2> >::value >
+    V1, V2, boost::mpl::and_<ranges_are_compatible<V1,V2>,
+			     range_is_mutable<V2> >::value >
 {
 };
 
 
 /**
  *
- *       Reduce for variant destructor (basic views have no destructor)
+ *       Reduce for variant destructor (basic ranges have no destructor)
  *
  */
 
 struct destructor_op;
-template <typename View>
-struct reduce_view_basic<destructor_op,View,true>
+template <typename Range>
+struct reduce_range_basic<destructor_op,Range,true>
 {
-    typedef mono8_view type;
+    typedef mono8_range type;
 };
 
 
 /**
  *
- *      Reduce for get_dimensions (basic views and buffers have the
+ *      Reduce for get_dimensions (basic ranges and buffers have the
  *      same structure and the dimensions are contained at the
  *      beginning)
  *
  */
 
 struct dynamic_type_get_dimensions;
-template <typename View>
-struct reduce_view_basic<dynamic_type_get_dimensions, View, true>
+template <typename Range>
+struct reduce_range_basic<dynamic_type_get_dimensions, Range, true>
 {
-    typedef mono8_view type;
+    typedef mono8_range type;
 };
 
 template <typename Img>
@@ -957,12 +957,12 @@ struct reduce_buffer_basic<dynamic_type_get_dimensions, Img, true>
  */
     
 struct dynamic_type_get_num_samples;
-template <typename View>
-struct reduce_view_basic<dynamic_type_get_num_samples,View,true>
+template <typename Range>
+struct reduce_range_basic<dynamic_type_get_num_samples,Range,true>
 { 
-    typedef typename View::channel_space::base Cs;
+    typedef typename Range::channel_space::base Cs;
 
-    typedef typename view_type<
+    typedef typename range_type<
 	bits8, typename reduce_channel_space<Cs>::type>::type type; 
 };
 
@@ -982,18 +982,18 @@ struct reduce_buffer_basic<dynamic_type_get_num_samples, Img, true>
 template <typename Sampler, typename MapFn> struct resample_frames_fn;
 
 template <typename S, typename M, typename V, bool IsBasic> 
-struct reduce_view_basic<resample_frames_fn<S,M>, V, IsBasic> :
-    public reduce_view_basic<copy_frames_fn, V, IsBasic> {};
+struct reduce_range_basic<resample_frames_fn<S,M>, V, IsBasic> :
+    public reduce_range_basic<copy_frames_fn, V, IsBasic> {};
 
 template <typename S, typename M, typename V1, typename V2, bool IsBasic> 
-struct reduce_views_basic<resample_frames_fn<S,M>, V1, V2, IsBasic>
-    : public reduce_views_basic<copy_frames_fn, V1, V2, IsBasic> {};
+struct reduce_ranges_basic<resample_frames_fn<S,M>, V1, V2, IsBasic>
+    : public reduce_ranges_basic<copy_frames_fn, V1, V2, IsBasic> {};
 
 /*
  *
  *      Reduce for copy_and_convert_frames
  *
- *      (the only reduction could be made when views are compatible
+ *      (the only reduction could be made when ranges are compatible
  *      and have the same mapping, planarity and stepness)
  *
  */
@@ -1001,9 +1001,9 @@ struct reduce_views_basic<resample_frames_fn<S,M>, V1, V2, IsBasic>
 template <typename CC> class copy_and_convert_frames_fn;
 
 // the only thing for 1D reduce is making them all mutable...
-template <typename CC, typename View, bool IsBasic> 
-struct reduce_view_basic<copy_and_convert_frames_fn<CC>, View, IsBasic> 
-    : public derived_view_type<View, use_default, use_default,
+template <typename CC, typename Range, bool IsBasic> 
+struct reduce_range_basic<copy_and_convert_frames_fn<CC>, Range, IsBasic> 
+    : public derived_range_type<Range, use_default, use_default,
 			       use_default, use_default, boost::mpl::true_>
 {
 };
@@ -1013,7 +1013,7 @@ struct reduce_view_basic<copy_and_convert_frames_fn<CC>, View, IsBasic>
 // case, reduce their common channel space. In general make the first
 // immutable and the second mutable
 template <typename CC, typename V1, typename V2, bool AreBasic> 
-struct reduce_views_basic<copy_and_convert_frames_fn<CC>, V1, V2, AreBasic>
+struct reduce_ranges_basic<copy_and_convert_frames_fn<CC>, V1, V2, AreBasic>
 {
     typedef is_same<typename V1::frame_type, typename V2::frame_type> Same;
 
@@ -1023,11 +1023,11 @@ struct reduce_views_basic<copy_and_convert_frames_fn<CC>, V1, V2, AreBasic>
     typedef typename boost::mpl::if_<
 	Same, typename CsR::type, typename V2::channel_space>::type Cs2;
     
-    typedef typename derived_view_type<
+    typedef typename derived_range_type<
 	V1, use_default, layout<Cs1, typename V1::sample_mapping>,
 	use_default, use_default, boost::mpl::false_>::type DV1;
 
-    typedef typename derived_view_type<
+    typedef typename derived_range_type<
 	V2, use_default, layout<Cs2, typename V2::sample_mapping_t>,
 	use_default, use_default, boost::mpl::true_ >::type DV2;
     
@@ -1052,18 +1052,18 @@ struct reduce_views_basic<copy_and_convert_frames_fn<CC>, V1, V2, AreBasic>
 //detail::copy_construct_in_place_fn<base_t>
 //detail::equal_to_fn<typename variant<Types>::base_t>
 
-//detail::dynamic_buffer_get_view<typename dynamic_buffer<Types>::view_t>
-//detail::dynamic_buffer_get_const_view<typename dynamic_buffer<Types>::view_t>
-//detail::flipped_up_down_view_fn<dynamic_buffer_view<ViewTypes> >
-//detail::flipped_left_right_view_fn<typename dynamic_buffer_view<ViewTypes>::dynamic_step_t>
-//detail::tranposed_view_fn<typename dynamic_buffer_view<ViewTypes>::dynamic_step_t>
-//detail::rotated90cw_view_fn<typename dynamic_buffer_view<ViewTypes>::dynamic_step_t>
-//detail::rotated90ccw_view_fn<typename dynamic_buffer_view<ViewTypes>::dynamic_step_t>
-//detail::rotated180_view_fn<typename dynamic_buffer_view<ViewTypes>::dynamic_step_t>
-//detail::subbuffer_view_fn<dynamic_buffer_view<ViewTypes> >
-//detail::sub_sampled_view_fn<typename dynamic_buffer_view<ViewTypes>::dynamic_step_t>
-//detail::nth_sample_view_fn<typename nth_sample_view_type<dynamic_buffer_view<ViewTypes> >
-//detail::channel_converted_view_fn<DstP,typename channel_convert_view_type<dynamic_buffer_view<ViewTypes>, DstP>::type >
+//detail::dynamic_buffer_get_range<typename dynamic_buffer<Types>::range_t>
+//detail::dynamic_buffer_get_const_range<typename dynamic_buffer<Types>::range_t>
+//detail::flipped_up_down_range_fn<dynamic_buffer_range<RangeTypes> >
+//detail::flipped_left_right_range_fn<typename dynamic_buffer_range<RangeTypes>::dynamic_step_t>
+//detail::tranposed_range_fn<typename dynamic_buffer_range<RangeTypes>::dynamic_step_t>
+//detail::rotated90cw_range_fn<typename dynamic_buffer_range<RangeTypes>::dynamic_step_t>
+//detail::rotated90ccw_range_fn<typename dynamic_buffer_range<RangeTypes>::dynamic_step_t>
+//detail::rotated180_range_fn<typename dynamic_buffer_range<RangeTypes>::dynamic_step_t>
+//detail::subbuffer_range_fn<dynamic_buffer_range<RangeTypes> >
+//detail::sub_sampled_range_fn<typename dynamic_buffer_range<RangeTypes>::dynamic_step_t>
+//detail::nth_sample_range_fn<typename nth_sample_range_type<dynamic_buffer_range<RangeTypes> >
+//detail::channel_converted_range_fn<DstP,typename channel_convert_range_type<dynamic_buffer_range<RangeTypes>, DstP>::type >
 
 } /* namespace detail */
 

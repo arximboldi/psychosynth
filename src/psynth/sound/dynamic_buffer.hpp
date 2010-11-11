@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-05 13:51:45 raskolnikov>
+ *  Time-stamp:  <2010-11-09 03:50:44 raskolnikov>
  *
  *  @file        dynamic_buffer.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -40,7 +40,7 @@
 #define PSYNTH_SOUND_DYNAMIC_BUFFER_HPP
 
 #include <psynth/sound/buffer.hpp>
-#include <psynth/sound/dynamic_buffer_view.hpp>
+#include <psynth/sound/dynamic_buffer_range.hpp>
 #include <psynth/sound/apply_operation.hpp>
 
 //#ifdef _MSC_VER
@@ -59,26 +59,26 @@ namespace sound
 namespace detail
 {
 
-template <typename T> struct get_view_type
+template <typename T> struct get_range_type
 {
-    typedef typename T::view type;
+    typedef typename T::range type;
 };
 
 template <typename Buffers>
-struct buffers_get_views_type :
+struct buffers_get_ranges_type :
 	public boost::mpl::transform<Buffers,
-				     get_view_type<boost::mpl::_1> > {};
+				     get_range_type<boost::mpl::_1> > {};
 
 template <typename T>
-struct get_const_view_type
+struct get_const_range_type
 {
-    typedef typename T::const_view type;
+    typedef typename T::const_range type;
 };
 
 template <typename Buffers>
-struct buffers_get_const_views_type :
+struct buffers_get_const_ranges_type :
 	public boost::mpl::transform<Buffers,
-				     get_const_view_type<boost::mpl::_1> > {};
+				     get_const_range_type<boost::mpl::_1> > {};
 
 struct recreate_buffer_fnobj
 {
@@ -98,27 +98,27 @@ struct recreate_buffer_fnobj
     }
 };
 
-template <typename AnyView>  // Models AnyViewConcept
-struct dynamic_buffer_get_view
+template <typename AnyRange>  // Models AnyRangeConcept
+struct dynamic_buffer_get_range
 {
-    typedef AnyView result_type;
+    typedef AnyRange result_type;
 
     template <typename Buffer>
     result_type operator() (Buffer& img) const
     {
-	return result_type (view (img));
+	return result_type (range (img));
     }
 };
 
-template <typename AnyConstView>  // Models AnyConstViewConcept
-struct dynamic_buffer_get_const_view
+template <typename AnyConstRange>  // Models AnyConstRangeConcept
+struct dynamic_buffer_get_const_range
 {
-    typedef AnyConstView result_type;
+    typedef AnyConstRange result_type;
         
     template <typename Buffer>
     result_type operator () (const Buffer& img) const
     {
-	return result_type (const_view (img));
+	return result_type (const_range (img));
     }
 };
 
@@ -137,9 +137,9 @@ struct dynamic_buffer_get_const_view
  *  cannot be fulfilled, since the language does not allow runtime
  *  type specification.  Other requirements, such as access to the
  *  pixels, would be inefficient to provide. Thus \p dynamic_buffer
- *  does not fully model BufferConcept.  In particular, its \p view
- *  and \p const_view methods return \p dynamic_buffer_view, which
- *  does not fully model BufferViewConcept. See \p dynamic_buffer_view
+ *  does not fully model BufferConcept.  In particular, its \p range
+ *  and \p const_range methods return \p dynamic_buffer_range, which
+ *  does not fully model BufferRangeConcept. See \p dynamic_buffer_range
  *  for more.
  */
 template <typename BufferTypes>
@@ -148,15 +148,16 @@ class dynamic_buffer : public variant<BufferTypes>
     typedef variant<BufferTypes> parent_type;
 
 public:
-    typedef dynamic_buffer_view<
-    typename detail::buffers_get_const_views_type<BufferTypes>::type>
-    const_view;
+    typedef dynamic_buffer_range<
+    typename detail::buffers_get_const_ranges_type<BufferTypes>::type>
+    const_range;
 
-    typedef dynamic_buffer_view<
-	typename detail::buffers_get_views_type<BufferTypes>::type>
-    view;
+    typedef dynamic_buffer_range<
+	typename detail::buffers_get_ranges_type<BufferTypes>::type>
+    range;
 
-    typedef std::ptrdiff_t size_type;
+    typedef typename range::size_type       size_type;
+    typedef typename range::difference_type difference_type;
 
     dynamic_buffer ()
 	: parent_type () {}
@@ -197,40 +198,40 @@ public:
 
     size_type size () const
     {
-	return apply_operation (*this, detail::dynamic_type_get_dimensions ());
+	return apply_operation (*this, detail::dynamic_type_get_size ());
     }
 };
 
 /**
  * @{
- * \name view, const_view
- * \brief Get an buffer view from a run-time instantiated buffer
+ * \name range, const_range
+ * \brief Get an buffer range from a run-time instantiated buffer
  *
  * \ingroup BufferModel
  *
- * \brief Returns the non-constant-pixel view of any buffer. The
- * returned view is any view.
+ * \brief Returns the non-constant-pixel range of any buffer. The
+ * returned range is any range.
  */
 template <typename Types>  PSYNTH_FORCEINLINE // Models BufferVectorConcept
-typename dynamic_buffer<Types>::view
-view (dynamic_buffer<Types>& buf)
+typename dynamic_buffer<Types>::range
+range (dynamic_buffer<Types>& buf)
 { 
     return apply_operation (
-	buf, detail::dynamic_buffer_get_view<
-	    typename dynamic_buffer<Types>::view> ());
+	buf, detail::dynamic_buffer_get_range<
+	    typename dynamic_buffer<Types>::range> ());
 }
 
 /**
- * \brief Returns the constant-pixel view of any buffer. The returned
- * view is any view.
+ * \brief Returns the constant-pixel range of any buffer. The returned
+ * range is any range.
  */
 template <typename Types> PSYNTH_FORCEINLINE // Models BufferVectorConcept
-typename dynamic_buffer<Types>::const_view
-const_view (const dynamic_buffer<Types>& buf)
+typename dynamic_buffer<Types>::const_range
+const_range (const dynamic_buffer<Types>& buf)
 { 
     return apply_operation (
-	buf, detail::dynamic_buffer_get_const_view <
-	    typename dynamic_buffer<Types>::const_view> ());
+	buf, detail::dynamic_buffer_get_const_range <
+	    typename dynamic_buffer<Types>::const_range> ());
 }
 /** @} */
 

@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-07 16:19:07 raskolnikov>
+ *  Time-stamp:  <2010-11-09 03:11:01 raskolnikov>
  *
  *  @file        frame_iterator.cpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -50,7 +50,7 @@
 #include <psynth/sound/step_iterator.hpp>
 #include <psynth/sound/typedefs.hpp>
 #include <psynth/sound/channel_convert.hpp>
-#include <psynth/sound/buffer_view_factory.hpp>
+#include <psynth/sound/buffer_range_factory.hpp>
 #include <psynth/sound/output.hpp>
 
 using namespace psynth::base;

@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-05 13:22:57 raskolnikov>
+ *  Time-stamp:  <2010-11-09 03:01:51 raskolnikov>
  *
  *  @file        stereo.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -73,12 +73,12 @@ typedef layout<stereo_space, boost::mpl::vector2_c<int, 1, 0> > rlstereo_layout;
 */
 template <typename IC>
 inline
-typename type_from_iterator<planar_frame_iterator<IC, stereo_space> >::view
-planar_stereo_view (std::size_t size, IC l, IC r)
+typename type_from_iterator<planar_frame_iterator<IC, stereo_space> >::range
+planar_stereo_range (std::size_t size, IC l, IC r)
 {
     typedef typename type_from_iterator<
-	planar_frame_iterator<IC, stereo_space> >::view RView;
-    return RView (size, planar_frame_iterator<IC, stereo_space> (l, r));
+	planar_frame_iterator<IC, stereo_space> >::range RRange;
+    return RRange (size, planar_frame_iterator<IC, stereo_space> (l, r));
 }
 
 } /* namespace sound */

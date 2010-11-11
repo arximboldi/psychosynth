@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-10-18 15:38:34 raskolnikov>
+ *  Time-stamp:  <2010-11-09 02:29:40 raskolnikov>
  *
  *  @file        conf_backend_xml.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -38,7 +38,7 @@
 
 #include <psynth/base/type_value.hpp>
 #include <psynth/base/config.hpp>
-#include <psynth/base/conf_backend_xml_def.hpp>
+#include <psynth/base/conf_backend_xml_fwd.hpp>
 
 namespace psynth
 {
