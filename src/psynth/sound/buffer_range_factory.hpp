@@ -1,14 +1,14 @@
 /**
- *  Time-stamp:  <2010-11-09 14:13:03 raskolnikov>
+ *  Time-stamp:  <2010-11-11 21:25:25 raskolnikov>
  *
- *  @file        buffer_view_factory.hpp
+ *  @file        buffer_range_factory.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
  *  @date        Fri Oct 29 11:55:36 2010
  *
- *  View factories.  Methods for creating shallow image views from raw
- *  pixel data or from other image views - flipping horizontally or
+ *  Range factories.  Methods for creating shallow image ranges from raw
+ *  pixel data or from other image ranges - flipping horizontally or
  *  vertically, axis-aligned rotation, a subimage, sub_sampled or n-th
- *  channel image view. Derived image views are shallow copies and are
+ *  channel image range. Derived image ranges are shallow copies and are
  *  fast to construct.
  */
 
@@ -278,13 +278,56 @@ inline typename dynamic_step_type<Range>::type flipped_range (const Range& src)
 */
 template <typename Range>
 inline typename buffer_range_type<Range>::type
-sub_buffer_range (const Range& src,
+sub_buffer_range (const Range& src, size_t start, size_t size)
+{
+    typedef typename buffer_range_type<Range>::type RRange;
+    return RRange (size, src.at (start));
+}
+
+/**
+   \defgroup BufferRangeTransformationsSubbuffer subbuffer_range
+   \ingroup BufferRangeTransformations
+   \brief range of an axis-aligned rectangular area within an buffer_range
+
+   \ingroup BufferRangeTransformationsSubbuffer
+   
+   @todo This is an overload for buffer to avoid the container vs
+   range constness problem. Maybe we should step back in front of this
+   constness nightmare?
+*/
+template <typename F, bool P, typename A>
+class buffer;
+
+template <typename F, bool P, typename A>
+inline typename buffer_range_type<buffer<F,P,A> >::type
+sub_buffer_range (buffer<F,P,A>& src, size_t start, size_t size)
+{
+    typedef typename buffer_range_type<buffer<F,P,A> >::type RRange;
+    return RRange (size, src.at (start));
+}
+
+/**
+   \defgroup BufferRangeTransformationsSubbuffer subbuffer_range
+   \ingroup BufferRangeTransformations
+   \brief range of an axis-aligned rectangular area within an buffer_range
+
+   \ingroup BufferRangeTransformationsSubbuffer
+   
+   @todo This is a non-const version. Non const versions of
+   range factories are needed because buffers are now ranges. Keep
+   working on this.
+*/
+/*
+template <typename Range>
+inline typename buffer_range_type<Range>::type
+sub_buffer_range (Range& src,
 		  const typename Range::size_type start,
 		  const typename Range::size_type size)
 {
     typedef typename buffer_range_type<Range>::type RRange;
     return RRange (size, src.at (start));
 }
+*/
 
 /**
    \defgroup BufferRangeTransformationsSub_Sampled sub_sampled_range

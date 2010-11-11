@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-09 16:50:05 raskolnikov>
+ *  Time-stamp:  <2010-11-10 13:26:21 raskolnikov>
  *
  *  @file        ring_buffer.tpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -31,62 +31,66 @@
  *
  */
 
-#ifndef PSYNTH_SOUND_RING_BUFFER_TPP_
-#define PSYNTH_SOUND_RING_BUFFER_TPP_
+#ifndef PSYNTH_SOUND_RING_BUFFER_RANGE_TPP_
+#define PSYNTH_SOUND_RING_BUFFER_RANGE_TPP_
 
 #include <cassert>
+#include <algorithm>
+
+#include <psynth/sound/buffer_range_factory.hpp>
 
 namespace psynth
 {
-namespace once
+namespace sound
 {
 
 template <class R>
-template <class Position, class Range>
-buffer_range_type<R>::type
+template <class Position>
+typename buffer_range_type<R>::type
 ring_buffer_range_base<R>::sub_buffer_one (const Position& p,
-					     size_type slice)
+					   size_type slice) const
 {
     assert (slice <= avalible (r));
-    if (r._pos + slice > size ())
-	return sub_buffer_range (_buffer, p._pos, size () - r._pos);
-    return
-	return sub_buffer_range (_buffer, p._pos, slice);
+    if (p._pos + slice > size ())
+	return sub_buffer_range (_range, p._pos, size () - p._pos);
+    else
+	return sub_buffer_range (_range, p._pos, slice);
 }
 
 template <class R>
 template <class Position>
-buffer_range_type<R>::type
+typename buffer_range_type<R>::type
 ring_buffer_range_base<R>::sub_buffer_two (const Position& p,
-					     size_type slice)
+					   size_type slice) const
 {
-    assert (slice <= avalible (r));
+    assert (slice <= avalible (p));
     
-    if (r._pos + slice > size ())
-	return sub_buffer_range (_buffer, 0, r._pos + slice - size ());
+    if (p._pos + slice > size ())
+	return sub_buffer_range (_range, 0, p._pos + slice - size ());
     else
-	return sub_buffer_range (_buffer, p._pos + slice, 0);
+	return sub_buffer_range (_range, p._pos + slice, 0);
 }
 
 template <class R>
 template <class Position, class Range>
-size_type ring_buffer_range_base<R>::read (Position& r,
-					     Range& buf,
-					     size_type samples) const
+typename ring_buffer_range_base<R>::size_type
+ring_buffer_range_base<R>::read (Position& r,
+				 Range& buf,
+				 size_type samples) const
 {
-    const size_type slice = min (availible (r), samples);
+    const size_type slice = std::min (availible (r), samples);
 	
-    if (position (r) + slice > size ())
+    if (r._pos + slice > size ())
     {
 	const size_type slice_one = size () - r._pos;
-	const size_type slice_two = r._pos + slice - size ();
-	copy_frames (sub_buffer_range (_buffer, p._pos, slice_one),
+	const size_type slice_two = slice - slice_one;
+	copy_frames (sub_buffer_range (_range, r._pos, slice_one),
 		     sub_buffer_range (buf, 0, slice_one));
-	copy_frames (sub_buffer_range (_buffer, 0, slice_two),
+	copy_frames (sub_buffer_range (_range, 0, slice_two),
 		     sub_buffer_range (buf, slice_one, slice_two));
     }
     else
-	copy_frames (sub_buffer_range (_buffer, p._pos, slice),
+	copy_frames (sub_buffer_range (_range, r._pos, slice),
 		     sub_buffer_range (buf, 0, slice));
 	
     advance (r, slice);
@@ -94,55 +98,57 @@ size_type ring_buffer_range_base<R>::read (Position& r,
 }
 
 template <class R>
-template <class Position, class Range>
+template <class Range>
 void ring_buffer_range_base<R>::write (const Range& buf, size_type nwrite)
 {
     // We can use write more data than fits in the buffer. We skip the
     // first samples 'offset'.
     size_type offset = 0;
-
-    if (nwrite > _size) {
-	offset = nwrite - size ();
-	nwrite = size ();
+    size_type slice  = nwrite;
+    
+    if (slice > size ()) {
+	offset = slice - size ();
+	slice = size ();
     }
     
-    if (_write_pos._pos + nwrite > _size)
+    if (_writepos._pos + slice > size ())
     {
-	const size_type slice_one = size () - _write_pos._pos;
-	const size_type slice_two = _write_pos._pos + nwrite - size ();
+	const size_type slice_one = size () - _writepos._pos;
+	const size_type slice_two = slice - slice_one;
 	copy_frames (sub_buffer_range (buf, offset, slice_one),
-		     sub_buffer_range (_buffer, _write_pos._pos, slice_one));
+		     sub_buffer_range (_range, _writepos._pos, slice_one));
 	copy_frames (sub_buffer_range (buf, offset + slice_one, slice_two),
-		     sub_buffer_range (buf, 0, slice_two))
+		     sub_buffer_range (_range, 0, slice_two));
     } else 
 	copy_frames (sub_buffer_range (buf, 0, slice),
-		     sub_buffer_range (_buffer, _write_pos._pos, slice))
+		     sub_buffer_range (_range, _writepos._pos, slice));
 	
     advance (nwrite);
 }
 
 template <class R>
 template <class Position, class Range, class CC>
-size_type ring_buffer_range_base<R>::read_and_convert (Position& r,
-					      Range& buf,
-					      size_type samples,
-					      CC cc) const
+typename ring_buffer_range_base<R>::size_type
+ring_buffer_range_base<R>::read_and_convert (Position& r,
+					     Range& buf,
+					     size_type samples,
+					     CC cc) const
 {
-    const size_type slice = min (availible (r), samples);
+    const size_type slice = std::min (availible (r), samples);
 	
-    if (position (r) + slice > size ())
+    if (r._pos + slice > size ())
     {
 	const size_type slice_one = size () - r._pos;
-	const size_type slice_two = r._pos + slice - size ();
-	copy_and_convert_frames (sub_buffer_range (_buffer, p._pos, slice_one),
+	const size_type slice_two = slice - slice_one;
+	copy_and_convert_frames (sub_buffer_range (_range, r._pos, slice_one),
 				 sub_buffer_range (buf, 0, slice_one),
 				 cc);
-	copy_and_convert_frames (sub_buffer_range (_buffer, 0, slice_two),
+	copy_and_convert_frames (sub_buffer_range (_range, 0, slice_two),
 				 sub_buffer_range (buf, slice_one, slice_two),
 				 cc);
     }
     else
-	copy_and_convert_frames (sub_buffer_range (_buffer, p._pos, slice),
+	copy_and_convert_frames (sub_buffer_range (_range, r._pos, slice),
 				 sub_buffer_range (buf, 0, slice),
 				 cc);
 	
@@ -151,40 +157,41 @@ size_type ring_buffer_range_base<R>::read_and_convert (Position& r,
 }
 
 template <class R>
-template <class Position, class Range, class CC>
-void ring_buffer_range_base<R>::write (const Range& buf, size_type nwrite, CC cc)
+template <class Range, class CC>
+void ring_buffer_range_base<R>::write_and_convert (const Range& buf,
+						   size_type nwrite, CC cc)
 {
     // We can use write more data than fits in the buffer. We skip the
     // first samples 'offset'.
     size_type offset = 0;
-
-    if (nwrite > _size) {
-	offset = nwrite - size ();
-	nwrite = size ();
+    size_type slice = nwrite;
+    if (slice > size ()) {
+	offset = slice - size ();
+	slice = size ();
     }
     
-    if (_write_pos._pos + nwrite > _size)
+    if (_writepos._pos + slice > size ())
     {
-	const size_type slice_one = size () - _write_pos._pos;
-	const size_type slice_two = _write_pos._pos + nwrite - size ();
+	const size_type slice_one = size () - _writepos._pos;
+	const size_type slice_two = slice - slice_one;
 	copy_and_convert_frames (
 	    sub_buffer_range (buf, offset, slice_one),
-	    sub_buffer_range (_buffer, _write_pos._pos, slice_one),
+	    sub_buffer_range (_range, _writepos._pos, slice_one),
 	    cc);
 	copy_and_convert_frames (
 	    sub_buffer_range (buf, offset + slice_one, slice_two),
-	    sub_buffer_range (buf, 0, slice_two),
+	    sub_buffer_range (_range, 0, slice_two),
 	    cc);
     } else 
 	copy_and_convert_frames (
 	    sub_buffer_range (buf, 0, slice),
-	    sub_buffer_range (_buffer, _write_pos._pos, slice),
+	    sub_buffer_range (_range, _writepos._pos, slice),
 	    cc);
 	
     advance (nwrite);
 }
 
-} /* namespace once */
+} /* namespace sound */
 } /* namespace psynth */
 
-#endif /* PSYNTH_SOUND_RING_BUFFER_TPP_ */
+#endif /* PSYNTH_SOUND_RING_BUFFER_RANGE_TPP_ */

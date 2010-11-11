@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-09 02:57:58 raskolnikov>
+ *  Time-stamp:  <2010-11-11 19:27:22 raskolnikov>
  *
  *  @file        dynamic_buffer_range_factory.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -137,9 +137,8 @@ template <typename RangeTypes> inline
 // Models MPL Random Access Container of models of BufferRangeConcept
 dynamic_buffer_range <RangeTypes>
 sub_buffer_range (const dynamic_buffer_range<RangeTypes>& src,
-		 std::ptrdiff_t start,
-		 std::ptrdiff_t size)
-{ 
+		  size_t start, size_t size)
+{
     return apply_operation (src, detail::sub_buffer_range_fn<
 				dynamic_buffer_range<RangeTypes> >(start, size)); 
 }
@@ -148,7 +147,8 @@ sub_buffer_range (const dynamic_buffer_range<RangeTypes>& src,
 template <typename RangeTypes> inline
 // Models MPL Random Access Container of models of BufferRangeConcept
 typename dynamic_step_type<dynamic_buffer_range<RangeTypes> >::type
-sub_sampled_range (const dynamic_buffer_range<RangeTypes>& src, std::ptrdiff_t step)
+sub_sampled_range (const dynamic_buffer_range<RangeTypes>& src,
+		   std::ptrdiff_t step)
 { 
     return apply_operation (
 	src, detail::sub_sampled_range_fn<

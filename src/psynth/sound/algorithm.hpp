@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-09 13:27:32 raskolnikov>
+ *  Time-stamp:  <2010-11-10 12:37:34 raskolnikov>
  *
  *  @file        algorithm.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -433,6 +433,16 @@ void fill_frames (const Range& buf_range, const Value& val)
 		      val, is_planar<Range>());
 }
 
+/**
+   \ingroup ImageRangeSTLAlgorithmsFillFrames
+   \brief std::fill for image ranges
+*/
+template <typename Range, typename Value> PSYNTH_FORCEINLINE 
+void fill_frames (Range& buf_range, const Value& val)
+{
+    detail::fill_aux (buf_range.begin (), buf_range.end (), 
+		      val, is_planar<Range>());
+}
 
 namespace detail
 {
@@ -491,7 +501,8 @@ void destruct_aux (It first, It last, boost::mpl::false_)
 template <typename Range> PSYNTH_FORCEINLINE 
 void destruct_frames (const Range& buf_range)
 {
-    detail::destruct_aux (buf_range.begin (), buf_range.end (), is_planar<Range>());
+    detail::destruct_aux (buf_range.begin (), buf_range.end (),
+			  is_planar<Range>());
 }
 
 

@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-09 03:51:35 raskolnikov>
+ *  Time-stamp:  <2010-11-11 21:19:25 raskolnikov>
  *
  *  @file        dynamic_buffer_range.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -131,10 +131,10 @@ public:
 	: parent_type () {}
     
     template <typename T>
-    explicit dynamic_buffer_range (const T& obj)
+    explicit dynamic_buffer_range (const T& obj) throw ()
 	: parent_type (obj) {}
     
-    dynamic_buffer_range (const dynamic_buffer_range& v)
+    dynamic_buffer_range (const dynamic_buffer_range& v) 
 	: parent_type ((const parent_type&) v)
     {}
 

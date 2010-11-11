@@ -35,6 +35,7 @@ psynth_unit_test_SOURCES = \
 	psynth/sound/buffer.cpp \
 	psynth/sound/performance.cpp \
 	psynth/sound/frame_iterator.cpp \
+	psynth/sound/ring.cpp \
 	psynth_unit_test.cpp
 
 AM_CPPFLAGS = -Wall $(BOOST_CPPFLAGS) -I..

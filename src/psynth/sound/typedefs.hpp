@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-09 03:02:37 raskolnikov>
+ *  Time-stamp:  <2010-11-09 19:35:31 raskolnikov>
  *
  *  @file        typedefs.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -51,13 +51,15 @@
 #include <psynth/sound/device_n.hpp>
 
 // CS = 'bgr' LAYOUT='bgr_layout_t'
-#define PSYNTH_SOUND_DEFINE_BASE_TYPEDEFS_INTERNAL(T,CS,LAYOUT)			\
+#define PSYNTH_SOUND_DEFINE_BASE_TYPEDEFS_INTERNAL(T,CS,LAYOUT)		\
     template <typename, typename>    struct frame;			\
     template <typename, typename>    struct planar_frame_reference;	\
     template <typename, typename>    struct planar_frame_iterator;	\
     template <typename>              class memory_based_step_iterator;	\
-    template <typename>              class buffer_range;			\
+    template <typename>              class buffer_range;		\
     template <typename, bool, typename>     class buffer;		\
+    template <typename>              class ring_buffer_range;		\
+    template <typename>              class ring_buffer;			\
     typedef frame<bits##T, LAYOUT >         CS##T##_frame;		\
     typedef const frame<bits##T, LAYOUT >   CS##T##c_frame;		\
     typedef frame<bits##T, LAYOUT >&        CS##T##_ref;		\
@@ -69,11 +71,14 @@
     typedef memory_based_step_iterator<CS##T##c_ptr>			\
     CS##T##c_step_ptr;							\
     typedef buffer_range<CS##T##_ptr>            CS##T##_range;		\
-    typedef buffer_range<CS##T##c_ptr>           CS##T##c_range;		\
+    typedef buffer_range<CS##T##c_ptr>           CS##T##c_range;	\
     typedef buffer_range<CS##T##_step_ptr>       CS##T##_step_range;	\
     typedef buffer_range<CS##T##c_step_ptr>      CS##T##c_step_range;	\
-    typedef buffer<CS##T##_frame,false,std::allocator<unsigned char> > \
-    CS##T##_buffer;
+    typedef buffer<CS##T##_frame,false,std::allocator<unsigned char> >	\
+    CS##T##_buffer;							\
+    typedef ring_buffer_range<CS##T##_range> CS##T##_ring_range;	\
+    typedef ring_buffer_range<CS##T##c_range> CS##T##c_ring_range;	\
+    typedef ring_buffer<CS##T##_buffer> CS##T##_ring_buffer;		
 
 // CS = 'bgr' CS_FULL = 'rgb' LAYOUT='bgr_layout'
 #define PSYNTH_SOUND_DEFINE_ALL_TYPEDEFS_INTERNAL(T,CS,CS_FULL,LAYOUT)	\
@@ -86,9 +91,9 @@
     CS##T##_planar_ptr;							\
     typedef planar_frame_iterator<const bits##T*,CS_FULL >              \
     CS##T##c_planar_ptr;						\
-    typedef memory_based_step_iterator<CS##T##_planar_ptr>            \
+    typedef memory_based_step_iterator<CS##T##_planar_ptr>		\
     CS##T##_planar_step_ptr;						\
-    typedef memory_based_step_iterator<CS##T##c_planar_ptr>           \
+    typedef memory_based_step_iterator<CS##T##c_planar_ptr>		\
     CS##T##c_planar_step_ptr;						\
     typedef buffer_range<CS##T##_planar_ptr>				\
     CS##T##_planar_range;						\
@@ -98,8 +103,12 @@
     CS##T##_planar_step_range;						\
     typedef buffer_range<CS##T##c_planar_step_ptr>			\
     CS##T##c_planar_step_range;						\
-    typedef buffer<CS##T##_frame,true,std::allocator<unsigned char> >  \
-    CS##T##_planar_buffer;    
+    typedef buffer<CS##T##_frame,true,std::allocator<unsigned char> >	\
+    CS##T##_planar_buffer;						\
+    typedef ring_buffer_range<CS##T##_planar_range> CS##T##_planar_ring_range; \
+    typedef ring_buffer_range<CS##T##c_planar_range> CS##T##c_planar_ring_range; \
+    typedef ring_buffer<CS##T##_planar_buffer> CS##T##_planar_ring_buffer;
+
 
 #define PSYNTH_SOUND_DEFINE_BASE_TYPEDEFS(T,CS)        \
     PSYNTH_SOUND_DEFINE_BASE_TYPEDEFS_INTERNAL(T,CS,CS##_layout)

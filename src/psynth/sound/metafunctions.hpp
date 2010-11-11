@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-09 14:13:49 raskolnikov>
+ *  Time-stamp:  <2010-11-09 19:17:01 raskolnikov>
  *
  *  @file        metafunctions.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -49,6 +49,7 @@
 #include <boost/mpl/push_back.hpp>
 #include <boost/mpl/transform.hpp>
 #include <boost/mpl/vector.hpp>
+#include <boost/mpl/vector_c.hpp>
 #include <boost/mpl/print.hpp>
 #include <boost/type_traits.hpp>
 

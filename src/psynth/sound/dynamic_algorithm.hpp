@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-09 15:07:20 raskolnikov>
+ *  Time-stamp:  <2010-11-10 14:06:57 raskolnikov>
  *
  *  @file        dynamic_algorithm.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -77,6 +77,16 @@ bool equal_frames (const dynamic_buffer_range<Types1>& src, const Range2& dst)
 {
     return apply_operation (
 	src, boost::bind (detail::equal_frames_fn(), _1, dst));
+}
+
+/** \ingroup BufferRangeSTLAlgorithmsEqualFrames */
+template <typename Types1,  // Model MPL Random Access Container of
+			    // models of BufferRangeConcept
+          typename Range2>   // Model MutableBufferRangeConcept
+bool equal_frames (const dynamic_buffer<Types1>& src, const Range2& dst)
+{
+    return apply_operation (
+	src, boost::bind (detail::equal_frames_fn (), _1, dst));
 }
 
 /** \ingroup BufferRangeSTLAlgorithmsEqualFrames */
@@ -296,6 +306,19 @@ template <typename Types, // Model MPL Random Access Container of
 			  // models of MutableBufferRangeConcept
           typename Value>
 void fill_frames (const dynamic_buffer_range<Types>& range, const Value& val)
+{
+    apply_operation (range, detail::fill_frames_fn<Value>(val));
+}
+
+/**
+ * \ingroup BufferRangeSTLAlgorithmsFillFrames
+ * \brief fill_frames for any buffer range. The frame to fill with must
+ * be compatible with the current range
+ */
+template <typename Types, // Model MPL Random Access Container of
+			  // models of MutableBufferRangeConcept
+          typename Value>
+void fill_frames (dynamic_buffer<Types>& range, const Value& val)
 {
     apply_operation (range, detail::fill_frames_fn<Value>(val));
 }

@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-09 12:43:52 raskolnikov>
+ *  Time-stamp:  <2010-11-09 19:36:58 raskolnikov>
  *
  *  @file        buffer.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -42,6 +42,7 @@
 #include <cstddef>
 #include <memory>
 #include <psynth/base/compat.hpp>
+#include <psynth/sound/frame.hpp>
 #include <psynth/sound/buffer_range.hpp>
 #include <psynth/sound/metafunctions.hpp>
 #include <psynth/sound/algorithm.hpp>
@@ -98,17 +99,7 @@ public:
     typedef typename const_range::iterator         const_iterator;
     typedef typename range::reverse_iterator       reverse_iterator;
     typedef typename const_range::reverse_iterator const_reverse_iterator;
-    
-    #if 0
-    // TODO: Is an alternative necesary or should we rely on recreate?
-    explicit buffer (std::size_t alignment = 0,
-		     const Alloc alloc_in  = Alloc())
-	: _memory (0)
-	, _align_in_bytes (alignment)
-	, _alloc (alloc_in)
-    {}
-    #endif
-    
+        
     /* Create with size and optional initial value and
      * alignment */
     explicit buffer (size_type size = 0,
@@ -253,16 +244,17 @@ public:
     const_reverse_iterator rend () const
     { return _range.rend (); }
     
-    reference operator [] (difference_type i) const
-    {
-	return begin() [i];
-    } // potential performance problem!
+    reference operator [] (difference_type i)
+    { return begin () [i]; } // potential performance problem!
 
-    iterator at (difference_type i) const
-    {
-	return begin () + i;
-    }
-    //\}@
+    const reference operator [] (difference_type i) const
+    { return begin () [i]; } // potential performance problem!
+    
+    iterator at (difference_type i)
+    { return begin () + i; }
+    
+    const_iterator at (difference_type i) const
+    { return begin () + i; }
     
 private:
     template <typename F, bool P, typename A> friend 

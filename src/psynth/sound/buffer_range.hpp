@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-09 14:08:25 raskolnikov>
+ *  Time-stamp:  <2010-11-10 12:27:28 raskolnikov>
  *
  *  @file        buffer_range.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -44,6 +44,10 @@
 
 #include <psynth/base/compat.hpp>
 #include <psynth/sound/frame.hpp>
+#include <psynth/sound/frame_iterator_adaptor.hpp>
+#include <psynth/sound/step_iterator.hpp>
+#include <psynth/sound/planar_frame_reference.hpp>
+#include <psynth/sound/planar_frame_iterator.hpp>
 
 //#ifdef _MSC_VER
 //#pragma warning(push)
@@ -115,9 +119,9 @@ public:
     typedef buffer_range<typename const_iterator_type<Iterator>::type>
     const_type;
 
-    typedef Iterator                                     iterator;
-    typedef std::reverse_iterator<iterator>              reverse_iterator;
-    typedef std::ptrdiff_t                               size_type;
+    typedef Iterator                               iterator;
+    typedef std::reverse_iterator<iterator>        reverse_iterator;
+    typedef std::ptrdiff_t                         size_type;
 
     template <typename Deref>
     struct add_deref
@@ -269,7 +273,7 @@ struct is_planar<buffer_range<I> > : public is_planar<I> {};
 
 /*
  *
- *      HasDynamicXStepTypeConcept
+ *      HasDynamicStepTypeConcept
  *
  */
 
