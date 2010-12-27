@@ -38,6 +38,7 @@ psynth_config_ok="yes"
 dnl  Options
 dnl ======================================================================
 
+dnl CXX=gfilt
 CXXFLAGS="${CXXFLAGS} -std=c++0x"
 
 AC_ARG_ENABLE([gprof], 
