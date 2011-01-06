@@ -67,6 +67,8 @@ nobase_libpsynthinc_HEADERS = \
 	base/type_value.hpp\
 	base/threads.hpp\
 	base/util.hpp\
+	base/meta.hpp\
+	base/c3_class.hpp\
 	synth/scaler.hpp\
 	synth/audio_buffer.hpp \
 	synth/sample_buffer.hpp\
