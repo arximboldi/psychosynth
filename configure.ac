@@ -104,19 +104,19 @@ AC_MSG_ERROR([
 dnl  Gtk 2.0
 dnl ----------------------------------------------------------------------
 
-PKG_CHECK_MODULES(GTK, [ gtk+-2.0 ],
-[
-    HAVE_GTK=yes
-    AC_DEFINE([HAVE_GTK], 1, [Have Gtk?])
-],
-[
-AC_MSG_ERROR([
-***
-*** You need GTK 2.0 development libraries to compile the program.
-*** Install it and run this script again.
-***
-])
-])
+dnl PKG_CHECK_MODULES(GTK, [ gtk+-2.0 ],
+dnl [
+dnl     HAVE_GTK=yes
+dnl     AC_DEFINE([HAVE_GTK], 1, [Have Gtk?])
+dnl ],
+dnl [
+dnl AC_MSG_ERROR([
+dnl ***
+dnl *** You need GTK 2.0 development libraries to compile the program.
+dnl *** Install it and run this script again.
+dnl ***
+dnl ])
+dnl ])
 
 dnl  Optional libraries
 dnl ======================================================================
@@ -196,7 +196,7 @@ AC_ARG_ENABLE([soundtouch],
         [soundtouch=$enableval], [soundtouch=auto])
 
 if test "x${soundtouch}" != xno ; then
-    PKG_CHECK_MODULES(SOUNDTOUCH, [ soundtouch-1.0 ],
+    PKG_CHECK_MODULES(SOUNDTOUCH, [ soundtouch ],
         [
             HAVE_SOUNDTOUCH=yes
             AC_DEFINE([HAVE_SOUNDTOUCH], 1, [Have Soundtouch?])

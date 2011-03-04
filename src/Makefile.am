@@ -48,7 +48,11 @@ endif
 
 psynth_cli_CXXFLAGS = $(SIGC_CFLAGS)
 psynth_cli_LDFLAGS = 
-psynth_cli_LDADD = $(SIGC_LIBS) \
+psynth_cli_LDADD = \
+	$(SIGC_LIBS) \
+	$(LIBLO_LIBS) \
+	$(BOOST_FILESYSTEM_LIB) \
+	-lboost_system-mt \
 	./psynth/libpsynth.la
 
 psynth_cli_SOURCES = \
@@ -66,9 +70,12 @@ psynth3d_CXXFLAGS = \
 	$(OIS_CFLAGS) \
 	$(CEGUIOGRE_CFLAGS)
 
+# libboost_system is a hack
 psynth3d_LDFLAGS = 
 psynth3d_LDADD = \
 	$(BOOST_SIGNALS_LIB) \
+	$(BOOST_FILESYSTEM_LIB) \
+	-lboost_system-mt \
 	$(SIGC_LIBS) \
 	$(OGRE_LIBS) \
 	$(CEGUI_LIBS) \

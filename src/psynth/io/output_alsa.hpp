@@ -42,7 +42,7 @@ class output_alsa : public output
     snd_pcm_format_t alsa_format;
     short int* m_buf;
     std::string alsa_device;
-    int m_buffersize;
+    snd_pcm_uframes_t m_buffersize;
   
     boost::thread alsa_thread;
     

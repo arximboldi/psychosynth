@@ -35,7 +35,11 @@ lib_LTLIBRARIES = libpsynth.la
 libpsynth_la_CXXFLAGS = $(SIGC_CFLAGS) -I.. \
 	-DPSYNTH_DATA_DIR=\"$(PACKAGE_DATA_DIR)\"
 libpsynth_la_LDFLAGS =  
-libpsynth_la_LIBADD = $(BOOST_THREAD_LIB) $(BOOST_FILESYSTEM_LIB) $(SIGC_LIBS)
+libpsynth_la_LIBADD = \
+	$(BOOST_THREAD_LIB) \
+	$(BOOST_FILESYSTEM_LIB) \
+	-lboost_system-mt \
+	$(SIGC_LIBS)
 
 libpsynthincdir = $(PACKAGE_INCLUDE_DIR)
 
