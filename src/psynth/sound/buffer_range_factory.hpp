@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-11 21:25:25 raskolnikov>
+ *  Time-stamp:  <2011-03-08 18:59:19 raskolnikov>
  *
  *  @file        buffer_range_factory.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -125,7 +125,7 @@ interleaved_range_get_raw_data(const HomogeneousRange& range)
     BOOST_STATIC_ASSERT((!is_planar<HomogeneousRange>::value &&
 			 range_is_basic<HomogeneousRange>::value));
     BOOST_STATIC_ASSERT((boost::is_pointer<
-			     typename HomogeneousRange::iterator>::value));
+                         typename HomogeneousRange::iterator>::value));
 
     return &psynth::sound::at_c<0>(range [0]);
 }
@@ -160,8 +160,8 @@ template <typename SrcConstRefP, typename DstP,
 	  typename CC=default_channel_converter>
 // const_reference to the source frame and destination frame value
 class channel_convert_deref_fn :
-    public deref_base<channel_convert_deref_fn<SrcConstRefP, DstP, CC>,
-		      DstP, DstP, const DstP&, SrcConstRefP, DstP, false>
+        public deref_base<channel_convert_deref_fn<SrcConstRefP, DstP, CC>,
+                          DstP, DstP, const DstP&, SrcConstRefP, DstP, false>
 {
 public:
     channel_convert_deref_fn () {}
@@ -193,7 +193,7 @@ private:
     
 public:
     typedef typename add_ref_t::type type;
-        static type make (const SrcRange& sv,CC cc)
+    static type make (const SrcRange& sv,CC cc)
     {
 	return add_ref_t::make (sv, deref_t (cc));
     }
@@ -220,10 +220,10 @@ struct channel_converted_range_type_impl<SrcRange,CC,DstP,DstP>
 */
 template <typename SrcRange, typename DstP, typename CC=default_channel_converter>
 struct channel_converted_range_type :
-    public detail::channel_converted_range_type_impl<SrcRange,
-						    CC,
-						    DstP,
-						    typename SrcRange::value_type>
+        public detail::channel_converted_range_type_impl<SrcRange,
+                                                         CC,
+                                                         DstP,
+                                                         typename SrcRange::value_type>
 {
     PSYNTH_CLASS_REQUIRE(DstP, psynth::sound, MutableFrameConcept)
     // Why does it have to be mutable???
@@ -278,7 +278,7 @@ inline typename dynamic_step_type<Range>::type flipped_range (const Range& src)
 */
 template <typename Range>
 inline typename buffer_range_type<Range>::type
-sub_buffer_range (const Range& src, size_t start, size_t size)
+sub_range (const Range& src, size_t start, size_t size)
 {
     typedef typename buffer_range_type<Range>::type RRange;
     return RRange (size, src.at (start));
@@ -300,7 +300,7 @@ class buffer;
 
 template <typename F, bool P, typename A>
 inline typename buffer_range_type<buffer<F,P,A> >::type
-sub_buffer_range (buffer<F,P,A>& src, size_t start, size_t size)
+sub_range (buffer<F,P,A>& src, size_t start, size_t size)
 {
     typedef typename buffer_range_type<buffer<F,P,A> >::type RRange;
     return RRange (size, src.at (start));
@@ -317,17 +317,20 @@ sub_buffer_range (buffer<F,P,A>& src, size_t start, size_t size)
    range factories are needed because buffers are now ranges. Keep
    working on this.
 */
-/*
+
+#ifdef PSYNTH_BUFFER_MODEL_RANGE
+
 template <typename Range>
 inline typename buffer_range_type<Range>::type
-sub_buffer_range (Range& src,
-		  const typename Range::size_type start,
-		  const typename Range::size_type size)
+sub_range (Range& src,
+           const typename Range::size_type start,
+           const typename Range::size_type size)
 {
     typedef typename buffer_range_type<Range>::type RRange;
     return RRange (size, src.at (start));
 }
-*/
+
+#endif /* PSYNTH_BUFFER_MODEL_RANGE */
 
 /**
    \defgroup BufferRangeTransformationsSub_Sampled sub_sampled_range
@@ -344,7 +347,7 @@ sub_sampled_range (const Range& src, typename Range::size_type step)
     assert (step > 0);
     typedef typename dynamic_step_type<Range>::type RRange;
     return RRange ((src.size () + (step - 1)) / step,
-		  make_step_iterator (src.begin (), step));
+                   make_step_iterator (src.begin (), step));
 }
 
 
@@ -369,8 +372,8 @@ template <typename Range>
 struct nth_sample_range_basic_impl<Range, false>
 {
     typedef typename range_type<typename sample_type<Range>::type,
-			       mono_layout, false, true,
-			       range_is_mutable<Range>::value>::type type;
+                                mono_layout, false, true,
+                                range_is_mutable<Range>::value>::type type;
 
     static type make (const Range& src, int n)
     {
@@ -391,8 +394,8 @@ template <typename Range>
 struct nth_sample_range_basic_impl<Range, true>
 {
     typedef typename range_type<typename sample_type<Range>::type,
-			       mono_layout, false, false,
-			       range_is_mutable<Range>::value>::type type;
+                                mono_layout, false, false,
+                                range_is_mutable<Range>::value>::type type;
 
     static type make (const Range& src, int n)
     {
@@ -560,7 +563,7 @@ private:
 
 public:
     typedef typename range_type<sample_t, mono_layout, false, true,
-			       range_is_mutable<Range>::value>::type type;
+                                range_is_mutable<Range>::value>::type type;
 
     static type make(const Range& src)
     {
@@ -647,7 +650,7 @@ private:
     typedef typename kth_element_type<src_frame_t, K>::type sample_t;
     typedef typename src_frame_t::const_reference const_ref_t;
     typedef typename frame_reference_type<
-	    sample_t, mono_layout, false, is_mutable>::type ref_t;
+        sample_t, mono_layout, false, is_mutable>::type ref_t;
 
 public:
     typedef kth_sample_deref_fn<K,const_ref_t>    const_type;
@@ -656,8 +659,8 @@ public:
     typedef typename frame_reference_type<
 	sample_t, mono_layout,false,false>::type  const_reference;
     typedef SrcP                                  argument_type;
-        typedef typename boost::mpl::if_c<
-	    is_mutable, ref_t, value_type>::type  reference;
+    typedef typename boost::mpl::if_c<
+        is_mutable, ref_t, value_type>::type  reference;
     typedef reference                             result_type;
     
     kth_sample_deref_fn () {}

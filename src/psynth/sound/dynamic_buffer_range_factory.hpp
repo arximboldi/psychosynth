@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-11 19:27:22 raskolnikov>
+ *  Time-stamp:  <2011-03-08 18:59:32 raskolnikov>
  *
  *  @file        dynamic_buffer_range_factory.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -35,17 +35,17 @@ struct flipped_range_fn
 };
 
 template <typename Result>
-struct sub_buffer_range_fn
+struct sub_range_fn
 {
     typedef Result result_type;
-    sub_buffer_range_fn (std::ptrdiff_t start, std::ptrdiff_t size)
+    sub_range_fn (std::ptrdiff_t start, std::ptrdiff_t size)
 	: _start (start)
 	, _size (size) {}
     
     template <typename Range>
     result_type operator () (const Range& src) const
     {
-	return result_type (sub_buffer_range (src, _start, _size));
+	return result_type (sub_range (src, _start, _size));
     }
 
     std::ptrdiff_t _start, _size;
@@ -136,10 +136,10 @@ flipped_range (const dynamic_buffer_range<RangeTypes>& src)
 template <typename RangeTypes> inline
 // Models MPL Random Access Container of models of BufferRangeConcept
 dynamic_buffer_range <RangeTypes>
-sub_buffer_range (const dynamic_buffer_range<RangeTypes>& src,
-		  size_t start, size_t size)
+sub_range (const dynamic_buffer_range<RangeTypes>& src,
+           size_t start, size_t size)
 {
-    return apply_operation (src, detail::sub_buffer_range_fn<
+    return apply_operation (src, detail::sub_range_fn<
 				dynamic_buffer_range<RangeTypes> >(start, size)); 
 }
 
@@ -191,8 +191,8 @@ nth_sample_range (const dynamic_buffer_range<RangeTypes>& src, int n)
 { 
     return apply_operation (
 	src, detail::nth_sample_range_fn<
-	    typename nth_sample_range_type<
-		dynamic_buffer_range<RangeTypes> >::type>(n)); 
+        typename nth_sample_range_type<
+        dynamic_buffer_range<RangeTypes> >::type>(n)); 
 }
 
 namespace detail
@@ -233,8 +233,8 @@ channel_converted_range (const dynamic_buffer_range<RangeTypes>& src,CC cc)
 { 
     return apply_operation (
 	src, detail::channel_converted_range_fn<
-	    DstP,typename channel_converted_range_type<
-		dynamic_buffer_range<RangeTypes>, DstP, CC>::type >()); 
+        DstP,typename channel_converted_range_type<
+        dynamic_buffer_range<RangeTypes>, DstP, CC>::type >()); 
 }
 
 /**
@@ -263,8 +263,8 @@ channel_converted_range (const dynamic_buffer_range<RangeTypes>& src)
 { 
     return apply_operation (
 	src, detail::channel_converted_range_fn <
-	    DstP,typename channel_converted_range_type<
-		dynamic_buffer_range<RangeTypes>, DstP>::type >()); 
+        DstP,typename channel_converted_range_type<
+        dynamic_buffer_range<RangeTypes>, DstP>::type >()); 
 }
 
 /**
@@ -284,8 +284,8 @@ dynamic_channel_converted_range (const dynamic_buffer_range<RangeTypes>& src, CC
 { 
     return apply_operation (
 	src, detail::channel_converted_range_fn<
-	    DstP,typename channel_converted_range_type<
-		dynamic_buffer_range<RangeTypes>, DstP, CC>::type >()); 
+        DstP,typename channel_converted_range_type<
+        dynamic_buffer_range<RangeTypes>, DstP, CC>::type >()); 
 }
 
 /**
@@ -304,8 +304,8 @@ dynamic_channel_converted_range (const dynamic_buffer_range<RangeTypes>& src)
 { 
     return apply_operation (
 	src, detail::channel_converted_range_fn<
-	    DstP, typename channel_converted_range_type<
-		dynamic_buffer_range<RangeTypes>, DstP>::type >()); 
+        DstP, typename channel_converted_range_type<
+        dynamic_buffer_range<RangeTypes>, DstP>::type >()); 
 }
 
 /** \} */

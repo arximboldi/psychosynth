@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-10 12:27:28 raskolnikov>
+ *  Time-stamp:  <2011-03-07 16:16:58 raskolnikov>
  *
  *  @file        buffer_range.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -206,7 +206,7 @@ public:
     {
 	return psynth::sound::num_samples<value_type>::value;
     }
-
+    
     iterator begin () const
     {
 	return _frames;
@@ -237,7 +237,7 @@ public:
 	return begin () + i;
     }
     //\}@
-
+    
 private:
     template <typename L2> friend class buffer_range;
 

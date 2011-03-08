@@ -40,7 +40,7 @@ output_alsa::output_alsa()
 output_alsa::output_alsa(const audio_info& info, const std::string& device)
     : output(info)
     , alsa_device (device) //device)
-    , m_buffersize (128)
+    , m_buffersize (1024)
 {
 }
 
@@ -120,7 +120,9 @@ bool output_alsa::open()
 	snd_pcm_hw_params_set_channels (alsa_pcm, alsa_hwparams, get_info ().num_channels);
 
 	/* TODO optimize period size and all that stuff... */
-	snd_pcm_hw_params_set_buffer_size (alsa_pcm, alsa_hwparams, m_buffersize);
+	//snd_pcm_hw_params_set_buffer_size (alsa_pcm, alsa_hwparams,
+	//m_buffersize);
+        snd_pcm_hw_params_get_buffer_size(alsa_hwparams, &m_buffersize);
 	snd_pcm_hw_params (alsa_pcm, alsa_hwparams);
 		
 	snd_pcm_sw_params_malloc (&alsa_swparams);

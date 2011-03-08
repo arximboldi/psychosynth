@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-09 19:17:01 raskolnikov>
+ *  Time-stamp:  <2011-03-07 19:09:11 raskolnikov>
  *
  *  @file        metafunctions.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -938,6 +938,8 @@ public:
 /**
  * Returns the buffer_range type of a Range. This is the range itself
  * for most ranges but it is its buffer_range for buffers.
+ *
+ * @todo Remove this buffer_range_type metafunction?
  */
 template <class Range>
 struct buffer_range_type
@@ -946,9 +948,23 @@ struct buffer_range_type
 };
 
 template <class Frame, bool Planar, class Alloc>
-struct buffer_range_type<buffer<Frame, Planar, Alloc>>
+struct buffer_range_type<buffer<Frame, Planar, Alloc> >
 {
     typedef typename buffer<Frame, Planar, Alloc>::range type;
+};
+
+/**
+ * Returns a buffer type that can hold data of a given buffer_range
+ * type with the same representation.
+ */
+template <class Range, typename Alloc = std::allocator<unsigned char> >
+struct buffer_type_from_range
+{
+    typedef buffer<std::iterator_traits<
+                       typename Range::iterator>::value_type,
+                   is_planar<Range>::value,
+                   Alloc>
+    type;
 };
 
 } /* namespace sound */

@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-11 23:07:02 raskolnikov>
+ *  Time-stamp:  <2011-03-08 18:39:41 raskolnikov>
  *
  *  @file        ring_buffer.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -282,19 +282,19 @@ public:
     { return _range.size (); }
 
     /**
-     * Returns a read pointer to the beginning of the availible data.
+     * Returns a read pointer to the beginning of the available data.
      */
     position begin_pos () const
     { return position (_startpos); };
 
     /**
-     * Returns a read pointer to the end of the availible data.
+     * Returns a read pointer to the end of the available data.
      */
     position end_pos () const
     { return position (_writepos); };
 
     /**
-     * Returns a read pointer to the beginning of the availible data.
+     * Returns a read pointer to the beginning of the available data.
      */
     safe_position safe_begin_pos () const
     {
@@ -304,23 +304,23 @@ public:
     };
 
     /**
-     * Returns a read pointer to the end of the availible data.
+     * Returns a read pointer to the end of the available data.
      */
     safe_position safe_end_pos () const
     { return _writepos; };
     
     /**
-     * Returns the number of availible data from a read pointer.
-     * @param r The read pointer to test for availible data.
+     * Returns the number of available data from a read pointer.
+     * @param r The read pointer to test for available data.
      */
-    size_type availible (const safe_position& r) const
+    size_type available (const safe_position& r) const
     { return _writepos._count - r._count; }
 
     /**
-     * Returns the number of availible data from a read pointer.
-     * @param r The read pointer to test for availible data.
+     * Returns the number of available data from a read pointer.
+     * @param r The read pointer to test for available data.
      */
-    size_type availible (const position& r) const
+    size_type available (const position& r) const
     {
 	return _writepos._pos > r._pos ?
 	    _writepos._pos - r._pos :
@@ -328,10 +328,10 @@ public:
     }
     
     /**
-     * Returns the number of availible data from a read pointer.
-     * @param r The read pointer to test for availible data.
+     * Returns the number of available data from a read pointer.
+     * @param r The read pointer to test for available data.
      */
-    size_type availible () const
+    size_type available () const
     { return _writepos._count > size () ? size () : _writepos._count; }
     
     /**
@@ -443,7 +443,7 @@ public:
     /**
      * Returns wether this buffer is being written backwards.
      */
-    bool backwards () const
+    bool is_backwards () const
     { return _backwards; }
     
     /**
@@ -452,15 +452,19 @@ public:
      * medium and your where reading that medium forwards, this allows you to
      * not to lose the already read data remaining in the buffer if you
      * change the reading direction.
+     *
      * @see sync ()
      * @note Returna new range instead of modifying the current?
+     *
+     * @todo This seems to be fixed.
+     * @todo caching_file_input_impl::set_backwards seems to
+     * compensate the reading backwards bug. Check old implementation.
      */
     void set_backwards ()
     {
 	_backwards = !_backwards;
 	if (_writepos._count < size ())
 	    std::swap (_startpos, _writepos._pos);
-	// TODO!!! Fix backwards!!
     }
     
     /**

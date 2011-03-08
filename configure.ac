@@ -38,6 +38,7 @@ psynth_config_ok="yes"
 dnl  Options
 dnl ======================================================================
 
+dnl CXX=gfilt
 CXXFLAGS="${CXXFLAGS} -std=c++0x"
 
 AC_ARG_ENABLE([gprof], 
@@ -88,7 +89,7 @@ dnl ----------------------------------------------------------------------
 PKG_CHECK_MODULES(SIGC, [ sigc++-2.0 ],
 [
     HAVE_SIGC=yes
-    AC_DEFINE([HAVE_SIGC], 1, [Have Sndfile?])
+    AC_DEFINE([HAVE_SIGC], 1, [Have sigc++?])
 ],
 [
 AC_MSG_ERROR([
@@ -103,19 +104,19 @@ AC_MSG_ERROR([
 dnl  Gtk 2.0
 dnl ----------------------------------------------------------------------
 
-PKG_CHECK_MODULES(GTK, [ gtk+-2.0 ],
-[
-    HAVE_GTK=yes
-    AC_DEFINE([HAVE_GTK], 1, [Have Gtk?])
-],
-[
-AC_MSG_ERROR([
-***
-*** You need GTK 2.0 development libraries to compile the program.
-*** Install it and run this script again.
-***
-])
-])
+dnl PKG_CHECK_MODULES(GTK, [ gtk+-2.0 ],
+dnl [
+dnl     HAVE_GTK=yes
+dnl     AC_DEFINE([HAVE_GTK], 1, [Have Gtk?])
+dnl ],
+dnl [
+dnl AC_MSG_ERROR([
+dnl ***
+dnl *** You need GTK 2.0 development libraries to compile the program.
+dnl *** Install it and run this script again.
+dnl ***
+dnl ])
+dnl ])
 
 dnl  Optional libraries
 dnl ======================================================================
@@ -175,7 +176,7 @@ AC_ARG_ENABLE([sndfile],
         [sndfile=$enableval], [sndfile=auto])
 
 if test "x${sndfile}" != xno ; then
-    PKG_CHECK_MODULES(SNDFILE, [ sndfile ],
+    PKG_CHECK_MODULES(SNDFILE, [ sndfile >= 1.0.18 ],
         [
             HAVE_SNDFILE=yes
             AC_DEFINE([HAVE_SNDFILE], 1, [Have Sndfile?])
@@ -195,7 +196,7 @@ AC_ARG_ENABLE([soundtouch],
         [soundtouch=$enableval], [soundtouch=auto])
 
 if test "x${soundtouch}" != xno ; then
-    PKG_CHECK_MODULES(SOUNDTOUCH, [ soundtouch-1.0 ],
+    PKG_CHECK_MODULES(SOUNDTOUCH, [ soundtouch ],
         [
             HAVE_SOUNDTOUCH=yes
             AC_DEFINE([HAVE_SOUNDTOUCH], 1, [Have Soundtouch?])

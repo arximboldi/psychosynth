@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-09 19:36:58 raskolnikov>
+ *  Time-stamp:  <2011-03-07 19:01:54 raskolnikov>
  *
  *  @file        buffer.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -71,7 +71,7 @@ namespace sound
  *
  * Note that its element type does not have to be a frame. \p buffer
  * can be instantiated with any Regular element, in which case it
- * models the weaker RandomAccess2DBufferConcept and does not model
+ * models the weaker RandomAccessBufferConcept and does not model
  * FrameBasedConcept
  *
  * @note Should we merge buffer and range? Think about constness
@@ -124,9 +124,9 @@ public:
     }
     
     buffer (const buffer& buf)
-	: _memory(0)
+	: _memory (0)
 	, _align_in_bytes (buf._align_in_bytes)
-	, _alloc(buf._alloc)
+	, _alloc (buf._alloc)
     {
         allocate_and_copy (buf.size (), buf._range);
     }
@@ -214,6 +214,8 @@ public:
         }
     }
 
+#ifdef PSYNTH_BUFFER_MODEL_RANGE
+    
     iterator frames () 
     { return _range.frames (); }
 
@@ -255,6 +257,8 @@ public:
     
     const_iterator at (difference_type i) const
     { return begin () + i; }
+
+#endif /* PSYNTH_BUFFER_MODEL_RANGE */
     
 private:
     template <typename F, bool P, typename A> friend 

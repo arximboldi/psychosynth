@@ -1,0 +1,165 @@
+
+%%
+%% Proyecto de fin de Carrera -- GNU Psychosynth
+%% (c) 2010-2011 Juan Pedro Bolívar Puente
+%%
+%% TODO: Add license.
+%%
+
+\documentclass{book}
+\usepackage[usenames]{color}
+\usepackage{thesis}
+\usepackage{ucs}
+\usepackage[utf8x]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{url}
+\usepackage{graphicx}
+\usepackage{alltt}
+\usepackage{fancyhdr}
+\usepackage{multirow}
+\usepackage{listings}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usepackage{float}
+\usepackage{appendix}
+\usepackage{hyperref}
+\usepackage{framed}
+%\usepackage{theorem}
+\usepackage[framed,thref,hyperref]{ntheorem}
+
+\hypersetup{ linkbordercolor= 1 0.7 0.7}
+
+% \theoremstyle{marginbreak}
+\theoremheaderfont{\normalfont\bfseries\sffamily}
+% \theorembodyfont{\slshape}
+% \theoremsymbol{\ensuremath{\diamondsuit}}
+% \theoremseparator{:}
+\newframedtheorem{mynote}{Note}[chapter]
+
+% TODO: IS THIS OK?
+\setcounter{secnumdepth}{3}
+
+\def\startappendix{
+  \appendix
+  \appendixpage
+  \addappheadtotoc
+}
+
+\definecolor{red}{rgb}{0.9,0.1,0.1}
+{
+  \theorembodyfont{\color{red}}
+  \newtheorem{todo}{TO-DO note}
+}
+
+{
+  \newtheorem{objective}{Objective}
+  \newtheorem{requirement}{Requirement}
+}
+
+
+\def\disabletodo {
+  \let\todo=\comment 
+  \let\endtodo=\endcomment 
+}
+
+\makeindex
+
+\newcommand{\myTitle}{GNU Psychosynth: A framework for modular,
+  interactive and collaborative sound synthesis and live music
+  performance }
+\newcommand{\myDegree}{Ingeniería en Informática}
+\newcommand{\myName}{Juan Pedro Bolívar Puente}
+\newcommand{\myProf}{Joaquín Fernandez-Valdivia}
+%\newcommand{\myOtherProf}{Javier Sánchez Monedero}
+\newcommand{\myFaculty}{Escuela Técnica Superior de Ingenierías Informática y de
+  Telecomunicación}
+\newcommand{\myFacultyShort}{E.T.S. de Ingenierías Informática y de
+  Telecomunicación}
+\newcommand{\myDepartment}{Departamento de Ciencias de la Computación
+  e Inteligencia Artificial}
+\newcommand{\myUni}{\protect{Universidad de Granada}}
+\newcommand{\myLocation}{Granada}
+\newcommand{\myTime}{\today}
+\newcommand{\myVersion}{Version 0.1}
+
+\hypersetup{%
+  pdfauthor = {\myName (jpboli (en) correo (punto) ugr (punto) es)},
+  pdftitle = {\myTitle},
+  pdfsubject = {},
+  pdfkeywords = {TODO},
+  pdfcreator = {LaTeX con el paquete hyperref},
+  pdfproducer = {pdflatex}
+}
+
+%
+% Heading
+%
+% \pagestyle{fancy}
+% \fancyhf{}
+% \fancyhead[LO]{\leftmark}
+% \fancyhead[RE]{\rightmark}
+% \fancyhead[RO,LE]{\textbf{\thepage}}
+% \renewcommand{\chaptermark}[1]{\markboth{\textbf{#1}}{}}
+% \renewcommand{\sectionmark}[1]{\markright{\textbf{\thesection. #1}}}
+% \setlength{\headheight}{1.5\headheight}
+
+%
+% No header in white pages
+%
+\makeatletter
+\def\clearpage{%
+  \ifvmode
+    \ifnum \@dbltopnum =\m@ne
+      \ifdim \pagetotal <\topskip
+        \hbox{}
+      \fi
+    \fi
+  \fi
+  \newpage
+  \thispagestyle{empty}
+  \write\m@ne{}
+  \vbox{}
+  \penalty -\@Mi
+}
+\makeatother
+
+\begin{document}
+
+\input{00-frontpage}
+\input{00-preface}
+
+\frontmatter
+\tableofcontents
+\listoffigures
+\listoftables
+\mainmatter
+
+\setlength{\parskip}{5pt}
+
+\input{01-intro}
+\input{02-analysis}
+\input{03-meta}
+
+\bibliography{00-main}
+\bibliographystyle{unsrt}
+\addcontentsline{toc}{chapter}{Bibliography}
+
+\startappendix
+
+\chapter{Glossary}
+\begin{todo}[Juan Pedro]
+¿Añado un glosario recopilando las definiciones que doy de diferentes
+términos específicos del dominio del audio y para expandir y aclarar
+siglas y acŕonimos? ¿O mejor paso?
+\end{todo}
+
+\input{99-license}
+
+\end{document}
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: t
+%%% End: 

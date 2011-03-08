@@ -144,8 +144,7 @@ void output_jack::connect_ports()
     ports = jack_get_ports (m_client, 0, 0, JackPortIsPhysical | JackPortIsInput);
 
     if (!ports) {
-	PSYNTH_LOG << log::warning << "There are no phisical output ports."
-		   << log_msg;
+	PSYNTH_LOG << log::warning << "There are no phisical output ports.";
 	return;
     }
 

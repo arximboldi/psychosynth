@@ -35,7 +35,11 @@ lib_LTLIBRARIES = libpsynth.la
 libpsynth_la_CXXFLAGS = $(SIGC_CFLAGS) -I.. \
 	-DPSYNTH_DATA_DIR=\"$(PACKAGE_DATA_DIR)\"
 libpsynth_la_LDFLAGS =  
-libpsynth_la_LIBADD = $(BOOST_THREAD_LIB) $(BOOST_FILESYSTEM_LIB) $(SIGC_LIBS)
+libpsynth_la_LIBADD = \
+	$(BOOST_THREAD_LIB) \
+	$(BOOST_FILESYSTEM_LIB) \
+	-lboost_system-mt \
+	$(SIGC_LIBS)
 
 libpsynthincdir = $(PACKAGE_INCLUDE_DIR)
 
@@ -67,6 +71,8 @@ nobase_libpsynthinc_HEADERS = \
 	base/type_value.hpp\
 	base/threads.hpp\
 	base/util.hpp\
+	base/meta.hpp\
+	base/c3_class.hpp\
 	synth/scaler.hpp\
 	synth/audio_buffer.hpp \
 	synth/sample_buffer.hpp\

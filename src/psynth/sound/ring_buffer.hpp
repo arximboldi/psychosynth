@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-11 22:30:37 raskolnikov>
+ *  Time-stamp:  <2011-03-08 18:37:43 raskolnikov>
  *
  *  @file        ring_buffer.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -130,7 +130,10 @@ public:
 	_buffer.recreate (size, alignment, alloc_in);
 	_range = range_base (range (_buffer));
     }
+
     
+#ifdef PSYNTH_BUFFER_MODEL_RANGE
+
     position begin_pos () const
     { return _range.begin_pos (); }
 
@@ -143,13 +146,13 @@ public:
     safe_position safe_end_pos () const
     { return _range.safe_end_pos (); }
 
-    /** @see range_buffer_base::availible */
-    size_type availible (const safe_position& r) const
-    { return _range.availible (r); }
+    /** @see range_buffer_base::available */
+    size_type available (const safe_position& r) const
+    { return _range.available (r); }
 
-    /** @see range_buffer_base::availible */
-    size_type availible () const
-    { return _range.availible (); }
+    /** @see range_buffer_base::available */
+    size_type available () const
+    { return _range.available (); }
 
     /** @see range_buffer_base::check_position */
     ring_buffer_error check_position (const safe_position& r) const
@@ -212,8 +215,8 @@ public:
     { _range.zero (); }
 
     /** @see range_buffer_base::backwards */
-    bool backwards () const
-    { return _range.backwards (); }
+    bool is_backwards () const
+    { return _range.is_backwards (); }
     
     /** @see range_buffer_base::set_backwards */
     void set_backwards ()
@@ -240,6 +243,8 @@ public:
     safe_position sync (const safe_position& r) const
     { return _range.sync (); }
 
+#endif /* PSYNTH_BUFFER_MODEL_RANGE */
+    
 protected:
     Buffer      _buffer;
     range_base  _range;
@@ -298,6 +303,9 @@ public:
 	parent_type::operator= (buf);
         return *this;
     }
+
+
+#ifdef PSYNTH_BUFFER_MODELS_RANGE
     
     iterator begin ()
     { return this->_range.begin (); }
@@ -323,6 +331,8 @@ public:
     const_safe_iterator safe_end () const
     { return this->_range.safe_end (); }    
 
+#endif /* PSYNTH_BUFFER_MODEL_RANGE */
+    
     allocator_type&       allocator ()
     { return this->_buffer.allocator (); }
 
