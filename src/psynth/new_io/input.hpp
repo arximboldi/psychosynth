@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-08 16:26:42 raskolnikov>
+ *  Time-stamp:  <2011-03-09 13:29:32 raskolnikov>
  *
  *  @file        input.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -31,6 +31,11 @@
 #ifndef PSYNTH_IO_INPUT_H_
 #define PSYNTH_IO_INPUT_H_
 
+#include <cstddef>
+#include <psynth/new_io/async_base.hpp>
+
+#include <psynth/new_io/input.tpp>
+
 namespace psynth
 {
 namespace io
@@ -52,10 +57,26 @@ public:
 };
 
 /**
+ * Dummy output class.
+ */
+template <typename Range>
+class dummy_input : public input<Range>
+{
+public:
+    typedef Range range;
+    
+    virtual std::size_t take (const range& data)
+    {
+        detail::dummy_input_take_impl ();
+        return data.size ();
+    }
+};
+
+/**
  * @todo Not used yet.
  */
 template <typename Range>
-class async_input : public output<Range>,
+class async_input : public input<Range>,
                     public virtual async_base
 {
 public:

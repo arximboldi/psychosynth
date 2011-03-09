@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-09 01:17:06 raskolnikov>
+ *  Time-stamp:  <2011-03-09 20:14:40 raskolnikov>
  *
  *  @file        oss_raw_output.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -30,6 +30,8 @@
 
 #define PSYNTH_MODULE_NAME "psynth.io.oss"
 
+#include <cassert>
+
 #include <fcntl.h>
 #include <sys/soundcard.h>
 #include <sys/stat.h>
@@ -50,13 +52,13 @@ PSYNTH_DEFINE_ERROR (oss_error);
 PSYNTH_DEFINE_ERROR_WHAT (oss_open_error, "Error while opening OSS device.");
 PSYNTH_DEFINE_ERROR_WHAT (oss_param_error, "Invalid parameter for OSS device.");
 
-#define PSYNTH_OSS_CHECK(fun, except)                           \
-    do {                                                        \
-        int err = fun;                                          \
-        if (err < 0) {                                          \
-            PSYNTH_LOG << base::log::warning << ::strerror (err);       \
-            throw except ();                                    \
-        }                                                       \
+#define PSYNTH_OSS_CHECK(fun, except)                                   \
+    do {                                                                \
+        int err = fun;                                                  \
+        if (err == -1) {                                                \
+            PSYNTH_LOG << base::log::warning << ::strerror (errno);     \
+            throw except ();                                            \
+        }                                                               \
     } while (0)
 
 oss_raw_output::oss_raw_output (const char* device,
@@ -66,7 +68,8 @@ oss_raw_output::oss_raw_output (const char* device,
                                 bool        interleaved,
                                 int         rate,
                                 int         channels)
-    : _buffer_size (buffer_size)
+    : _frame_size (sample_size * channels)
+    , _buffer_size (buffer_size)
 {
     int stereo;
     switch (channels)
@@ -115,23 +118,22 @@ oss_raw_output::~oss_raw_output ()
     ::close (_handle);
 }
 
-std::size_t oss_raw_output::put_i (void*  data, std::size_t frames)
+std::size_t oss_raw_output::put_i (const void* data, std::size_t frames)
 {
     ::ssize_t bytes_or_err = ::write (_handle, data, _frame_size * frames);
-    if (bytes_or_err < 0)
+    if (bytes_or_err == -1)
     {
         PSYNTH_LOG  << base::log::warning
                     << "Error while writing to OSS device: "
-                    << strerror (bytes_or_err);
+                    << strerror (errno);
         return 0;
     }
     return bytes_or_err / _frame_size; // TODO: Performance?
 }
 
-std::size_t oss_raw_output::put_n (void** data, std::size_t frames)
+std::size_t oss_raw_output::put_n (const void* const* data, std::size_t frames)
 {
-    PSYNTH_LOG << base::log::warning
-               << "Interleaved output not supporter by OSS.";
+    assert (false);
     return 0;
 }
 

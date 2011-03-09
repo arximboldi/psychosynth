@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-08 23:53:58 raskolnikov>
+ *  Time-stamp:  <2011-03-09 13:49:37 raskolnikov>
  *
  *  @file        output.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -34,20 +34,47 @@
 #include <psynth/sound/forwards.hpp>
 #include <psynth/new_io/async_base.hpp>
 
+#include <psynth/new_io/output.tpp>
+
 namespace psynth
 {
 namespace io
 {
 
+/**
+ * Output device base abstract class.
+ */
 template <typename Range>
 class output
 {
 public:
     typedef Range range;
+
+    /**
+     * Write a bunch of data into the device.
+     */
     virtual std::size_t put (const range& data) = 0;
 };
 
+/**
+ * Dummy output class.
+ */
+template <typename Range>
+class dummy_output : public output<Range>
+{
+public:
+    typedef Range range;
+    
+    virtual std::size_t put (const range& data)
+    {
+        detail::dummy_output_put_impl ();
+        return data.size ();
+    }
+};
 
+/**
+ * An output device with asynchronous operation base class.
+ */
 template <typename Range>
 class async_output : public output<Range>,
                      public virtual async_base
@@ -56,32 +83,12 @@ public:
     virtual std::size_t buffer_size () const = 0;
 };
 
+/**
+ * Utility function to implement output devices in term of a raw
+ * output device.
+ */
 template <typename RawOutput, typename Range>
-std::size_t put_on_raw (RawOutput& out, const Range& data)
-{
-    std::size_t block_size = out.buffer_size ();
-    std::size_t total      = data.size (); // int is an optimization
-    std::size_t written    = 0;
-    
-    while (written < total)
-    {
-        auto block = sub_range (
-            data, written, std::min (block_size, total - written));
-
-        // TODO: Make sure that this if is optimized away.
-        if (sound::is_planar<Range>::value)
-        {
-            written += out.put_i (block.begin (), block.size ());
-        }
-        else
-        {
-            auto it = block.begin ();
-            written += out.put_w (&it, block.size ());
-        }
-    }
-
-    return written;
-}
+std::size_t put_on_raw (RawOutput& out, const Range& data);
 
 } /* namespace io */
 } /* namespace psynth */

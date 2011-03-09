@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-07 21:13:15 raskolnikov>
+ *  Time-stamp:  <2011-03-09 18:22:36 raskolnikov>
  *
  *  @file        oss_output.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -31,6 +31,7 @@
 #ifndef PSYNTH_IO_OSS_OUTPUT_H_
 #define PSYNTH_IO_OSS_OUTPUT_H_
 
+#include <psynth/new_io/oss_raw_output.hpp>
 #include <psynth/new_io/output.hpp>
 
 namespace psynth
@@ -42,20 +43,30 @@ template <typename Range>
 struct oss_support;
 
 template <typename Range>
+struct oss_is_supported
+{
+    typedef typename oss_support<Range>::is_supported type;
+};
+
+template <typename Range>
 class oss_output : public async_output<Range>,
                    public oss_raw_output
 {
 public:
-    static_assert (oss_support<Range>::is_suported::value,
+    static_assert (oss_support<Range>::is_supported::value,
                    "Range output format not supported by OSS.");
     
     typedef Range range;
     
     oss_output (const std::string& device,
                 std::size_t        buffer_size,
-                std::size_t        rate);
+                std::size_t        rate,
+                callback_type      cb = callback_type ());
 
     std::size_t put (const range& data);
+
+    std::size_t buffer_size () const
+    { return oss_raw_output::buffer_size (); }
 };
 
 } /* namespace io */

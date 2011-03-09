@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-09 01:12:41 raskolnikov>
+ *  Time-stamp:  <2011-03-09 18:50:23 raskolnikov>
  *
  *  @file        oss_raw_output.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -60,8 +60,8 @@ public:
     
     ~oss_raw_output ();
 
-    std::size_t put_i (void*  data, std::size_t frames);
-    std::size_t put_n (void** data, std::size_t frames);
+    std::size_t put_i (const void*        data, std::size_t frames);
+    std::size_t put_n (const void* const* data, std::size_t frames);
 
     std::size_t buffer_size () const
     { return _buffer_size; }

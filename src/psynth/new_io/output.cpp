@@ -1,11 +1,11 @@
 /**
- *  Time-stamp:  <2011-03-09 14:28:16 raskolnikov>
+ *  Time-stamp:  <2011-03-09 13:49:51 raskolnikov>
  *
- *  @file        async_base.cpp
+ *  @file        output.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
- *  @date        Fri Mar  4 17:51:08 2011
+ *  @date        Wed Mar  9 13:13:42 2011
  *
- *  Asynchronous infrastructure implementation.
+ *  Implementation of some output facilities.
  */
 
 /*
@@ -28,21 +28,25 @@
  *
  */
 
-#define PSYNTH_MODULE_NAME "psynth.io.async"
+#define PSYNTH_MODULE_NAME "psynth.io.output"
 
-#include "async_base.hpp"
+#include "base/logger.hpp"
+#include "output.hpp"
 
 namespace psynth
 {
 namespace io
 {
 
-PSYNTH_DEFINE_ERROR (async_error);
-PSYNTH_DEFINE_ERROR_WHAT (async_not_running_error,
-                          "Asynchronous I/O device is not running.");
-PSYNTH_DEFINE_ERROR_WHAT (async_not_idle_error,
-                          "Asynchronous I/O device is not idle.");
+namespace detail
+{
 
+void dummy_output_put_impl ()
+{
+    PSYNTH_LOG_DEBUG << "dummy_output::put";
+}
+
+} /* namespace detail */
 
 } /* namespace io */
 } /* namespace psynth */

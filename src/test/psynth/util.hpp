@@ -1,11 +1,11 @@
 /**
- *  Time-stamp:  <2011-03-09 14:28:16 raskolnikov>
+ *  Time-stamp:  <2011-03-09 16:14:10 raskolnikov>
  *
- *  @file        async_base.cpp
+ *  @file        util.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
- *  @date        Fri Mar  4 17:51:08 2011
+ *  @date        Wed Mar  9 16:09:43 2011
  *
- *  Asynchronous infrastructure implementation.
+ *  Utilities for testing modules.
  */
 
 /*
@@ -28,21 +28,28 @@
  *
  */
 
-#define PSYNTH_MODULE_NAME "psynth.io.async"
+#ifndef PSYNTH_TEST_UTIL_H_
+#define PSYNTH_TEST_UTIL_H_
 
-#include "async_base.hpp"
+#include <psynth/base/logger.hpp>
 
 namespace psynth
 {
-namespace io
+namespace test
 {
 
-PSYNTH_DEFINE_ERROR (async_error);
-PSYNTH_DEFINE_ERROR_WHAT (async_not_running_error,
-                          "Asynchronous I/O device is not running.");
-PSYNTH_DEFINE_ERROR_WHAT (async_not_idle_error,
-                          "Asynchronous I/O device is not idle.");
+class std_logger_fixture
+{
+public:
+    std_logger_fixture ();
+    ~std_logger_fixture ();
 
+private:
+    base::log_sink_ptr _sink;
+};
 
-} /* namespace io */
+} /* namespace test */
 } /* namespace psynth */
+
+#endif /* PSYNTH_TEST_UTIL_H_ */
+

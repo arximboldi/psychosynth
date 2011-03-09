@@ -1,11 +1,11 @@
 /**
- *  Time-stamp:  <2011-03-09 14:28:16 raskolnikov>
+ *  Time-stamp:  <2011-03-09 17:18:40 raskolnikov>
  *
- *  @file        async_base.cpp
+ *  @file        util.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
- *  @date        Fri Mar  4 17:51:08 2011
+ *  @date        Wed Mar  9 16:11:32 2011
  *
- *  Asynchronous infrastructure implementation.
+ *  Implementation of testing utilities.
  */
 
 /*
@@ -28,21 +28,40 @@
  *
  */
 
-#define PSYNTH_MODULE_NAME "psynth.io.async"
-
-#include "async_base.hpp"
+#include "util.hpp"
 
 namespace psynth
 {
-namespace io
+namespace test
 {
 
-PSYNTH_DEFINE_ERROR (async_error);
-PSYNTH_DEFINE_ERROR_WHAT (async_not_running_error,
-                          "Asynchronous I/O device is not running.");
-PSYNTH_DEFINE_ERROR_WHAT (async_not_idle_error,
-                          "Asynchronous I/O device is not idle.");
+namespace
+{
 
+/*
+ * HACK: When a test aborts because of a signal, the logger remains
+ * in the global variable as the destructor of the fixture never gets
+ * called. This kind of fixes it.
+ */
+int std_logger_count = 0;
 
-} /* namespace io */
+} /* anonymous namespace */
+
+std_logger_fixture::std_logger_fixture ()
+{
+    if (std_logger_count == 0)
+    {
+        _sink = base::new_log_std_sink ();
+        base::logger::self ().add_sink (_sink);
+        ++std_logger_count;
+    }
+}
+
+std_logger_fixture::~std_logger_fixture ()
+{
+    base::logger::self ().del_sink (_sink);
+    --std_logger_count;
+}
+
+} /* namespace test */
 } /* namespace psynth */

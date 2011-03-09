@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-09 01:20:21 raskolnikov>
+ *  Time-stamp:  <2011-03-09 18:49:58 raskolnikov>
  *
  *  @file        jack_raw_output.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -59,8 +59,8 @@ public:
     void start ();
     void stop ();
     
-    std::size_t put_i (void*  data, std::size_t frames);
-    std::size_t put_n (void** data, std::size_t frames);
+    std::size_t put_i (const void*        data, std::size_t frames);
+    std::size_t put_n (const void* const* data, std::size_t frames);
 
     std::size_t buffer_size () const
     { return _buffer_size; }

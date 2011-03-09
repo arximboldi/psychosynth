@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-05 17:41:07 raskolnikov>
+ *  Time-stamp:  <2011-03-09 17:47:57 raskolnikov>
  *
  *  @file        thread_async.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -39,6 +39,7 @@ void thread_async::start ()
 {
     check_idle ();
     _thread = std::thread (std::bind (&thread_async::run, this));
+    set_state (async_state::running);
 }
 
 void thread_async::stop ()

@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-09 00:46:11 raskolnikov>
+ *  Time-stamp:  <2011-03-09 18:50:36 raskolnikov>
  *
  *  @file        alsa_raw_output.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -46,8 +46,11 @@ PSYNTH_DEFINE_ERROR_WHAT (alsa_param_error, "Invalid parameter.");
 #define PSYNTH_ALSA_CHECK(fun, except)                                  \
     do {                                                                \
         int err = fun;                                                  \
-        if (err < 0)                                                    \
-            PSYNTH_LOG << base::log::warning << snd_strerror (err);     \
+        if (err < 0) {                                                  \
+            PSYNTH_LOG << base::log::warning << "ALSA error:"           \
+                       << snd_strerror (err);                           \
+            throw except ();                                            \
+        }                                                               \
     } while (0)
 
 alsa_raw_output::alsa_raw_output (const char*       device,
@@ -56,19 +59,19 @@ alsa_raw_output::alsa_raw_output (const char*       device,
                                   snd_pcm_access_t  access,
                                   unsigned int      rate,
                                   unsigned int      channels)
+ : _buffer_size (buffer_size)
 {
 
     PSYNTH_ALSA_CHECK (snd_pcm_open (&_handle, device,
                                      SND_PCM_STREAM_PLAYBACK, 0),
                        alsa_open_error);
     auto grd_handle = base::make_guard ([&] { snd_pcm_close (_handle); });
-    
+
     PSYNTH_ALSA_CHECK (snd_pcm_hw_params_malloc (&_hw_params),
                        alsa_param_error);
     auto grd_hw_params = base::make_guard (
         [&] { snd_pcm_hw_params_free (_hw_params); });
 
-    
     PSYNTH_ALSA_CHECK (snd_pcm_hw_params_any (_handle, _hw_params),
                        alsa_param_error);
 
@@ -79,22 +82,32 @@ alsa_raw_output::alsa_raw_output (const char*       device,
     PSYNTH_ALSA_CHECK (snd_pcm_hw_params_set_format (
                            _handle, _hw_params, format),
                        alsa_param_error);
-    
-    PSYNTH_ALSA_CHECK (snd_pcm_hw_params_set_rate (
-                           _handle, _hw_params, rate, 0),
+
+    unsigned int actual_rate = rate;
+    PSYNTH_ALSA_CHECK (snd_pcm_hw_params_set_rate_near (
+                           _handle, _hw_params, &actual_rate, 0),
                        alsa_param_error);
-    
+    if (actual_rate != rate)
+        PSYNTH_LOG << base::log::warning
+                   << "ALSA does not like the selected frame rate and instead "
+                   << "it chose: " << actual_rate;
+
     PSYNTH_ALSA_CHECK (snd_pcm_hw_params_set_channels (
                            _handle, _hw_params, channels),
                        alsa_param_error);
 
-    PSYNTH_ALSA_CHECK (snd_pcm_hw_params_set_buffer_size (
-                           _handle, _hw_params, buffer_size),
+    PSYNTH_ALSA_CHECK (snd_pcm_hw_params_set_buffer_size_min (
+                           _handle, _hw_params, &_buffer_size),
                        alsa_param_error);
+
+    if (_buffer_size != buffer_size)
+        PSYNTH_LOG << base::log::warning
+                   << "ALSA could not set the requested buffer size. "
+                   << "Actual buffer size is: " << _buffer_size;
     
     PSYNTH_ALSA_CHECK (snd_pcm_hw_params (_handle, _hw_params),
                        alsa_param_error);
-		
+
     PSYNTH_ALSA_CHECK (snd_pcm_sw_params_malloc (&_sw_params),
                        alsa_param_error);
 
@@ -129,7 +142,7 @@ alsa_raw_output::~alsa_raw_output ()
     snd_pcm_sw_params_free (_sw_params);
 }
 
-std::size_t alsa_raw_output::put_i (void*  data, std::size_t frames)
+std::size_t alsa_raw_output::put_i (const void*  data, std::size_t frames)
 {
     snd_pcm_sframes_t res = snd_pcm_writei (_handle, data, frames);
 
@@ -142,9 +155,10 @@ std::size_t alsa_raw_output::put_i (void*  data, std::size_t frames)
     return res;
 }
 
-std::size_t alsa_raw_output::put_n (void** data, std::size_t frames)
+std::size_t alsa_raw_output::put_n (const void* const* data, std::size_t frames)
 {
-    snd_pcm_sframes_t res = snd_pcm_writen (_handle, data, frames);
+    snd_pcm_sframes_t res = snd_pcm_writen (
+        _handle, const_cast<void**>(data), frames);
 
     if (res < 0)
     {

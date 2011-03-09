@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-07 19:15:49 raskolnikov>
+ *  Time-stamp:  <2011-03-09 14:42:41 raskolnikov>
  *
  *  @file        alsa_output.tpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -38,6 +38,8 @@ namespace psynth
 namespace io
 {
 
+namespace mpl = boost::mpl;
+
 namespace detail
 {
 
@@ -62,30 +64,34 @@ PSYNTH_DECLARE_ALSA_FORMAT (sound::bits32sf, SND_PCM_FORMAT_FLOAT);
 
 template <typename Range>
 struct alsa_access : public mpl::if_<
-    sound::is_planar<Range>::type,
+    typename sound::is_planar<Range>::type,
     alsa_access_c<SND_PCM_ACCESS_RW_NONINTERLEAVED>,
-    alsa_access_c<SND_PCM_ACCESS_RW_INTERLEAVED> >;
+    alsa_access_c<SND_PCM_ACCESS_RW_INTERLEAVED> >
+{};
 
 } /* namespace detail */
 
 template <typename Range>
 struct alsa_support
 {
-    typedef detail::alsa_format<sound::sample_type<Range>::type>::type format;
-    typedef detail::alsa_access<Range>::type access;
-    typedef sound::num_samples<Range>::type channels;
+    typedef typename detail::alsa_format<
+        typename sound::sample_type<Range>::type>::type format;
+    typedef typename detail::alsa_access<Range>::type access;
+    typedef typename sound::num_samples<Range>::type channels;
 
-    typedef mpl::not_<
-        mpl::eq_<detail::alsa_format_c<SND_PCM_FORMAT_UNKNOWN>,
-                 format> >::type
+    typedef typename mpl::not_<
+        mpl::equal_to<detail::alsa_format_c<SND_PCM_FORMAT_UNKNOWN>,
+                      format> >::type
     is_supported;
 };
 
 template <typename Range>
 alsa_output<Range>::alsa_output (const std::string& device,
                                  std::size_t        buffer_size,
-                                 std::size_t        rate)
-    : alsa_raw_output (device.c_str (),
+                                 std::size_t        rate,
+                                 callback_type      cb)
+    : async_base (cb)
+    , alsa_raw_output (device.c_str (),
                        alsa_support<Range>::format::value,
                        buffer_size,
                        alsa_support<Range>::access::value,

@@ -1,11 +1,11 @@
 /**
- *  Time-stamp:  <2011-03-09 14:28:16 raskolnikov>
+ *  Time-stamp:  <2011-03-09 13:29:44 raskolnikov>
  *
- *  @file        async_base.cpp
+ *  @file        input.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
- *  @date        Fri Mar  4 17:51:08 2011
+ *  @date        Wed Mar  9 13:22:48 2011
  *
- *  Asynchronous infrastructure implementation.
+ *  Input base class translation unit.
  */
 
 /*
@@ -28,21 +28,25 @@
  *
  */
 
-#define PSYNTH_MODULE_NAME "psynth.io.async"
+#define PSYNTH_MODULE_NAME "psynth.io.input"
 
-#include "async_base.hpp"
+#include "base/logger.hpp"
+#include "input.hpp"
 
 namespace psynth
 {
 namespace io
 {
 
-PSYNTH_DEFINE_ERROR (async_error);
-PSYNTH_DEFINE_ERROR_WHAT (async_not_running_error,
-                          "Asynchronous I/O device is not running.");
-PSYNTH_DEFINE_ERROR_WHAT (async_not_idle_error,
-                          "Asynchronous I/O device is not idle.");
+namespace detail
+{
 
+void dummy_input_take_impl ()
+{
+    PSYNTH_LOG_DEBUG << "dummy_input::take";
+}
+
+} /* namespace detail */
 
 } /* namespace io */
 } /* namespace psynth */

@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-09 01:35:26 raskolnikov>
+ *  Time-stamp:  <2011-03-09 20:15:08 raskolnikov>
  *
  *  @file        jack_raw_output.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -78,8 +78,8 @@ jack_raw_output::jack_raw_output (const char* client,
     jack_set_error_function (log_jack_error);
     jack_set_info_function (log_jack_info);
     
-    jack_options_t options = server ? JackNullOption : JackServerName; 
-    _client = jack_client_open (server, options, 0, server);
+    jack_options_t options = !server ? JackNullOption : JackServerName; 
+    _client = jack_client_open (client, options, 0, server);
     if (!_client) throw jack_open_error ();
 
     auto grd_client = base::make_guard ([&] { jack_client_close (_client); });
@@ -99,6 +99,11 @@ jack_raw_output::jack_raw_output (const char* client,
             << base::log::warning
             << "Jackd sample rate and application sample rate mismatch."
             << "Better sound quality is achieved if both are the same.";
+
+
+    _buffer_size = jack_get_buffer_size (_client);
+    PSYNTH_LOG << base::log::info
+               << "Jackd buffer size is: " << _buffer_size;
     
     for (size_t i = 0; i < _out_ports.size(); ++i)
     {
@@ -123,19 +128,24 @@ jack_raw_output::~jack_raw_output ()
         jack_client_close (_client);
 }
 
-std::size_t jack_raw_output::put_i (void* data, std::size_t frames)
+std::size_t jack_raw_output::put_i (const void* data, std::size_t frames)
 {
-    /* TODO: error check in different way? */
+    assert (false);
     return 0;
 }
 
-std::size_t jack_raw_output::put_n (void** data, std::size_t frames)
+std::size_t jack_raw_output::put_n (const void* const* data, std::size_t frames)
 {
+    assert (get_state () == async_state::running); // Non-asynchronous
+                                                   // IO only
+    
     for (size_t i = 0; i < _out_ports.size(); ++i)
     {
 	const auto out   = jack_port_get_buffer (_out_ports [i], frames);
         const auto bytes = sizeof (jack_default_audio_sample_t) * frames;
-        std::memcpy (out, *data++, bytes);
+        const auto src   = *data++;
+
+        std::memcpy (out, src, bytes);
     }
     return frames;
 }
@@ -143,14 +153,21 @@ std::size_t jack_raw_output::put_n (void** data, std::size_t frames)
 void jack_raw_output::start ()
 {
     check_idle ();
+
     jack_activate (_client);
+    auto grd_activate = base::make_guard ([&] { jack_deactivate (_client); });
+
     connect_ports ();
+    
+    grd_activate.dismiss ();
+    set_state (async_state::running);
 }
 
 void jack_raw_output::stop ()
 {
     check_running ();
     jack_deactivate (_client);
+    set_state (async_state::idle);
 }
 
 void jack_raw_output::connect_ports ()

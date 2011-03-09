@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-08 23:35:09 raskolnikov>
+ *  Time-stamp:  <2011-03-09 17:40:29 raskolnikov>
  *
  *  @file        async_base.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -54,7 +54,10 @@ class async_base
 public:
     typedef std::function<void (std::size_t)> callback_type;
 
-    async_base () : _state (async_state::idle) {}
+    async_base (callback_type cb = callback_type ())
+        : _state (async_state::idle)
+        , _callback (cb)
+    {}
     
     virtual ~async_base () {}
     
@@ -80,18 +83,19 @@ public:
 
     void check_running ()
     {
-        if (_state != async_state::idle)
+        if (_state != async_state::running)
             throw async_not_running_error ();
     }
 
     void check_idle ()
     {
-        if (_state != async_state::running)
+        if (_state != async_state::idle)
             throw async_not_idle_error ();
     }
 
     void set_callback (callback_type cb)
     {
+        check_idle ();
         _callback = cb;
     }
     

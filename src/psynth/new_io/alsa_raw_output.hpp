@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-09 00:44:19 raskolnikov>
+ *  Time-stamp:  <2011-03-09 18:50:17 raskolnikov>
  *
  *  @file        alsa_raw_output.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -58,8 +58,8 @@ public:
     
     ~alsa_raw_output ();
 
-    std::size_t put_i (void*  data, std::size_t frames);
-    std::size_t put_n (void** data, std::size_t frames);
+    std::size_t put_i (const void*        data, std::size_t frames);
+    std::size_t put_n (const void* const* data, std::size_t frames);
 
     std::size_t buffer_size () const
     { return _buffer_size; }

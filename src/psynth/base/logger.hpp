@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-09 00:09:12 raskolnikov>
+ *  Time-stamp:  <2011-03-09 17:07:02 raskolnikov>
  *
  *  @file        logger.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -78,7 +78,6 @@ private:
 
     template <typename T>
     friend log_stream_adapter& operator<< (log_stream_adapter&, const T&);
-    template <typename T>
     friend log_stream_adapter& operator<< (
 	log_stream_adapter&, log_stream_adapter&(*)(log_stream_adapter&));
 };
@@ -212,21 +211,13 @@ public:
      * Attachs a sink to this node.
      * @param d The sink that we want to dump this log's messages.
      */
-    void add_sink (log_sink_ptr d)
-    {
-	lock lock (this);
-	_dumpers.push_back (d);
-    }
-
+    void add_sink (log_sink_ptr d);
+        
     /**
      * Dettachs a sink from this node.
      * @param d The sink we don't want to dump massages of this log anymore.
      */
-    void del_sink (log_sink_ptr d)
-    {
-	lock lock (this);
-	_dumpers.remove (d);
-    }
+    void del_sink (log_sink_ptr d);
 
     /**
      * Logs a message in a child of this node and all its parents.
@@ -387,6 +378,7 @@ private:
 void log_stream_adapter::flush ()
 {
     _log (_level, _str.str ());
+    _str.str ("");
 }
 
 inline
@@ -401,6 +393,13 @@ log_stream_adapter& operator<< (log_stream_adapter& s, const T& x)
 {
     s._str << x;
     return s;
+}
+
+inline log_stream_adapter& operator<< (
+    log_stream_adapter& stm,
+    log_stream_adapter&(*func)(log_stream_adapter&))
+{
+    return func (stm);
 }
 
 log_stream_adapter::log_stream_adapter (log& l)

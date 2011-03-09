@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-07 19:15:26 raskolnikov>
+ *  Time-stamp:  <2011-03-09 18:22:51 raskolnikov>
  *
  *  @file        oss_output.tpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -31,6 +31,9 @@
 #ifndef PSYNTH_IO_OSS_OUTPUT_TPP_
 #define PSYNTH_IO_OSS_OUTPUT_TPP_
 
+#include <sys/soundcard.h>
+
+#include <boost/mpl/int.hpp>
 #include <psynth/new_io/oss_output.hpp>
 
 namespace psynth
@@ -38,44 +41,58 @@ namespace psynth
 namespace io
 {
 
+namespace mpl = boost::mpl;
+
 namespace detail
 {
 
+/**
+ * @todo It seems that we should use AFMT_UNDEF for the "error"
+ * format, but sadly it is not working. We thus use this obsolete
+ * format that we won't want to use in the real world anyway.
+ */
+#define PSYNTH_OSS_UNDEF AFMT_S8
+
 template <typename Sample>
-struct oss_format : public mpl::int_c<AFMT_UNDEF> {};
+struct oss_format : public mpl::int_<PSYNTH_OSS_UNDEF> {};
 
 #define PSYNTH_DECLARE_OSS_FORMAT(pfmt, afmt) \
-    template <> struct oss_format<pfmt> : public int_c<afmt> {};
+    template <> struct oss_format<pfmt> : public mpl::int_<afmt> {};
 
 PSYNTH_DECLARE_OSS_FORMAT (sound::bits8,    AFMT_U8);
-PSYNTH_DECLARE_OSS_FORMAT (sound::bits8s,   AFMT_S8);
-PSYNTH_DECLARE_OSS_FORMAT (sound::bits16,   AFMT_U16_NE);
+//PSYNTH_DECLARE_OSS_FORMAT (sound::bits8s,   AFMT_S8);
+//PSYNTH_DECLARE_OSS_FORMAT (sound::bits16,   AFMT_U16_NE);
 PSYNTH_DECLARE_OSS_FORMAT (sound::bits16s,  AFMT_S16_NE);
-PSYNTH_DECLARE_OSS_FORMAT (sound::bits32,   AFMT_U32_NE);
-PSYNTH_DECLARE_OSS_FORMAT (sound::bits32s,  AFMT_S32_NE);
-PSYNTH_DECLARE_OSS_FORMAT (sound::bits32sf, AFMT_FLOAT);
+//PSYNTH_DECLARE_OSS_FORMAT (sound::bits32,   AFMT_U32_NE);
+//PSYNTH_DECLARE_OSS_FORMAT (sound::bits32s,  AFMT_S32_NE);
+//PSYNTH_DECLARE_OSS_FORMAT (sound::bits32sf, AFMT_FLOAT);
 
 } /* namespace detail */
 
 template <typename Range>
 struct oss_support
 {
-    typedef detail::oss_format<sound::sample_type<Range> >::type format;
-    typedef sound::is_planar<Range>::type is_planar;
-    typedef sound::num_samples<Range>::type channels;
+    typedef typename detail::oss_format<
+        typename sound::sample_type<Range>::type >::type format;
+    typedef typename sound::is_planar<Range>::type is_planar;
+    typedef typename sound::num_samples<Range>::type channels;
     
-    typedef mpl::and_<mpl::not_<mpl::eq_<mpl::int_c<AFMT_UNDEF>, format> >,
-                      is_planar>::type
+    typedef typename mpl::and_<mpl::not_<
+                                   mpl::equal_to<mpl::int_<PSYNTH_OSS_UNDEF>,
+                                                 format> >,
+                               mpl::not_<is_planar> >::type
     is_supported;
 };
 
 template <typename Range>
 oss_output<Range>::oss_output (const std::string& device,
                                std::size_t        buffer_size,
-                               std::size_t        rate)
-    : oss_raw_output (device.c_str (),
+                               std::size_t        rate,
+                               callback_type      cb)
+    : async_base (cb)
+    , oss_raw_output (device.c_str (),
                       oss_support<Range>::format::value,
-                      sizeof (sound::sample_type<Range>::type),
+                      sizeof (typename sound::sample_type<Range>::type),
                       buffer_size,
                       !oss_support<Range>::is_planar::value,
                       rate,

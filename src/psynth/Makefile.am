@@ -130,7 +130,9 @@ nobase_libpsynthinc_HEADERS = \
 	new_io/file_common.hpp \
 	new_io/file_common.tpp \
 	new_io/input.hpp \
+	new_io/input.tpp \
 	new_io/output.hpp \
+	new_io/output.tpp \
 	new_io/thread_async.hpp \
 	version.hpp
 
@@ -185,6 +187,8 @@ libpsynth_la_SOURCES = \
 	io/file_reader_fetcher.cpp \
 	new_io/exception.cpp \
 	new_io/async_base.cpp \
+	new_io/input.cpp \
+	new_io/output.cpp \
 	new_io/file_common.cpp \
 	new_io/thread_async.cpp
 

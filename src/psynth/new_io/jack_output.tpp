@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-07 19:15:17 raskolnikov>
+ *  Time-stamp:  <2011-03-09 19:23:19 raskolnikov>
  *
  *  @file        jack_output.tpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -31,6 +31,8 @@
 #ifndef PSYNTH_IO_JACK_OUTPUT_TPP_
 #define PSYNTH_IO_JACK_OUTPUT_TPP_
 
+#include <boost/type_traits.hpp>
+#include <boost/mpl/if.hpp>
 #include <psynth/new_io/jack_output.hpp>
 
 namespace psynth
@@ -41,17 +43,20 @@ namespace io
 template <typename Range>
 struct jack_support
 {
-    typedef sound::num_samples<Range>::type channels;    
-    typedef mpl::and_<mpl::eq_<sound::sample_type<Range>, sound::bits32sf>,
-                      sound::is_planar<Range>::type>::type
+    typedef typename sound::num_samples<Range>::type channels;    
+    typedef typename mpl::and_<
+        boost::is_same<typename sound::sample_type<Range>::type, sound::bits32sf>,
+        typename sound::is_planar<Range> >::type
     is_supported;
 };
 
 template <typename Range>
 jack_output<Range>::jack_output (const std::string& client,
                                  const std::string& server,
-                                 std::size_t        rate)
-    : jack_raw_output (client.c_str (),
+                                 std::size_t        rate,
+                                 callback_type      cb)
+    : async_base (cb)
+    , jack_raw_output (client.c_str (),
                        server.c_str (),
                        rate,
                        jack_support<Range>::channels::value)
@@ -60,8 +65,10 @@ jack_output<Range>::jack_output (const std::string& client,
 
 template <typename Range>
 jack_output<Range>::jack_output (const std::string& client,
-                                 std::size_t        rate)
-    : jack_raw_output (client.c_str (),
+                                 std::size_t        rate,
+                                 callback_type      cb)
+    : async_base (cb)
+    , jack_raw_output (client.c_str (),
                        0,
                        rate,
                        jack_support<Range>::channels::value)
