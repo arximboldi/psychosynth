@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-03 01:08:44 raskolnikov>
+ *  Time-stamp:  <2011-03-08 22:37:32 raskolnikov>
  *
  *  @file        arg_parser_test.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -43,11 +43,11 @@ static const int   argc_1 = 7;
 
 static const char* argv_2 []  =
 {"cmd", "-t", "-anb", "1", "2"};
-static const int   argc_2 = 6;
+static const int   argc_2 = 5;
 
 static const char* argv_3 []  =
 {"cmd", "-t", "-anb", "1", "2", "-t"};
-static const int   argc_3 = 7;
+static const int   argc_3 = 6;
 
 
 BOOST_AUTO_TEST_SUITE (arg_parser_test_suite)
@@ -83,7 +83,8 @@ BOOST_AUTO_TEST_CASE (arg_paser_test_1)
     p.add ('b', "bold", &arg_float);
     p.add ('c', "cold", &arg_int);
 
-    BOOST_CHECK_THROW (p.parse (argc_0, argv_0), psynth::base::arg_parser_error);
+    BOOST_CHECK_THROW (p.parse (argc_0, argv_0),
+                       psynth::base::arg_parser_error);
 
     BOOST_CHECK_NO_THROW (p.parse (argc_1, argv_1));
     BOOST_CHECK_EQUAL (p.has_free_args (), true);

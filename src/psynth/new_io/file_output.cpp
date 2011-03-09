@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-08 17:06:12 raskolnikov>
+ *  Time-stamp:  <2011-03-09 01:50:43 raskolnikov>
  *
  *  @file        wave_raw_output.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -65,7 +65,7 @@ file_output_put_impl (SNDFILE* file, sound::bits32s* ptr, std::size_t frames)
 std::size_t
 file_output_put_impl (SNDFILE* file, sound::bits32sf* ptr, std::size_t frames)
 {
-    return sf_writef_float (file, ptr, frames);
+    return sf_writef_float (file, reinterpret_cast<float*>(ptr), frames);
 }
 
 } /* namespace detail */

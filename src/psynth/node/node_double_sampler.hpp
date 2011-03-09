@@ -80,7 +80,7 @@ private:
     std::string m_param_file_one;
     std::string m_param_file_two;
     
-    boost::mutex m_update_mutex;
+    std::mutex m_update_mutex;
     
     void on_file_one_change (node_param& par);
     void on_file_two_change (node_param& par);

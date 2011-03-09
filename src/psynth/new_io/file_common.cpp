@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-08 17:47:40 raskolnikov>
+ *  Time-stamp:  <2011-03-09 00:11:16 raskolnikov>
  *
  *  @file        file_common.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -30,6 +30,7 @@
 
 #define PSYNTH_MODULE_NAME "psynth.io.file"
 
+#include "base/logger.hpp"
 #include "file_common.hpp"
 
 namespace psynth
@@ -63,12 +64,14 @@ int sndfile_seek_dir [] =
 
 } /* anonymous namespace */
 
+
 namespace detail
 {
 
-int file_format_impl (file_format format, int sample_format)
+int file_format_impl (file_fmt format, int sample_format)
 {
-    return sndfile_format [format] | sample_format | SF_ENDIAN_FILE;
+    return sndfile_format [static_cast<int> (format)] |
+        sample_format | SF_ENDIAN_FILE;
 }
 
 SNDFILE* file_open_impl (const char* fname, int mode, SF_INFO* info)
@@ -77,10 +80,10 @@ SNDFILE* file_open_impl (const char* fname, int mode, SF_INFO* info)
 
     if (file == 0)
     {
-        PSYNTH_LOG << log::warning
+        PSYNTH_LOG << base::log::warning
                    << "Problem while opening audio file for writing: "
                    << sf_strerror (file);
-        throw file_open_error;
+        throw file_open_error ();
     }
     
     return file;
@@ -88,14 +91,15 @@ SNDFILE* file_open_impl (const char* fname, int mode, SF_INFO* info)
 
 std::size_t file_seek_impl (SNDFILE* file, std::ptrdiff_t offset, seek_dir dir)
 {
-    sf_count_t res = sf_seek (file, offset, sndfile_seek_dir [dir]);
+    sf_count_t res = sf_seek (file, offset,
+                              sndfile_seek_dir [static_cast<int> (dir)]);
 
     if (res < 0)
     {
-        PSYNTH_LOG << log::warning
+        PSYNTH_LOG << base::log::warning
                    << "Error while seeking audio file: "
                    << sf_strerror (file);
-        throw file_seek_error;
+        throw file_seek_error ();
     }
     
     return res;
@@ -105,6 +109,8 @@ void file_close_impl (SNDFILE* file)
 {
     sf_close (file);
 }
+
+} /* namespace detail */
 
 } /* namespace io */
 } /* namespace psynth */

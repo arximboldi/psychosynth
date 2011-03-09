@@ -29,8 +29,7 @@
 #include <set>
 #include <iostream>
 #include <algorithm>
-
-#include <boost/thread/mutex.hpp>
+#include <thread>
 
 #include <psynth/synth/sample_buffer.hpp>
 #include <psynth/synth/audio_buffer.hpp>
@@ -207,7 +206,7 @@ private:
     bool m_updated;
     bool m_single_update;
     
-    boost::mutex m_paramlock;
+    std::mutex m_paramlock;
 
     void blend_buffer (sample* buf, int n_elem,
 		       sample stable_value, envelope_simple env);

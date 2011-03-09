@@ -1,13 +1,16 @@
 /**
- *  Time-stamp:  <2010-11-09 13:20:40 raskolnikov>
+ *  Time-stamp:  <2011-03-08 23:50:42 raskolnikov>
  *
  *  @file        concept.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
  *  @date        Wed Oct 20 20:01:23 2010
  *
  *  Concepts of the sound library.
+ *
  *  @todo Buffer Views are, actually, a range. We have boost
  *  range. Should we use that instead of this confusing thing?
+ *
+ *  @todo Add unit tests that do declare this.
  */
 
 /*
@@ -42,10 +45,12 @@
 #define PSYNTH_SOUND_CONCEPT_H
 
 #include <psynth/base/concept.hpp>
+#include <psynth/sound/forwards.hpp>
 
 /**
  * @todo Why add_reference in std is not working? GCC bug?
  */
+
 #include <type_traits>
 #include <boost/type_traits.hpp>
 #include <functional>
@@ -58,99 +63,6 @@ namespace psynth
 {
 namespace sound
 {
-
-template <typename T> struct dynamic_step_type;
-
-template <typename T> struct sample_traits;
-template <typename P> struct is_frame;
-template <typename dstT, typename srcT>
-
-typename sample_traits<dstT>::value_type sample_convert (const srcT& val);
-
-template <typename ChannelBase, int K> struct
-kth_element_type;
-template <typename ChannelBase, int K> struct
-kth_element_reference_type;
-template <typename ChannelBase, int K> struct
-kth_element_const_reference_type;
-template <typename ChannelBase, int K>
-struct kth_semantic_element_reference_type;
-template <typename ChannelBase, int K>
-struct kth_semantic_element_const_reference_type;
-
-template <typename ChannelBase> struct size;
-template <typename ChannelBase> struct element_type;
-template <typename T> struct sample_type;
-template <typename T> struct channel_space_type;
-template <typename T> struct sample_mapping_type;
-template <typename T> struct is_planar;
-template <typename T> struct num_samples;
-
-template <typename It> struct const_iterator_type;
-template <typename It> struct iterator_is_mutable;
-template <typename It> struct is_iterator_adaptor;
-template <typename It, typename NewBaseIt> struct iterator_adaptor_rebind;
-template <typename It> struct iterator_adaptor_get_base;
-
-/* forward-declare at_c */
-namespace detail
-{
-
-template <typename Element, typename Layout, int K>
-struct homogeneous_channel_base;
-
-} /* namespace detail */
-
-template <int K, typename E, typename L, int N>
-typename boost::add_reference<E>::type at_c (
-    detail::homogeneous_channel_base<E,L,N>& p);
-
-template <int K, typename E, typename L, int N>
-typename boost::add_reference<typename boost::add_const<E>::type>::type at_c (
-    const detail::homogeneous_channel_base<E,L,N>& p);
-
-#if !defined(_MSC_VER)  || _MSC_VER > 1310
-template <typename P, typename C, typename L> struct packed_frame;
-template <int K, typename P, typename C, typename L>
-typename kth_element_reference_type<packed_frame<P,C,L>, K>::type 
-at_c (packed_frame<P,C,L>& p);
-
-template <int K, typename P, typename C, typename L>
-typename kth_element_const_reference_type<packed_frame<P,C,L>,K>::type 
-at_c (const packed_frame<P,C,L>& p);
-
-template <typename B, typename C, typename L, bool M>
-struct bit_aligned_frame_reference;
-
-template <int K, typename B, typename C, typename L, bool M> inline
-typename kth_element_reference_type<
-    bit_aligned_frame_reference<B,C,L,M>, K>::type
-at_c(const bit_aligned_frame_reference<B,C,L,M>& p);
-#endif
-
-/* Forward-declare semantic_at_c */
-template <int K, typename ChannelBase>
-typename boost::disable_if<
-    boost::is_const<ChannelBase>,
-    typename kth_semantic_element_reference_type<ChannelBase,K>::type>::type
-semantic_at_c (ChannelBase& p);
-
-template <int K, typename ChannelBase>
-typename kth_semantic_element_const_reference_type<ChannelBase,K>::type
-semantic_at_c(const ChannelBase& p);
-
-namespace detail
-{
-
-template <typename T>
-void initialize_it (T& x) {}
-
-} /* namespace detail */
-
-template <typename T>
-struct remove_const_and_reference :
-	public boost::remove_const<typename boost::remove_reference<T>::type> {};
-
 
 /*
  *

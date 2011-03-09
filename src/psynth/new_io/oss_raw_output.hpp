@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-07 19:19:43 raskolnikov>
+ *  Time-stamp:  <2011-03-09 01:12:41 raskolnikov>
  *
  *  @file        oss_raw_output.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -31,6 +31,7 @@
 #ifndef PSYNTH_IO_OSS_RAW_OUTPUT_H_
 #define PSYNTH_IO_OSS_RAW_OUTPUT_H_
 
+#include <psynth/new_io/exception.hpp>
 #include <psynth/new_io/thread_async.hpp>
 
 namespace psynth
@@ -38,7 +39,7 @@ namespace psynth
 namespace io
 {
 
-PSYNTH_DELCARE_ERROR (error, oss_error);
+PSYNTH_DECLARE_ERROR (error, oss_error);
 PSYNTH_DECLARE_ERROR (oss_error, oss_open_error);
 PSYNTH_DECLARE_ERROR (oss_error, oss_param_error);
 

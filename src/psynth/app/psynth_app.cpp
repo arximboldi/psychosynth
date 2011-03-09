@@ -165,7 +165,7 @@ int psynth_app::run (int argc, const char* argv[])
 #ifdef PSYNTH_HAVE_XML
 	    conf.set_backend (
 		base::new_conf_backend_xml (
-		    (get_config_path () / "psychosynth.xml").file_string ()));
+		    (get_config_path () / "psychosynth.xml").native ()));
 #endif
 	    conf.def_load();
 	} catch (psynth::base::exception& error) {

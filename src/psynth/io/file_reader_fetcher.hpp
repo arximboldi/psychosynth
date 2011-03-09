@@ -23,9 +23,10 @@
 #ifndef PSYNTH_FILEREADERFETCHER_H
 #define PSYNTH_FILEREADERFETCHER_H
 
-#include <boost/thread/thread.hpp>
-#include <boost/thread/mutex.hpp>
-#include <boost/bind.hpp>
+#include <thread>
+#include <mutex>
+#include <condition_variable>
+#include <functional>
 
 #include <psynth/io/file_reader.hpp>
 #include <psynth/synth/ring_audio_buffer.hpp>
@@ -52,10 +53,10 @@ class file_reader_fetcher : public file_reader
 
     bool m_finished;
 
-    boost::thread m_thread;
-    boost::mutex m_reader_mutex;
-    boost::mutex m_buffer_mutex;
-    boost::condition_variable m_cond;
+    std::thread m_thread;
+    std::mutex m_reader_mutex;
+    std::mutex m_buffer_mutex;
+    std::condition_variable m_cond;
 
     void run ();
 
@@ -69,8 +70,8 @@ public:
 			size_t threshold  = DEFAULT_THRESHOLD);
 
     void start () {
-	if (m_thread.get_id () == boost::thread::id ())
-	    m_thread = boost::thread (boost::bind (&file_reader_fetcher::run, this));
+	if (m_thread.get_id () == std::thread::id ())
+	    m_thread = std::thread (std::bind (&file_reader_fetcher::run, this));
     }
     
     void set_file_reader (file_reader* reader) {

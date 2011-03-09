@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-08 17:48:44 raskolnikov>
+ *  Time-stamp:  <2011-03-09 00:04:06 raskolnikov>
  *
  *  @file        file_common.tpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -34,22 +34,31 @@
 #ifndef PSYNTH_IO_FILE_COMMON_TPP_
 #define PSYNTH_IO_FILE_COMMON_TPP_
 
-#include <sndfile.h>
+#include <boost/mpl/int.hpp>
+
+#include <psynth/version.hpp>
+#include <psynth/sound/sample.hpp>
 #include <psynth/new_io/file_common.hpp>
+
+#ifdef PSYNTH_HAVE_PCM
+
+#include <sndfile.h>
 
 namespace psynth
 {
 namespace io
 {
 
+namespace mpl = boost::mpl;
+
 namespace detail
 {
 
 template <class Sample>
-struct file_format : public  mpl::int_c<SF_FORMAT_ENDMASK> {};
+struct file_format : public mpl::int_<SF_FORMAT_ENDMASK> {};
 
 #define PSYNTH_DECLARE_FILE_FORMAT(pfmt, afmt)                          \
-    template <> struct file_format<pfmt> : public mpl::int_c<afmt> {};
+    template <> struct file_format<pfmt> : public mpl::int_<afmt> {};
 
 // TODO: The sndfile library supports 8 bits but not in its API.
 // Because want to do the format conversion ourselves this ain't
@@ -59,18 +68,18 @@ struct file_format : public  mpl::int_c<SF_FORMAT_ENDMASK> {};
 
 PSYNTH_DECLARE_FILE_FORMAT (sound::bits16s,  SF_FORMAT_PCM_16);
 PSYNTH_DECLARE_FILE_FORMAT (sound::bits32s,  SF_FORMAT_PCM_32);
-PSYNTH_DECLARE_FILE_FORMAT (sound::bits32sf, SF_FORMAT_PCM_FLOAT);
+PSYNTH_DECLARE_FILE_FORMAT (sound::bits32sf, SF_FORMAT_FLOAT);
 
 } /* namespace detail */
 
 template <class Range>
 struct file_support
 {
-    typename typename sound::sample_type<Range>::type format;
+    typedef typename sound::sample_type<Range>::type format;
     
-    typename mpl::and_<
-        mpl::equal_to<format, mpl::int_c<SF_FORMAT_ENDMASK> >,
-        mpl::not_<typename sound::is_planar<Range>::type>::type
+    typedef typename mpl::and_<
+        mpl::equal_to<format, mpl::int_<SF_FORMAT_ENDMASK> >,
+        mpl::not_<typename sound::is_planar<Range>::type> >
     is_supported;
 };
 
@@ -79,7 +88,7 @@ namespace detail
 
 SNDFILE* file_open_impl (const char* fname, int mode, SF_INFO* info);
 
-int file_format_impl (file_format format, int sample_format);
+int file_format_impl (file_fmt format, int sample_format);
 
 std::size_t file_seek_impl (SNDFILE* file,
                             std::ptrdiff_t offset, seek_dir dir);
@@ -90,5 +99,23 @@ void file_close_impl (SNDFILE* file);
 
 } /* namespace io */
 } /* namespace psynth */
+
+#else
+
+namespace psynth
+{
+namespace io
+{
+
+template <class Range>
+struct file_support
+{
+    typedef mpl::false_ is_supported;
+};
+
+} /* namespace io */
+} /* namespace psynth */
+
+#endif /* PSYNTH_HAVE_PCM */
 
 #endif /* PSYNTH_IO_FILE_COMMON_TPP_ */

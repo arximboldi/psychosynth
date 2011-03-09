@@ -67,13 +67,13 @@ node_echo::~node_echo()
 int node_echo::do_update_channel (int chan)
 {
     const audio_buffer* _input     = get_input<audio_buffer>(LINK_AUDIO, IN_A_INPUT);
-    const sample_buffer* _delay    = get_input<sample_buffer>(LINK_CONTROL, IN_C_DELAY);
+    // TODO: const sample_buffer* _delay    = get_input<sample_buffer>(LINK_CONTROL, IN_C_DELAY);
     const sample_buffer* _feedback = get_input<sample_buffer>(LINK_CONTROL, IN_C_FEEDBACK);
     audio_buffer* _output          = get_output<audio_buffer>(LINK_AUDIO, IN_A_INPUT);    
 
     const sample* in_buf  = _input    ? _input->get_channel(chan) : 0;
     const sample* fb_buf  = _feedback ? _feedback->get_data()     : 0;
-    const sample* del_buf = _delay    ? _delay->get_data()        : 0;
+    // TODO: const sample* del_buf = _delay    ? _delay->get_data()        : 0;
 
     sample* out_buf = _output->get_channel(chan);
     sample* tmp_buf = m_buffer.get_channel(chan);
@@ -82,7 +82,7 @@ int node_echo::do_update_channel (int chan)
     
     float delay;
     float in_val;
-    int i;
+    std::size_t i;
     int pos = m_pos;
     float val;
   
@@ -118,9 +118,9 @@ void node_echo::do_update (const node* caller,
 	m_buffer.zero();
     m_old_param_delay = m_param_delay;
 
-    int new_pos = m_pos;
+    std::size_t new_pos = m_pos;
  
-    for (int i = 0; i < get_info ().num_channels; ++i)
+    for (size_t i = 0; i < get_info ().num_channels; ++i)
 	new_pos = do_update_channel (i);
     
     m_pos = new_pos;

@@ -72,7 +72,7 @@ bool output_oss::start()
 {
     if (get_state () == IDLE) {
 	set_state (RUNNING);
-	m_thread = boost::thread (boost::bind (&output_oss::run, this));
+	m_thread = std::thread (boost::bind (&output_oss::run, this));
 	return true;
     } else {
 	logger::self () ("oss", log::error,

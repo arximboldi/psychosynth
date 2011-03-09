@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-07 17:28:01 raskolnikov>
+ *  Time-stamp:  <2011-03-09 01:17:06 raskolnikov>
  *
  *  @file        oss_raw_output.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -35,7 +35,9 @@
 #include <sys/stat.h>
 #include <sys/ioctl.h>
 #include <unistd.h>
+#include <cstring>
 
+#include "base/logger.hpp"
 #include "base/scope_guard.hpp"
 #include "oss_raw_output.hpp"
 
@@ -51,8 +53,10 @@ PSYNTH_DEFINE_ERROR_WHAT (oss_param_error, "Invalid parameter for OSS device.");
 #define PSYNTH_OSS_CHECK(fun, except)                           \
     do {                                                        \
         int err = fun;                                          \
-        if (err < 0)                                            \
-            PSYNTH_LOG << log::warning << strerror (err);       \
+        if (err < 0) {                                          \
+            PSYNTH_LOG << base::log::warning << ::strerror (err);       \
+            throw except ();                                    \
+        }                                                       \
     } while (0)
 
 oss_raw_output::oss_raw_output (const char* device,
@@ -74,22 +78,24 @@ oss_raw_output::oss_raw_output (const char* device,
         stereo = 1;
         break;
     default:
-        PSYNTH_LOG << log::warning << "Only stereo and mono sound is supported.";
-        throw oss_param_error;
+        PSYNTH_LOG << base::log::warning
+                   << "Only stereo and mono sound is supported.";
+        throw oss_param_error ();
     };
 
     int fragment = (2 << 16) | ((int) std::log2 (buffer_size));
 
     if (!interleaved)
     {
-        PSYNTH_LOG << log::warning << "Planar audio data is not supported."
-        throw oss_param_error;
+        PSYNTH_LOG << base::log::warning
+                   << "Planar audio data is not supported.";
+        throw oss_param_error ();
     }
     
     _handle = ::open (device, O_WRONLY, 0);
     PSYNTH_OSS_CHECK (_handle, oss_open_error);
 
-    auto grd_handle = base::make_guard ([] { ::close (_handle); });
+    auto grd_handle = base::make_guard ([&] { ::close (_handle); });
 
     PSYNTH_OSS_CHECK (::ioctl (_handle, SNDCTL_DSP_SETFRAGMENT, &fragment),
                       oss_param_error);
@@ -114,8 +120,9 @@ std::size_t oss_raw_output::put_i (void*  data, std::size_t frames)
     ::ssize_t bytes_or_err = ::write (_handle, data, _frame_size * frames);
     if (bytes_or_err < 0)
     {
-        PSYNTH_LOG  << log::warning << "Error while writing to OSS device: "
-                    << strerror (bytes);
+        PSYNTH_LOG  << base::log::warning
+                    << "Error while writing to OSS device: "
+                    << strerror (bytes_or_err);
         return 0;
     }
     return bytes_or_err / _frame_size; // TODO: Performance?
@@ -123,13 +130,14 @@ std::size_t oss_raw_output::put_i (void*  data, std::size_t frames)
 
 std::size_t oss_raw_output::put_n (void** data, std::size_t frames)
 {
-    PSYNTH_LOG << log::warning << "Interleaved output not supporter by OSS.";
+    PSYNTH_LOG << base::log::warning
+               << "Interleaved output not supporter by OSS.";
     return 0;
 }
 
 void oss_raw_output::iterate ()
 {
-    process (_block_size);
+    process (_buffer_size);
 }
 
 } /* namespace io */

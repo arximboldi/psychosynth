@@ -98,7 +98,7 @@ void node_manager::delete_node (iterator it)
 
 void node_manager::set_info (const audio_info& info)
 {
-    boost::mutex::scoped_lock lock (m_update_mutex);
+    unique_lock<mutex> lock (m_update_mutex);
 
     map<int, base::mgr_ptr<node> >::iterator map_iter;
     for (map_iter = m_node_map.begin();
@@ -111,7 +111,7 @@ void node_manager::set_info (const audio_info& info)
 
 void node_manager::update()
 {
-    boost::mutex::scoped_lock lock (m_update_mutex);
+    unique_lock<mutex> lock (m_update_mutex);
     
     map<int, base::mgr_ptr<node> >::iterator map_iter;
     for (map_iter = m_node_map.begin();

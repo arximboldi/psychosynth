@@ -20,6 +20,8 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <boost/bind.hpp>
+
 #include "synth/audio_buffer.hpp"
 #include "base/misc.hpp"
 #include "base/file_manager.hpp"
@@ -89,7 +91,7 @@ void node_sampler::on_file_change (node_param& par)
     if (m_fetcher.is_open ())
 	m_fetcher.close();
     
-    m_fetcher.open (path.file_string ());
+    m_fetcher.open (path.native ());
 
     if (m_fetcher.is_open()) {
 	m_inbuf.set_info (m_fetcher.get_info(), get_info ().block_size);

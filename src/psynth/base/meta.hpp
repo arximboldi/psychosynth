@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-12-27 20:22:11 raskolnikov>
+ *  Time-stamp:  <2011-03-08 23:53:01 raskolnikov>
  *
  *  @file        meta.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>

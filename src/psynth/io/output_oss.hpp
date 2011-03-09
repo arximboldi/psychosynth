@@ -23,7 +23,7 @@
 #ifndef PSYNTH_OUTPUTOSS_H
 #define PSYNTH_OUTPUTOSS_H
 
-#include <boost/thread/thread.hpp>
+#include <thread>
 
 #include <psynth/io/output.hpp>
 
@@ -40,7 +40,7 @@ class output_oss : public output
     short int* m_buf;
     std::string m_device;
 	
-    boost::thread m_thread;
+    std::thread m_thread;
     
 public:
     output_oss ();

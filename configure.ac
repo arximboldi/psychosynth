@@ -26,7 +26,7 @@ AC_INIT([psychosynth], [0.1.7], [raskolnikov@es.gnu.org])
 AC_CONFIG_MACRO_DIR([m4])
 
 dnl TODO: Make portable makefiles.
-AM_INIT_AUTOMAKE([--warnings=no-portability])
+AM_INIT_AUTOMAKE([--warnings=no-portability, subdir-objects])
 AM_CONFIG_HEADER(config.h)
 
 AC_LANG(C++)
@@ -39,6 +39,7 @@ dnl  Options
 dnl ======================================================================
 
 dnl CXX=gfilt
+CXX=g++-4.5
 CXXFLAGS="${CXXFLAGS} -std=c++0x"
 
 AC_ARG_ENABLE([gprof], 
@@ -58,20 +59,9 @@ dnl ======================================================================
 dnl  BOOST
 dnl ----------------------------------------------------------------------
 
-AX_BOOST_BASE([1.39])
-AX_BOOST_THREAD
+AX_BOOST_BASE([1.44])
 AX_BOOST_FILESYSTEM
 AX_BOOST_UNIT_TEST_FRAMEWORK
-
-if test "x${ax_cv_boost_thread}" != xyes ; then
-AC_MSG_ERROR([
-***
-*** You need Boost.Thread library to compile the program.
-*** Install it and run this script again.
-***
-])
-psynth_config_ok=no
-fi
 
 if test "x${ax_cv_boost_filesystem}" != xyes ; then
 AC_MSG_ERROR([

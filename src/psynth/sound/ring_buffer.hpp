@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-08 18:37:43 raskolnikov>
+ *  Time-stamp:  <2011-03-08 20:00:38 raskolnikov>
  *
  *  @file        ring_buffer.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -250,6 +250,7 @@ protected:
     range_base  _range;
 };
 
+
 template <class Buffer>
 class ring_buffer : public ring_buffer_base<Buffer, ring_buffer_range>
 {
@@ -338,7 +339,36 @@ public:
 
     allocator_type const& allocator () const
     { return this->_buffer.allocator (); }
+
+private:
+    template <typename B> friend 
+    const typename ring_buffer<B>::range&
+    range (ring_buffer<B>& buf);
+
+    template <typename B> friend 
+    const typename ring_buffer<B>::const_range
+    const_range (const ring_buffer<B>& buf);
 };
+
+/*
+ *
+ *  @todo BufferConcept
+ *
+ */
+
+template <typename B>
+const typename ring_buffer<B>::range&
+range (ring_buffer<B>& buf)
+{
+    return buf._range;
+}
+
+template <typename B>
+const typename ring_buffer<B>::const_range
+const_range (const ring_buffer<B>& buf)
+{
+    return buf._range;
+}
 
 /*
  *

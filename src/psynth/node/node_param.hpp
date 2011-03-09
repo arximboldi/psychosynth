@@ -23,8 +23,8 @@
 #ifndef PSYNTH_OBJPARAM
 #define PSYNTH_OBJPARAM
 
-#include <boost/thread/mutex.hpp>
-#include <boost/thread/locks.hpp>
+#include <mutex>
+
 #include <boost/function.hpp>
 #include <string>
 
@@ -85,7 +85,7 @@ public:
     template <typename T>
     void set (const T& d) {
 	{
-	    boost::mutex::scoped_lock lock (m_mutex);
+	    std::unique_lock<std::mutex> lock (m_mutex);
 	    m_changed = true;
 	    *static_cast<T*>(m_src) = d;
 	}
@@ -102,7 +102,7 @@ public:
 private:
     friend class node;
 	
-    mutable boost::mutex m_mutex;
+    mutable std::mutex m_mutex;
 
     std::string m_name;
     int m_id;

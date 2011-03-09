@@ -23,7 +23,7 @@
 #ifndef PSYNTH_OUTPUTALSA_H
 #define PSYNTH_OUTPUTALSA_H
 
-#include <boost/thread/thread.hpp>
+#include <thread>
 
 #define ALSA_PCM_NEW_HW_PARAMS_API
 #include <alsa/asoundlib.h>
@@ -44,7 +44,7 @@ class output_alsa : public output
     std::string alsa_device;
     snd_pcm_uframes_t m_buffersize;
   
-    boost::thread alsa_thread;
+    std::thread alsa_thread;
     
 public:
     output_alsa ();

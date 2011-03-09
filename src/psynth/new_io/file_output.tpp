@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-08 17:45:30 raskolnikov>
+ *  Time-stamp:  <2011-03-09 01:49:42 raskolnikov>
  *
  *  @file        file_output.tpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -54,20 +54,20 @@ file_output_put_impl (SNDFILE* file, sound::bits32sf* ptr, std::size_t frames);
 
 template <class Range>
 file_output<Range>::file_output (const char*  fname,
-                                 file_format  format,
+                                 file_fmt     format,
                                  std::size_t  rate)
 {
-    _info.channels = sound::num_samples<Range>::value;
-    _info.rate     = rate;
-    _info.format   = file_format_impl (file_format,
-                                       file_support<Range>::format::value);
-    _file = file_open_impl (fname, SFM_WRITE, &_info);
+    _info.channels   = sound::num_samples<Range>::value;
+    _info.samplerate = rate;
+    _info.format     = detail::file_format_impl (
+        format, file_support<Range>::format::value);
+    _file = detail::file_open_impl (fname, SFM_WRITE, &_info);
 }
 
 template <class Range>
 file_output<Range>::~file_output ()
 {
-    file_close_impl (_file);
+    detail::file_close_impl (_file);
 }
 
 /**
@@ -92,16 +92,16 @@ file_output<Range>::~file_output ()
 template <class Range>
 std::size_t file_output<Range>::put (const range& data)
 {
-    return file_output_put_impl (_file,
-                                 static_cast<sample_type<Range>::type*> (
-                                     range.frames ()),
-                                 data.size ());
+    return detail::file_output_put_impl (
+        _file,
+        data.frames (),
+        data.size ());
 }
 
 template <class Range>
 std::size_t file_output<Range>::seek (std::ptrdiff_t offset, seek_dir dir)
 {
-    return file_seek_impl (_file, offset, dir);
+    return detail::file_seek_impl (_file, offset, dir);
 }
 
 } /* namespace io */

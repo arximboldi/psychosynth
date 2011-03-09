@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-08 17:49:52 raskolnikov>
+ *  Time-stamp:  <2011-03-09 01:44:14 raskolnikov>
  *
  *  @file        file_input.tpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -55,31 +55,32 @@ file_input_take_impl (SNDFILE* file, sound::bits32sf* ptr, std::size_t frames);
 template <class Range>
 file_input<Range>::file_input (const char* fname)
 {
-    _file = file_open_impl (fname, SF_READ, &info);
+    _file = detail::file_open_impl (fname, SFM_READ, &_info);
 }
 
 template <class Range>
 file_input<Range>::~file_input ()
 {
-    file_close_impl (_file);
+    detail::file_close_impl (_file);
 }
 
 /**
  * @todo Read note in file_input::put
  */
 template <class Range>
-std::size_t file_input<Range>::put (const range& data)
+std::size_t file_input<Range>::take (const range& data)
 {
-    return file_input_take_impl (_file,
-                                 static_cast<sample_type<Range>::type*> (
-                                     range.frames ()),
-                                 data.size ());
+    return detail::file_input_take_impl (
+        _file,
+//        reinterpret_cast<typename sound::sample_type<Range>::type*> (
+        data.frames (),//),
+        data.size ());
 }
 
 template <class Range>
 std::size_t file_input<Range>::seek (std::ptrdiff_t offset, seek_dir dir)
 {
-    return file_seek_impl (_file, offset, dir);
+    return detail::file_seek_impl (_file, offset, dir);
 }
 
 } /* namespace io */

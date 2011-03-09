@@ -22,7 +22,6 @@
 
 #include <iostream>
 #include "io/file_reader_fetcher.hpp"
-#include <boost/thread.hpp>
 
 using namespace std;
 
@@ -125,7 +124,7 @@ size_t file_reader_fetcher::read (audio_buffer& buf, size_t n_samples)
     size_t n_read;
 
     {
-	boost::mutex::scoped_lock lock (m_buffer_mutex);
+	unique_lock<mutex> lock (m_buffer_mutex);
 	
 	while (m_buffer.availible(m_read_ptr) == 0)
 	    m_cond.wait (lock);
@@ -148,7 +147,7 @@ size_t file_reader_fetcher::read (audio_buffer& buf, size_t n_samples)
 
 void file_reader_fetcher::close ()
 {
-    boost::mutex::scoped_lock lock (m_reader_mutex);
+    unique_lock<mutex> lock (m_reader_mutex);
 
     m_reader->close ();
     set_is_open (m_reader->is_open ());
@@ -163,7 +162,7 @@ void file_reader_fetcher::run ()
 	/* Read the data. */
 	{
 	    n_read = 0;
-	    boost::mutex::scoped_lock lock (m_reader_mutex);
+	    unique_lock<mutex> lock (m_reader_mutex);
 	
 	    if (m_reader->is_open ()) {
 		must_read = m_threshold;
@@ -201,14 +200,14 @@ void file_reader_fetcher::run ()
 	
 	/* Add it to the buffer. */
 	if (n_read) {
-	    boost::mutex::scoped_lock lock (m_buffer_mutex);
+	    unique_lock<mutex> lock (m_buffer_mutex);
 	    m_buffer.write (m_tmp_buffer, n_read);
 	    m_cond.notify_all ();
 	}
 
 	/* Wait until more data is needed. */
 	{
-	    boost::mutex::scoped_lock lock (m_buffer_mutex);
+	    unique_lock<mutex> lock (m_buffer_mutex);
 	    while (!m_finished &&
 		   (m_buffer.availible (m_read_ptr) > m_threshold || !is_open()))
 		m_cond.wait (lock);

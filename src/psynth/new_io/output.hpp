@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-08 17:12:36 raskolnikov>
+ *  Time-stamp:  <2011-03-08 23:53:58 raskolnikov>
  *
  *  @file        output.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -31,6 +31,7 @@
 #ifndef PSYNTH_IO_OUTPUT_HPP_
 #define PSYNTH_IO_OUTPUT_HPP_
 
+#include <psynth/sound/forwards.hpp>
 #include <psynth/new_io/async_base.hpp>
 
 namespace psynth
@@ -60,22 +61,26 @@ std::size_t put_on_raw (RawOutput& out, const Range& data)
 {
     std::size_t block_size = out.buffer_size ();
     std::size_t total      = data.size (); // int is an optimization
+    std::size_t written    = 0;
     
-    while (remaining > 0)
+    while (written < total)
     {
-        auto block = sub_buffer_range (
+        auto block = sub_range (
             data, written, std::min (block_size, total - written));
 
         // TODO: Make sure that this if is optimized away.
         if (sound::is_planar<Range>::value)
         {
-            written += out.put_i (block.begin (), );
+            written += out.put_i (block.begin (), block.size ());
         }
         else
         {
-            written += ;
+            auto it = block.begin ();
+            written += out.put_w (&it, block.size ());
         }
     }
+
+    return written;
 }
 
 } /* namespace io */

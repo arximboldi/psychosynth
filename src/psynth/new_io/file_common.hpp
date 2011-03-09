@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-08 17:34:50 raskolnikov>
+ *  Time-stamp:  <2011-03-09 00:03:56 raskolnikov>
  *
  *  @file        file_common.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -56,7 +56,7 @@ class file_support;
  * @todo Fill with the rest of sndfile formats.
  * @todo Implement MP3 support. That would require some refactoring.
  */
-enum class file_format
+enum class file_fmt
 {
     wav = 0,
     aiff,

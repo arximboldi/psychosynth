@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-07 21:49:38 raskolnikov>
+ *  Time-stamp:  <2011-03-09 01:35:26 raskolnikov>
  *
  *  @file        jack_raw_output.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -30,6 +30,10 @@
 
 #define PSYNTH_MODULE_NAME "psynth.io.jack"
 
+#include <cstring>
+#include <boost/lexical_cast.hpp>
+
+#include "base/logger.hpp"
 #include "base/scope_guard.hpp"
 #include "jack_raw_output.hpp"
 
@@ -47,12 +51,12 @@ namespace
 
 void log_jack_info (const char* msg)
 {
-    PSYNTH_LOG << log::info << msg;
+    PSYNTH_LOG << base::log::info << msg;
 }
 
 void log_jack_error (const char* msg)
 {
-    PSYNTH_LOG << log::error << msg;
+    PSYNTH_LOG << base::log::error << msg;
 }
 
 } /* anonymous namespace */
@@ -61,14 +65,14 @@ void log_jack_error (const char* msg)
 #define PSYNTH_JACK_CHECK(fun, except)                          \
     do {                                                        \
         int err = fun;                                          \
-        if (err < 0) throw except;                              \
+        if (err < 0) throw except ();                           \
     } while (0)
 
 jack_raw_output::jack_raw_output (const char* client,
                                   const char* server,
                                   int         rate,
                                   int         channels)
-    : _out_ports (channels, 0)
+    : _out_ports (channels)
     , _buffer_size (0)
 {
     jack_set_error_function (log_jack_error);
@@ -76,38 +80,37 @@ jack_raw_output::jack_raw_output (const char* client,
     
     jack_options_t options = server ? JackNullOption : JackServerName; 
     _client = jack_client_open (server, options, 0, server);
-    if (!_client) throw jack_open_error;
+    if (!_client) throw jack_open_error ();
 
-    auto grd_client = base::make_guard ([] { jack_client_close (_client); });
+    auto grd_client = base::make_guard ([&] { jack_client_close (_client); });
     
     PSYNTH_JACK_CHECK (jack_set_process_callback (
-                           _client, &output_jack::_process_cb, this),
+                           _client, &jack_raw_output::_process_cb, this),
                        jack_param_error);
     PSYNTH_JACK_CHECK (jack_set_sample_rate_callback (
-                           _client, &output_jack::_sample_rate_cb, this),
+                           _client, &jack_raw_output::_sample_rate_cb, this),
                        jack_param_error);
-    PSYNTH_JACK_CHECK (jack_on_shutdown (
-                           _client, &output_jack::_shutdown_cb, this),
-                       jack_param_error);
+
+    jack_on_shutdown (_client, &jack_raw_output::_shutdown_cb, this);
 	
     _actual_rate = jack_get_sample_rate (_client);
     if (_actual_rate != rate)
         PSYNTH_LOG
-            << log::warning
+            << base::log::warning
             << "Jackd sample rate and application sample rate mismatch."
             << "Better sound quality is achieved if both are the same.";
     
     for (size_t i = 0; i < _out_ports.size(); ++i)
     {
         std::string port_name = std::string ("out_") +
-            boost::lexical_cast (i);
+            boost::lexical_cast<std::string> (i);
         
         _out_ports [i] = jack_port_register (
             _client, port_name.c_str (), JACK_DEFAULT_AUDIO_TYPE,
             JackPortIsOutput, 0);
         
         if (_out_ports [i] == 0)
-            throw jack_param_error;
+            throw jack_param_error ();
     }
     
     grd_client.dismiss ();
@@ -134,6 +137,7 @@ std::size_t jack_raw_output::put_n (void** data, std::size_t frames)
         const auto bytes = sizeof (jack_default_audio_sample_t) * frames;
         std::memcpy (out, *data++, bytes);
     }
+    return frames;
 }
 
 void jack_raw_output::start ()
@@ -153,46 +157,47 @@ void jack_raw_output::connect_ports ()
 {
     const char** ports;
 
-    ports = jack_get_ports (m_client, 0, 0, JackPortIsPhysical | JackPortIsInput);
+    ports = jack_get_ports (_client, 0, 0, JackPortIsPhysical | JackPortIsInput);
     if (!ports)
     {
-	PSYNTH_LOG << log::warning << "There are no phisical output ports.";
+	PSYNTH_LOG << base::log::warning << "There are no phisical output ports.";
 	return;
     }
 
     PSYNTH_ON_BLOCK_EXIT ([&] { ::free (ports); });
-    
-    for (std::size_t i = 0; i < _out_ports.size() && ports [i]; ++i)
-	jack_connect (m_client, jack_port_name (_out_ports [i]), ports [i]);
+
+    std::size_t i = 0;
+    for (; i < _out_ports.size() && ports [i]; ++i)
+	jack_connect (_client, jack_port_name (_out_ports [i]), ports [i]);
 
     if (i < _out_ports.size ())
-        PSYNTH_LOG << log::warning << "Not enough phisical output ports.";
+        PSYNTH_LOG << base::log::warning << "Not enough phisical output ports.";
 }
 
-static int jack_raw_output::_process_cb (jack_nframes_t nframes,
-                                         void* jack_client)
+int jack_raw_output::_process_cb (jack_nframes_t nframes,
+                                  void* jack_client)
 {
-    static_cast<output_jack*>(_client)->_on_process (nframes);
+    static_cast<jack_raw_output*>(jack_client)->_on_process (nframes);
     return 0;
 }
 
-static int jack_raw_output::_sample_rate_cb (jack_nframes_t newrate,
+int jack_raw_output::_sample_rate_cb (jack_nframes_t newrate,
+                                      void* jack_client)
+{
+    static_cast<jack_raw_output*>(jack_client)->_on_sample_rate (newrate);
+    return 0;
+}
+
+int jack_raw_output::_buffer_size_cb (jack_nframes_t newsize,
                                              void* jack_client)
 {
-    static_cast<output_jack*>(_client)->_on_sample_rate (newrate);
+    static_cast<jack_raw_output*>(jack_client)->_on_buffer_size (newsize);
     return 0;
 }
 
-static int jack_raw_output::_buffer_size_cb (jack_nframes_t newsize,
-                                             void* jack_client)
+void jack_raw_output::_shutdown_cb (void* jack_client)
 {
-    static_cast<output_jack*>(_client)->_on_buffer_size (newsize);
-    return 0;
-}
-
-static void jack_raw_output::_shutdown_cb (void* jack_client)
-{
-    static_cast<output_jack*>(_client)->_on_shutdown ();
+    static_cast<jack_raw_output*>(jack_client)->_on_shutdown ();
 }
 
 } /* namespace io */

@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-07 19:17:42 raskolnikov>
+ *  Time-stamp:  <2011-03-08 23:35:09 raskolnikov>
  *
  *  @file        async_base.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -31,6 +31,7 @@
 #ifndef PSYNTH_IO_ASYNC_BASE_H_
 #define PSYNTH_IO_ASYNC_BASE_H_
 
+#include <functional>
 #include <psynth/new_io/exception.hpp>
 
 namespace psynth
@@ -51,7 +52,7 @@ enum class async_state
 class async_base
 {
 public:
-    typedef std::function<std::size_t> callback_type;
+    typedef std::function<void (std::size_t)> callback_type;
 
     async_base () : _state (async_state::idle) {}
     
@@ -80,13 +81,13 @@ public:
     void check_running ()
     {
         if (_state != async_state::idle)
-            throw async_not_running_error;
+            throw async_not_running_error ();
     }
 
     void check_idle ()
     {
         if (_state != async_state::running)
-            throw async_not_idle_error;
+            throw async_not_idle_error ();
     }
 
     void set_callback (callback_type cb)

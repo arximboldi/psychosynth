@@ -24,8 +24,7 @@
 #define PSYNTH_NODE_MANAGER_H
 
 #include <map>
-
-#include <boost/thread/mutex.hpp>
+#include <thread>
 
 #include <psynth/base/pointer.hpp>
 #include <psynth/base/iterator.hpp>
@@ -45,7 +44,7 @@ private:
     std::list <node_output*> m_outputs;
     std::list <node*> m_delete_list;
     
-    boost::mutex m_update_mutex;
+    std::mutex m_update_mutex;
 
     void do_delete_node (iterator it);
 

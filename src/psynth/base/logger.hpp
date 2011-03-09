@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-11 23:13:18 raskolnikov>
+ *  Time-stamp:  <2011-03-09 00:09:12 raskolnikov>
  *
  *  @file        logger.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -36,6 +36,7 @@
 #include <list>
 #include <iostream>
 #include <fstream>
+#include <sstream>
 
 #include <psynth/base/singleton.hpp>
 #include <psynth/base/tree.hpp>
@@ -412,14 +413,15 @@ log_stream_adapter::~log_stream_adapter ()
     // *this << log_msg;
 }
 
-#define PSYNTH_LOG logger::self ().path (PSYNTH_MODULE_NAME).stream ()
+#define PSYNTH_LOG \
+    ::psynth::base::logger::self ().path (PSYNTH_MODULE_NAME).stream ()
 
 #if PSYNTH_DEBUG
 #define PSYNTH_LOG_DEBUG \
-    psynth::base::logger::self ().path (PSYNTH_MODULE_NAME).stream () \
-    << log::debug
+    ::psynth::base::logger::self ().path (PSYNTH_MODULE_NAME).stream () \
+    << ::psynth::base::log::debug
 #else
-#define PSYNTH_LOG_DEBUG psynth::base::nop_ostream ()
+#define PSYNTH_LOG_DEBUG ::psynth::base::nop_ostream ()
 #endif
 
 } /* namespace base */

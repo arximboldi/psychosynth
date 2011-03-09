@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-07 19:09:11 raskolnikov>
+ *  Time-stamp:  <2011-03-08 19:48:38 raskolnikov>
  *
  *  @file        metafunctions.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -960,7 +960,7 @@ struct buffer_range_type<buffer<Frame, Planar, Alloc> >
 template <class Range, typename Alloc = std::allocator<unsigned char> >
 struct buffer_type_from_range
 {
-    typedef buffer<std::iterator_traits<
+    typedef buffer<typename std::iterator_traits<
                        typename Range::iterator>::value_type,
                    is_planar<Range>::value,
                    Alloc>

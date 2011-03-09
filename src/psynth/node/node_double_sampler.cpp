@@ -20,6 +20,8 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <boost/bind.hpp>
+
 #include "synth/audio_buffer.hpp"
 #include "base/misc.hpp"
 #include "base/file_manager.hpp"
@@ -86,7 +88,7 @@ void node_double_sampler::on_file_one_change (node_param& par)
     if (m_fetcher_one.is_open ())
 	m_fetcher_one.close();
     
-    m_fetcher_one.open (path.file_string ());
+    m_fetcher_one.open (path.native ());
 
     if (m_fetcher_one.is_open()) {
 	m_inbuf_one.set_info (m_fetcher_one.get_info(), get_info ().block_size);
@@ -108,7 +110,7 @@ void node_double_sampler::on_file_two_change (node_param& par)
     if (m_fetcher_two.is_open ())
 	m_fetcher_two.close();
     
-    m_fetcher_two.open (path.file_string ());
+    m_fetcher_two.open (path.native ());
 
     if (m_fetcher_two.is_open()) {
 	m_inbuf_two.set_info (m_fetcher_two.get_info(), get_info ().block_size);

@@ -36,12 +36,15 @@ libpsynth_la_CXXFLAGS = $(SIGC_CFLAGS) -I.. \
 	-DPSYNTH_DATA_DIR=\"$(PACKAGE_DATA_DIR)\"
 libpsynth_la_LDFLAGS =  
 libpsynth_la_LIBADD = \
-	$(BOOST_THREAD_LIB) \
 	$(BOOST_FILESYSTEM_LIB) \
 	-lboost_system-mt \
 	$(SIGC_LIBS)
 
 libpsynthincdir = $(PACKAGE_INCLUDE_DIR)
+
+#
+# TODO: Add sound module here so it gets distributed.
+#
 
 nobase_libpsynthinc_HEADERS = \
 	app/director.hpp \
@@ -73,6 +76,7 @@ nobase_libpsynthinc_HEADERS = \
 	base/util.hpp\
 	base/meta.hpp\
 	base/c3_class.hpp\
+	base/scope_guard.hpp\
 	synth/scaler.hpp\
 	synth/audio_buffer.hpp \
 	synth/sample_buffer.hpp\
@@ -118,6 +122,16 @@ nobase_libpsynthinc_HEADERS = \
 	io/file_reader.hpp\
 	io/file_reader_any.hpp\
 	io/file_reader_fetcher.hpp\
+	new_io/async_base.hpp\
+	new_io/buffered_output.hpp\
+	new_io/buffered_output.tpp\
+	new_io/caching_file_input.hpp\
+	new_io/caching_file_input.tpp\
+	new_io/file_common.hpp \
+	new_io/file_common.tpp \
+	new_io/input.hpp \
+	new_io/output.hpp \
+	new_io/thread_async.hpp \
 	version.hpp
 
 libpsynth_la_SOURCES = \
@@ -167,8 +181,13 @@ libpsynth_la_SOURCES = \
 	node/node_control_noise.cpp \
 	node/node_echo.cpp \
 	node/node_delay.cpp \
-	io/file_reader_any.cpp\
-	io/file_reader_fetcher.cpp
+	io/file_reader_any.cpp \
+	io/file_reader_fetcher.cpp \
+	new_io/exception.cpp \
+	new_io/async_base.cpp \
+	new_io/file_common.cpp \
+	new_io/thread_async.cpp
+
 
 if HAVE_SAMPLERATE
 libpsynth_la_CXXFLAGS += $(SAMPLERATE_CFLAGS)
@@ -223,18 +242,26 @@ libpsynth_la_LIBADD += $(ALSA_LIBS)
 nobase_libpsynthinc_HEADERS += \
 	app/defaults_alsa.hpp \
 	app/output_director_alsa.hpp \
-	io/output_alsa.hpp	
+	io/output_alsa.hpp \
+	new_io/alsa_output.hpp \
+	new_io/alsa_output.tpp \
+	new_io/alsa_raw_output.hpp
 libpsynth_la_SOURCES += \
-	io/output_alsa.cpp
+	io/output_alsa.cpp \
+	new_io/alsa_raw_output.cpp
 endif
 
 if HAVE_OSS
 nobase_libpsynthinc_HEADERS += \
 	app/defaults_oss.hpp \
 	app/output_director_oss.hpp \
-	io/output_oss.hpp
+	io/output_oss.hpp \
+	new_io/oss_output.hpp \
+	new_io/oss_output.tpp \
+	new_io/oss_raw_output.hpp
 libpsynth_la_SOURCES += \
-	io/output_oss.cpp
+	io/output_oss.cpp \
+	new_io/oss_raw_output.cpp
 endif
 
 if HAVE_JACK
@@ -243,20 +270,30 @@ libpsynth_la_LDFLAGS += $(JACK_LIBS)
 nobase_libpsynthinc_HEADERS += \
 	app/defaults_jack.hpp \
 	app/output_director_jack.hpp \
-	io/output_jack.hpp
+	io/output_jack.hpp \
+	new_io/jack_output.hpp\
+	new_io/jack_output.tpp\
+	new_io/jack_raw_output.hpp
 libpsynth_la_SOURCES += \
-	io/output_jack.cpp
+	io/output_jack.cpp \
+	new_io/jack_raw_output.cpp
 endif
 
 if HAVE_SNDFILE
 libpsynth_la_CXXFLAGS += $(SNDFILE_CFLAGS)
 libpsynth_la_LIBADD += $(SNDFILE_LIBS)
 nobase_libpsynthinc_HEADERS += \
-	io/output_wave.hpp\
-	io/file_reader_wave.hpp
+	io/output_wave.hpp \
+	io/file_reader_wave.hpp \
+	new_io/file_input.hpp \
+	new_io/file_input.tpp \
+	new_io/file_output.hpp \
+	new_io/file_output.tpp
 libpsynth_la_SOURCES += \
 	io/output_wave.cpp\
-	io/file_reader_wave.cpp
+	io/file_reader_wave.cpp\
+	new_io/file_input.cpp \
+	new_io/file_output.cpp
 endif
 
 if HAVE_VORBIS

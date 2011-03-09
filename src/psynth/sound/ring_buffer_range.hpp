@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-08 18:39:41 raskolnikov>
+ *  Time-stamp:  <2011-03-08 21:00:58 raskolnikov>
  *
  *  @file        ring_buffer.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -241,6 +241,18 @@ public:
 	, _range (range._range)
     {}
 
+    explicit ring_buffer_range_base (const Range& range)
+	: _backwards (false)
+	, _startpos (0)
+	, _writepos (0, 0)
+	, _range (range)
+    {}
+    
+#if 0    
+    // FIXME: This kind of constructor in this and related classes
+    // produced anoying behaviour because the derived class does not
+    // get casted and passes up through this constructor.
+    
     template<class Range2>
     explicit ring_buffer_range_base (Range2& range)
 	: _backwards (false)
@@ -256,6 +268,7 @@ public:
 	, _writepos (0, 0)
 	, _range (range)
     {}
+#endif
     
     /** Copy constructor. */
     template <class Range2>
@@ -360,7 +373,7 @@ public:
      * @param buf The buffer to fill with the data.
      */
     template<class Position, class Range2>
-    size_t read (Position& r, Range2& range) const
+    size_t read (Position& r, const Range2& range) const
     {
 	return read (r, range, range.size ());
     };
@@ -372,7 +385,7 @@ public:
      * @param samples The number of samples to read.
      */
     template<class Position, class Range2>
-    size_type read (Position& r, Range2& range, size_type samples) const;
+    size_type read (Position& r, const Range2& range, size_type samples) const;
 
     /**
      * Fills a sample_buffer with data from the ring buffer.
@@ -380,9 +393,9 @@ public:
      * @param buf The buffer to fill with the data.
      */
     template<class Position, class Range2, class CC = default_channel_converter>
-    size_t read_and_convert (Position& r, Range2& range, CC cc = CC ()) const
+    size_t read_and_convert (Position& r, const Range2& range, CC cc = CC ()) const
     {
-	return read (r, range, range.size (), cc);
+	return read_and_convert (r, range, range.size (), cc);
     };
 
     /**
@@ -392,7 +405,7 @@ public:
      * @param samples The number of samples to read.
      */
     template<class Position, class Range2, class CC = default_channel_converter>
-    size_type read_and_convert (Position& r, Range2& range,
+    size_type read_and_convert (Position& r, const Range2& range,
 				size_type samples, CC cc = CC ()) const;
     
     /**
@@ -420,7 +433,7 @@ public:
     template <class Range2, class CC = default_channel_converter>
     void write_and_convert (const Range2& range, CC cc = CC ())
     {
-	write (range, range.size (), cc);
+	write_and_convert (range, range.size (), cc);
     }
 
     /**
@@ -577,8 +590,12 @@ public:
 
     /** Copy constructor */
     ring_buffer_range (const ring_buffer_range& range)
-	: parent_type ((const parent_type&) range) {}
+	: parent_type (range) {}
 
+    explicit ring_buffer_range (const Range& range)
+	: parent_type (range) {}
+    
+#if 0
     template<class Range2>
     explicit ring_buffer_range (Range2& range)
 	: parent_type (range) {}
@@ -586,11 +603,13 @@ public:
     template<class Range2>
     explicit ring_buffer_range (const Range2& range)
 	: parent_type (range) {}
+
     
     /** Copy constructor. */
     template <class Range2>
     ring_buffer_range (const ring_buffer_range<Range2>& range)
 	: parent_type ((const ring_buffer_range_base<Range2>&) range) {}
+#endif
     
     iterator begin () const
     { return iterator (this->begin_pos (), this); }

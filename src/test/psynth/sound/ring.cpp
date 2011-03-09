@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-11 23:00:35 raskolnikov>
+ *  Time-stamp:  <2011-03-08 21:01:11 raskolnikov>
  *
  *  @file        ring.cpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -47,10 +47,12 @@ BOOST_AUTO_TEST_SUITE (sound_ring_test);
 
 BOOST_AUTO_TEST_CASE (test_ring_buffer)
 {
-    stereo32sf_planar_buffer buf (buffer_size);
+    stereo32sf_planar_buffer bbuf (buffer_size);
+    stereo32sf_planar_buffer::range buf (range (bbuf)); 
     fill_frames (buf, stereo32sf_frame (.0f));
 
-    stereo32sf_ring_buffer ring (buffer_size * 1.3);
+    stereo32sf_ring_buffer rring (buffer_size * 1.3);
+    stereo32sf_ring_buffer::range ring (range (rring));
     auto reader = ring.safe_begin_pos ();
 
     ring.write (sample_range);
@@ -65,7 +67,8 @@ BOOST_AUTO_TEST_CASE (test_ring_buffer)
 
 BOOST_AUTO_TEST_CASE (test_ring_buffer_iterator)
 {
-    stereo32sf_ring_buffer ring (buffer_size * 1.3);
+    stereo32sf_ring_buffer rring (buffer_size * 1.3);
+    stereo32sf_ring_buffer::range ring (range (rring)); 
         
     ring.write (sample_range);
     BOOST_CHECK (std::equal (ring.begin (), ring.end (),
@@ -96,7 +99,15 @@ BOOST_AUTO_TEST_CASE (test_dynamic_ring_buffer)
     // TODO: Avoid range()?
 
     BOOST_TEST_CHECKPOINT ("Create ring buffer.");
-    some_ring_buffer ring { mono8_buffer (buffer_size * 1.3) };
+    some_ring_buffer rring { mono8_buffer (buffer_size * 1.3) };
+
+    BOOST_TEST_CHECKPOINT ("Create ring buffer range.");
+    // BOOST_MPL_ASSERT_MSG(false,
+    //                      PSYNTH_CHECK_TYPES,
+    //                      (some_ring_buffer::range,
+    //                       decltype (range (rring))));
+    some_ring_buffer::range ring (range (rring));
+
     BOOST_TEST_CHECKPOINT ("Create position.");
     auto reader = ring.safe_begin_pos ();
 

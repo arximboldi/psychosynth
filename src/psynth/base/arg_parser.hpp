@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-02 22:35:46 raskolnikov>
+ *  Time-stamp:  <2011-03-08 21:05:16 raskolnikov>
  *
  *  @file        arg_parser.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -444,7 +444,7 @@ public:
 private:
     typedef ptr_iterator<std::list<option*>::iterator> option_iterator;
     typedef std::list<option*> option_list;
-    typedef std::list<std::unique_ptr<option>> unique_option_list;
+    typedef std::list<std::unique_ptr<option> > unique_option_list;
     typedef std::map <const char*, option_list, detail::ltstr>
     option_map;
 

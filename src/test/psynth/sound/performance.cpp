@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-09 18:44:21 raskolnikov>
+ *  Time-stamp:  <2011-03-09 02:21:54 raskolnikov>
  *
  *  @file        performance.cpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -230,13 +230,13 @@ void test_fill (std::size_t trials)
     
     BOOST_TEST_MESSAGE (
 	"psynth: " << measure_time (
-	    fill_psynth<Range,P> (range (bufp), P()), trials));
+	    fill_psynth<Range,P> (range (bufp), P(0)), trials));
 
     BOOST_TEST_MESSAGE (
 	"non-psynth: "<< measure_time (
-	    fill_nonpsynth<Range,P> (range (bufn), P()), trials));
-
-    BOOST_CHECK (range (bufp) [0] == P());
+	    fill_nonpsynth<Range,P> (range (bufn), P(0)), trials));
+    
+    BOOST_CHECK (range (bufp) [0] == P(0));
     BOOST_CHECK (equal_frames (range (bufp), range (bufn)));
 };
 
@@ -661,12 +661,12 @@ void test_transform (std::size_t trials)
     BOOST_TEST_MESSAGE (
 	"psynth: " << measure_time (
 	    transform_psynth<Range1, Range2, F>(
-		bufp1, bufp2, F()), trials));
+		range (bufp1), range (bufp2), F()), trials));
 
     BOOST_TEST_MESSAGE (
 	"non-psynth: "<< measure_time (
 	    transform_nonpsynth<Range1,Range2,F>(
-		range(bufn1), range(bufn2), F()), trials));
+		range(bufn1), range (bufn2), F()), trials));
 
     BOOST_CHECK (equal_frames (range (bufp1), range (bufn1)));
     BOOST_CHECK (equal_frames (range (bufp2), range (bufn2)));

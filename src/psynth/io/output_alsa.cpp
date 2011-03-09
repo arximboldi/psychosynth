@@ -74,7 +74,7 @@ bool output_alsa::start()
 {
     if (get_state () == IDLE) {
 	set_state (RUNNING);
-	alsa_thread = boost::thread (boost::bind (&output_alsa::run, this));
+	alsa_thread = std::thread (std::bind (&output_alsa::run, this));
 	return true;
     } else {
 	logger::self () ("alsa", log::warning, "Thread already started or subsystem not initialized.");

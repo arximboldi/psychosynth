@@ -23,6 +23,8 @@
 #ifndef PSYNTH_OBJECTSAMPLER_H
 #define PSYNTH_OBJECTSAMPLER_H
 
+#include <mutex>
+
 #include <psynth/node/node.hpp>
 #include <psynth/io/file_reader_any.hpp>
 #include <psynth/io/file_reader_fetcher.hpp>
@@ -81,7 +83,7 @@ private:
     
     std::string m_param_file;
     
-    boost::mutex m_update_mutex;
+    std::mutex m_update_mutex;
     
     void on_file_change (node_param& par);
     void read (audio_buffer& buf, int start, int end);

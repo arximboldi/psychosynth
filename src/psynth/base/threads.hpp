@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-04 18:13:36 raskolnikov>
+ *  Time-stamp:  <2011-03-08 19:42:07 raskolnikov>
  *
  *  @file        threads.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -46,6 +46,7 @@
 #ifndef PSYNTH_THREADS_H_
 #define PSYNTH_THREADS_H_
 
+#include <cassert>
 #include <psynth/base/util.hpp>
 
 #define PSYNTH_DEFAULT_THREADING         \

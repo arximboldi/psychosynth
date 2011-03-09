@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-08 19:00:00 raskolnikov>
+ *  Time-stamp:  <2011-03-08 20:11:32 raskolnikov>
  *
  *  @file        ring_buffer.tpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -75,10 +75,10 @@ template <class R>
 template <class Position, class Range>
 typename ring_buffer_range_base<R>::size_type
 ring_buffer_range_base<R>::read (Position& r,
-				 Range& buf,
+				 const Range& buf,
 				 size_type samples) const
 {
-    const size_type slice = std::min (availible (r), samples);
+    const size_type slice = std::min (available (r), samples);
 	
     if (r._pos + slice > size ())
     {
@@ -130,11 +130,11 @@ template <class R>
 template <class Position, class Range, class CC>
 typename ring_buffer_range_base<R>::size_type
 ring_buffer_range_base<R>::read_and_convert (Position& r,
-					     Range& buf,
+					     const Range& buf,
 					     size_type samples,
 					     CC cc) const
 {
-    const size_type slice = std::min (availible (r), samples);
+    const size_type slice = std::min (available (r), samples);
 	
     if (r._pos + slice > size ())
     {

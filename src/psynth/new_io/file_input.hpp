@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-08 17:50:11 raskolnikov>
+ *  Time-stamp:  <2011-03-09 01:38:05 raskolnikov>
  *
  *  @file        file_input.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -31,6 +31,8 @@
 #ifndef PSYNTH_IO_FILE_INPUT_H_
 #define PSYNTH_IO_FILE_INPUT_H_
 
+#include <sndfile.h>
+
 #include <psynth/new_io/file_common.hpp>
 
 namespace psynth
@@ -41,7 +43,10 @@ namespace io
 template <class Range>
 class file_input : public file_input_base<Range>
 {
+    typedef file_input_base<Range> base;
 public:
+    typedef typename base::range range;
+    
     static_assert (file_support<Range>::is_supported::value,
                    "Audio file format not supported.");
     
@@ -58,7 +63,7 @@ public:
     
 private:
     SNDFILE* _file;
-    SF_INFO  _info,
+    SF_INFO  _info;
 };
 
 } /* namespace io */

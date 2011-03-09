@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-07 19:19:23 raskolnikov>
+ *  Time-stamp:  <2011-03-09 00:44:19 raskolnikov>
  *
  *  @file        alsa_raw_output.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -49,12 +49,12 @@ class alsa_raw_output : public thread_async,
                         public boost::noncopyable
 {
 public:
-    alsa_raw_output (const char*      device,
-                     snd_pcm_format_t format,
-                     snd_uframes_t    buffer_size,
-                     snd_pcm_access_t access,
-                     unsigned int     rate,
-                     unsigned int     channels);
+    alsa_raw_output (const char*       device,
+                     snd_pcm_format_t  format,
+                     snd_pcm_uframes_t buffer_size,
+                     snd_pcm_access_t  access,
+                     unsigned int      rate,
+                     unsigned int      channels);
     
     ~alsa_raw_output ();
 
@@ -68,10 +68,10 @@ protected:
     void iterate ();
     
 private:
-    snd_uframes_t        _buffer_size;
+    snd_pcm_uframes_t    _buffer_size;
     snd_pcm_t*           _handle;
-    snd_pcm_hw_params_t* _hwparams;
-    snd_pcm_sw_params_t* _swparams;
+    snd_pcm_hw_params_t* _hw_params;
+    snd_pcm_sw_params_t* _sw_params;
 };
 
 } /* namespace io */

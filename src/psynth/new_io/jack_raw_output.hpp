@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-07 19:18:51 raskolnikov>
+ *  Time-stamp:  <2011-03-09 01:20:21 raskolnikov>
  *
  *  @file        jack_raw_output.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -85,7 +85,7 @@ private:
     
     std::vector<jack_port_t*> _out_ports;
     jack_client_t*            _client;
-    std::size_t               _actual_rate;
+    int                       _actual_rate;
     std::size_t               _buffer_size;
 };
 

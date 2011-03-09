@@ -1,11 +1,11 @@
 /**
- *  Time-stamp:  <2011-03-09 01:51:51 raskolnikov>
+ *  Time-stamp:  <2011-03-09 00:53:59 raskolnikov>
  *
- *  @file        file_input.cpp
+ *  @file        exception.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
- *  @date        Tue Mar  8 17:50:47 2011
+ *  @date        Tue Mar  8 22:59:25 2011
  *
- *  Implementation of file input facilities.
+ *  Common exception base clases for the IO layer.
  */
 
 /*
@@ -28,45 +28,19 @@
  *
  */
 
-#include "file_input.hpp"
+#ifndef PSYNTH_IO_EXCEPTION_H_
+#define PSYNTH_IO_EXCEPTION_H_
+
+#include <psynth/base/exception.hpp>
 
 namespace psynth
 {
 namespace io
 {
 
-namespace detail
-{
-
-/**
- * @todo Not supported by libsndfile.
- */
-std::size_t
-file_output_take_impl (SNDFILE* file, sound::bits8s* ptr, std::size_t frames)
-{
-    return 0;
-}
-
-std::size_t
-file_output_take_impl (SNDFILE* file, sound::bits16s* ptr, std::size_t frames)
-{
-    // TODO: Error checking?
-    return sf_readf_short (file, ptr, frames);
-}
-
-std::size_t
-file_output_take_impl (SNDFILE* file, sound::bits32s* ptr, std::size_t frames)
-{
-    return sf_readf_int (file, ptr, frames);
-}
-
-std::size_t
-file_output_take_impl (SNDFILE* file, sound::bits32sf* ptr, std::size_t frames)
-{
-    return sf_readf_float (file, reinterpret_cast<float*>(ptr), frames);
-}
-
-} /* namespace detail */
+PSYNTH_DECLARE_ERROR (base::error_base, error);
 
 } /* namespace io */
 } /* namespace psynth */
+
+#endif /* PSYNTH_IO_EXCEPTION_H_ */
