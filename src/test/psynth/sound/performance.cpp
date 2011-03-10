@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-09 02:21:54 raskolnikov>
+ *  Time-stamp:  <2011-03-10 03:39:05 raskolnikov>
  *
  *  @file        performance.cpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -54,9 +54,9 @@
  */
 
 #include <cstddef>
-#include <ctime>
 #include <iostream>
 
+#include <boost/timer.hpp>
 #include <boost/test/unit_test.hpp>
 
 #include <psynth/sound/frame.hpp>
@@ -72,18 +72,18 @@
 
 using namespace psynth::sound;
 
-// returns time in milliseconds per call
+// returns time in microseconds per call
 template <typename Op>
 double measure_time (Op op, std::size_t num_loops)
 {
-    clock_t begin = clock();
+    boost::timer t;
     for (std::size_t ii = 0; ii < num_loops; ++ii)
 	op ();
-    return double (clock() - begin) / double (num_loops);
+    return t.elapsed () * 1000000. / double (num_loops);
 }
 
 // buffer dimension
-std::size_t buffer_size = 1024;
+const std::size_t buffer_size = 4096;
 
 // macros for standard GIL ranges
 #define STEREO_RANGE(T) \
@@ -673,9 +673,9 @@ void test_transform (std::size_t trials)
 }
 
 #ifdef NDEBUG
-    const std::size_t num_trials = 10000;
+    const std::size_t num_trials = 100000;
 #else
-    const std::size_t num_trials = 100;
+    const std::size_t num_trials = 100000;
 #endif
 
 BOOST_AUTO_TEST_SUITE (sound_peformance_test_suite);

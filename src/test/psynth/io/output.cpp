@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-09 20:21:52 raskolnikov>
+ *  Time-stamp:  <2011-03-09 21:37:48 raskolnikov>
  *
  *  @file        output.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -59,7 +59,6 @@ namespace mpl = boost::mpl;
 
 typedef mpl::list<
     psynth::sound::mono8s_range,
-    //psynth::sound::mono8s_planar_range,
     psynth::sound::mono16_range,
     psynth::sound::stereo16s_range,
     psynth::sound::stereo16s_planar_range,
@@ -76,6 +75,11 @@ BOOST_AUTO_TEST_SUITE (io_output_test_suite);
 #endif
 
 BOOST_AUTO_TEST_CASE (buffered_output_test)
+{
+    
+}
+
+BOOST_AUTO_TEST_CASE (buffered_output_adapter_test)
 {
     
 }
