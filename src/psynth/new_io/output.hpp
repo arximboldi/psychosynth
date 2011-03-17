@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-16 22:34:06 raskolnikov>
+ *  Time-stamp:  <2011-03-17 15:32:04 raskolnikov>
  *
  *  @file        output.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -111,11 +111,15 @@ public:
 
     void start ()
     {
+        this->check_idle ();
+        this->set_state (async_state::running);
         detail::dummy_output_start_impl ();
     }
 
     void stop ()
     {
+        this->check_running ();
+        this->set_state (async_state::idle);
         detail::dummy_output_stop_impl ();
     }
     

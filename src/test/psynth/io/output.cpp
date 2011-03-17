@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-16 23:57:20 raskolnikov>
+ *  Time-stamp:  <2011-03-17 14:58:45 raskolnikov>
  *
  *  @file        output.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -136,7 +136,7 @@ struct do_test_buffered_output
 };
 
 /*
- * When both are the same it skips.
+ * When both are the same it skips the buffer.
  * TODO: Find a way to test this.
  */
 template <class R>
@@ -197,7 +197,7 @@ struct do_test_async_buffered_output
 };
 
 /*
- * When both are the same it skips.
+ * When both are the same it skips the buffer.
  * TODO: Find a way to test this.
  */
 template <class R>

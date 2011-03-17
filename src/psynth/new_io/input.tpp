@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-09 13:25:13 raskolnikov>
+ *  Time-stamp:  <2011-03-17 15:00:18 raskolnikov>
  *
  *  @file        input.tpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -42,6 +42,10 @@ namespace detail
 {
 
 void dummy_input_take_impl ();
+
+void dummy_input_start_impl ();
+
+void dummy_input_stop_impl ();
 
 } /* namespace detail */
 

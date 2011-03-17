@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-09 13:29:32 raskolnikov>
+ *  Time-stamp:  <2011-03-17 15:45:40 raskolnikov>
  *
  *  @file        input.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -32,14 +32,17 @@
 #define PSYNTH_IO_INPUT_H_
 
 #include <cstddef>
-#include <psynth/new_io/async_base.hpp>
 
+#include <psynth/sound/forwards.hpp>
+#include <psynth/new_io/async_base.hpp>
 #include <psynth/new_io/input.tpp>
 
 namespace psynth
 {
 namespace io
 {
+
+const std::size_t default_input_buffer_size = 1024;
 
 /**
  *
@@ -57,7 +60,7 @@ public:
 };
 
 /**
- * Dummy output class.
+ * Dummy input class.
  */
 template <typename Range>
 class dummy_input : public input<Range>
@@ -68,6 +71,11 @@ public:
     virtual std::size_t take (const range& data)
     {
         detail::dummy_input_take_impl ();
+        typename range::value_type zero (
+            sound::sample_traits<
+                typename sound::sample_type<range>::type
+                >::zero_value ());
+        fill_frames (data, zero);
         return data.size ();
     }
 };
@@ -82,6 +90,52 @@ class async_input : public input<Range>,
 public:
     virtual std::size_t buffer_size () const = 0;
 };
+
+/**
+ * Dummy input class.
+ */
+template <typename Range>
+class dummy_async_input : public input<Range>
+{
+public:
+    typedef Range range;
+
+    dummy_async_input (std::size_t buffer_size)
+        : _buffer_size (buffer_size)
+    {}
+    
+    std::size_t buffer_size () const
+    { return _buffer_size; }
+    
+    virtual std::size_t take (const range& data)
+    {
+        detail::dummy_input_take_impl ();
+        typename range::value_type zero (
+            sound::sample_traits<
+                typename sound::sample_type<range>::type
+                >::zero_value ());
+        fill_frames (data, zero);
+        return data.size ();
+    }
+
+    void start ()
+    {
+        this->check_idle ();
+        this->set_state (async_state::running);
+        detail::dummy_input_start_impl ();
+    }
+
+    void stop ()
+    {
+        this->check_running ();
+        this->set_state (async_state::idle);
+        detail::dummy_input_stop_impl ();
+    }
+    
+private:
+    std::size_t _buffer_size;
+};
+
 
 } /* namespace io */
 } /* namespace psynth */

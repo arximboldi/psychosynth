@@ -38,6 +38,7 @@ psynth_unit_test_SOURCES = \
 	psynth/sound/frame_iterator.cpp \
 	psynth/sound/ring.cpp \
 	psynth/io/output.cpp \
+	psynth/io/input.cpp \
 	psynth/util.cpp \
 	psynth/util.hpp \
 	psynth_unit_test.cpp

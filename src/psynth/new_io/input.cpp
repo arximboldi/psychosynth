@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-09 13:29:44 raskolnikov>
+ *  Time-stamp:  <2011-03-17 15:01:12 raskolnikov>
  *
  *  @file        input.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -44,6 +44,16 @@ namespace detail
 void dummy_input_take_impl ()
 {
     PSYNTH_LOG_DEBUG << "dummy_input::take";
+}
+
+void dummy_input_start_impl ()
+{
+    PSYNTH_LOG_DEBUG << "dummy_input::start";
+}
+
+void dummy_input_stop_impl ()
+{
+    PSYNTH_LOG_DEBUG << "dummy_input::stop";
 }
 
 } /* namespace detail */
