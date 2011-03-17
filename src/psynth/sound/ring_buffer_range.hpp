@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-08 21:00:58 raskolnikov>
+ *  Time-stamp:  <2011-03-17 21:05:50 raskolnikov>
  *
  *  @file        ring_buffer.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -79,12 +79,13 @@ public:
     typedef typename Ring::difference_type difference_type;
     typedef Ring                           ring_type;
 
-    ring_position () {}
-    ring_position (const ring_position& r) : _pos (r._pos) {}
+    ring_position () = default;
+    ring_position (const ring_position& r) = default;
+    ring_position& operator= (const ring_position& p) = default;
+    
     ring_position (size_type p) : _pos (p) {}
-    ring_position& operator= (const ring_position& p)
-    { _pos = p._pos; }
 
+    
     size_type offset () const
     { return _pos; }
 
@@ -105,15 +106,13 @@ public:
     typedef typename parent_type::size_type size_type;
     typedef typename parent_type::difference_type difference_type;
     
-    safe_ring_position () {}
-    safe_ring_position (const safe_ring_position& r)
-	: parent_type (r), _count (r._count) {}
+    safe_ring_position () = default;
+    safe_ring_position (const safe_ring_position& r) = default;
+    safe_ring_position& operator= (const safe_ring_position& p) = default;
+    
     safe_ring_position (size_type p, size_type c)
 	: parent_type (p), _count (c) {}
     
-    safe_ring_position& operator= (const safe_ring_position& p)
-    { parent_type::opertor= (p); _count = p._count; return *this; }
-
     difference_type count () const { return _count; }
 
     bool operator== (const safe_ring_position& p) const
@@ -556,7 +555,7 @@ public:
 					    size () - _writepos._pos + r._pos));
     }
     
-protected:
+public:
     bool          _backwards;  /**< @c true if we are reading and
 			          writting the ringbuffer backwards. */
     size_type     _startpos;   /**< The new starting position of the

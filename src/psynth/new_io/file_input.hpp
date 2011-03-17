@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-09 01:38:05 raskolnikov>
+ *  Time-stamp:  <2011-03-17 16:56:08 raskolnikov>
  *
  *  @file        file_input.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -50,7 +50,7 @@ public:
     static_assert (file_support<Range>::is_supported::value,
                    "Audio file format not supported.");
     
-    file_input (const char* fname);
+    file_input (const std::string& fname);
 
     ~file_input ();
 

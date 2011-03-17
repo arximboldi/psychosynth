@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-16 22:46:34 raskolnikov>
+ *  Time-stamp:  <2011-03-17 19:28:21 raskolnikov>
  *
  *  @file        buffered_output.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -58,7 +58,7 @@ public:
     typedef typename std::remove_pointer<OutputPtr>::type output_type;
     typedef typename output_type::range                   output_range;
 
-    typedef typename sound::buffer_type_from_range<output_range>::type
+    typedef typename sound::buffer_from_range<output_range>::type
     buffer_type;
 
     buffered_output_impl (OutputPtr output_ptr = 0)

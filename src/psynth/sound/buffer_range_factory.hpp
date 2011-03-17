@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-16 19:28:08 raskolnikov>
+ *  Time-stamp:  <2011-03-17 19:12:41 raskolnikov>
  *
  *  @file        buffer_range_factory.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -295,6 +295,9 @@ sub_range (const Range& src, size_t start, size_t size)
    range constness problem. Maybe we should step back in front of this
    constness nightmare?
 */
+
+#ifdef PSYNTH_BUFFER_MODEL_RANGE
+
 template <typename F, bool P, typename A>
 class buffer;
 
@@ -305,6 +308,8 @@ sub_range (buffer<F,P,A>& src, size_t start, size_t size)
     typedef typename buffer_range_type<buffer<F,P,A> >::type RRange;
     return RRange (size, src.at (start));
 }
+
+#endif /* PSYNTH_BUFFER_MODEL_RANGE */
 
 /**
    \defgroup BufferRangeTransformationsSubbuffer subbuffer_range

@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-17 14:58:45 raskolnikov>
+ *  Time-stamp:  <2011-03-17 19:30:34 raskolnikov>
  *
  *  @file        output.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -104,7 +104,7 @@ struct do_test_buffered_output
         typedef R1 src_range;
         typedef R2 dst_range;
         
-        typedef typename sound::buffer_type_from_range<src_range>::type
+        typedef typename sound::buffer_from_range<src_range>::type
             src_buffer_type;
 
         const std::size_t tmp_buffer_size = 1024;
@@ -166,7 +166,7 @@ struct do_test_async_buffered_output
         typedef R1 src_range;
         typedef R2 dst_range;
         
-        typedef typename sound::buffer_type_from_range<src_range>::type
+        typedef typename sound::buffer_from_range<src_range>::type
             src_buffer_type;
 
         const std::size_t buffer_size = 1024;
@@ -225,7 +225,7 @@ alsa_test_types;
 BOOST_AUTO_TEST_CASE_TEMPLATE (alsa_output_test, Range, alsa_test_types)
 {
     using namespace psynth;
-    typedef typename sound::buffer_type_from_range<Range>::type buffer_type;
+    typedef typename sound::buffer_from_range<Range>::type buffer_type;
     
     const std::size_t buffer_size = 1024;
     const std::size_t sample_rate = 44100;
@@ -272,7 +272,7 @@ oss_test_types;
 BOOST_AUTO_TEST_CASE_TEMPLATE (oss_output_test, Range, oss_test_types)
 {    
     using namespace psynth;
-    typedef typename sound::buffer_type_from_range<Range>::type buffer_type;
+    typedef typename sound::buffer_from_range<Range>::type buffer_type;
     
     const std::size_t buffer_size = 1024;
     const std::size_t sample_rate = 44100;
@@ -318,7 +318,7 @@ jack_test_types;
 BOOST_AUTO_TEST_CASE_TEMPLATE (jack_output_test, Range, jack_test_types)
 {    
     using namespace psynth;
-    typedef typename sound::buffer_type_from_range<Range>::type buffer_type;
+    typedef typename sound::buffer_from_range<Range>::type buffer_type;
     
     const std::size_t buffer_size = 1024;
     const std::size_t sample_rate = 44100;
@@ -362,7 +362,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE (file_output_test, Range, file_test_types)
     using namespace psynth;
     namespace fs = boost::filesystem;
     
-    typedef typename sound::buffer_type_from_range<Range>::type buffer_type;
+    typedef typename sound::buffer_from_range<Range>::type buffer_type;
 
     const std::string filename    = std::tmpnam (0);
     const std::size_t sample_rate = 44100;
@@ -372,19 +372,19 @@ BOOST_AUTO_TEST_CASE_TEMPLATE (file_output_test, Range, file_test_types)
     PSYNTH_ON_BLOCK_EXIT ([&] { fs::remove (fs::path (filename)); });
 
     for (int fmt = 0; fmt < (int) io::file_fmt::num_formats; ++fmt)
-    try
-    {
-        io::file_output<Range> device (
-            filename, (io::file_fmt) fmt, sample_rate);
-        std::size_t nframes = device.put (range (buf));
-        BOOST_CHECK_EQUAL (nframes, buffer_size);
-    }
-    catch (io::file_error& err)
-    {
-        BOOST_TEST_MESSAGE("File test did throw an exception but it "
-                           "might be caused by the system.");
-        err.log ();
-    }
+        try
+        {
+            io::file_output<Range> device (
+                filename, (io::file_fmt) fmt, sample_rate);
+            std::size_t nframes = device.put (range (buf));
+            BOOST_CHECK_EQUAL (nframes, buffer_size);
+        }
+        catch (io::file_error& err)
+        {
+            BOOST_TEST_MESSAGE("File test did throw an exception but it "
+                               "might be caused by the system.");
+            err.log ();
+        }
 }
 
 #endif /* PSYNTH_HAVE_PCM */

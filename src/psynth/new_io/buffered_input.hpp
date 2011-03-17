@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-17 15:17:20 raskolnikov>
+ *  Time-stamp:  <2011-03-17 19:28:57 raskolnikov>
  *
  *  @file        buffered_input.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -48,7 +48,7 @@ public:
     typedef typename std::remove_pointer<InputPtr>::type input_type;
     typedef typename input_type::range                   input_range;
 
-    typedef typename sound::buffer_type_from_range<input_range>::type
+    typedef typename sound::buffer_from_range<input_range>::type
     buffer_type;
 
     buffered_input_impl (InputPtr input_ptr = 0)

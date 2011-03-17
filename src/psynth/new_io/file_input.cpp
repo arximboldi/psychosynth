@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-09 01:51:51 raskolnikov>
+ *  Time-stamp:  <2011-03-17 17:22:16 raskolnikov>
  *
  *  @file        file_input.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -42,28 +42,31 @@ namespace detail
  * @todo Not supported by libsndfile.
  */
 std::size_t
-file_output_take_impl (SNDFILE* file, sound::bits8s* ptr, std::size_t frames)
+file_input_take_impl (SNDFILE* file, sound::bits8s* ptr, std::size_t frames)
 {
+    assert (false);
     return 0;
 }
 
 std::size_t
-file_output_take_impl (SNDFILE* file, sound::bits16s* ptr, std::size_t frames)
+file_input_take_impl (SNDFILE* file, sound::bits16s* ptr, std::size_t frames)
 {
-    // TODO: Error checking?
-    return sf_readf_short (file, ptr, frames);
+    sf_count_t res = sf_readf_short (file, ptr, frames);
+    return res;
 }
 
 std::size_t
-file_output_take_impl (SNDFILE* file, sound::bits32s* ptr, std::size_t frames)
+file_input_take_impl (SNDFILE* file, sound::bits32s* ptr, std::size_t frames)
 {
-    return sf_readf_int (file, ptr, frames);
+    sf_count_t res = sf_readf_int (file, ptr, frames);
+    return res;
 }
 
 std::size_t
-file_output_take_impl (SNDFILE* file, sound::bits32sf* ptr, std::size_t frames)
+file_input_take_impl (SNDFILE* file, sound::bits32sf* ptr, std::size_t frames)
 {
-    return sf_readf_float (file, reinterpret_cast<float*>(ptr), frames);
+    sf_count_t res = sf_readf_float (file, reinterpret_cast<float*>(ptr), frames);
+    return res;
 }
 
 } /* namespace detail */

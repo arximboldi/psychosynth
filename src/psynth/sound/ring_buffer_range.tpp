@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-08 20:11:32 raskolnikov>
+ *  Time-stamp:  <2011-03-17 20:31:24 raskolnikov>
  *
  *  @file        ring_buffer.tpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -98,6 +98,36 @@ ring_buffer_range_base<R>::read (Position& r,
 }
 
 template <class R>
+template <class Position, class Range, class CC>
+typename ring_buffer_range_base<R>::size_type
+ring_buffer_range_base<R>::read_and_convert (Position& r,
+					     const Range& buf,
+					     size_type samples,
+					     CC cc) const
+{    
+    const size_type slice = std::min (available (r), samples);
+	
+    if (r._pos + slice > size ())
+    {
+	const size_type slice_one = size () - r._pos;
+	const size_type slice_two = slice - slice_one;
+	copy_and_convert_frames (sub_range (_range, r._pos, slice_one),
+				 sub_range (buf, 0, slice_one),
+				 cc);
+	copy_and_convert_frames (sub_range (_range, 0, slice_two),
+				 sub_range (buf, slice_one, slice_two),
+				 cc);
+    }
+    else
+	copy_and_convert_frames (sub_range (_range, r._pos, slice),
+				 sub_range (buf, 0, slice),
+				 cc);
+	
+    advance (r, slice);
+    return slice;
+}
+
+template <class R>
 template <class Range>
 void ring_buffer_range_base<R>::write (const Range& buf, size_type nwrite)
 {
@@ -126,35 +156,6 @@ void ring_buffer_range_base<R>::write (const Range& buf, size_type nwrite)
     advance (nwrite);
 }
 
-template <class R>
-template <class Position, class Range, class CC>
-typename ring_buffer_range_base<R>::size_type
-ring_buffer_range_base<R>::read_and_convert (Position& r,
-					     const Range& buf,
-					     size_type samples,
-					     CC cc) const
-{
-    const size_type slice = std::min (available (r), samples);
-	
-    if (r._pos + slice > size ())
-    {
-	const size_type slice_one = size () - r._pos;
-	const size_type slice_two = slice - slice_one;
-	copy_and_convert_frames (sub_range (_range, r._pos, slice_one),
-				 sub_range (buf, 0, slice_one),
-				 cc);
-	copy_and_convert_frames (sub_range (_range, 0, slice_two),
-				 sub_range (buf, slice_one, slice_two),
-				 cc);
-    }
-    else
-	copy_and_convert_frames (sub_range (_range, r._pos, slice),
-				 sub_range (buf, 0, slice),
-				 cc);
-	
-    advance (r, slice);
-    return slice;
-}
 
 template <class R>
 template <class Range, class CC>

@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-08 20:00:38 raskolnikov>
+ *  Time-stamp:  <2011-03-17 19:07:59 raskolnikov>
  *
  *  @file        ring_buffer.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -342,7 +342,7 @@ public:
 
 private:
     template <typename B> friend 
-    const typename ring_buffer<B>::range&
+    typename ring_buffer<B>::range&
     range (ring_buffer<B>& buf);
 
     template <typename B> friend 
@@ -356,8 +356,13 @@ private:
  *
  */
 
+/**
+ * @todo This returns non-const reference because writing to a
+ * ring_buffer_range mutates the internal range state. Does this has
+ * bad consecuences? Is this the best alternative?
+ */
 template <typename B>
-const typename ring_buffer<B>::range&
+typename ring_buffer<B>::range&
 range (ring_buffer<B>& buf)
 {
     return buf._range;

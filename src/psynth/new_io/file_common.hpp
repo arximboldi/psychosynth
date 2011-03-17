@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-16 23:56:26 raskolnikov>
+ *  Time-stamp:  <2011-03-17 19:01:18 raskolnikov>
  *
  *  @file        file_common.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -96,10 +96,35 @@ template <typename Range>
 class file_input_base : public input<Range>
 {
 public:
-    virtual std::size_t frame_rate () const;
+    virtual std::size_t frame_rate () const = 0;
     
     virtual std::size_t seek (std::ptrdiff_t offset,
                               seek_dir dir = seek_dir::beg) = 0;
+};
+
+template <typename Range>
+class dummy_file_input : public file_input_base<Range>
+{
+public:
+    typedef Range range;
+    
+    std::size_t frame_rate () const
+    { return 44100; }
+    
+    std::size_t seek (std::ptrdiff_t offset,
+                      seek_dir dir = seek_dir::beg)
+    { return 0; }
+    
+    virtual std::size_t take (const range& data)
+    {
+        detail::dummy_input_take_impl ();
+        typename range::value_type zero (
+            sound::sample_traits<
+                typename sound::sample_type<range>::type
+                >::zero_value ());
+        fill_frames (data, zero);
+        return data.size ();
+    }
 };
 
 } /* namespace io */

@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-09 01:44:14 raskolnikov>
+ *  Time-stamp:  <2011-03-17 17:01:09 raskolnikov>
  *
  *  @file        file_input.tpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -53,9 +53,9 @@ file_input_take_impl (SNDFILE* file, sound::bits32sf* ptr, std::size_t frames);
 } /* namespace detail */
 
 template <class Range>
-file_input<Range>::file_input (const char* fname)
+file_input<Range>::file_input (const std::string& fname)
 {
-    _file = detail::file_open_impl (fname, SFM_READ, &_info);
+    _file = detail::file_open_impl (fname.c_str (), SFM_READ, &_info);
 }
 
 template <class Range>
@@ -72,8 +72,8 @@ std::size_t file_input<Range>::take (const range& data)
 {
     return detail::file_input_take_impl (
         _file,
-//        reinterpret_cast<typename sound::sample_type<Range>::type*> (
-        data.frames (),//),
+        reinterpret_cast<typename sound::sample_type<Range>::type*> (
+            data.frames ()),
         data.size ());
 }
 

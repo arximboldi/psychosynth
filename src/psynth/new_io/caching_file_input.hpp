@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-08 18:46:47 raskolnikov>
+ *  Time-stamp:  <2011-03-17 21:04:12 raskolnikov>
  *
  *  @file        caching_file_reader.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -41,6 +41,7 @@
 #include <psynth/sound/metafunctions.hpp>
 #include <psynth/sound/ring_buffer.hpp>
 #include <psynth/new_io/file_common.hpp>
+#include <psynth/new_io/async_base.hpp>
 
 namespace psynth
 {
@@ -52,30 +53,47 @@ namespace detail
 
 template <class Range,
           class InputPtr> // Models file_input_base
-class caching_file_input_impl : public file_input_base
+class caching_file_input_impl : public file_input_base<Range>
+                              , public boost::noncopyable
 {
 public:
-    typedef Range                       range;
-    typedef std::decay<InputPtr>::type  input;
-    typedef typename output::range      input_range;
+    typedef Range range;
+
+    typedef typename std::remove_pointer<InputPtr>::type  input_type;
+    typedef typename input_type::range                    input_range;
 
     /*
      * High default values for lower number of seeks when reading
      * backwards which is in our default usecase.
      */
+    static const std::size_t DEFAULT_CHUNK_SIZE  = 1024;
     static const std::size_t DEFAULT_BUFFER_SIZE = 16384;
     static const std::size_t DEFAULT_THRESHOLD   = 4096; 
    
     caching_file_input_impl (
-        InputPtr    input = 0,
+        InputPtr    input       = 0,
+        std::size_t chunk_size  = DEFAULT_CHUNK_SIZE,
         std::size_t buffer_size = DEFAULT_BUFFER_SIZE,
         std::size_t threshold   = DEFAULT_THRESHOLD);
 
+    // caching_file_input_impl (
+    //     caching_file_input_impl&& other) = default;
+
+    ~caching_file_input_impl ();
+    
+#if 0 // TODO
+    caching_file_input_impl& operator= (
+        caching_file_input_impl&& other) = default;
+#endif
+    
     void start ();
     void stop ();
 
-    const InputPtr input () const
-    { return _input; }
+    std::size_t frame_rate () const
+    { return _input->frame_rate (); }
+    
+    const input_type& input () const
+    { return *_input; }
     
     bool is_backwards () const
     { return _backwards; }
@@ -85,19 +103,36 @@ public:
     void soft_seek (std::size_t pos);
     std::size_t seek (std::ptrdiff_t pos, seek_dir dir);
     
-    std::size_t take (const range& buf);
+    std::size_t take (const range& buf)
+    { return this->template take<range> (buf); }
+
+    template <class Range2>
+    std::size_t take (const Range2& buf);
+
+protected:
+    InputPtr      _input;
     
-private:
-    typedef sound::buffer_type_from_range<output_range>::type buffer_type;
+public:
+    typedef typename sound::buffer_from_range<input_range>::type
+    input_buffer_type;
+
+    typedef typename sound::buffer_from_range<range>::type
+    buffer_type;
+    
     typedef sound::ring_buffer<buffer_type> ring_buffer_type;
 
-    InputPtr      _input;
+    void set_input (InputPtr ptr);
+    
+    std::size_t   _chunk_size; // TODO: This substitutes
+                               // get_info().block_size, but there
+                               // might be problems.
     std::size_t   _buffer_size;
     std::size_t   _threshold;
     
-    buffer_type                _tmp_buffer;
-    ring_buffer_type           _buffer;
-    ring_buffer_type::position _read_ptr;
+    input_buffer_type                        _tmp_buffer;
+    ring_buffer_type                         _buffer;
+    typename ring_buffer_type::range&        _range;
+    typename ring_buffer_type::safe_position _read_ptr;
     
     bool        _backwards;
     std::size_t _read_pos;
@@ -109,22 +144,39 @@ private:
     std::mutex              _input_mutex;
     std::mutex              _buffer_mutex;
     std::condition_variable _cond;
-
+    
     void run ();
 };
 
 } /* namespace detail */
 
 template <class Range, class InputPtr>
-class caching_file_input_adapter : public detail::caching_file_input_impl
+class caching_file_input_adapter :
+        public detail::caching_file_input_impl<Range, InputPtr>
 {
 public:
+    typedef detail::caching_file_input_impl<Range, InputPtr> base;
+    
+    caching_file_input_adapter (
+        InputPtr    input       = 0,
+        std::size_t chunk_size  = base::DEFAULT_CHUNK_SIZE,
+        std::size_t buffer_size = base::DEFAULT_BUFFER_SIZE,
+        std::size_t threshold   = base::DEFAULT_THRESHOLD)
+        : base (input, buffer_size, threshold)
+    {}
+
+    caching_file_input_adapter (caching_file_input_adapter&& other)
+        : base (std::move (other))
+    {}
+
     void set_input (InputPtr input)
-    { _input = input; }
+    { base::set_input (input); }
 };
 
 } /* namespace io */
 } /* namespace psynth */
+
+#include <psynth/new_io/caching_file_input.tpp>
 
 #endif /* PSYNTH_IO_CACHING_FILE_INPUT_H_ */
 
