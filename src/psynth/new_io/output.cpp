@@ -1,11 +1,11 @@
 /**
- *  Time-stamp:  <2011-03-09 13:49:51 raskolnikov>
+ *  Time-stamp:  <2011-03-16 22:34:35 raskolnikov>
  *
  *  @file        output.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
  *  @date        Wed Mar  9 13:13:42 2011
  *
- *  Implementation of some output facilities.
+ *  @brief Implementation of some output facilities.
  */
 
 /*
@@ -44,6 +44,16 @@ namespace detail
 void dummy_output_put_impl ()
 {
     PSYNTH_LOG_DEBUG << "dummy_output::put";
+}
+
+void dummy_output_start_impl ()
+{
+    PSYNTH_LOG_DEBUG << "dummy_output::start";
+}
+
+void dummy_output_stop_impl ()
+{
+    PSYNTH_LOG_DEBUG << "dummy_output::stop";
 }
 
 } /* namespace detail */

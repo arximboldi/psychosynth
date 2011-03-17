@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-08 18:50:51 raskolnikov>
+ *  Time-stamp:  <2011-03-16 20:08:39 raskolnikov>
  *
  *  @file        buffered_output.tpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -31,6 +31,8 @@
 #ifndef PSYNTH_IO_BUFFERED_OUTPUT_TPP_
 #define PSYNTH_IO_BUFFERED_OUTPUT_TPP_
 
+#include <psynth/new_io/buffered_output.hpp>
+
 namespace psynth
 {
 namespace io
@@ -44,37 +46,54 @@ struct buffered_output_put_fn
 {
     template <class Output>
     std::size_t operator () (Output& out, const R1& data)
-    { out.template put<R1> (data); }
+    { return out.template put<R1> (data); }
 };
 
-template <class R, class R>
-struct buffered_output_put_fn
+template <class R>
+struct buffered_output_put_fn<R, R>
 {
     template <class Output>
-    std::size_t operator () (Output& out, const R1& data)
-    { out.wrapped ().put (data); }
+    std::size_t operator () (Output& out, const R& data)
+    { return out.output ().put (data); }
 };
 
 template <class Ir, class Op>
-std::size_t buffered_output_adapter_impl<Ir, Op>::put (const range& data)
+std::size_t buffered_output_impl<Ir, Op>::put (const range& data)
 {
     buffered_output_put_fn <range, output_range> p;
     return p (*this, data);
 }
 
-template <class Range>
 template <class Ir, class Op>
-std::size_t buffered_output_adapter_impl<Ir, Op>::put (const Range& data)
+template <class Range>
+std::size_t buffered_output_impl<Ir, Op>::put (const Range& data)
 {
-    // TODO TODO TODO
+    std::size_t block_size  = _buffer.size ();
+    std::size_t total       = data.size ();
+    std::size_t written     = 0;
+    std::size_t old_written = 1; // Do not get into an infinite loop
+                                 // when the device refuses to write.
+    
+    while (old_written != written && written < total)
+    {
+        const std::size_t to_write = std::min (block_size, total - written); 
+        auto src = sub_range (data, written, to_write);
+        auto dst = sub_range (sound::range (_buffer), 0, to_write);
+        old_written = written;
+        copy_and_convert_frames (src, dst);
+        written += _output_ptr->put (dst);
+    }
+    
+    return written;
 }
 
-template <class IR, class OP>
-void buffered_output_adapter_impl<Ir, Op>::fit_buffer ()    
+template <class Ir, class Op>
+void buffered_async_output_impl<Ir, Op>::fit_buffer ()    
 {
-    std::size_t new_size = _output_ptr->buffer_size ();
-    if (new_size != _buffer.size ())
-        _buffer.recreate ();
+    this->_output_ptr->check_idle ();
+    std::size_t new_size = this->_output_ptr->get_buffer_size ();
+    if (new_size != this->_buffer.size ())
+        this->set_buffer_size (this->_output_ptr->get_buffer_size ());
 }
 
 } /* namespace detail */

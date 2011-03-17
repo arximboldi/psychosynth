@@ -52,6 +52,7 @@ psynth_cli_LDADD = \
 	$(SIGC_LIBS) \
 	$(LIBLO_LIBS) \
 	$(BOOST_FILESYSTEM_LIB) \
+	$(BOOST_SIGNALS_LIB) \
 	-lboost_system-mt \
 	./psynth/libpsynth.la
 

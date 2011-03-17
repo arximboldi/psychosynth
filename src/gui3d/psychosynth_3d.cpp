@@ -235,9 +235,9 @@ void psychosynth_3d::setup_settings (conf_node& conf)
 	
     /* Is it dangerous to have this set before the gui is initialized? */
     conf.on_nudge.connect
-	(sigc::mem_fun (*this, &psychosynth_3d::on_config_change));
+	(boost::bind (&psychosynth_3d::on_config_change, this, _1));
     conf.child ("fps").on_change.connect
-	(sigc::mem_fun (*this, &psychosynth_3d::on_fps_change));
+	(boost::bind (&psychosynth_3d::on_fps_change, this, _1));
     
 }
 

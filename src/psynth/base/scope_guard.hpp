@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-09 01:25:51 raskolnikov>
+ *  Time-stamp:  <2011-03-17 00:19:22 raskolnikov>
  *
  *  @file        scope_guard.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -39,6 +39,7 @@
 #define PSYNTH_BASE_SCOPE_GUARD_H_
 
 #include <boost/utility.hpp>
+#include <psynth/base/util.hpp>
 
 namespace psynth
 {
@@ -101,10 +102,8 @@ typedef const scope_guard_impl_base& scope_guard;
 #define PSYNTH_CONCATENATE(s1, s2)         PSYNTH_CONCATENATE_DIRECT(s1, s2)
 #define PSYNTH_ANONYMOUS_VARIABLE(str)     PSYNTH_CONCATENATE(str, __LINE__)
 
-#define PSYNTH_ON_BLOCK_EXIT                                            \
-    ::psynth::base::scope_guard PSYNTH_ANONYMOUS_VARIABLE(scope_guard) = \
-        ::psynth::base::make_guard
-
+#define PSYNTH_ON_BLOCK_EXIT(f)                                         \
+    ::psynth::base::scope_guard PSYNTH_ANONYMOUS_VARIABLE(scope_guard) = ::psynth::base::make_guard(f); ::psynth::base::ignore_unused_variable_warning (PSYNTH_ANONYMOUS_VARIABLE(scope_guard)) 
 
 } /* namespace base */
 } /* namespace psynth */

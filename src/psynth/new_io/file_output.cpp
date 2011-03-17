@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-09 01:50:43 raskolnikov>
+ *  Time-stamp:  <2011-03-16 23:44:14 raskolnikov>
  *
  *  @file        wave_raw_output.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -30,6 +30,7 @@
 
 #define PSYNTH_MODULE_NAME "psynth.io.file"
 
+#include <cassert>
 #include "file_output.hpp"
 
 namespace psynth
@@ -44,29 +45,31 @@ namespace detail
  * @todo Not supported by libsndfile.
  */
 std::size_t
-file_output_put_impl (SNDFILE* file, sound::bits8s* ptr, std::size_t frames)
+file_output_put_impl (SNDFILE* file, const sound::bits8s* ptr, std::size_t frames)
 {
+    assert (false);
     return 0;
 }
 
 std::size_t
-file_output_put_impl (SNDFILE* file, sound::bits16s* ptr, std::size_t frames)
+file_output_put_impl (SNDFILE* file, const sound::bits16s* ptr, std::size_t frames)
 {
     // TODO: Error checking?
     return sf_writef_short (file, ptr, frames);
 }
 
 std::size_t
-file_output_put_impl (SNDFILE* file, sound::bits32s* ptr, std::size_t frames)
+file_output_put_impl (SNDFILE* file, const sound::bits32s* ptr, std::size_t frames)
 {
     return sf_writef_int (file, ptr, frames);
 }
 
 std::size_t
-file_output_put_impl (SNDFILE* file, sound::bits32sf* ptr, std::size_t frames)
+file_output_put_impl (SNDFILE* file, const sound::bits32sf* ptr, std::size_t frames)
 {
-    return sf_writef_float (file, reinterpret_cast<float*>(ptr), frames);
+    return sf_writef_float (file, reinterpret_cast<const float*>(ptr), frames);
 }
+
 
 } /* namespace detail */
 

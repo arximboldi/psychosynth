@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-07 19:01:54 raskolnikov>
+ *  Time-stamp:  <2011-03-16 20:25:34 raskolnikov>
  *
  *  @file        buffer.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -425,8 +425,7 @@ template <typename Frame, bool IsPlanar, typename Alloc> inline
 const typename buffer <Frame, IsPlanar, Alloc>::const_range
 const_range (const buffer<Frame,IsPlanar,Alloc>& buf)
 { 
-    return static_cast<
-	const typename buffer<Frame, IsPlanar, Alloc>::const_range> (buf._range); 
+    return typename buffer<Frame, IsPlanar, Alloc>::const_range (buf._range); 
 }
 /** @} */
 

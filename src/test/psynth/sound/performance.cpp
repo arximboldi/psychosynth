@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-10 03:39:05 raskolnikov>
+ *  Time-stamp:  <2011-03-16 22:37:52 raskolnikov>
  *
  *  @file        performance.cpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -673,9 +673,9 @@ void test_transform (std::size_t trials)
 }
 
 #ifdef NDEBUG
-    const std::size_t num_trials = 100000;
+    const std::size_t num_trials = 10000;
 #else
-    const std::size_t num_trials = 100000;
+    const std::size_t num_trials = 10000;
 #endif
 
 BOOST_AUTO_TEST_SUITE (sound_peformance_test_suite);

@@ -7,5 +7,5 @@
 #     --log_level=message         for detailed output with checkpoints.
 #    
 
-exec $1 --log_level=message
+exec $1
 

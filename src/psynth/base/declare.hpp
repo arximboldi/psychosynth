@@ -1,11 +1,12 @@
 /**
- *  Time-stamp:  <2010-11-02 23:54:57 raskolnikov>
+ *  Time-stamp:  <2011-03-16 19:08:29 raskolnikov>
  *
  *  @file        declare.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
  *  @date        Mon Oct 18 15:11:23 2010
  *
- *  Aiding in forward declaring types.
+ *  @brief Aiding in forward declaring types.
+ *  @todo new_xxx function should use std::forward when available.
  */
 
 /*
@@ -28,6 +29,7 @@
  *
  */
 
+#include <utility>
 #include <memory>
 
 namespace psynth
@@ -35,12 +37,12 @@ namespace psynth
 namespace base
 {
 
-#define PSYNTH_DECLARE_SHARED_POINTER(type_name)		\
-    typedef std::shared_ptr<type_name> type_name ## _ptr;	\
-    template <typename... Args>					\
-    type_name ## _ptr new_ ## type_name (Args && ... args)	\
-    {								\
-	return std::make_shared <type_name> (args ...);		\
+#define PSYNTH_DECLARE_SHARED_POINTER(type_name)                        \
+    typedef std::shared_ptr<type_name> type_name ## _ptr;               \
+    template <typename... Args>                                         \
+    type_name ## _ptr new_ ## type_name (Args && ... args)              \
+    {                                                                   \
+        return std::make_shared <type_name> (args ...);                 \
     }
 
 #define PSYNTH_DECLARE_TYPE(type_name)		\

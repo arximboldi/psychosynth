@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-07 16:16:58 raskolnikov>
+ *  Time-stamp:  <2011-03-16 20:01:05 raskolnikov>
  *
  *  @file        buffer_range.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -140,12 +140,16 @@ public:
 	: _size (0)
     {}
 
+#ifdef PSYNTH_BUFFER_MODEL_RANGE
+    
     /** We need a non const constructor to copy from buffers. */
     template <typename Range>
     buffer_range (Range& bv)
 	: _size (bv.size ())
 	, _frames (bv.frames ()) {}
 
+#endif /* PSYNTH_BUFFER_MODEL_RANGE */
+    
     template <typename Range>
     buffer_range (const Range& bv)
 	: _size (bv.size ())

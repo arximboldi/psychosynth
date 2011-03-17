@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-03 00:17:17 raskolnikov>
+ *  Time-stamp:  <2011-03-16 12:56:33 raskolnikov>
  *
  *  @file        director.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -95,12 +95,12 @@ void director::register_config ()
     m_config->child ("num_channels").def (int (PSYNTH_DEFAULT_NUM_CHANNELS));
     m_config->child ("output")      .def (string (PSYNTH_DEFAULT_OUTPUT));
 
-    m_config->on_nudge.connect (sigc::mem_fun (*this, &director::on_config_nudge));
+    m_config->on_nudge.connect (boost::bind (&director::on_config_nudge, this, _1));
 }
 
 void director::unregister_config()
 {
-    m_config->on_nudge.connect (sigc::mem_fun (*this, &director::on_config_nudge));
+    m_config->on_nudge.connect (boost::bind (&director::on_config_nudge, this, _1));
 }
 
 void director::start (base::conf_node& conf, const boost::filesystem::path& home_path)

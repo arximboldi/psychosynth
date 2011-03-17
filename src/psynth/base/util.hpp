@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-09 17:08:22 raskolnikov>
+ *  Time-stamp:  <2011-03-17 00:19:11 raskolnikov>
  *
  *  @file        util.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -37,6 +37,9 @@ namespace psynth
 {
 namespace base
 {
+
+template <typename T>
+void ignore_unused_variable_warning (T&&) {}
 
 template <template <class, class> class F, typename Y>
 struct tpl_bind_snd

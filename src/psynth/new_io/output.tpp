@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-09 20:02:04 raskolnikov>
+ *  Time-stamp:  <2011-03-16 20:37:08 raskolnikov>
  *
  *  @file        output.tpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -75,7 +75,7 @@ template <typename RawOutput, typename Range>
 std::size_t put_on_raw (RawOutput& out, const Range& data)
 {
     std::size_t block_size  = out.buffer_size ();
-    std::size_t total       = data.size (); // int is an optimization
+    std::size_t total       = data.size ();
     std::size_t written     = 0;
     std::size_t old_written = 1; // Do not get into an infinite loop
                                  // when the device refuses to write.
@@ -84,9 +84,7 @@ std::size_t put_on_raw (RawOutput& out, const Range& data)
     {
         auto block = sub_range (
             data, written, std::min (block_size, total - written));
-
         old_written = written;
-
         written += detail::put_on_raw_fn<sound::is_planar<Range>::value> () (
             out, block);
     }
@@ -99,6 +97,8 @@ namespace detail
 {
 
 void dummy_output_put_impl ();
+void dummy_output_start_impl ();
+void dummy_output_stop_impl ();
 
 } /* detail */
 

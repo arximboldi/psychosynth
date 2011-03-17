@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-09 02:23:47 raskolnikov>
+ *  Time-stamp:  <2011-03-17 00:21:29 raskolnikov>
  *
  *  @file        default_selector_populator.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -97,7 +97,8 @@ void default_selector_populator::populate(selector_window* sel)
     m_selector = sel;
     config::self ()
 	.path ("psychosynth.file_manager.samples").on_nudge.connect
-	(sigc::mem_fun (*this, &default_selector_populator::on_samples_conf_nudge));
+	(boost::bind (&default_selector_populator::on_samples_conf_nudge,
+                      this, _1));
     
     selector_window::category* cat = NULL;
     world_node_creator creat;

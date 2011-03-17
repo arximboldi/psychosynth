@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-09 00:03:56 raskolnikov>
+ *  Time-stamp:  <2011-03-16 23:56:26 raskolnikov>
  *
  *  @file        file_common.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -50,6 +50,13 @@ PSYNTH_DECLARE_ERROR (file_error, file_seek_error);
 template <class Range>
 class file_support;
 
+template <class Range>
+struct file_is_supported
+{
+    typedef typename file_support<Range>::is_supported type;
+};
+
+
 /**
  * Supported file formats.
  * 
@@ -60,8 +67,10 @@ enum class file_fmt
 {
     wav = 0,
     aiff,
+    au,
     ogg,
-    flac
+    flac,
+    num_formats
 };
 
 /**

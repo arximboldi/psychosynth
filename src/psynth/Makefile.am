@@ -37,8 +37,8 @@ libpsynth_la_CXXFLAGS = $(SIGC_CFLAGS) -I.. \
 libpsynth_la_LDFLAGS =  
 libpsynth_la_LIBADD = \
 	$(BOOST_FILESYSTEM_LIB) \
-	-lboost_system-mt \
-	$(SIGC_LIBS)
+	$(BOOST_SIGNALS_LIB) \
+	-lboost_system-mt
 
 libpsynthincdir = $(PACKAGE_INCLUDE_DIR)
 

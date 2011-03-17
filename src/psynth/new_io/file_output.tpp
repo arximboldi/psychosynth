@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-09 01:49:42 raskolnikov>
+ *  Time-stamp:  <2011-03-16 23:47:37 raskolnikov>
  *
  *  @file        file_output.tpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -42,26 +42,26 @@ namespace detail
 {
 
 std::size_t
-file_output_put_impl (SNDFILE* file, sound::bits8s* ptr, std::size_t frames);
+file_output_put_impl (SNDFILE* file, const sound::bits8s* ptr, std::size_t frames);
 std::size_t
-file_output_put_impl (SNDFILE* file, sound::bits16s* ptr, std::size_t frames);
+file_output_put_impl (SNDFILE* file, const sound::bits16s* ptr, std::size_t frames);
 std::size_t
-file_output_put_impl (SNDFILE* file, sound::bits32s* ptr, std::size_t frames);
+file_output_put_impl (SNDFILE* file, const sound::bits32s* ptr, std::size_t frames);
 std::size_t
-file_output_put_impl (SNDFILE* file, sound::bits32sf* ptr, std::size_t frames);
+file_output_put_impl (SNDFILE* file, const sound::bits32sf* ptr, std::size_t frames);
 
 } /* namespace detail */
 
 template <class Range>
-file_output<Range>::file_output (const char*  fname,
-                                 file_fmt     format,
-                                 std::size_t  rate)
+file_output<Range>::file_output (const std::string& fname,
+                                 file_fmt           format,
+                                 std::size_t        rate)
 {
     _info.channels   = sound::num_samples<Range>::value;
     _info.samplerate = rate;
     _info.format     = detail::file_format_impl (
         format, file_support<Range>::format::value);
-    _file = detail::file_open_impl (fname, SFM_WRITE, &_info);
+    _file = detail::file_open_impl (fname.c_str (), SFM_WRITE, &_info);
 }
 
 template <class Range>
@@ -94,7 +94,8 @@ std::size_t file_output<Range>::put (const range& data)
 {
     return detail::file_output_put_impl (
         _file,
-        data.frames (),
+        reinterpret_cast<const typename sound::sample_type<Range>::type*> (
+            data.frames ()),
         data.size ());
 }
 

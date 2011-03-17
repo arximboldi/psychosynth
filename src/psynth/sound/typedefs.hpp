@@ -1,12 +1,12 @@
 /**
- *  Time-stamp:  <2010-11-09 19:35:31 raskolnikov>
+ *  Time-stamp:  <2011-03-16 23:20:16 raskolnikov>
  *
  *  @file        typedefs.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
  *  @date        Tue Oct 19 13:04:44 2010
  *
- *  Useful typedefs.
- *
+ *  @brief Useful typedefs.
+ *  @todo Add 24 bit integrals and 64 bit float types.
  */
 
 /*

@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-08 18:59:19 raskolnikov>
+ *  Time-stamp:  <2011-03-16 19:28:08 raskolnikov>
  *
  *  @file        buffer_range_factory.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>

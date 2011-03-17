@@ -49,8 +49,8 @@ AM_LDFLAGS  = $(BOOST_LDFLAGS)
 psynth_unit_test_LDADD = \
 	$(BOOST_UNIT_TEST_FRAMEWORK_LIB) \
 	$(BOOST_FILESYSTEM_LIB) \
+	$(BOOST_SIGNALS_LIB) \
 	-lboost_system-mt \
-	$(SIGC_LIBS) \
 	../psynth/libpsynth.la
 
 psynth_unit_test_LDFLAGS =

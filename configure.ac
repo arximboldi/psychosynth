@@ -39,7 +39,6 @@ dnl  Options
 dnl ======================================================================
 
 dnl CXX=gfilt
-CXX=g++-4.5
 CXXFLAGS="${CXXFLAGS} -std=c++0x"
 
 AC_ARG_ENABLE([gprof], 
@@ -61,6 +60,7 @@ dnl ----------------------------------------------------------------------
 
 AX_BOOST_BASE([1.44])
 AX_BOOST_FILESYSTEM
+AX_BOOST_SIGNALS
 AX_BOOST_UNIT_TEST_FRAMEWORK
 
 if test "x${ax_cv_boost_filesystem}" != xyes ; then
@@ -73,40 +73,15 @@ AC_MSG_ERROR([
 psynth_config_ok=no
 fi
 
-dnl  Sigc
-dnl ----------------------------------------------------------------------
-   
-PKG_CHECK_MODULES(SIGC, [ sigc++-2.0 ],
-[
-    HAVE_SIGC=yes
-    AC_DEFINE([HAVE_SIGC], 1, [Have sigc++?])
-],
-[
+if test "x${ax_cv_boost_signals}" != xyes ; then
 AC_MSG_ERROR([
 ***
-*** You need Sigc++ library to compile the program.
-*** Install it and run this script again. 
+*** You need Boost.Filsystem library to compile the program.
+*** Install it and run this script again.
 ***
 ])
-])
-
-
-dnl  Gtk 2.0
-dnl ----------------------------------------------------------------------
-
-dnl PKG_CHECK_MODULES(GTK, [ gtk+-2.0 ],
-dnl [
-dnl     HAVE_GTK=yes
-dnl     AC_DEFINE([HAVE_GTK], 1, [Have Gtk?])
-dnl ],
-dnl [
-dnl AC_MSG_ERROR([
-dnl ***
-dnl *** You need GTK 2.0 development libraries to compile the program.
-dnl *** Install it and run this script again.
-dnl ***
-dnl ])
-dnl ])
+psynth_config_ok=no
+fi
 
 dnl  Optional libraries
 dnl ======================================================================
@@ -217,7 +192,7 @@ dnl        ])
 dnl else
 dnl    HAVE_SAMPLERATE=disabled
 dnl fi
-
+ 
 dnl  OGG Vorbis
 dnl ----------------------------------------------------------------------
 
@@ -454,40 +429,38 @@ AC_MSG_RESULT([
 else
 AC_MSG_RESULT([
 **************************************************************
-*
-*  Psychosynth $VERSION:  Automatic configuration OK.
-*
-*
-*   Configuration summary:
-*
-*      3D client (psynth3d) ..... $BUILD_PSYNTH3D
-*      CLI client (psynth) ...... $BUILD_PSYNTH
-* 
-*      OSC support: ............. $HAVE_LIBLO
-*      XML config support: ...... $HAVE_LIBXML
-*      SoundTouch support: ...... $HAVE_SOUNDTOUCH
-*      PCM support: ............. $HAVE_SNDFILE
-*      OGG support: ............. $HAVE_VORBIS
-*      OSS support: ............. $HAVE_OSS
-*      ALSA support: ............ $HAVE_ALSA
-*      Jack support: ............ $HAVE_JACK
-*      Unit tests support: ...... $HAVE_BOOST_TEST
-* 
-*   Installation directories:
-* 
-*      Program: ................. $PACKAGE_BIN_DIR
-*      Library: ................. $PACKAGE_LIB_DIR
-*      Includes: ................ $PACKAGE_INCLUDE_DIR
-*      Data: .................... $PACKAGE_DATA_DIR
-*
-* 
-**
-* 
-*   Type 'make' to compile.
-*   Then type 'make install' to install.
-*   
-*   Have fun!
-* 
+ 
+   Psychosynth $VERSION:  Automatic configuration OK.
+ 
+ 
+    Configuration summary:
+ 
+       3D client (psynth3d) ..... $BUILD_PSYNTH3D
+       CLI client (psynth) ...... $BUILD_PSYNTH
+  
+       OSC support: ............. $HAVE_LIBLO
+       XML config support: ...... $HAVE_LIBXML
+       SoundTouch support: ...... $HAVE_SOUNDTOUCH
+       PCM support: ............. $HAVE_SNDFILE
+       OGG support: ............. $HAVE_SNDFILE
+       OSS support: ............. $HAVE_OSS
+       ALSA support: ............ $HAVE_ALSA
+       Jack support: ............ $HAVE_JACK
+       Unit tests support: ...... $HAVE_BOOST_TEST
+  
+    Installation directories:
+  
+       Program: ................. $PACKAGE_BIN_DIR
+       Library: ................. $PACKAGE_LIB_DIR
+       Includes: ................ $PACKAGE_INCLUDE_DIR
+       Data: .................... $PACKAGE_DATA_DIR
+
+     
+    Type 'make' to compile.
+    Then type 'make install' to install.
+    
+    Have fun!
+  
 *************************************************************
 ])
 

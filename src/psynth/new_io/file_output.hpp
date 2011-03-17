@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-09 01:45:16 raskolnikov>
+ *  Time-stamp:  <2011-03-16 23:46:50 raskolnikov>
  *
  *  @file        file_raw_output.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -51,9 +51,9 @@ public:
     static_assert (file_support<Range>::is_supported::value,
                    "Audio file format not supported.");
     
-    file_output (const char*  fname,
-                 file_fmt     format,
-                 std::size_t  rate);
+    file_output (const std::string& fname,
+                 file_fmt           format,
+                 std::size_t        rate);
 
     ~file_output ();
 

@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-09 00:04:06 raskolnikov>
+ *  Time-stamp:  <2011-03-16 23:38:04 raskolnikov>
  *
  *  @file        file_common.tpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -75,10 +75,11 @@ PSYNTH_DECLARE_FILE_FORMAT (sound::bits32sf, SF_FORMAT_FLOAT);
 template <class Range>
 struct file_support
 {
-    typedef typename sound::sample_type<Range>::type format;
+    typedef typename detail::file_format<
+        typename sound::sample_type<Range>::type>::type format;
     
     typedef typename mpl::and_<
-        mpl::equal_to<format, mpl::int_<SF_FORMAT_ENDMASK> >,
+        mpl::not_<mpl::equal_to<format, mpl::int_<SF_FORMAT_ENDMASK> > >,
         mpl::not_<typename sound::is_planar<Range>::type> >
     is_supported;
 };

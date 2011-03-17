@@ -33,7 +33,7 @@ namespace psynth
 class output_director_alsa : public output_director
 {
     output_alsa* m_output;
-    sigc::connection m_on_device_change_slot;
+    boost::signals::connection m_on_device_change_slot;
     
     ~output_director_alsa()
     {
@@ -61,7 +61,7 @@ class output_director_alsa : public output_director
 	conf.child ("out_device").get (device);
 	m_on_device_change_slot =
 	    conf.child ("out_device").on_change.connect
-	    (sigc::mem_fun (*this, &output_director_alsa::on_device_change));
+	    (boost::bind (&output_director_alsa::on_device_change, this, _1));
 
 	m_output = new output_alsa;
 	m_output->set_device(device);

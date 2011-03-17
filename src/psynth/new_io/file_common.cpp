@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-09 00:11:16 raskolnikov>
+ *  Time-stamp:  <2011-03-16 23:59:27 raskolnikov>
  *
  *  @file        file_common.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -39,7 +39,7 @@ namespace io
 {
 
 PSYNTH_DEFINE_ERROR (file_error);
-PSYNTH_DEFINE_ERROR_WHAT (file_open_error, "Error while opening file file.");
+PSYNTH_DEFINE_ERROR_WHAT (file_open_error, "Error while opening file.");
 PSYNTH_DEFINE_ERROR_WHAT (file_param_error, "Invalid filefile parameter.");
 PSYNTH_DEFINE_ERROR_WHAT (file_seek_error, "Error while seeking file.");
 

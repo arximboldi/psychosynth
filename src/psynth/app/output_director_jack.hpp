@@ -33,7 +33,7 @@ namespace psynth
 class output_director_jack : public output_director
 {
     output_jack* m_output;
-    sigc::connection m_on_server_change_slot;
+    boost::signals::connection m_on_server_change_slot;
     
     ~output_director_jack() {
 	if (m_output)
@@ -58,7 +58,7 @@ class output_director_jack : public output_director
      	conf.child ("server").get(server);
 	m_on_server_change_slot =
 	    conf.child ("server").on_change.connect
-	    (sigc::mem_fun (*this, &output_director_jack::on_server_change));
+	    (boost::bind (&output_director_jack::on_server_change, this, _1));
 	
 	m_output = new output_jack;
 

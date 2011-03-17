@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-09 13:49:37 raskolnikov>
+ *  Time-stamp:  <2011-03-16 22:34:06 raskolnikov>
  *
  *  @file        output.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -41,8 +41,11 @@ namespace psynth
 namespace io
 {
 
+const std::size_t default_output_buffer_size = 1024;
+
 /**
  * Output device base abstract class.
+ * @todo Take constness into account.
  */
 template <typename Range>
 class output
@@ -72,6 +75,7 @@ public:
     }
 };
 
+
 /**
  * An output device with asynchronous operation base class.
  */
@@ -81,6 +85,42 @@ class async_output : public output<Range>,
 {
 public:
     virtual std::size_t buffer_size () const = 0;
+};
+
+/**
+ * Dummy output class.
+ */
+template <typename Range>
+class dummy_async_output : public output<Range>
+{
+public:
+    typedef Range range;
+
+    dummy_async_output (std::size_t buffer_size)
+        : _buffer_size (buffer_size)
+    {}
+    
+    std::size_t buffer_size () const
+    { return _buffer_size; }
+    
+    virtual std::size_t put (const range& data)
+    {
+        detail::dummy_output_put_impl ();
+        return data.size ();
+    }
+
+    void start ()
+    {
+        detail::dummy_output_start_impl ();
+    }
+
+    void stop ()
+    {
+        detail::dummy_output_stop_impl ();
+    }
+    
+private:
+    std::size_t _buffer_size;
 };
 
 /**

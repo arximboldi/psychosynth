@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-09 00:38:55 raskolnikov>
+ *  Time-stamp:  <2011-03-16 12:58:41 raskolnikov>
  *
  *  @file        file_manager_director.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -59,7 +59,7 @@ void file_manager_director::register_config ()
 {
     m_on_conf_nudge_slot = 
 	m_conf->child ("samples").on_nudge.connect
-	(sigc::mem_fun (*this, &file_manager_director::on_conf_nudge));
+	(boost::bind (&file_manager_director::on_conf_nudge, this, _1));
     m_conf->child ("samples").nudge ();
 }
 
