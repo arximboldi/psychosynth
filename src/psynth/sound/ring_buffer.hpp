@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-17 19:07:59 raskolnikov>
+ *  Time-stamp:  <2011-03-21 21:25:41 raskolnikov>
  *
  *  @file        ring_buffer.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -51,8 +51,8 @@ public:
 
     typedef typename range_base::difference_type difference_type;
     typedef typename range_base::size_type       size_type;
+    typedef typename range_base::unsafe_position unsafe_position;
     typedef typename range_base::position        position;
-    typedef typename range_base::safe_position   safe_position;
     
     /* Create with size and optional initial value and
      * alignment */
@@ -113,7 +113,6 @@ public:
         swap (_buffer, buf._buffer);
         swap (_range,  buf._range);
     }
-
     
     void recreate (size_type size,
 		   std::size_t alignment = 0)
@@ -121,7 +120,7 @@ public:
 	_buffer.recreate (size, alignment);
 	_range = range_base (range (_buffer));
     }
-
+    
     template <typename Allocator>
     void recreate (size_type size,
 		   std::size_t alignment,
@@ -265,10 +264,10 @@ public:
     typedef typename range::value_type          value_type;
     typedef typename range::reference           reference;
     
-    typedef typename range::iterator            iterator;
-    typedef typename const_range::iterator      const_iterator;
-    typedef typename range::safe_iterator       safe_iterator;
-    typedef typename const_range::safe_iterator const_safe_iterator;
+    typedef typename range::unsafe_iterator            unsafe_iterator;
+    typedef typename const_range::unsafe_iterator      const_unsafe_iterator;
+    typedef typename range::iterator                   iterator;
+    typedef typename const_range::iterator             const_iterator;
 
     /**
      * Create with size and optional initial value and
@@ -305,6 +304,15 @@ public:
         return *this;
     }
 
+    using parent_type::recreate;
+    
+    void recreate (typename parent_type::size_type size,
+                   typename Buffer::range::value_type val,
+		   std::size_t alignment = 0)
+    {
+	this->_buffer.recreate (size, val, alignment);
+	this->_range = range (sound::range (this->_buffer));
+    }
 
 #ifdef PSYNTH_BUFFER_MODELS_RANGE
     
@@ -377,9 +385,26 @@ const_range (const ring_buffer<B>& buf)
 
 /*
  *
- *  @todo FrameBasedConcept
+ *  FrameBasedConcept
  *  
  */
+
+template <typename Buffer>
+struct sample_type<ring_buffer<Buffer> > :
+    public sample_type<Buffer> {}; 
+
+template <typename Buffer>
+struct channel_space_type<ring_buffer<Buffer> > :
+    public channel_space_type<Buffer> {}; 
+
+template <typename Buffer>
+struct sample_mapping_type<ring_buffer<Buffer> > :
+    public sample_mapping_type<Buffer> {}; 
+
+template <typename Buffer>
+struct is_planar<ring_buffer<Buffer> > :
+    public is_planar<Buffer> {}; 
+
 
 /*
  *

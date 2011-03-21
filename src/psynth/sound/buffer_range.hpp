@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-16 20:01:05 raskolnikov>
+ *  Time-stamp:  <2011-03-21 20:59:27 raskolnikov>
  *
  *  @file        buffer_range.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -149,14 +149,21 @@ public:
 	, _frames (bv.frames ()) {}
 
 #endif /* PSYNTH_BUFFER_MODEL_RANGE */
-    
+
+    buffer_range (const buffer_range& bv) = default;
+
+    template <typename Range>
+    buffer_range (Range&& bv)
+	: _size (bv.size ())
+	, _frames (bv.frames ()) {}
+
     template <typename Range>
     buffer_range (const Range& bv)
 	: _size (bv.size ())
 	, _frames (bv.frames ()) {}
 
     template <typename I2>
-    buffer_range (const size_type& sz, const I2& it)
+    buffer_range (size_type sz, I2 it)
 	: _size (sz)
 	, _frames (it)
     {}

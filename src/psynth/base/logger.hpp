@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-09 17:07:02 raskolnikov>
+ *  Time-stamp:  <2011-03-21 23:01:26 raskolnikov>
  *
  *  @file        logger.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -173,6 +173,7 @@ public:
      */
     enum level
     {
+        debug,   /**< Debug information interesting only for devels. */
 	info,    /**< Usefull info to the user. */
 	warning, /**< A problem that may cause inconvenience. */
 	error,   /**< A problem that definetly causes inconvenience. */

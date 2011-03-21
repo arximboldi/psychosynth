@@ -25,14 +25,13 @@
 
 #include <psynth/app/defaults_alsa.hpp>
 #include <psynth/app/output_director.hpp>
-#include <psynth/io/output_alsa.hpp>
+#include <psynth/io/alsa_output.hpp>
 
 namespace psynth
 {
 
 class output_director_alsa : public output_director
 {
-    output_alsa* m_output;
     boost::signals::connection m_on_device_change_slot;
     
     ~output_director_alsa()
@@ -43,40 +42,37 @@ class output_director_alsa : public output_director
     
     void on_device_change (base::conf_node& conf)
     {
-	std::string device;
-	output::state old_state;
-	
-	conf.get(device);
-	
-	old_state = m_output->get_state();
-	m_output->goto_state(output::NOTINIT);
-	m_output->set_device(device);
-	m_output->goto_state(old_state);
+        auto old_state = m_output->state ();
+        build_output (*conf.parent ());
+        if (old_state == io::async_state::running)
+            m_output->start ();
     }
     
-    virtual output* do_start (base::conf_node& conf)
+    virtual graph::audio_async_output_ptr
+    do_start (base::conf_node& conf)
     {
-	std::string device;
-	
-	conf.child ("out_device").get (device);
-	m_on_device_change_slot =
+     	m_on_device_change_slot =
 	    conf.child ("out_device").on_change.connect
 	    (boost::bind (&output_director_alsa::on_device_change, this, _1));
 
-	m_output = new output_alsa;
-	m_output->set_device(device);
-
-	return m_output;
+        return build_output (conf);
     };
+
+    virtual graph::audio_async_output_ptr
+    build_output (base::conf_node& conf)
+    {
+        auto device = conf.child ("out_device").get<std::string> ();
+	m_output = io::new_buffered_async_output<
+            graph::audio_const_range,
+            io::alsa_output<sound::stereo16sc_range> >(device, 1024, 44100);
+	return m_output;
+    }
 
     virtual void do_stop (base::conf_node& conf)
     {
 	m_on_device_change_slot.disconnect ();
-	
-	if (m_output) {
-	    delete m_output;
-	    m_output = NULL;
-	}
+	if (m_output)
+            m_output.reset ();
     }
 
 public:
@@ -85,23 +81,16 @@ public:
 	conf.child ("out_device").def (
 	    std::string (PSYNTH_DEFAULT_ALSA_OUT_DEVICE));
     }
-    
-    output_director_alsa () :
-	m_output(NULL) {}
 };
 
 class output_director_alsa_factory : public output_director_factory
 {
 public:
     virtual const char* get_name()
-    {
-	return PSYNTH_DEFAULT_ALSA_NAME;
-    }
+    { return PSYNTH_DEFAULT_ALSA_NAME; }
     
     virtual output_director* create_output_director()
-    {
-	return new output_director_alsa;
-    }
+    { return new output_director_alsa; }
 };
 
 } /* namespace psynth */

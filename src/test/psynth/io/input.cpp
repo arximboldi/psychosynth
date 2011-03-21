@@ -46,13 +46,13 @@
 #include <psynth/sound/buffer.hpp>
 #include <psynth/sound/buffer_range.hpp>
 #include <psynth/sound/output.hpp>
-#include <psynth/new_io/input.hpp>
-#include <psynth/new_io/buffered_input.hpp>
+#include <psynth/io/input.hpp>
+#include <psynth/io/buffered_input.hpp>
 
 #ifdef PSYNTH_HAVE_PCM
-#include <psynth/new_io/file_input.hpp>
-#include <psynth/new_io/caching_file_input.hpp>
-#include <psynth/new_io/file_output.hpp>
+#include <psynth/io/file_input.hpp>
+#include <psynth/io/caching_file_input.hpp>
+#include <psynth/io/file_output.hpp>
 #endif
 
 namespace mpl = boost::mpl;

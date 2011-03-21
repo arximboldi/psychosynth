@@ -25,62 +25,61 @@
 
 #include <psynth/app/defaults_jack.hpp>
 #include <psynth/app/output_director.hpp>
-#include <psynth/io/output_jack.hpp>
+#include <psynth/io/jack_output.hpp>
 
 namespace psynth
 {
 
 class output_director_jack : public output_director
 {
-    output_jack* m_output;
     boost::signals::connection m_on_server_change_slot;
-    
-    ~output_director_jack() {
+       
+    ~output_director_jack()
+    {
 	if (m_output)
 	    stop();
     }
     
-    void on_server_change (base::conf_node& conf) {
-	std::string server;
-	output::state old_state;
-	
-	conf.get(server);
-	
-	old_state = m_output->get_state();
-	m_output->goto_state(output::NOTINIT);
-	m_output->set_server(server);
-	m_output->goto_state(old_state);
+    void on_server_change (base::conf_node& conf)
+    {
+        auto old_state = m_output->state ();
+        build_output (*conf.parent ());
+        if (old_state == io::async_state::running)
+            m_output->start ();
     }
-  
-    virtual output* do_start (base::conf_node& conf) {
-	std::string server;
-
-     	conf.child ("server").get(server);
-	m_on_server_change_slot =
+    
+    virtual graph::audio_async_output_ptr
+    do_start (base::conf_node& conf)
+    {
+     	m_on_server_change_slot =
 	    conf.child ("server").on_change.connect
 	    (boost::bind (&output_director_jack::on_server_change, this, _1));
-	
-	m_output = new output_jack;
 
-	m_output->set_server(server);
-
-	return m_output;
+        return build_output (conf);
     };
 
-    virtual void do_stop (base::conf_node& conf) {
+    virtual graph::audio_async_output_ptr
+    build_output (base::conf_node& conf)
+    {
+        auto server = conf.child ("server").get<std::string> ();
+	m_output = io::new_jack_output<graph::audio_const_range>(server, 44100);
+	return m_output;
+    }
+
+    virtual void do_stop (base::conf_node& conf)
+    {
 	m_on_server_change_slot.disconnect ();
 	
-	delete m_output;
-	m_output = NULL;
+	if (m_output)
+            m_output.reset ();
     }
 
 public:
-    void defaults (base::conf_node& conf) {
-	conf.child ("server").def (std::string (PSYNTH_DEFAULT_JACK_SERVER));
+    void defaults (base::conf_node& conf)
+    {
+	conf.child ("server").def (
+	    std::string (PSYNTH_DEFAULT_JACK_SERVER));
     }
-
-    output_director_jack () :
-	m_output(NULL) {}
 };
 
 class output_director_jack_factory : public output_director_factory

@@ -24,6 +24,13 @@
 AM_CPPFLAGS = -Wall $(BOOST_CPPFLAGS) $(all_includes)
 AM_LDFLAGS  = $(BOOST_LDFLAGS) $(SIGC_LDFLAGS)
 
+#  Documentation
+# ======================================================================
+.PHONY: doc
+
+doc:
+	\doxygen ../doc/Doxyfile
+
 #  The library
 # ======================================================================
 

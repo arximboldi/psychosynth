@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-16 20:25:34 raskolnikov>
+ *  Time-stamp:  <2011-03-21 17:57:43 raskolnikov>
  *
  *  @file        buffer.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -200,16 +200,16 @@ public:
         }
     }
     
-    void recreate (size_type size, 
+    void recreate (size_type size_, 
 		   const Frame& frame_in,
 		   std::size_t alignment,
 		   const Alloc alloc_in = Alloc())
     {
-        if (size != size() ||
+        if (size_ != size() ||
 	    _align_in_bytes != alignment ||
 	    alloc_in != _alloc)
 	{
-            buffer tmp (size, frame_in, alignment, alloc_in);
+            buffer tmp (size_, frame_in, alignment, alloc_in);
             swap (tmp);
         }
     }

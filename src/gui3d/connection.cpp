@@ -20,7 +20,7 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <psynth/node/watch_viewer.hpp>
+#include <psynth/graph/watch_viewer.hpp>
 
 #include "gui3d/connection.hpp"
 
@@ -168,13 +168,13 @@ connection::connection (Ogre::SceneManager* scene,
 {
     vector_2f v;
     
-    ev.src.get_param (node::PARAM_MUTE, m_is_muted);
+    ev.src.get_param (graph::node::PARAM_MUTE, m_is_muted);
   
-    ev.src.get_param (node::PARAM_POSITION, v);
+    ev.src.get_param (graph::node::PARAM_POSITION, v);
     m_src.x = v.x;
     m_src.y = v.y;
 
-    ev.dest.get_param (node::PARAM_POSITION, v);
+    ev.dest.get_param (graph::node::PARAM_POSITION, v);
     m_dest.x = v.x;
     m_dest.y = v.y;
     
@@ -188,7 +188,7 @@ connection::connection (Ogre::SceneManager* scene,
     m_wave = new connection_wave (m_node->getName() + "wave",
 				  m_is_muted ?
 				  WAVE_MUTE_COLOUR :
-				  ev.socket_type == node::LINK_AUDIO ?
+				  ev.socket_type == graph::node::LINK_AUDIO ?
 				  WAVE_NORMAL_A_COLOUR :
 				  WAVE_NORMAL_C_COLOUR,
 				  m_src, m_dest);
@@ -199,12 +199,12 @@ connection::connection (Ogre::SceneManager* scene,
     m_link.src.add_listener (this);
     m_link.dest.add_listener (this);
 
-    if (ev.socket_type == node::LINK_AUDIO)
-	m_watch = new watch_view_audio (WAVE_POINTS,
-					WAVE_A_SECS);
+    if (ev.socket_type == graph::node::LINK_AUDIO)
+	m_watch = new graph::watch_view_audio (WAVE_POINTS,
+                                               WAVE_A_SECS);
     else
-	m_watch = new watch_view_control (WAVE_POINTS,
-					  WAVE_C_SECS);
+	m_watch = new graph::watch_view_control (WAVE_POINTS,
+                                                 WAVE_C_SECS);
     m_link.dest.attach_watch (ev.socket_type, ev.dest_socket, m_watch);
 }
 
@@ -224,7 +224,7 @@ connection::~connection ()
 
 void connection::handle_set_param_node (world_node& obj, int id)
 {
-    if (id == node::PARAM_POSITION) {
+    if (id == graph::node::PARAM_POSITION) {
 	vector_2f pos;
 	obj.get_param (id, pos);
     
@@ -239,7 +239,7 @@ void connection::handle_set_param_node (world_node& obj, int id)
 	m_line->update(m_src, m_dest);
     }
 
-    if (id == node::PARAM_MUTE
+    if (id == graph::node::PARAM_MUTE
 	&& obj == m_link.src) {
 	
 	obj.get_param (id, m_is_muted);
@@ -248,7 +248,7 @@ void connection::handle_set_param_node (world_node& obj, int id)
 	    m_wave->set_colour (WAVE_MUTE_COLOUR);
 	} else {
 	    m_line->set_colour (LINE_NORMAL_COLOUR);
-	    m_wave->set_colour (m_link.socket_type == node::LINK_AUDIO ?
+	    m_wave->set_colour (m_link.socket_type == graph::node::LINK_AUDIO ?
 				WAVE_NORMAL_A_COLOUR :
 				WAVE_NORMAL_C_COLOUR);
 	}
@@ -267,7 +267,7 @@ bool connection::pointer_clicked (const Ogre::Vector2& pos, OIS::MouseButtonID i
 
     if (point_is_in_poly (pos, top_left, top_right, bot_right, bot_left)) {
 	m_is_muted = !m_is_muted;
-	m_link.src.set_param (node::PARAM_MUTE, m_is_muted);
+	m_link.src.set_param (graph::node::PARAM_MUTE, m_is_muted);
 
 	return true;
     }
@@ -279,10 +279,14 @@ void connection::update ()
 {
     const sample* buf;
 
-    if (m_link.socket_type == node::LINK_AUDIO)
-	buf = dynamic_cast<watch_view_audio*>(m_watch)->get_buffer().get_data()[0];
+    if (m_link.socket_type == graph::node::LINK_AUDIO)
+	buf = (const sample*)
+            &const_range (dynamic_cast<graph::watch_view_audio*>(
+                              m_watch)->get_buffer()) [0][0];
     else
-	buf = dynamic_cast<watch_view_control*>(m_watch)->get_buffer().get_data();
+	buf = (const sample*)
+            &const_range (dynamic_cast<graph::watch_view_control*>(
+                              m_watch)->get_buffer()) [0];
     
     //m_line->update(m_src, m_dest);
     m_wave->update(m_src, m_dest, buf, WAVE_POINTS);

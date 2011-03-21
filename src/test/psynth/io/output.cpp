@@ -46,23 +46,23 @@
 #include <psynth/sound/buffer.hpp>
 #include <psynth/sound/buffer_range.hpp>
 #include <psynth/sound/output.hpp>
-#include <psynth/new_io/output.hpp>
-#include <psynth/new_io/buffered_output.hpp>
+#include <psynth/io/output.hpp>
+#include <psynth/io/buffered_output.hpp>
 
 #ifdef PSYNTH_HAVE_ALSA
-#include <psynth/new_io/alsa_output.hpp>
+#include <psynth/io/alsa_output.hpp>
 #endif
 
 #ifdef PSYNTH_HAVE_OSS
-#include <psynth/new_io/oss_output.hpp>
+#include <psynth/io/oss_output.hpp>
 #endif
 
 #ifdef PSYNTH_HAVE_JACK
-#include <psynth/new_io/jack_output.hpp>
+#include <psynth/io/jack_output.hpp>
 #endif
 
 #ifdef PSYNTH_HAVE_PCM
-#include <psynth/new_io/file_output.hpp>
+#include <psynth/io/file_output.hpp>
 #endif
 
 namespace mpl = boost::mpl;

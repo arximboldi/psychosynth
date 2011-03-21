@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-16 12:50:51 raskolnikov>
+ *  Time-stamp:  <2011-03-18 19:03:48 raskolnikov>
  *
  *  @file        config.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -42,7 +42,7 @@ PSYNTH_DEFINE_ERROR_WHAT  (config_type_error, "Config node type mismatch.");
 PSYNTH_DEFINE_ERROR_WHAT  (config_backend_error, "Config node has no backend.");
 
 void conf_subject::add_listener (conf_listener& l)
-{
+{    
     on_change.connect (boost::bind (&conf_listener::handle_conf_change, &l, _1));
     on_nudge.connect (boost::bind (&conf_listener::handle_conf_nudge, &l, _1));
     on_add_child.connect (boost::bind (&conf_listener::handle_conf_add_child, &l, _1));

@@ -24,14 +24,15 @@
 #define RECORDWINDOW_H
 
 #include <psynth/world/world.hpp>
-#include <psynth/io/output_wave.hpp>
+#include <psynth/io/file_output.hpp>
+#include <psynth/graph/node_output.hpp>
 
 #include "gui3d/toggable_window.hpp"
 
 class record_window : public toggable_window
 {
     psynth::world* m_table;
-    psynth::output_wave m_output;
+    psynth::graph::audio_output_ptr m_output;
 
     CEGUI::Window* m_button;
     CEGUI::Editbox* m_file;
@@ -43,13 +44,12 @@ class record_window : public toggable_window
 public:
     record_window (psynth::world* table) :
 	m_table (table),
-	m_output (table->get_info ()),
 	m_recording (false)
 	{};
 
     ~record_window () {
 	if (m_recording)
-	    m_table->detach_passive_output (&m_output);
+	    m_table->detach_passive_output (m_output);
     }
 
     bool on_click (const CEGUI::EventArgs &e);

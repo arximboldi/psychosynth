@@ -23,10 +23,13 @@
 #include <algorithm>
 #include <string>
 
+#include <psynth/sound/typedefs.hpp>
+#include <psynth/io/buffered_output.hpp>
 #include "gui3d/record_window.hpp"
 
 using namespace std;
 using namespace CEGUI;
+using namespace psynth;
 
 #define RW_WIDTH  220
 #define RW_HEIGHT 90
@@ -74,18 +77,23 @@ bool record_window::on_click (const CEGUI::EventArgs &e)
 {
     if (!m_recording) {
 	std::string fname = m_file->getText().c_str();
-	m_output.set_file_name (fname);
-	if (m_output.open()) {
-	    m_table->attach_passive_output (&m_output);
-	    m_button->setText("Stop");
-	    m_file->disable();
+	m_output = io::new_buffered_output<
+            graph::audio_const_range,
+            io::file_output<sound::stereo16sc_range> > (
+                fname, io::file_fmt::au, 44100 // FIXME HACK DIRTY SUCKS!
+                );
+            
+	if (m_output) {
+	    m_table->attach_passive_output (m_output);
+	    m_button->setText ("Stop");
+	    m_file->disable ();
 	    m_recording = true;
 	}
     } else {
-	m_table->detach_passive_output (&m_output);
-	m_output.close();
-	m_button->setText("Start");
-	m_file->enable();
+	m_table->detach_passive_output (m_output);
+        m_output.reset ();
+	m_button->setText ("Start");
+	m_file->enable ();
 	m_recording = false;
     }
     

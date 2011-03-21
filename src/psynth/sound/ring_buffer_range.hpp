@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-17 21:05:50 raskolnikov>
+ *  Time-stamp:  <2011-03-22 00:11:42 raskolnikov>
  *
  *  @file        ring_buffer.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -72,24 +72,24 @@ namespace detail
  * A pointer a reader can use to read data from the buffer.
  */
 template <class Ring>
-class ring_position
+class unsafe_ring_position
 {
 public:
     typedef typename Ring::size_type       size_type;
     typedef typename Ring::difference_type difference_type;
     typedef Ring                           ring_type;
 
-    ring_position () = default;
-    ring_position (const ring_position& r) = default;
-    ring_position& operator= (const ring_position& p) = default;
+    unsafe_ring_position () = default;
+    unsafe_ring_position (const unsafe_ring_position& r) = default;
+    unsafe_ring_position& operator= (const unsafe_ring_position& p) = default;
     
-    ring_position (size_type p) : _pos (p) {}
+    unsafe_ring_position (size_type p) : _pos (p) {}
 
     
     size_type offset () const
     { return _pos; }
 
-    bool operator== (const ring_position& p) const
+    bool operator== (const unsafe_ring_position& p) const
     { return  _pos == p._pos; }
     
     // TODO: Make private
@@ -98,24 +98,24 @@ public:
 };
 
 template <class Ring>
-class safe_ring_position : public ring_position<Ring>
+class ring_position : public unsafe_ring_position<Ring>
 {
-    typedef ring_position<Ring> parent_type;
+    typedef unsafe_ring_position<Ring> parent_type;
 
 public:
     typedef typename parent_type::size_type size_type;
     typedef typename parent_type::difference_type difference_type;
     
-    safe_ring_position () = default;
-    safe_ring_position (const safe_ring_position& r) = default;
-    safe_ring_position& operator= (const safe_ring_position& p) = default;
+    ring_position () = default;
+    ring_position (const ring_position& r) = default;
+    ring_position& operator= (const ring_position& p) = default;
     
-    safe_ring_position (size_type p, size_type c)
+    ring_position (size_type p, size_type c)
 	: parent_type (p), _count (c) {}
     
     difference_type count () const { return _count; }
 
-    bool operator== (const safe_ring_position& p) const
+    bool operator== (const ring_position& p) const
     { return parent_type::operator== (p) && _count == p._count; }
     
     // TODO: Make private
@@ -219,8 +219,8 @@ public:
     typedef typename Range::size_type       size_type;
     typedef typename Range::difference_type difference_type;
     
-    typedef detail::ring_position<ring_buffer_range_base>       position;
-    typedef detail::safe_ring_position<ring_buffer_range_base>  safe_position;    
+    typedef detail::unsafe_ring_position<ring_buffer_range_base> unsafe_position;
+    typedef detail::ring_position<ring_buffer_range_base>        position;
     
     /**
      * Constructor.
@@ -279,7 +279,7 @@ public:
     {}
     
     /** Assignment operator. */
-    ring_buffer_range_base& operator= (ring_buffer_range_base& range)
+    ring_buffer_range_base& operator= (const ring_buffer_range_base& range)
     {
 	_backwards = range._backwards;
 	_startpos  = range._startpos;
@@ -296,43 +296,43 @@ public:
     /**
      * Returns a read pointer to the beginning of the available data.
      */
-    position begin_pos () const
-    { return position (_startpos); };
+    unsafe_position begin_unsafe_pos () const
+    { return unsafe_position (_startpos); };
 
     /**
      * Returns a read pointer to the end of the available data.
      */
-    position end_pos () const
-    { return position (_writepos); };
+    unsafe_position end_unsafe_pos () const
+    { return unsafe_position (_writepos); };
 
     /**
      * Returns a read pointer to the beginning of the available data.
      */
-    safe_position safe_begin_pos () const
+    position begin_pos () const
     {
 	return _writepos._count > (difference_type) size () ?
-	    safe_position (_startpos, _writepos._count - size ()) :
-	    safe_position (_startpos, 0);
+	    position (_startpos, _writepos._count - size ()) :
+	    position (_startpos, 0);
     };
 
     /**
      * Returns a read pointer to the end of the available data.
      */
-    safe_position safe_end_pos () const
+    position end_pos () const
     { return _writepos; };
     
     /**
      * Returns the number of available data from a read pointer.
      * @param r The read pointer to test for available data.
      */
-    size_type available (const safe_position& r) const
+    size_type available (const position& r) const
     { return _writepos._count - r._count; }
 
     /**
      * Returns the number of available data from a read pointer.
      * @param r The read pointer to test for available data.
      */
-    size_type available (const position& r) const
+    size_type available (const unsafe_position& r) const
     {
 	return _writepos._pos > r._pos ?
 	    _writepos._pos - r._pos :
@@ -349,7 +349,7 @@ public:
     /**
      * Checks a iterator for error states.
      */
-    int check_position (const safe_position& reader) const
+    int check_position (const position& reader) const
     {
 	if (reader._count < _writepos._count - size ())
 	    return ring_buffer_error::underrun;
@@ -501,7 +501,16 @@ public:
 	    r._add (n);
 	}
     }
-
+    
+    difference_type distance (const unsafe_position& ra,
+                              const unsafe_position& rb) const
+    {
+        assert (false); // TODO
+    }
+        
+    difference_type distance (const position& ra, const position& rb) const
+    { return rb.count () - ra.count (); }
+    
     template <typename Position>
     void increment (Position& r) const
     {
@@ -541,15 +550,15 @@ public:
      * and @b must be called whenever the write direction is changed using
      * the @c backwards () function.
      */
-    safe_position sync (const safe_position& r) const
+    position sync (const position& r) const
     {
 	if (!_backwards)
-	    return safe_iterator (
+	    return position (
 		r._pos, _writepos._count - (r._pos <= _writepos._pos ?
 					    _writepos._pos - r._pos :
 					    size () - r._pos + _writepos._pos));
 	else
-	    return safe_iterator (
+	    return position (
 		r._pos,	_writepos._count - (r._pos >= _writepos._pos ?
 					    r._pos - _writepos._pos :
 					    size () - _writepos._pos + r._pos));
@@ -560,7 +569,7 @@ public:
 			          writting the ringbuffer backwards. */
     size_type     _startpos;   /**< The new starting position of the
 				  ring buffer. */
-    safe_position _writepos;
+    position      _writepos;
     Range         _range;
 };
 
@@ -574,25 +583,20 @@ public:
     typedef typename parent_type::range::reference          reference;
     typedef typename parent_type::range::difference_type    difference_type;
     
+    typedef detail::ring_iterator<typename parent_type::unsafe_position,
+				  ring_buffer_range>
+    unsafe_iterator;
     typedef detail::ring_iterator<typename parent_type::position,
 				  ring_buffer_range>
     iterator;
-    typedef detail::ring_iterator<typename parent_type::safe_position,
-				  ring_buffer_range>
-    safe_iterator;
 
-    /**
-     * Constructor.
-     * @param size The size of the buffer, defaults to zero.
-     */
-    ring_buffer_range () {}
-
-    /** Copy constructor */
-    ring_buffer_range (const ring_buffer_range& range)
-	: parent_type (range) {}
+    ring_buffer_range () = default;
+    ring_buffer_range (const ring_buffer_range&) = default;
+    ring_buffer_range& operator= (const ring_buffer_range&) = default;
 
     explicit ring_buffer_range (const Range& range)
-	: parent_type (range) {}
+        : parent_type (range)
+    {}
     
 #if 0
     template<class Range2>
@@ -610,17 +614,17 @@ public:
 	: parent_type ((const ring_buffer_range_base<Range2>&) range) {}
 #endif
     
+    unsafe_iterator begin_unsafe () const
+    { return unsafe_iterator (this->begin_unsafe_pos (), this); }
+
+    unsafe_iterator end_unsafe () const
+    { return unsafe_iterator (this->end_unsafe_pos (), this); }
+
     iterator begin () const
     { return iterator (this->begin_pos (), this); }
 
     iterator end () const
     { return iterator (this->end_pos (), this); }
-
-    safe_iterator safe_begin () const
-    { return safe_iterator (this->safe_begin_pos (), this); }
-
-    safe_iterator safe_end () const
-    { return safe_iterator (this->safe_end_pos (), this); }
 
     /**
      * @note This should not be implemented in terms of iterator::operator*!
@@ -630,6 +634,9 @@ public:
     
     iterator at (difference_type i) const
     { return begin () + i; }
+    
+    unsafe_iterator unsafe_at (difference_type i) const
+    { return begin_unsafe () + i; }
 };
 
 template <class Range>
@@ -641,6 +648,22 @@ struct const_ring_buffer_range :
  *  @todo FrameBasedConcept
  *  
  */
+
+template <typename Range>
+struct sample_type<ring_buffer_range<Range> > :
+    public sample_type<Range> {}; 
+
+template <typename Range>
+struct channel_space_type<ring_buffer_range<Range> > :
+    public channel_space_type<Range> {}; 
+
+template <typename Range>
+struct sample_mapping_type<ring_buffer_range<Range> > :
+    public sample_mapping_type<Range> {}; 
+
+template <typename Range>
+struct is_planar<ring_buffer_range<Range> > :
+    public is_planar<Range> {}; 
 
 /*
  *

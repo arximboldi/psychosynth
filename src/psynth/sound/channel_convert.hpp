@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-02 10:52:48 raskolnikov>
+ *  Time-stamp:  <2011-03-21 17:31:00 raskolnikov>
  *
  *  @file        channel_convert.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -164,6 +164,14 @@ template <typename SrcP, typename DstP>
 inline void channel_convert (const SrcP& src, DstP& dst)
 {
     default_channel_converter()(src,dst);
+}
+
+template <typename SrcP, typename DstP>
+inline DstP channel_convert (const SrcP& src)
+{
+    DstP res;
+    default_channel_converter()(src,res);
+    return res;
 }
 
 } /* namespace sound */

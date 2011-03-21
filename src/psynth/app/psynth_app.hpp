@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-10-17 20:34:56 raskolnikov>
+ *  Time-stamp:  <2011-03-18 17:43:41 raskolnikov>
  *
  *  @file        psynth_app.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -71,7 +71,7 @@ public:
 	return m_director.get_world ();
     };
     
-    output* get_output () {
+    graph::audio_async_output_ptr get_output () {
 	return m_director.get_output ();
     };
     

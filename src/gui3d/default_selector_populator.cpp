@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-17 00:21:29 raskolnikov>
+ *  Time-stamp:  <2011-03-21 20:08:17 raskolnikov>
  *
  *  @file        default_selector_populator.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -37,11 +37,11 @@
 #include <psynth/base/file_manager.hpp>
 #include <psynth/world/world_node_creator.hpp>
 
-#include <psynth/node/node_mixer.hpp>
-#include <psynth/node/node_oscillator.hpp>
-#include <psynth/node/node_filter.hpp>
-#include <psynth/node/node_step_seq.hpp>
-#include <psynth/node/node_noise.hpp>
+#include <psynth/graph/node_mixer.hpp>
+#include <psynth/graph/node_oscillator.hpp>
+#include <psynth/graph/node_filter.hpp>
+#include <psynth/graph/node_step_seq.hpp>
+#include <psynth/graph/node_noise.hpp>
 
 #include "gui3d/selector_window.hpp"
 #include "gui3d/default_selector_populator.hpp"
@@ -108,24 +108,24 @@ void default_selector_populator::populate(selector_window* sel)
     creat.set_param ("frequency", (float) 110.0f);
     creat.set_param ("amplitude", (float) 0.3f);
     
-    creat.set_param ("wave", (int) node_oscillator::OSC_SINE);
+    creat.set_param ("wave", (int) graph::node_oscillator::OSC_SINE);
     cat->add_button ("Sine", creat);
-    creat.set_param ("wave", (int) node_oscillator::OSC_SQUARE);
+    creat.set_param ("wave", (int) graph::node_oscillator::OSC_SQUARE);
     cat->add_button ("Square", creat);
-    creat.set_param ("wave", (int) node_oscillator::OSC_SAWTOOTH);
+    creat.set_param ("wave", (int) graph::node_oscillator::OSC_SAWTOOTH);
     cat->add_button ("Sawtooth", creat);
-    creat.set_param ("wave", (int) node_oscillator::OSC_TRIANGLE);
+    creat.set_param ("wave", (int) graph::node_oscillator::OSC_TRIANGLE);
     cat->add_button ("Triangle", creat);
-    creat.set_param ("wave", (int) node_oscillator::OSC_MOOGSAW);
+    creat.set_param ("wave", (int) graph::node_oscillator::OSC_MOOGSAW);
     cat->add_button ("Moogsaw", creat);
-    creat.set_param ("wave", (int) node_oscillator::OSC_EXP);
+    creat.set_param ("wave", (int) graph::node_oscillator::OSC_EXP);
     cat->add_button ("Exponential", creat);
 
     creat.clear();
     creat.set_name ("audio_noise");
-    creat.set_param ("type", (int) node_noise::NOISE_PINK);
+    creat.set_param ("type", (int) graph::node_noise::NOISE_PINK);
     cat->add_button ("Pink Noise", creat);
-    creat.set_param ("type", (int) node_noise::NOISE_WHITE);
+    creat.set_param ("type", (int) graph::node_noise::NOISE_WHITE);
     cat->add_button ("White Noise", creat);
     
     creat.clear();
@@ -134,24 +134,24 @@ void default_selector_populator::populate(selector_window* sel)
     creat.set_param ("frequency", 1.0f);
     creat.set_param ("amplitude", 0.7f);
     
-    creat.set_param ("wave", (int) node_oscillator::OSC_SINE);
+    creat.set_param ("wave", (int) graph::node_oscillator::OSC_SINE);
     cat->add_button ("Sine", creat);
-    creat.set_param ("wave", (int) node_oscillator::OSC_SQUARE);
+    creat.set_param ("wave", (int) graph::node_oscillator::OSC_SQUARE);
     cat->add_button ("Square", creat);
-    creat.set_param ("wave", (int) node_oscillator::OSC_SAWTOOTH);
+    creat.set_param ("wave", (int) graph::node_oscillator::OSC_SAWTOOTH);
     cat->add_button ("Sawtooth", creat);
-    creat.set_param ("wave", (int) node_oscillator::OSC_TRIANGLE);
+    creat.set_param ("wave", (int) graph::node_oscillator::OSC_TRIANGLE);
     cat->add_button ("Triangle", creat);
-    creat.set_param ("wave", (int) node_oscillator::OSC_MOOGSAW);
+    creat.set_param ("wave", (int) graph::node_oscillator::OSC_MOOGSAW);
     cat->add_button ("Moogsaw", creat);
-    creat.set_param ("wave", (int) node_oscillator::OSC_EXP);
+    creat.set_param ("wave", (int) graph::node_oscillator::OSC_EXP);
     cat->add_button ("Exponential", creat);
 
     creat.clear();
     creat.set_name ("control_noise");
-    creat.set_param ("type", (int) node_noise::NOISE_PINK);
+    creat.set_param ("type", (int) graph::node_noise::NOISE_PINK);
     cat->add_button ("Pink Noise", creat);
-    creat.set_param ("type", (int) node_noise::NOISE_WHITE);
+    creat.set_param ("type", (int) graph::node_noise::NOISE_WHITE);
     cat->add_button ("White Noise", creat);
     
     creat.clear();
@@ -159,17 +159,17 @@ void default_selector_populator::populate(selector_window* sel)
     creat.set_name ("filter");
     creat.set_param ("resonance", (float) 0.8f);
 	
-    creat.set_param ("type", (int) node_filter::FILTER_LOWPASS);
+    creat.set_param ("type", (int) graph::node_filter::FILTER_LOWPASS);
     cat->add_button ("Low-pass", creat);
-    creat.set_param ("type", (int) node_filter::FILTER_HIGHPASS);
+    creat.set_param ("type", (int) graph::node_filter::FILTER_HIGHPASS);
     cat->add_button ("Hi-pass", creat);
-    creat.set_param ("type", (int) node_filter::FILTER_BANDPASS_CSG);
+    creat.set_param ("type", (int) graph::node_filter::FILTER_BANDPASS_CSG);
     cat->add_button ("Band-pass CSG", creat);
-    creat.set_param ("type", (int) node_filter::FILTER_BANDPASS_CZPG);
+    creat.set_param ("type", (int) graph::node_filter::FILTER_BANDPASS_CZPG);
     cat->add_button ("Band-pass CZPG", creat);
-    creat.set_param ("type", (int) node_filter::FILTER_NOTCH);
+    creat.set_param ("type", (int) graph::node_filter::FILTER_NOTCH);
     cat->add_button ("Notch", creat);
-    creat.set_param ("type", (int) node_filter::FILTER_MOOG);
+    creat.set_param ("type", (int) graph::node_filter::FILTER_MOOG);
     cat->add_button ("Moog", creat);
 
     creat.clear();
@@ -184,28 +184,28 @@ void default_selector_populator::populate(selector_window* sel)
     cat = sel->add_category ("Mixers");
     creat.set_name ("audio_mixer");
 
-    creat.set_param ("mixop", (int) node_mixer::MIX_SUM);
+    creat.set_param ("mixop", (int) graph::node_mixer::MIX_SUM);
     cat->add_button ("Audio Sum", creat);
-    creat.set_param ("mixop", (int) node_mixer::MIX_PRODUCT);
+    creat.set_param ("mixop", (int) graph::node_mixer::MIX_PRODUCT);
     cat->add_button ("Audio Mul", creat);
 
     creat.set_name ("control_mixer");
 
-    creat.set_param ("mixop", (int) node_mixer::MIX_SUM);
+    creat.set_param ("mixop", (int) graph::node_mixer::MIX_SUM);
     cat->add_button ("Control Sum", creat);
-    creat.set_param ("mixop", (int) node_mixer::MIX_PRODUCT);
+    creat.set_param ("mixop", (int) graph::node_mixer::MIX_PRODUCT);
     cat->add_button ("Control Mul", creat);
 
     creat.clear();
     cat = sel->add_category ("Sequencing");
     creat.set_name ("stepseq");
-    creat.set_param ("shape", (int) node_step_seq::SHAPE_SQUARE);
+    creat.set_param ("shape", (int) graph::node_step_seq::SHAPE_SQUARE);
     cat->add_button ("Step Square", creat);
-    creat.set_param ("shape", (int) node_step_seq::SHAPE_TRIANGLE);
+    creat.set_param ("shape", (int) graph::node_step_seq::SHAPE_TRIANGLE);
     cat->add_button ("Step Triangle", creat);
-    creat.set_param ("shape", (int) node_step_seq::SHAPE_FWSAWTOOTH);
+    creat.set_param ("shape", (int) graph::node_step_seq::SHAPE_FWSAWTOOTH);
     cat->add_button ("Step FW Saw", creat);
-    creat.set_param ("shape", (int) node_step_seq::SHAPE_BWSAWTOOTH);
+    creat.set_param ("shape", (int) graph::node_step_seq::SHAPE_BWSAWTOOTH);
     cat->add_button ("Step BW Saw", creat);
     
     cat = sel->add_category ("Samples");

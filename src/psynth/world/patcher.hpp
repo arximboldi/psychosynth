@@ -26,19 +26,19 @@
 #include <map>
 #include <set>
 
-#include <psynth/node/node.hpp>
+#include <psynth/graph/node.hpp>
 
 namespace psynth
 {
 
 struct patcher_event {
-    node* src;
-    node* dest;
+    graph::node* src;
+    graph::node* dest;
     int src_socket;
     int dest_socket;
     int socket_type;
 
-    patcher_event (node* s, node* d, int ss, int ds, int st):
+    patcher_event (graph::node* s, graph::node* d, int ss, int ds, int st):
 	src(s), dest(d), src_socket(ss), dest_socket(ds), socket_type(st) {};
 };
 
@@ -80,9 +80,9 @@ class patcher : public patcher_subject
 public:
     virtual ~patcher () {};
     
-    virtual bool add_node (node* obj) = 0;
-    virtual bool delete_node (node* obj) = 0;
-    virtual void set_param_node (node* obj, int param) = 0;
+    virtual bool add_node (graph::node* obj) = 0;
+    virtual bool delete_node (graph::node* obj) = 0;
+    virtual void set_param_node (graph::node* obj, int param) = 0;
     virtual void update () = 0;
     virtual void clear () = 0;
 };

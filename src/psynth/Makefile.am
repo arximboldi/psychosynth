@@ -77,63 +77,51 @@ nobase_libpsynthinc_HEADERS = \
 	base/meta.hpp\
 	base/c3_class.hpp\
 	base/scope_guard.hpp\
-	synth/scaler.hpp\
-	synth/audio_buffer.hpp \
-	synth/sample_buffer.hpp\
-	synth/ring_buffer.hpp\
-	synth/ring_audio_buffer.hpp \
-	synth/ring_sample_buffer.hpp \
 	synth/audio_info.hpp \
 	synth/filter.hpp \
 	synth/wave_table.hpp \
+	synth/wave_table.tpp \
 	synth/oscillator.hpp \
-	synth/envelope_simple.hpp\
-	synth/envelope_multi.hpp\
+	synth/oscillator.tpp \
+	synth/simple_envelope.hpp \
+	synth/multi_point_envelope.hpp \
+	synth/multi_point_envelope.tpp \
 	synth/envelope.hpp\
 	world/world.hpp \
 	world/patcher.hpp\
 	world/patcher_dynamic.hpp \
 	world/world_node_creator.hpp\
-	node/node.hpp \
-	node/node_types.hpp \
-	node/node_param.hpp\
-	node/node_manager.hpp \
-	node/node_output.hpp \
-	node/node_mixer.hpp \
-	node/node_audio_mixer.hpp \
-	node/node_control_mixer.hpp \
-	node/node_oscillator.hpp \
-	node/node_lfo.hpp \
-	node/node_audio_oscillator.hpp \
-	node/node_filter.hpp \
-	node/node_sampler.hpp \
-	node/node_double_sampler.hpp \
-	node/node_step_seq.hpp \
-	node/node_noise.hpp \
-	node/node_audio_noise.hpp \
-	node/node_control_noise.hpp \
-	node/node_echo.hpp \
-	node/node_delay.hpp \
-	node/watch.hpp\
-	node/watch_viewer.hpp\
-	node/node_factory.hpp\
-	node/node_factory_manager.hpp\
-	io/output.hpp\
-	io/file_reader.hpp\
-	io/file_reader_any.hpp\
-	io/file_reader_fetcher.hpp\
-	new_io/async_base.hpp\
-	new_io/buffered_output.hpp\
-	new_io/buffered_output.tpp\
-	new_io/caching_file_input.hpp\
-	new_io/caching_file_input.tpp\
-	new_io/file_common.hpp \
-	new_io/file_common.tpp \
-	new_io/input.hpp \
-	new_io/input.tpp \
-	new_io/output.hpp \
-	new_io/output.tpp \
-	new_io/thread_async.hpp \
+	graph/buffers.hpp \
+	graph/node.hpp \
+	graph/node_types.hpp \
+	graph/node_param.hpp\
+	graph/node_manager.hpp \
+	graph/node_output.hpp \
+	graph/node_mixer.hpp \
+	graph/node_oscillator.hpp \
+	graph/node_filter.hpp \
+	graph/node_sampler.hpp \
+	graph/node_double_sampler.hpp \
+	graph/node_step_seq.hpp \
+	graph/node_noise.hpp \
+	graph/node_echo.hpp \
+	graph/node_delay.hpp \
+	graph/watch.hpp\
+	graph/watch_viewer.hpp\
+	graph/node_factory.hpp\
+	graph/node_factory_manager.hpp\
+	io/async_base.hpp\
+	io/buffered_output.hpp\
+	io/buffered_output.tpp\
+	io/caching_file_input.hpp\
+	io/caching_file_input.tpp\
+	io/file_common.hpp \
+	io/file_common.tpp \
+	io/input.hpp \
+	io/input.tpp \
+	io/output.hpp \
+	io/output.tpp \
+	io/thread_async.hpp \
 	version.hpp
 
 libpsynth_la_SOURCES = \
@@ -150,65 +138,39 @@ libpsynth_la_SOURCES = \
 	base/exception.cpp\
 	base/tree.cpp\
 	base/singleton.cpp\
-	synth/audio_buffer.cpp \
-	synth/sample_buffer.cpp \
-	synth/ring_buffer.cpp \
-	synth/ring_audio_buffer.cpp \
-	synth/ring_sample_buffer.cpp \
 	synth/filter.cpp \
-	synth/wave_table.cpp \
-	synth/oscillator.cpp\
-	synth/envelope_multi.cpp\
 	world/world.cpp \
 	world/patcher.cpp \
 	world/patcher_dynamic.cpp \
 	world/world_node_creator.cpp\
-	node/node.cpp \
-	node/node_param.cpp \
-	node/node_factory_manager.cpp\
-	node/node_mixer.cpp \
-	node/node_audio_mixer.cpp \
-	node/node_control_mixer.cpp \
-	node/node_manager.cpp \
-	node/node_output.cpp \
-	node/node_oscillator.cpp \
-	node/node_lfo.cpp \
-	node/node_audio_oscillator.cpp \
-	node/node_filter.cpp \
-	node/node_sampler.cpp \
-	node/node_double_sampler.cpp \
-	node/node_step_seq.cpp \
-	node/node_noise.cpp \
-	node/node_audio_noise.cpp \
-	node/node_control_noise.cpp \
-	node/node_echo.cpp \
-	node/node_delay.cpp \
-	io/file_reader_any.cpp \
-	io/file_reader_fetcher.cpp \
-	new_io/exception.cpp \
-	new_io/async_base.cpp \
-	new_io/input.cpp \
-	new_io/output.cpp \
-	new_io/file_common.cpp \
-	new_io/thread_async.cpp
-
-
-if HAVE_SAMPLERATE
-libpsynth_la_CXXFLAGS += $(SAMPLERATE_CFLAGS)
-libpsynth_la_LIBADD += $(SAMPLERATE_LIBS)
-libpsynth_la_SOURCES += \
-	synth/scaler_src.cpp
-nobase_libpsynthinc_HEADERS += \
-	synth/scaler_src.hpp
-endif
+	graph/buffers.cpp \
+	graph/node.cpp \
+	graph/node_param.cpp \
+	graph/node_factory_manager.cpp\
+	graph/node_mixer.cpp \
+	graph/node_manager.cpp \
+	graph/node_output.cpp \
+	graph/node_oscillator.cpp \
+	graph/node_filter.cpp \
+	graph/node_sampler.cpp \
+	graph/node_step_seq.cpp \
+	graph/node_noise.cpp \
+	graph/node_echo.cpp \
+	graph/node_delay.cpp \
+	io/exception.cpp \
+	io/async_base.cpp \
+	io/input.cpp \
+	io/output.cpp \
+	io/file_common.cpp \
+	io/thread_async.cpp
 
 if HAVE_SOUNDTOUCH
 libpsynth_la_CXXFLAGS += $(SOUNDTOUCH_CFLAGS)
 libpsynth_la_LIBADD += $(SOUNDTOUCH_LIBS)
 libpsynth_la_SOURCES += \
-	synth/scaler_st.cpp
+	synth/scaler.cpp
 nobase_libpsynthinc_HEADERS += \
-	synth/scaler_st.hpp
+	synth/scaler.hpp
 endif
 
 if HAVE_LIBXML
@@ -246,26 +208,22 @@ libpsynth_la_LIBADD += $(ALSA_LIBS)
 nobase_libpsynthinc_HEADERS += \
 	app/defaults_alsa.hpp \
 	app/output_director_alsa.hpp \
-	io/output_alsa.hpp \
-	new_io/alsa_output.hpp \
-	new_io/alsa_output.tpp \
-	new_io/alsa_raw_output.hpp
+	io/alsa_output.hpp \
+	io/alsa_output.tpp \
+	io/alsa_raw_output.hpp
 libpsynth_la_SOURCES += \
-	io/output_alsa.cpp \
-	new_io/alsa_raw_output.cpp
+	io/alsa_raw_output.cpp
 endif
 
 if HAVE_OSS
 nobase_libpsynthinc_HEADERS += \
 	app/defaults_oss.hpp \
 	app/output_director_oss.hpp \
-	io/output_oss.hpp \
-	new_io/oss_output.hpp \
-	new_io/oss_output.tpp \
-	new_io/oss_raw_output.hpp
+	io/oss_output.hpp \
+	io/oss_output.tpp \
+	io/oss_raw_output.hpp
 libpsynth_la_SOURCES += \
-	io/output_oss.cpp \
-	new_io/oss_raw_output.cpp
+	io/oss_raw_output.cpp
 endif
 
 if HAVE_JACK
@@ -274,39 +232,24 @@ libpsynth_la_LDFLAGS += $(JACK_LIBS)
 nobase_libpsynthinc_HEADERS += \
 	app/defaults_jack.hpp \
 	app/output_director_jack.hpp \
-	io/output_jack.hpp \
-	new_io/jack_output.hpp\
-	new_io/jack_output.tpp\
-	new_io/jack_raw_output.hpp
+	io/jack_output.hpp\
+	io/jack_output.tpp\
+	io/jack_raw_output.hpp
 libpsynth_la_SOURCES += \
-	io/output_jack.cpp \
-	new_io/jack_raw_output.cpp
+	io/jack_raw_output.cpp
 endif
 
 if HAVE_SNDFILE
 libpsynth_la_CXXFLAGS += $(SNDFILE_CFLAGS)
 libpsynth_la_LIBADD += $(SNDFILE_LIBS)
 nobase_libpsynthinc_HEADERS += \
-	io/output_wave.hpp \
-	io/file_reader_wave.hpp \
-	new_io/file_input.hpp \
-	new_io/file_input.tpp \
-	new_io/file_output.hpp \
-	new_io/file_output.tpp
+	io/file_input.hpp \
+	io/file_input.tpp \
+	io/file_output.hpp \
+	io/file_output.tpp
 libpsynth_la_SOURCES += \
-	io/output_wave.cpp\
-	io/file_reader_wave.cpp\
-	new_io/file_input.cpp \
-	new_io/file_output.cpp
-endif
-
-if HAVE_VORBIS
-libpsynth_la_CXXFLAGS += $(VORBIS_CFLAGS)
-libpsynth_la_LIBADD += $(VORBIS_LIBS)
-nobase_libpsynthinc_HEADERS += \
-	io/file_reader_ogg.hpp
-libpsynth_la_SOURCES += \
-	io/file_reader_ogg.cpp
+	io/file_input.cpp \
+	io/file_output.cpp
 endif
 
 libpsynth_la_SOURCES += $(nobase_libpsynthinc_HEADERS)

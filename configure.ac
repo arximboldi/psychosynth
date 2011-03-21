@@ -39,7 +39,7 @@ dnl  Options
 dnl ======================================================================
 
 dnl CXX=gfilt
-CXXFLAGS="${CXXFLAGS} -std=c++0x"
+CXXFLAGS="${CXXFLAGS} -std=c++0x "
 
 AC_ARG_ENABLE([gprof], 
 		[AC_HELP_STRING([--enable-gprof],
@@ -49,7 +49,7 @@ AC_ARG_ENABLE([gprof],
 AC_ARG_ENABLE([debug], 
 		[AC_HELP_STRING([--enable-debug],
 	        [enable debug [default=disabled] ])],
-		[CXXFLAGS="${CXXFLAGS} -g -O0"], 
+		[CXXFLAGS="${CXXFLAGS} -g3 -O0"], 
 		[CXXFLAGS="${CXXFLAGS} -DNDEBUG"])
 
 dnl  Compulsory libraries

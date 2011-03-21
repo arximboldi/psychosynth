@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-16 12:51:55 raskolnikov>
+ *  Time-stamp:  <2011-03-18 19:04:03 raskolnikov>
  *
  *  @file        observer.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -34,8 +34,8 @@
 #ifndef PSYNTH_OBSERVER_H_
 #define PSYNTH_OBSERVER_H_
 
-#include <boost/signal.hpp>
 #include <boost/bind.hpp>
+#include <boost/signal.hpp>
 #include <boost/signals/trackable.hpp>
 
 namespace psynth

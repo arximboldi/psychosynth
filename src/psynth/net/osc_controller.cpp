@@ -130,25 +130,25 @@ void osc_controller::handle_set_param_node(world_node& obj, int param_id)
 	lo_message_add_int32(msg, param_id);
 
 	switch(obj.get_param_type(param_id)) {
-	case node_param::INT: {
+	case graph::node_param::INT: {
 	    int val;
 	    obj.get_param(param_id, val);
 	    lo_message_add_int32(msg, val);
 	    break;
 	}    
-	case node_param::FLOAT: {
+	case graph::node_param::FLOAT: {
 	    float val;
 	    obj.get_param(param_id, val);
 	    lo_message_add_float(msg, val);
 	    break;
 	}  
-	case node_param::STRING: {
+	case graph::node_param::STRING: {
 	    string val;
 	    obj.get_param(param_id, val);
 	    lo_message_add_string(msg, val.c_str());
 	    break;
 	}
-	case node_param::VECTOR2F: {
+	case graph::node_param::VECTOR2F: {
 	    base::vector_2f val;
 	    obj.get_param(param_id, val);
 	    lo_message_add_float(msg, val.x);
@@ -251,16 +251,16 @@ int osc_controller::_param_cb(const char* path, const char* types,
 	    
 	    m_skip++;
 	    switch(obj.get_param_type(param_id)) {
-	    case node_param::FLOAT:
+	    case graph::node_param::FLOAT:
 		m_world->set_param_node(obj, param_id, argv[3]->f);
 		break;
-	    case node_param::INT:
+	    case graph::node_param::INT:
 		m_world->set_param_node(obj, param_id, argv[3]->i);
 		break;
-	    case node_param::STRING:
+	    case graph::node_param::STRING:
 		m_world->set_param_node(obj, param_id, string(&argv[3]->s));
 		break;
-	    case node_param::VECTOR2F:
+	    case graph::node_param::VECTOR2F:
 		m_world->set_param_node(obj, param_id,
 					base::vector_2f(argv[3]->f, argv[4]->f));
 		break;
@@ -276,16 +276,16 @@ int osc_controller::_param_cb(const char* path, const char* types,
 		lo_message_add_int32(newmsg, argv[2]->i);
 		
 		switch(obj.get_param_type(param_id)) {
-		case node_param::FLOAT:
+		case graph::node_param::FLOAT:
 		    lo_message_add_float(newmsg, argv[3]->f);
 		    break;
-		case node_param::INT:
+		case graph::node_param::INT:
 		    lo_message_add_int32(newmsg, argv[3]->i);
 		    break;
-		case node_param::STRING:
+		case graph::node_param::STRING:
 		    lo_message_add_string(newmsg, &argv[3]->s);
 		    break;
-		case node_param::VECTOR2F:
+		case graph::node_param::VECTOR2F:
 		    lo_message_add_float(newmsg, argv[3]->f);
 		    lo_message_add_float(newmsg, argv[4]->f);
 		    break;
