@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-21 19:47:29 raskolnikov>
+ *  Time-stamp:  <2011-03-22 20:24:01 raskolnikov>
  *
  *  @file        caching_file_reader.tpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -54,8 +54,11 @@ void caching_file_input_impl<R, I>::start ()
 {
     // TODO: Error checking
     if (_thread.get_id () == std::thread::id ())
+    {
+        _finished = false;
         _thread = std::thread (
             std::bind (&caching_file_input_impl::run, this));
+    }
 }
 
 template <class R, class I>
@@ -72,13 +75,10 @@ caching_file_input_impl<R, I>::caching_file_input_impl (
     , _buffer (buffer_size)
     , _range (sound::range (_buffer))
     , _read_ptr (_range.end_pos ())
-      // TODO: Fuck fuck fuck, maybe I should consider completely
-      // removing non safe positions. I spent a fucking whole evening
-      // trying to find a bug cause by _read_ptr not being a safe_pos.
     , _backwards (false)
     , _read_pos (0)
     , _new_read_pos (-1)
-    , _finished (false)
+    , _finished (true)
 {
 }
 
@@ -88,10 +88,10 @@ void caching_file_input_impl<R, I>::set_backwards (bool backwards)
     std::size_t old_avail;
     std::size_t new_avail;
     std::size_t diff_avail;
-    
+
     if (_backwards != backwards)
     {
-	std::unique_lock<std::mutex> buffer_lock (_buffer_mutex);
+ 	std::unique_lock<std::mutex> buffer_lock (_buffer_mutex);
         std::unique_lock<std::mutex> input_lock  (_input_mutex);
 
 	old_avail = _range.available (_read_ptr);
@@ -110,7 +110,7 @@ void caching_file_input_impl<R, I>::set_backwards (bool backwards)
 		_new_read_pos += _chunk_size;
 	} else {
 	    _new_read_pos += diff_avail;
-	    if (_new_read_pos >= _chunk_size)
+	    if (_new_read_pos >= std::ptrdiff_t (_chunk_size))
 		_new_read_pos -= _chunk_size;
 	}
     }
@@ -150,15 +150,17 @@ std::size_t caching_file_input_impl<R, I>::take (const Range& buf)
 
     {
 	std::unique_lock<std::mutex> lock (_buffer_mutex);
-	
+
 	while (_range.available (_read_ptr) == 0)
-	    _cond.wait (lock);
+        {
+            _cond.wait (lock);
+        }
         
 	nread = std::min<std::size_t> (nsamples, _range.available (_read_ptr));
 
         if (nread)
         {
-            _range.read_and_convert (_read_ptr, buf);
+            _range.read_and_convert (_read_ptr, sub_range (buf, 0, nread));
                         
             // TODO: Why is ring_buffer_range::size_type signed?
 	    if ((std::size_t) _range.available (_read_ptr) < _threshold)
@@ -178,7 +180,7 @@ void caching_file_input_impl<R, I>::run ()
 {
     std::size_t nread;
     std::size_t must_read;
-    
+
     do {
 	/* Read the data. */
 	{
@@ -193,15 +195,16 @@ void caching_file_input_impl<R, I>::run ()
 		if (_new_read_pos >= 0) {
 		    _read_pos = _new_read_pos;
 		    _new_read_pos = -1;
-		    if (!_backwards)
-			_input->seek (_read_pos, seek_dir::beg);
-		}
+		    if (!_backwards) {
+                        _input->seek (_read_pos, seek_dir::beg);
+                    }
+                }
 
 		/* Backwards reading needs seeking. */
 		if (_backwards) {
-		    if (_read_pos == 0)
+                    if (_read_pos == 0)
 			_read_pos = _chunk_size - must_read;
-		    else if (must_read > _read_pos) {
+		    else if (std::ptrdiff_t (must_read) > _read_pos) {
 			must_read = _read_pos;
 			_read_pos = 0;
 		    } else
@@ -212,7 +215,7 @@ void caching_file_input_impl<R, I>::run ()
                 auto block = sound::sub_range (
                     sound::range (_tmp_buffer), 0, must_read);
 		nread = _input->take (block);
-
+                
 		/* Check wether whe have finished reading and loop. */
 		if (!nread && !_backwards) {
 		    _read_pos += nread;
@@ -223,10 +226,10 @@ void caching_file_input_impl<R, I>::run ()
 	}
 	
 	/* Add it to the buffer. */
-	if (nread) {
+	if (nread)
+        {
 	    std::unique_lock<std::mutex> lock (_buffer_mutex);
             auto block = sound::sub_range (sound::range (_tmp_buffer), 0, nread);
-
             _range.write_and_convert (block);
             _cond.notify_all ();
 	}

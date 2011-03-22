@@ -1,11 +1,18 @@
 /**
- *  Time-stamp:  <2011-03-22 00:11:42 raskolnikov>
+ *  Time-stamp:  <2011-03-22 20:14:01 raskolnikov>
  *
  *  @file        ring_buffer.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
  *  @date        Mon Nov  8 16:24:42 2010
  *
- *  Ring buffer.
+ *  @brief Ring buffer class.
+ *
+ *  @todo Take a look at this:
+ *      http://www.rossbencina.com/code/lockfree?q=~rossb/code/lockfree/
+ *  And this:
+ *      http://subversion.jackaudio.org/jack/trunk/jack/libjack/ringbuffer.c
+ *  To implement such a lock_free ring buffer.
+ *
  */
 
 /*
@@ -45,7 +52,7 @@ namespace sound
 class default_channel_converter;
 
 /**
- * Error codes for a read pointer.
+ *  Error codes for a read pointer.
  */
 enum class ring_buffer_error
 {
@@ -53,14 +60,15 @@ enum class ring_buffer_error
     none,
 
     /**
-     * An underrun has ocurred. This means that there has been too much
-     * data written overwritting data thas has not been previously read.
+     *  An underrun has ocurred. This means that there has been too
+     *  much data written overwritting data thas has not been
+     *  previously read.
      */
     underrun,
 	
     /**
-     * An overrun has ocurred. This means that the reader has read more data
-     * that the one actually in the buffer.
+     *  An overrun has ocurred. This means that the reader has read
+     *  more data that the one actually in the buffer.
      */
     overrun
 };
@@ -82,8 +90,8 @@ public:
     unsafe_ring_position () = default;
     unsafe_ring_position (const unsafe_ring_position& r) = default;
     unsafe_ring_position& operator= (const unsafe_ring_position& p) = default;
-    
-    unsafe_ring_position (size_type p) : _pos (p) {}
+
+    explicit unsafe_ring_position (size_type p) : _pos (p) {}
 
     
     size_type offset () const
@@ -110,7 +118,7 @@ public:
     ring_position (const ring_position& r) = default;
     ring_position& operator= (const ring_position& p) = default;
     
-    ring_position (size_type p, size_type c)
+    explicit ring_position (size_type p, size_type c)
 	: parent_type (p), _count (c) {}
     
     difference_type count () const { return _count; }
@@ -311,7 +319,7 @@ public:
     position begin_pos () const
     {
 	return _writepos._count > (difference_type) size () ?
-	    position (_startpos, _writepos._count - size ()) :
+	    position (_writepos._pos, _writepos._count - size ()) :
 	    position (_startpos, 0);
     };
 

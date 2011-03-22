@@ -21,6 +21,8 @@
  ***************************************************************************/
 
 #include <algorithm>
+
+#include "sound/output.hpp"
 #include "graph/node_types.hpp"
 #include "graph/node_mixer.hpp"
 
@@ -65,7 +67,7 @@ void node_audio_mixer::do_update (const node* caller,
 {
     audio_buffer* buf = get_output<audio_buffer> (LINK_AUDIO, OUT_A_OUTPUT);
     const audio_buffer* in = NULL;
-    const sample_buffer * ampl = get_input<sample_buffer> (LINK_CONTROL, IN_C_AMPLITUDE);
+    const sample_buffer* ampl = get_input<sample_buffer> (LINK_CONTROL, IN_C_AMPLITUDE);
     size_t i, j;
     bool input = false;
     
@@ -85,9 +87,10 @@ void node_audio_mixer::do_update (const node* caller,
 		else {
 		    link_envelope ctrl_env = get_in_envelope(LINK_CONTROL,
                                                              IN_C_AMPLITUDE);
+                    
 		    mix((sample*) &range (*buf) [0][i],
                         (const sample*) &const_range (*in) [0][i],
-                        (const sample*) &const_range (*ampl) [0][i],
+                        (const sample*) &const_range (*ampl) [0],
 			env, ctrl_env, get_info().block_size);
 		}
 		input = true;

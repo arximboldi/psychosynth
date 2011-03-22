@@ -74,9 +74,10 @@ private:
     typedef sound::stereo32sf_buffer interleaved_buffer;
     
     io::file_input_ptr<interleaved_range> m_reader;
-    io::caching_file_input_adapter<interleaved_range, decltype (m_reader)> m_fetcher;
+    io::caching_file_input_adapter<interleaved_range,
+                                   decltype (m_reader)> m_fetcher;
     
-    interleaved_buffer m_inbuf;
+    interleaved_buffer m_inbuf;;
     synth::scaler<interleaved_range> m_scaler;
     
     float m_ctrl_pos;

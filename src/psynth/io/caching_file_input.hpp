@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-21 16:55:07 raskolnikov>
+ *  Time-stamp:  <2011-03-22 20:21:51 raskolnikov>
  *
  *  @file        caching_file_reader.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -8,6 +8,8 @@
  *  Caching file reader that prefetches in a separate thread the data
  *  such that the operation happens fast and can be done in the
  *  realtime thread.
+ *
+ *  @todo Make sure the fetcher does not overrun!
  */
 
 /*
@@ -101,7 +103,11 @@ public:
     { return _backwards; }
     
     void set_backwards (bool backwards);
-    
+
+    /** @todo Synchronization? */
+    void set_chunk_size (std::size_t cs)
+    { _chunk_size = cs; }
+
     void soft_seek (std::size_t pos);
     std::size_t seek (std::ptrdiff_t pos, seek_dir dir);
     
@@ -136,9 +142,9 @@ public:
     typename ring_buffer_type::range&   _range;
     typename ring_buffer_type::position _read_ptr;
     
-    bool        _backwards;
-    std::size_t _read_pos;
-    std::size_t _new_read_pos;
+    bool           _backwards;
+    std::ptrdiff_t _read_pos;
+    std::ptrdiff_t _new_read_pos;
 
     bool _finished;
 
@@ -164,7 +170,7 @@ public:
         std::size_t chunk_size  = base::DEFAULT_CHUNK_SIZE,
         std::size_t buffer_size = base::DEFAULT_BUFFER_SIZE,
         std::size_t threshold   = base::DEFAULT_THRESHOLD)
-        : base (input, buffer_size, threshold)
+        : base (input, chunk_size, buffer_size, threshold)
     {}
 
     caching_file_input_adapter (caching_file_input_adapter&& other)

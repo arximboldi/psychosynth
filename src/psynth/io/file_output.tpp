@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-16 23:47:37 raskolnikov>
+ *  Time-stamp:  <2011-03-22 17:34:08 raskolnikov>
  *
  *  @file        file_output.tpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -94,8 +94,7 @@ std::size_t file_output<Range>::put (const range& data)
 {
     return detail::file_output_put_impl (
         _file,
-        reinterpret_cast<const typename sound::sample_type<Range>::type*> (
-            data.frames ()),
+        &data [0][0],
         data.size ());
 }
 

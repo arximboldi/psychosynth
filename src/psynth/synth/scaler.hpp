@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-21 19:46:52 raskolnikov>
+ *  Time-stamp:  <2011-03-22 17:40:26 raskolnikov>
  *
  *  @file        scaler.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -52,6 +52,9 @@ template <class Range>
 class scaler
 {    
 public:
+    static_assert (std::is_same<soundtouch::SAMPLETYPE, float>::value,
+                   "Soundtouch SAMPLETYPE must be flaot.");
+    
     static_assert (scaler_support<Range>::is_supported::value,
                    "Soundtouch supports only interleaved bits32sf ranges.");
 
@@ -92,14 +95,15 @@ public:
     void set_pitch (float pitch)
     {
 	_pitch = pitch;
-	_st.setPitch(pitch);
+	_st.setPitch (pitch);
     }
 
     /**
      * Sets the sample rate of the original signal.
      * @param samplerate The sampling rate.
      */
-    void set_frame_rate (int samplerate) {
+    void set_frame_rate (int samplerate)
+    {
 	_st.setSampleRate (samplerate);
     }
 
@@ -135,8 +139,9 @@ public:
      * @return The actual number of samples received.
      */
     std::size_t receive (const Range& data)
-    { return _st.receiveSamples ((soundtouch::SAMPLETYPE*) &data[0][0], data.size ()); }
-
+    { return _st.receiveSamples (
+            (soundtouch::SAMPLETYPE*) &data[0][0], data.size ()); }
+    
     /**
      * Push some data for scaling.
      * @param data The buffer with the data to scale in interleaved format.

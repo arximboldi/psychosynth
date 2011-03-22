@@ -20,10 +20,14 @@
  *                                                                         *
  ***************************************************************************/
 
+#define PSYNTH_MODULE_NAME "psynth.io.node_sampler"
+
 #include <boost/bind.hpp>
 
 #include "base/misc.hpp"
+#include "base/logger.hpp"
 #include "base/file_manager.hpp"
+#include "sound/output.hpp"
 #include "synth/util.hpp"
 #include "graph/node_types.hpp"
 #include "graph/node_sampler.hpp"
@@ -68,10 +72,11 @@ node_sampler::node_sampler(const audio_info& info):
     add_param ("rate", node_param::FLOAT, &m_param_rate);
     add_param ("tempo", node_param::FLOAT, &m_param_tempo);
     add_param ("pitch", node_param::FLOAT, &m_param_pitch);
-
+    
     m_scaler.set_rate (1.0);
     m_scaler.set_frame_rate (info.sample_rate);
 
+    m_fetcher.set_chunk_size (info.block_size);
     m_fetcher.start ();
 }
 
@@ -89,13 +94,13 @@ void node_sampler::on_file_change (node_param& par)
     path = base::file_manager::self ().path("psychosynth.samples").find (val);
     
     m_update_mutex.lock();
-    
+        
     m_reader = io::new_file_input <interleaved_range> (path.native ());
     m_fetcher.set_input (m_reader);
 
     if (m_reader) {
-	m_inbuf.recreate (get_info ().block_size);
-	// m_scaler.set_channels (2); // HACK HACK
+        m_inbuf.recreate (get_info ().block_size);
+        // m_scaler.set_channels (2); // HACK HACK
 	// m_scaler.setSampleRate(m_fetcher.get_info().sample_rate);
     }
     
@@ -138,13 +143,14 @@ void node_sampler::do_update (const node* caller, int caller_port_type, int call
 	fill_frames (range (*out), audio_frame (0));
     
     /* Set amplitude. */
-    transform_frames (range (*out), range (*out),
-                      [&] (audio_frame in) -> audio_frame {
-                          static_transform (in, in, [&] (audio_sample in) -> audio_sample {
-                                  return in * this->m_param_ampl;
-                              });
-                          return in;
-                      });
+    transform_frames (
+        range (*out), range (*out),
+        [&] (audio_frame in) -> audio_frame {
+            static_transform (in, in, [&] (audio_sample in) -> audio_sample {
+                    return in * this->m_param_ampl;
+                });
+            return in;
+        });
     
     /* Apply trigger envelope. */
     if (trig_buf) {
@@ -173,7 +179,8 @@ void node_sampler::restart()
 
 void node_sampler::read (audio_buffer& buf, int start, int end)
 {
-    const sample_buffer* rate = get_input<sample_buffer> (node::LINK_CONTROL, IN_C_RATE);
+    const sample_buffer* rate = get_input<sample_buffer> (
+        node::LINK_CONTROL, IN_C_RATE);
     const sample* rate_buf = rate ? (const sample*) &const_range (*rate) [0] : 0;
     
     float base_factor =
@@ -186,11 +193,13 @@ void node_sampler::read (audio_buffer& buf, int start, int end)
     bool backwards = false;;
     bool high_latency = false;
     
-    m_update_mutex.lock ();
-    m_scaler.set_tempo (m_param_tempo);
-    m_scaler.set_pitch (m_param_pitch);
-    m_update_mutex.unlock ();
-
+    if (m_update_mutex.try_lock ())
+    {
+        m_scaler.set_tempo (m_param_tempo);
+        m_scaler.set_pitch (m_param_pitch);
+        m_update_mutex.unlock ();
+    }
+    
     if (m_param_tempo != 1.0f ||
 	m_param_pitch != 1.0f)
 	high_latency = true;
@@ -218,7 +227,7 @@ void node_sampler::read (audio_buffer& buf, int start, int end)
 	    must_read = (float)must_read * factor * m_param_tempo;
 	else
 	    must_read = must_read;
-	   
+        
 	m_update_mutex.lock();
 	nread = m_fetcher.take (sub_range (range (m_inbuf), 0, must_read));
 
@@ -226,7 +235,8 @@ void node_sampler::read (audio_buffer& buf, int start, int end)
         {
 	    m_ctrl_pos += (float) nread / (factor * m_param_tempo);
 	    if (m_ctrl_pos >= get_info ().block_size)
-		m_ctrl_pos = base::phase(m_ctrl_pos) + ((int) m_ctrl_pos % get_info ().block_size);
+		m_ctrl_pos = base::phase(m_ctrl_pos) +
+                    ((int) m_ctrl_pos % get_info ().block_size);
 
             m_scaler.set_rate (factor);
 	    m_scaler.update (sub_range (range (m_inbuf), 0, nread));

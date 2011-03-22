@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-21 19:30:03 raskolnikov>
+ *  Time-stamp:  <2011-03-22 17:34:17 raskolnikov>
  *
  *  @file        scaler.tpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>

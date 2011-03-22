@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-16 23:59:27 raskolnikov>
+ *  Time-stamp:  <2011-03-22 20:26:26 raskolnikov>
  *
  *  @file        file_common.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -31,6 +31,7 @@
 #define PSYNTH_MODULE_NAME "psynth.io.file"
 
 #include "base/logger.hpp"
+#include "base/scope_guard.hpp"
 #include "file_common.hpp"
 
 namespace psynth
@@ -76,16 +77,22 @@ int file_format_impl (file_fmt format, int sample_format)
 
 SNDFILE* file_open_impl (const char* fname, int mode, SF_INFO* info)
 {
+    int orig_channels = info->channels;
     SNDFILE* file = sf_open (fname, mode, info);
-
+    auto file_grd = base::make_guard ([&] { sf_close (file); });
+    
     if (file == 0)
     {
         PSYNTH_LOG << base::log::warning
-                   << "Problem while opening audio file for writing: "
+                   << "Problem while opening audio file: "
                    << sf_strerror (file);
         throw file_open_error ();
     }
-    
+
+    if (orig_channels != info->channels)
+        throw file_open_error ("Number of channels expected mismatch.");
+
+    file_grd.dismiss ();    
     return file;
 }
 
