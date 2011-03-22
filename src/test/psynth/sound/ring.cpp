@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-21 19:52:09 raskolnikov>
+ *  Time-stamp:  <2011-03-22 02:17:13 raskolnikov>
  *
  *  @file        ring.cpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -63,6 +63,24 @@ BOOST_AUTO_TEST_CASE (test_ring_buffer)
     ring.read (reader, buf, buffer_size);
 
     BOOST_CHECK (equal_frames (buf, sample_range));
+}
+
+BOOST_AUTO_TEST_CASE (test_ring_buffer_nr)
+{
+    stereo32sf_planar_buffer buf (buffer_size);
+    fill_frames (range (buf), stereo32sf_frame (.0f));
+
+    stereo32sf_ring_buffer ring (buffer_size * 1.3);
+    auto reader = range (ring).begin_pos ();
+
+    range (ring).write (sample_range);
+    range (ring).read (reader, range (buf));
+    BOOST_CHECK (equal_frames (range (buf), sample_range));
+
+    range (ring).write (sample_range, buffer_size);
+    range (ring).read (reader, range (buf), buffer_size);
+
+    BOOST_CHECK (equal_frames (range (buf), sample_range));
 }
 
 BOOST_AUTO_TEST_CASE (test_ring_buffer_iterator)

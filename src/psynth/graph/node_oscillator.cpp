@@ -220,16 +220,18 @@ void node_oscillator::update_osc (sample* out)
 	if (mod)
         {
             boost::apply_visitor (
-                do_update_osc_mod (m_param_mod,
-                                   mod_env,
-                                   sample_const_range (end-start, (const sample_frame*) mod + start),
-                                   sample_range (end-start, (sample_frame*) out + start)),
+                do_update_osc_mod
+                (m_param_mod,
+                 mod_env,
+                 sample_const_range (end-start, (const sample_frame*) mod + start),
+                 sample_range (end-start, (sample_frame*) out + start)),
                 m_oscillator);
 	}
         else
         {
             boost::apply_visitor (
-                do_update_osc (sample_range (end - start, (sample_frame*) out + start)),
+                do_update_osc (
+                    sample_range (end - start, (sample_frame*) out + start)),
                 m_oscillator);
         }
         

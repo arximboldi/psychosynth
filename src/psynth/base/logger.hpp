@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-21 23:01:26 raskolnikov>
+ *  Time-stamp:  <2011-03-22 02:02:33 raskolnikov>
  *
  *  @file        logger.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -187,7 +187,9 @@ public:
     static const char* level_name (int level)
     {
 	switch(level) {
-	case info:
+	case debug:
+            return "DEBUG";
+        case info:
 	    return "INFO";
 	case warning:
 	    return "WARNING";
@@ -195,7 +197,7 @@ public:
 	    return "ERROR";
 	case fatal:
 	    return "FATAL";
-	default:
+        default:
 	    return "UNKNOWN";
 	};
     };

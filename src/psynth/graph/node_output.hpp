@@ -121,7 +121,7 @@ public:
     {
 	//m_buflock.readLock();
 	m_slots.push_back(
-            new slot (out, this, range (m_buffer).end_pos(), get_info()));
+            new slot (out, this, range (m_buffer).begin_pos(), get_info()));
 	//m_buflock.unlock();
     };
     

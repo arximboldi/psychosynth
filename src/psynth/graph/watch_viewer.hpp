@@ -24,6 +24,7 @@
 #define PSYNTH_WATCH_VIEWER_H
 
 #include <mutex>
+#include <iostream> // FIXME 
 #include <psynth/graph/watch.hpp>
 #include <psynth/sound/buffer.hpp>
 #include <psynth/sound/ring_buffer.hpp>
@@ -46,11 +47,11 @@ protected:
     std::mutex m_mutex;
     
 public:
-    watch_viewer (int points, float secs) :
+    watch_viewer (std::size_t points, std::size_t secs) :
 	m_ring(points),
 	m_buffer(points, typename BufferType::range::value_type (0), 0),
 	m_points(points),
-	m_factor(1.0f),
+	m_factor(2),
 	m_secs(secs),
 	m_updated(false)
 	{
@@ -64,15 +65,20 @@ public:
         //m_ring.zero();
     }
 
-    virtual void update (const BufferType& buf) {
-        std::unique_lock<std::mutex> lock (m_mutex);
-	range (m_ring).write (sound::sub_sampled_range (const_range (buf), m_factor));
-	//m_ring.write(buf);
-	m_updated = false;
+    virtual void update (const typename BufferType::const_range& buf)
+    {
+        std::unique_lock<std::mutex> lock (m_mutex, std::try_to_lock_t ());
+        if (lock.owns_lock ())
+        {
+            range (m_ring).write (buf);//sound::sub_sampled_range (buf, m_factor));
+            m_updated = false;
+        }
     }
 
-    const BufferType& get_buffer () {
-	if (!m_updated) {
+    const BufferType& get_buffer ()
+    {
+	if (!m_updated)
+        {
 	    std::unique_lock<std::mutex> lock (m_mutex);
 	    typename RingBufferType::position ptr = range (m_ring).begin_pos ();
 	    range (m_ring).read (ptr, range (m_buffer));
@@ -89,7 +95,7 @@ class watch_view_audio : public watch_viewer<audio_buffer, audio_ring_buffer>
 public:
     typedef watch_viewer<audio_buffer, audio_ring_buffer> base;
     
-    watch_view_audio (int points, float secs) :
+    watch_view_audio (std::size_t points, std::size_t secs) :
 	base (points, secs) {}
     
     virtual void set_info (const audio_info& newinfo)
@@ -98,7 +104,7 @@ public:
 	info.block_size = m_points;
 	m_ring.recreate (info.block_size, audio_frame (0), 0);
 	m_buffer.recreate (info.block_size, audio_frame (0), 0);
-	m_factor = (float) info.sample_rate / ((float) m_points / m_secs);
+	//m_factor = (float) info.sample_rate / ((float) m_points / m_secs);
     }
 };
 

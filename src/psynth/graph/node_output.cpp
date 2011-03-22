@@ -20,6 +20,9 @@
  *                                                                         *
  ***************************************************************************/
 
+#define PSYNTH_MODULE_NAME "psynth.graph.node_output"
+
+#include "base/logger.hpp"
 #include "graph/node_types.hpp"
 #include "graph/node_output.hpp"
 #include "graph/node_manager.hpp"
@@ -36,7 +39,7 @@ namespace graph
 PSYNTH_DEFINE_NODE_FACTORY(node_output);
 
 void node_output::slot::callback (std::size_t nframes)
-{	
+{
     m_parent->do_output (*this, nframes);
 }
 
@@ -64,10 +67,10 @@ void node_output::do_update (const node* caller,
 			      int caller_port_type, int caller_port)
 {
     const audio_buffer* in;
-    
+
     if ((in = get_input<audio_buffer>(LINK_AUDIO, IN_A_INPUT))) {
 	//m_buflock.writeLock();
-	range (m_buffer).write (const_range (*in));
+    	range (m_buffer).write (const_range (*in));
 	//m_buflock.unlock();
 	
 	//m_passive_lock.lock();
@@ -77,7 +80,7 @@ void node_output::do_update (const node* caller,
 	    (*it)->put (const_range (*in));
 	//m_passive_lock.unlock();
     } else {
-	//m_buflock.writeLock();
+    	//m_buflock.writeLock();
         // FIXME: This is slow.
         auto zero_buf = audio_buffer (get_info ().block_size, audio_frame (0), 0);
 	range (m_buffer).write (const_range (zero_buf));
@@ -115,10 +118,9 @@ void node_output::do_output (slot& slot, size_t nframes)
 
     if (m_manager) {
 	size_t avail;
-        auto rng = range (m_buffer);
-        
+        auto& rng = range (m_buffer);        
 	avail = rng.available (slot.m_ptr);
-	
+
 	while(avail < nframes)
         {
 	    m_manager->update ();

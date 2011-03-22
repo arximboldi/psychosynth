@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-21 20:04:11 raskolnikov>
+ *  Time-stamp:  <2011-03-22 13:22:05 raskolnikov>
  *
  *  @file        oscillator.tpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -77,7 +77,8 @@ void oscillator<G>::update_fm (const Range1& out_buf, const Range2& mod_buf)
     
     transform_frames (mod_buf, out_buf, [&] (modval m) -> outval {
             auto ret = this->_gen (this->_x) * this->_ampl;
-            this->_x += this->_speed + (sound::bits32sf) (m) / this->_frame_rate;
+            this->_x += (this->_freq + this->_freq * (sound::bits32sf) (m))
+                / this->_frame_rate;
             return outval { ret };
         });
     this->_x = base::phase (_x);
