@@ -7,5 +7,5 @@
 #     --log_level=message         for detailed output with checkpoints.
 #    
 
-exec $1
+exec ./psynth_unit_test --log_level=message
 

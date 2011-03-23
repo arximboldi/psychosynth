@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-23 13:23:05 raskolnikov>
+ *  Time-stamp:  <2011-03-23 17:14:13 raskolnikov>
  *
  *  @file        ring_buffer.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -512,7 +512,7 @@ public:
 	    while (new_pos < 0)
 		new_pos += size ();
         r._pos = new_pos;
-        r._add (std::abs (n));
+        r._add (n * (is_backwards () ? -1 : 1));
     }
     
     difference_type distance (const unsafe_position& ra,

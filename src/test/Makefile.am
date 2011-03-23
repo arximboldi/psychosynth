@@ -20,33 +20,37 @@
 
 if HAVE_BOOST_TEST
 
-TESTS_ENVIRONMENT = ./utf_test_driver
+dist_TESTS = utf_test_driver
 
-TESTS = psynth_unit_test
+TESTS = $(dist_TESTS)
 
-noinst_PROGRAMS = $(TESTS)
+EXTRA_DIST = $(dist_TESTS)
+
+noinst_PROGRAMS = psynth_unit_test
 
 psynth_unit_test_SOURCES = psynth_unit_test.cpp
 
-# psynth_unit_test_SOURCES += \
-# 	psynth/base/tree_node.cpp \
-# 	psynth/base/arg_parser.cpp \
-# 	psynth/base/c3_class.cpp \
-# 	psynth/sound/sample.cpp \
-# 	psynth/sound/frame.cpp \
-# 	psynth/sound/sample_buffer.cpp \
-# 	psynth/sound/buffer.cpp \
-# 	psynth/sound/performance.cpp \
-# 	psynth/sound/frame_iterator.cpp \
-# 	psynth/sound/ring.cpp \
-# 	psynth/io/output.cpp \
-# 	psynth/io/input.cpp \
-# 	psynth/util.cpp \
-# 	psynth/util.hpp
-# 
+psynth_unit_test_SOURCES += \
+	psynth/base/tree_node.cpp \
+	psynth/base/arg_parser.cpp \
+	psynth/base/c3_class.cpp \
+	psynth/sound/sample.cpp \
+	psynth/sound/frame.cpp \
+	psynth/sound/sample_buffer.cpp \
+	psynth/sound/buffer.cpp \
+	psynth/sound/performance.cpp \
+	psynth/sound/frame_iterator.cpp \
+	psynth/sound/ring.cpp \
+	psynth/io/output.cpp \
+	psynth/io/input.cpp \
+	psynth/util.cpp \
+	psynth/util.hpp
 
-AM_CPPFLAGS = -Wall $(BOOST_CPPFLAGS) -I..
-AM_LDFLAGS  = $(BOOST_LDFLAGS)
+psynth_unit_test_CXXFLAGS = -Wall $(BOOST_CPPFLAGS) \
+	-I$(top_srcdir)/src \
+	-I$(top_builddir)/src
+
+psynth_unit_test_LDFLAGS  = $(BOOST_LDFLAGS)
 
 psynth_unit_test_LDADD = \
 	$(BOOST_UNIT_TEST_FRAMEWORK_LIB) \
@@ -55,6 +59,5 @@ psynth_unit_test_LDADD = \
 	-lboost_system-mt \
 	../psynth/libpsynth.la
 
-psynth_unit_test_LDFLAGS =
 
 endif # HAVE_BOOST_TEST
