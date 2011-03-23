@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-18 19:59:13 raskolnikov>
+ *  Time-stamp:  <2011-03-23 15:56:39 raskolnikov>
  *
  *  @file        alsa_raw_output.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -43,6 +43,7 @@ namespace io
 
 PSYNTH_DECLARE_ERROR (error, alsa_error);
 PSYNTH_DECLARE_ERROR (alsa_error, alsa_open_error);
+PSYNTH_DECLARE_ERROR (alsa_error, alsa_start_error);
 PSYNTH_DECLARE_ERROR (alsa_error, alsa_param_error);
 
 class alsa_raw_output : public thread_async,
@@ -63,9 +64,12 @@ public:
 
     std::size_t put_i (const void*        data, std::size_t frames);
     std::size_t put_n (const void* const* data, std::size_t frames);
-
+    
     std::size_t buffer_size () const
     { return _buffer_size; }
+
+    void start ();
+    void stop ();
     
 protected:
     void iterate ();

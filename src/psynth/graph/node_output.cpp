@@ -38,6 +38,19 @@ namespace graph
 
 PSYNTH_DEFINE_NODE_FACTORY(node_output);
 
+node_output::slot::slot (audio_async_output_ptr out,
+                         node_output* parent,
+                         audio_ring_range::position ptr,
+                         const audio_info& info)
+    : m_ptr (ptr)
+    , m_out (out)
+    , m_parent (parent)
+    , m_buf (out->buffer_size ())
+{
+    out->set_callback (std::bind (&node_output::slot::callback, this,
+                                  std::placeholders::_1));
+}
+
 void node_output::slot::callback (std::size_t nframes)
 {
     m_parent->do_output (*this, nframes);
@@ -96,7 +109,8 @@ node_output::node_output (const audio_info& info) :
 	  N_IN_C_SOCKETS,
 	  N_OUT_A_SOCKETS,
 	  N_OUT_C_SOCKETS),
-    m_buffer (info.block_size * SAFETY_FACTOR),
+    m_buffer (16384), // HACK this should be calculated from the
+                      // maximum buffer size of the outputs.
     m_manager (NULL)
 {
 }
@@ -121,7 +135,7 @@ void node_output::do_output (slot& slot, size_t nframes)
         auto& rng = range (m_buffer);        
 	avail = rng.available (slot.m_ptr);
 
-	while(avail < nframes)
+	while (avail < nframes)
         {
 	    m_manager->update ();
             avail = rng.available (slot.m_ptr);

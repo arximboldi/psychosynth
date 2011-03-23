@@ -32,8 +32,7 @@ namespace psynth
 {
 
 class output_director_oss : public output_director
-{
-    
+{    
     boost::signals::connection m_on_device_change_slot;
     
     ~output_director_oss()
@@ -67,14 +66,12 @@ class output_director_oss : public output_director
 	m_output = io::new_buffered_async_output<
             graph::audio_const_range,
             io::oss_output<sound::stereo16s_range> >(device, 1024, 44100);
-        
         return m_output;
     }
 
     virtual void do_stop (base::conf_node& conf)
     {
 	m_on_device_change_slot.disconnect ();
-	
 	if (m_output)
             m_output.reset ();
     }

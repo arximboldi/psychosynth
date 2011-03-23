@@ -52,16 +52,8 @@ class node_output : public node
 	slot (audio_async_output_ptr out,
               node_output* parent,
               audio_ring_range::position ptr,
-              const audio_info& info)
-	    : m_ptr(ptr)
-	    , m_out(out)
-	    , m_parent(parent)
-	    , m_buf(info.block_size)
-        {
-	    out->set_callback (std::bind (&node_output::slot::callback, this,
-                                          std::placeholders::_1));
-	}
-
+              const audio_info& info);
+        
         void callback (std::size_t nframes);    
     };
 	

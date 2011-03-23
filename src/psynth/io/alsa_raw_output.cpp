@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-21 22:43:19 raskolnikov>
+ *  Time-stamp:  <2011-03-23 16:52:53 raskolnikov>
  *
  *  @file        alsa_raw_output.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -30,6 +30,9 @@
 
 #define PSYNTH_MODULE_NAME "psynth.io.alsa"
 
+#include <limits>
+#include <algorithm>
+
 #include "base/logger.hpp"
 #include "base/scope_guard.hpp"
 #include "alsa_raw_output.hpp"
@@ -41,16 +44,17 @@ namespace io
 
 PSYNTH_DEFINE_ERROR (alsa_error);
 PSYNTH_DEFINE_ERROR_WHAT (alsa_open_error, "Can not open device.");
+PSYNTH_DEFINE_ERROR_WHAT (alsa_start_error, "Can not start device.");
 PSYNTH_DEFINE_ERROR_WHAT (alsa_param_error, "Invalid parameter.");
 
-#define PSYNTH_ALSA_CHECK(fun, except)                                  \
-    do {                                                                \
-        int err = fun;                                                  \
-        if (err < 0) {                                                  \
-            PSYNTH_LOG << base::log::warning << "ALSA error:"           \
-                       << snd_strerror (err);                           \
-            throw except ();                                            \
-        }                                                               \
+#define PSYNTH_ALSA_CHECK(fun, except)                          \
+    do {                                                        \
+        int err = fun;                                          \
+        if (err < 0) {                                          \
+            PSYNTH_LOG << base::log::warning << "ALSA error:"   \
+                       << snd_strerror (err);                   \
+            throw except ();                                    \
+        }                                                       \
     } while (0)
 
 alsa_raw_output::alsa_raw_output (const char*       device,
@@ -63,6 +67,8 @@ alsa_raw_output::alsa_raw_output (const char*       device,
     : thread_async (cb)
     , _buffer_size (buffer_size)
 {
+    int dir;
+    
     PSYNTH_ALSA_CHECK (snd_pcm_open (&_handle, device,
                                      SND_PCM_STREAM_PLAYBACK, 0),
                        alsa_open_error);
@@ -99,8 +105,7 @@ alsa_raw_output::alsa_raw_output (const char*       device,
 
     PSYNTH_ALSA_CHECK (snd_pcm_hw_params_set_buffer_size_min (
                            _handle, _hw_params, &_buffer_size),
-                       alsa_param_error);
-
+                       alsa_param_error); 
     if (_buffer_size != buffer_size)
         PSYNTH_LOG << base::log::warning
                    << "ALSA could not set the requested buffer size. "
@@ -114,13 +119,22 @@ alsa_raw_output::alsa_raw_output (const char*       device,
 
     auto grd_sw_params = base::make_guard (
         [&] { snd_pcm_sw_params_free (_sw_params); });
+
+    PSYNTH_ALSA_CHECK (snd_pcm_sw_params_current (_handle, _sw_params),
+                       alsa_param_error);
     
     PSYNTH_ALSA_CHECK (snd_pcm_sw_params_set_avail_min (
                            _handle, _sw_params, buffer_size),
                        alsa_param_error);
-    
+
+    snd_pcm_uframes_t period_size;
+    PSYNTH_ALSA_CHECK (snd_pcm_hw_params_get_period_size (
+                           _hw_params, &period_size, &dir),
+                       alsa_param_error);
+        
     PSYNTH_ALSA_CHECK (snd_pcm_sw_params_set_start_threshold (
-                           _handle, _sw_params, buffer_size),
+                           _handle, _sw_params,
+                           (_buffer_size / period_size) * period_size),
                        alsa_param_error);
     
     PSYNTH_ALSA_CHECK (snd_pcm_sw_params_set_stop_threshold (
@@ -143,13 +157,51 @@ alsa_raw_output::~alsa_raw_output ()
     snd_pcm_sw_params_free (_sw_params);
 }
 
-std::size_t alsa_raw_output::put_i (const void*  data, std::size_t frames)
+namespace
 {
-    snd_pcm_sframes_t res = snd_pcm_writei (_handle, data, frames);
 
-    if (res < 0)
+static int alsa_xrun_recovery (snd_pcm_t *handle, int err)
+{
+    if (err == -EPIPE)
     {
-        PSYNTH_LOG << "snd_pcm_writei () error: " << snd_strerror (res);
+        /* under-run */
+        err = snd_pcm_prepare (handle);
+        if (err < 0)
+            PSYNTH_LOG << base::log::error
+                       << "Can't recovery from underrun, prepare failed: "
+                       << snd_strerror (err);
+        return 0;
+    }
+    else if (err == -ESTRPIPE)
+    {
+        while ((err = snd_pcm_resume(handle)) == -EAGAIN)
+            sleep (1); /* wait until the suspend flag is released */
+
+        if (err < 0)
+        {
+            err = snd_pcm_prepare (handle);
+            if (err < 0)
+            PSYNTH_LOG << base::log::error
+                       << "Can't recovery from suspend, prepare failed: "
+                       << snd_strerror (err);         
+        }
+        return 0;
+    }
+    
+    return err;
+}
+
+} /* namespace anonymous */
+
+std::size_t alsa_raw_output::put_i (const void* data, std::size_t frames)
+{
+    snd_pcm_sframes_t res;
+    
+    while ((res = snd_pcm_writei (_handle, data, frames)) == -EAGAIN);
+    
+    if (res < 0 && alsa_xrun_recovery (_handle, res) < 0)
+    {
+        PSYNTH_LOG << "Write error: " << snd_strerror (res);
         return 0;
     }
     
@@ -158,37 +210,56 @@ std::size_t alsa_raw_output::put_i (const void*  data, std::size_t frames)
 
 std::size_t alsa_raw_output::put_n (const void* const* data, std::size_t frames)
 {
-    snd_pcm_sframes_t res = snd_pcm_writen (
-        _handle, const_cast<void**>(data), frames);
+    
+    snd_pcm_sframes_t res;
+    
+    while ((res = snd_pcm_writen (_handle, (void**) data, frames)) == -EAGAIN);
 
-    if (res < 0)
+    if (res < 0 && alsa_xrun_recovery (_handle, res) < 0)
     {
-        PSYNTH_LOG << "snd_pcm_writen () error: " << snd_strerror (res);
+        PSYNTH_LOG << "Write error: " << snd_strerror (res);
         return 0;
     }
     
     return res;
 }
 
+void alsa_raw_output::start ()
+{
+    //check_idle ();
+    //PSYNTH_ALSA_CHECK (snd_pcm_prepare (_handle), alsa_start_error);
+    //PSYNTH_ALSA_CHECK (snd_pcm_start (_handle), alsa_start_error);
+    thread_async::start ();
+}
+
+void alsa_raw_output::stop ()
+{
+    thread_async::stop ();
+}   
+
 void alsa_raw_output::iterate ()
 {
-    snd_pcm_sframes_t nframes_or_err = 0;
+    // snd_pcm_sframes_t nframes_or_err = 0;
 
-    nframes_or_err = snd_pcm_wait (_handle, 1000);  
-    if (nframes_or_err < 0)
-        PSYNTH_LOG << "snd_pcm_wait () error: "
-                   << snd_strerror (nframes_or_err);
+    // nframes_or_err = snd_pcm_wait (_handle, 1000);  
+    // if (nframes_or_err < 0)
+    //     PSYNTH_LOG << "snd_pcm_wait () error: "
+    //                << snd_strerror (nframes_or_err);
     
-    if ((nframes_or_err = snd_pcm_avail_update (_handle)) < 0)
-    {
-        PSYNTH_LOG << base::log::warning
-                   << (nframes_or_err == -EPIPE ?
-                       "Buffer underrun ocurred: " :
-                       "snd_pcm_avail_update () error: ")
-                   << snd_strerror (nframes_or_err);
-    }
-    else
-        process (nframes_or_err);
+    // if ((nframes_or_err = snd_pcm_avail_update (_handle)) < 0)
+    // {
+    //     PSYNTH_LOG << base::log::warning
+    //                << (nframes_or_err == -EPIPE ?
+    //                    "Buffer underrun ocurred: " :
+    //                    "snd_pcm_avail_update () error: ")
+    //                << snd_strerror (nframes_or_err);
+    // }
+    // else
+    // {
+    //     process (std::min<std::size_t> (nframes_or_err, _buffer_size));
+    // }
+
+    process (_buffer_size);
 }
 
 } /* namespace io */

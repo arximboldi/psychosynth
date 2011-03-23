@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-21 19:59:09 raskolnikov>
+ *  Time-stamp:  <2011-03-23 15:39:21 raskolnikov>
  *
  *  @file        buffered_output.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -197,7 +197,9 @@ public:
     buffered_async_output (Args... args)
         : base (&_output)
         , _output (args...)
-    {}
+    {
+        this->fit_buffer ();
+    }
 
 private:
     Output _output;
