@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-22 20:21:51 raskolnikov>
+ *  Time-stamp:  <2011-03-22 23:50:14 raskolnikov>
  *
  *  @file        caching_file_reader.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -130,6 +130,8 @@ public:
     typedef sound::ring_buffer<buffer_type> ring_buffer_type;
 
     void set_input (InputPtr ptr);
+
+    void do_seek (std::ptrdiff_t offst, seek_dir dir);
     
     std::size_t   _chunk_size; // TODO: This substitutes
                                // get_info().block_size, but there

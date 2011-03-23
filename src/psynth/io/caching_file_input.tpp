@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-22 20:24:01 raskolnikov>
+ *  Time-stamp:  <2011-03-23 00:38:28 raskolnikov>
  *
  *  @file        caching_file_reader.tpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -80,29 +80,26 @@ caching_file_input_impl<R, I>::caching_file_input_impl (
     , _new_read_pos (-1)
     , _finished (true)
 {
+    assert (chunk_size < threshold && threshold < buffer_size);
 }
 
 template <class R, class I>
 void caching_file_input_impl<R, I>::set_backwards (bool backwards)
 {
-    std::size_t old_avail;
-    std::size_t new_avail;
-    std::size_t diff_avail;
-
     if (_backwards != backwards)
     {
  	std::unique_lock<std::mutex> buffer_lock (_buffer_mutex);
         std::unique_lock<std::mutex> input_lock  (_input_mutex);
 
-	old_avail = _range.available (_read_ptr);
+        std::size_t old_avail = _range.available (_read_ptr);
 	
 	_backwards = backwards;
 	_range.set_backwards ();
 	_read_ptr = _range.sync (_read_ptr);
-
-	new_avail = _range.available (_read_ptr);
-	diff_avail = old_avail - new_avail;
-
+        
+        std::size_t new_avail  = _range.available (_read_ptr);
+        std::size_t diff_avail = old_avail - new_avail;
+        
 	/* Fix reading position. */
 	if (_backwards) {
 	    _new_read_pos -= diff_avail;
@@ -151,17 +148,15 @@ std::size_t caching_file_input_impl<R, I>::take (const Range& buf)
     {
 	std::unique_lock<std::mutex> lock (_buffer_mutex);
 
-	while (_range.available (_read_ptr) == 0)
-        {
+	while (_range.available (_read_ptr) <= 0)
             _cond.wait (lock);
-        }
         
 	nread = std::min<std::size_t> (nsamples, _range.available (_read_ptr));
 
         if (nread)
         {
             _range.read_and_convert (_read_ptr, sub_range (buf, 0, nread));
-                        
+            
             // TODO: Why is ring_buffer_range::size_type signed?
 	    if ((std::size_t) _range.available (_read_ptr) < _threshold)
 		_cond.notify_all ();
@@ -173,6 +168,20 @@ std::size_t caching_file_input_impl<R, I>::take (const Range& buf)
     }
     
     return nread;
+}
+
+template <class R, class I>
+void caching_file_input_impl<R, I>::do_seek (std::ptrdiff_t offst,
+                                             seek_dir dir)
+{
+    std::cout << "Seek: " << offst << std::endl;
+    try
+    {
+        _input->seek (offst, dir);
+    } catch (file_seek_error&) {
+        /* We just rely on the next 'take'
+         * failing. */
+    }
 }
 
 template <class R, class I>
@@ -195,22 +204,23 @@ void caching_file_input_impl<R, I>::run ()
 		if (_new_read_pos >= 0) {
 		    _read_pos = _new_read_pos;
 		    _new_read_pos = -1;
-		    if (!_backwards) {
-                        _input->seek (_read_pos, seek_dir::beg);
-                    }
+		    if (!_backwards)
+                        do_seek (_read_pos, seek_dir::beg);
                 }
 
 		/* Backwards reading needs seeking. */
 		if (_backwards) {
                     if (_read_pos == 0)
 			_read_pos = _chunk_size - must_read;
-		    else if (std::ptrdiff_t (must_read) > _read_pos) {
+		    else if (must_read > _read_pos)
+                    {
 			must_read = _read_pos;
 			_read_pos = 0;
-		    } else
+		    }
+                    else
 			_read_pos -= must_read;
-		    _input->seek (_read_pos, seek_dir::beg);
-		}
+                    do_seek (_read_pos, seek_dir::beg);
+                }
                 
                 auto block = sound::sub_range (
                     sound::range (_tmp_buffer), 0, must_read);
@@ -241,7 +251,7 @@ void caching_file_input_impl<R, I>::run ()
 		   ((std::size_t) _range.available (_read_ptr) > _threshold
                     || !_input))
 		_cond.wait (lock);
-	}	
+	}
     } while (!_finished);
 }
 

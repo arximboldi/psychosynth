@@ -25,6 +25,7 @@
 
 #include <OIS/OIS.h>
 #include <CEGUI/CEGUI.h>
+#include <psynth/base/misc.hpp>
 
 inline CEGUI::MouseButton convert_button (OIS::MouseButtonID buttonID)
 {
@@ -32,6 +33,8 @@ inline CEGUI::MouseButton convert_button (OIS::MouseButtonID buttonID)
     case OIS::MB_Left:   return CEGUI::LeftButton;
     case OIS::MB_Right:  return CEGUI::RightButton;
     case OIS::MB_Middle: return CEGUI::MiddleButton;
+        //case OIS::MB_Button3:
+        //case OIS::MB_Button4:
     default:             return CEGUI::LeftButton;
     }
 }
@@ -40,7 +43,12 @@ class cegui_injecter : public OIS::MouseListener, public OIS::KeyListener
 {
 public:
     bool mouseMoved(const OIS::MouseEvent& e) {
-	return CEGUI::System::getSingleton().injectMousePosition(e.state.X.abs, e.state.Y.abs);
+	return
+            CEGUI::System::getSingleton().injectMousePosition(
+                e.state.X.abs, e.state.Y.abs) ||
+            CEGUI::System::getSingleton().injectMouseWheelChange(
+                psynth::base::sign (e.state.Z.rel));
+
 	//return CEGUI::System::getSingleton().injectMouseMove(e.state.X.rel, e.state.Y.rel);
     }
 	

@@ -42,10 +42,13 @@ selector_window::category::button::button (const std::string& name,
     WindowManager& wmgr = WindowManager::getSingleton();
 	
     m_window = wmgr.createWindow("TaharezLook/Button");
-    m_window->setText    (name);
-    m_window->setSize    ( UVector2(CEGUI::UDim(0, BUT_WIDTH), CEGUI::UDim(0, BUT_HEIGHT)));
-    
-    m_window->setWantsMultiClickEvents(false);
+    m_window->setText (name);
+    m_window->setSize ( UVector2(CEGUI::UDim(0, BUT_WIDTH),
+                                 CEGUI::UDim(0, BUT_HEIGHT)));
+
+    m_window->setMousePassThroughEnabled (false);
+    //m_window->setWantsMultiClickEvents(false);
+    m_window->setEnabled(true);
     m_window->subscribeEvent(
 	PushButton::EventClicked,
 	Event::Subscriber(&selector_window::category::button::on_click, this));
