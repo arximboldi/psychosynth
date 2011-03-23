@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-10 12:27:28 raskolnikov>
+ *  Time-stamp:  <2011-03-21 20:59:27 raskolnikov>
  *
  *  @file        buffer_range.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -140,9 +140,20 @@ public:
 	: _size (0)
     {}
 
+#ifdef PSYNTH_BUFFER_MODEL_RANGE
+    
     /** We need a non const constructor to copy from buffers. */
     template <typename Range>
     buffer_range (Range& bv)
+	: _size (bv.size ())
+	, _frames (bv.frames ()) {}
+
+#endif /* PSYNTH_BUFFER_MODEL_RANGE */
+
+    buffer_range (const buffer_range& bv) = default;
+
+    template <typename Range>
+    buffer_range (Range&& bv)
 	: _size (bv.size ())
 	, _frames (bv.frames ()) {}
 
@@ -152,7 +163,7 @@ public:
 	, _frames (bv.frames ()) {}
 
     template <typename I2>
-    buffer_range (const size_type& sz, const I2& it)
+    buffer_range (size_type sz, I2 it)
 	: _size (sz)
 	, _frames (it)
     {}
@@ -206,7 +217,7 @@ public:
     {
 	return psynth::sound::num_samples<value_type>::value;
     }
-
+    
     iterator begin () const
     {
 	return _frames;
@@ -237,7 +248,7 @@ public:
 	return begin () + i;
     }
     //\}@
-
+    
 private:
     template <typename L2> friend class buffer_range;
 

@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-10-17 20:29:54 raskolnikov>
+ *  Time-stamp:  <2011-03-18 17:43:13 raskolnikov>
  *
  *  @file        director.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -85,10 +85,10 @@ public:
 	return m_world;
     }
 
-    output* get_output() {
+    graph::audio_async_output_ptr get_output() {
 	if (m_output)
 	    return m_output->get_output ();
-	return NULL;
+	return {};
     }
 };
 

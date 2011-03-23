@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-09 04:21:24 raskolnikov>
+ *  Time-stamp:  <2011-03-08 19:49:08 raskolnikov>
  *
  *  @file        buffer.cpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -291,7 +291,7 @@ void buffer_test::range_transformations_test (const Range& buf_range,
 {
     check_range (buf_range, prefix + "original");
 
-    check_range (sub_buffer_range (
+    check_range (sub_range (
 		    buf_range, buf_range.size () / 4, buf_range.size () / 2),
 	prefix + "cropped");
     check_range(channel_converted_range<mono8_frame>(buf_range), prefix + "mono8");
@@ -384,7 +384,7 @@ void buffer_test::dynamic_buffer_test ()
     check_range (range (any_buf), "dynamic_");
     check_range (flipped_range (range (any_buf)), "dynamic_fliplr");
         
-    test_buffer::range sub_buffer = sub_buffer_range (
+    test_buffer::range sub_buffer = sub_range (
 	range (any_buf), 128, 256);
     
     check_range (sub_buffer, "dynamic_subbuffer");

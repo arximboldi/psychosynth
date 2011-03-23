@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-11 22:01:51 raskolnikov>
+ *  Time-stamp:  <2011-03-08 20:51:52 raskolnikov>
  *
  *  @file        dynamic_ring_buffer_range.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -75,5 +75,4 @@ public:
 } /* namespace psynth */
 
 #endif /* PSYNTH_SOUND_DYNAMIC_RING_BUFFER_RANGE_H_ */
-
 

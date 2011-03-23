@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-11 23:13:18 raskolnikov>
+ *  Time-stamp:  <2011-03-22 02:02:33 raskolnikov>
  *
  *  @file        logger.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -36,6 +36,7 @@
 #include <list>
 #include <iostream>
 #include <fstream>
+#include <sstream>
 
 #include <psynth/base/singleton.hpp>
 #include <psynth/base/tree.hpp>
@@ -77,7 +78,6 @@ private:
 
     template <typename T>
     friend log_stream_adapter& operator<< (log_stream_adapter&, const T&);
-    template <typename T>
     friend log_stream_adapter& operator<< (
 	log_stream_adapter&, log_stream_adapter&(*)(log_stream_adapter&));
 };
@@ -173,6 +173,7 @@ public:
      */
     enum level
     {
+        debug,   /**< Debug information interesting only for devels. */
 	info,    /**< Usefull info to the user. */
 	warning, /**< A problem that may cause inconvenience. */
 	error,   /**< A problem that definetly causes inconvenience. */
@@ -186,7 +187,9 @@ public:
     static const char* level_name (int level)
     {
 	switch(level) {
-	case info:
+	case debug:
+            return "DEBUG";
+        case info:
 	    return "INFO";
 	case warning:
 	    return "WARNING";
@@ -194,7 +197,7 @@ public:
 	    return "ERROR";
 	case fatal:
 	    return "FATAL";
-	default:
+        default:
 	    return "UNKNOWN";
 	};
     };
@@ -211,21 +214,13 @@ public:
      * Attachs a sink to this node.
      * @param d The sink that we want to dump this log's messages.
      */
-    void add_sink (log_sink_ptr d)
-    {
-	lock lock (this);
-	_dumpers.push_back (d);
-    }
-
+    void add_sink (log_sink_ptr d);
+        
     /**
      * Dettachs a sink from this node.
      * @param d The sink we don't want to dump massages of this log anymore.
      */
-    void del_sink (log_sink_ptr d)
-    {
-	lock lock (this);
-	_dumpers.remove (d);
-    }
+    void del_sink (log_sink_ptr d);
 
     /**
      * Logs a message in a child of this node and all its parents.
@@ -386,6 +381,7 @@ private:
 void log_stream_adapter::flush ()
 {
     _log (_level, _str.str ());
+    _str.str ("");
 }
 
 inline
@@ -402,6 +398,13 @@ log_stream_adapter& operator<< (log_stream_adapter& s, const T& x)
     return s;
 }
 
+inline log_stream_adapter& operator<< (
+    log_stream_adapter& stm,
+    log_stream_adapter&(*func)(log_stream_adapter&))
+{
+    return func (stm);
+}
+
 log_stream_adapter::log_stream_adapter (log& l)
     : _log (l)
     , _level (log::info)
@@ -412,14 +415,15 @@ log_stream_adapter::~log_stream_adapter ()
     // *this << log_msg;
 }
 
-#define PSYNTH_LOG logger::self ().path (PSYNTH_MODULE_NAME).stream ()
+#define PSYNTH_LOG \
+    ::psynth::base::logger::self ().path (PSYNTH_MODULE_NAME).stream ()
 
 #if PSYNTH_DEBUG
 #define PSYNTH_LOG_DEBUG \
-    psynth::base::logger::self ().path (PSYNTH_MODULE_NAME).stream () \
-    << log::debug
+    ::psynth::base::logger::self ().path (PSYNTH_MODULE_NAME).stream () \
+    << ::psynth::base::log::debug
 #else
-#define PSYNTH_LOG_DEBUG psynth::base::nop_ostream ()
+#define PSYNTH_LOG_DEBUG ::psynth::base::nop_ostream ()
 #endif
 
 } /* namespace base */

@@ -1,161 +1,142 @@
-/***************************************************************************
- *                                                                         *
- *   PSYCHOSYNTH                                                           *
- *   ===========                                                           *
- *                                                                         *
- *   Copyright (C) 2007 by Juan Pedro Bolivar Puente                       *
- *                                                                         *
- *   This program is free software: you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation, either version 3 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
- *   This program is distributed in the hope that it will be useful,       *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
- *   GNU General Public License for more details.                          *
- *                                                                         *
- *   You should have received a copy of the GNU General Public License     *
- *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
- *                                                                         *
- ***************************************************************************/
+/**
+ *  Time-stamp:  <2011-03-21 19:57:28 raskolnikov>
+ *
+ *  @file        output.hpp
+ *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
+ *  @date        Mon Mar  7 18:02:42 2011
+ *
+ *  Output base.
+ */
 
-#ifndef PSYNTH_OUTPUT_H
-#define PSYNTH_OUTPUT_H
+/*
+ *  Copyright (C) 2011 Juan Pedro Bolívar Puente
+ *
+ *  This file is part of Psychosynth.
+ *   
+ *  Psychosynth is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  Psychosynth is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
 
-#include <psynth/synth/audio_buffer.hpp>
+#ifndef PSYNTH_IO_OUTPUT_HPP_
+#define PSYNTH_IO_OUTPUT_HPP_
+
+#include <psynth/sound/forwards.hpp>
+
+#include <psynth/io/output_fwd.hpp>
+#include <psynth/io/async_base.hpp>
+#include <psynth/io/output.tpp>
 
 namespace psynth
 {
-
-class output_processor
+namespace io
 {
-public:
-    virtual void process_output (int n_frames) = 0;
-};
 
+const std::size_t default_output_buffer_size = 1024;
+
+/**
+ * Output device base abstract class.
+ * @todo Take constness into account.
+ */
+template <typename Range>
 class output
 {
 public:
-    enum state {
-	NOTINIT,
-	IDLE,
-	RUNNING,
-	N_STATES
-    };
-    
-    typedef void (* callback_t) (int,void*);
+    typedef Range range;
 
-private:
-    audio_info m_info;
-    state m_state;
-	
-    void* m_cbdata;
-    callback_t m_callback;
+    /**
+     * Write a bunch of data into the device.
+     */
+    virtual std::size_t put (const range& data) = 0;
+};
 
-protected:
-    void process(int n_frames) {
-	if (m_callback)
-	    m_callback(n_frames, m_cbdata);
-    }
-
-    void set_state(state state) {
-	m_state = state;
-    }
-    
-    callback_t get_callback() {
-	return m_callback;
-    }
-
-    void* get_callback_data() {
-	return m_cbdata;
-    }
-    
+/**
+ * Dummy output class.
+ */
+template <typename Range>
+class dummy_output : public output<Range>
+{
 public:
+    typedef Range range;
     
-    output (audio_info info = audio_info(),
-	    void (*callback)(int,void*) = NULL,
-	    void* data = NULL)
-	: m_info(info)
-	, m_state(NOTINIT)
-	, m_cbdata(data)
-	, m_callback(callback)
-	{}
-
-    virtual bool open () = 0;
-    virtual bool close ()  = 0;
-    virtual bool put (const audio_buffer& buf, size_t nframes) = 0;
-    virtual bool start () = 0;
-    virtual bool stop () = 0;
-
-    virtual ~output() {};
-    
-    bool put (const audio_buffer& buf) {
-	return put(buf, buf.size());
-    }
-    
-    bool set_info (const audio_info& info) {
-	if (m_state == NOTINIT) {
-	    m_info = info;
-	    return true;
-	} else {
-	    /*
-	      WARNING("Cannot change parameters of output device once initialized.");
-	    */
-	    return false;
-	}
-    }
-	
-    bool set_callback (callback_t callback, void* data) {
-	if (m_state == NOTINIT) {
-	    m_cbdata = data;
-	    m_callback = callback;
-	    return true;
-	} else {
-	    /*
-	      WARNING("Cannot change parameters of output device once initialized.");
-	    */
-	    return false;
-	}
-    }
-	
-    const audio_info& get_info () const {
-	return m_info;
-    }
-
-    /* maybe-TODO: A StepMachine class for this kind of things? */
-    state get_state () const {
-	return m_state;
-    }
-
-    bool goto_state (state target) {
-	if (target > m_state) {
-	    switch(m_state) {
-	    case NOTINIT:
-		return open () && goto_state (target);
-	    case IDLE:
-		return start () && goto_state (target);
-	    default:
-		break;
-	    }
-	}
-	
-	if (target < m_state) {
-	    switch(m_state) {
-	    case IDLE:
-		return close () && goto_state (target);
-	    case RUNNING:
-		return stop () && goto_state (target);
-	    default:
-		break;
-	    }
-	}
-	
-	return true;
+    virtual std::size_t put (const range& data)
+    {
+        detail::dummy_output_put_impl ();
+        return data.size ();
     }
 };
 
+
+/**
+ * An output device with asynchronous operation base class.
+ */
+template <typename Range>
+class async_output : public output<Range>,
+                     public virtual async_base
+{
+public:
+    virtual std::size_t buffer_size () const = 0;
+};
+
+/**
+ * Dummy output class.
+ */
+template <typename Range>
+class dummy_async_output : public detail::async_base_impl
+{
+public:
+    typedef Range range;
+
+    dummy_async_output (std::size_t buffer_size)
+        : _buffer_size (buffer_size)
+    {}
+    
+    std::size_t buffer_size () const
+    { return _buffer_size; }
+    
+    virtual std::size_t put (const range& data)
+    {
+        detail::dummy_output_put_impl ();
+        return data.size ();
+    }
+
+    void start ()
+    {
+        this->check_idle ();
+        this->set_state (async_state::running);
+        detail::dummy_output_start_impl ();
+    }
+
+    void stop ()
+    {
+        this->check_running ();
+        this->set_state (async_state::idle);
+        detail::dummy_output_stop_impl ();
+    }
+    
+private:
+    std::size_t _buffer_size;
+};
+
+/**
+ * Utility function to implement output devices in term of a raw
+ * output device.
+ */
+template <typename RawOutput, typename Range>
+std::size_t put_on_raw (RawOutput& out, const Range& data);
+
+} /* namespace io */
 } /* namespace psynth */
 
-#endif /* PSYNTH_OUTPUT_H */
+#endif /* PSYNTH_IO_OUTPUT_H */
 

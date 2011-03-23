@@ -1,12 +1,12 @@
 /**
- *  Time-stamp:  <2010-11-09 19:35:31 raskolnikov>
+ *  Time-stamp:  <2011-03-21 20:49:06 raskolnikov>
  *
  *  @file        typedefs.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
  *  @date        Tue Oct 19 13:04:44 2010
  *
- *  Useful typedefs.
- *
+ *  @brief Useful typedefs.
+ *  @todo Add 24 bit integrals and 64 bit float types.
  */
 
 /*
@@ -142,7 +142,7 @@ PSYNTH_SOUND_DEFINE_BASE_TYPEDEFS(8,    mono)
 PSYNTH_SOUND_DEFINE_BASE_TYPEDEFS(8s,   mono)
 PSYNTH_SOUND_DEFINE_BASE_TYPEDEFS(16,   mono)
 PSYNTH_SOUND_DEFINE_BASE_TYPEDEFS(16s,  mono)
-PSYNTH_SOUND_DEFINE_BASE_TYPEDEFS(32 ,  mono)
+PSYNTH_SOUND_DEFINE_BASE_TYPEDEFS(32,   mono)
 PSYNTH_SOUND_DEFINE_BASE_TYPEDEFS(32s,  mono)
 PSYNTH_SOUND_DEFINE_BASE_TYPEDEFS(32f,  mono)
 PSYNTH_SOUND_DEFINE_BASE_TYPEDEFS(32sf, mono)
@@ -150,7 +150,7 @@ PSYNTH_SOUND_DEFINE_BASE_TYPEDEFS(8,    stereo)
 PSYNTH_SOUND_DEFINE_BASE_TYPEDEFS(8s,   stereo)
 PSYNTH_SOUND_DEFINE_BASE_TYPEDEFS(16,   stereo)
 PSYNTH_SOUND_DEFINE_BASE_TYPEDEFS(16s,  stereo)
-PSYNTH_SOUND_DEFINE_BASE_TYPEDEFS(32 ,  stereo)
+PSYNTH_SOUND_DEFINE_BASE_TYPEDEFS(32,   stereo)
 PSYNTH_SOUND_DEFINE_BASE_TYPEDEFS(32s,  stereo)
 PSYNTH_SOUND_DEFINE_BASE_TYPEDEFS(32f,  stereo)
 PSYNTH_SOUND_DEFINE_BASE_TYPEDEFS(32sf, stereo)

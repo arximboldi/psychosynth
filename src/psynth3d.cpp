@@ -21,7 +21,6 @@
  ***************************************************************************/
 
 #include "gui3d/psychosynth_3d.hpp"
-#include <sigc++/sigc++.h>
 
 #if 0
 const char* test_func ()

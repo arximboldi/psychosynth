@@ -1,114 +1,174 @@
-/***************************************************************************
- *                                                                         *
- *   PSYCHOSYNTH                                                           *
- *   ===========                                                           *
- *                                                                         *
- *   Copyright (C) Juan Pedro Bolivar Puente 2008                          *
- *                                                                         *
- *   This program is free software: you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation, either version 3 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
- *   This program is distributed in the hope that it will be useful,       *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
- *   GNU General Public License for more details.                          *
- *                                                                         *
- *   You should have received a copy of the GNU General Public License     *
- *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
- *                                                                         *
- ***************************************************************************/
+/**
+ *  Time-stamp:  <2011-03-22 17:40:26 raskolnikov>
+ *
+ *  @file        scaler.hpp
+ *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
+ *  @date        2008
+ *
+ *  @brief Scaling of audio data.
+ */
 
-#ifndef PSYNTH_SCALER_H
-#define PSYNTH_SCALER_H
+/*
+ *  Copyright (C) 2008, 2011 Juan Pedro Bolívar Puente
+ *
+ *  This file is part of Psychosynth.
+ *   
+ *  Psychosynth is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  Psychosynth is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+ 
+#ifndef PSYNTH_SCALERST_H
+#define PSYNTH_SCALERST_H
+
+#include <soundtouch/SoundTouch.h>
+#include <cstddef>
+#include <psynth/sound/forwards.hpp>
 
 namespace psynth
 {
+namespace synth
+{
+
+template <class Range>
+class scaler_support;
 
 /**
- * Basic scaler interface.
- * 
- * A scaler is an object that processes audio data
- * in a way that may cause some stretching or enlargement of the signal, and
- * and usually refers to a sample rate converter but also to a pitch or tempo
- * changer.
+ * Scaler implementation using the RubberBand library.
  *
- * Note that all params are defined as a factor where 1.0f means no change. For
- * example 2.0f means twice as fast, twice higher tone, and such.
+ * @see Scaler
  */
+template <class Range>
 class scaler
-{
+{    
 public:
-    /**
-     * Change the tempo factor.
-     * @param tempo New tempo factor.
-     */
-    virtual void set_tempo (float tempo) = 0;
+    static_assert (std::is_same<soundtouch::SAMPLETYPE, float>::value,
+                   "Soundtouch SAMPLETYPE must be flaot.");
+    
+    static_assert (scaler_support<Range>::is_supported::value,
+                   "Soundtouch supports only interleaved bits32sf ranges.");
+
+    typedef Range range;
+    
+    /** Constructor. */
+    scaler (std::size_t frame_rate)
+    {
+	_st.clear ();
+        _st.setChannels (sound::num_samples<Range>::value);
+        set_frame_rate (frame_rate);
+    }
 
     /**
-     * Change the rate factor.
-     * @param rate New rate factor.
+     * Sets the tempo factor.
+     * @param tempo The new tempo factor.
      */
-    virtual void set_rate (float rate) = 0;
+    void set_tempo (float tempo)
+    {
+	_tempo = tempo;
+	_st.setTempo(tempo);
+    }
 
     /**
-     * Change the pitch factor.
-     * @param pitch New pitch factor.
+     * Sets the new sampling rate factor.
+     * @param rate The new rate factor.
      */
-    virtual void set_pitch (float pitch) = 0;
+    void set_rate (float rate)
+    {
+	_rate = rate;
+	_st.setRate(rate);
+    }
 
     /**
-     * Set the number of channels.
+     * Sets the new pitch factor.
+     * @param pitch The new pitch factor.
      */
-    virtual void set_channels (int chan) = 0;
+    void set_pitch (float pitch)
+    {
+	_pitch = pitch;
+	_st.setPitch (pitch);
+    }
 
     /**
-     * Returns the tempo factor.
+     * Sets the sample rate of the original signal.
+     * @param samplerate The sampling rate.
      */
-    virtual float get_tempo () = 0;
+    void set_frame_rate (int samplerate)
+    {
+	_st.setSampleRate (samplerate);
+    }
 
     /**
-     * Returns the rate factor.
+     * Returns the tempo scaling factor.
      */
-    virtual float get_rate () = 0;
+    float tempo ()
+    { return _tempo; }
 
     /**
-     * Returns the pitch factor.
+     * Returns the rate scaling factor.
      */
-    virtual float get_pitch () = 0;
+    float rate ()
+    { return _rate; }
 
     /**
-     * Returns the number of channels.
+     * Returns the pitch scaling factor.
      */
-    virtual int get_channels () = 0;
+    float pitch ()
+    { return _pitch; }
 
     /**
-     * Returns the number of availible frames.
+     * Returns the ammount of data availible in the scaler.
      */
-    virtual int availible () = 0;
+    std::size_t available ()
+    { return _st.numSamples(); }
 
     /**
-     * Updates the scaler with some data. The data must be interleaved.
-     * @param data The data to inject to the scaler.
-     * @param frames The number of frames to inject.
+     * Pops some data already processed in the scaler.
+     * @param data The buffer to store the data. It will be stored in
+     * interleaved format.
+     * @param samples The maximum number of samples to receive.
+     * @return The actual number of samples received.
      */
-    virtual void update (float* data, int frames) = 0;
-
+    std::size_t receive (const Range& data)
+    { return _st.receiveSamples (
+            (soundtouch::SAMPLETYPE*) &data[0][0], data.size ()); }
+    
     /**
-     * Pops some data form the scaler. The data will be loaded interleaved.
-     * @param data A buffer where to store the data.
-     * @param frames The maximun number of frames to pop.
-     * @return The actual number of frames received.
+     * Push some data for scaling.
+     * @param data The buffer with the data to scale in interleaved format.
+     * @param samples The number of samples to push.
      */
-    virtual int receive (float* data, int frames) = 0;
+    void update (const Range& data)
+    { _st.putSamples ((soundtouch::SAMPLETYPE*) &data[0][0], data.size ()); }
 
     /**
      * Clears all the data left in the scaler.
      */
-    virtual void clear() = 0;
+    void clear ()
+    {
+	_st.clear();
+    }
+
+public:
+    float _tempo;
+    float _rate;
+    float _pitch;
+
+    soundtouch::SoundTouch  _st;
 };
 
+} /* namespace synth */
 } /* namespace psynth */
 
-#endif /* PSYNTH_SCALER_H */
+#include <psynth/synth/scaler.tpp>
+
+#endif /* PSYNTH_SCALERST_H */

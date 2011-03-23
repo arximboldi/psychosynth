@@ -29,10 +29,9 @@ pkgconfig_DATA = libpsynth.pc
 
 noinst_DATA = ChangeLog
 
-.PHONY: doc log
+AM_RECURSIVE_TARGETS = doc
 
-doc:
-	\doxygen doc/Doxyfile
+.PHONY: log
 
 log:
 	\bzr log --gnu-changelog -r97.. > ChangeLog

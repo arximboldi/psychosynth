@@ -30,7 +30,7 @@
 
 #include <psynth/base/logger.hpp>
 
-#include <psynth/node/node_types.hpp>
+#include <psynth/graph/node_types.hpp>
 
 using namespace std;
 using namespace Ogre;

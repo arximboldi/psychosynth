@@ -34,8 +34,8 @@ namespace psynth
 class patcher_dynamic : public patcher
 {    
     struct link {
-	node* src;
-	node* dest;
+	graph::node* src;
+	graph::node* dest;
 	float dist;
 	float dist_to_center;
 	int sock_type;
@@ -43,7 +43,7 @@ class patcher_dynamic : public patcher
 	int in_sock;
 	int actual_in_sock;
 	
-	link (node* s, node* d, float ds, float dc, int t, int os, int is) :
+	link (graph::node* s, graph::node* d, float ds, float dc, int t, int os, int is) :
 	    src(s), dest(d), dist(ds), dist_to_center(dc),
 	    sock_type(t), out_sock(os), in_sock(is), actual_in_sock(-1)
 	    {}
@@ -54,13 +54,13 @@ class patcher_dynamic : public patcher
     };
 
     struct pnode {
-	node* obj;
-	node* dest;
+	graph::node* obj;
+	graph::node* dest;
 	bool out_used; /* We output to one object only */
 	int actual_sock_type;
 	int actual_in_sock; 
 
-	pnode (node* o = NULL) :
+	pnode (graph::node* o = NULL) :
 	    obj(o),
 	    dest(NULL),
 	    out_used(false),
@@ -89,9 +89,9 @@ public:
     patcher_dynamic ();
     ~patcher_dynamic ();
     
-    bool add_node (node* obj);
-    bool delete_node (node* obj);
-    void set_param_node (node* obj, int id);
+    bool add_node (graph::node* obj);
+    bool delete_node (graph::node* obj);
+    void set_param_node (graph::node* obj, int id);
     void update ();
     void clear ();
 };

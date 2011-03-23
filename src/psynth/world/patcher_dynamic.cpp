@@ -26,23 +26,21 @@
 
 #include "world/patcher_dynamic.hpp"
 
-#include "node/node.hpp"
-#include "node/node_output.hpp"
-#include "node/node_audio_mixer.hpp"
-#include "node/node_control_mixer.hpp"
-#include "node/node_audio_oscillator.hpp"
-#include "node/node_lfo.hpp"
-#include "node/node_filter.hpp"
-#include "node/node_sampler.hpp"
-#include "node/node_step_seq.hpp"
-#include "node/node_audio_noise.hpp"
-#include "node/node_control_noise.hpp"
-#include "node/node_echo.hpp"
-#include "node/node_delay.hpp"
-#include "node/node_double_sampler.hpp"
+#include "graph/node.hpp"
+#include "graph/node_output.hpp"
+#include "graph/node_mixer.hpp"
+#include "graph/node_oscillator.hpp"
+#include "graph/node_filter.hpp"
+#include "graph/node_sampler.hpp"
+#include "graph/node_step_seq.hpp"
+#include "graph/node_noise.hpp"
+#include "graph/node_echo.hpp"
+#include "graph/node_delay.hpp"
+#include "graph/node_double_sampler.hpp"
 
 using namespace std;
 using namespace psynth::base;
+using namespace psynth::graph;
 
 namespace psynth
 {
@@ -338,12 +336,11 @@ bool patcher_dynamic::add_node (node* obj)
 
 bool patcher_dynamic::delete_node (node* obj)
 {
-    if (m_nodes.erase (obj->get_id())) {
-	multiset<link*>::iterator i, r;
-	
-	for (i = m_links.begin(); i != m_links.end();) {
+    if (m_nodes.erase (obj->get_id()))
+    {
+	for (auto i = m_links.begin(); i != m_links.end();) {
 	    if ((*i)->src == obj || (*i)->dest == obj) {
-		r = i++;
+		auto r = i++;
 		undo_link (**r);
 		delete *r;
 		m_links.erase(r);
@@ -361,12 +358,11 @@ bool patcher_dynamic::delete_node (node* obj)
 void patcher_dynamic::set_param_node(node* obj, int id)
 {
     if (id == node::PARAM_POSITION) {
-	multiset<link*>::iterator i, r;
-	list<link*> readd;
+        list<link*> readd;
     
-	for (i = m_links.begin(); i != m_links.end();) {
+	for (auto i = m_links.begin(); i != m_links.end();) {
 	    if ((*i)->src == obj || (*i)->dest == obj) {
-		r = i++;
+		auto r = i++;
 
 		(*r)->dist = (*r)->src->sqr_distance_to(*(*r)->dest);
 		if ((*r)->dest == obj)
@@ -380,7 +376,7 @@ void patcher_dynamic::set_param_node(node* obj, int id)
 		++i;
 	}
 
-	for (list<link*>::iterator it = readd.begin(); it != readd.end(); ++it)
+	for (auto it = readd.begin(); it != readd.end(); ++it)
 	    m_links.insert(*it);
     }
 }
@@ -463,7 +459,7 @@ void patcher_dynamic::update ()
 	 ++i)
 	(*i).second.out_used = false;
 
-    for (multiset<link*>::iterator i = m_links.begin();
+    for (auto i = m_links.begin();
 	 i != m_links.end();
 	 ++i)
     {
@@ -505,7 +501,7 @@ void patcher_dynamic::update ()
 
 void patcher_dynamic::clear ()
 {
-    for (multiset<link*>::iterator i = m_links.begin(); i != m_links.end(); ++i)
+    for (auto i = m_links.begin(); i != m_links.end(); ++i)
 	undo_link (**i);
 }
 

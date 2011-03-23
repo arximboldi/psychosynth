@@ -25,15 +25,15 @@
 
 #include <psynth/app/defaults_oss.hpp>
 #include <psynth/app/output_director.hpp>
-#include <psynth/io/output_oss.hpp>
+#include <psynth/io/oss_output.hpp>
+#include <psynth/io/buffered_output.hpp>
 
 namespace psynth
 {
 
 class output_director_oss : public output_director
-{
-    output_oss* m_output;
-    sigc::connection m_on_device_change_slot;
+{    
+    boost::signals::connection m_on_device_change_slot;
     
     ~output_director_oss()
     {
@@ -41,50 +41,47 @@ class output_director_oss : public output_director
 	    stop();
     }
     
-    void on_device_change(base::conf_node& conf)
+    void on_device_change (base::conf_node& conf)
     {
-	std::string device;
-	output::state old_state;
-	
-	conf.get(device);
-	
-	old_state = m_output->get_state();
-	m_output->goto_state (output::NOTINIT);
-	m_output->set_device (device);
-	m_output->goto_state (old_state);
+        auto old_state = m_output->state ();
+        build_output (*conf.parent ());
+        if (old_state == io::async_state::running)
+            m_output->start ();
     }
     
-    virtual output* do_start (base::conf_node& conf)
+    virtual graph::audio_async_output_ptr
+    do_start (base::conf_node& conf)
     {
-	std::string device;
-	
-	conf.child ("out_device").get (device);
-	m_on_device_change_slot =
+     	m_on_device_change_slot =
 	    conf.child ("out_device").on_change.connect
-	    (sigc::mem_fun (*this, &output_director_oss::on_device_change));
+	    (boost::bind (&output_director_oss::on_device_change, this, _1));
 
-	m_output = new output_oss;
-	m_output->set_device(device);
+        return build_output (conf);
+    };
 
-	return m_output;
+    virtual graph::audio_async_output_ptr
+    build_output (base::conf_node& conf)
+    {
+        auto device = conf.child ("out_device").get<std::string> ();
+	m_output = io::new_buffered_async_output<
+            graph::audio_const_range,
+            io::oss_output<sound::stereo16s_range> >(device, 1024, 44100);
+        return m_output;
     }
 
     virtual void do_stop (base::conf_node& conf)
     {
 	m_on_device_change_slot.disconnect ();
-	delete m_output;
-	m_output = NULL;
+	if (m_output)
+            m_output.reset ();
     }
 
 public:
-    void defaults(base::conf_node& conf)
+    void defaults (base::conf_node& conf)
     {
 	conf.child ("out_device").def (
 	    std::string (PSYNTH_DEFAULT_OSS_OUT_DEVICE));
     }
-
-    output_director_oss() :
-	m_output(NULL) {}
 };
 
 class output_director_oss_factory : public output_director_factory

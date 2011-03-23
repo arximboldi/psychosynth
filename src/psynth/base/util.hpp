@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-02 22:08:50 raskolnikov>
+ *  Time-stamp:  <2011-03-17 00:19:11 raskolnikov>
  *
  *  @file        util.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -38,6 +38,9 @@ namespace psynth
 namespace base
 {
 
+template <typename T>
+void ignore_unused_variable_warning (T&&) {}
+
 template <template <class, class> class F, typename Y>
 struct tpl_bind_snd
 {
@@ -56,7 +59,18 @@ struct tpl_bind_fst
 
 struct nop_ostream {};
 template <typename T> PSYNTH_FORCEINLINE
-nop_ostream& operator<< (nop_ostream& s, const T&) { return s; }
+const nop_ostream& operator<< (const nop_ostream& s, const T&) { return s; }
+
+/**
+ * Utility to compare for equality pointers with weird comparison
+ * semantics like std::shared_ptr.
+ * http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2004/n1590.html
+ */
+template <typename Ptr1, typename Ptr2>
+bool equal_ptr (Ptr1 a, Ptr2 b)
+{
+    return &*a == &*b;
+}
 
 } /* namespace base */
 } /* namespace psynth */

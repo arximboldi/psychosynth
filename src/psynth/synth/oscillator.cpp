@@ -32,17 +32,6 @@ namespace psynth
 bool oscillator::m_table_init = false;
 wave_table oscillator::TABLE [oscillator::WAVE_TYPES];
 
-void oscillator::initialize_tables ()
-{
-    TABLE[SINE].fill(TABLE_SIZE, &compute_sine);
-    TABLE[SQUARE].fill(TABLE_SIZE, &compute_square);
-    TABLE[TRIANGLE].fill(TABLE_SIZE, &compute_triangle);
-    TABLE[SAWTOOTH].fill(TABLE_SIZE, &compute_sawtooth);
-    TABLE[MOOGSAW].fill(TABLE_SIZE, &compute_moogsaw);
-    TABLE[EXP].fill(TABLE_SIZE, &compute_exp);
-    
-    m_table_init = true;
-}
 
 void oscillator::update(sample* out_buf, size_t n_frames)
 {

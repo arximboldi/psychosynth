@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-03 00:22:13 raskolnikov>
+ *  Time-stamp:  <2011-03-16 12:58:41 raskolnikov>
  *
  *  @file        file_manager_director.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -59,7 +59,7 @@ void file_manager_director::register_config ()
 {
     m_on_conf_nudge_slot = 
 	m_conf->child ("samples").on_nudge.connect
-	(sigc::mem_fun (*this, &file_manager_director::on_conf_nudge));
+	(boost::bind (&file_manager_director::on_conf_nudge, this, _1));
     m_conf->child ("samples").nudge ();
 }
 
@@ -87,9 +87,9 @@ void file_manager_director::stop ()
 void file_manager_director::defaults ()
 {
     m_conf->child ("samples").child ("path0").def(
-	(boost::filesystem::path (PSYNTH_DATA_DIR) / "samples").file_string ());
+	(boost::filesystem::path (PSYNTH_DATA_DIR) / "samples").native ());
     m_conf->child ("samples").child ("path1").def(
-	(m_home_path / "samples").file_string ());
+	(m_home_path / "samples").native ());
 }
 
 } /* namespace psynth */

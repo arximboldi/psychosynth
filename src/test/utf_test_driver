@@ -1,2 +1,11 @@
 #! /bin/sh
-exec $1 # --report_level=detailed --log_level=message
+
+#
+#  Tips:
+#     --catch_system_errors=no    for disablign catching system errors.
+#     --report_level=detailed     and
+#     --log_level=message         for detailed output with checkpoints.
+#    
+
+exec ./psynth_unit_test --log_level=message
+

@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-10-17 20:09:36 raskolnikov>
+ *  Time-stamp:  <2011-03-23 01:04:38 raskolnikov>
  *
  *  @file        misc.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -40,12 +40,22 @@ namespace base
 {
 
 /**
+ * Returns the sign of a number or zero if zero.
+ */
+template <typename T>
+inline T sign (T x)
+{
+    return x > 0 ? +1 : (x < 0 ? -1 : 0);
+}
+
+/**
  * Returns the fractional part of a number.
  * @param x The number to get its floating point part.
  */
-inline float phase (float x)
+template <class T>
+inline T phase (T x)
 {
-    return x - (x >= 0.0f ?
+    return x - (x >= 0 ?
 		static_cast<int>(x) :
 		static_cast<int>(x) - 1);
 }

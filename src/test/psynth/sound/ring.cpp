@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-11 23:00:35 raskolnikov>
+ *  Time-stamp:  <2011-03-22 02:17:13 raskolnikov>
  *
  *  @file        ring.cpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -47,11 +47,13 @@ BOOST_AUTO_TEST_SUITE (sound_ring_test);
 
 BOOST_AUTO_TEST_CASE (test_ring_buffer)
 {
-    stereo32sf_planar_buffer buf (buffer_size);
+    stereo32sf_planar_buffer bbuf (buffer_size);
+    stereo32sf_planar_buffer::range buf (range (bbuf)); 
     fill_frames (buf, stereo32sf_frame (.0f));
 
-    stereo32sf_ring_buffer ring (buffer_size * 1.3);
-    auto reader = ring.safe_begin_pos ();
+    stereo32sf_ring_buffer rring (buffer_size * 1.3);
+    stereo32sf_ring_buffer::range ring (range (rring));
+    auto reader = ring.begin_pos ();
 
     ring.write (sample_range);
     ring.read (reader, buf);
@@ -63,20 +65,39 @@ BOOST_AUTO_TEST_CASE (test_ring_buffer)
     BOOST_CHECK (equal_frames (buf, sample_range));
 }
 
+BOOST_AUTO_TEST_CASE (test_ring_buffer_nr)
+{
+    stereo32sf_planar_buffer buf (buffer_size);
+    fill_frames (range (buf), stereo32sf_frame (.0f));
+
+    stereo32sf_ring_buffer ring (buffer_size * 1.3);
+    auto reader = range (ring).begin_pos ();
+
+    range (ring).write (sample_range);
+    range (ring).read (reader, range (buf));
+    BOOST_CHECK (equal_frames (range (buf), sample_range));
+
+    range (ring).write (sample_range, buffer_size);
+    range (ring).read (reader, range (buf), buffer_size);
+
+    BOOST_CHECK (equal_frames (range (buf), sample_range));
+}
+
 BOOST_AUTO_TEST_CASE (test_ring_buffer_iterator)
 {
-    stereo32sf_ring_buffer ring (buffer_size * 1.3);
+    stereo32sf_ring_buffer rring (buffer_size * 1.3);
+    stereo32sf_ring_buffer::range ring (range (rring)); 
         
     ring.write (sample_range);
-    BOOST_CHECK (std::equal (ring.begin (), ring.end (),
+    BOOST_CHECK (std::equal (ring.begin_unsafe (), ring.end_unsafe (),
 			     sample_range.begin ()));
-    BOOST_CHECK (std::equal (ring.safe_begin (), ring.safe_end (),
+    BOOST_CHECK (std::equal (ring.begin (), ring.end (),
 			     sample_range.begin ()));
 
     ring.write (sample_range, buffer_size);
-    BOOST_CHECK (std::equal (ring.end () - buffer_size, ring.end (),
+    BOOST_CHECK (std::equal (ring.end_unsafe () - buffer_size, ring.end_unsafe (),
 			     sample_range.begin ()));
-    BOOST_CHECK (std::equal (ring.safe_end () - buffer_size, ring.safe_end (),
+    BOOST_CHECK (std::equal (ring.end () - buffer_size, ring.end (),
 			     sample_range.begin ()));
     
 }
@@ -96,9 +117,17 @@ BOOST_AUTO_TEST_CASE (test_dynamic_ring_buffer)
     // TODO: Avoid range()?
 
     BOOST_TEST_CHECKPOINT ("Create ring buffer.");
-    some_ring_buffer ring { mono8_buffer (buffer_size * 1.3) };
+    some_ring_buffer rring { mono8_buffer (buffer_size * 1.3) };
+
+    BOOST_TEST_CHECKPOINT ("Create ring buffer range.");
+    // BOOST_MPL_ASSERT_MSG(false,
+    //                      PSYNTH_CHECK_TYPES,
+    //                      (some_ring_buffer::range,
+    //                       decltype (range (rring))));
+    some_ring_buffer::range ring (range (rring));
+
     BOOST_TEST_CHECKPOINT ("Create position.");
-    auto reader = ring.safe_begin_pos ();
+    auto reader = ring.begin_pos ();
 
     BOOST_TEST_CHECKPOINT ("Write and convert.");
     ring.write_and_convert (sample_range);

@@ -218,7 +218,7 @@ void psychosynth_3d::setup_settings (conf_node& conf)
 #ifdef PSYNTH_HAVE_XML
 	conf.set_backend (
 	    new_conf_backend_xml (
-		(get_config_path() / "psynth3d.xml").file_string ()));
+		(get_config_path() / "psynth3d.xml").native ()));
 #endif
 	conf.def_load();
     }
@@ -235,9 +235,9 @@ void psychosynth_3d::setup_settings (conf_node& conf)
 	
     /* Is it dangerous to have this set before the gui is initialized? */
     conf.on_nudge.connect
-	(sigc::mem_fun (*this, &psychosynth_3d::on_config_change));
+	(boost::bind (&psychosynth_3d::on_config_change, this, _1));
     conf.child ("fps").on_change.connect
-	(sigc::mem_fun (*this, &psychosynth_3d::on_fps_change));
+	(boost::bind (&psychosynth_3d::on_fps_change, this, _1));
     
 }
 
@@ -254,22 +254,22 @@ void psychosynth_3d::setup_ogre (conf_node& conf)
     conf.child ("fps").get (fps);
     
     (new LogManager)->createLog
-	((get_config_path() / "gui3d/psynth3d_Ogre.log").file_string (),
+	((get_config_path() / "gui3d/psynth3d_Ogre.log").native (),
 	 false, false, false);
     
-    m_ogre = new Root ((get_data_path() / "gui3d/plugins.cfg").file_string (),
-		       (get_data_path() / "gui3d/ogre.cfg").file_string ());
+    m_ogre = new Root ((get_data_path() / "gui3d/plugins.cfg").native (),
+		       (get_data_path() / "gui3d/ogre.cfg").native ());
         
     ResourceGroupManager& res_mgr = ResourceGroupManager::getSingleton();
-    res_mgr.addResourceLocation (get_data_path ().file_string (),
+    res_mgr.addResourceLocation (get_data_path ().native (),
 				 "FileSystem", "General");
-    res_mgr.addResourceLocation ((get_data_path () / "gui3d/mesh").file_string (),
+    res_mgr.addResourceLocation ((get_data_path () / "gui3d/mesh").native (),
 				 "FileSystem", "General");
-    res_mgr.addResourceLocation ((get_data_path () / "gui3d/texture").file_string (),
+    res_mgr.addResourceLocation ((get_data_path () / "gui3d/texture").native (),
 				 "FileSystem", "General");
-    res_mgr.addResourceLocation ((get_data_path () / "gui3d/material").file_string (),
+    res_mgr.addResourceLocation ((get_data_path () / "gui3d/material").native (),
 				 "FileSystem", "General");
-    res_mgr.addResourceLocation ((get_data_path () / "gui3d/gui").file_string (),
+    res_mgr.addResourceLocation ((get_data_path () / "gui3d/gui").native (),
 				 "FileSystem", "GUI");
 
     if (!m_ogre->restoreConfig() && !m_ogre->showConfigDialog())
@@ -328,7 +328,7 @@ void psychosynth_3d::setup_gui ()
 						 false, 3000, m_scene);
     
     m_gui = new CEGUI::System (m_ceguirender, 0, 0, 0, "",
-			       (get_config_path () / "psynth3d_CEGUI.log").file_string ());
+			       (get_config_path () / "psynth3d_CEGUI.log").native ());
 
     CEGUI::SchemeManager::getSingleton().loadScheme("TaharezLook.scheme");
     m_gui->setDefaultMouseCursor("TaharezLook", "MouseArrow");

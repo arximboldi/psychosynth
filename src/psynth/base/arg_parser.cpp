@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-02 22:37:00 raskolnikov>
+ *  Time-stamp:  <2011-03-08 21:11:26 raskolnikov>
  *
  *  @file        arg_parser.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -80,6 +80,8 @@ bool is_free (const char *arg)
 
 void arg_parser::add (unsigned char flag, const char* str, option* op)
 {
+    // FIXME: Potential memory leak. push_back can throw.
+    
     if (op == 0)
 	op = new option;
     

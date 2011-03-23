@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-11 23:13:04 raskolnikov>
+ *  Time-stamp:  <2011-03-16 12:32:14 raskolnikov>
  *
  *  @file        config.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -94,7 +94,7 @@ public:
 class conf_subject : public subject_base <conf_listener>
 {
 public:
-    typedef sigc::signal <void, conf_node&> signal;
+    typedef boost::signal <void (conf_node&)> signal;
     //typedef psynth::base::signal <void, conf_node&> signal;
     
     /** Event emitted whenever the node value is changed. */

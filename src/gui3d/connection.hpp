@@ -84,7 +84,7 @@ class connection : public psynth::world_node_listener
     Ogre::SceneManager* m_scene;
     Ogre::SceneNode* m_node;
 
-    psynth::watch* m_watch;
+    psynth::graph::watch* m_watch;
     connection_line* m_line;
     connection_wave* m_wave;
     

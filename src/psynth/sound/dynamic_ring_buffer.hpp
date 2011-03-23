@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-11 21:47:31 raskolnikov>
+ *  Time-stamp:  <2011-03-08 20:09:02 raskolnikov>
  *
  *  @file        dynamic_ring_buffer.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -61,7 +61,37 @@ public:
 	parent_type::operator= (buf);
         return *this;
     }
+
+private:
+    template <typename B> friend
+    const typename dynamic_ring_buffer<B>::range&
+    range (dynamic_ring_buffer<B>& buf);
+    
+    template <typename B> friend
+    const typename dynamic_ring_buffer<B>::const_range
+    const_range (const dynamic_ring_buffer<B>& buf);
 };
+
+
+/*
+ *
+ *  @todo BufferConcept ?
+ *
+ */
+template <typename B>
+const typename dynamic_ring_buffer<B>::range&
+range (dynamic_ring_buffer<B>& buf)
+{
+    return buf._range;
+}
+
+template <typename B>
+const typename dynamic_ring_buffer<B>::const_range
+const_range (const dynamic_ring_buffer<B>& buf)
+{
+    return buf._range;
+}
+
 
 } /* namespace sound */
 } /* namespace psynth */

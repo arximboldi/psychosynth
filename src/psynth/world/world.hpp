@@ -29,11 +29,11 @@
 
 #include <psynth/synth/audio_info.hpp>
 #include <psynth/world/patcher.hpp>
-#include <psynth/node/node.hpp>
-#include <psynth/node/node_output.hpp>
-#include <psynth/node/node_audio_mixer.hpp>
-#include <psynth/node/node_manager.hpp>
-#include <psynth/node/node_factory_manager.hpp>
+#include <psynth/graph/node.hpp>
+#include <psynth/graph/node_output.hpp>
+#include <psynth/graph/node_mixer.hpp>
+#include <psynth/graph/node_manager.hpp>
+#include <psynth/graph/node_factory_manager.hpp>
 
 namespace psynth
 {
@@ -45,10 +45,10 @@ class world_node
 {
     friend class world;
     
-    node* m_nod; /* Use node_manager::Iterator instead? */
+    graph::node* m_nod; /* TODO: Use node_manager::Iterator instead? */
     world* m_world;
 
-    world_node (node* nod, world* world) :
+    world_node (graph::node* nod, world* world) :
 	m_nod (nod), m_world (world) {};
 
 public:
@@ -98,11 +98,11 @@ public:
     template <typename T>
     inline void set_param (const std::string& name, const T& data);
 
-    void attach_watch (int type, int in_sock, watch* watch) {
+    void attach_watch (int type, int in_sock, graph::watch* watch) {
 	m_nod->attach_watch (type, in_sock, watch);
     }
 
-    void detach_watch (int type, int in_sock, watch* watch) {
+    void detach_watch (int type, int in_sock, graph::watch* watch) {
 	m_nod->detach_watch (type, in_sock, watch);
     }
     
@@ -245,11 +245,11 @@ class world : public world_subject,
 
     base::mgr_auto_ptr<patcher> m_patcher;
     
-    node_manager m_node_mgr;
-    node_output* m_output;
-    node_audio_mixer* m_mixer;
+    graph::node_manager m_node_mgr;
+    graph::node_output* m_output;
+    graph::node_audio_mixer* m_mixer;
     int m_last_id;
-    node_factory_manager m_nodfact;
+    graph::node_factory_manager m_nodfact;
     
     static const int MIXER_CHANNELS = 16;
 
@@ -276,7 +276,7 @@ public:
 	    m_node_mgr.set_info (info);
     }
 
-    void register_node_factory (node_factory& f) {
+    void register_node_factory (graph::node_factory& f) {
 	m_nodfact.register_factory (f);
     }
     
@@ -295,7 +295,7 @@ public:
 
     template <typename T>
     void set_param_node (world_node& nod, const std::string& name, const T& data) {
-	node_param& param = nod.m_nod->param(name);
+        graph::node_param& param = nod.m_nod->param(name);
 	param.set (data);
 	notify_set_param_node (nod, param.get_id());
 	if (m_patcher)
@@ -308,19 +308,19 @@ public:
 
     void deactivate_node (world_node& nod);
 
-    void attach_output (output* out) {
+    void attach_output (graph::audio_async_output_ptr out) {
 	m_output->attach_output (out);
     };
 
-    void attach_passive_output (output* out) {
+    void attach_passive_output (graph::audio_output_ptr out) {
 	m_output->attach_passive_output (out);
     };
     
-    void detach_output (output* out) {
+    void detach_output (graph::audio_async_output_ptr out) {
 	m_output->detach_output (out);
     };
 
-    void detach_passive_output (output* out) {
+    void detach_passive_output (graph::audio_output_ptr out) {
 	m_output->detach_passive_output (out);
     };
 

@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-10-18 16:06:42 raskolnikov>
+ *  Time-stamp:  <2011-03-08 19:42:07 raskolnikov>
  *
  *  @file        threads.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -46,6 +46,7 @@
 #ifndef PSYNTH_THREADS_H_
 #define PSYNTH_THREADS_H_
 
+#include <cassert>
 #include <psynth/base/util.hpp>
 
 #define PSYNTH_DEFAULT_THREADING         \
@@ -54,8 +55,8 @@
     psynth::base::default_class_lockable::type
 
 #ifndef PSYNTH_DEFAULT_MUTEX
-#include <boost/thread/recursive_mutex.hpp>
-#define PSYNTH_DEFAULT_MUTEX             boost::recursive_mutex
+#include <mutex>
+#define PSYNTH_DEFAULT_MUTEX             std::recursive_mutex
 #endif
 
 namespace psynth

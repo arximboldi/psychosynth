@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-12-27 20:22:11 raskolnikov>
+ *  Time-stamp:  <2011-03-16 18:32:49 raskolnikov>
  *
  *  @file        meta.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -42,6 +42,9 @@
 #include <boost/mpl/equal_to.hpp>
 #include <boost/mpl/empty_sequence.hpp>
 #include <boost/mpl/copy.hpp>
+#include <boost/mpl/pair.hpp>
+#include <boost/mpl/reverse.hpp>
+#include <boost/mpl/transform.hpp>
 #include <boost/mpl/front_inserter.hpp>
 
 namespace psynth
@@ -90,6 +93,40 @@ struct any_p
             typename mpl::find_if<Sequence, Pred>::type,
             typename mpl::end<Sequence>::type> >::type type;
 };
+
+struct join 
+{ 
+    template <class Seq1, class Seq2> 
+    struct apply 
+    { 
+        typedef typename mpl::reverse<
+            typename boost::mpl::copy< 
+                Seq2, 
+                boost::mpl::front_inserter<Seq1> 
+                >::type >::type type; 
+    }; 
+};
+
+/**
+ *
+ * @todo Use join_view instead?
+ */
+template<class Sequence> 
+struct flatten 
+{ 
+    typedef typename boost::mpl::fold< 
+        Sequence, 
+        typename boost::mpl::clear<Sequence>::type, 
+        join 
+        >::type type; 
+};
+
+template <class Element, class Sequence>
+struct pair_seq : public mpl::transform<
+    Sequence,
+    mpl::lambda<typename mpl::pair<Element, mpl::_1> >
+    >::type {};
+
 
 } /* namespace base */
 } /* namespace psynth */

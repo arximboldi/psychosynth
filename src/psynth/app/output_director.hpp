@@ -24,43 +24,47 @@
 #define PSYNTH_OUTPUT_DIRECTOR_H
 
 #include <psynth/base/config.hpp>
+#include <psynth/graph/node_output.hpp>
 
 namespace psynth
 {
 
-class output;
-
 class output_director
 {
+protected:
     base::conf_node* m_conf;
-    output* m_output;
+    graph::audio_async_output_ptr m_output;
     
-    virtual output* do_start (base::conf_node& conf) = 0;
-    virtual void do_stop (base::conf_node& conf) = 0;
+    virtual graph::audio_async_output_ptr
+    do_start (base::conf_node& conf) = 0;
+
+    virtual void
+    do_stop (base::conf_node& conf) = 0;
 
 public:
     virtual void defaults (base::conf_node& conf) = 0;
     
     output_director ()
-	: m_conf(NULL)
-	, m_output(NULL)
+	: m_conf (0)
+	, m_output ()
 	{}
     
     virtual ~output_director () {}
 
-    void start (base::conf_node& conf) {
+    void start (base::conf_node& conf)
+    {
 	m_conf = &conf;
 	m_output = do_start (conf);
     }
 
-    void stop () {
+    void stop ()
+    {
 	do_stop (*m_conf);
-	m_output = 0;
+	m_output.reset ();
     }
     
-    output* get_output() const {
-	return m_output;
-    }
+    graph::audio_async_output_ptr get_output() const
+    { return m_output; }
 };
 
 class output_director_factory

@@ -24,19 +24,16 @@
 
 #include "world/world.hpp"
 
-#include "node/node_output.hpp"
-#include "node/node_audio_mixer.hpp"
-#include "node/node_control_mixer.hpp"
-#include "node/node_audio_oscillator.hpp"
-#include "node/node_lfo.hpp"
-#include "node/node_filter.hpp"
-#include "node/node_sampler.hpp"
-#include "node/node_step_seq.hpp"
-#include "node/node_audio_noise.hpp"
-#include "node/node_control_noise.hpp"
-#include "node/node_echo.hpp"
-#include "node/node_delay.hpp"
-#include "node/node_double_sampler.hpp"
+#include "graph/node_output.hpp"
+#include "graph/node_mixer.hpp"
+#include "graph/node_oscillator.hpp"
+#include "graph/node_filter.hpp"
+#include "graph/node_sampler.hpp"
+#include "graph/node_step_seq.hpp"
+#include "graph/node_noise.hpp"
+#include "graph/node_echo.hpp"
+#include "graph/node_delay.hpp"
+#include "graph/node_double_sampler.hpp"
 
 using namespace std;
 
@@ -112,8 +109,8 @@ world::world (const audio_info& info)
     , m_patcher (0)
     , m_last_id (MIN_USER_ID)
 {
-    m_output = new node_output (m_info);
-    m_mixer = new node_audio_mixer (m_info, MIXER_CHANNELS);
+    m_output = new graph::node_output (m_info);
+    m_mixer = new graph::node_audio_mixer (m_info, MIXER_CHANNELS);
 
     m_mixer->param("amplitude").set(0.5f);
 
@@ -125,19 +122,19 @@ world::world (const audio_info& info)
 
 void world::register_default_node_factory ()
 {
-    register_node_factory (get_node_audio_mixer_factory());
-    register_node_factory (get_node_control_mixer_factory());
-    register_node_factory (get_node_audio_oscillator_factory());
-    register_node_factory (get_node_lfo_factory());
-    register_node_factory (get_node_output_factory());
-    register_node_factory (get_node_filter_factory());
-    register_node_factory (get_node_sampler_factory());
-    register_node_factory (get_node_step_seq_factory());
-    register_node_factory (get_node_audio_noise_factory());
-    register_node_factory (get_node_control_noise_factory());
-    register_node_factory (get_node_echo_factory());
-    register_node_factory (get_node_delay_factory());
-    register_node_factory (get_node_double_sampler_factory());
+    register_node_factory (graph::get_node_audio_mixer_factory());
+    register_node_factory (graph::get_node_control_mixer_factory());
+    register_node_factory (graph::get_node_audio_oscillator_factory());
+    register_node_factory (graph::get_node_lfo_factory());
+    register_node_factory (graph::get_node_output_factory());
+    register_node_factory (graph::get_node_filter_factory());
+    register_node_factory (graph::get_node_sampler_factory());
+    register_node_factory (graph::get_node_step_seq_factory());
+    register_node_factory (graph::get_node_audio_noise_factory());
+    register_node_factory (graph::get_node_control_noise_factory());
+    register_node_factory (graph::get_node_echo_factory());
+    register_node_factory (graph::get_node_delay_factory());
+    register_node_factory (graph::get_node_double_sampler_factory());
 }
 
 world::~world ()
@@ -147,7 +144,7 @@ world::~world ()
 void
 world::clear ()
 {
-    for (node_manager::iterator it = m_node_mgr.begin();
+    for (auto it = m_node_mgr.begin();
 	 it != m_node_mgr.end();)
 	if ((*it)->get_id () >= MIN_USER_ID) {
 	    if (m_patcher)
@@ -162,7 +159,7 @@ world::clear ()
 
 world_node world::find_node (int id)
 {
-    node_manager::iterator i = m_node_mgr.find (id);
+    graph::node_manager::iterator i = m_node_mgr.find (id);
     if (i == m_node_mgr.end ())
 	return world_node(NULL, NULL);
     else
@@ -172,26 +169,26 @@ world_node world::find_node (int id)
 #if 0
 world_node world::add_node (int type)
 {
-    node* nod;
+    graph::node* nod;
 
     switch (type) {
     case NOD_OSCILLATOR:
-	nod = new node_audio_oscillator(m_info);
+	nod = new graph::node_audio_oscillator(m_info);
 	break;
     case NOD_LFO:
-	nod = new node_lfo(m_info);
+	nod = new graph::node_lfo(m_info);
 	break;
     case NOD_FILTER:
-	nod = new node_filter(m_info);
+	nod = new graph::node_filter(m_info);
 	break;
     case NOD_MIXER:
-	nod = new node_audio_mixer(m_info);
+	nod = new graph::node_audio_mixer(m_info);
 	break;
     case NOD_CONTROLMIXER:
-	nod = new node_control_mixer (m_info);
+	nod = new graph::node_control_mixer (m_info);
 	break;
     case NOD_SAMPLER:
-	nod = new node_sampler(m_info);
+	nod = new graph::node_sampler(m_info);
 	break;
     default:
 	nod = NULL;
@@ -209,7 +206,7 @@ world_node world::add_node (int type)
 
 world_node world::add_node (const std::string& name)
 {
-    node* nod;
+    graph::node* nod;
     world_node tnod;
 	
     nod = m_nodfact.create (name, m_info);
@@ -257,7 +254,7 @@ void world::set_patcher (base::mgr_ptr<patcher> pat)
     unset_patcher ();
     m_patcher = pat;
     pat->add_listener (this);
-    for (node_manager::iterator it = m_node_mgr.begin();
+    for (auto it = m_node_mgr.begin();
 	 it != m_node_mgr.end();
 	 ++it)
 	m_patcher->add_node (*it);

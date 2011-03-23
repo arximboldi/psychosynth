@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-02 22:44:06 raskolnikov>
+ *  Time-stamp:  <2011-03-18 19:03:48 raskolnikov>
  *
  *  @file        config.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -42,19 +42,19 @@ PSYNTH_DEFINE_ERROR_WHAT  (config_type_error, "Config node type mismatch.");
 PSYNTH_DEFINE_ERROR_WHAT  (config_backend_error, "Config node has no backend.");
 
 void conf_subject::add_listener (conf_listener& l)
-{
-    on_change.connect (sigc::mem_fun (l, &conf_listener::handle_conf_change));
-    on_nudge.connect (sigc::mem_fun (l, &conf_listener::handle_conf_nudge));
-    on_add_child.connect (sigc::mem_fun (l, &conf_listener::handle_conf_add_child));
-    on_del_child.connect (sigc::mem_fun (l, &conf_listener::handle_conf_del_child));
+{    
+    on_change.connect (boost::bind (&conf_listener::handle_conf_change, &l, _1));
+    on_nudge.connect (boost::bind (&conf_listener::handle_conf_nudge, &l, _1));
+    on_add_child.connect (boost::bind (&conf_listener::handle_conf_add_child, &l, _1));
+    on_del_child.connect (boost::bind (&conf_listener::handle_conf_del_child, &l, _1));
 }
 
 void conf_subject::del_listener (conf_listener& l)
 {
-    remove_slot (on_change, sigc::mem_fun (l, &conf_listener::handle_conf_change));
-    remove_slot (on_nudge, sigc::mem_fun (l, &conf_listener::handle_conf_nudge));
-    remove_slot (on_add_child, sigc::mem_fun (l, &conf_listener::handle_conf_add_child));
-    remove_slot (on_del_child, sigc::mem_fun (l, &conf_listener::handle_conf_del_child));
+    remove_slot (on_change, boost::bind (&conf_listener::handle_conf_change, &l, _1));
+    remove_slot (on_nudge, boost::bind (&conf_listener::handle_conf_nudge, &l, _1));
+    remove_slot (on_add_child, boost::bind (&conf_listener::handle_conf_add_child, &l, _1));
+    remove_slot (on_del_child, boost::bind (&conf_listener::handle_conf_del_child, &l, _1));
 }
 
 void conf_node::save ()

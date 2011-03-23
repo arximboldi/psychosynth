@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-09 18:44:21 raskolnikov>
+ *  Time-stamp:  <2011-03-16 22:37:52 raskolnikov>
  *
  *  @file        performance.cpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -54,9 +54,9 @@
  */
 
 #include <cstddef>
-#include <ctime>
 #include <iostream>
 
+#include <boost/timer.hpp>
 #include <boost/test/unit_test.hpp>
 
 #include <psynth/sound/frame.hpp>
@@ -72,18 +72,18 @@
 
 using namespace psynth::sound;
 
-// returns time in milliseconds per call
+// returns time in microseconds per call
 template <typename Op>
 double measure_time (Op op, std::size_t num_loops)
 {
-    clock_t begin = clock();
+    boost::timer t;
     for (std::size_t ii = 0; ii < num_loops; ++ii)
 	op ();
-    return double (clock() - begin) / double (num_loops);
+    return t.elapsed () * 1000000. / double (num_loops);
 }
 
 // buffer dimension
-std::size_t buffer_size = 1024;
+const std::size_t buffer_size = 4096;
 
 // macros for standard GIL ranges
 #define STEREO_RANGE(T) \
@@ -230,13 +230,13 @@ void test_fill (std::size_t trials)
     
     BOOST_TEST_MESSAGE (
 	"psynth: " << measure_time (
-	    fill_psynth<Range,P> (range (bufp), P()), trials));
+	    fill_psynth<Range,P> (range (bufp), P(0)), trials));
 
     BOOST_TEST_MESSAGE (
 	"non-psynth: "<< measure_time (
-	    fill_nonpsynth<Range,P> (range (bufn), P()), trials));
-
-    BOOST_CHECK (range (bufp) [0] == P());
+	    fill_nonpsynth<Range,P> (range (bufn), P(0)), trials));
+    
+    BOOST_CHECK (range (bufp) [0] == P(0));
     BOOST_CHECK (equal_frames (range (bufp), range (bufn)));
 };
 
@@ -661,12 +661,12 @@ void test_transform (std::size_t trials)
     BOOST_TEST_MESSAGE (
 	"psynth: " << measure_time (
 	    transform_psynth<Range1, Range2, F>(
-		bufp1, bufp2, F()), trials));
+		range (bufp1), range (bufp2), F()), trials));
 
     BOOST_TEST_MESSAGE (
 	"non-psynth: "<< measure_time (
 	    transform_nonpsynth<Range1,Range2,F>(
-		range(bufn1), range(bufn2), F()), trials));
+		range(bufn1), range (bufn2), F()), trials));
 
     BOOST_CHECK (equal_frames (range (bufp1), range (bufn1)));
     BOOST_CHECK (equal_frames (range (bufp2), range (bufn2)));
@@ -675,7 +675,7 @@ void test_transform (std::size_t trials)
 #ifdef NDEBUG
     const std::size_t num_trials = 10000;
 #else
-    const std::size_t num_trials = 100;
+    const std::size_t num_trials = 10000;
 #endif
 
 BOOST_AUTO_TEST_SUITE (sound_peformance_test_suite);

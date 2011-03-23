@@ -67,7 +67,7 @@ element::element (world_node& obj, Ogre::SceneManager* scene) :
     m_node->attachObject(m_base);
 
     vector_2f v;
-    obj.get_param (psynth::node::PARAM_POSITION, v);
+    obj.get_param (psynth::graph::node::PARAM_POSITION, v);
     m_pos.x = v.x;
     m_pos.y = v.y;
     m_node->setPosition(Vector3(m_pos.x, Z_POS, m_pos.y));
@@ -111,7 +111,7 @@ void element::set_target (const world_node& obj)
 	m_target.add_listener (this);
 
 	vector_2f v;
-	m_target.get_param (psynth::node::PARAM_POSITION, v);
+	m_target.get_param (psynth::graph::node::PARAM_POSITION, v);
 	m_aimpoint.x = v.x;
 	m_aimpoint.y = v.y;
 	
@@ -135,7 +135,7 @@ void element::set_position (const Ogre::Vector2& pos)
     vector_2f dest;
     dest.x = pos.x;
     dest.y = pos.y;
-    m_obj.set_param (psynth::node::PARAM_POSITION, dest);
+    m_obj.set_param (psynth::graph::node::PARAM_POSITION, dest);
 }
 
 void element::set_ghost (bool ghost)
@@ -314,7 +314,7 @@ void element::handle_deactivate_node (world_node& obj)
 void element::handle_set_param_node (world_node& obj, int param_id)
 {
     if (obj == m_obj) {
-	if (param_id == node::PARAM_POSITION) {
+	if (param_id == graph::node::PARAM_POSITION) {
 	    vector_2f dest;
 	    obj.get_param (param_id, dest);
 	    node_moved (obj, dest);
@@ -323,7 +323,7 @@ void element::handle_set_param_node (world_node& obj, int param_id)
 	for (elem_component_iter it = m_comp.begin(); it != m_comp.end(); ++it)
 	    (*it)->handle_param_change (obj, param_id);
     } else if (obj == m_target) {
-	if (param_id == node::PARAM_POSITION) {
+	if (param_id == graph::node::PARAM_POSITION) {
 	    vector_2f dest;
 	    obj.get_param (param_id, dest);
 	    node_moved (obj, dest);

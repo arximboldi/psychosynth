@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-10-17 19:53:24 raskolnikov>
+ *  Time-stamp:  <2011-03-09 02:13:33 raskolnikov>
  *
  *  @file        file_finder.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>

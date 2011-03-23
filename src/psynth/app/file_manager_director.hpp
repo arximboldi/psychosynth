@@ -33,7 +33,7 @@ class file_manager_director
 {
     base::conf_node* m_conf;
     boost::filesystem::path m_home_path;
-    sigc::connection m_on_conf_nudge_slot;
+    boost::signals::connection m_on_conf_nudge_slot;
     
     void on_conf_nudge (base::conf_node& node);
     void register_config ();

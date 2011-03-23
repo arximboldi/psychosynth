@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-11 22:30:37 raskolnikov>
+ *  Time-stamp:  <2011-03-21 21:25:41 raskolnikov>
  *
  *  @file        ring_buffer.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -51,8 +51,8 @@ public:
 
     typedef typename range_base::difference_type difference_type;
     typedef typename range_base::size_type       size_type;
+    typedef typename range_base::unsafe_position unsafe_position;
     typedef typename range_base::position        position;
-    typedef typename range_base::safe_position   safe_position;
     
     /* Create with size and optional initial value and
      * alignment */
@@ -113,7 +113,6 @@ public:
         swap (_buffer, buf._buffer);
         swap (_range,  buf._range);
     }
-
     
     void recreate (size_type size,
 		   std::size_t alignment = 0)
@@ -121,7 +120,7 @@ public:
 	_buffer.recreate (size, alignment);
 	_range = range_base (range (_buffer));
     }
-
+    
     template <typename Allocator>
     void recreate (size_type size,
 		   std::size_t alignment,
@@ -130,7 +129,10 @@ public:
 	_buffer.recreate (size, alignment, alloc_in);
 	_range = range_base (range (_buffer));
     }
+
     
+#ifdef PSYNTH_BUFFER_MODEL_RANGE
+
     position begin_pos () const
     { return _range.begin_pos (); }
 
@@ -143,13 +145,13 @@ public:
     safe_position safe_end_pos () const
     { return _range.safe_end_pos (); }
 
-    /** @see range_buffer_base::availible */
-    size_type availible (const safe_position& r) const
-    { return _range.availible (r); }
+    /** @see range_buffer_base::available */
+    size_type available (const safe_position& r) const
+    { return _range.available (r); }
 
-    /** @see range_buffer_base::availible */
-    size_type availible () const
-    { return _range.availible (); }
+    /** @see range_buffer_base::available */
+    size_type available () const
+    { return _range.available (); }
 
     /** @see range_buffer_base::check_position */
     ring_buffer_error check_position (const safe_position& r) const
@@ -212,8 +214,8 @@ public:
     { _range.zero (); }
 
     /** @see range_buffer_base::backwards */
-    bool backwards () const
-    { return _range.backwards (); }
+    bool is_backwards () const
+    { return _range.is_backwards (); }
     
     /** @see range_buffer_base::set_backwards */
     void set_backwards ()
@@ -240,10 +242,13 @@ public:
     safe_position sync (const safe_position& r) const
     { return _range.sync (); }
 
+#endif /* PSYNTH_BUFFER_MODEL_RANGE */
+    
 protected:
     Buffer      _buffer;
     range_base  _range;
 };
+
 
 template <class Buffer>
 class ring_buffer : public ring_buffer_base<Buffer, ring_buffer_range>
@@ -259,10 +264,10 @@ public:
     typedef typename range::value_type          value_type;
     typedef typename range::reference           reference;
     
-    typedef typename range::iterator            iterator;
-    typedef typename const_range::iterator      const_iterator;
-    typedef typename range::safe_iterator       safe_iterator;
-    typedef typename const_range::safe_iterator const_safe_iterator;
+    typedef typename range::unsafe_iterator            unsafe_iterator;
+    typedef typename const_range::unsafe_iterator      const_unsafe_iterator;
+    typedef typename range::iterator                   iterator;
+    typedef typename const_range::iterator             const_iterator;
 
     /**
      * Create with size and optional initial value and
@@ -298,6 +303,18 @@ public:
 	parent_type::operator= (buf);
         return *this;
     }
+
+    using parent_type::recreate;
+    
+    void recreate (typename parent_type::size_type size,
+                   typename Buffer::range::value_type val,
+		   std::size_t alignment = 0)
+    {
+	this->_buffer.recreate (size, val, alignment);
+	this->_range = range (sound::range (this->_buffer));
+    }
+
+#ifdef PSYNTH_BUFFER_MODELS_RANGE
     
     iterator begin ()
     { return this->_range.begin (); }
@@ -323,18 +340,71 @@ public:
     const_safe_iterator safe_end () const
     { return this->_range.safe_end (); }    
 
+#endif /* PSYNTH_BUFFER_MODEL_RANGE */
+    
     allocator_type&       allocator ()
     { return this->_buffer.allocator (); }
 
     allocator_type const& allocator () const
     { return this->_buffer.allocator (); }
+
+private:
+    template <typename B> friend 
+    typename ring_buffer<B>::range&
+    range (ring_buffer<B>& buf);
+
+    template <typename B> friend 
+    const typename ring_buffer<B>::const_range
+    const_range (const ring_buffer<B>& buf);
 };
 
 /*
  *
- *  @todo FrameBasedConcept
+ *  @todo BufferConcept
+ *
+ */
+
+/**
+ * @todo This returns non-const reference because writing to a
+ * ring_buffer_range mutates the internal range state. Does this has
+ * bad consecuences? Is this the best alternative?
+ */
+template <typename B>
+typename ring_buffer<B>::range&
+range (ring_buffer<B>& buf)
+{
+    return buf._range;
+}
+
+template <typename B>
+const typename ring_buffer<B>::const_range
+const_range (const ring_buffer<B>& buf)
+{
+    return buf._range;
+}
+
+/*
+ *
+ *  FrameBasedConcept
  *  
  */
+
+template <typename Buffer>
+struct sample_type<ring_buffer<Buffer> > :
+    public sample_type<Buffer> {}; 
+
+template <typename Buffer>
+struct channel_space_type<ring_buffer<Buffer> > :
+    public channel_space_type<Buffer> {}; 
+
+template <typename Buffer>
+struct sample_mapping_type<ring_buffer<Buffer> > :
+    public sample_mapping_type<Buffer> {}; 
+
+template <typename Buffer>
+struct is_planar<ring_buffer<Buffer> > :
+    public is_planar<Buffer> {}; 
+
 
 /*
  *

@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-03 00:17:17 raskolnikov>
+ *  Time-stamp:  <2011-03-18 17:42:09 raskolnikov>
  *
  *  @file        director.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -55,13 +55,9 @@ void director::attach_output_director_factory (output_director_factory* fact)
 void director::stop_output ()
 {
     if (m_output) {
-	m_output->get_output()->close();
-	m_world->detach_output (m_output->get_output());
-	
-	m_output->stop();   
-	
-	delete m_output;
-	m_output = NULL;
+        m_world->detach_output (m_output->get_output());
+        delete m_output;
+	m_output = 0;
     }
 }
 
@@ -78,8 +74,10 @@ void director::start_output ()
 
 	m_world->attach_output (m_output->get_output());
 
+#if 0 // FIXME: Pass this information somehow!
 	m_output->get_output()->set_info(m_info);
 	m_output->get_output()->open();
+#endif
 	m_output->get_output()->start();
     } else {
 	m_config->child ("output").set (string (PSYNTH_DEFAULT_OUTPUT));
@@ -95,12 +93,12 @@ void director::register_config ()
     m_config->child ("num_channels").def (int (PSYNTH_DEFAULT_NUM_CHANNELS));
     m_config->child ("output")      .def (string (PSYNTH_DEFAULT_OUTPUT));
 
-    m_config->on_nudge.connect (sigc::mem_fun (*this, &director::on_config_nudge));
+    m_config->on_nudge.connect (boost::bind (&director::on_config_nudge, this, _1));
 }
 
 void director::unregister_config()
 {
-    m_config->on_nudge.connect (sigc::mem_fun (*this, &director::on_config_nudge));
+    m_config->on_nudge.connect (boost::bind (&director::on_config_nudge, this, _1));
 }
 
 void director::start (base::conf_node& conf, const boost::filesystem::path& home_path)
@@ -144,6 +142,7 @@ void director::stop()
 
 void director::update_info ()
 {
+#if 0 // FIXME FIXME!
     m_world->set_info (m_info);
 
     output::state old_state;
@@ -152,6 +151,7 @@ void director::update_info ()
     m_output->get_output()->goto_state (output::NOTINIT);
     m_output->get_output()->set_info(m_info);
     m_output->get_output()->goto_state (old_state);
+#endif
 }
 
 void director::on_config_nudge (base::conf_node& node)
@@ -166,11 +166,13 @@ void director::on_config_nudge (base::conf_node& node)
     m_world->set_info (m_info);
 
     if (m_output && out == m_old_output) {    
-	output::state old_state;
+#if 0
+        output::state old_state;
 	old_state = m_output->get_output()->get_state();
 	m_output->get_output()->goto_state (output::NOTINIT);
 	m_output->get_output()->set_info (m_info);
 	m_output->get_output()->goto_state (old_state);
+#endif
     } else {
 	stop_output ();
 	start_output ();

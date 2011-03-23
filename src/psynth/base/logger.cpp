@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-03 00:22:31 raskolnikov>
+ *  Time-stamp:  <2011-03-09 17:18:52 raskolnikov>
  *
  *  @file        logger.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -40,6 +40,24 @@ namespace base
 
 log::~log()
 {
+}
+
+void log::add_sink (log_sink_ptr d)    
+{
+    lock lock (this);
+    _dumpers.push_back (d);
+}
+
+void log::del_sink (log_sink_ptr d)    
+{
+    lock lock (this);
+
+    _dumpers.remove (d);
+#if 0
+    _dumpers.remove_if ([&] (log_sink_ptr p) {
+            return equal_ptr (d, p);
+        });
+#endif
 }
 
 void log::operator () (log& l, int level, const string& msg)
