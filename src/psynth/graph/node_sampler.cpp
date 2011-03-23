@@ -93,7 +93,7 @@ void node_sampler::on_file_change (node_param& par)
     par.get (val);
     path = base::file_manager::self ().path("psychosynth.samples").find (val);
     
-    m_update_mutex.lock();
+    std::unique_lock<std::mutex> lock (m_update_mutex);
         
     m_reader = io::new_file_input <interleaved_range> (path.native ());
     m_fetcher.set_input (m_reader);
@@ -103,8 +103,6 @@ void node_sampler::on_file_change (node_param& par)
         // m_scaler.set_channels (2); // HACK HACK
 	// m_scaler.setSampleRate(m_fetcher.get_info().sample_rate);
     }
-    
-    m_update_mutex.unlock();
 }
 
 void node_sampler::do_update (const node* caller, int caller_port_type, int caller_port)

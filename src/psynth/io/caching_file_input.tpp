@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-23 13:33:13 raskolnikov>
+ *  Time-stamp:  <2011-03-23 14:15:34 raskolnikov>
  *
  *  @file        caching_file_reader.tpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -178,14 +178,7 @@ template <class R, class I>
 void caching_file_input_impl<R, I>::do_seek (std::ptrdiff_t offst,
                                              seek_dir dir)
 {
-    std::cout << "Seek: " << offst << std::endl;
-    //try
-    //{
-        _input->seek (offst, dir);
-        //} catch (file_seek_error&) {
-        /* We just rely on the next 'take'
-         * failing. */
-        //}
+    _input->seek (offst, dir);
 }
 
 template <class R, class I>
@@ -216,15 +209,12 @@ void caching_file_input_impl<R, I>::run ()
                     }
                 }
                 
-                if (_new_read_pos >= _input->length ())
+                if (_new_read_pos >= (std::ptrdiff_t) _input->length ())
                     _new_read_pos = 0;
                 
                 assert (_new_read_pos >= 0);
                 assert (_new_read_pos < _input->length ());
-
-                std::cout << "POS: " << _read_pos << " "
-                          << _new_read_pos << std::endl;
-
+                
                 /* Do we have to seek */
                 if (_new_read_pos != _read_pos)
                 {

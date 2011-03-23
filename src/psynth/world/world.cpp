@@ -134,7 +134,7 @@ void world::register_default_node_factory ()
     register_node_factory (graph::get_node_control_noise_factory());
     register_node_factory (graph::get_node_echo_factory());
     register_node_factory (graph::get_node_delay_factory());
-    //register_node_factory (graph::get_node_double_sampler_factory());
+    register_node_factory (graph::get_node_double_sampler_factory());
 }
 
 world::~world ()

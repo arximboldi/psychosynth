@@ -153,6 +153,7 @@ libpsynth_la_SOURCES = \
 	graph/node_oscillator.cpp \
 	graph/node_filter.cpp \
 	graph/node_sampler.cpp \
+	graph/node_double_sampler.cpp \
 	graph/node_step_seq.cpp \
 	graph/node_noise.cpp \
 	graph/node_echo.cpp \

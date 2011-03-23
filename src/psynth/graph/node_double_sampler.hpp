@@ -65,14 +65,19 @@ public:
     };
     
 private:
-    io::file_input_ptr<sound::stereo32sf_range> m_reader_one;
-    io::caching_file_input_adapter<audio_range, decltype (m_reader_one)>
+    typedef sound::stereo32sf_range  interleaved_range;
+    typedef sound::stereo32sf_buffer interleaved_buffer;
+
+    io::file_input_ptr<interleaved_range> m_reader_one;
+    io::caching_file_input_adapter<interleaved_range,
+                                   decltype (m_reader_one)>
     m_fetcher_one;
-    io::file_input_ptr<sound::stereo32sf_range> m_reader_two;
-    io::caching_file_input_adapter<audio_range, decltype (m_reader_two)>
+    io::file_input_ptr<interleaved_range> m_reader_two;
+    io::caching_file_input_adapter<interleaved_range, decltype (m_reader_two)>
     m_fetcher_two;
-    audio_buffer m_inbuf_one;
-    audio_buffer m_inbuf_two;
+    
+    interleaved_buffer m_inbuf_one;
+    interleaved_buffer m_inbuf_two;
         
     float m_param_ampl;
     float m_param_blend;
