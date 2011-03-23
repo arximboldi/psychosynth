@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-23 14:15:34 raskolnikov>
+ *  Time-stamp:  <2011-03-23 19:24:06 raskolnikov>
  *
  *  @file        caching_file_reader.tpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -98,10 +98,6 @@ void caching_file_input_impl<R, I>::set_backwards (bool backwards)
 	_read_ptr = _range.sync (_read_ptr);
         
         std::ptrdiff_t new_avail  = _range.available (_read_ptr);
-
-        std::cout << "new_avail: " << new_avail
-                  << "old_avail: " << old_avail << std::endl;
-        
         std::ptrdiff_t diff_avail = new_avail - old_avail;
         
 	/* Fix reading position. */

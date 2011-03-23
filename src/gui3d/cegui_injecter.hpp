@@ -47,7 +47,7 @@ public:
             CEGUI::System::getSingleton().injectMousePosition(
                 e.state.X.abs, e.state.Y.abs) ||
             CEGUI::System::getSingleton().injectMouseWheelChange(
-                psynth::base::sign (e.state.Z.rel));
+                e.state.Z.rel * .01);
 
 	//return CEGUI::System::getSingleton().injectMouseMove(e.state.X.rel, e.state.Y.rel);
     }
