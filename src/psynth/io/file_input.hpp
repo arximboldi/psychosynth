@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-21 16:37:23 raskolnikov>
+ *  Time-stamp:  <2011-03-23 12:08:53 raskolnikov>
  *
  *  @file        file_input.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -61,6 +61,9 @@ public:
 
     std::size_t frame_rate () const
     { return _info.samplerate; }
+
+    std::size_t length () const
+    { return _info.frames; }
     
 private:
     SNDFILE* _file;

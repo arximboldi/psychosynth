@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-21 22:59:59 raskolnikov>
+ *  Time-stamp:  <2011-03-23 12:37:21 raskolnikov>
  *
  *  @file        ring_buffer.tpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -79,7 +79,10 @@ ring_buffer_range_base<R>::read (Position& r,
 				 size_type samples) const
 {
     const size_type slice = std::min (available (r), samples);
-	
+
+    if (is_backwards ())
+        advance (r, -slice);
+    
     if (r._pos + slice > size ())
     {
 	const size_type slice_one = size () - r._pos;
@@ -92,8 +95,10 @@ ring_buffer_range_base<R>::read (Position& r,
     else
 	copy_frames (sub_range (_range, r._pos, slice),
 		     sub_range (buf, 0, slice));
-	
-    advance (r, slice);
+
+    if (!is_backwards ())
+        advance (r, slice);
+    
     return slice;
 }
 
@@ -106,7 +111,10 @@ ring_buffer_range_base<R>::read_and_convert (Position& r,
 					     CC cc) const
 {    
     const size_type slice = std::min (available (r), samples);
-	
+
+    if (is_backwards ())
+        advance (r, -slice);
+    
     if (r._pos + slice > size ())
     {
 	const size_type slice_one = size () - r._pos;
@@ -122,8 +130,10 @@ ring_buffer_range_base<R>::read_and_convert (Position& r,
 	copy_and_convert_frames (sub_range (_range, r._pos, slice),
 				 sub_range (buf, 0, slice),
 				 cc);
-	
-    advance (r, slice);
+
+    if (!is_backwards ())
+        advance (r, slice);
+    
     return slice;
 }
 
@@ -140,6 +150,9 @@ void ring_buffer_range_base<R>::write (const Range& buf, size_type nwrite)
 	offset = slice - size ();
 	slice = size ();
     }
+
+    if (is_backwards ())
+        advance (-slice);
     
     if (_writepos._pos + slice > size ())
     {
@@ -152,8 +165,9 @@ void ring_buffer_range_base<R>::write (const Range& buf, size_type nwrite)
     } else 
 	copy_frames (sub_range (buf, 0, slice),
 		     sub_range (_range, _writepos._pos, slice));
-	
-    advance (nwrite);
+
+    if (!is_backwards ())
+        advance (slice);
 }
 
 
@@ -170,6 +184,9 @@ void ring_buffer_range_base<R>::write_and_convert (const Range& buf,
 	offset = slice - size ();
 	slice = size ();
     }
+
+    if (is_backwards ())
+        advance (-nwrite);
     
     if (_writepos._pos + slice > size ())
     {
@@ -188,8 +205,9 @@ void ring_buffer_range_base<R>::write_and_convert (const Range& buf,
 	    sub_range (buf, 0, slice),
 	    sub_range (_range, _writepos._pos, slice),
 	    cc);
-	
-    advance (nwrite);
+
+    if (!is_backwards ())
+        advance (slice);
 }
 
 } /* namespace sound */

@@ -162,7 +162,8 @@ AC_ARG_ENABLE([soundtouch],
 
 if test "x${soundtouch}" != xno ; then
     PKG_CHECK_MODULES(SOUNDTOUCH, [ soundtouch ],
-        [
+    
+    [
             HAVE_SOUNDTOUCH=yes
             AC_DEFINE([HAVE_SOUNDTOUCH], 1, [Have Soundtouch?])
         ],

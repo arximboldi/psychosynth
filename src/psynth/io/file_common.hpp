@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-17 19:01:18 raskolnikov>
+ *  Time-stamp:  <2011-03-23 12:22:30 raskolnikov>
  *
  *  @file        file_common.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -100,6 +100,8 @@ public:
     
     virtual std::size_t seek (std::ptrdiff_t offset,
                               seek_dir dir = seek_dir::beg) = 0;
+
+    virtual std::size_t length () const = 0;
 };
 
 template <typename Range>
@@ -110,6 +112,9 @@ public:
     
     std::size_t frame_rate () const
     { return 44100; }
+
+    std::size_t length () const
+    { return 0; }
     
     std::size_t seek (std::ptrdiff_t offset,
                       seek_dir dir = seek_dir::beg)

@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-22 20:14:01 raskolnikov>
+ *  Time-stamp:  <2011-03-23 13:23:05 raskolnikov>
  *
  *  @file        ring_buffer.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -92,7 +92,6 @@ public:
     unsafe_ring_position& operator= (const unsafe_ring_position& p) = default;
 
     explicit unsafe_ring_position (size_type p) : _pos (p) {}
-
     
     size_type offset () const
     { return _pos; }
@@ -102,6 +101,7 @@ public:
     
     // TODO: Make private
     void _add (difference_type n) {}
+
     size_type _pos;
 };
 
@@ -488,6 +488,15 @@ public:
     }
     
     /**
+     * Advances the write pointer of the buffer a given number of elements.
+     * @param n The number of elements to advance.
+     */
+    void advance (difference_type n)
+    {
+	advance (_writepos, n);
+    }
+    
+    /**
      * Advances a read pointer a given number of elements.
      * @param r The iterator to advance.
      * @param n The number of elements to advance.
@@ -495,19 +504,15 @@ public:
     template <typename Position> // Models PositionConcept
     void advance (Position& r, difference_type n) const
     {
+        difference_type new_pos = r._pos + n;
 	if (n >= 0)
-	{
-	    r._pos = (r._pos + n) % size ();
-	    r._add (n);
-	}
-	else
-	{
-	    difference_type new_pos = r._pos + n;
+	    while (new_pos >= size ())
+		new_pos -= size ();
+        else
 	    while (new_pos < 0)
 		new_pos += size ();
-	    r._pos = new_pos;
-	    r._add (n);
-	}
+        r._pos = new_pos;
+        r._add (std::abs (n));
     }
     
     difference_type distance (const unsafe_position& ra,
@@ -535,15 +540,6 @@ public:
 	if (r._pos < 0)
 	    r._pos = _range.size () - 1;
 	r._add (-1);
-    }
-
-    /**
-     * Advances the write pointer of the buffer a given number of elements.
-     * @param n The number of elements to advance.
-     */
-    void advance (size_type n)
-    {
-	advance (_writepos, n);
     }
 
     difference_type count () const

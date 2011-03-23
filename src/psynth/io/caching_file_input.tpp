@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-23 00:38:28 raskolnikov>
+ *  Time-stamp:  <2011-03-23 13:33:13 raskolnikov>
  *
  *  @file        caching_file_reader.tpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -77,7 +77,7 @@ caching_file_input_impl<R, I>::caching_file_input_impl (
     , _read_ptr (_range.end_pos ())
     , _backwards (false)
     , _read_pos (0)
-    , _new_read_pos (-1)
+    , _new_read_pos (_read_pos)
     , _finished (true)
 {
     assert (chunk_size < threshold && threshold < buffer_size);
@@ -91,22 +91,26 @@ void caching_file_input_impl<R, I>::set_backwards (bool backwards)
  	std::unique_lock<std::mutex> buffer_lock (_buffer_mutex);
         std::unique_lock<std::mutex> input_lock  (_input_mutex);
 
-        std::size_t old_avail = _range.available (_read_ptr);
+        std::ptrdiff_t old_avail = _range.available (_read_ptr);
 	
 	_backwards = backwards;
 	_range.set_backwards ();
 	_read_ptr = _range.sync (_read_ptr);
         
-        std::size_t new_avail  = _range.available (_read_ptr);
-        std::size_t diff_avail = old_avail - new_avail;
+        std::ptrdiff_t new_avail  = _range.available (_read_ptr);
+
+        std::cout << "new_avail: " << new_avail
+                  << "old_avail: " << old_avail << std::endl;
+        
+        std::ptrdiff_t diff_avail = new_avail - old_avail;
         
 	/* Fix reading position. */
 	if (_backwards) {
-	    _new_read_pos -= diff_avail;
+	    _new_read_pos = _read_pos + diff_avail;
 	    if (_new_read_pos < 0)
 		_new_read_pos += _chunk_size;
 	} else {
-	    _new_read_pos += diff_avail;
+	    _new_read_pos += _read_pos + diff_avail;
 	    if (_new_read_pos >= std::ptrdiff_t (_chunk_size))
 		_new_read_pos -= _chunk_size;
 	}
@@ -175,20 +179,20 @@ void caching_file_input_impl<R, I>::do_seek (std::ptrdiff_t offst,
                                              seek_dir dir)
 {
     std::cout << "Seek: " << offst << std::endl;
-    try
-    {
+    //try
+    //{
         _input->seek (offst, dir);
-    } catch (file_seek_error&) {
+        //} catch (file_seek_error&) {
         /* We just rely on the next 'take'
          * failing. */
-    }
+        //}
 }
 
 template <class R, class I>
 void caching_file_input_impl<R, I>::run ()
 {
-    std::size_t nread;
-    std::size_t must_read;
+    std::ptrdiff_t nread;
+    std::ptrdiff_t must_read;
 
     do {
 	/* Read the data. */
@@ -200,25 +204,31 @@ void caching_file_input_impl<R, I>::run ()
             {
 		must_read = _threshold;
 
-		/* Do we have to seek? */
-		if (_new_read_pos >= 0) {
-		    _read_pos = _new_read_pos;
-		    _new_read_pos = -1;
-		    if (!_backwards)
-                        do_seek (_read_pos, seek_dir::beg);
-                }
-
 		/* Backwards reading needs seeking. */
-		if (_backwards) {
-                    if (_read_pos == 0)
-			_read_pos = _chunk_size - must_read;
-		    else if (must_read > _read_pos)
-                    {
-			must_read = _read_pos;
-			_read_pos = 0;
-		    }
-                    else
-			_read_pos -= must_read;
+		if (_backwards)
+                {
+                    _new_read_pos -= must_read;
+                    if (_new_read_pos == -must_read)
+                        _new_read_pos += _input->length ();
+                    if (_new_read_pos < 0) {
+                        must_read += _new_read_pos;
+                        _new_read_pos = 0;
+                    }
+                }
+                
+                if (_new_read_pos >= _input->length ())
+                    _new_read_pos = 0;
+                
+                assert (_new_read_pos >= 0);
+                assert (_new_read_pos < _input->length ());
+
+                std::cout << "POS: " << _read_pos << " "
+                          << _new_read_pos << std::endl;
+
+                /* Do we have to seek */
+                if (_new_read_pos != _read_pos)
+                {
+                    _read_pos = _new_read_pos;
                     do_seek (_read_pos, seek_dir::beg);
                 }
                 
@@ -227,13 +237,15 @@ void caching_file_input_impl<R, I>::run ()
 		nread = _input->take (block);
                 
 		/* Check wether whe have finished reading and loop. */
-		if (!nread && !_backwards) {
-		    _read_pos += nread;
-		    if (nread == 0)
-			_new_read_pos = 0;
-		}
+                if (!_backwards)
+                {
+                    _read_pos += nread;
+                    _new_read_pos = _read_pos;
+                    if (!nread)
+                        _new_read_pos = 0;
+                }
 	    }
-	}
+	} /* lock _input_mutex */
 	
 	/* Add it to the buffer. */
 	if (nread)

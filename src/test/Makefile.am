@@ -26,23 +26,24 @@ TESTS = psynth_unit_test
 
 noinst_PROGRAMS = $(TESTS)
 
-psynth_unit_test_SOURCES = \
-	psynth/base/tree_node.cpp \
-	psynth/base/arg_parser.cpp \
-	psynth/base/c3_class.cpp \
-	psynth/sound/sample.cpp \
-	psynth/sound/frame.cpp \
-	psynth/sound/sample_buffer.cpp \
-	psynth/sound/buffer.cpp \
-	psynth/sound/performance.cpp \
-	psynth/sound/frame_iterator.cpp \
-	psynth/sound/ring.cpp \
-	psynth/io/output.cpp \
-	psynth/io/input.cpp \
-	psynth/util.cpp \
-	psynth/util.hpp \
-	psynth_unit_test.cpp
+psynth_unit_test_SOURCES = psynth_unit_test.cpp
 
+# psynth_unit_test_SOURCES += \
+# 	psynth/base/tree_node.cpp \
+# 	psynth/base/arg_parser.cpp \
+# 	psynth/base/c3_class.cpp \
+# 	psynth/sound/sample.cpp \
+# 	psynth/sound/frame.cpp \
+# 	psynth/sound/sample_buffer.cpp \
+# 	psynth/sound/buffer.cpp \
+# 	psynth/sound/performance.cpp \
+# 	psynth/sound/frame_iterator.cpp \
+# 	psynth/sound/ring.cpp \
+# 	psynth/io/output.cpp \
+# 	psynth/io/input.cpp \
+# 	psynth/util.cpp \
+# 	psynth/util.hpp
+# 
 
 AM_CPPFLAGS = -Wall $(BOOST_CPPFLAGS) -I..
 AM_LDFLAGS  = $(BOOST_LDFLAGS)

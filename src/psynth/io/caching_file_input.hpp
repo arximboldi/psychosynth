@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-22 23:50:14 raskolnikov>
+ *  Time-stamp:  <2011-03-23 12:20:18 raskolnikov>
  *
  *  @file        caching_file_reader.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -95,7 +95,10 @@ public:
 
     std::size_t frame_rate () const
     { return _input->frame_rate (); }
-    
+
+    std::size_t length () const
+    { return _input->length (); }
+
     const input_type& input () const
     { return *_input; }
     
