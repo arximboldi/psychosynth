@@ -218,7 +218,7 @@ void psychosynth_3d::setup_settings (conf_node& conf)
 #ifdef PSYNTH_HAVE_XML
 	conf.set_backend (
 	    new_conf_backend_xml (
-		(get_config_path() / "psynth3d.xml").native ()));
+		(get_config_path() / "psynth3d.xml").string ()));
 #endif
 	conf.def_load();
     }
@@ -254,22 +254,22 @@ void psychosynth_3d::setup_ogre (conf_node& conf)
     conf.child ("fps").get (fps);
     
     (new LogManager)->createLog
-	((get_config_path() / "gui3d/psynth3d_Ogre.log").native (),
+	((get_config_path() / "gui3d/psynth3d_Ogre.log").string (),
 	 false, false, false);
     
-    m_ogre = new Root ((get_data_path() / "gui3d/plugins.cfg").native (),
-		       (get_data_path() / "gui3d/ogre.cfg").native ());
+    m_ogre = new Root ((get_data_path() / "gui3d/plugins.cfg").string (),
+		       (get_data_path() / "gui3d/ogre.cfg").string ());
         
     ResourceGroupManager& res_mgr = ResourceGroupManager::getSingleton();
-    res_mgr.addResourceLocation (get_data_path ().native (),
+    res_mgr.addResourceLocation (get_data_path ().string (),
 				 "FileSystem", "General");
-    res_mgr.addResourceLocation ((get_data_path () / "gui3d/mesh").native (),
+    res_mgr.addResourceLocation ((get_data_path () / "gui3d/mesh").string (),
 				 "FileSystem", "General");
-    res_mgr.addResourceLocation ((get_data_path () / "gui3d/texture").native (),
+    res_mgr.addResourceLocation ((get_data_path () / "gui3d/texture").string (),
 				 "FileSystem", "General");
-    res_mgr.addResourceLocation ((get_data_path () / "gui3d/material").native (),
+    res_mgr.addResourceLocation ((get_data_path () / "gui3d/material").string (),
 				 "FileSystem", "General");
-    res_mgr.addResourceLocation ((get_data_path () / "gui3d/gui").native (),
+    res_mgr.addResourceLocation ((get_data_path () / "gui3d/gui").string (),
 				 "FileSystem", "GUI");
 
     if (!m_ogre->restoreConfig() && !m_ogre->showConfigDialog())
@@ -328,7 +328,7 @@ void psychosynth_3d::setup_gui ()
 						 false, 3000, m_scene);
     
     m_gui = new CEGUI::System (m_ceguirender, 0, 0, 0, "",
-			       (get_config_path () / "psynth3d_CEGUI.log").native ());
+			       (get_config_path () / "psynth3d_CEGUI.log").string ());
 
     CEGUI::SchemeManager::getSingleton().loadScheme("TaharezLook.scheme");
     m_gui->setDefaultMouseCursor("TaharezLook", "MouseArrow");

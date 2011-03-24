@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-10-17 19:52:29 raskolnikov>
+ *  Time-stamp:  <2011-03-24 18:24:27 raskolnikov>
  *
  *  @file        file_finder.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -37,8 +37,8 @@
 #include <string>
 #include <cstdlib>
 
+#define BOOST_FILESYSTEM_VERSION 2
 #include <boost/filesystem.hpp>
-
 #include <psynth/base/misc.hpp>
 
 namespace psynth

@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-23 17:14:13 raskolnikov>
+ *  Time-stamp:  <2011-03-24 18:40:45 raskolnikov>
  *
  *  @file        ring_buffer.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -506,7 +506,7 @@ public:
     {
         difference_type new_pos = r._pos + n;
 	if (n >= 0)
-	    while (new_pos >= size ())
+	    while (new_pos >= difference_type (size ()))
 		new_pos -= size ();
         else
 	    while (new_pos < 0)

@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-09 03:50:44 raskolnikov>
+ *  Time-stamp:  <2011-03-24 18:39:23 raskolnikov>
  *
  *  @file        dynamic_buffer.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -53,6 +53,9 @@
 
 namespace psynth
 {
+
+namespace mpl = boost::mpl;
+
 namespace sound
 {
 
@@ -66,8 +69,8 @@ template <typename T> struct get_range_type
 
 template <typename Buffers>
 struct buffers_get_ranges_type :
-	public boost::mpl::transform<Buffers,
-				     get_range_type<boost::mpl::_1> > {};
+	public mpl::transform<Buffers,
+                              mpl::quote1<get_range_type> > {};
 
 template <typename T>
 struct get_const_range_type
@@ -77,8 +80,8 @@ struct get_const_range_type
 
 template <typename Buffers>
 struct buffers_get_const_ranges_type :
-	public boost::mpl::transform<Buffers,
-				     get_const_range_type<boost::mpl::_1> > {};
+	public mpl::transform<Buffers,
+                              mpl::quote1<get_const_range_type> > {};
 
 struct recreate_buffer_fnobj
 {

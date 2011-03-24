@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-11 21:19:25 raskolnikov>
+ *  Time-stamp:  <2011-03-24 18:40:29 raskolnikov>
  *
  *  @file        dynamic_buffer_range.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -45,6 +45,9 @@
 
 namespace psynth
 {
+
+namespace mpl = boost::mpl;
+
 namespace sound
 {
 
@@ -59,7 +62,8 @@ struct get_const_type
 
 template <typename Ranges>
 struct ranges_get_const_type :
-	public boost::mpl::transform<Ranges, get_const_type<boost::mpl::_1> > {};
+	public mpl::transform<Ranges,
+                              mpl::quote1<get_const_type> > {};
 
 } /* namespace detail */
 
@@ -172,7 +176,7 @@ struct dynamic_step_type<dynamic_buffer_range<IVTypes> >
 {
     typedef dynamic_buffer_range<
 	typename boost::mpl::transform<
-	    IVTypes, dynamic_step_type<boost::mpl::_1> >::type> type;
+	    IVTypes, mpl::quote1<dynamic_step_type> >::type> type;
 };
 
 } /* namespace sound */

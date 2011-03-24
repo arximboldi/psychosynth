@@ -58,7 +58,7 @@ dnl ======================================================================
 dnl  BOOST
 dnl ----------------------------------------------------------------------
 
-AX_BOOST_BASE([1.44])
+AX_BOOST_BASE([1.42])
 AX_BOOST_FILESYSTEM
 AX_BOOST_SIGNALS
 AX_BOOST_UNIT_TEST_FRAMEWORK

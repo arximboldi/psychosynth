@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-12-27 21:33:08 raskolnikov>
+ *  Time-stamp:  <2011-03-24 18:37:13 raskolnikov>
  *
  *  @file        c3_class.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -148,7 +148,7 @@ struct all_superclasses
         typename concat<
             typename mpl::transform<
                 superclasses,
-                all_superclasses<mpl::_1> >::type,
+                mpl::quote1<all_superclasses> >::type,
             mpl::list<superclasses> >::type >::type type;
 };
 

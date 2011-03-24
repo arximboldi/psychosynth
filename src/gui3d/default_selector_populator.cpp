@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-21 20:08:17 raskolnikov>
+ *  Time-stamp:  <2011-03-24 18:44:09 raskolnikov>
  *
  *  @file        default_selector_populator.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -87,8 +87,8 @@ void default_selector_populator::populate_samples (selector_window::category* ca
     for (file_mgr_node::path_list::iterator it = files.begin();
 	 it != files.end (); ++it)
     {
-	creat.set_param ("file", it->leaf ().native ());
-	cat->add_button (it->leaf ().native (), creat);
+	creat.set_param ("file", it->leaf ());
+	cat->add_button (it->leaf (), creat);
     }
 }
 

@@ -95,7 +95,7 @@ void node_sampler::on_file_change (node_param& par)
     
     std::unique_lock<std::mutex> lock (m_update_mutex);
         
-    m_reader = io::new_file_input <interleaved_range> (path.native ());
+    m_reader = io::new_file_input <interleaved_range> (path.string ());
     m_fetcher.set_input (m_reader);
 
     if (m_reader) {

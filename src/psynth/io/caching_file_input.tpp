@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-23 19:24:06 raskolnikov>
+ *  Time-stamp:  <2011-03-24 02:36:44 raskolnikov>
  *
  *  @file        caching_file_reader.tpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>

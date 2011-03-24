@@ -9,7 +9,7 @@ src/psynth/base \
 src/psynth/sound \
 src/psynth/synth \
 src/psynth/io \
-src/psynth/node \
+src/psynth/graph \
 src/psynth/world \
 src/psynth/psynth \
 src/psynth/net \

@@ -89,7 +89,7 @@ void node_double_sampler::on_file_one_change (node_param& par)
     path = base::file_manager::self ().path("psychosynth.samples").find (val);
     
     std::unique_lock<mutex> (m_update_mutex);    
-    m_reader_one = io::new_file_input <interleaved_range> (path.native ());
+    m_reader_one = io::new_file_input <interleaved_range> (path.string ());
     m_fetcher_one.set_input (m_reader_one);
 
     if (m_reader_one) {
@@ -108,7 +108,7 @@ void node_double_sampler::on_file_two_change (node_param& par)
     path = base::file_manager::self ().path("psychosynth.samples").find (val);
 
     std::unique_lock<mutex> (m_update_mutex);    
-    m_reader_two = io::new_file_input <interleaved_range> (path.native ());
+    m_reader_two = io::new_file_input <interleaved_range> (path.string ());
     m_fetcher_two.set_input (m_reader_two);
 
     if (m_reader_two) {

@@ -62,7 +62,7 @@ void selector_window::category::button::set_position ()
     float x, y;
     int xindex, yindex, butsinrow;
     float maxw = m_window->getParentPixelWidth() - 5;
-	
+    
     butsinrow = int(maxw) / int(BUT_WIDTH + BUT_XGAP);
     if (butsinrow < 1)
 	butsinrow = 1;
