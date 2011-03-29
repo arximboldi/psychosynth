@@ -26,6 +26,7 @@
 #include <psynth/app/defaults_alsa.hpp>
 #include <psynth/app/output_director.hpp>
 #include <psynth/io/alsa_output.hpp>
+#include <psynth/io/buffered_output.hpp>
 
 namespace psynth
 {

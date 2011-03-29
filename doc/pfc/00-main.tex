@@ -6,9 +6,11 @@
 %% TODO: Add license.
 %%
 
-\documentclass{book}
-\usepackage[usenames]{color}
-\usepackage{thesis}
+\documentclass[11pt,a5paper,footinclude=true,headinclude=true]{scrbook}
+
+\usepackage[linedheaders]{classicthesis}
+%\usepackage{arsclassica}
+%\RequirePackage[usenames]{color}
 \usepackage{ucs}
 \usepackage[utf8x]{inputenc}
 \usepackage{amsmath}
@@ -17,7 +19,7 @@
 \usepackage{url}
 \usepackage{graphicx}
 \usepackage{alltt}
-\usepackage{fancyhdr}
+%\usepackage{fancyhdr}
 \usepackage{multirow}
 \usepackage{listings}
 \usepackage{algorithm}
@@ -26,17 +28,23 @@
 \usepackage{appendix}
 \usepackage{hyperref}
 \usepackage{framed}
+\usepackage{epigraph}
+\usepackage[disable]{todonotes}
 %\usepackage{theorem}
+%\usepackage[avantgarde]{quotchap}
 \usepackage[framed,thref,hyperref]{ntheorem}
 
 \hypersetup{ linkbordercolor= 1 0.7 0.7}
 
 % \theoremstyle{marginbreak}
-\theoremheaderfont{\normalfont\bfseries\sffamily}
+% \theoremheaderfont{\normalfont\bfseries\sffamily}
 % \theorembodyfont{\slshape}
 % \theoremsymbol{\ensuremath{\diamondsuit}}
 % \theoremseparator{:}
-\newframedtheorem{mynote}{Note}[chapter]
+{
+  \theoremstyle{break}
+  \newframedtheorem{mynote}{Note}[chapter]
+}
 
 % TODO: IS THIS OK?
 \setcounter{secnumdepth}{3}
@@ -50,7 +58,7 @@
 \definecolor{red}{rgb}{0.9,0.1,0.1}
 {
   \theorembodyfont{\color{red}}
-  \newtheorem{todo}{TO-DO note}
+  %\newtheorem{todo}{TO-DO note}
 }
 
 {
@@ -58,11 +66,10 @@
   \newtheorem{requirement}{Requirement}
 }
 
-
-\def\disabletodo {
-  \let\todo=\comment 
-  \let\endtodo=\endcomment 
-}
+% \def\disabletodo {
+%   \let\todo=\comment 
+%   \let\endtodo=\endcomment 
+% }
 
 \makeindex
 
@@ -134,6 +141,7 @@
 \tableofcontents
 \listoffigures
 \listoftables
+\listoftodos
 \mainmatter
 
 \setlength{\parskip}{5pt}
@@ -149,11 +157,10 @@
 \startappendix
 
 \chapter{Glossary}
-\begin{todo}[Juan Pedro]
-¿Añado un glosario recopilando las definiciones que doy de diferentes
-términos específicos del dominio del audio y para expandir y aclarar
-siglas y acŕonimos? ¿O mejor paso?
-\end{todo}
+
+\todo{¿Añado un glosario recopilando las definiciones que doy de diferentes
+  términos específicos del dominio del audio y para expandir y aclarar
+  siglas y acŕonimos? ¿O mejor paso? --- JP}
 
 \input{99-license}
 

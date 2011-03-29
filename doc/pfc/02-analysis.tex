@@ -1,14 +1,11 @@
 
-\begin{savequote}[10pc]
-  \sffamily As I see it, criticism is the prime \emph{duty} of the
+\chapter{Analysis and planning}
+
+\epigraph{As I see it, criticism is the prime \emph{duty} of the
   scientist and of anyone who wants to advance knowledge. Seeing new
   problems and having new ideas, on the other hand, are \emph{not}
-  one's duty: originality is, rather, a gift of the gods.
-  \qauthor{Karl Popper --- 1982 Preface to ``Quantum theory and
-    the schism in physics''}
-\end{savequote}
-
-\chapter{Analysis and planning}
+  one's duty: originality is, rather, a gift of the gods.}{Karl Popper
+  --- 1982 Preface to ``Quantum theory and the schism in physics''}
 
 \section{Requirement modelling}
 
@@ -80,15 +77,13 @@ software in a productive usage context.
   control ports are that the later are sampled at much less frequency.
 \end{requirement}
 
-\begin{todo}[Juan Pedro]
-De hecho, la naturaleza real de las señales de control aún no la tengo
+\todo{De hecho, la naturaleza real de las señales de control aún no la tengo
 clara al 100\%. Las señales de control son lo que en la versión actual
 de GNU/Psychosynth se llaman \emph{parámetros}. Sin embargo, el tema
 no es del todo trivial y tras ver como funciona Reaktor y pensar mucho
 en como reinventar el MVC del Psychosynth la situación está cada vez
 más confusa, pero supongo que la concreción se puede dejar para el
-rediseño de esta capa del software en la segunda iteración.
-\end{todo}
+rediseño de esta capa del software en la segunda iteración.}
 
 \begin{requirement}
   Both signal and control ports should be able to process information
@@ -334,13 +329,11 @@ The software should be able to use arbitrary precision samples. Up to
   permits it.
 \end{requirement}
 
-\begin{todo}
-  En realidad este requisito es un poco ambigüo, pero no se muy bien
+\todo{En realidad este requisito es un poco ambigüo, pero no se muy bien
   cómo especificar la posibilidad e usar tamaños de buffer bajos, ya
   que las condiciones en las que es medible esto dependen de la
   potencia del procesador y, en un sinte modular que permite redes
-  arbitrariamente complejas, del tamaño del sinte. ¿Alguna sugerencia?
-\end{todo}
+  arbitrariamente complejas, del tamaño del sinte. ¿Alguna sugerencia?}
 
 \section{Open, community oriented development}
 
@@ -488,10 +481,8 @@ compatibility to C and evolutionary design. Some of this flaws are
 nonetheless going to be solved in the next standardisation of the
 language, to be released in 2011 \cite{herb10iso}.
 
-\begin{todo}[Juan Pedro]
-Aquí estoy citando un blog --- ¿Es esto correcto o mejor lo pongo como
-nota al pie? 
-\end{todo}
+\todo{Aquí estoy citando un blog --- ¿Es esto correcto o mejor lo pongo como
+nota al pie? }
 
 Compilers are starting to support it and we are very interested in
 exploring the benefits and new programming patterns and design
@@ -822,9 +813,9 @@ this observable interface abstracting the synthesis engine as
 
 \begin{figure}[h!] \centering
 \includegraphics[width=.5\textwidth]{pic/mvc.png}
-\begin{todo}[Juan Pedro]
-Mejorar y traducir esta figura.
-\end{todo}
+
+\todo{Mejorar y traducir esta figura.}
+
 \caption[The MVC architectural style]{The Model View Controller
   arquitectural style. Dashed arrows represent indirect invocation
   ---i.e. via the \emph{observer} design pattern--- and normal lines
@@ -897,17 +888,14 @@ code.
 
 \subsection{Rationale --- A critique on software engineering}
 
-\begin{todo}[Juan Pedro]
-Lo se, soy un criticón enfermizo. He acabado convirtiendo esta sección
-en una crítica (indirecta y relativamente elegante, espero) a la
-concepción de la ingeniería del software que se da en la facultad y
-que se hace a menudo de los PFC.
-
-Si pensáis que esta crítica es demasiado larga o inapropiada puedo
-matizarla o eliminarla :D No obstante, en su defensa la considero
-apropiada ya que la elección de una metodología debe ser racional y
-como tanto debe incluir un análisis crítico de las alternativas.
-\end{todo}
+\todo{Lo se, soy un criticón enfermizo. He acabado convirtiendo esta
+  sección en una crítica (indirecta y relativamente elegante, espero)
+  a la concepción de la ingeniería del software que se da en la
+  facultad y que se hace a menudo de los PFC. Si pensáis que esta
+  crítica es demasiado larga o inapropiada puedo matizarla o
+  eliminarla :D No obstante, en su defensa la considero apropiada ya
+  que la elección de una metodología debe ser racional y como tanto
+  debe incluir un análisis crítico de las alternativas.}
 
 Choosing a well known software engineering process is considered one
 of the first steps to be taken in a final master thesis project. In
