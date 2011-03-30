@@ -574,8 +574,8 @@ Some example models include \texttt{stereo\_space} or
 define his own channel space follows.
 
 \begin{lstlisting}
-struct left_channel;
-struct right_channel;
+struct left_channel {};
+struct right_channel {};
 
 typedef mpl::vector<left_channel, right_channel> 
         stereo_space;
