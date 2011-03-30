@@ -29,10 +29,18 @@
 \usepackage{hyperref}
 \usepackage{framed}
 \usepackage{epigraph}
-\usepackage[disable]{todonotes}
+\usepackage{subfig}
+\usepackage[textwidth=2cm, textsize=small]{todonotes}
 %\usepackage{theorem}
 %\usepackage[avantgarde]{quotchap}
 \usepackage[framed,thref,hyperref]{ntheorem}
+
+\presetkeys{todonotes}{inline,color=green!40}{}
+
+\lstset{language=C++,
+  %frame=lines,
+  basicstyle=\small\sf,
+  morekeywords={concept, concept_map, decltype, nullptr, where}}
 
 \hypersetup{ linkbordercolor= 1 0.7 0.7}
 
@@ -141,6 +149,8 @@
 \tableofcontents
 \listoffigures
 \listoftables
+
+\newpage
 \listoftodos
 \mainmatter
 
