@@ -321,7 +321,7 @@ Adobe where he held a course ``Foundations of Programming'' based on
 his book. Thus, the \emph{modeling} of the library extensively uses
 concepts. Its implementation uses a limited form of concept checking
 via the Boost.ConceptCheck\footnote{
-  \url{http://www.boost.org/doc/libs/release/libs/concept_check/concept_check.htm}}
+  Boost.ConceptCheck: \url{http://www.boost.org/doc/libs/release/libs/concept_check/concept_check.htm}}
 \cite{siek00concept} library, however, enabling this library in
 release mode can affect performance and its syntax is quite more
 cumbersome than the concepts in the C++ standard proposal. For
@@ -523,10 +523,9 @@ struct fib_class {
    struct apply : public fib<N> {};
 };
 
-int maint ()
+int main ()
 {
-  return fib_class::apply<integral_c<int, 42>>
-           ::type::value;
+  return fib_class::apply<integral_c<int, 42>>::type::value;
 }
 \end{lstlisting}
 
@@ -566,8 +565,7 @@ A channel space is a sequence of whose elements channel tags (empty
 types giving a name )
 
 \begin{lstlisting}
-concept ChannelSpaceConcept<
-           MPLRandomAccessSequence Cs> 
+concept ChannelSpaceConcept<MPLRandomAccessSequence Cs> 
 {};
 \end{lstlisting}
 
@@ -579,8 +577,7 @@ define his own channel space follows.
 struct left_channel {};
 struct right_channel {};
 
-typedef mpl::vector<left_channel, right_channel> 
-        stereo_space;
+typedef mpl::vector<left_channel, right_channel> stereo_space;
 \end{lstlisting}
 
 A related trivial concept is
@@ -742,7 +739,6 @@ models the concept.
 \subsection{Unit testing}
 
 
-
 \subsection{Performance}
 
 \subsection{Integration}
@@ -758,13 +754,17 @@ compile and run properly again.
 
 The system was then \emph{peer reviewed} by project collaborators,
 mainly by the maintainer of the Ubuntu/Trinux packages Aleksander
-Morgado\footnote{\url{http://sigquit.wordpress.com}}. After minor
-bugfixing, we agreed to make a new Psychosynth 0.2.0 release that
-included the new code described in this chapter and some other fixes
-and modifications developed alongside. 
+Morgado\footnote{Aleksander Morgado's web blog:
+  \url{http://sigquit.wordpress.com}}. After minor bugfixing, we
+agreed to make a new Psychosynth 0.2.0 release that included the new
+code described in this chapter and some other fixes and modifications
+developed alongside.
 
-The official changelog briefing for this release includes:
+The official changelog briefing for this release is included in note
+\ref{note:changelog02}.
 
+\begin{mynote}[Changelog of Psychosynth 0.2.0]
+\label{note:changelog02}
 \begin{itemize}
 \item New audio processing and I/O subsystem based on template programming
 for generic yet efficient sound signals.
@@ -796,8 +796,185 @@ files too.
 \item For this same reason, Boost.Threads is no longer a dependency,
   we use STL threads instead.
 \end{itemize}
+\end{mynote}
 
-\section{Conclusions and future work}
+\section{Conclusions}
+
+In this iteration we developed a generic approach to representation
+and input and output of audio data. We do not have any records of
+any audio software using such paradigm in their code, so this
+development have been exploratory and has a lot of value in its
+novelty. This however delayed our development more than expected in
+our original plan.
+
+\subsection{Benefits and caveats}
+
+The three main advantages in the new code are:
+\begin{enumerate}
+\item Code can be mostly abstracted from the audio format
+  representation while retaining near optimal performance. Because
+  generality allowed decoupling orthogonal concepts, each audio
+  representation factor can be optimised and tuned for computational
+  accuracy on its own, leading to higher quality code with lower
+  maintenance cost as we avoid the combinatorial explosion that
+  happens otherwise.
+
+\item Algorithms correctly written with our generic facilities have a
+  performance equivalent to the hand-written code. When a certain
+  algorithm has not general interpretation or can not be efficiently
+  implemented generally, the library still allows for the algorithm to
+  be written with for a concrete or a constrained family of audio
+  formats.
+
+\item Because the signal format is encoded in the data type, we can
+  either statically check that the data is in the correct format
+  through our processing chain, or trivially enforce runtime checks
+  when the format is unknown at compile time (via
+  \texttt{dynamic\_buffer} and similar tools), leading to more secure
+  code.
+\end{enumerate}
+
+Also, because a lot of learning have happened since the old code base
+was written, the new code is better written and quite safer, making
+use of exceptions and scope guards \cite{alexandrescu00gener}.
+
+Even though we believe the benefits outweight the drawbacks, we have
+to acknowledge the caveats of our new approach, the most relevant
+being:
+
+\begin{enumerate}
+\item The new code uses advanced C++ programming techniques that many
+  programmers find hard to understand. Thus, it might be harder for
+  casual contributors to join the project in the future.
+
+\item In the absence of real language support for concepts, template
+  metaprograms leak their implementation in user code's compilation
+  errors. This is so because, actually, by expanding the type
+  instantiations in the compilation error, the compiler is actually
+  showing a full backtrace of the metaprogram. This leads to cryptic
+  error messages that often obfuscate the real source of the problem,
+  discouraging novel developers.
+
+\item Template metaprograms take longer to compile. However, proper
+  usage of the new \texttt{extern template} facility should avoid
+  redundantly instantiating templates in different translation units
+  only to be discarded by the linker mostly solving this issue. Also,
+  because the compiler generates different object code for each audio
+  format, thoughtless use of the library can lead to code bloat and
+  too large binary size.
+\end{enumerate}
+
+\subsection{Future work}
+
+While the current status of the library is quite satisfactory for our
+needs, there is still a lot of room for improvement that we will
+postpone since they fall outside this project's scope. Nonetheless it
+is worth enumerating them:
+
+\subsubsection{Virtual and adapted iterators and ranges}
+
+Boost.GIL included a ``locator adapter'' and ``virtual locator''
+notions that allowed creating or modifying images lazily via a
+function object. We discarded implementing them because they were
+coupled to their \texttt{locator} concept which is specific to the
+problem of image representation --- locators are in practice 2D
+iterators. Moreover, they used the indexed position in the image as
+the parameter to the function object that synthesised the
+image. However, because audio is processed in chunks, the position in
+the audio buffer is meaningless for the synthesis or filter function
+--- instead, some stateful function object which includes a notion of
+time position related to the frame rate is needed. Thus, many
+unexplored design decisions should be taken, and the interactions with
+other similar libraries like Boost.Iterator\footnote{The
+  Boost.Iterator Library:
+  \url{http://www.boost.org/doc/libs/release/libs/iterator}} and
+Boost.Range\footnote{The Boost.Range Library:
+  \url{http://www.boost.org/doc/libs/release/libs/range}} should be
+carefully evaluated.
+
+\subsubsection{Better arithmetic support}
+
+The library includes some basic arithmetic support for samples. There
+are few complications when developing full generic arithmetic support
+for samples and frames. As Lubomir Bourdev, lead developer of
+Boost.GIL, stated it in an email conversation with us:
+
+\begin{quotation}
+``Doing arithmetic operations is tricky for a number of reasons:
+
+\begin{itemize}
+\item What do you do on overflow? Clip, throw exception, allow out of
+  range values?
+
+\item What is the type to be used during conversion? Even if the
+  source and destination have the same type, the operation might need
+  to be done in another type and then cast back.
+
+\item Certain arithmetic operations have no meaningful interpretation
+  as far as color is concerned, such as multiplying one pixel by
+  another. 
+\end{itemize}
+
+Because of issues like these we have not tackled the problem of
+providing arithmetic operations, but we have provided generic
+operations that can be done per channel or per pair of channels which
+could be the basis for arithmetic operations.''
+\end{quotation}
+
+Nonetheless with time and effort the problem could be
+approached making some compromises. Some of the issues Lubomir states
+have different answers for sound processing, in fact, allowing out of
+range values is the best answer for the first question given the fact
+that sound amplitude is not naturally constrained and clipping is
+introduced only by the DAC hardware or when moving from floating to a
+fixed point representation. Maybe, not all those questions have to be
+answered in order to improve the arithmetic support.
+
+One of the main annoyances when writing a generic algorithm is using
+the per sample \texttt{static\_*} algorithms. Using them we could
+write a simple arithmetic layer for frames that would simplify the
+user code. However, even though we do not have experimental data, we
+believe this straightforward solution could introduce overhead. This
+is because every \texttt{static\_*} unrolls one statement per
+channel. Thus, a simple frame arithmetic expression would in fact
+result into many sequence points that is yet to be tested whether
+compilers can optimise properly.
+
+This is not a dead end. Using the \emph{expressions templates}
+\cite{veldhuizen95expression} technique and r-value references we can
+perform transformations with the aid of metaprogramming such that
+sequence points are not introduced by the arithmetic expression
+itself. A expression template framework like Boost.Proto\footnote{The
+  Boost Proto library:
+  \url{http://www.boost.org/doc/libs/release/libs/proto}}
+\cite{niebler07proto} could be of great help. Moreover, with careful
+studying of the audio DSL's studied in section \ref{sec:dsl} and the
+usage of these same techniques the scope of such effort could be
+broadened to build a full sound synthesis and processing EDSL for C++.
+
+\subsubsection{Submission to Boost}
+
+In our conversations with Lubomir Bourdev he suggested submitting our
+library for inclusion in the Boost package. However, there are few
+issues that we should tackle before that:
+
+\begin{enumerate}
+\item A lot of code is algorithmically identical to that of Boost.GIL
+  with changes only in terminology. A lot of work in properly
+  abstracting such common parts should be made to avoid code
+  repetition and doubled maintenance effort inside Boost.
+
+\item As we said earlier, interesting interactions can emerge with
+  the Boost.Iterator and Boost.Range libraries. We believe that any
+  possible issues and unneeded incompatibilities with those libraries
+  should be solved before submission into Boost.
+
+\item Boost is written in C++03 standard, while our code uses
+  C++0x. Moreover, our code has dependencies with other submodules in
+  \texttt{psynth::base}, specially the expection and logging
+  system. While these dependencies are not too strong, the effort made
+  to polish these corners is outside the scope of the current project.
+\end{enumerate}
 
 %%% Local Variables: 
 %%% mode: latex
