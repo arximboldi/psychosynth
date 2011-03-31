@@ -1,11 +1,13 @@
 /**
- *  Time-stamp:  <2011-03-08 19:49:08 raskolnikov>
+ *  Time-stamp:  <2011-03-31 14:01:43 raskolnikov>
  *
  *  @file        buffer.cpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
  *  @date        Thu Nov  4 12:54:33 2010
  *
  *  Unit tests for the buffers.
+ *
+ *  @todo Split buffer_test class into several tests.
  */
 
 /*

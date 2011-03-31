@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-08 23:50:42 raskolnikov>
+ *  Time-stamp:  <2011-03-31 12:55:13 raskolnikov>
  *
  *  @file        concept.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -202,11 +202,11 @@ struct SampleMappingConcept
 */
 
 /**         
-   For example, in the RGB channel space, using 8-bit unsigned samples,
-   the channel red is defined as [255 0 0], which means maximum of Red, and
-   no Green and Blue.
+   For example, in the stereo channel space, using 8-bit unsigned
+   samples, the "left channel" is defined as [255 0 ], which means
+   maximum of left, and no right.
     
-   Built-in scalar types, such as \p int and \p float, are valid GIL
+   Built-in scalar types, such as \p int and \p float, are valid Psynth
    samples. In more complex scenarios, samples may be represented as
    bit ranges or even individual bits.  In such cases special classes are
    needed to represent the value and reference to a sample.
@@ -229,7 +229,8 @@ concept SampleConcept<typename T> : EqualityComparable<T> {
     static const bool is_mutable;
     // use sample_traits<T>::is_mutable to access it
 
-    static T min_value(); // use sample_traits<T>::min_value to access it
+    static T min_value(); // use sample_traits<T>::min_value to accessit
+    static T zero_value(); // use sample_traits<T>::zero_value to access it
     static T max_value(); // use sample_traits<T>::min_value to access it
 };
 \endcode
@@ -324,7 +325,7 @@ Example:
 BOOST_STATIC_ASSERT((samples_are_compatible<bits8, const bits8&>::value));
 \endcode
 */
-template <typename T1, typename T2>  // Models GIL Frame
+template <typename T1, typename T2>  // Models Psynth Frame
 struct samples_are_compatible 
     : public boost::is_same<typename sample_traits<T1>::value_type,
 			    typename sample_traits<T2>::value_type> {};
@@ -406,22 +407,22 @@ struct SampleConvertibleConcept
     two ways to index the elements of a channel base: A physical index
     corresponds to the way they are ordered in memory, and a semantic
     index corresponds to the way the elements are ordered in their
-    channel space.  For example, in the RGB channel space the elements are
-    ordered as {red_t, green_t, blue_t}. For a channel base with a BGR
-    layout, the first element in physical ordering is the blue
-    element, whereas the first semantic element is the red one.
-    Models of \p ChannelBaseConcept are required to provide the \p
-    at_c<K>(ChannelBase) function, which allows for accessing the
-    elements based on their physical order. GIL provides a \p
-    semantic_at_c<K>(ChannelBase) function (described later) which can
-    operate on any model of ChannelBaseConcept and returns the
-    corresponding semantic element.
+    channel space.  For example, in the stereo channel space the
+    elements are ordered as {left_channel, right_channel}. For a
+    channel base with a RL-stereo layout, the first element in
+    physical ordering is the right element, whereas the first semantic
+    element is the red one.  Models of \p ChannelBaseConcept are
+    required to provide the \p at_c<K>(ChannelBase) function, which
+    allows for accessing the elements based on their physical
+    order. Psynth provides a \p semantic_at_c<K>(ChannelBase) function
+    (described later) which can operate on any model of
+    ChannelBaseConcept and returns the corresponding semantic element.
 
 \code
 concept ChannelBaseConcept<typename T> :
       CopyConstructible<T>, EqualityComparable<T>
 {
-    // a GIL layout (the channel space and element permutation)
+    // a Psynth layout (the channel space and element permutation)
     typename layout_t;     
         
     // The type of K-th element
@@ -668,7 +669,7 @@ struct ChannelBasesCompatibleConcept
  */
 
 /**
-   \brief Concept for all frame-based GIL constructs, such as frames,
+   \brief Concept for all frame-based Psynth constructs, such as frames,
    iterators, locators, ranges and buffers whose value type is a frame
    
    \ingroup FrameBasedConcept
@@ -709,7 +710,7 @@ struct FrameBasedConcept
 };
 
 /**
-   \brief Concept for homogeneous frame-based GIL constructs
+   \brief Concept for homogeneous frame-based Psynth constructs
    \ingroup FrameBasedConcept
 */
 /**
@@ -924,7 +925,7 @@ namespace detail
    
    \ingroup FrameAlgorithm
 */
-template <typename P1, typename P2>  // Models GIL Frame
+template <typename P1, typename P2>  // Models Psynth Frame
 struct frames_are_compatible 
     : public boost::mpl::and_<typename channel_spaces_are_compatible<
 				  typename channel_space_type<P1>::type, 
@@ -1101,7 +1102,7 @@ struct HasDynamicStepTypeConcept
    FrameConcept.
 */
 /**
-   GIL's iterators must also provide the following metafunctions:
+   Psynth's iterators must also provide the following metafunctions:
  - \p const_iterator_type<Iterator>:
    Returns a read-only equivalent of \p Iterator
  - \p iterator_is_mutable<Iterator>:
@@ -1322,7 +1323,7 @@ struct MutableStepIteratorConcept
    forward iterator.
 */
 /**
-   In addition to GIL iterator requirements, GIL iterator adaptors
+   In addition to Psynth iterator requirements, Psynth iterator adaptors
    must provide the following metafunctions:
  - \p is_iterator_adaptor<Iterator>:             Returns \p boost::mpl::true_
  - \p iterator_adaptor_get_base<Iterator>:       Returns the base iterator type
@@ -1521,7 +1522,7 @@ struct RandomAccessBufferRangeConcept
 
 /**
    \ingroup FrameBufferRangeConcept
-   \brief GIL's 2-dimensional range over immutable GIL frames
+   \brief Psynth's 2-dimensional range over immutable Psynth frames
 */
 /**
 \code
@@ -1607,7 +1608,7 @@ struct MutableRandomAccessBufferRangeConcept
 
 /**
    \ingroup FrameBufferRangeConcept
-   \brief GIL's 2-dimensional range over mutable GIL frames
+   \brief Psynth's 2-dimensional range over mutable Psynth frames
 */
 /**
    \code

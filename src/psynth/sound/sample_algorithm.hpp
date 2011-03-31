@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-05 12:04:25 raskolnikov>
+ *  Time-stamp:  <2011-03-31 14:41:43 raskolnikov>
  *
  *  @file        sample_algorithm.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -480,6 +480,13 @@ template <> struct sample_convert_to_unsigned<bits32s> :
     { return static_cast<bits32>(x + (1 << 31)); }
 };
 
+template <> struct sample_convert_to_unsigned<bits32sf> :
+	public std::unary_function<bits32sf, bits32f>
+{
+    typedef bits32f type;
+    type operator () (bits32sf x) const
+    { return static_cast<float>((x + 1.0f) * .5f); }
+};
 
 /*
   Converting from unsigned to signed integral sample
@@ -497,7 +504,8 @@ struct sample_convert_from_unsigned<bits8s> :
     public std::unary_function<bits8, bits8s>
 { 
     typedef bits8s type;
-    type  operator () (bits8  val) const { return val-128; } 
+    type  operator () (bits8  val) const
+    { return val-128; } 
 };
 
 template <>
@@ -505,7 +513,8 @@ struct sample_convert_from_unsigned<bits16s> :
     public std::unary_function<bits16,bits16s>
 { 
     typedef bits16s type;
-    type operator () (bits16 val) const { return val-32768; } 
+    type operator () (bits16 val) const
+    { return val-32768; } 
 };
 
 template <>
@@ -513,7 +522,18 @@ struct sample_convert_from_unsigned<bits32s> :
     public std::unary_function<bits32, bits32s>
 {
     typedef bits32s type;
-    type operator () (bits32 x) const { return static_cast<bits32s>(x-(1<<31)); }
+    type operator () (bits32 x) const
+    { return static_cast<bits32s>(x-(1<<31)); }
+};
+
+template <>
+struct sample_convert_from_unsigned<bits32f> :
+    public std::unary_function<bits32f, bits32sf>
+{
+    typedef bits32sf type;
+    type operator () (bits32f x) const {
+        return static_cast<float>(x * 2.0f - 1.0f);
+    }
 };
 
 }  /* namespace detail */
@@ -543,7 +563,7 @@ struct sample_converter : public std::unary_function<SrcSampleV, DstSampleV>
 template <typename DstSample, typename SrcSample>
 // Model SampleConcept (could be sample references)
 inline typename sample_traits<DstSample>::value_type
-sample_convert(const SrcSample& src)
+sample_convert (const SrcSample& src)
 { 
     return sample_converter<
 	typename sample_traits<SrcSample>::value_type,
@@ -603,8 +623,8 @@ inline uint32_t div32768 (uint32_t in)
 */
 
 /** @{
-\brief This is the default implementation. Performance specializatons
-are provided
+    \brief This is the default implementation. Performance specializatons
+    are provided.
 */
 
 template <typename SampleValue>
@@ -672,6 +692,23 @@ struct sample_multiplier :
         return from_unsigned () (multiplier_unsigned () (
 				     to_unsigned () (a), to_unsigned () (b))); 
     }
+};
+
+/** @todo Is this needed? */
+template <>
+struct sample_multiplier<bits32sf> :
+    public std::binary_function<bits32sf, bits32sf, bits32sf>
+{
+    bits32sf operator () (bits32sf a, bits32sf b) const
+    { return a * b; }
+};
+
+template <>
+struct sample_multiplier<bits32f> :
+    public std::binary_function<bits32f, bits32f, bits32f>
+{
+    bits32f operator () (bits32f a, bits32f b) const
+    { return a * b; }
 };
 
 /**

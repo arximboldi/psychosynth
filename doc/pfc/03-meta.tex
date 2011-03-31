@@ -11,6 +11,8 @@
   minus $x$ is thirtyfive thousand.  Fall quite flat. It’s on account of
   the sounds it is.}{\emph{Ulysses}\\\textsc{James Joyce}}
 
+\todo{Este capítulo en general necesita más dibujos.}
+
 \section{Analysis}
 
 Requirements \ref{req:iter1-begin} to \ref{req:iter1-end} and
@@ -581,9 +583,221 @@ typedef mpl::vector<left_channel, right_channel>
         stereo_space;
 \end{lstlisting}
 
+A related trivial concept is
+\texttt{ChannelSpaceCompatibleConcept}. Two channel spaces are
+compatible if they are the same. In fact, this leaks the underlying
+MPL sequence type used in the channel space through the abstraction,
+because spaces with the same set of semantic channels might be found
+incompatible, but it suffices in practise.
+
+\subsubsection{\texttt{SampleConcept}}
+
+A \emph{sample} is the type we use to represent the amplitude of a
+channel at certain point in time.
+
+\begin{lstlisting}
+concept SampleConcept<typename T> :
+             EqualityComparable<T> {
+    typename value_type      = T;
+    // use sample_traits<T>::value_type to access it
+    typename reference       = T&;
+    // use sample_traits<T>::reference to access it
+    typename pointer         = T*;
+    // use sample_traits<T>::pointer to access it
+    typename const_reference = const T&;
+    // use sample_traits<T>::const_reference to access it
+    typename const_pointer   = const T*;
+    // use sample_traits<T>::const_pointer to access it
+    static const bool is_mutable;
+    // use sample_traits<T>::is_mutable to access it
+
+    static T min_value(); 
+    // use sample_traits<T>::min_value to access it
+    static T zero_value(); 
+    // use sample_traits<T>::zero_value to access it
+    static T max_value(); 
+    // use sample_traits<T>::min_value to access it
+};
+\end{lstlisting}
+
+Built-in scalar types like \texttt{char}, \texttt{int} or
+\texttt{float} model \texttt{SampleConcept} by default. 
+
+The \texttt{scoped\_sample\_value<Type, Min, Max, Zero>} template
+class models the concept whenever \texttt{Type} is a scalar type and
+\texttt{Min}, \texttt{Zero} and \texttt{Max} satisfy:
+\begin{equation}
+Min < Zero < Max \land \forall x \in Type, x + Zero = x
+\end{equation}
+Note that, in order to avoid the limitation of floating point values
+not being usable as template arguments, \texttt{Min}, \texttt{Zero}
+and \texttt{Max} should be a type with a static method
+\texttt{apply()} that returns the actual value. It should be used to
+constraint the ``clipping thresholds'' of floating point types. For
+example, the \texttt{bits32sf} model defined as:
+
+\begin{lstlisting}
+  scoped_sample<float,
+                float_minus_one,
+                float_zero,
+                float_one>;
+\end{lstlisting}
+
+User defined types should specialise \texttt{sample\_traits} to map
+the concept.
+
+Related trivial concepts are \texttt{MutableSampleConcept} and
+\texttt{SampleValueConcept} (a sample that is also \texttt{Regular}).
+
+\subsubsection{\texttt{SampleConvertibleConcept}}
+
+Because casting does not suffice in most cases, one should
+override a \texttt{T sample\_convert (U)} function for \texttt{U} to
+be convertible into \texttt{T}.
+
+\begin{lstlisting}
+concept SampleConvertibleConcept<SampleConcept SrcSample,
+     SampleValueConcept DstSample> {
+    DstSample sample_convert (const SrcSample&);
+};
+\end{lstlisting}
+
+The library provides overrides for \texttt{sample\_convert} making
+most supplied sample types being convertible too.
+
+\subsubsection{\texttt{ChannelBaseConcept}}
+
+A \emph{channel base} is a container of channel elements (such as
+samples, sample references or sample pointers).
+
+The most common use of channel base is in the implementation of a
+frame, in which case the channel elements are sample values. The
+channel base concept, however, can be used in other scenarios. For
+example, a planar frame has samples that are not contiguous in
+memory. Its reference is a proxy class that uses a channel base whose
+elements are sample references. Its iterator uses a channel base whose
+elements are sample iterators.
+
+\begin{lstlisting}
+concept ChannelBaseConcept<typename T> :
+      CopyConstructible<T>, EqualityComparable<T>
+{
+    // a Psynth layout (the channel space and element permutation)
+    typename layout;     
+        
+    // The type of K-th element
+    template <int K> struct kth_element_type;
+    where Metafunction<kth_element_type>;
+    
+    // The result of at_c
+    template <int K> 
+    struct kth_element_const_reference_type;
+    where Metafunction<
+            kth_element_const_reference_type>;        
+    
+    template <int K> 
+    kth_element_const_reference_type<T,K>::type at_c(T);
+
+    // Copy-constructible and equality comparable 
+    // with other compatible channel bases
+    template <ChannelBaseConcept T2> 
+        where { ChannelBasesCompatibleConcept<T,T2> } 
+        T::T(T2);
+    template <ChannelBaseConcept T2> 
+        where { ChannelBasesCompatibleConcept<T,T2> } 
+        bool operator==(const T&, const T2&);
+    template <ChannelBaseConcept T2> 
+        where { ChannelBasesCompatibleConcept<T,T2> } 
+        bool operator!=(const T&, const T2&);
+};
+\end{lstlisting}
+
+A channel base must have an associated layout (which consists of a
+channel space, as well as an ordering of the samples).  There are two
+ways to index the elements of a channel base: A physical index
+corresponds to the way they are ordered in memory, and a semantic
+index corresponds to the way the elements are ordered in their channel
+space.  For example, in the stereo channel space the elements are
+ordered as \texttt{\{left\_channel, right\_channel\}}. For a channel
+base with a RL-stereo layout, the first element in physical ordering
+is the right element, whereas the first semantic element is the red
+one.  Models of \texttt{ChannelBaseConcept} are required to provide
+the \texttt{at\_c<K>(ChannelBase)} function, which allows for
+accessing the elements based on their physical order. Psynth provides
+a \texttt{semantic\_at\_c<K>(ChannelBase)} function (described
+later) which can operate on any model of \texttt{ChannelBaseConcept}
+and returns the corresponding semantic element.
+
+The library provides an \texttt{homogeneous\_channel\_base} class that
+models the concept.
+
+\subsubsection{\texttt{...Concept}}
+
+\subsection{Going dynamic}
+\subsection{Input and Output module}
+\subsection{Synthesis module}
 
 \section{Validation}
 
+\subsection{Unit testing}
+
+
+
+\subsection{Performance}
+
+\subsection{Integration}
+
+The module was first developed separately from the main development
+branch in a branch called \texttt{gil-import}. Once the previous tests
+were passed, the former signal representation classes and I/O code was
+removed from the code base. The upper layers --- mainly the
+\texttt{graph} layer --- was adapted to use the new library. Note
+that, given that we will mostly rewrite the \texttt{graph} layer in
+the next iteration we tried to make minimal changes to get the project
+compile and run properly again.
+
+The system was then \emph{peer reviewed} by project collaborators,
+mainly by the maintainer of the Ubuntu/Trinux packages Aleksander
+Morgado\footnote{\url{http://sigquit.wordpress.com}}. After minor
+bugfixing, we agreed to make a new Psychosynth 0.2.0 release that
+included the new code described in this chapter and some other fixes
+and modifications developed alongside. 
+
+The official changelog briefing for this release includes:
+
+\begin{itemize}
+\item New audio processing and I/O subsystem based on template programming
+for generic yet efficient sound signals.
+
+\item The extreme latency when using ALSA bug seems to be fixed in
+  some cases.
+
+\item No longer depend on libvorbis, libsndfile can now handle ogg and flac
+files too.
+
+\item No longer depend on \texttt{libsigc++}, using \texttt{boost::signals}
+  which, which is a bit slower but neglibe and this simplifies the
+  dependencies.
+
+\item The mouse wheel now scrolls in the object selector.
+
+\item The object selector no longer lets mouse clicks pass through.  
+
+\item Backwards reproducing a sample works a bit better now too.
+
+\item Some new niceties in the framework base layer, including some
+  experiments on applying the C3 class linearisation algorithm in raw
+  C++.
+
+\item C++0x features are being used in the code. For GCC, this means
+  version 4.5 shall be used. We doubt it will compile with any other
+  compiler (maybe latest VS), but users are welcomed to try and report.
+
+\item For this same reason, Boost.Threads is no longer a dependency,
+  we use STL threads instead.
+\end{itemize}
+
+\section{Conclusions and future work}
 
 %%% Local Variables: 
 %%% mode: latex

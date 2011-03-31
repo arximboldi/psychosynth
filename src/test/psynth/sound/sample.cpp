@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-06 02:45:44 raskolnikov>
+ *  Time-stamp:  <2011-03-31 13:57:26 raskolnikov>
  *
  *  @file        sample.cpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -38,6 +38,7 @@
 
 #include <exception>
 #include <boost/test/unit_test.hpp>
+#include <boost/mpl/vector.hpp>
 
 #include <psynth/base/compat.hpp>
 #include <psynth/sound/sample_algorithm.hpp>
@@ -45,6 +46,7 @@
 
 using namespace psynth::sound;
 using namespace std;
+namespace mpl = boost::mpl;
 
 bits8   c8_min   =  sample_traits<bits8  >::min_value();
 bits8   c8_max   =  sample_traits<bits8  >::max_value();
@@ -289,50 +291,50 @@ protected:
 };
 
 template <typename SampleValue>
-void test_sample_value()
+void do_test_sample_value()
 { 
     do_test<value_core<SampleValue> >().test_all();
 }
 
 template <typename SampleRef>
-void test_sample_reference()
+void do_test_sample_reference()
 { 
     do_test<reference_core<SampleRef> >().test_all();
 }
 
 template <typename SampleSubbyteRef>
-void test_packed_sample_reference()
+void do_test_packed_sample_reference()
 {
     do_test<packed_reference_core<
 	SampleSubbyteRef,SampleSubbyteRef> >().test_all();
 }
 
 template <typename SampleSubbyteRef, typename MutableRef>
-void test_const_packed_sample_reference ()
+void do_test_const_packed_sample_reference ()
 {
     do_test<packed_reference_core<SampleSubbyteRef,MutableRef> >().test_all();
 }
 
 template <typename SampleSubbyteRef>
-void test_packed_dynamic_sample_reference()
+void do_test_packed_dynamic_sample_reference()
 {
     do_test<packed_dynamic_reference_core<
 	SampleSubbyteRef,SampleSubbyteRef> >().test_all();
 }
 
 template <typename SampleSubbyteRef, typename MutableRef>
-void test_const_packed_dynamic_sample_reference()
+void do_test_const_packed_dynamic_sample_reference()
 {
     do_test<packed_dynamic_reference_core<
 	SampleSubbyteRef,MutableRef> >().test_all();
 }
 
 template <typename SampleValue>
-void test_sample_value_impl ()
+void do_test_sample_value_impl ()
 {
-    test_sample_value<SampleValue>();
-    test_sample_reference<SampleValue&>();
-    test_sample_reference<const SampleValue&>();
+    do_test_sample_value<SampleValue>();
+    do_test_sample_reference<SampleValue&>();
+    do_test_sample_reference<const SampleValue&>();
 }
 
 
@@ -405,7 +407,17 @@ sample_value_archetype sample_archetype::max_value ()
 sample_value_archetype sample_archetype::zero_value ()
 { return sample_value_archetype(); }
 
-BOOST_AUTO_TEST_CASE (test_packed_sample_reference_0)
+
+typedef mpl::vector<
+    packed_sample_reference<boost::uint16_t, 0,  5, true>,
+    packed_sample_reference<boost::uint16_t, 5,  6, true>,
+    packed_sample_reference<boost::uint16_t, 11, 5, true>
+    >
+packed_sample_types;
+    
+BOOST_AUTO_TEST_CASE_TEMPLATE (test_packed_sample_reference,
+                               PackedSampleRef,
+                               packed_sample_types)
 {
     typedef packed_sample_reference<boost::uint16_t, 0,5,true>
 	sample16_0_5_reference_t;
@@ -424,12 +436,18 @@ BOOST_AUTO_TEST_CASE (test_packed_sample_reference_0)
     sample3=sample_traits<sample16_11_5_reference_t>::max_value();
     BOOST_CHECK_EQUAL (data, 65535);
 
-    test_packed_sample_reference<sample16_0_5_reference_t>();
-    test_packed_sample_reference<sample16_5_6_reference_t>();
-    test_packed_sample_reference<sample16_11_5_reference_t>();
+    do_test_packed_sample_reference<PackedSampleRef>();
 }
 
-BOOST_AUTO_TEST_CASE (test_packed_dynamic_sample_reference_0)
+typedef mpl::vector<
+    packed_dynamic_sample_reference<boost::uint16_t,5,true>,
+    packed_dynamic_sample_reference<boost::uint16_t,6,true>
+    >
+packed_dynamic_sample_types;
+
+BOOST_AUTO_TEST_CASE_TEMPLATE (test_packed_dynamic_sample_reference,
+                               PackedSampleRef,
+                               packed_dynamic_sample_types)
 {
     typedef packed_dynamic_sample_reference<boost::uint16_t,5,true>
 	sample16_5_reference_t;
@@ -446,20 +464,28 @@ BOOST_AUTO_TEST_CASE (test_packed_dynamic_sample_reference_0)
     sample3=sample_traits<sample16_5_reference_t>::max_value();
     BOOST_CHECK_EQUAL (data, 65535);
 
-    test_packed_dynamic_sample_reference<sample16_5_reference_t>();
+    do_test_packed_dynamic_sample_reference<PackedSampleRef>();
 }
 
-BOOST_AUTO_TEST_CASE (test_sample)
+typedef mpl::vector<
+    bits8,
+    bits8s,
+    bits16,
+    bits16s,
+    bits32,
+    bits32s,
+    bits32f,
+    bits32sf
+    >
+sample_types;
+
+BOOST_AUTO_TEST_CASE_TEMPLATE (test_sample, Sample, sample_types)
 {
-    test_sample_value_impl<bits8>();
-    test_sample_value_impl<bits8s>();
-    test_sample_value_impl<bits16>();
-    test_sample_value_impl<bits16s>();
-    test_sample_value_impl<bits32>();
-    test_sample_value_impl<bits32s>();
+    do_test_sample_value_impl<Sample>();
+}
 
-    test_sample_value_impl<bits32f>();
-
+BOOST_AUTO_TEST_CASE (test_sample_archetype)
+{
     // Do only compile-time tests for the archetype (because asserts
     // like val1<val2 fail)
     boost::function_requires<MutableSampleConcept<sample_archetype> >();
