@@ -749,11 +749,18 @@ i.e. code paths of the metaprogram --- compile without errors and lead
 to correct execution.
 
 \todo{Recordar actualizar esto si más adelante se añaden pruebas por
-  lo que sea}
-The modules described in this chapter are evaluated with a total 223
-unit tests. All of them pass with a total of 1478 successful
-assertions. Note \ref{note:gistests} includes a more detailed summary of the
-test cases involving these modules.
+  lo que sea} The modules described in this chapter are evaluated with
+a total 223 unit tests. All of them pass with a total of 1478
+successful assertions. Note \ref{note:gistests} includes a more
+detailed summary of the test cases involving these modules. Not all of
+those unit tests have been written manually. Using
+\type{BOOST\_UNIT\_TEST\_TEMPLATE} once can define a parametrised over
+a type and that is later instantiated for every type in a given MPL
+sequence. For example, we can compute the product of a MPL sequence of
+buffer types with a metafunction and pass the result to the templated
+unit test that checks proper conversion among buffer types,
+simplifying a lot the amount of testing code --- avoiding
+combinatorial explosion of code to test all instantiation paths.
 
 \begin{mynote}[\texttt{psynth::sound} and \texttt{psynth::io} unit
   tests]
@@ -898,7 +905,7 @@ generality. We did informal tests confirming our hypotheses that can
 be repeated by the reader. Also, there are some similar object code
 comparisons in the Boost.GIL video tutorial\footnote{Boost.GIL
   presentation:
-  \http{http://stlab.adobe.com/gil/presentation/index.htm}} that the
+  \url{http://stlab.adobe.com/gil/presentation/index.htm}} that the
 interested reader can check --- given the similarities in GIL and
 \texttt{psynth::sound} we can expect equivalent results.
 
