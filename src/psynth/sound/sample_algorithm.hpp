@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-31 14:41:43 raskolnikov>
+ *  Time-stamp:  <2011-03-31 20:05:59 raskolnikov>
  *
  *  @file        sample_algorithm.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -527,7 +527,7 @@ struct sample_convert_from_unsigned<bits32s> :
 };
 
 template <>
-struct sample_convert_from_unsigned<bits32f> :
+struct sample_convert_from_unsigned<bits32sf> :
     public std::unary_function<bits32f, bits32sf>
 {
     typedef bits32sf type;
@@ -536,6 +536,34 @@ struct sample_convert_from_unsigned<bits32f> :
     }
 };
 
+template <typename SrcSampleV, typename DstSampleV, bool DstIsUnsigned>
+struct sample_converter_impl
+{  
+    PSYNTH_FORCEINLINE
+    DstSampleV operator () (const SrcSampleV& src) const
+    {
+       typedef detail::sample_convert_to_unsigned<SrcSampleV> to_unsigned;	
+       typedef sample_converter_unsigned<typename to_unsigned::result_type,
+                                         DstSampleV> converter_unsigned;
+       return converter_unsigned () (to_unsigned () (src));
+    }
+};
+
+template <typename SrcSampleV, typename DstSampleV>
+struct sample_converter_impl<SrcSampleV, DstSampleV, false>
+{
+    PSYNTH_FORCEINLINE
+    DstSampleV operator () (const SrcSampleV& src) const
+    {	
+        typedef detail::sample_convert_to_unsigned<SrcSampleV> to_unsigned;	
+        typedef detail::sample_convert_from_unsigned<DstSampleV> from_unsigned;
+        typedef sample_converter_unsigned<typename to_unsigned::result_type,
+                                          typename from_unsigned::argument_type>
+	    converter_unsigned;
+        return from_unsigned () (converter_unsigned () (to_unsigned () (src))); 
+    }
+};
+    
 }  /* namespace detail */
 
 /**
@@ -545,16 +573,19 @@ struct sample_convert_from_unsigned<bits32f> :
 template <typename SrcSampleV, typename DstSampleV> // Model SampleValueConcept
 struct sample_converter : public std::unary_function<SrcSampleV, DstSampleV>
 {
+    typedef detail::sample_convert_from_unsigned<DstSampleV> from_unsigned;
+    typedef detail::sample_converter_impl<
+        SrcSampleV, DstSampleV,
+        std::is_same<typename from_unsigned::argument_type,
+                     DstSampleV>::value> converter_impl;
+    
+    PSYNTH_FORCEINLINE
     DstSampleV operator () (const SrcSampleV& src) const
     {
-        typedef detail::sample_convert_to_unsigned<SrcSampleV> to_unsigned;
-        typedef detail::sample_convert_from_unsigned<DstSampleV> from_unsigned;
-        typedef sample_converter_unsigned<typename to_unsigned::result_type,
-					  typename from_unsigned::argument_type>
-	    converter_unsigned;
-        return from_unsigned () (converter_unsigned () (to_unsigned () (src))); 
+        return converter_impl () (src);
     }
 };
+
 
 /**
    \ingroup SampleConvertAlgorithm
@@ -695,14 +726,6 @@ struct sample_multiplier :
 };
 
 /** @todo Is this needed? */
-template <>
-struct sample_multiplier<bits32sf> :
-    public std::binary_function<bits32sf, bits32sf, bits32sf>
-{
-    bits32sf operator () (bits32sf a, bits32sf b) const
-    { return a * b; }
-};
-
 template <>
 struct sample_multiplier<bits32f> :
     public std::binary_function<bits32f, bits32f, bits32f>

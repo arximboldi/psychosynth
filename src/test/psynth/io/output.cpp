@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-17 19:30:34 raskolnikov>
+ *  Time-stamp:  <2011-03-31 20:11:38 raskolnikov>
  *
  *  @file        output.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -334,7 +334,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE (jack_output_test, Range, jack_test_types)
             { async_nframes = device.put (range (buf)); });
         
         device.start ();
-        for (std::size_t i = 100; async_nframes == 0 && i > 0; --i)
+        for (std::size_t i = 1000; async_nframes == 0 && i > 0; --i)
             // HACK because g++-4.5 does not have this_thread::sleep
             ::usleep (10);
         device.stop ();

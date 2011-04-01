@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-31 13:57:26 raskolnikov>
+ *  Time-stamp:  <2011-03-31 20:06:34 raskolnikov>
  *
  *  @file        sample.cpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -48,20 +48,22 @@ using namespace psynth::sound;
 using namespace std;
 namespace mpl = boost::mpl;
 
-bits8   c8_min   =  sample_traits<bits8  >::min_value();
-bits8   c8_max   =  sample_traits<bits8  >::max_value();
-bits8s  c8s_min  =  sample_traits<bits8s >::min_value();
-bits8s  c8s_max  =  sample_traits<bits8s >::max_value();
-bits16  c16_min  =  sample_traits<bits16 >::min_value();
-bits16  c16_max  =  sample_traits<bits16 >::max_value();
-bits16s c16s_min =  sample_traits<bits16s>::min_value();
-bits16s c16s_max =  sample_traits<bits16s>::max_value();
-bits32  c32_min  =  sample_traits<bits32 >::min_value();
-bits32  c32_max  =  sample_traits<bits32 >::max_value();
-bits32s c32s_min =  sample_traits<bits32s>::min_value();
-bits32s c32s_max =  sample_traits<bits32s>::max_value();
-bits32f c32f_min =  sample_traits<bits32f>::min_value();
-bits32f c32f_max =  sample_traits<bits32f>::max_value();
+bits8    c8_min    =  sample_traits<bits8   >::min_value();
+bits8    c8_max    =  sample_traits<bits8   >::max_value();
+bits8s   c8s_min   =  sample_traits<bits8s  >::min_value();
+bits8s   c8s_max   =  sample_traits<bits8s  >::max_value();
+bits16   c16_min   =  sample_traits<bits16  >::min_value();
+bits16   c16_max   =  sample_traits<bits16  >::max_value();
+bits16s  c16s_min  =  sample_traits<bits16s >::min_value();
+bits16s  c16s_max  =  sample_traits<bits16s >::max_value();
+bits32   c32_min   =  sample_traits<bits32  >::min_value();
+bits32   c32_max   =  sample_traits<bits32  >::max_value();
+bits32s  c32s_min  =  sample_traits<bits32s >::min_value();
+bits32s  c32s_max  =  sample_traits<bits32s >::max_value();
+bits32f  c32f_min  =  sample_traits<bits32f >::min_value();
+bits32f  c32f_max  =  sample_traits<bits32f >::max_value();
+bits32sf c32sf_min =  sample_traits<bits32sf>::min_value();
+bits32sf c32sf_max =  sample_traits<bits32sf>::max_value();
 
 BOOST_AUTO_TEST_SUITE (sound_sample_test_suite);
 
@@ -195,6 +197,11 @@ struct do_test : public SampleTestCore
 
         v_min = sample_convert<sample_t>(c32f_min);
         v_max = sample_convert<sample_t>(c32f_max);
+        BOOST_CHECK_EQUAL (v_min, this->_min_v);
+	BOOST_CHECK_EQUAL (v_max, this->_max_v);
+
+        v_min = sample_convert<sample_t>(c32sf_min);
+        v_max = sample_convert<sample_t>(c32sf_max);
         BOOST_CHECK_EQUAL (v_min, this->_min_v);
 	BOOST_CHECK_EQUAL (v_max, this->_max_v);
     }

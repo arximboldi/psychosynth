@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-16 22:37:52 raskolnikov>
+ *  Time-stamp:  <2011-04-01 15:02:53 raskolnikov>
  *
  *  @file        performance.cpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -84,6 +84,8 @@ double measure_time (Op op, std::size_t num_loops)
 
 // buffer dimension
 const std::size_t buffer_size = 4096;
+const std::size_t num_trials  = 1 << 21;
+
 
 // macros for standard GIL ranges
 #define STEREO_RANGE(T) \
@@ -243,16 +245,16 @@ void test_fill (std::size_t trials)
 template <typename T>
 struct stereo_fr_t
 {
+    PSYNTH_FORCEINLINE
     void operator () (frame<T,stereo_layout>& p) const
     {
-	p[0] = 0;
-	p[1] = 1;
+        p = frame<T,stereo_layout> {0, 1};
     }
     
+    PSYNTH_FORCEINLINE
     void operator () (const planar_frame_reference<T&, stereo_space>& p) const
     {
-	p[0] = 0;
-	p[1] = 1;
+	p = frame<T,stereo_layout> {0, 1};
     }
 };
 
@@ -334,7 +336,7 @@ void test_for_each (std::size_t trials)
     BOOST_TEST_MESSAGE (
 	"psynth: " << measure_time (
 	    for_each_psynth<Range, F> (range (bufp), F ()), trials));
-
+    
     BOOST_TEST_MESSAGE (
 	"non-psynth: " << measure_time (
 	    for_each_nonpsynth<Range, F> (range (bufn), F ()), trials));
@@ -672,13 +674,7 @@ void test_transform (std::size_t trials)
     BOOST_CHECK (equal_frames (range (bufp2), range (bufn2)));
 }
 
-#ifdef NDEBUG
-    const std::size_t num_trials = 10000;
-#else
-    const std::size_t num_trials = 10000;
-#endif
-
-BOOST_AUTO_TEST_SUITE (sound_peformance_test_suite);
+BOOST_AUTO_TEST_SUITE (sound_performance_test_suite);
 
 BOOST_AUTO_TEST_CASE (test_fill_frames_performance)
 {

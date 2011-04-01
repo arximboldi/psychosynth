@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-10 12:37:34 raskolnikov>
+ *  Time-stamp:  <2011-04-01 13:13:44 raskolnikov>
  *
  *  @file        algorithm.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -568,6 +568,7 @@ void uninitialized_fill_aux (It first, It last,
    frames
 */
 template <typename Range, typename Value> 
+PSYNTH_FORCEINLINE
 void uninitialized_fill_frames (const Range& buf_range, const Value& val)
 {
     detail::uninitialized_fill_aux (buf_range.begin(),
@@ -662,6 +663,7 @@ struct has_trivial_frame_constructor<Range, true> :
    default-constructed frames
 */
 template <typename Range> 
+PSYNTH_FORCEINLINE
 void default_construct_frames (const Range& buf_range)
 {
     if (detail::has_trivial_frame_constructor<
@@ -719,7 +721,8 @@ void uninitialized_copy_aux (It1 first1, It1 last1,
    If an exception is thrown destructs any in-place copy-constructed
    objects
 */
-template <typename Range1, typename Range2> 
+template <typename Range1, typename Range2>
+PSYNTH_FORCEINLINE
 void uninitialized_copy_frames (const Range1& range1, const Range2& range2)
 {
     typedef boost::mpl::bool_<is_planar<Range1>::value &&
@@ -744,6 +747,7 @@ void uninitialized_copy_frames (const Range1& range1, const Range2& range2)
    \ingroup ImageRangeSTLAlgorithmsForEachFrame
 */
 template <typename V, typename F>
+PSYNTH_FORCEINLINE
 F for_each_frame (const V& buf, F fun)
 {
     return std::for_each (buf.begin (), buf.end(), fun);
@@ -761,6 +765,7 @@ F for_each_frame (const V& buf, F fun)
 */
 
 template <typename Range, typename F>
+PSYNTH_FORCEINLINE
 F for_each_frame_position (const Range& buf, F fun)
 {
     for (auto loc = buf.begin (); loc != buf.end (); ++loc)
@@ -778,6 +783,7 @@ F for_each_frame_position (const Range& buf, F fun)
    \brief std::generate for image ranges
 */
 template <typename Range, typename F>
+PSYNTH_FORCEINLINE
 void generate_frames (const Range& v, F fun)
 {
     std::generate (v.begin (), v.end (), fun);

@@ -634,10 +634,10 @@ constraint the ``clipping thresholds'' of floating point types. For
 example, the \texttt{bits32sf} model defined as:
 
 \begin{lstlisting}
-  scoped_sample<float,
-                float_minus_one,
-                float_zero,
-                float_one>;
+typedef scoped_sample<float,
+                      float_minus_one,
+                      float_zero,
+                      float_one> bits32sf;
 \end{lstlisting}
 
 User defined types should specialise \texttt{sample\_traits} to map
@@ -738,8 +738,299 @@ models the concept.
 
 \subsection{Unit testing}
 
+Unit testing serves to ensure that the actual behaviour of a function
+matches its documented requirements. In this code it is very important
+because: (1) because it is a library to be used by third party
+developers, the proper functioning of every single method is as
+important as the observable behaviour of the final application that we
+may deploy alongside; and (2) because of the duck typing in template
+metaprograms we need to ensure that all ``instantiation paths'' ---
+i.e. code paths of the metaprogram --- compile without errors and lead
+to correct execution.
+
+\todo{Recordar actualizar esto si más adelante se añaden pruebas por
+  lo que sea}
+The modules described in this chapter are evaluated with a total 223
+unit tests. All of them pass with a total of 1478 successful
+assertions. Note \ref{note:gistests} includes a more detailed summary of the
+test cases involving these modules.
+
+\begin{mynote}[\texttt{psynth::sound} and \texttt{psynth::io} unit
+  tests]
+\label{note:gistests}
+The user can run the unit tests by herself by running \texttt{make
+  check} or running the \texttt{psynth\_unit\_tests} in the
+\texttt{src/test} folder.
+{\small
+\begin{verbatim}
+Test suite "io_input_test_suite" passed with:
+  177 assertions out of 177 passed
+  110 test cases out of 110 passed
+
+Test suite "io_output_test_suite" passed with:
+  140 assertions out of 140 passed
+  81 test cases out of 81 passed
+
+Test suite "sound_ring_test" passed with:
+  10 assertions out of 10 passed
+  4 test cases out of 4 passed
+
+Test suite "frame_iterator_test_suite" passed with:
+  5 assertions out of 5 passed
+  2 test cases out of 2 passed
+
+Test suite "sound_peformance_test_suite" passed 
+with:
+  38 assertions out of 38 passed
+  4 test cases out of 4 passed
+
+Test suite "buffer_test_suite" passed with:
+  14 assertions out of 14 passed
+  2 test cases out of 2 passed
+
+Test suite "sound_frame_test_suite" passed with:
+  81 assertions out of 81 passed
+  4 test cases out of 4 passed
+
+Test suite "sound_sample_test_suite" passed with:
+  1073 assertions out of 1073 passed
+  14 test cases out of 14 passed
+\end{verbatim}
+}
+\end{mynote}
 
 \subsection{Performance}
+
+We claimed that static polymorphism and optimal algorithm selection
+via template metaprogramming allow genericity with no overhead over
+non-generic implementations. Given the performance constraints on the
+real time audio processing thread, satisfying this property is a must.
+
+To ensure that there is no overhead, we include a test suite that
+compares the efficiency of the generic algorithm building blocks
+provided by the library with hand-rolled loops performing the same
+function. Listing \ref{lst:perf-gen} shows an example of such generic
+function that you can compare with its concrete implementation in
+\ref{lst:perf-nongen}. Note that for simplicity and because it does
+not affect the results the non generic version is still parametrised
+over the sample type $T$. One can read the whole performance test
+suite in \texttt{src/test/psynth/sound/performance.cpp}.
+
+\begin{lstlisting}[float=h,
+  caption={Generic \texttt{for\_each} that asigns $(0,1)$ to every
+  frame over non interleaved data},
+  label=lst:perf-gen]
+for_each_frame (_v, [] (F& f) { 
+    f = F {0, 1};
+});
+\end{lstlisting}
+
+\begin{lstlisting}[float=h,
+  caption={Non generic \texttt{for\_each} that asigns $(0,1)$ to every
+  frame over non interleaved data},
+  label=lst:perf-nongen]
+T* first = (T*)_v.begin ();
+T* last  = first + _v.size () * 2;
+while (first != last) {
+    first [0] =  0;
+    first [1] =  1;
+    first     += 2;
+}
+\end{lstlisting}
+
+We check the performance on some different cases that try to stress
+different potential overhead corners, like using a different layout
+from the natural order in the channel space, planar and interleaved
+buffers, etc. Each test case test a kind of loop over a buffer of a
+certain size. We test sizes of 32 and 4092 samples, as those are the
+common bounds of buffer sizes used in audio (the lower the buffer
+size, the better ---lower--- latency). This way we ensure that both
+the per buffer and per sample overhead is minimal. Each test is
+repeated $2^{21}$ times for buffers with 4096 samples, and $2^{26}$
+times for buffers of 32 samples.
+
+\begin{table}[h!]
+  \centering\small
+  \begin{tabular}{rl}
+    Name & Meaning \\ \hline
+    \type{s8b} & Interleaved stereo buffer with 8 bit samples.\\
+    \type{rs8b} & Interleaved reversed stereo buffer with 8 bit samples.\\
+    \type{s8pb} & Planar stereo buffer with 8 bit samples.\\
+    \type{s8f} & Stereo frame with 8 bit samples.\\
+    \type{rs8f} & Reversed stereo frame with 8 bit samples.\\
+  \end{tabular}
+  \caption{Acronyms for the parameter types in performance test result
+    tables.}
+  \label{tab:perfacrn}
+\end{table}
+
+We ran the tests in a Intel i5 M460 with four 2.53FHz cores. We
+compiled tested the code with different versions of GCC compiled with
+options \texttt{-O3 -std=c++0x}. Tables \ref{tab:perf4096} and
+\ref{tab:perf32} show the results for GCC 4.5.2 with 4096 and 32
+buffer size respectively and \ref{tab:perf4096-46} and
+\ref{tab:perf32-46} show the results for GCC 4.6.0. The acronyms for
+the concrete parameter types are expanded in table \ref{tab:perfacrn}
+
+The tables show interesting results. With GCC 4.5 the generic versions
+performs as efficiently or better most of the time for larger buffer
+sizes, however, there seems to be an additive constant that makes the
+hand coded version slightly better when the buffer size is very
+small. Surprisingly, GCC 4.6 changes this tendency and the generic
+version actually gets more favourable results with short buffer
+sizes. Actually the results are more even with this compiler in a
+probable tendency in making optimisation techniques more general ---
+i.e. dependent on the actual semantics of the code and not on
+how you express it --- which is very desirable for generic code.
+
+In any case, these results supports our claims that the performance
+overhead, if any, is negligible. Sometimes the generic code is even
+more efficient than a carefully hand-coded algorithm for a specific
+audio format. The results also show that as soon as you add arithmetic
+computations like in the \texttt{transform} test micro-optimisation in
+the looping constructs is futile. Maybe testing with a wider variety
+of compilers should be done, but that is not possible because few
+support C++0x. Anyway, it is to expect that a compiler supporting
+C++0x also has a decent optimiser and the we would get similar
+results. Comparison of the generated object code would can be another
+interesting mechanism for assuring the lack of overhead due to
+generality. We did informal tests confirming our hypotheses that can
+be repeated by the reader. Also, there are some similar object code
+comparisons in the Boost.GIL video tutorial\footnote{Boost.GIL
+  presentation:
+  \http{http://stlab.adobe.com/gil/presentation/index.htm}} that the
+interested reader can check --- given the similarities in GIL and
+\texttt{psynth::sound} we can expect equivalent results.
+
+We can safely state that the library passes the performance requirements.
+
+\begin{table}[p]
+  \centering\small
+  \begin{tabular}{c|c|c|c|c|c}
+    Algo. & \multicolumn{2}{c|}{Parameters} & Psynth & Non-Psynth & Gain \\ \hline\hline
+
+    %% fill_frames
+    \multirow{4}{*}{\type{fill}} & \multirow{2}{*}{\type{s8b}} & \type{s8f} & 0.38147 & 0.38147 & 1 \\ 
+    &  & \type{rs8f} & 0.376701 & 0.38147 & 1.0127 \\
+    & \multirow{2}{*}{\type{s8pb}} & \type{s8f} & 0.195503 & 0.190735 & 0.9756 \\
+    &  & \type{rs8f} & 0.190735 & 0.190735 & 1 \\ \hline
+
+    %% for_each_frame
+    \multirow{2}{*}{\type{for\_each}} & \multicolumn{2}{c|}{\type{s8b}} & 0.371933 & 0.376701 & 1.0128 \\
+    & \multicolumn{2}{c|}{\type{s8pb}} & 0.286102 & 0.281334 & 0.9833 \\ \hline
+    
+    %% copy_frames
+    \multirow{5}{*}{\type{copy}} & \multirow{3}{*}{\type{s8b}} & \type{s8b} & 0.38147 & 0.38147 & 1 \\ 
+    &  & \type{rs8b} & 1.00136 & 1.05381 & 1.0524 \\ 
+    &  & \type{s8pb} & 0.753403 & 0.753403 & 1 \\ 
+    & \multirow{2}{*}{\type{s8pb}} & \type{s8pb} & 0.748634 & 0.762939 & 1.0191 \\ 
+    &  & \type{s8b} & 0.38147 & 0.38147 & 1 \\ \hline
+
+    %% transform_frames
+    \multirow{4}{*}{\type{transform}} & \multirow{2}{*}{\type{s8b}} & \type{s8b} & 23.4795 & 23.4842 & 1.0002 \\ 
+    &  & \type{s8pb} & 23.4842 & 23.4842 & 1 \\
+    & \multirow{2}{*}{\type{s8pb}} & \type{s8b} & 23.4842 & 23.4842 & 1 \\
+    &  & \type{s8pb} & 23.4842 & 23.4842 & 1 \\ \hline
+  \end{tabular}
+  \caption{Performance tests  4096 buffer size with GCC 4.5.}
+  \label{tab:perf4096}
+\end{table}
+
+\begin{table}[p]
+  \centering\small
+  \begin{tabular}{c|c|c|c|c|c}
+    Algo. & \multicolumn{2}{c|}{Parameters} & Psynth & Non-Psynth & Gain \\ \hline\hline
+
+    %% fill_frames
+    \multirow{4}{*}{\type{fill}} & \multirow{2}{*}{\type{s8b}} & \type{s8f} & 0.0103563 & 0.0104308 & 1.0071 \\ 
+    &  & \type{rs8f} & 0.0103563 & 0.0104308 & 1.0071 \\
+    & \multirow{2}{*}{\type{s8pb}} & \type{s8f} & 0.0125915 & 0.0104308 & 0.8284 \\
+    &  & \type{rs8f} & 0.018999 & 0.0139326 & 0.7333 \\ \hline
+
+    %% for_each_frame
+    \multirow{2}{*}{\type{for\_each}} & \multicolumn{2}{c|}{\type{s8b}} & 0.00149012 & 0.00141561 & 0.9499 \\
+    & \multicolumn{2}{c|}{\type{s8pb}} & 0.0090152 & 0.0064075 & 0.7107 \\ \hline
+
+    %% copy_frames
+    \multirow{5}{*}{\type{copy}} & \multirow{3}{*}{\type{s8b}} & \type{s8b} & 0.012517 & 0.012219 & 0.9761 \\ 
+    &  & \type{rs8b} & 0.0112504 & 0.0108033 & 0.9602 \\ 
+    &  & \type{s8pb} & 0.0179559 & 0.0175089 & 0.9751 \\ 
+    & \multirow{2}{*}{\type{s8pb}} & \type{s8pb} & 0.0239909 & 0.0243634 & 1.0155 \\ 
+    &  & \type{s8b} & 0.0136346 &  0.00394881 & 0.2896 \\ \hline
+
+    %% transform_frames
+    \multirow{4}{*}{\type{transform}} & \multirow{2}{*}{\type{s8b}} & \type{s8b} & 0.183433 & 0.183508 & 1.0004 \\ 
+    &  & \type{s8pb} & 0.183508 & 0.183433 & 0.9995\\
+    & \multirow{2}{*}{\type{s8pb}} & \type{s8b} & 0.183433 & 0.183508 & 1.0004 \\
+    &  & \type{s8pb} & 0.183508 & 0.183433 & 0.9995 \\ \hline
+  \end{tabular}
+  \caption{Performance tests for 32 buffer size with GCC 4.5.}
+  \label{tab:perf32}
+\end{table}
+
+\begin{table}[p]
+  \centering\small
+  \begin{tabular}{c|c|c|c|c|c}
+    Algo. & \multicolumn{2}{c|}{Parameters} & Psynth & Non-Psynth & Gain \\ \hline\hline
+
+    %% fill_frames
+    \multirow{4}{*}{\type{fill}} & \multirow{2}{*}{\type{s8b}} & \type{s8f} & 0.557899 & 0.562668 & 1.0085 \\ 
+    &  & \type{rs8f} & 0.557899 & 0.557899 & 1 \\
+    & \multirow{2}{*}{\type{s8pb}} & \type{s8f} & 0.190735 & 0.190735 & 1 \\
+    &  & \type{rs8f} & 0.190735 & 0.185966 & 0.9749 \\ \hline
+
+    %% for_each_frame
+    \multirow{2}{*}{\type{for\_each}} & \multicolumn{2}{c|}{\type{s8b}} & 0.557899 & 0.562668 & 1.0085 \\
+    & \multicolumn{2}{c|}{\type{s8pb}} & 0.276566 & 0.286102 & 1.0344 \\ \hline
+    
+    %% copy_frames
+    \multirow{5}{*}{\type{copy}} & \multirow{3}{*}{\type{s8b}} & \type{s8b} & 0.739098 & 0.743866 & 1.0064 \\ 
+    &  & \type{rs8b} & 1.05381 & 0.934601 & 0.8868 \\ 
+    &  & \type{s8pb} & 0.753403 & 0.753403 & 1 \\ 
+    & \multirow{2}{*}{\type{s8pb}} & \type{s8pb} & 0.867844 & 0.743866 & 0.8571 \\ 
+    &  & \type{s8b} & 0.38147 & 0.386238 & 1.0125 \\ \hline
+
+    %% transform_frames
+    \multirow{4}{*}{\type{transform}} & \multirow{2}{*}{\type{s8b}} & \type{s8b} & 23.4842 & 23.4795 & 0.9997 \\ 
+    &  & \type{s8pb} & 23.4842 & 23.4842 & 1 \\
+    & \multirow{2}{*}{\type{s8pb}} & \type{s8b} & 23.4842 & 23.4842 & 1 \\
+    &  & \type{s8pb} & 23.4842 & 23.4795 & 0.9997 \\ \hline
+  \end{tabular}
+  \caption{Performance tests for 4096 samples with GCC~4.6.}
+  \label{tab:perf4096-46}
+\end{table}
+
+\begin{table}[p]
+  \centering\small
+  \begin{tabular}{c|c|c|c|c|c}
+    Algo. & \multicolumn{2}{c|}{Parameters} & Psynth & Non-Psynth & Gain \\ \hline\hline
+
+    %% fill_frames
+    \multirow{4}{*}{\type{fill}} & \multirow{2}{*}{\type{s8b}} & \type{s8f} & 0.00625849 & 0.00625849 & 1 \\ 
+    &  & \type{rs8f} & 0.00499189 & 0.00499189 & 1 \\
+    & \multirow{2}{*}{\type{s8pb}} & \type{s8f} & 0.0103563 & 0.0104308 & 1.0071 \\
+    &  & \type{rs8f} & 0.0104308 & 0.0104308 & 1 \\ \hline
+
+    %% for_each_frame
+    \multirow{2}{*}{\type{for\_each}} & \multicolumn{2}{c|}{\type{s8b}} & 0.00618398 & 0.00625849 & 1.0120 \\
+    & \multicolumn{2}{c|}{\type{s8pb}} & 0.0064075 & 0.0064075 & 1 \\ \hline
+
+    %% copy_frames
+    \multirow{5}{*}{\type{copy}} & \multirow{3}{*}{\type{s8b}} & \type{s8b} & 0.012219 & 0.0125915 & 1.0304 \\ 
+    &  & \type{rs8b} & 0.00782311 & 0.0111014 & 1.419 \\ 
+    &  & \type{s8pb} & 0.0169873 & 0.0172853 & 1.018 \\ 
+    & \multirow{2}{*}{\type{s8pb}} & \type{s8pb} & 0.0243634 & 0.0219047 & 0.899 \\ 
+    &  & \type{s8b} & 0.0114739 &  0.0160933 & 1.4026 \\ \hline
+
+    %% transform_frames
+    \multirow{4}{*}{\type{transform}} & \multirow{2}{*}{\type{s8b}} & \type{s8b} & 0.183433 & 0.183508 & 1.0004 \\ 
+    &  & \type{s8pb} & 0.183433 & 0.183582 & 1.0004 \\
+    & \multirow{2}{*}{\type{s8pb}} & \type{s8b} & 0.183433 & 0.183433 & 1 \\
+    &  & \type{s8pb} & 0.183433 & 0.183508 & 1.0004 \\ \hline
+  \end{tabular}
+  \caption{Performance tests for 32 buffer size with GCC 4.6.}
+  \label{tab:perf32-46}
+\end{table}
 
 \subsection{Integration}
 
