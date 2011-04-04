@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-31 12:55:13 raskolnikov>
+ *  Time-stamp:  <2011-04-04 01:07:43 raskolnikov>
  *
  *  @file        concept.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -544,7 +544,7 @@ struct ChannelBaseValueConcept
 
 /**
    \ingroup ChannelBaseConcept
-   \brief Channel base whose elements all have the same type
+   \brief Channel base whose elements all have the same type.
 */
 /** 
 \code
@@ -669,8 +669,8 @@ struct ChannelBasesCompatibleConcept
  */
 
 /**
-   \brief Concept for all frame-based Psynth constructs, such as frames,
-   iterators, locators, ranges and buffers whose value type is a frame
+   \brief Concept for all frame-based Psynth constructs, such as
+   frames, iterators, ranges and buffers whose value type is a frame.
    
    \ingroup FrameBasedConcept
 */
@@ -736,33 +736,33 @@ struct HomogeneousFrameBasedConcept
 
 
 /**
-   \brief Frame concept - A channel base whose elements are samples
+   \brief A set of samples coincidents in time.
    \ingroup FrameConcept
 */
 /**
 \code
-concept FrameConcept<typename P> :
-            ChannelBaseConcept<P>, FrameBasedConcept<P> {    
-    where is_frame<P>::type::value==true;
-    // where for each K [0..size<P>::value-1]:
-    //      SampleConcept<kth_element_type<P,K> >;
+concept FrameConcept<typename F> :
+            ChannelBaseConcept<F>, FrameBasedConcept<F> {    
+    where is_frame<F>::type::value==true;
+    // where for each K [0..size<F>::value-1]:
+    //      SampleConcept<kth_element_type<F,K> >;
         
-    typename P::value_type;       where FrameValueConcept<value_type>;
-    typename P::reference;        where FrameConcept<reference>;
-    typename P::const_reference;  where FrameConcept<const_reference>;
-    static const bool P::is_mutable;
+    typename F::value_type;       where FrameValueConcept<value_type>;
+    typename F::reference;        where FrameConcept<reference>;
+    typename F::const_reference;  where FrameConcept<const_reference>;
+    static const bool F::is_mutable;
 
-    template <FrameConcept P2> where { FrameConcept<P,P2> } 
-        P::P(P2);
-    template <FrameConcept P2> where { FrameConcept<P,P2> } 
-        bool operator==(const P&, const P2&);
-    template <FrameConcept P2> where { FrameConcept<P,P2> } 
-        bool operator!=(const P&, const P2&);
+    template <FrameConcept F2> where { FrameConcept<F,F2> } 
+        F::F(F2);
+    template <FrameConcept F2> where { FrameConcept<F,F2> } 
+        bool operator==(const F&, const F2&);
+    template <FrameConcept F2> where { FrameConcept<F,F2> } 
+        bool operator!=(const F&, const F2&);
 }; 
 \endcode
 */
 
-template <typename P>
+template <typename F>
 struct FrameConcept
 {
     void constraints() {
@@ -965,7 +965,7 @@ struct FramesCompatibleConcept
    \brief Frame convertible concept
 
    Convertibility is non-symmetric and implies that one frame can be
-   converted to another, approximating the channel. Conversion is
+   converted to another, approximating the value. Conversion is
    explicit and sometimes lossy.
    \ingroup FrameConcept
 */
@@ -1078,9 +1078,9 @@ struct FrameDereferenceAdaptorArchetype : public std::unary_function<P, P>
 */
 /**
 \code
-concept HasDynamicXStepTypeConcept<typename T> {
-    typename dynamic_x_step_type<T>;
-        where Metafunction<dynamic_x_step_type<T> >;
+concept HasDynamicStepTypeConcept<typename T> {
+    typename dynamic_step_type<T>;
+        where Metafunction<dynamic_step_type<T> >;
 };
 \endcode
 */
@@ -1400,6 +1400,8 @@ struct MutableIteratorAdaptorConcept
  */
 
 /**
+   @todo Fix this documentation.
+   
    \defgroup BufferRangeConcept BufferRangeConcept
    \ingroup BufferRangeConcept
    \brief 1-dimensional range
@@ -1412,59 +1414,42 @@ struct MutableIteratorAdaptorConcept
    \brief N-dimensional range over immutable values
 */
 
- /**
+/**
+   
 \code
 concept RandomAccessBufferRangeConcept<base::Regular Range> {
     typename value_type;
     typename reference;       // result of dereferencing
     typename difference_type;
-    // result of operator-(iterator,iterator) (1-dimensional!)
-    typename const_t;  where RandomAccessNDBufferRangeConcept<Range>;
+    // result of operator-(iterator,iterator)
+    typename const_type;  where RandomAccessBufferRangeConcept<Range>;
     // same as Range, but over immutable values
-    typename point_t;  where PointNDConcept<point_t>; // N-dimensional point
-    typename locator;  where RandomAccessNDLocatorConcept<locator>;
-    // N-dimensional locator.
     typename iterator; where RandomAccessTraversalConcept<iterator>;
-    // 1-dimensional iterator over all values
+    // iterator over all values
     typename reverse_iterator;
     where RandomAccessTraversalConcept<reverse_iterator>; 
     typename size_type;       // the return value of size()
 
-    // Equivalent to RandomAccessNDLocatorConcept::axis
-    template <size_t D> struct axis {
-        typename coord_t = point_t::axis<D>::coord_t;
-        typename iterator; where
-    RandomAccessTraversalConcept<iterator>;
-    // iterator along D-th axis.
-        where SameType<coord_t, iterator::difference_type>;
-        where SameType<iterator::value_type,value_type>;
-    };
-
     // Defines the type of a range similar to this type, except it
     // invokes Deref upon dereferencing
-    template <FrameDereferenceAdaptorConcept Deref> struct add_deref {
-        typename type;        where RandomAccessNDBufferRangeConcept<type>;
+    template <FrameDereferenceAdaptorConcept Deref>
+    struct add_deref {
+        typename type;
+        where RandomAccessBufferRangeConcept<type>;
         static type make(const Range& v, const Deref& deref);
     };
-
-    static const size_t num_dimensions = point_t::num_dimensions;
     
     // Create from a locator at the top-left corner and dimensions
     Range::Range(const locator&, const point_type&);
     
     size_type        Range::size()       const; // total number of elements
     reference        operator[](Range, const difference_type&) const;
-    // 1-dimensional reference
+    
     iterator         Range::begin()      const;
     iterator         Range::end()        const;
     reverse_iterator Range::rbegin()     const;
     reverse_iterator Range::rend()       const;
     iterator         Range::at(const point_t&);
-    point_t          Range::dimensions() const; // number of elements along each dimension
-    bool             Range::is_1d_traversable() const;   // can an iterator over the first dimension visit each value? I.e. are there gaps between values?
-
-    // iterator along a given dimension starting at a given point
-    template <size_t D> Range::axis<D>::iterator Range::axis_iterator(const point_t&) const;
 
     reference operator()(Range,const point_t&) const;
 };
@@ -1519,22 +1504,16 @@ struct RandomAccessBufferRangeConcept
     Range range;
 };
 
-
 /**
    \ingroup FrameBufferRangeConcept
-   \brief Psynth's 2-dimensional range over immutable Psynth frames
+   \brief Psynth's 1-dimensional range over immutable Psynth frames
 */
+
 /**
 \code
-concept BufferRangeConcept<RandomAccess2DBufferRangeConcept Range> {
+concept BufferRangeConcept<RandomAccessBufferRangeConcept Range> {
     where FrameValueConcept<value_type>;
-    where FrameIteratorConcept<x_iterator>;        
-    where FrameIteratorConcept<y_iterator>;
-    where x_coord_t == y_coord_t;
-    
-    typename coord_t = x_coord_t;
-
-    std::size_t Range::num_samples() const;
+    std::size_t Range::num_channels() const;
 };
 \endcode
 */
@@ -1545,6 +1524,7 @@ struct BufferRangeConcept {
 
         std::size_t num_chan = range.num_samples ();
 	boost::ignore_unused_variable_warning (num_chan);
+
     }
     Range range;
 };
@@ -1674,19 +1654,18 @@ struct RangesCompatibleConcept
 /**
 \code
 concept RandomAccessBufferConcept<typename Buf> : base::Regular<Buf> {
-    typename range_t; where MutableRandomAccessBufferRangeConcept<range_t>;
-    typename const_range_t = range_t::const_t;
-    typename point_t      = range_t::point_t;
-    typename value_type   = range_t::value_type;
+    typename range; where MutableRandomAccessBufferRangeConcept<range>;
+    typename const_range = range::const_type;
+    typename value_type  = range::value_type;
     typename allocator_type;
 
     Buf::Buf(point_t dims, std::size_t alignment=1);
     Buf::Buf(point_t dims, value_type fill_value, std::size_t alignment);
     
     void Buf::recreate(point_t new_dims, std::size_t alignment=1);
-    void Buf::recreate(point_t new_dims, value_type fill_value, std::size_t alignment);
-
-    const point_t&        Buf::dimensions() const;
+    void Buf::recreate(point_t new_dims, value_type fill_value,
+                       std::size_t alignment);
+    
     const const_range_t&   const_range(const Buf&);
     const range_t&         range(Buf&);
 };
@@ -1732,7 +1711,6 @@ struct RandomAccessBufferConcept
 \code 
 concept BufferConcept<RandomAccess2DBufferConcept Buf> {
     where MutableBufferRangeConcept<range_t>;
-    typename coord_t  = range_t::coord_t;
 };
 \endcode
 */
