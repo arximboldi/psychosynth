@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-04-01 15:02:53 raskolnikov>
+ *  Time-stamp:  <2011-04-05 13:25:42 raskolnikov>
  *
  *  @file        performance.cpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -84,7 +84,7 @@ double measure_time (Op op, std::size_t num_loops)
 
 // buffer dimension
 const std::size_t buffer_size = 4096;
-const std::size_t num_trials  = 1 << 21;
+const std::size_t num_trials  = 1 << 10;
 
 
 // macros for standard GIL ranges

@@ -1796,7 +1796,15 @@ options \texttt{-O3 -std=c++0x}. Tables \ref{tab:perf4096} and
 \ref{tab:perf32} show the results for GCC 4.5.2 with 4096 and 32
 buffer size respectively and \ref{tab:perf4096-46} and
 \ref{tab:perf32-46} show the results for GCC 4.6.0. The acronyms for
-the concrete parameter types are expanded in table \ref{tab:perfacrn}
+the concrete parameter types are expanded in table
+\ref{tab:perfacrn}. All the timings are represented in
+$milliseconds$. The ``gain'' is computed as:
+\begin{equation}
+  Gain=\frac{T_{non\_psynth}}{T_{psynth}}  
+\end{equation}
+Such that a value greater than one signifies that the generic version
+is faster and a value smaller than one implies that there is some
+overhead.
 
 The tables show interesting results. With GCC 4.5 the generic versions
 performs as efficiently or better most of the time for larger buffer
