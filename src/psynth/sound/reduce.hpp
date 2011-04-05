@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-09 02:59:33 raskolnikov>
+ *  Time-stamp:  <2011-04-04 17:42:13 raskolnikov>
  *
  *  @file        reduce.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -44,11 +44,13 @@
 #include <boost/mpl/vector_c.hpp>
 #include <boost/mpl/back.hpp>
 #include <boost/mpl/vector.hpp>
+#include <boost/mpl/set.hpp>
 #include <boost/mpl/long.hpp>
 #include <boost/mpl/logical.hpp>
 #include <boost/mpl/transform.hpp>
 #include <boost/mpl/insert.hpp>
 #include <boost/mpl/transform.hpp>
+#include <boost/mpl/order.hpp>
 
 #include <psynth/sound/metafunctions.hpp>
 #include <psynth/sound/typedefs.hpp>
@@ -67,322 +69,34 @@ namespace boost
 namespace mpl
 {
 
-/**
- * Mapping vector - represents the mapping of one type vector to
- * another It is not a full-blown MPL Random Access Type sequence;
- * just has at_c and size implemented
- *
- * SrcTypes, DstTypes: MPL Random Access Type Sequences
- *
- * Implements size and at_c to behave as if this is an MPL vector of integers
- */
+namespace detail {
 
-template <typename SrcTypes, typename DstTypes>
-struct mapping_vector {};
-
-template <typename SrcTypes, typename DstTypes, long K>
-struct at_c<mapping_vector<SrcTypes,DstTypes>, K>
-{
-    static const std::size_t value =
-	size<DstTypes>::value -
-	order<DstTypes, typename at_c<SrcTypes,K>::type>::type::value + 1;
-    typedef size_t<value> type;
-};
-
-template <typename SrcTypes, typename DstTypes>
-struct size<mapping_vector<SrcTypes,DstTypes> >
-{
-    typedef typename size<SrcTypes>::type type;
-    static const std::size_t value = type::value;
-};
-
-
-/**
- * copy_to_vector - copies a sequence (boost::mpl::set) to vector.
- *
- * Temporary solution because I couldn't get boost::mpl::copy to do
- * this.  This is what I tried: boost::mpl::copy<SET,
- * boost::mpl::back_inserter<boost::mpl::vector<> > >::type; It works
- * when SET is boost::mpl::vector, but not when SET is
- * boost::mpl::set...
- */
-
-namespace detail
-{
-
-template <typename SFirst, std::size_t NLeft>
-struct copy_to_vector_impl
-{
+template <typename VecOfVecs, std::size_t N, std::size_t B_SIZE>
+struct _select_subvector {
 private:
-    typedef typename deref<SFirst>::type T;
-    typedef typename next<SFirst>::type next;
-    typedef typename copy_to_vector_impl<next, NLeft-1>::type rest;
+    typedef typename front<VecOfVecs>::type cur_vec;
+    static const std::size_t cur_base = size<cur_vec>::value;
+    typedef typename pop_front<VecOfVecs>::type  next_vec_of_vecs; 
+    typedef typename _select_subvector<next_vec_of_vecs,  N/cur_base, B_SIZE-1>::type
+    next_subvector;
 public:
-    typedef typename push_front<rest, T>::type type;
+    typedef typename push_front<
+    next_subvector,
+    typename at_c<cur_vec, N%cur_base>::type >::type type;
 };
-
-template <typename SFirst> 
-struct copy_to_vector_impl<SFirst,1>
-{
-    typedef vector<typename deref<SFirst>::type> type;
+ 
+template <typename VecOfVecs, std::size_t N>
+struct _select_subvector<VecOfVecs, N, 0> {
+    typedef vector<>::type type;
+};
+ 
+template <typename VecOfVecs, std::size_t N>
+struct select_subvector_c {
+    typedef typename _select_subvector<
+        VecOfVecs, N, size<VecOfVecs>::value>::type type;
 };
 
 } /* namespace detail */
-
-template <typename Src>
-struct copy_to_vector
-{
-    typedef typename detail::copy_to_vector_impl<
-	typename begin<Src>::type, size<Src>::value>::type type;
-};
-
-template <>
-struct copy_to_vector<set<> >
-{
-    typedef vector0<> type;
-};
-
-} /* namespace mpl */
-} /* namespace boost */
-
-
-namespace psynth
-{
-namespace sound
-{
-
-/**
- * unary_reduce, binary_reduce - given an MPL Random Access Sequence,
- * dynamically specified index to that container, the bits of an
- * instance of the corresponding type and a generic operation, invokes
- * the operation on the given type
- */
-
-/** 
- * \brief Unary reduce.
- *
- * Given a set of types and an operation, reduces each type in the set
- * (to reduced_t), then removes duplicates (to unique_t) To apply the
- * operation, first constructs a lookup table that maps each element
- * from Types to its place in unique_t and uses it to map the index to
- * anther index (in map_index). Then invokes apply_operation_base on
- * the unique types with the new index.
- */
-
-template <typename Types, typename Op>
-struct unary_reduce_impl
-{
-    typedef typename boost::mpl::transform<
-	Types, detail::reduce<Op, boost::mpl::_1> >::type reduced_t;
-    typedef typename boost::mpl::copy<
-	reduced_t, boost::mpl::inserter<
-		       boost::mpl::set<>,
-		       boost::mpl::insert<boost::mpl::_1,
-					  boost::mpl::_2> > >::type unique_t;
-    static const bool is_single = boost::mpl::size<unique_t>::value == 1;
-};
-
-template <typename Types, typename Op,
-	  bool IsSingle = unary_reduce_impl<Types,Op>::is_single>
-struct unary_reduce : public unary_reduce_impl<Types,Op>
-{
-    typedef typename unary_reduce_impl<Types,Op>::reduced_t reduced_t;
-    typedef typename unary_reduce_impl<Types,Op>::unique_t unique_t;
-
-    static unsigned short inline map_index (std::size_t index)
-    {
-        typedef typename boost::mpl::mapping_vector<reduced_t, unique_t> indices_t;
-        return gil::at_c<indices_t, unsigned short>(index);
-    }
-    
-    template <typename Bits> PSYNTH_FORCEINLINE
-    static typename Op::result_type applyc (
-	const Bits& bits, std::size_t index, Op op)
-    {
-        return apply_operation_basec<unique_t>(bits, map_index (index), op);
-    }
-
-    template <typename Bits> PSYNTH_FORCEINLINE
-    static typename Op::result_type apply (Bits& bits, std::size_t index, Op op)
-    {
-        return apply_operation_base<unique_t>(bits, map_index(index), op);
-    }
-};
-
-template <typename Types, typename Op>
-struct unary_reduce<Types,Op,true> : public unary_reduce_impl<Types,Op>
-{
-    typedef typename unary_reduce_impl<Types,Op>::unique_t unique_t;
-
-    static unsigned short inline map_index (std::size_t index)
-    {
-	return 0;
-    }
-
-    template <typename Bits> PSYNTH_FORCEINLINE
-    static typename Op::result_type applyc (
-	const Bits& bits, std::size_t index, Op op)
-    {
-        return op (*psynth_reinterpret_cast_c<
-		       const typename boost::mpl::front<unique_t>::type*>(&bits));
-    }
-
-    template <typename Bits> PSYNTH_FORCEINLINE
-    static typename Op::result_type apply (Bits& bits, std::size_t index, Op op)
-    {
-        return op (*psynth_reinterpret_cast<
-		       typename boost::mpl::front<unique_t>::type*>(&bits));
-    }
-};
-
-
-/**
- * \brief Binary reduce.
- *
- * Given two sets of types, Types1 and Types2, first performs unary
- * reduction on each. Then checks if the product of their sizes is
- * above the PSYNTH_BINARY_REDUCE_LIMIT limit. If so, the operation is
- * too complex to be binary-reduced and uses a specialization of
- * binary_reduce_impl to simply call the binary apply_operation_base
- * (which performs two nested 1D apply operations) If the operation is
- * not too complex, uses the other specialization of
- * binary_reduce_impl to create a cross-product of the input types and
- * performs unary reduction on the result (bin_reduced_t). To apply
- * the binary operation, it simply invokes a unary
- * apply_operation_base on the reduced cross-product types.
- */
-
-namespace detail
-{
-
-struct pair_generator
-{
-    template <typename Vec2>
-    struct apply
-    {
-	typedef std::pair<
-	    const typename boost::mpl::at_c<Vec2,0>::type*,
-	    const typename boost::mpl::at_c<Vec2,1>::type*> type;
-};
-};
-
-// When the types are not too large, applies reduce on their cross
-// product
-template <typename Unary1, typename Unary2, typename Op,
-	  bool IsComplex>
-struct binary_reduce_impl
-{
-    // TODO: private:
-    typedef typename boost::mpl::copy_to_vector<
-	typename Unary1::unique_t>::type vec1_types;
-    typedef typename boost::mpl::copy_to_vector<
-	typename Unary2::unique_t>::type vec2_types;
-
-    typedef boost::mpl::cross_vector<
-	boost::mpl::vector2<vec1_types, vec2_types>, pair_generator> BIN_TYPES;
-
-    typedef unary_reduce<BIN_TYPES,Op> bin_reduced_t;
-        
-    static unsigned short inline map_index (std::size_t index1,
-					    std::size_t index2)
-    {
-	unsigned short r1=Unary1::map_index(index1);
-	unsigned short r2=Unary2::map_index(index2);
-	return bin_reduced_t::map_index (
-	    r2 * boost::mpl::size<vec1_types>::value + r1);
-    }
-
-public:
-    typedef typename bin_reduced_t::unique_t unique_t;
-    
-    template <typename Bits1, typename Bits2>
-    static typename Op::result_type inline apply (
-	const Bits1& bits1, std::size_t index1,
-	const Bits2& bits2, std::size_t index2, Op op)
-    {
-	std::pair<const void*,const void*> pr (&bits1, &bits2);
-	return apply_operation_basec<unique_t> (
-	    pr, map_index (index1, index2), op);
-    }
-};
-
-// When the types are large performs a double-dispatch. Binary
-// reduction is not done.
-template <typename Unary1, typename Unary2, typename Op>
-struct binary_reduce_impl<Unary1, Unary2,Op, true>
-{
-    template <typename Bits1, typename Bits2>
-    static typename Op::result_type inline apply (
-	const Bits1& bits1, std::size_t index1,
-	const Bits2& bits2, std::size_t index2, Op op)
-    {
-	return apply_operation_base<Unary1::unique_t, Unary2::unique_t>(
-	    bits1, index1, bits2, index2, op);
-    }
-};
-
-} /* namespace detail */
-
-
-template <typename Types1, typename Types2, typename Op>
-struct binary_reduce
-{
-// TODO private:
-    typedef unary_reduce<Types1,Op> unary1_t;
-    typedef unary_reduce<Types2,Op> unary2_t;
-
-    static const std::size_t CROSS_SIZE =
-	boost::mpl::size<typename unary1_t::unique_t>::value * 
-	boost::mpl::size<typename unary2_t::unique_t>::value;
-
-    typedef detail::binary_reduce_impl<
-	unary1_t, unary2_t, Op, (CROSS_SIZE > PSYNTH_BINARY_REDUCE_LIMIT)> impl;
-
-public:
-    template <typename Bits1, typename Bits2>
-    static typename Op::result_type inline apply (
-	const Bits1& bits1, std::size_t index1,
-	const Bits2& bits2, std::size_t index2, Op op)
-    {
-        return boost::mpl::apply (bits1, index1, bits2, index2, op);
-    }
-};
-
-template <typename Types, typename UnaryOp> PSYNTH_FORCEINLINE
-typename UnaryOp::result_type apply_operation (variant<Types>& arg, UnaryOp op)
-{
-    return unary_reduce<Types,UnaryOp>::template apply (
-	arg._bits, arg._index, op);
-}
-
-template <typename Types, typename UnaryOp> PSYNTH_FORCEINLINE
-typename UnaryOp::result_type apply_operation (const variant<Types>& arg,
-					       UnaryOp op)
-{
-    return unary_reduce<Types,UnaryOp>::template applyc (
-	arg._bits, arg._index, op);
-}
-
-template <typename Types1, typename Types2, typename BinaryOp> PSYNTH_FORCEINLINE
-typename BinaryOp::result_type apply_operation (const variant<Types1>& arg1,
-						const variant<Types2>& arg2,
-						BinaryOp op)
-{    
-    return binary_reduce<Types1, Types2, BinaryOp>::template apply (
-	arg1._bits, arg1._index,
-	arg2._bits, arg2._index, op);
-}
-
-#undef PSYNTH_BINARY_REDUCE_LIMIT
-
-} /* namespace sound */
-} /* namespace psynth */
-
-
-namespace boost
-{
-namespace mpl
-{
 
 /**
  * \brief Represents the virtual cross-product of the types generated
@@ -600,8 +314,325 @@ struct transform<cross_vector<VecOfVecs,TypeGen>, OPP > {
     typedef cross_vector<VecOfVecs, adapter > type; 
 };
 
-} /* mpl */
-} /* boost */
+} /* namespace mpl */
+} /* namespace boost */
+
+namespace boost
+{
+namespace mpl
+{
+
+/**
+ * Mapping vector - represents the mapping of one type vector to
+ * another It is not a full-blown MPL Random Access Type sequence;
+ * just has at_c and size implemented
+ *
+ * SrcTypes, DstTypes: MPL Random Access Type Sequences
+ *
+ * Implements size and at_c to behave as if this is an MPL vector of integers
+ */
+
+template <typename SrcTypes, typename DstTypes>
+struct mapping_vector {};
+
+template <typename SrcTypes, typename DstTypes, long K>
+struct at_c<mapping_vector<SrcTypes,DstTypes>, K>
+{
+    static const std::size_t value =
+	size<DstTypes>::value -
+	mpl::order<DstTypes, typename at_c<SrcTypes,K>::type>::type::value + 1;
+    typedef size_t<value> type;
+};
+
+template <typename SrcTypes, typename DstTypes>
+struct size<mapping_vector<SrcTypes,DstTypes> >
+{
+    typedef typename size<SrcTypes>::type type;
+    static const std::size_t value = type::value;
+};
+
+
+/**
+ * copy_to_vector - copies a sequence (boost::mpl::set) to vector.
+ *
+ * Temporary solution because I couldn't get boost::mpl::copy to do
+ * this.  This is what I tried: boost::mpl::copy<SET,
+ * boost::mpl::back_inserter<boost::mpl::vector<> > >::type; It works
+ * when SET is boost::mpl::vector, but not when SET is
+ * boost::mpl::set...
+ */
+
+namespace detail
+{
+
+template <typename SFirst, std::size_t NLeft>
+struct copy_to_vector_impl
+{
+private:
+    typedef typename deref<SFirst>::type T;
+    typedef typename next<SFirst>::type next;
+    typedef typename copy_to_vector_impl<next, NLeft-1>::type rest;
+public:
+    typedef typename push_front<rest, T>::type type;
+};
+
+template <typename SFirst> 
+struct copy_to_vector_impl<SFirst,1>
+{
+    typedef vector<typename deref<SFirst>::type> type;
+};
+
+} /* namespace detail */
+
+template <typename Src>
+struct copy_to_vector
+{
+    typedef typename detail::copy_to_vector_impl<
+	typename begin<Src>::type, size<Src>::value>::type type;
+};
+
+template <>
+struct copy_to_vector<mpl::set<> >
+{
+    typedef mpl::vector0<> type;
+};
+
+} /* namespace mpl */
+} /* namespace boost */
+
+
+namespace psynth
+{
+namespace sound
+{
+
+/**
+ * unary_reduce, binary_reduce - given an MPL Random Access Sequence,
+ * dynamically specified index to that container, the bits of an
+ * instance of the corresponding type and a generic operation, invokes
+ * the operation on the given type
+ */
+
+/** 
+ * \brief Unary reduce.
+ *
+ * Given a set of types and an operation, reduces each type in the set
+ * (to reduced_t), then removes duplicates (to unique_t) To apply the
+ * operation, first constructs a lookup table that maps each element
+ * from Types to its place in unique_t and uses it to map the index to
+ * anther index (in map_index). Then invokes apply_operation_base on
+ * the unique types with the new index.
+ */
+
+template <typename Types, typename Op>
+struct unary_reduce_impl
+{
+    typedef typename boost::mpl::transform<
+	Types, detail::reduce<Op, boost::mpl::_1> >::type reduced_t;
+    typedef typename boost::mpl::copy<
+	reduced_t, boost::mpl::inserter<
+		       boost::mpl::set<>,
+		       boost::mpl::insert<boost::mpl::_1,
+					  boost::mpl::_2> > >::type unique_t;
+    static const bool is_single = boost::mpl::size<unique_t>::value == 1;
+};
+
+template <typename Types, typename Op,
+	  bool IsSingle = unary_reduce_impl<Types,Op>::is_single>
+struct unary_reduce : public unary_reduce_impl<Types,Op>
+{
+    typedef typename unary_reduce_impl<Types,Op>::reduced_t reduced_t;
+    typedef typename unary_reduce_impl<Types,Op>::unique_t unique_t;
+
+    static unsigned short inline map_index (std::size_t index)
+    {
+        typedef typename boost::mpl::mapping_vector<reduced_t, unique_t> indices_t;
+        return gil::at_c<indices_t, unsigned short>(index);
+    }
+    
+    template <typename Bits> PSYNTH_FORCEINLINE
+    static typename Op::result_type applyc (
+	const Bits& bits, std::size_t index, Op op)
+    {
+        return apply_operation_basec<unique_t>(bits, map_index (index), op);
+    }
+
+    template <typename Bits> PSYNTH_FORCEINLINE
+    static typename Op::result_type apply (Bits& bits, std::size_t index, Op op)
+    {
+        return apply_operation_base<unique_t>(bits, map_index(index), op);
+    }
+};
+
+template <typename Types, typename Op>
+struct unary_reduce<Types,Op,true> : public unary_reduce_impl<Types,Op>
+{
+    typedef typename unary_reduce_impl<Types,Op>::unique_t unique_t;
+
+    static unsigned short inline map_index (std::size_t index)
+    {
+	return 0;
+    }
+
+    template <typename Bits> PSYNTH_FORCEINLINE
+    static typename Op::result_type applyc (
+	const Bits& bits, std::size_t index, Op op)
+    {
+        return op (*psynth_reinterpret_cast_c<
+		       const typename boost::mpl::front<unique_t>::type*>(&bits));
+    }
+
+    template <typename Bits> PSYNTH_FORCEINLINE
+    static typename Op::result_type apply (Bits& bits, std::size_t index, Op op)
+    {
+        return op (*psynth_reinterpret_cast<
+		       typename boost::mpl::front<unique_t>::type*>(&bits));
+    }
+};
+
+
+/**
+ * \brief Binary reduce.
+ *
+ * Given two sets of types, Types1 and Types2, first performs unary
+ * reduction on each. Then checks if the product of their sizes is
+ * above the PSYNTH_BINARY_REDUCE_LIMIT limit. If so, the operation is
+ * too complex to be binary-reduced and uses a specialization of
+ * binary_reduce_impl to simply call the binary apply_operation_base
+ * (which performs two nested 1D apply operations) If the operation is
+ * not too complex, uses the other specialization of
+ * binary_reduce_impl to create a cross-product of the input types and
+ * performs unary reduction on the result (bin_reduced_t). To apply
+ * the binary operation, it simply invokes a unary
+ * apply_operation_base on the reduced cross-product types.
+ */
+
+namespace detail
+{
+
+struct pair_generator
+{
+    template <typename Vec2>
+    struct apply
+    {
+	typedef std::pair<
+	    const typename boost::mpl::at_c<Vec2,0>::type*,
+	    const typename boost::mpl::at_c<Vec2,1>::type*> type;
+};
+};
+
+// When the types are not too large, applies reduce on their cross
+// product
+template <typename Unary1, typename Unary2, typename Op,
+	  bool IsComplex>
+struct binary_reduce_impl
+{
+    // TODO: private:
+    typedef typename boost::mpl::copy_to_vector<
+	typename Unary1::unique_t>::type vec1_types;
+    typedef typename boost::mpl::copy_to_vector<
+	typename Unary2::unique_t>::type vec2_types;
+
+    typedef boost::mpl::cross_vector<
+	boost::mpl::vector2<vec1_types, vec2_types>, pair_generator> BIN_TYPES;
+
+    typedef unary_reduce<BIN_TYPES,Op> bin_reduced_t;
+        
+    static unsigned short inline map_index (std::size_t index1,
+					    std::size_t index2)
+    {
+	unsigned short r1=Unary1::map_index(index1);
+	unsigned short r2=Unary2::map_index(index2);
+	return bin_reduced_t::map_index (
+	    r2 * boost::mpl::size<vec1_types>::value + r1);
+    }
+
+public:
+    typedef typename bin_reduced_t::unique_t unique_t;
+    
+    template <typename Bits1, typename Bits2>
+    static typename Op::result_type inline apply (
+	const Bits1& bits1, std::size_t index1,
+	const Bits2& bits2, std::size_t index2, Op op)
+    {
+	std::pair<const void*,const void*> pr (&bits1, &bits2);
+	return apply_operation_basec<unique_t> (
+	    pr, map_index (index1, index2), op);
+    }
+};
+
+// When the types are large performs a double-dispatch. Binary
+// reduction is not done.
+template <typename Unary1, typename Unary2, typename Op>
+struct binary_reduce_impl<Unary1, Unary2,Op, true>
+{
+    template <typename Bits1, typename Bits2>
+    static typename Op::result_type inline apply (
+	const Bits1& bits1, std::size_t index1,
+	const Bits2& bits2, std::size_t index2, Op op)
+    {
+	return apply_operation_base<Unary1::unique_t, Unary2::unique_t>(
+	    bits1, index1, bits2, index2, op);
+    }
+};
+
+} /* namespace detail */
+
+
+template <typename Types1, typename Types2, typename Op>
+struct binary_reduce
+{
+// TODO private:
+    typedef unary_reduce<Types1,Op> unary1_t;
+    typedef unary_reduce<Types2,Op> unary2_t;
+
+    static const std::size_t CROSS_SIZE =
+	boost::mpl::size<typename unary1_t::unique_t>::value * 
+	boost::mpl::size<typename unary2_t::unique_t>::value;
+
+    typedef detail::binary_reduce_impl<
+	unary1_t, unary2_t, Op, (CROSS_SIZE > PSYNTH_BINARY_REDUCE_LIMIT)> impl;
+
+public:
+    template <typename Bits1, typename Bits2>
+    static typename Op::result_type inline apply (
+	const Bits1& bits1, std::size_t index1,
+	const Bits2& bits2, std::size_t index2, Op op)
+    {
+        return impl::apply (bits1, index1, bits2, index2, op);
+    }
+};
+
+template <typename Types, typename UnaryOp> PSYNTH_FORCEINLINE
+typename UnaryOp::result_type apply_operation (variant<Types>& arg, UnaryOp op)
+{
+    return unary_reduce<Types,UnaryOp>::template apply (
+	arg._bits, arg._index, op);
+}
+
+template <typename Types, typename UnaryOp> PSYNTH_FORCEINLINE
+typename UnaryOp::result_type apply_operation (const variant<Types>& arg,
+					       UnaryOp op)
+{
+    return unary_reduce<Types,UnaryOp>::template applyc (
+	arg._bits, arg._index, op);
+}
+
+template <typename Types1, typename Types2, typename BinaryOp> PSYNTH_FORCEINLINE
+typename BinaryOp::result_type apply_operation (const variant<Types1>& arg1,
+						const variant<Types2>& arg2,
+						BinaryOp op)
+{    
+    return binary_reduce<Types1, Types2, BinaryOp>::template apply (
+	arg1._bits, arg1._index,
+	arg2._bits, arg2._index, op);
+}
+
+#undef PSYNTH_BINARY_REDUCE_LIMIT
+
+} /* namespace sound */
+} /* namespace psynth */
+
 
 namespace psynth
 {
@@ -611,11 +642,15 @@ namespace sound
 template <typename Types, typename T> struct type_to_index;
 template <typename V> struct range_is_basic;
 
+#if 0 // HACK?
+
 struct stereo_space;
 struct mono_space;
 struct quad_space;
 struct surround_space;
 struct error_type;
+
+#endif
 
 namespace detail
 {
@@ -655,16 +690,17 @@ struct reduce<Op, buffer_range<Loc> >
  *
  */
 
-template <typename Op, typename Img, bool IsBasic>
+template <typename Op, typename Buf, bool IsBasic>
 struct reduce_buffer_basic
 {
-    typedef Img type;
+    typedef Buf type;
 };
 
-template <typename Op, typename V, typename Alloc>
-struct reduce<Op, buffer<V,Alloc> > :
-	public reduce_buffer_basic<Op, buffer<V, Alloc>,
-				   buffer_is_basic<buffer<V,Alloc> >::value > {};
+template <typename Op, typename F, bool P, typename A>
+struct reduce<Op, buffer<F, P, A>> :
+    public reduce_buffer_basic<Op,
+                               buffer<F, P, A>,
+                               buffer_is_basic<buffer<F, P, A>>::value > {};
 
 /**
  *
@@ -894,12 +930,14 @@ struct reduce_copy_pixop_compat<V1, V2, true>
      typedef typename reduce_channel_layouts<layout1,layout2>::second_t L2;
 
      typedef typename derived_range_type<
-	 V1, use_default, L1, use_default, use_default,
-	 use_default, boost::mpl::false_>::type DV1;
+	 V1, boost::use_default, L1,
+         boost::use_default, 
+	 boost::use_default, boost::mpl::false_>::type DV1;
 
      typedef typename derived_range_type<
-	 V2, use_default, L2, use_default, use_default,
-	 use_default, boost::mpl::true_ >::type DV2;
+	 V2, boost::use_default, L2,
+         boost::use_default, 
+	 boost::use_default, boost::mpl::true_ >::type DV2;
         
      typedef std::pair<const DV1*, const DV2*> type;
 };
@@ -1003,8 +1041,8 @@ template <typename CC> class copy_and_convert_frames_fn;
 // the only thing for 1D reduce is making them all mutable...
 template <typename CC, typename Range, bool IsBasic> 
 struct reduce_range_basic<copy_and_convert_frames_fn<CC>, Range, IsBasic> 
-    : public derived_range_type<Range, use_default, use_default,
-			       use_default, use_default, boost::mpl::true_>
+    : public derived_range_type<Range, boost::use_default, boost::use_default,
+			       boost::use_default, boost::use_default, boost::mpl::true_>
 {
 };
 
@@ -1015,7 +1053,7 @@ struct reduce_range_basic<copy_and_convert_frames_fn<CC>, Range, IsBasic>
 template <typename CC, typename V1, typename V2, bool AreBasic> 
 struct reduce_ranges_basic<copy_and_convert_frames_fn<CC>, V1, V2, AreBasic>
 {
-    typedef is_same<typename V1::frame_type, typename V2::frame_type> Same;
+    typedef boost::is_same<typename V1::frame_type, typename V2::frame_type> Same;
 
     typedef reduce_channel_space<typename V1::channel_space::base> CsR;
     typedef typename boost::mpl::if_<
@@ -1024,12 +1062,12 @@ struct reduce_ranges_basic<copy_and_convert_frames_fn<CC>, V1, V2, AreBasic>
 	Same, typename CsR::type, typename V2::channel_space>::type Cs2;
     
     typedef typename derived_range_type<
-	V1, use_default, layout<Cs1, typename V1::sample_mapping>,
-	use_default, use_default, boost::mpl::false_>::type DV1;
+	V1, boost::use_default, layout<Cs1, typename V1::sample_mapping>,
+	boost::use_default, boost::use_default, boost::mpl::false_>::type DV1;
 
     typedef typename derived_range_type<
-	V2, use_default, layout<Cs2, typename V2::sample_mapping_t>,
-	use_default, use_default, boost::mpl::true_ >::type DV2;
+	V2, boost::use_default, layout<Cs2, typename V2::sample_mapping_t>,
+	boost::use_default, boost::use_default, boost::mpl::true_ >::type DV2;
     
     typedef std::pair<const DV1*, const DV2*> type;
 };

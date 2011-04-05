@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-23 15:39:21 raskolnikov>
+ *  Time-stamp:  <2011-04-04 21:24:07 raskolnikov>
  *
  *  @file        buffered_output.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -12,6 +12,8 @@
  *  @todo Think about the complexity of wrapping async_output
  *  polymorphically. Actually it could be wise to make it pure
  *  abstract and turn buffered_async_output into a real adapter.
+ *
+ *  @todo The converter function used should be parametrised.
  */
 
 /*

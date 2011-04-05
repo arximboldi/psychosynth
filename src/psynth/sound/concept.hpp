@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-04-04 01:07:43 raskolnikov>
+ *  Time-stamp:  <2011-04-04 16:50:14 raskolnikov>
  *
  *  @file        concept.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -9,8 +9,8 @@
  *
  *  @todo Buffer Views are, actually, a range. We have boost
  *  range. Should we use that instead of this confusing thing?
- *
  *  @todo Add unit tests that do declare this.
+ *  @todo Add ring buffers and so on.
  */
 
 /*
@@ -766,21 +766,21 @@ template <typename F>
 struct FrameConcept
 {
     void constraints() {
-        base::psynth_function_requires<ChannelBaseConcept<P> >();
-        base::psynth_function_requires<FrameBasedConcept<P> >();
+        base::psynth_function_requires<ChannelBaseConcept<F> >();
+        base::psynth_function_requires<FrameBasedConcept<F> >();
 
-        BOOST_STATIC_ASSERT((is_frame<P>::value));
-        static const bool is_mutable = P::is_mutable;
+        BOOST_STATIC_ASSERT((is_frame<F>::value));
+        static const bool is_mutable = F::is_mutable;
 	boost::ignore_unused_variable_warning(is_mutable);
 
-        typedef typename P::value_type      value_type;
+        typedef typename F::value_type      value_type;
 //      base::psynth_function_requires<FrameValueConcept<value_type> >();
 
-        typedef typename P::reference       reference;
+        typedef typename F::reference       reference;
         base::psynth_function_requires<
 	    FrameConcept<typename remove_const_and_reference<reference>::type> >();
 
-        typedef typename P::const_reference const_reference;
+        typedef typename F::const_reference const_reference;
         base::psynth_function_requires<
 	    FrameConcept<
 		typename remove_const_and_reference<const_reference>::type> >();
@@ -795,17 +795,17 @@ struct FrameConcept
 
 /**
 \code
-concept MutableFrameConcept<FrameConcept P> : MutableChannelBaseConcept<P> {
+concept MutableFrameConcept<FrameConcept P> : MutableChannelBaseConcept<F> {
     where is_mutable==true;
 };
 \endcode
 */
-template <typename P>
+template <typename F>
 struct MutableFrameConcept
 {
     void constraints() {
-        base::psynth_function_requires<FrameConcept<P> >();
-        BOOST_STATIC_ASSERT(P::is_mutable);
+        base::psynth_function_requires<FrameConcept<F> >();
+        BOOST_STATIC_ASSERT(F::is_mutable);
     }
 };
 
@@ -816,22 +816,22 @@ struct MutableFrameConcept
 /**
 \code
 concept HomogeneousFrameConcept<FrameConcept P> :
-   HomogeneousChannelBaseConcept<P>, HomogeneousFrameBasedConcept<P> { 
-     P::template element_const_reference_type<P>::type operator[] (
+   HomogeneousChannelBaseConcept<F>, HomogeneousFrameBasedConcept<F> { 
+     F::template element_const_reference_type<F>::type operator[] (
           P p, std::size_t i) const { return dynamic_at_c(p,i); }
 };
 \endcode
 */
-template <typename P>
+template <typename F>
 struct HomogeneousFrameConcept
 {
     void constraints() {
-        base::psynth_function_requires<FrameConcept<P> >();
-        base::psynth_function_requires<HomogeneousChannelBaseConcept<P> >();
-        base::psynth_function_requires<HomogeneousFrameBasedConcept<P> >();
+        base::psynth_function_requires<FrameConcept<F> >();
+        base::psynth_function_requires<HomogeneousChannelBaseConcept<F> >();
+        base::psynth_function_requires<HomogeneousFrameBasedConcept<F> >();
         p[0];
     }
-    P p;
+    F p;
 };
 
 /**
@@ -841,22 +841,22 @@ struct HomogeneousFrameConcept
 /**
 \code
 concept MutableHomogeneousFrameConcept<HomogeneousFrameConcept P> :
-           MutableHomogeneousChannelBaseConcept<P> { 
-    P::template element_reference_type<P>::type operator[](P p,
+           MutableHomogeneousChannelBaseConcept<F> { 
+    F::template element_reference_type<F>::type operator[](P p,
     std::size_t i) {
      return dynamic_at_c(p,i); }
 };
 \endcode
 */
-template <typename P>
+template <typename F>
 struct MutableHomogeneousFrameConcept
 {
     void constraints() {
-        base::psynth_function_requires<HomogeneousFrameConcept<P> >();
-        base::psynth_function_requires<MutableHomogeneousChannelBaseConcept<P> >();
+        base::psynth_function_requires<HomogeneousFrameConcept<F> >();
+        base::psynth_function_requires<MutableHomogeneousChannelBaseConcept<F> >();
         p[0] = p[0];
     }
-    P p;
+    F p;
 };
 
 /**
@@ -865,17 +865,17 @@ struct MutableHomogeneousFrameConcept
 */
 /**
 \code
-concept FrameValueConcept<FrameConcept P> : base::Regular<P> {
-    where SameType<value_type,P>;
+concept FrameValueConcept<FrameConcept P> : base::Regular<F> {
+    where SameType<value_type,F>;
 };    
 \endcode
 */
-template <typename P>
+template <typename F>
 struct FrameValueConcept
 {
     void constraints() {
-        base::psynth_function_requires<FrameConcept<P> >();
-        base::psynth_function_requires<base::Regular<P> >();
+        base::psynth_function_requires<FrameConcept<F> >();
+        base::psynth_function_requires<base::Regular<F> >();
     }
 };
 
@@ -885,34 +885,34 @@ struct FrameValueConcept
 */
 /**
 \code
-concept HomogeneousFrameValueConcept<HomogeneousFrameConcept P> : base::Regular<P> {
-    where SameType<value_type,P>;
+concept HomogeneousFrameValueConcept<HomogeneousFrameConcept P> : base::Regular<F> {
+    where SameType<value_type,F>;
 }; 
 \endcode
 */
-template <typename P>
+template <typename F>
 struct HomogeneousFrameValueConcept
 {
     void constraints() {
-        base::psynth_function_requires<HomogeneousFrameConcept<P> >();
-        base::psynth_function_requires<base::Regular<P> >();
-        BOOST_STATIC_ASSERT((boost::is_same<P, typename P::value_type>::value));
+        base::psynth_function_requires<HomogeneousFrameConcept<F> >();
+        base::psynth_function_requires<base::Regular<F> >();
+        BOOST_STATIC_ASSERT((boost::is_same<F, typename F::value_type>::value));
     }
 };
 
 namespace detail
 {
-    template <typename P1, typename P2, int K>
+    template <typename F1, typename F2, int K>
     struct samples_are_pairwise_compatible : public 
         boost::mpl::and_<
-	samples_are_pairwise_compatible<P1,P2,K-1>,
+	samples_are_pairwise_compatible<F1,F2,K-1>,
 	samples_are_compatible<
-	    typename kth_semantic_element_reference_type<P1,K>::type,
-	    typename kth_semantic_element_reference_type<P2,K>::type> >
+	    typename kth_semantic_element_reference_type<F1,K>::type,
+	    typename kth_semantic_element_reference_type<F2,K>::type> >
     {};
                                                  
-    template <typename P1, typename P2>
-    struct samples_are_pairwise_compatible<P1, P2, -1> :
+    template <typename F1, typename F2>
+    struct samples_are_pairwise_compatible<F1, F2, -1> :
 	public boost::mpl::true_ {};
 } /* namespace detail */
 
@@ -925,13 +925,13 @@ namespace detail
    
    \ingroup FrameAlgorithm
 */
-template <typename P1, typename P2>  // Models Psynth Frame
+template <typename F1, typename F2>  // Models Psynth Frame
 struct frames_are_compatible 
     : public boost::mpl::and_<typename channel_spaces_are_compatible<
-				  typename channel_space_type<P1>::type, 
-				  typename channel_space_type<P2>::type>::type, 
+				  typename channel_space_type<F1>::type, 
+				  typename channel_space_type<F2>::type>::type, 
 			      detail::samples_are_pairwise_compatible<
-				  P1, P2, num_samples<P1>::value-1> > {};
+				  F1, F2, num_samples<F1>::value-1> > {};
 
 /**
    \brief  Concept for frame compatibility
@@ -945,19 +945,19 @@ struct frames_are_compatible
 /**
 \code
 concept FramesCompatibleConcept<FrameConcept P1, FrameConcept P2> :
-          ChannelBasesCompatibleConcept<P1,P2> {
-    // where for each K [0..size<P1>::value):
-    //    SamplesCompatibleConcept<kth_semantic_element_type<P1,K>::type,
-                kth_semantic_element_type<P2,K>::type>;
+          ChannelBasesCompatibleConcept<F1,F2> {
+    // where for each K [0..size<F1>::value):
+    //    SamplesCompatibleConcept<kth_semantic_element_type<F1,K>::type,
+                kth_semantic_element_type<F2,K>::type>;
 };
 \endcode
 */
-template <typename P1, typename P2>
+template <typename F1, typename F2>
 // precondition: P1 and P2 model FrameConcept
 struct FramesCompatibleConcept
 {
     void constraints() {
-        BOOST_STATIC_ASSERT((frames_are_compatible<P1,P2>::value));
+        BOOST_STATIC_ASSERT((frames_are_compatible<F1,F2>::value));
     }
 };
 
@@ -1051,15 +1051,15 @@ struct FrameDereferenceAdaptorConcept
     D d;
 };
 
-template <typename P>
-struct FrameDereferenceAdaptorArchetype : public std::unary_function<P, P>
+template <typename F>
+struct FrameDereferenceAdaptorArchetype : public std::unary_function<F, F>
 {
     typedef FrameDereferenceAdaptorArchetype const_t;
-    typedef typename boost::remove_reference<P>::type value_type;
-    typedef typename boost::add_reference<P>::type reference;
+    typedef typename boost::remove_reference<F>::type value_type;
+    typedef typename boost::add_reference<F>::type reference;
     typedef reference const_reference;
     static const bool is_mutable=false;
-    P operator()(P x) const { throw; }
+    F operator()(F x) const { throw; }
 };
 
 
@@ -1422,7 +1422,7 @@ concept RandomAccessBufferRangeConcept<base::Regular Range> {
     typename reference;       // result of dereferencing
     typename difference_type;
     // result of operator-(iterator,iterator)
-    typename const_type;  where RandomAccessBufferRangeConcept<Range>;
+    typename const_type; where RandomAccessBufferRangeConcept<Range>;
     // same as Range, but over immutable values
     typename iterator; where RandomAccessTraversalConcept<iterator>;
     // iterator over all values
@@ -1439,19 +1439,17 @@ concept RandomAccessBufferRangeConcept<base::Regular Range> {
         static type make(const Range& v, const Deref& deref);
     };
     
-    // Create from a locator at the top-left corner and dimensions
-    Range::Range(const locator&, const point_type&);
+    Range::Range(const iterator&, const size_type&);
     
-    size_type        Range::size()       const; // total number of elements
+    // total number of elements
+    size_type        Range::size()       const; 
     reference        operator[](Range, const difference_type&) const;
     
     iterator         Range::begin()      const;
     iterator         Range::end()        const;
     reverse_iterator Range::rbegin()     const;
     reverse_iterator Range::rend()       const;
-    iterator         Range::at(const point_t&);
-
-    reference operator()(Range,const point_t&) const;
+    iterator         Range::at(const size_type&);
 };
 \endcode
 */
@@ -1709,7 +1707,7 @@ struct RandomAccessBufferConcept
 */
 /**
 \code 
-concept BufferConcept<RandomAccess2DBufferConcept Buf> {
+concept BufferConcept<RandomAccessBufferConcept Buf> {
     where MutableBufferRangeConcept<range_t>;
 };
 \endcode
@@ -1728,7 +1726,6 @@ struct BufferConcept
     }
     Buf buf;
 };
-
 
 } /* namespace sound */
 } /* namespace psynth */

@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-17 19:27:45 raskolnikov>
+ *  Time-stamp:  <2011-04-04 17:26:51 raskolnikov>
  *
  *  @file        metafunctions.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -865,7 +865,8 @@ public:
    Use boost::use_default for the properties of the source range that you want
    to keep
 */
-template <typename Range, typename T=boost::use_default,
+template <typename Range,
+          typename T=boost::use_default,
 	  typename L=boost::use_default,
 	  typename IsPlanar=boost::use_default,
 	  typename StepX=boost::use_default,

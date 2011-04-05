@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-09 03:01:51 raskolnikov>
+ *  Time-stamp:  <2011-04-04 16:47:10 raskolnikov>
  *
  *  @file        stereo.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>

@@ -9,6 +9,7 @@
   \textsc{Karl Popper}}
 
 \section{Requirement modelling}
+\label{sec:requirements}
 
 In the following section we discuss the requirements that we want to
 impose on the resulting framework. Note that functional requirements
@@ -77,14 +78,6 @@ software in a productive usage context.
   control input and output ports. The difference between signal and
   control ports are that the later are sampled at much less frequency.
 \end{requirement}
-
-\todo{De hecho, la naturaleza real de las señales de control aún no la tengo
-clara al 100\%. Las señales de control son lo que en la versión actual
-de GNU/Psychosynth se llaman \emph{parámetros}. Sin embargo, el tema
-no es del todo trivial y tras ver como funciona Reaktor y pensar mucho
-en como reinventar el MVC del Psychosynth la situación está cada vez
-más confusa, pero supongo que la concreción se puede dejar para el
-rediseño de esta capa del software en la segunda iteración.}
 
 \begin{requirement}
   Both signal and control ports should be able to process information
@@ -330,12 +323,6 @@ The software should be able to use arbitrary precision samples. Up to
   permits it.
 \end{requirement}
 
-\todo{En realidad este requisito es un poco ambigüo, pero no se muy bien
-  cómo especificar la posibilidad e usar tamaños de buffer bajos, ya
-  que las condiciones en las que es medible esto dependen de la
-  potencia del procesador y, en un sinte modular que permite redes
-  arbitrariamente complejas, del tamaño del sinte. ¿Alguna sugerencia?}
-
 \section{Open, community oriented development}
 
 The developers of this software are strong proponents of Free Software
@@ -482,9 +469,6 @@ compatibility to C and evolutionary design. Some of this flaws are
 nonetheless going to be solved in the next standardisation of the
 language, to be released in 2011 \cite{herb10iso}.
 
-\todo{Aquí estoy citando un blog --- ¿Es esto correcto o mejor lo pongo como
-nota al pie? }
-
 Compilers are starting to support it and we are very interested in
 exploring the benefits and new programming patterns and design
 benefits that it can provide. Because Psychosynth is an ongoing and
@@ -630,27 +614,27 @@ attached to this document.
 The Psychosynth project was started in 2007 and since there has been
 some relevant developments. The screenshot in figure
 \ref{fig:screenie} gives a broad perspective of the current features
-of the project. For a more detailed description from the user point of
-view, please refer to the user manual that can be checked online on
-the project
-webpage\footnote{\url{http://psychosynth.com/index.php/Documentation}},
-where there are also demonstration videos and other multimedia
-material. The article \cite{bolivar08psychosynth} can serve as an
-introduction to the project too.
+of the project. On the bottom we can see some buttons for poping up
+different menu windows, such as for settings, recording the sound into
+a file or connecting several instances over the network. The window on
+the top of the screen is used to add elements to the processing
+graph. The smaller \emph{properties} windows contains a listing of all
+the actual parameters of a node and allows us to give numeric values
+to them. All around the screen, sinusoids, step sequencers, file
+samplers and echo filters are interconnected as represented by the 3D
+blocks.  For a more detailed description from the user point of view,
+please refer to the user manual that can be checked online on the
+project webpage
+\footnote{\url{http://psychosynth.com/index.php/Documentation}}, where
+there are also demonstration videos and other multimedia material. The
+article \cite{bolivar08psychosynth} can serve as an introduction to
+the project too.
 
 \begin{figure}[h!]
   \centering
-  \includegraphics[width=.7\textwidth]{pic/screenie.png}
+  \includegraphics[width=\textwidth]{pic/screenie.png}
   \caption[A screenshot of GNU Psychosynth 0.1.4]{A screenshot of GNU
-    Psychosynth 0.1.4. On the bottom we can see some buttons for
-    poping up different menu windows, such as for settings, recording
-    the sound into a file or connecting several instances over the
-    network. The window on the top of the screen is used to add
-    elements to the processing graph. The smaller \emph{properties}
-    windows contains a listing of all the actual parameters of a node
-    and allows us to give numeric values to them. All around the
-    screen, sinusoids, step sequencers, file samplers and echo filters
-    are interconnected as represented by the 3D blocks.}
+    Psychosynth 0.1.4.}
   \label{fig:screenie}
 \end{figure}
 
@@ -694,7 +678,8 @@ Figure \ref{fig:layers} represents the current layered
 architecture. Lets make a bit more in-depth discussion of each layer.
 
 \begin{figure}[h!]\centering
-\includegraphics[width=.4\textwidth]{pic/layers.png}
+\todo{La capa node hay que cambiarlo por \texttt{graph}}
+\includegraphics[width=.6\textwidth]{pic/layers.png}
 \caption{The Psychosynth layered architecture.}
 \label{fig:layers}
 \end{figure}
@@ -888,15 +873,6 @@ code.
 \section{Project planning and methodology}
 
 \subsection{Rationale --- A critique on software engineering}
-
-\todo{Lo se, soy un criticón enfermizo. He acabado convirtiendo esta
-  sección en una crítica (indirecta y relativamente elegante, espero)
-  a la concepción de la ingeniería del software que se da en la
-  facultad y que se hace a menudo de los PFC. Si pensáis que esta
-  crítica es demasiado larga o inapropiada puedo matizarla o
-  eliminarla :D No obstante, en su defensa la considero apropiada ya
-  que la elección de una metodología debe ser racional y como tanto
-  debe incluir un análisis crítico de las alternativas.}
 
 Choosing a well known software engineering process is considered one
 of the first steps to be taken in a final master thesis project. In

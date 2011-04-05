@@ -1,17 +1,19 @@
 
 \chapter{A generic sound processing library}
 
-\epigraph{Numbers it is. All music when you come to think.  Two
-  multiplied by two divided by half is twice one.  Vibrations: chords
-  those are. One plus two plus six is seven. Do anything you like with
-  figures juggling. Always find out this equal to that. Symmetry under
-  a cemetery wall. He doesn’t see my mourning. Callous: all for his
-  own gut. Musemathematics. And you think you’re listening to the
-  etherial. But suppose you said it like: Martha, seven times nine
-  minus $x$ is thirtyfive thousand.  Fall quite flat. It’s on account of
-  the sounds it is.}{\emph{Ulysses}\\\textsc{James Joyce}}
-
-\todo{Este capítulo en general necesita más dibujos.}
+{
+  \setlength{\epigraphwidth}{\textwidth}
+  \renewcommand{\textflush}{flushepinormal}
+  \epigraph{Numbers it is. All music when you come to think.  Two
+    multiplied by two divided by half is twice one.  Vibrations: chords
+    those are. One plus two plus six is seven. Do anything you like with
+    figures juggling. Always find out this equal to that. Symmetry under
+    a cemetery wall. He doesn’t see my mourning. Callous: all for his
+    own gut. Musemathematics. And you think you’re listening to the
+    etherial. But suppose you said it like: Martha, seven times nine
+    minus $x$ is thirtyfive thousand.  Fall quite flat. It’s on account of
+    the sounds it is.}{\emph{Ulysses}\\\textsc{James Joyce}}
+}
 
 \section{Analysis}
 
@@ -25,12 +27,9 @@ system exposes for delivering sound to the soundcard --- but the first
 question is still to be answered. Actually, the solution to this first
 question mostly subsumes the issue of how to interface with these
 external interfaces, thus, shall we debate it with care.
+\todo{Añadir más dibujitos.}
 
 \subsection{Factors of sound representation}
-\todo{Me he dado cuenta de que esta sección introduce muchas
-  definiciones. ¿Tal vez utilizar un estilo más formal usando el
-  paquete theorem para las definiciones ayudaría a usar el documento
-  como referencia?}
 
 A sound signal is a longitudinal wave of air in motion. We can
 analogically record the \emph{proximal stimuli} --- i.e. the physical
@@ -47,7 +46,7 @@ interrelated and our actual subjective perception of loudness might
 vary with pitch and otherwise \cite{fletcher37loudness}.
 
 Most of the time, we represent the relative air pressure value as a
-voltage, that varies at some range --- p.e. $[ -5, 5 ] V$. This is an
+voltage, that varies at some range --- e.g. $[ -5, 5 ] V$. This is an
 analogous signal that we have to discretise somehow in order to
 manipulate it computationally.
 
@@ -144,7 +143,7 @@ are needed for the left and right channels. Moreover, nowdays
 channels up to 20.2 are used in different systems.
 
 We call \emph{channel space} to the set of semantic channels we use in
-some sort of audio representation --- p.e. stereo audio has channel
+some sort of audio representation --- e.g. stereo audio has channel
 space with $left$ and $right$ elements. We use the term
 \emph{frame} to call a set of samples coincident in time, this is, the
 samples of the various channels at a given time point. Thus, we will
@@ -244,9 +243,9 @@ the properties of light electromagnetic waveform at those discrete
 points. Each pixel, however, is decomposed in several \emph{colors}
 that, for example, capture the intensity in the red, green and blue
 sensors of a CCD camera. As there are different ways of decomposing an
-audio frame (p.e, stereo, surround, etc.), there are different ways of
+audio frame (e.g, stereo, surround, etc.), there are different ways of
 decomposing a pixel into several values, known as the \emph{color
-  space} (p.e, RGB, CMYK, YUV, etc.). Boost.GIL uses the term
+  space} (e.g, RGB, CMYK, YUV, etc.). Boost.GIL uses the term
 \emph{channel} to name the individual value of one those color
 components.
 
@@ -269,6 +268,20 @@ easily our Psynth.Sound module design and implementation that we are
 to describe in the following section.
 
 \section{Design}
+
+This section describes the design of the modules implemented in this
+layer. We will first introduce some advanced techniques used in the
+design that the reader might be unfamiliar with. Then, sections
+\ref{sec:ns-sound-beg} to \ref{sec:ns-sound-end} will describe the
+classes in the \texttt{psynth::sound} namespace, section
+\ref{sec:ns-io} will be dedicated to the \texttt{psynth::io} namespace
+and finally section \ref{sec:ns-synth} to the \texttt{psynth::synth}
+namespace. \texttt{psynth::io} and \texttt{psynth::synth} are
+independent from eachother and both depend on
+\texttt{psynth::sound}. Still, from the architectural point of view
+they are all considered to be on the same layer --- the ``synth''
+layer dedicated to mostly statically arranged sound synthesis and
+processing.
 
 \subsection{Core techniques}
 
@@ -538,7 +551,7 @@ instead, we shall convert them when needed using the
 facility.
 
 \subsection{Core concepts}
-
+\label{sec:ns-sound-beg}
 We are now ready to understand the main design and implementation
 techniques used in our generic library. Because the library is
 \emph{generic}, in the sense of generic programming, most algorithms
@@ -555,11 +568,11 @@ described in section \ref{sec:concepts} and finally we will enumerate
 and describe some models for such concept.
 
 For brevity, we will omit basic concepts such as
-\texttt{CopyConstructible}, \texttt{Regular}, \texttt{Metafunction},
+\texttt{Copy\-Constructible}, \texttt{Regular}, \texttt{Metafunction},
 etc. Their complete definition should be evident and an interested
 reader can find most of them in \cite{stepanov09elements}.
 
-\subsubsection{\texttt{ChannelSpaceConcept}}
+\subsubsection{{ChannelSpaceConcept}}
 
 A channel space is a MPL sequence (like \type{mpl::list}) of whose
 elements channel tags (empty types giving a name for the semantic
@@ -570,8 +583,8 @@ concept ChannelSpaceConcept<MPLRandomAccessSequence Cs>
 {};
 \end{lstlisting}
 
-Some example models include \texttt{stereo\_space} or
-\texttt{surround\_space}. An example on how a user of the library can
+Some example models include \texttt{stereo\-\_space} or
+\texttt{surround\-\_space}. An example on how a user of the library can
 define his own channel space follows.
 
 \begin{lstlisting}
@@ -582,13 +595,13 @@ typedef mpl::vector<left_channel, right_channel> stereo_space;
 \end{lstlisting}
 
 A related trivial concept is
-\texttt{ChannelSpaceCompatibleConcept}. Two channel spaces are
+\texttt{Channel\-Space\-Compatible\-Con\-cept}. Two channel spaces are
 compatible if they are the same. In fact, this leaks the underlying
 MPL sequence type used in the channel space through the abstraction,
 because spaces with the same set of semantic channels might be found
 incompatible, but it suffices in practise.
 
-\subsubsection{\type{SampleMappingConcept}}
+\subsubsection{{SampleMappingConcept}}
 
 An MPL Random Access Sequence, whose elements model
 \texttt{MPLIntegralConstant} (like \texttt{mpl::int\_}) representing a
@@ -623,7 +636,7 @@ as:
 typedef layout<stereo_space, mpl::vector2_c<int, 1, 0>> rlstereo_layout;
 \end{lstlisting}
 
-\subsubsection{\texttt{SampleConcept}}
+\subsubsection{{SampleConcept}}
 
 A \emph{sample} is the type we use to represent the amplitude of a
 channel at certain point in time.
@@ -654,7 +667,7 @@ concept SampleConcept<typename T> :
 \end{lstlisting}
 
 Built-in scalar types like \texttt{char}, \texttt{int} or
-\texttt{float} model \texttt{SampleConcept} by default. 
+\texttt{float} model \texttt{Sample\-Concept} by default. 
 
 The \texttt{scoped\_sample\_value<Type, Min, Max, Zero>} template
 class models the concept whenever \texttt{Type} is a scalar type and
@@ -676,13 +689,13 @@ typedef scoped_sample<float,
                       float_one> bits32sf;
 \end{lstlisting}
 
-User defined types should specialise \texttt{sample\_traits} to map
+User defined types should specialise \texttt{sample\-\_traits} to map
 the concept.
 
 Related trivial concepts are \texttt{MutableSampleConcept} and
 \texttt{SampleValueConcept} (a sample that is also \texttt{Regular}).
 
-\subsubsection{\texttt{SampleConvertibleConcept}}
+\subsubsection{{SampleConvertibleConcept}}
 
 Because casting does not suffice in most cases, one should
 override a \texttt{T sample\_convert (U)} function for \texttt{U} to
@@ -698,7 +711,7 @@ concept SampleConvertibleConcept<SampleConcept SrcSample,
 The library provides overrides for \texttt{sample\_convert} making
 most supplied sample types being convertible too.
 
-\subsubsection{\texttt{ChannelBaseConcept}}
+\subsubsection{{ChannelBaseConcept}}
 
 A \emph{channel base} is a container of channel elements (such as
 samples, sample references or sample pointers).
@@ -753,7 +766,7 @@ index corresponds to the way the elements are ordered in their channel
 space.  For example, in the stereo channel space the elements are
 ordered as \texttt{\{left\_channel, right\_channel\}}. For a channel
 base with a RL-stereo layout, the first element in physical ordering
-is the right element, whereas the first semantic element is the red
+is the right element, whereas the first semantic element is the left
 one.  Models of \texttt{ChannelBaseConcept} are required to provide
 the \texttt{at\_c<K>(ChannelBase)} function, which allows for
 accessing the elements based on their physical order. Psynth provides
@@ -761,18 +774,21 @@ a \texttt{semantic\_at\_c<K>(ChannelBase)} function (described
 later) which can operate on any model of \texttt{ChannelBaseConcept}
 and returns the corresponding semantic element.
 
-A related concept is \texttt{MutableChannelBaseConcept} and
-\texttt{ChannelBaseValueConcept} with the excepted definition. There
-is also the concept \type{ChannelBasesCompatibleConcept}. Two channel
-bases are compatible if they have the same channel space and their
-elements are compatible, semantic-pairwise.
+A related concept is \texttt{Mutable\-Channel\-Base\-Con\-cept} and
+\texttt{Chan\-nel\-Base\-Value\-Con\-cept} with the excepted
+definition. There is also the concept
+\type{Channel\-Bases\-Compatible\-Concept}. Two channel bases are
+compatible if they have the same channel space and their elements are
+compatible, semantic-pairwise.
 
-\subsubsection{\texttt{HomogeneousChannelBaseConcept}}
+\subsubsection{{HomogeneousChannelBaseConcept}}
 
 Channel base whose elements all have the same type.
 
 \begin{lstlisting}
-concept HomogeneousChannelBaseConcept<ChannelBaseConcept CB> {
+concept HomogeneousChannelBaseConcept<
+            ChannelBaseConcept CB> 
+{
     // For all K in [0 ... size<C1>::value-1):
     //     where SameType<kth_element_type<CB,K>::type,
     //                    kth_element_type<CB,K+1>::type>;    
@@ -781,14 +797,14 @@ concept HomogeneousChannelBaseConcept<ChannelBaseConcept CB> {
 };  
 \end{lstlisting}
 
-Related concepts \type{MutableHomogeneousChannelBaseConcept} and
-\type{HomogeneousChannelBaseValueConcept} have the expected
+Related concepts \type{MutableHomogeneousChannel\-Base\-Con\-cept} and
+\type{Ho\-mo\-geneous\-ChannelBaseValueConcept} have the expected
 definition.
 
 The library provides an \texttt{homogeneous\_channel\_base} class that
 models the concept.
 
-\subsubsection{\texttt{FrameBasedConcept}}
+\subsubsection{{FrameBasedConcept}}
 
 Concept for all frame based constructs, such as frames themselves,
 iterators, ranges and buffers whose value type is a frame. A
@@ -814,7 +830,7 @@ There are many models for this in the library, like \type{buffer},
 \type{buffer\_range}, \type{frame}, \type{bitaligned\_frame\_iterator},\\
 \type{bitaligned\_frame\_reference}, \type{packed\_frame} and so on.
 
-\subsubsection{\texttt{HomogeneousFrameBasedConcept}}
+\subsubsection{{HomogeneousFrameBasedConcept}}
 
 Concept for homogeneous frame-based constructs --- frame based with
 the same sample type for all its channels. These should allow access
@@ -832,7 +848,7 @@ Most container and alike constructs in the library --- iteators,
 buffers, ranges --- model this whenever the underlying frame is
 homogeneous.
 
-\subsubsection{\texttt{FrameConcept}}
+\subsubsection{{FrameConcept}}
 
 A set of samples coincident in time, one per channel in the given
 channel space.
@@ -844,9 +860,12 @@ concept FrameConcept<typename F> :
     // where for each K [0..size<F>::value-1]:
     //      SampleConcept<kth_element_type<F,K> >;
         
-    typename F::value_type;       where FrameValueConcept<value_type>;
-    typename F::reference;        where FrameConcept<reference>;
-    typename F::const_reference;  where FrameConcept<const_reference>;
+    typename F::value_type;       
+        where FrameValueConcept<value_type>;
+    typename F::reference;
+        where FrameConcept<reference>;
+    typename F::const_reference;  
+        where FrameConcept<const_reference>;
     static const bool F::is_mutable;
 
     template <FrameConcept F2> where { FrameConcept<F,F2> } 
@@ -858,29 +877,32 @@ concept FrameConcept<typename F> :
 }; 
 \end{lstlisting}
 
-Related concepts are \type{MutableFrameConcept} and
-\type{FrameValueConcept}, defined as usually.
+Related concepts are \type{MutableFrame\-Concept} and
+\type{Frame\-Value\-Concept}, defined as usually.
 
 Frame compatibility should be tested with the
-\texttt{FramesCompatibleConcept}.  Frames are compatible if their
+\texttt{Frames\-Compatible\-Concept}.  Frames are compatible if their
 samples and channel space types are compatible. Compatible frames can
 be assigned and copy constructed from one another.
 
 
-Provided models include \type{frame}, \type{packed\_frame},
-\type{planar\_frame\_reference} and
-\type{bit\_aligned\_frame\_reference}.
+Provided models include \type{frame}, \type{packed\-\_frame},
+\type{planar\-\_frame\-\_reference} and
+\type{bit\-\_aligned\-\_frame\-\_reference}.
 
-\subsubsection{\texttt{HomogeneousFrameConcept}}
+\subsubsection{{HomogeneousFrameConcept}}
 
 A frame with all samples of the same type should also provide an
 indexed access operator.
 
 \begin{lstlisting}
 concept HomogeneousFrameConcept<FrameConcept P> :
-   HomogeneousChannelBaseConcept<P>, HomogeneousFrameBasedConcept<P> { 
-     P::template element_const_reference_type<P>::type operator[] (
-          P p, std::size_t i) const { return dynamic_at_c(p,i); }
+            HomogeneousChannelBaseConcept<P>, 
+            HomogeneousFrameBasedConcept<P> 
+{ 
+     P::template element_const_reference_type<P>::type 
+     operator[] (P p, std::size_t i) const 
+     { return dynamic_at_c(p,i); }
 };
 \end{lstlisting}
 
@@ -890,7 +912,7 @@ Related concepts are \type{MutableHomogeneousFrameConcept} and
 Provided models include \type{planar\_frame\_reference} and
 \type{frame}.
 
-\subsubsection{\texttt{FrameConvertibleConcept}}
+\subsubsection{{FrameConvertibleConcept}}
 
 A frame type is convertible to another frame type if there exist a
 \texttt{channel\_convert} overload. Convertibility is non-symmetric
@@ -906,16 +928,19 @@ concept FrameConvertibleConcept {
 
 Frame types provided by the library are convertible.
 
-\subsubsection{\texttt{FrameDereferenceAdaptorConcept}}
+\subsubsection{{FrameDereferenceAdaptorConcept}}
 
 Represents a unary function object that can be invoked upon
 dereferencing a frame iterator. This can perform an arbitrary
 computation, such as channel conversion or table lookup.
 
 \begin{lstlisting}
-concept FrameDereferenceAdaptorConcept<boost::UnaryFunctionConcept D>
-  : DefaultConstructibleConcept<D>, base::CopyConstructibleConcept<D>,
-    AssignableConcept<D>  {
+concept FrameDereferenceAdaptorConcept<
+             boost::UnaryFunctionConcept D>
+        : DefaultConstructibleConcept<D>
+        , base::CopyConstructibleConcept<D>
+        , AssignableConcept<D>  
+{
     typename const_type;
         where FrameDereferenceAdaptorConcept<const_t>;
     typename value_type;
@@ -931,16 +956,17 @@ concept FrameDereferenceAdaptorConcept<boost::UnaryFunctionConcept D>
 The \type{channel\_convert\_deref\_fn} provides a model that performs
 channel conversion.
 
-\subsubsection{\texttt{FrameIteratorConcept}}
+\subsubsection{{FrameIteratorConcept}}
 
 An STL random access traversal iterator over a model of
 \type{FrameConcept}. Our iterators must provide some extra
 metafunctions.
 
 \begin{lstlisting}
-concept FrameIteratorConcept<typename Iterator> :
-boost_concepts::RandomAccessTraversalConcept<Iterator>,
-FrameBasedConcept<Iterator> {
+concept FrameIteratorConcept<typename Iterator> 
+        : boost_concepts::RandomAccessTraversalConcept<Iterator>
+        , FrameBasedConcept<Iterator> 
+{
     where FrameValueConcept<value_type>;
     typename const_iterator_type<It>::type;         
         where FrameIteratorConcept<const_iterator_type<It>::type>;
@@ -950,25 +976,26 @@ FrameBasedConcept<Iterator> {
 };
 \end{lstlisting}
 
-Related concepts include \type{MutableFrameIteratorConcept}, defined
-as usually. The related \texttt{HasDynamicStepTypeConcept} is modelled
-by those iterator types with an overload for the
-\type{dynamic\_step\_type} metafunction returning a similar iterator
-that models \texttt{StepIteratorConcept}.
+Related concepts include \type{MutableFrame\-Iterator\-Concept},
+defined as usually. The related \texttt{Has\-Dynamic\-StepTypeConcept}
+is modelled by those iterator types with an overload for the
+\type{dynamic\-\_step\-\_type} metafunction returning a similar
+iterator that models \texttt{Step\-Iterator\-Concept}.
 
 Models include \type{T*} where \type{T} is a frame or
-\type{bitaligned\_frame\_iterator},
-\texttt{memory\_based\_step\_iterator} and
-\type{planar\_frame\_iterator}.
+\type{bitaligned\-\_frame\-\_iterator},
+\texttt{memory\-\_based\-\_step\-\_iterator} and
+\type{planar\-\_frame\-\_iterator}.
 
-\subsubsection{\texttt{MemoryBasedIteratorConcept}}
+\subsubsection{{MemoryBasedIteratorConcept}}
 
 Iterator that advances by a specified step. Concept of a random-access
 iterator that can be advanced in memory units (bytes or bits).
 
 \begin{lstlisting}
 concept MemoryBasedIteratorConcept<
-          boost_concepts::RandomAccessTraversalConcept Iterator> {
+          boost_concepts::RandomAccessTraversalConcept Iterator> 
+{
     typename byte_to_memunit<Iterator>;
     where metafunction<byte_to_memunit<Iterator> >;
     std::ptrdiff_t memunit_step(const Iterator&);
@@ -1007,8 +1034,10 @@ iterator.
 
 \begin{lstlisting}
 concept IteratorAdaptorConcept<
-            boost_concepts::ForwardTraversalConcept Iterator> {
-    where SameType<is_iterator_adaptor<Iterator>::type, boost::mpl::true_>;
+            boost_concepts::ForwardTraversalConcept Iterator> 
+{
+    where SameType<is_iterator_adaptor<Iterator>::type, 
+                   boost::mpl::true_>;
 
     typename iterator_adaptor_get_base<Iterator>;
         where Metafunction<iterator_adaptor_get_base<Iterator> >;
@@ -1026,9 +1055,9 @@ concept IteratorAdaptorConcept<
 };
 \end{lstlisting}
 
-There exist a related \type{MutableIteratorAdaptorConcept} with the
-usual definition. Classes \type{dereference\_iterator\_adaptor} and
-\type{memory\_based\_step\_iterator} do model the concept.
+There exist a related \type{MutableIteratorAdaptor\-Con\-cept} with the
+usual definition. Classes \type{dereference\-\_iterator\-\_adaptor} and
+\type{memory\-\_based\-\_step\-\_iterator} do model the concept.
 
 \subsubsection{RandomAccessBufferRangeConcept}
 
@@ -1036,17 +1065,20 @@ This is a range, similar to the new STL range defined in C++0x, but
 with some extra members for random access.
 
 \begin{lstlisting}
-concept RandomAccessBufferRangeConcept<base::Regular Range> {
+concept RandomAccessBufferRangeConcept<base::Regular Range> 
+{
     typename value_type;
     typename reference;       // result of dereferencing
     typename difference_type;
     // result of operator-(iterator,iterator)
-    typename const_type; where RandomAccessBufferRangeConcept<Range>;
+    typename const_type; 
+        where RandomAccessBufferRangeConcept<Range>;
     // same as Range, but over immutable values
-    typename iterator; where RandomAccessTraversalConcept<iterator>;
+    typename iterator; 
+        where RandomAccessTraversalConcept<iterator>;
     // iterator over all values
     typename reverse_iterator;
-    where RandomAccessTraversalConcept<reverse_iterator>; 
+        where RandomAccessTraversalConcept<reverse_iterator>; 
     typename size_type;       // the return value of size()
 
     // Defines the type of a range similar to this type, except it
@@ -1058,8 +1090,7 @@ concept RandomAccessBufferRangeConcept<base::Regular Range> {
         static type make(const Range& v, const Deref& deref);
     };
     
-    // Create from a locator at the top-left corner and dimensions
-    Range::Range(const locator&, const point_type&);
+    Range::Range(const iterator&, const size_type&);
     
     // total number of elements
     size_type        Range::size()       const; 
@@ -1069,9 +1100,7 @@ concept RandomAccessBufferRangeConcept<base::Regular Range> {
     iterator         Range::end()        const;
     reverse_iterator Range::rbegin()     const;
     reverse_iterator Range::rend()       const;
-    iterator         Range::at(const point_t&);
-
-    reference operator()(Range,const point_t&) const;
+    iterator         Range::at(const size_type&);
 };
 \end{lstlisting}
 
@@ -1093,12 +1122,16 @@ concept BufferRangeConcept<RandomAccessBufferRangeConcept Range>
 
 There exists a related \type{MutableBufferRangeConcept} with the
 expected definition. Also, there is a
-\type{RangesAreCompatibleConcept}. Ranges are compatible if they have
+\type{RangesAre\-Compati\-ble\-Concept}. Ranges are compatible if they have
 the same channel spaces and compatible sample values. Constness and
 layout are not important for compatibility.
 
 The library provides the
-\texttt{buffer\_range<Iterator>} model.
+\texttt{buffer\_range<Iterator>} model. There exists also a whole
+family of \emph{range factories} that build a range or transform one
+kind of range into another. These allow to build a buffer range on
+top of raw data provided by an external library, lazily converting
+from once frame type to another, obtaining sub parts of a frame, etc.
 
 \subsubsection{RandomAccessBufferConcept}
 
@@ -1112,7 +1145,8 @@ would have to provide two overloads.
 \begin{lstlisting}
 concept RandomAccessBufferConcept<typename Buf> : 
             base::Regular<Buf> {
-    typename range; where MutableRandomAccessBufferRangeConcept<range>;
+    typename range; 
+        where MutableRandomAccessBufferRangeConcept<range>;
     typename const_range = range::const_type;
     typename value_type  = range::value_type;
     typename allocator_type;
@@ -1124,8 +1158,8 @@ concept RandomAccessBufferConcept<typename Buf> :
     void Buf::recreate(point_t new_dims, value_type fill_value,
                        std::size_t alignment);
     
-    const const_range_t&   const_range(const Buf&);
-    const range_t&         range(Buf&);
+    const const_range&   const_range(const Buf&);
+    const range&         range(Buf&);
 };
 \end{lstlisting}
 
@@ -1134,24 +1168,490 @@ concept RandomAccessBufferConcept<typename Buf> :
 A buffer containing frames.
 
 \begin{lstlisting}
-concept BufferConcept<RandomAccess2DBufferConcept Buf> {
-    where MutableBufferRangeConcept<range_t>;
+concept BufferConcept<RandomAccessBufferConcept Buf> {
+    where MutableBufferRangeConcept<Buf::range>;
 };
 \end{lstlisting}
 
-The \type{buffer} models the concept.
+The \type{buffer} class models the concept.
+
+\subsubsection{RandomAccessRingBufferRangeConcept}
+
+Circular or ring buffers provide a virtual continuous flow of data
+where one can write at one end and read from the other. There ring
+buffer has a fixed size and the amount of available data plus free
+space in the structure remains constant during operation, as seen in
+figure \ref{fig:ringbuf}. This data structure is specially important
+for passing audio data through different threads.
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=.6\textwidth]{pic/ringbuffer.png}
+  \caption{Ring buffer operation.}
+  \label{fig:ringbuf}
+\end{figure}
+
+Our ring buffers wrap and underlying buffer range. Note that each ring
+buffer range keeps its own write pointer, so using multiple ring
+buffer ranges on the same data might lead to subtle problems.
+
+\todo{A este concepto le faltan restricciones}.
+
+\begin{lstlisting}
+concept RandomAccessRingBufferRangeConcept<Regular R> 
+{
+    typedef range; where RandomAccessBufferRange<range>;
+
+    typename reference = range::reference;
+    typename size_type = range::size_type;
+    typename value_type = range::size_type;
+    typename difference_type = range::difference_type;
+    
+    typename unsafe_position;
+    typename position;
+
+    typename unsafe_iterator;
+    typename iterator;
+    
+    R (const range& range);
+    R& R::operator= (const range& r);
+
+    size_type R::size () const;
+    unsafe_iterator begin_unsafe () const;
+    unsafe_iterator end_unsafe () const;
+    iterator begin () const;
+    iterator end () const;
+    reference operator [] (difference_type i) const;    
+    iterator at (difference_type i) const;
+    unsafe_iterator unsafe_at (difference_type i) const;
+    
+    unsafe_position R::begin_unsafe_pos () const;
+    unsafe_position R::end_unsafe_pos () const;
+    position R::begin_pos () const;
+    position R::end_pos () const;
+    
+    size_type R::available (const position& r) const;
+    size_type R::available (const unsafe_position& r) const;    
+    size_type R::available () const;
+    ring_buffer_error R::check_position (const position& reader) const;
+
+    template <class Position> range
+    R::sub_range_one (const Position& p, size_type slice) const;
+    template <class Position> range
+    R::sub_range_two (const Position& p, size_type slice) const;
+    
+    template<class Position, class Range2>
+    size_t R::read (Position& r, const Range2& range) const;
+    template<class Position, class Range2, 
+             class CC = default_channel_converter>
+    size_t R::read_and_convert (Position& r, const Range2& range, 
+                                CC cc = CC ()) const;
+   
+    template <class Range2>
+    void R::write (const Range2& range);
+    template <class Range2, class CC = default_channel_converter>
+    void write_and_convert (const Range2& range, CC cc = CC ());
+
+    bool is_backwards () const;
+    void set_backwards ();
+    
+    // Total of data ever writen to the buffer.
+    difference_type count () const;
+
+    // Fix iterators after using set_backwards.
+    position sync (const position& r) const;
+};
+\end{lstlisting}
+
+There are some things worth mentioning about this concept. It supports
+two different ways of manipulation. The STL alike iterator based
+interface is provided for compatibility, but one should try to avoid
+it for performance issues --- it has to check for having to wrap
+around the end of the buffer on every iterator increment. Instead,
+data should be added in chunks as large as possible with the
+\emph{position} based interface --- the \type{read*} and \type{write*}
+functions. When this is not possible, sometimes the
+\type{sub\_range\_*} functions can provide a solution, allowing to
+obtain the slices of the underlying range that represent a sub range
+of the ring buffer.
+
+\todo{Tal vez podrían desacoplarse las dos formas de manipular en dos
+  conceptos diferentes...}
+
+Also, note that the ring buffer supports backwards operation. This is
+used such that whenever we are reading a file and we eventually want
+to read it backwards, we can reuse the data already in the
+buffer. 
+
+Note that non mutable ring buffers do not make sense.
 
 \subsubsection{RingBufferRangeConcept}
 
-\todo{Define}
+A ring buffer range of frames.
 
-\subsubsection{RingBufferConcept}
+\begin{lstlisting}
+concept RingBufferRangeConcept<
+            RandomAccessRingBufferRangeConcept Buf> {
+    where MutableBufferRangeConcept<Buf::range>;
+};
+\end{lstlisting}
 
-\todo{Define}
+The \type{ring\_buffer\_range} type provides the reference model for
+this concept.
+
+\subsubsection{RandomAccessRingBuffer}
+
+A random access ring buffer is a buffer that has an associated ring
+buffer range.
+
+\begin{lstlisting}
+concept RandomAccessRingBuffer<RandomAccessBuffer Buf> {
+  range& range(Buf&);
+}
+\end{lstlisting}
+
+Note that it returns a non const referencce in the \texttt{range}
+function. This is such that one can mutate the internal write pointer
+of the ring range associated to the buffer.
+
+\subsubsection{RingBuffer}
+
+A ring buffer over frames.
+
+\begin{lstlisting}
+concept RingBufferConcept<RandomAccessRingBufferConcept Buf> {
+    where MutableBufferRangeConcept<Buf::range>;
+};
+\end{lstlisting}
+
+The main model for this is the \texttt{ring\_buffer} template.
+
+\subsection{Algorithms}
+
+The library provides a series of generic algorithms similar to those
+of the Standard Template Library \cite{stepanov94stl}. Hand coding
+most loops often makes user code not generic as it is easy to be
+tempted to make assumptions on the data format when doing so. Using
+these algorithms it is easier to write concise generic code with no
+performance overhead.  We can distinguish between \emph{sample
+  algorithms}, \emph{frame algorithms} and \emph{range algorithms}.
+
+The first include sample conversion functions and limited arithmetic
+support --- proportional multiplication and inversion.
+
+Frame algorithms allow abstract iteration over the samples of a
+frame. They are the \type{static\_*} alternatives, including STL alike
+\emph{transform}, \emph{for each}, \emph{fill}, \emph{generate},
+\emph{equal} ... Because the number of channels is encoded in the
+type, they do perform static unrolling such that no looping overhead
+is added. Also, there are the aforementioned frame conversion
+overload that make our frame types convertible.
+
+The last family of algorithms include STL alike \emph{copy}, \emph{for
+each}, etc. over buffer ranges. They are the \type{*\_frames}
+functions. Also, those algorithms can mostly be safely used with their
+original iterator based versions in the \type{std} namespace because
+optimised overloads are provided.
+
+\subsection{Concrete types}
+
+A bunch of macros generate a whole range of typedefs for concrete
+types such that user code does not need to mess with long template
+instantiation. The naming pattern for these concrete types is:
+\begin{equation}
+\begin{aligned}
+ColorSpace+BitDepth+[\mbox{\tt f}]+[\mbox{\tt s}]+[\mbox{\tt c}]+&\\
+[\mbox{\tt \_planar}] + [\mbox{\tt\_step}] + ClassType&
+\end{aligned}
+\end{equation}
+$ColorSpace$ may be \type{mono}, \type{stereo}, \type{quad} or
+\type{surround}. The optional $f$ indicates floating point arithmetic
+samples, $s$ is for signed samples, the $c$ denotes immutability,
+$planar$ indicates that the data is in non interleaved form. $Step$
+indicates that it is a type with a dynamic step. $ClassType$ may be
+\type{ptr} for iterators, \type{range} for buffer range, \type{buffer}
+for buffers, \type{ring\_range} for ring buffer ranges,
+\type{ring\_buffer} for ring buffers, \type{frame} for frames, etc.
+
+For example:
+\begin{lstlisting}
+lrstereo8_buffer             a;
+surround16_frame;            b;
+surround16c_planar_ref_t     c(b);
+stereo32sf_planar_step_ptr_t d;
+\end{lstlisting}
+
+Types in the library are very interrelated with one another. Thus,
+wide range of metafunctions are provided to map among types, like the
+\type{*\_from\_*} family (e.g. \type{range\-\_type\-\_from\-\_frame}). The
+\type{derived\_*\_dype} metafunctions can be used to obtain a new type
+that is mostly like another but changing some of its parameters. There
+are metafunctions for obtaining the channel space, number of samples
+and the rest of properties from types. A full list of the provided
+metafunctions can be found in the reference manual.
 
 \subsection{Going dynamic}
+\label{sec:ns-sound-end}
+
+Until now, we have described a very generic system for sound data
+representation and manipulation that uses static
+polymorphism. However, we do not always know what kind of sound data
+we need to use at compile time.
+
+For this purpose we use the \texttt{variant} class, which implements a
+generic type safe disjoint union. Our variant class, taken from GIL,
+is very similar to the Boost.Variant class\footnote{The Boost.Variant
+  library: \url{www.boost.org/doc/html/variant.html}} --- the main
+differences being that our library takes a MPL sequence as parameter
+while Boost takes the types directly on the template argument list,
+and that our visitation function is \type{apply\_operation} in
+contrast with Boost.Variant's \type{apply\_visitor}.
+
+We provide the subclasses of variant \type{dynamic\_buffer} and
+\type{dynamic\_buffer\_range}. Note that the interface of these types
+is more limited than the one of \type{buffer} and
+\type{buffer\-\_range}. Specifically, they do not model
+\type{RandomAccessBuffer} and \type{RandomAccessBufferRange} or nor
+their more concrete frame based counterparts. There
+are obvious reasons for this: (1) there is no specific associated
+frame type associated to these so the static metafunctions associated
+to these models would have no sensible definition and (2) there is no
+efficient way to implement iteration with dynamic polymorphism ---
+this is the very same reason why we used generic programming in the
+first place!
+
+However, there are overloads taking a dynamic buffer or range for most
+algorithms and buffer factories supplied by the library, so they can
+be used as if they where a concrete static type most of the
+time. Moreover, with the \texttt{apply\_operation} function we can
+execute a function object ``inside'' the variant, this is, taking as
+an argument the concrete type that we want. This function object
+should provide an \type{operator()} overload of every file format from
+the variant that it supports. The \texttt{operator ()} can of course
+be a template for improved generality.
+
+A clarifying example follows:
+
+\begin{lstlisting}
+using namespace psynth::sound;
+namespace mpl = boost::mpl;
+
+// A dynamically determined buffer
+typedef sound::dynamic_buffer<
+    mpl::vector<
+       mono16s_buffer,
+       mono32sf_buffer,
+       stereo16s_buffer,
+       stereo32sf_buffer>>
+    my_buffer;
+
+// A generic operation
+struct set_to_zero
+{
+  template <typename R>
+  void operator () (const R& data)
+  {
+    psynth_function_requires<BufferRangeConcept<R>> (); // Works!
+    typedef typename sample_type<R>::type sample;
+    typedef typename R::value_type frame;
+    const auto zero = sample_traits<sample>::zero_value ();
+  
+    fill_frames (data, frame (zero));
+  }
+};
+
+int main ()
+{
+  my_buffer buf; // Now it holds a mono16s_buffer;
+  buf.recreate (1024);
+  apply_operation (range (buf), set_to_zero ());
+  
+  buf = stereo32sf_buffer (1024); // Now a stereo32sf_buffer
+  apply_operation (sub_range (range (buf), 128, 256), 
+                   set_to_zero ());
+  
+  // These two sentences generate compile errors:
+  buf = surround32sf_buffer (1024);
+  psynth_function_requires<BufferRangeConcept<buf::range>> ();
+  
+  return 0;
+}
+\end{lstlisting}
+
+In this example we defined a dynamic buffer type that can hold mono
+and interleaved stereo buffers of 32 bit signed floating points or 16
+bit signed fixed point frames. As the example illustrates, we can
+assign into it any of these types but static errors are generated when
+trying to assign other types. The example shows that inside the
+\type{set\_to\_zero} operation we can access to all the static
+information of the type that is actually in the buffer and write real
+generic code.
+
+Because dispatching is internally done via a
+\type{switch}\footnote{Generated with preprocessor meta programming,
+  which is kind of a hack, but pure template metaprogramming solutions
+  have worse performance.} there is minimal performance overhead ---
+ideally one switch per operation (because iteration itself is not done
+via the dynamic interface) which is negligible. However, careless use
+of this facility produces object code bloat. 
+
+This is so because whenever \type{apply\_operation} is used with a
+generic algorithm, it is instantiated for every possible type that the
+variant can hold. Bourdev presents a technique
+\cite{bourdev11efficient} that avoids a lot of the bloat using a
+\type{reduce} metafunction to partition the types and choose a
+representative for each subset of the types --- the generic algorithm
+is then instantiated only for the representatives. This escapes the
+C++ type system and thus the safety relies on the programmer properly
+matching the types taking into account the properties of the
+algorithm. Whether by using this technique or by just avoiding dynamic
+buffers over too many types, special care should be taken when using
+dynamic buffers.
+
+Note that there exist a \texttt{dynamic\-\_ring\-\_buffer} and
+\texttt{dynamic\-\_ring\-\_buffer\-\_range} that weaken their
+requirements on the underlying buffers and ranges such that they can
+be used over dynamic buffers and ranges.
+
 \subsection{Input and Output module}
+\label{sec:ns-io}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=\textwidth]{pic/io-class-input.pdf}
+  \caption{UML class diagram of \type{psynth::io} input facilities.}
+  \label{fig:inputuml}
+\end{figure}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=\textwidth]{pic/io-class-output.pdf}
+  \caption{UML class diagram of \type{psynth::io} output facilities.}
+  \label{fig:outputuml}
+\end{figure}
+
+When talking about input and output, runtime polymorphism is more
+important than static generality. We have to map the previous
+facilities with the data that is out there in formats not always known
+beforehand and provided by devices and interfaces whose availability
+depend from one user system to another. Object orientation comes back
+into play.
+
+Figures \ref{fig:inputuml} and \ref{fig:outputuml} show the class
+diagrams for the input and output parts of the module. We use the
+Unified Modelling Language notation \cite{umlspec}. The doted boxes over
+the corner of some classes list the formal parameter of generic
+entities, an extension that was introduced in the 2.3 version of
+UML. 
+
+One should start reading the diagrams from the \type{input} and
+\type{output} classes. They are the basic interfaces on which we build
+the system. They are very simple, providing just a \type{take(const
+  range\&)} and \type{put (const range\&)} abstract method
+respectively --- and a typedef for accessing the actual argument for
+its \type{Range} parameter. Because virtual functions can not be
+templates themselves, these classes, when instantiated, provide
+through those methods a hook for polymorphically sending or receiving
+data to and from the external systems \emph{in only one
+  format}. The next section shows how to work around this. Note also
+that not every device support every format. Sometimes this is known
+only at runtime --- and an exception will be thrown if trying to open
+it in the wrong format --- but sometimes it can be known at compile
+time (e.g., the OSS interface itself can not output planar data) 
+
+Note that none of our I/O devices support \emph{open} and \emph{close}
+functions. After our experience in previous versions of Psychosynth,
+we have decided to simplify the interface and force specialisations to
+use RAII --- opening the resource occurs in the constructor and closing it
+in the destructor. This makes life easier to implementer of
+specialisations (who are released from having to implement a state
+machine) and for users of the library (who can be sure that a living
+object is ready to use). If the same variable is to be used for
+opening several files, one can use \type{swap} or the \emph{move
+  constructor}. If the lifetime of variable does not match the one of
+the resource \type{boost::optional} or a smart pointer should be used.
+
+\subsubsection{Buffering}
+
+For the reader who paid attention to our discussion on dynamic buffers
+and ranges in section \ref{sec:ns-sound-beg} it might seem that
+constraint of having to interface with only one type can be easily
+solved by instantiating the I/O devices with a dynamic range. However,
+in most cases that is not possible, because the device is opened to be
+used in one mode of operation only and it will not be able to change
+it until it is reopened. The most sensible solution is to use an
+intermediate buffer where we convert the data before sending it or
+receiving it. In order to avoid overhead due to buffering when
+unneeded this behaviour is not provided by default.
+
+The \type{buffered\_*} family of classes are adaptors that match from
+a I/O interface in one format to another desired format. Because of
+buffering, the target interface can be have a \texttt{dynamic\_range}
+as parameter. The \type{buffered\_*\_adapter} types \emph{aggregate} the
+adaptee via a pointer or smart pointer such that an already living
+device can be adapted, or the buffer can be reused for several
+devices. The other types \emph{compose} the adaptee managing their
+lifetime --- the constructor parameters are forwarded from the
+buffered adaptor constructor.
+
+\subsubsection{Asynchronous operation}
+
+When data is to be provided in real time to or from a sound card,
+chunks of audio data are to be processed as requested by the
+device. All the descendants of \type{async\_base} are of this
+kind. That interface provides \type{start ()} and \type{stop ()}
+methods for controlling the state of the asynchronous
+operation, plus others for checking its current status.
+
+Whenever new data is sent or required by the device, a user specified
+callback is executed with the number of frames as parameter, which
+should in turn call \type{put ()} or \type{take ()} once the data is
+ready or it can consume new information. Unless otherwise specified by
+an specialisation, we assume that these functions can only be called
+from the asynchronous callback. Also, we shall assume that the
+callback is running under real time conditions, and thus it is
+expected to have a time $O(n)$, where $n$ is the number of requested
+samples, not block, perform no system calls and allocate no dynamic
+memory.
+
+\subsubsection{Raw I/O}
+
+Most device management code does not depend on the audio format type,
+and unnecessary object code bloat would be produced if it where in the
+templates over the buffer range type. It is then abstracted in the
+``raw'' I/O classes --- named after the pattern
+\type{*\_raw\_\{input|output\}}. They can perform the I/O in an type
+unsafe manner with incoming data in a void pointer. They are mostly an
+implementation detail, but some users might find them handy as a
+lightweight RAII wrapper over the underlying C interface.
+
+\subsubsection{Caching input}
+
+As we have noted, system calls should be avoided in the audio
+processing thread. However, files should be read from disk, and
+potentially decoded from hard formats, in order to play pre-recorded
+samples or mix full songs. The \texttt{caching\_file\_input} family of
+adaptors allow this kind of operation by reading the data in big
+chunks on a separate thread. Because it has to do buffering anyway, it
+can be used as an interface adaptor from one kind of buffer range to
+another too. 
+
+Our current implementation uses mutexes and condition variables, which
+should be avoided. It is planned to fix this in the future, section
+\ref{sec:fixringbuffer} further discusses this issue.
+
 \subsection{Synthesis module}
+\label{sec:ns-synth}
+
+In the \type{psynth::synth} namespace there is a whole bunch of
+algorithms for sound synthesis, including oscillators, wave tables,
+filters of all sorts, time stretchers, etc. Most of them are objects
+that just provide an \texttt{update (...)} method taking buffer ranges
+as needed plus several manipulators for their parameters.
+
+We feel that their interface can be extensively improved, as
+we discuss in section \ref{sec:fixsynth}. For this same reason, we
+will avoid giving a detailed discussion of its design now.
 
 \section{Validation}
 
@@ -1328,7 +1828,8 @@ comparisons in the Boost.GIL video tutorial\footnote{Boost.GIL
 interested reader can check --- given the similarities in GIL and
 \texttt{psynth::sound} we can expect equivalent results.
 
-We can safely state that the library passes the performance requirements.
+We can safely state that the library passes the performance
+requirements.
 
 \begin{table}[p]
   \centering\small
@@ -1589,11 +2090,7 @@ postpone since they fall outside this project's scope. Nonetheless it
 is worth enumerating them:
 
 \subsubsection{Lock free ring buffers}
-
-\todo{No se que mejor paper citar sobre la inversión de
-  prioridades. El que he puesto es reciente y no muy original pero
-  parece de los más orientados a nuestro tipo de trabajo y de hecho
-  introduce el tema de los bufferes lock-free}
+\label{sec:fixringbuffer}
 
 The audio processing thread has real time constraints. As we
 introduced in note \ref{note:realtime} this implies, among other
@@ -1611,7 +2108,7 @@ Locking is done with care and in practice we have experience no buffer
 underruns due to this problem, even with high number of caching file
 readers in execution.  However, for correctness and better support of
 Jackd, we should implement a lock-free ring buffer
-\cite{valois94lock}\cite{michael95correction} that does not require
+\cite{valois94lock, michael95correction} that does not require
 using special synchronisation. Jackd actually provides a C
 implementation that can serve as a basis for ours. The most important
 interface change is that only one reader should be permitted --- we
@@ -1620,6 +2117,7 @@ can embed the read pointer inside the data structure. Also, the
 introduce an unexpected complexity in the implementation.
 
 \subsubsection{Virtual and adapted iterators and ranges}
+\label{sec:fixsynth}
 
 Boost.GIL included a ``locator adapter'' and ``virtual locator''
 notions that allowed creating or modifying images lazily via a
