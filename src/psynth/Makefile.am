@@ -73,6 +73,7 @@ nobase_libpsynthinc_HEADERS = \
 	base/observer.hpp\
 	base/pointer.hpp\
 	base/exception.hpp\
+	base/throw.hpp\
 	base/type_value.hpp\
 	base/threads.hpp\
 	base/util.hpp\

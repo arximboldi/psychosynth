@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-02 22:41:50 raskolnikov>
+ *  Time-stamp:  <2011-06-07 18:51:05 raskolnikov>
  *
  *  @file        exception.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -45,7 +45,7 @@ namespace base
 /**
  * Base class for all the exceptions inside the framework.
  */
-class exception : public std::exception
+class exception : public virtual std::exception
 {
 public:
     virtual ~exception () throw () {}
@@ -56,7 +56,7 @@ public:
      *   logger::self ().path (where ())
      * @endcode
      */
-    virtual void log () const {}
+    virtual void log () const;
 
     /**
      * Returns a message in natural language describing the
@@ -79,7 +79,7 @@ public:
  * A base clase for the errors defined with PSYNTH_DECLARE_ERROR and
  * alike preprocessor commands.
  */
-class error_base : public exception
+class error_base : public virtual exception
 {
 public:
     /** Constructor */
@@ -93,9 +93,6 @@ public:
     
     virtual ~error_base () throw () {}
 
-    /** Writes the exception into the global log. */
-    virtual void log () const;
-    
     virtual const char* what () const throw ()
     {
 	return _what.empty () ? default_what () : _what.c_str ();
@@ -117,7 +114,9 @@ protected:
 private:
     std::string _what;
 };
-    
+
+int default_error_level () throw ();
+
 #define PSYNTH_DECLARE_ERROR(d_parent, d_error)				\
     class d_error : public d_parent					\
     {									\

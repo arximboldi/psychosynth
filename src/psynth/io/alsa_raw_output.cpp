@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-23 16:52:53 raskolnikov>
+ *  Time-stamp:  <2011-06-07 19:10:27 raskolnikov>
  *
  *  @file        alsa_raw_output.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -34,6 +34,7 @@
 #include <algorithm>
 
 #include "base/logger.hpp"
+#include "base/throw.hpp"
 #include "base/scope_guard.hpp"
 #include "alsa_raw_output.hpp"
 
@@ -47,16 +48,6 @@ PSYNTH_DEFINE_ERROR_WHAT (alsa_open_error, "Can not open device.");
 PSYNTH_DEFINE_ERROR_WHAT (alsa_start_error, "Can not start device.");
 PSYNTH_DEFINE_ERROR_WHAT (alsa_param_error, "Invalid parameter.");
 
-#define PSYNTH_ALSA_CHECK(fun, except)                          \
-    do {                                                        \
-        int err = fun;                                          \
-        if (err < 0) {                                          \
-            PSYNTH_LOG << base::log::warning << "ALSA error:"   \
-                       << snd_strerror (err);                   \
-            throw except ();                                    \
-        }                                                       \
-    } while (0)
-
 alsa_raw_output::alsa_raw_output (const char*       device,
                                   snd_pcm_format_t  format,
                                   snd_pcm_uframes_t buffer_size,
@@ -67,6 +58,17 @@ alsa_raw_output::alsa_raw_output (const char*       device,
     : thread_async (cb)
     , _buffer_size (buffer_size)
 {
+    
+#define PSYNTH_ALSA_CHECK(fun, except)                                  \
+    do {                                                                \
+        int err = fun;                                                  \
+        if (err < 0) {                                                  \
+            PSYNTH_THROW (except) << "Problem opening ("                \
+                                  << device << "). "                    \
+                                  << snd_strerror (err);                \
+        }                                                               \
+    } while (0)
+    
     int dir;
     
     PSYNTH_ALSA_CHECK (snd_pcm_open (&_handle, device,

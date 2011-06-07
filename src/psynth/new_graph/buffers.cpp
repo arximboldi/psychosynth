@@ -1,15 +1,15 @@
 /**
- *  Time-stamp:  <2011-06-07 18:51:53 raskolnikov>
+ *  Time-stamp:  <2011-03-18 22:40:30 raskolnikov>
  *
- *  @file        exception.cpp
+ *  @file        buffers.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
- *  @date        2009
+ *  @date        Fri Mar 18 12:02:33 2011
  *
- *  Exception handling system implementation.
+ *  @brief Buffers template instatiations.
  */
 
 /*
- *  Copyright (C) 2009 Juan Pedro Bolívar Puente
+ *  Copyright (C) 2011 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
  *   
@@ -28,38 +28,12 @@
  *
  */
 
-#include "base/exception.hpp"
-#include "base/logger.hpp"
-
-#define PSYNTH_MODULE_NAME "psynth.base.exception"
+#include "buffers.hpp"
 
 namespace psynth
 {
-namespace base
+namespace graph
 {
 
-PSYNTH_DEFINE_ERROR (error);
-
-int default_error_level () throw ()
-{
-    return log::error;
-}
-
-int error_base::level () const throw ()
-{
-    return default_error_level ();
-}
-
-const char* error_base::default_what () const throw ()
-{
-    return "unknown error";
-}
-
-void exception::log () const
-{
-    logger::self () (where (), level (), what ());
-}
-
-} /* namespace base */
+} /* namespace graph */
 } /* namespace psynth */
-

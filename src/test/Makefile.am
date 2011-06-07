@@ -34,6 +34,7 @@ psynth_unit_test_SOURCES += \
 	psynth/base/tree_node.cpp \
 	psynth/base/arg_parser.cpp \
 	psynth/base/c3_class.cpp \
+	psynth/base/exception.cpp \
 	psynth/sound/sample.cpp \
 	psynth/sound/frame.cpp \
 	psynth/sound/sample_buffer.cpp \

@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-22 02:02:33 raskolnikov>
+ *  Time-stamp:  <2011-06-07 18:41:40 raskolnikov>
  *
  *  @file        logger.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -60,7 +60,9 @@ public:
      * longer than the one of the log_stream_adapter
      */
     inline log_stream_adapter (log& l);
-
+    inline log_stream_adapter (const log_stream_adapter&);
+    inline log_stream_adapter (log_stream_adapter&&);
+    
     /** Destructor. */
     inline ~log_stream_adapter ();
 
@@ -68,9 +70,18 @@ public:
     void set_level (int level)
     { _level = level; } 
 
+    /** Gests current level. */
+    int level () const { return _level; }
+
+    /** Gests current message. */
+    const std::string message () const { return _str.str (); }
+    
     /** Sends the message. */
     inline void flush ();
-    
+
+    /** Sends the message keeping it. */
+    inline void dump ();
+
 private:
     log&               _log;
     int                _level;
@@ -384,6 +395,11 @@ void log_stream_adapter::flush ()
     _str.str ("");
 }
 
+void log_stream_adapter::dump ()
+{
+    _log (_level, _str.str ());
+}
+
 inline
 log_stream_adapter& operator<< (log_stream_adapter& s, log::level x)
 {
@@ -409,6 +425,20 @@ log_stream_adapter::log_stream_adapter (log& l)
     : _log (l)
     , _level (log::info)
 {}
+
+log_stream_adapter::log_stream_adapter (const log_stream_adapter& l)
+    : _log (l._log)
+    , _level (l._level)
+{
+    _str << l._str.str ();
+}
+
+log_stream_adapter::log_stream_adapter (log_stream_adapter&& l)
+    : _log (l._log)
+    , _level (l._level)
+{
+    _str << l._str.str (); // FIXME: SLOW!!!
+}
 
 log_stream_adapter::~log_stream_adapter ()
 {

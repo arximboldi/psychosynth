@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-20 16:34:19 raskolnikov>
+ *  Time-stamp:  <2011-06-07 19:13:56 raskolnikov>
  *
  *  @file        oss_raw_output.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -40,6 +40,7 @@
 #include <cstring>
 
 #include "base/logger.hpp"
+#include "base/throw.hpp"
 #include "base/scope_guard.hpp"
 #include "oss_raw_output.hpp"
 
@@ -51,15 +52,6 @@ namespace io
 PSYNTH_DEFINE_ERROR (oss_error);
 PSYNTH_DEFINE_ERROR_WHAT (oss_open_error, "Error while opening OSS device.");
 PSYNTH_DEFINE_ERROR_WHAT (oss_param_error, "Invalid parameter for OSS device.");
-
-#define PSYNTH_OSS_CHECK(fun, except)                                   \
-    do {                                                                \
-        int err = fun;                                                  \
-        if (err == -1) {                                                \
-            PSYNTH_LOG << base::log::warning << ::strerror (errno);     \
-            throw except ();                                            \
-        }                                                               \
-    } while (0)
 
 oss_raw_output::oss_raw_output (const char* device,
                                 int         format,
@@ -73,6 +65,17 @@ oss_raw_output::oss_raw_output (const char* device,
     , _frame_size (sample_size * channels)
     , _buffer_size (buffer_size)
 {
+    
+#define PSYNTH_OSS_CHECK(fun, except)                                   \
+    do {                                                                \
+        int err = fun;                                                  \
+        if (err == -1) {                                                \
+            PSYNTH_THROW (except) << "Problem opening ("                \
+                                  << device                             \
+                                  << ::strerror (errno);                \
+        }                                                               \
+    } while (0)
+
     int stereo;
     switch (channels)
     {
