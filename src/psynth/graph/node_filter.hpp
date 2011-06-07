@@ -74,8 +74,8 @@ public:
 	N_PARAM
     };
 
-    static const float DEFAULT_CUTOFF    = 660.0f;
-    static const float DEFAULT_RESONANCE = 0.5f;
+    static constexpr float DEFAULT_CUTOFF    = 660.0f;
+    static constexpr float DEFAULT_RESONANCE = 0.5f;
     
 private:
     int m_param_type;

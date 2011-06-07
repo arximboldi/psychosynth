@@ -57,7 +57,7 @@ public:
 	N_PARAM
     };
 
-    static const float DEFAULT_AMPL = 0.3f;
+    static constexpr float DEFAULT_AMPL = 0.3f;
     
 protected:
     sample update_pink ();

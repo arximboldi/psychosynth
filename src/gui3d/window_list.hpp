@@ -25,6 +25,7 @@
 
 #include <list>
 #include <iostream>
+#include <cstddef> // CEGUI bugfix.
 #include <CEGUI/CEGUI.h>
 #include <OIS/OIS.h>
 

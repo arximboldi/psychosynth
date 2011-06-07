@@ -21,6 +21,7 @@
  ***************************************************************************/
 
 #include <algorithm>
+#include <cstddef> // CEGUI bugfix.
 #include <CEGUI/CEGUI.h>
 
 #include "gui3d/element_manager.hpp"

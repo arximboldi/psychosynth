@@ -20,6 +20,7 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <cstddef> // CEGUI bugfix.
 #include <CEGUI/CEGUI.h>
 
 #include "gui3d/camera_controller_default.hpp"
@@ -162,7 +163,7 @@ bool camera_controller_default::mouseMoved (const OIS::MouseEvent& e)
 bool camera_controller_default::mousePressed (const OIS::MouseEvent &e, OIS::MouseButtonID id)
 {
     Vector3 table_pos;
-    const Vector3* corners;
+    //const Vector3* corners;
     Real min_dist;
 	
     switch(id) {
@@ -192,7 +193,7 @@ bool camera_controller_default::mousePressed (const OIS::MouseEvent &e, OIS::Mou
 	recalculate();
 	break; 
     case OIS::MB_Button4:
-	corners = m_camera->getWorldSpaceCorners();
+	//corners = m_camera->getWorldSpaceCorners();
 	//h = (corners[1] - corners[2]).length();
 	min_dist = 1; //h/Math::Tan(m_yangle);
 	m_dist -= 1.0;

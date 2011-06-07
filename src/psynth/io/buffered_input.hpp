@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-21 16:56:30 raskolnikov>
+ *  Time-stamp:  <2011-06-07 19:55:40 raskolnikov>
  *
  *  @file        buffered_input.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -31,7 +31,7 @@
 #ifndef PSYNTH_IO_BUFFERED_INPUT_H_
 #define PSYNTH_IO_BUFFERED_INPUT_H_
 
-#include <boost/pointee.hpp>
+#include <psynth/base/type_traits.hpp>
 #include <psynth/io/input.hpp>
 
 namespace psynth
@@ -48,7 +48,7 @@ class buffered_input_impl : public input<Range>
 public:
     typedef Range range;
     
-    typedef typename boost::pointee<InputPtr>::type input_type;
+    typedef typename base::pointee<InputPtr>::type input_type;
     typedef typename input_type::range                   input_range;
 
     typedef typename sound::buffer_from_range<input_range>::type

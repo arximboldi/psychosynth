@@ -106,8 +106,8 @@ class element : public psynth::world_node_listener
 		     psynth::base::vector_2f& dest);
 
 public:
-    static const Ogre::Real RADIOUS = 1.0f;
-    static const Ogre::Real Z_POS = 0.001f;
+    static constexpr Ogre::Real RADIOUS = 1.0f;
+    static constexpr Ogre::Real Z_POS = 0.001f;
     
     element (psynth::world_node& obj, Ogre::SceneManager* scene);
     

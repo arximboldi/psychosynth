@@ -23,6 +23,7 @@
 #ifndef TOGGABLEWINDOW_H
 #define TOGGABLEWINDOW_H
 
+#include <cstddef> // CEGUI bugfix.
 #include <CEGUI/CEGUI.h>
 
 class toggable_window

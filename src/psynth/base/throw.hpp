@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-07 18:45:04 raskolnikov>
+ *  Time-stamp:  <2011-06-07 20:43:06 raskolnikov>
  *
  *  @file        throw.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -53,6 +53,7 @@ public:
         _stream.set_level (Base::level ());
     }
 
+    exception_wrapper (const exception_wrapper&) = default;
     exception_wrapper (exception_wrapper&&) = default;
     exception_wrapper& operator= (const exception_wrapper&) = default;
 
@@ -90,6 +91,7 @@ public:
         _stream.set_level (default_error_level ());
     }
 
+    exception_wrapper (const exception_wrapper&) = default;
     exception_wrapper (exception_wrapper&&) = default;
     exception_wrapper& operator= (const exception_wrapper&) = default;
 

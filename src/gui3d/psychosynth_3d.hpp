@@ -24,6 +24,7 @@
 #define PSYCHOSYNTH3D_H
 
 #include <OGRE/Ogre.h>
+#include <cstddef> // CEGUI bugfix.
 #include <CEGUI/CEGUI.h>
 #include <OgreCEGUIRenderer.h>
 

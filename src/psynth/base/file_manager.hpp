@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-10-18 16:06:52 raskolnikov>
+ *  Time-stamp:  <2011-06-07 19:43:03 raskolnikov>
  *
  *  @file        file_manager.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -72,7 +72,7 @@ void file_mgr_node::find_if_all (StringPredicate pred,
     res = find_if (pred, res);
     
     for (it = begin(); it != end(); ++it)
-      it->find_if_all (pred, res);
+        it->find_if_all (pred, res);
 }
 
 typedef singleton_holder<file_mgr_node> file_manager;

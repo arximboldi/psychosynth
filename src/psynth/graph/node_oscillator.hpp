@@ -76,8 +76,8 @@ public:
 	N_PARAM
     };
 
-    static const float DEFAULT_FREQ = 110.0f;
-    static const float DEFAULT_AMPL = 0.4f;
+    static constexpr float DEFAULT_FREQ = 110.0f;
+    static constexpr float DEFAULT_AMPL = 0.4f;
     
 protected:
     typedef boost::variant<synth::oscillator<synth::sine_generator>,

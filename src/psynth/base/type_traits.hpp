@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-10-17 20:14:23 raskolnikov>
+ *  Time-stamp:  <2011-06-07 19:56:27 raskolnikov>
  *
  *  @file        type_traits.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -35,10 +35,25 @@
 #ifndef PSYNTH_TYPE_TRAITS_H_
 #define PSYNTH_TYPE_TRAITS_H_
 
+#include <memory>
+#include <type_traits>
+#include <boost/pointee.hpp>
+
 namespace psynth
 {
 namespace base
 {
+
+template <typename Ptr>
+struct pointee : public boost::pointee<Ptr> {};
+template <typename T>
+struct pointee<typename std::unique_ptr<T>> { typedef T type; };
+template <typename T>
+struct pointee<typename std::shared_ptr<T>> { typedef T type; };
+
+// TODO: Remove
+
+#if 0
 
 template<typename T>
 type_traits
@@ -61,6 +76,8 @@ struct take_pointer<T*>
     enum { result = true };
     typename T type;
 };
+
+#endif
 
 } /* namespace base */
 } /* namespace psynth */

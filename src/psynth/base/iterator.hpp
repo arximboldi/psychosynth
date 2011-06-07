@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-10-19 18:16:46 raskolnikov>
+ *  Time-stamp:  <2011-06-07 20:22:38 raskolnikov>
  *
  *  @file        iterator.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -33,8 +33,8 @@
 
 #include <map>
 #include <iterator>
-#include <type_traits>
 
+#include <psynth/base/type_traits.hpp>
 #include <psynth/base/pointer.hpp>
 
 namespace psynth
@@ -49,26 +49,36 @@ public:
     typedef std::iterator_traits<Iterator> base_traits;
     
     typedef typename std::iterator_traits<Iterator>::value_type ptr_value_type;
-    typedef typename std::remove_pointer<ptr_value_type>::type value_type;
-
+    typedef typename pointee<ptr_value_type>::type value_type;
+    
     typedef typename Iterator::iterator_category iterator_category;
     typedef typename Iterator::difference_type difference_type;
     typedef value_type* pointer;
     typedef value_type& reference;
 
-    ptr_iterator () {}
+    ptr_iterator () = default;
+    ptr_iterator (const ptr_iterator& it) = default;
 
-    ptr_iterator (const Iterator& it)
-	: Iterator (it)
+    ptr_iterator (ptr_iterator&& it)
+        : Iterator (std::move (it))
     {}
 
+    ptr_iterator (const Iterator& it)
+ 	: Iterator (it)
+    {}
+
+    ptr_iterator (Iterator&& it)
+ 	: Iterator (std::move (it))
+    {}
+    
     template<class OtherIterator>
     ptr_iterator (const OtherIterator& it)
 	: Iterator (it)
     {}
-    
-    ptr_iterator (const ptr_iterator& it)
-	: Iterator (it)
+
+    template<class OtherIterator>
+    ptr_iterator (OtherIterator&& it)
+	: Iterator (std::move (it))
     {}
     
     /**
@@ -83,9 +93,9 @@ public:
     /**
      * Indirection operator, returns a pointer to the referred value const value.
      */
-    typename Iterator::value_type operator->() const
+    value_type* operator->() const
     {
-	return Iterator::operator* ();
+	return &*Iterator::operator* ();
     }
 };
 
@@ -94,7 +104,7 @@ class ptr_const_iterator : public Iterator
 {
 public:
     typedef typename std::iterator_traits<Iterator>::value_type ptr_value_type;
-    typedef typename std::remove_pointer<ptr_value_type>::type value_type;
+    typedef typename pointee<ptr_value_type>::type value_type;
     
     typedef typename Iterator::iterator_category iterator_category;
     typedef typename Iterator::difference_type difference_type;
@@ -130,7 +140,7 @@ public:
      */
     const value_type* operator->() const
     {
-	return Iterator::operator* ();
+	return &*Iterator::operator* ();
     }
 };
   
@@ -143,27 +153,39 @@ template <typename Key, typename Data>
 class map_iterator : public std::map<Key, Data>::iterator
 {
 public:
-    typedef typename std::map<Key, Data>::iterator::iterator_category
-    iterator_category;
+    typedef typename std::map<Key, Data>::iterator base_type;
+    
+    typedef typename base_type::iterator_category iterator_category;
     typedef Data value_type;
-    typedef typename std::map<Key, Data>::iterator::difference_type
-    difference_type;
+    typedef typename base_type::difference_type difference_type;
     typedef Data* pointer;
     typedef Data& reference;
-
+    
     /** Constructor. */
-    map_iterator()
+    map_iterator ()
     {}
 
     /** Constructor from a map::iterator. */
-    map_iterator (const typename std::map<Key, Data>::iterator& i)
-	: std::map<Key, Data>::iterator(i) {}
+    map_iterator (const base_type& i)
+	: base_type (i) {}
 
     /** Copy constructor. */
-    map_iterator (const map_iterator<Key, Data>& i)
-	: std::map<Key, Data>::iterator (
-	    static_cast<const typename std::map<Key, Data>::iterator>(i)
+    map_iterator (const map_iterator& i)
+	: base_type (
+	    static_cast<const base_type&>(i)
 	    )
+    {}
+
+    /** Constructor from a map::iterator. */
+    map_iterator (base_type&& i)
+	: base_type (std::move (i)) {}
+
+    /** Copy constructor. */
+    map_iterator (map_iterator&& i)
+	: base_type (
+            std::move (
+                static_cast<const base_type&>(i)
+            ))
     {}
 
     /**

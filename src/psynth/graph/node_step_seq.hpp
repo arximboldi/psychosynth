@@ -35,12 +35,12 @@ namespace graph
 class node_step_seq : public node
 {
 public:
-    static const int MAX_STEPS = 32;
-    static const float DEFAULT_BPM = 260.0;
-    static const int DEFAULT_NUM_STEPS = 12;
-    static const int DEFAULT_STEP = true;
-    static const float DEFAULT_HIGH = 0.8f;
-    static const float DEFAULT_SLOPE = 0.1f;
+    static constexpr int MAX_STEPS = 32;
+    static constexpr float DEFAULT_BPM = 260.0;
+    static constexpr int DEFAULT_NUM_STEPS = 12;
+    static constexpr int DEFAULT_STEP = true;
+    static constexpr float DEFAULT_HIGH = 0.8f;
+    static constexpr float DEFAULT_SLOPE = 0.1f;
 
     enum shape {
 	SHAPE_SQUARE,

@@ -63,10 +63,10 @@ public:
 	N_PARAM
     };
 
-    static const float MAX_DELAY = 1.0f;
-    static const float DEFAULT_DELAY = 0.5f;
-    static const float DEFAULT_FEEDBACK = 0.5f;
-    static const float DEFAULT_HIDAMP = 0.5f;
+    static constexpr float MAX_DELAY = 1.0f;
+    static constexpr float DEFAULT_DELAY = 0.5f;
+    static constexpr float DEFAULT_FEEDBACK = 0.5f;
+    static constexpr float DEFAULT_HIDAMP = 0.5f;
     
 private:
     float m_param_delay;

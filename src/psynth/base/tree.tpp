@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-03 00:20:50 raskolnikov>
+ *  Time-stamp:  <2011-06-07 20:39:48 raskolnikov>
  *
  *  @file        tree.tpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -38,11 +38,6 @@ template <class N, class K, class T, class P>
 tree_node <N, K, T, P>::~tree_node ()
 {
     uninit ();
-    
-    for (map_iterator<K, null_ptr<N> > it = m_childs.begin ();
-	 it != m_childs.end ();
-	 ++it)
-	delete *it;
 }
 
 template <class N, class K, class T, class P>
@@ -50,11 +45,11 @@ bool tree_node<N, K, T, P>::attach (const K& name, N& node)
 {
     tree_lock lock (this);
     
-    if (node.m_isinit || m_childs.find (name) != end ())
+    if (node._isinit || _childs.find (name) != end ())
 	return false;
 
     node.init (name, dynamic_cast<N*> (this));
-    m_childs.insert (std::make_pair (name, null_ptr<N>(&node)));
+    _childs [name] = std::unique_ptr<N>(&node);
     on_new_child (node);
 
     return true;
@@ -66,9 +61,9 @@ N& tree_node<N, K, T, P>::detach (iterator iter)
     if (iter == end ())
 	throw tree_node_error ("Invalid iterator.");
     
-    N& node = *iter;
+    N& node = *typename child_map::iterator (iter)->second.release ();
       
-    m_childs.erase (iter);
+    _childs.erase (iter);
     on_remove_child (*iter);
     iter->uninit ();
       
@@ -79,11 +74,10 @@ template <class N, class K, class T, class P>
 typename tree_node <N, K, T, P>::iterator
 tree_node <N, K, T, P>::remove_child (iterator& iter)
 {
-    iterator next = iter;
-    next ++;
+    iterator next = std::next (iter);
+    
     on_remove_child (*iter);
-    delete &*iter;
-    m_childs.erase (iter);
+    _childs.erase (iter);
 
     return next;
 }
@@ -113,15 +107,16 @@ N& tree_node <N, K, T, P>::child (const K& name)
 {
     tree_lock lock (this);
     
-    null_ptr<N>& c = m_childs [name]; 
+    iterator it = _childs.find (name); 
     
-    if (!c) {
-	c = new N ();
-	c->init (name, dynamic_cast<N*>(this));
-	on_new_child (*c);
+    if (it == _childs.end ()) {
+	it = _childs.insert (make_pair (name, std::unique_ptr<N> (new N ()))).first;
+	
+	it->init (name, dynamic_cast<N*>(this));
+	on_new_child (*it);
     }
 	
-    return *c;
+    return *it;
 }
 
 template <class N, class K, class T, class P>
@@ -129,7 +124,7 @@ N& tree_node <N, K, T, P>::existing_child (const K& name)
 {
     tree_lock lock (this);
     
-    iterator it = m_childs.find (name);
+    iterator it = _childs.find (name);
 
     if (it == end ())
 	throw tree_node_error ("Can't find child node.");
@@ -144,15 +139,15 @@ N& tree_node <N, K, T, P>::path (const K& p)
 }
 
 template <class N, class K, class T, class P>
-const N& tree_node <N, K, T, P>::existing_path (const K& p) const
+const N& tree_node <N, K, T, P>::existing_path (const K& path) const
 {
-    return existing_path (p.begin (), p.end ());
+    return existing_path (path.begin (), path.end ());
 }
 
 template <class N, class K, class T, class P>
-N& tree_node <N, K, T, P>::existing_path (const K& p)
+N& tree_node <N, K, T, P>::existing_path (const K& path)
 {
-    return existing_path (p.begin (), p.end ());
+    return existing_path (path.begin (), path.end ());
 }
 
 /*
@@ -164,13 +159,13 @@ void tree_node <N, K, T, P>::path_name (K& prefix) const
 {
     tree_lock lock (this);
     
-    if (m_parent)
+    if (_parent)
     {
-	if (m_parent->m_parent) {
-	    m_parent->path_name (prefix);
+	if (_parent->_parent) {
+	    _parent->path_name (prefix);
 	    prefix.insert (prefix.end (), T::separator);
 	}
-	prefix.insert (prefix.end (), m_name.begin (), m_name.end ());
+	prefix.insert (prefix.end (), _name.begin (), _name.end ());
     }
 }
 

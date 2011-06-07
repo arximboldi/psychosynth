@@ -62,9 +62,9 @@ public:
 	N_PARAM
     };
 
-    static const float MAX_DELAY = 0.1f;
-    static const float DEFAULT_DELAY = 0.0015f;
-    static const float DEFAULT_DEPTH = 0.5f;
+    static constexpr float MAX_DELAY = 0.1f;
+    static constexpr float DEFAULT_DELAY = 0.0015f;
+    static constexpr float DEFAULT_DEPTH = 0.5f;
     
 private:
     float m_param_delay;

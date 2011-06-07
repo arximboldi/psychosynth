@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-04-04 21:24:07 raskolnikov>
+ *  Time-stamp:  <2011-06-07 19:55:22 raskolnikov>
  *
  *  @file        buffered_output.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -39,10 +39,8 @@
 #ifndef PSYNTH_IO_BUFFERED_OUTPUT_H_
 #define PSYNTH_IO_BUFFERED_OUTPUT_H_
 
-#include <type_traits>
 
-#include <boost/pointee.hpp>
-
+#include <psynth/base/type_traits.hpp>
 #include <psynth/sound/metafunctions.hpp>
 #include <psynth/io/output.hpp>
 
@@ -61,7 +59,7 @@ class buffered_output_impl : public Base
 public:
     typedef typename Base::range range;
     
-    typedef typename boost::pointee<OutputPtr>::type output_type;
+    typedef typename base::pointee<OutputPtr>::type output_type;
     typedef typename output_type::range                   output_range;
 
     typedef typename sound::buffer_from_range<output_range>::type
