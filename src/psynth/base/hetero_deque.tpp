@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-08 18:00:39 raskolnikov>
+ *  Time-stamp:  <2011-06-08 23:04:21 raskolnikov>
  *
  *  @file        hetero_queque.tpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -54,7 +54,7 @@ hetero_deque<B>::hetero_deque (std::size_t size)
     , _front (reinterpret_cast<header*> (_memory.get ()))
     , _back (reinterpret_cast<header*> (_memory.get ()))
 {
-    new (_front) header { 0, 0, 0 };
+    *_front = header { 0, 0, 0 };
 }
 
 template <class B>
@@ -149,23 +149,18 @@ bool hetero_deque<B>::push_back (Args&& ... args)
             req_size > _memory.get () + _size - (char*) _back)
             _back   = reinterpret_cast<header*> (_memory.get ());
         
-        if (_back < _front && (char*) _front - (char*) _back < req_size)
-        {
+        if (_back < _front && (char*) _front - (char*) _back < req_size) {
             _back  = old_back;
             return false;
         }
     }
-    else // Empty deque. We are in the front
-    {
-        if (req_size > (std::ptrdiff_t) _size)
-            return false;
-    }
+    else if (req_size > (std::ptrdiff_t) _size)
+        return false;
     
     auto construct_guard = make_guard ([&] { _back  = old_back; });
     this->construct<Concrete> (_back, std::forward<Args> (args) ...);
     *_back->next = header { 0, 0, _back };
-    if (_back != old_back)
-    {
+    if (_back != old_back) {
         _back->prev = old_back;
         _back->prev->next = _back;
     }
@@ -179,6 +174,7 @@ bool hetero_deque<B>::pop_back ()
 {    
     if (_back->next) // Non empty deque
     {
+        _back->access->~B ();
         if (_back->prev) { // More than one element
             _back = _back->prev;
             *_back->next = header { 0, 0, _back };
@@ -204,24 +200,19 @@ bool hetero_deque<B>::push_front (Args&& ... args)
 
         if (old_front > _back)
         {
-            if (_front < _back->next + 1)
-            {
+            if (_front < _back->next + 1) {
                 _front = old_front;
                 return false;
             }
         }
-        else
+        else if ((char*) _front < _memory.get ())
         {
-            if ((char*) _front < _memory.get ())
-            {
-                _front = reinterpret_cast<header*> (
-                    _memory.get () + _size - req_size);
-
-                if (_front < _back->next + 1)
-                {
-                    _front = old_front;
-                    return false;
-                }
+            _front = reinterpret_cast<header*> (
+                _memory.get () + _size - req_size);
+            
+            if (_front < _back->next + 1) {
+                _front = old_front;
+                return false;
             }
         }
     }
@@ -244,12 +235,13 @@ bool hetero_deque<B>::pop_front ()
 {
     if (_front->next) // Non empty deque
     {
+        _front->access->~B ();
         if (_front->next->next) { // More than one element
             _front = _front->next;
             _front->prev = 0;
-        } else 
+        } else
             *_front = header { 0, 0, 0 };
-
+        
         return true;
     }
     
@@ -259,7 +251,10 @@ bool hetero_deque<B>::pop_front ()
 template <class B>
 void hetero_deque<B>::clear ()
 {
-    // TODO: Add iteration.
+    for (auto it = _front; it->next != 0; it = it->next)
+        it->access->~B ();
+    _front = _back = reinterpret_cast<header*> (_memory.get ());
+    *_front = header { 0, 0, 0 };
 }
 
 template <class B>

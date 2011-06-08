@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-08 18:06:55 raskolnikov>
+ *  Time-stamp:  <2011-06-08 23:30:00 raskolnikov>
  *
  *  @file        hetero_queue.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -28,6 +28,7 @@
  *
  */
 
+#include <iostream>
 #include <boost/test/unit_test.hpp>
 #include <psynth/base/hetero_deque.hpp>
 
@@ -51,6 +52,11 @@ struct test_count_dec : test_base
     int dec_count;
     test_count_dec () : dec_count (0) {} 
     void method () { ++dec_count; --count; }
+};
+
+struct test_except : test_base
+{
+    test_except () { throw std::logic_error ("except"); };
 };
 
 typedef psynth::base::hetero_deque<test_base> test_deque;
@@ -84,7 +90,8 @@ BOOST_AUTO_TEST_CASE(hetero_deque_test_some_back)
 
     BOOST_CHECK_EQUAL (q.front ().count, 1);
     BOOST_CHECK_EQUAL (q.back ().count, -1);
-    BOOST_CHECK_EQUAL (dynamic_cast<test_count_dec&>(q.back ()).dec_count, 1);
+    BOOST_CHECK_EQUAL (
+        dynamic_cast<test_count_dec&>(q.back ()).dec_count, 1);
 
     BOOST_CHECK_EQUAL (q.pop_back (), true);
     BOOST_CHECK_EQUAL (q.empty (), false);
@@ -111,7 +118,8 @@ BOOST_AUTO_TEST_CASE(hetero_deque_test_some_front)
 
     BOOST_CHECK_EQUAL (q.back ().count, 1);
     BOOST_CHECK_EQUAL (q.front ().count, -1);
-    BOOST_CHECK_EQUAL (dynamic_cast<test_count_dec&>(q.front ()).dec_count, 1);
+    BOOST_CHECK_EQUAL (
+        dynamic_cast<test_count_dec&>(q.front ()).dec_count, 1);
 
     BOOST_CHECK_EQUAL (q.pop_front (), true);
     BOOST_CHECK_EQUAL (q.empty (), false);
@@ -139,6 +147,56 @@ BOOST_AUTO_TEST_CASE(hetero_deque_test_some_mixed)
 
     BOOST_CHECK_EQUAL (q.front ().count, 1);
     BOOST_CHECK_EQUAL (q.back ().count, -1);
+}
+
+BOOST_AUTO_TEST_CASE(hetero_deque_test_except)
+{
+    test_deque q (1024);
+
+    BOOST_CHECK_EQUAL (q.push_back<test_count> (), true);
+    BOOST_CHECK_EQUAL (q.push_back<test_count_dec> (), true);
+    BOOST_CHECK_THROW (q.push_back<test_except> (), std::logic_error);
+    
+    q.front ().method ();
+    q.back ().method ();
+
+    BOOST_CHECK_EQUAL (q.front ().count, 1);
+    BOOST_CHECK_EQUAL (q.back ().count, -1);
+}
+
+BOOST_AUTO_TEST_CASE(hetero_deque_iter)
+{
+    test_deque q (1024);
+    
+    for (int i = 0; i < 8; ++i)
+    {
+        BOOST_CHECK_EQUAL (q.push_back<test_count> (), true);
+        BOOST_CHECK_EQUAL (q.push_back<test_count> (), true);
+        BOOST_CHECK_EQUAL (q.push_back<test_count_dec> (), true);
+    }
+
+    int sum = 0;
+    for (auto& x : q) {
+        x.method ();
+        sum += x.count;
+    }
+
+    BOOST_CHECK_EQUAL (sum, 8);
+    BOOST_CHECK_EQUAL (&*--q.end (), &q.back ());
+    BOOST_CHECK_EQUAL (&*q.begin (), &q.front ());
+}
+
+
+BOOST_AUTO_TEST_CASE(hetero_deque_clear)
+{
+    test_deque q (1024);
+
+    BOOST_CHECK_EQUAL (q.empty (), true);
+    BOOST_CHECK_EQUAL (q.push_back<test_count> (), true);
+    BOOST_CHECK_EQUAL (q.push_back<test_count_dec> (), true);
+    BOOST_CHECK_EQUAL (q.empty (), false);
+    q.clear ();
+    BOOST_CHECK_EQUAL (q.empty (), true);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

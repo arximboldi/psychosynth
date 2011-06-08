@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-08 18:07:12 raskolnikov>
+ *  Time-stamp:  <2011-06-08 23:26:54 raskolnikov>
  *
  *  @file        hetero_queque.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -33,8 +33,13 @@
 
 #include <type_traits>
 #include <memory>
+
+#include <boost/iterator/iterator_facade.hpp>
+#include <boost/iterator/reverse_iterator.hpp>
+
 #include <psynth/base/util.hpp>
 #include <psynth/base/exception.hpp>
+
 
 namespace psynth
 {
@@ -42,6 +47,53 @@ namespace base
 {
 
 PSYNTH_DECLARE_ERROR (error, hetero_deque_empty);
+
+namespace detail
+{
+
+template <class Base>
+struct hetero_header
+{
+    Base*          access;
+    hetero_header* next;
+    hetero_header* prev;
+};
+
+template <class Base>
+class hetero_iterator : public boost::iterator_facade <
+    hetero_iterator<Base>,
+    Base,
+    boost::bidirectional_traversal_tag>
+{
+    typedef hetero_header<Base> header;
+    
+public:
+    explicit hetero_iterator (header* curr)
+        : _curr (curr) {}
+
+    hetero_iterator () : _curr (0) {}
+    hetero_iterator (const hetero_iterator&) = default;
+    hetero_iterator& operator= (const hetero_iterator&) = default;
+
+private:
+    friend class boost::iterator_core_access;
+    
+    Base& dereference () const
+    { return *_curr->access; }
+
+    bool equal (const hetero_iterator& other) const
+    { return _curr == other._curr; }
+
+    void increment ()
+    { _curr = _curr->next; }
+    
+    void decrement ()
+    { _curr = _curr->prev; }
+                
+    header* _curr;
+};
+
+} /* namespace detail */
 
 /**
  * A deque of constant size over polymorphic types with a common
@@ -52,13 +104,27 @@ PSYNTH_DECLARE_ERROR (error, hetero_deque_empty);
  * Base is the common base of all the elements in the collection. Note
  * that, in the general case, Base should define a virtual destructor.
  *
+ * @todo Pushing an element invalidates the end iterator. Maybe it is
+ * desirable to change this behaviour?
+ *
  * @todo Abstract raw memory management into a separate non template
  * class.
+ *
+ * @todo Parametrize allocator?
  */
 template <class Base>
 class hetero_deque : public boost::noncopyable
 {
 public:
+    typedef detail::hetero_iterator<Base> iterator;
+    typedef detail::hetero_iterator<const Base> const_iterator;
+    typedef boost::reverse_iterator<iterator> reverse_iterator;
+    typedef boost::reverse_iterator<const_iterator> const_reverse_iterator;
+
+    typedef typename iterator::value_type value_type;
+    typedef typename iterator::reference reference;
+    typedef typename iterator::difference_type difference_type;
+    typedef typename const_iterator::reference const_reference;
     
     explicit hetero_deque (std::size_t size = 0);
     hetero_deque (hetero_deque&&);
@@ -85,16 +151,33 @@ public:
 
     bool empty () const
     { return !_front->access; }
+
+    iterator begin ()
+    { return iterator (_front); }
+    const_iterator begin () const
+    { return const_iterator (_front); }
+    const_iterator cbegin () const
+    { return const_iterator (_front); }
+    reverse_iterator rbegin ()
+    { return reverse_iterator (_front); }
+    const_reverse_iterator rbegin () const
+    { return const_reverse_iterator (_front); }
+    
+    iterator end ()
+    { return iterator (_back->next); }
+    const_iterator end () const
+    { return const_iterator (_back->next); }
+    const_iterator cend () const
+    { return const_iterator (_back->next); }
+    reverse_iterator rend ()
+    { return reverse_iterator (_back->next); }
+    const_reverse_iterator rend () const
+    { return const_reverse_iterator (_back->next); }
     
 private:
-    struct header
-    {
-        Base*       access;
-        header*     next;
-        header*     prev;
-    };
+    typedef detail::hetero_header<Base> header;
     static_assert (std::is_pod<header>::value,
-                   "Why is this not a POD?");
+                   "hetero_header must be a POD");
     
     template <class Concrete, typename ...Args>
     void construct (header* data, Args&&... args);
