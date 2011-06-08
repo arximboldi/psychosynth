@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-07 18:51:05 raskolnikov>
+ *  Time-stamp:  <2011-06-08 11:25:23 raskolnikov>
  *
  *  @file        exception.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -45,7 +45,7 @@ namespace base
 /**
  * Base class for all the exceptions inside the framework.
  */
-class exception : public virtual std::exception
+class exception
 {
 public:
     virtual ~exception () throw () {}
@@ -79,7 +79,8 @@ public:
  * A base clase for the errors defined with PSYNTH_DECLARE_ERROR and
  * alike preprocessor commands.
  */
-class error_base : public virtual exception
+class error_base : public virtual exception,
+                   public virtual std::exception
 {
 public:
     /** Constructor */

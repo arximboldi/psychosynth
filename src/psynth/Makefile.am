@@ -44,9 +44,6 @@ libpsynth_la_LIBADD = \
 
 libpsynthincdir = $(PACKAGE_INCLUDE_DIR)
 
-#
-# TODO: Add sound module here so it gets distributed.
-#
 
 nobase_libpsynthinc_HEADERS = \
 	app/director.hpp\
@@ -84,6 +81,8 @@ nobase_libpsynthinc_HEADERS = \
 	base/declare.hpp\
 	base/preprocessor.hpp\
 	base/concept.hpp\
+	base/hetero_deque.hpp\
+	base/hetero_deque.tpp\
 	synth/audio_info.hpp\
 	synth/filter.hpp\
 	synth/wave_table.hpp\
@@ -194,6 +193,7 @@ libpsynth_la_SOURCES = \
 	base/exception.cpp\
 	base/tree.cpp\
 	base/singleton.cpp\
+	base/hetero_deque.cpp\
 	synth/filter.cpp\
 	world/world.cpp\
 	world/patcher.cpp\

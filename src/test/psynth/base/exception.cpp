@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-07 18:29:44 raskolnikov>
+ *  Time-stamp:  <2011-06-08 12:52:37 raskolnikov>
  *
  *  @file        exception.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -63,7 +63,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(base_test_throw_psynth,
     
     BOOST_CHECK_THROW (test_throw<Error> (), error_actual_type);
     BOOST_CHECK_THROW (test_throw<Error> (), Error);
-    // BOOST_CHECK_THROW (test_throw<Error> (), std::exception); FIXME
+    BOOST_CHECK_THROW (test_throw<Error> (), std::exception);
     BOOST_CHECK_THROW (test_throw<Error> (), psynth::base::exception);
 }
 

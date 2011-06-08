@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-07 19:28:42 raskolnikov>
+ *  Time-stamp:  <2011-06-08 12:23:01 raskolnikov>
  *
  *  @file        tree.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -92,6 +92,7 @@ PSYNTH_DECLARE_ERROR(error, tree_node_error);
  *
  * @todo Fix copy operations.
  * @todo Fix string operations to be more generic.
+ * @todo Add value_type and other container typedefs.
  */
 template <class Node,
 	  class Key = std::string,
@@ -101,9 +102,14 @@ class tree_node
 {   
 public:
     /**
+     * Pointer to the node type.
+     */
+    typedef std::unique_ptr<Node> node_ptr;
+    
+    /**
      * Iterator to check the childs of this node.
      */
-    typedef ptr_iterator<map_iterator<Key, std::unique_ptr<Node> > > iterator;
+    typedef ptr_iterator<map_iterator<Key, node_ptr > > iterator;
 
     /**
      * Iterator to check the childs of this node, const version.
@@ -217,7 +223,7 @@ public:
      *
      * @return A pointer to the detached node. 
      */
-    Node& detach (const Key& name)
+    node_ptr detach (const Key& name)
     {
 	tree_lock lock (this);
 	return detach (_childs.find (name));
@@ -240,7 +246,7 @@ public:
      *
      * @return true If the node was successfully attached and false otherwise.
      */
-    bool attach (const Key& name, Node& node);
+    bool attach (const Key& name, node_ptr node);
     
     /**
      * Detaches a node from the tree. Once detached you are responsible
@@ -250,7 +256,7 @@ public:
      * @return A pointer to the detached node.
      * @note This version of detach is not thread-safe.
      */
-    Node& detach (iterator iter);
+    node_ptr detach (iterator iter);
     
     /**
      * Returns the path of this node from the root to the node.

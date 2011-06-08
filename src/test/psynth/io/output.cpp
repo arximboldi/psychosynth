@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-31 20:11:38 raskolnikov>
+ *  Time-stamp:  <2011-06-08 13:00:38 raskolnikov>
  *
  *  @file        output.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -51,10 +51,14 @@
 
 #ifdef PSYNTH_HAVE_ALSA
 #include <psynth/io/alsa_output.hpp>
+#define TEST_DEVICE_ALSA "hdmi"
+//#define TEST_DEVICE_ALSA "default"
 #endif
 
 #ifdef PSYNTH_HAVE_OSS
 #include <psynth/io/oss_output.hpp>
+#define TEST_DEVICE_OSS "/dev/null"
+//#define TEST_DEVICE_OSS "/dev/dsp"
 #endif
 
 #ifdef PSYNTH_HAVE_JACK
@@ -232,13 +236,13 @@ BOOST_AUTO_TEST_CASE_TEMPLATE (alsa_output_test, Range, alsa_test_types)
 
     try
     {
-        buffer_type buf (buffer_size);
+        buffer_type buf (buffer_size, 0);
         
         std::size_t nframes       = 0;
         std::size_t async_nframes = 0;
         
         io::alsa_output<Range> device (
-            "default", buffer_size, sample_rate, [&] (std::size_t)
+            TEST_DEVICE_ALSA, buffer_size, sample_rate, [&] (std::size_t)
             { async_nframes = device.put (range (buf)); });
 
         nframes = device.put (range (buf));
@@ -277,7 +281,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE (oss_output_test, Range, oss_test_types)
     const std::size_t buffer_size = 1024;
     const std::size_t sample_rate = 44100;
     
-    buffer_type buf (buffer_size);
+    buffer_type buf (buffer_size, 0);
         
     std::size_t nframes       = 0;
     std::size_t async_nframes = 0;
@@ -285,7 +289,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE (oss_output_test, Range, oss_test_types)
     try
     {
         io::oss_output<Range> device (
-            "/dev/dsp", buffer_size, sample_rate, [&] (std::size_t)
+            TEST_DEVICE_OSS, buffer_size, sample_rate, [&] (std::size_t)
             { async_nframes = device.put (range (buf)); });
 
         nframes = device.put (range (buf));
@@ -323,7 +327,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE (jack_output_test, Range, jack_test_types)
     const std::size_t buffer_size = 1024;
     const std::size_t sample_rate = 44100;
     
-    buffer_type buf (buffer_size);
+    buffer_type buf (buffer_size, 0);
     
     std::size_t async_nframes = 0;
 

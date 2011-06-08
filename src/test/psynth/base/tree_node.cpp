@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-03 01:09:04 raskolnikov>
+ *  Time-stamp:  <2011-06-08 12:53:08 raskolnikov>
  *
  *  @file        tree_node_test.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -28,6 +28,7 @@
  *
  */
 
+#include <iostream>
 #include <boost/test/unit_test.hpp>
 #include <psynth/base/tree.hpp>
 
@@ -131,28 +132,30 @@ BOOST_AUTO_TEST_CASE(tree_node_test_7)
 }
 
 BOOST_AUTO_TEST_CASE(tree_node_test_6)
-{   
-    value_node<int>& ref1 = root.detach (std::string ("1"));
-    BOOST_CHECK_EQUAL (ref1.path ("2.3.4").value, -1);
-    BOOST_CHECK_EQUAL (ref1.name (), "");
+{
+    auto ptr1 = root.detach (std::string ("1"));
+    BOOST_CHECK_EQUAL (ptr1->path ("2.3.4").value, -1);
+        
+    BOOST_CHECK_EQUAL (ptr1->name (), "");
     BOOST_CHECK_THROW (root.existing_path ("1.2.3.4"),
 		       psynth::base::tree_node_error);
     
-    BOOST_CHECK_EQUAL (root.attach ("1", ref1), true);
+    BOOST_CHECK_EQUAL (root.attach ("1", std::move (ptr1)), true);
     BOOST_CHECK_NO_THROW (root.existing_path ("1.2.3.4"));
     BOOST_CHECK_EQUAL (root.path ("1.2.3.4").value, -1);
 
     value_node<int> node;
     node.value = 1;
-    BOOST_CHECK_EQUAL (root.path ("1.2.3").attach ("5", node), true);
+    BOOST_CHECK_EQUAL (root.path ("1.2.3").attach (
+                           "5", std::unique_ptr<value_node<int>> (&node)),
+                       true);
     BOOST_CHECK_EQUAL (root.path ("1.2.3.5").value, 1);
     BOOST_CHECK_THROW (root.path ("1.2.3").detach (std::string ("")),
 		       psynth::base::tree_node_error);
-    BOOST_CHECK_NO_THROW (root.path ("1.2.3").detach (std::string ("5")));
+    BOOST_CHECK_NO_THROW (root.path ("1.2.3").detach (std::string ("5")).release ());
 	
-    value_node<int>& ref2 = root.path ("1.2.3").detach (std::string ("4"));
-    BOOST_CHECK_EQUAL (ref2.value, -1);
-    delete &ref2;
+    auto ptr2 = root.path ("1.2.3").detach (std::string ("4"));
+    BOOST_CHECK_EQUAL (ptr2->value, -1);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

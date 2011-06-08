@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-07 20:39:48 raskolnikov>
+ *  Time-stamp:  <2011-06-08 12:44:07 raskolnikov>
  *
  *  @file        tree.tpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -41,31 +41,34 @@ tree_node <N, K, T, P>::~tree_node ()
 }
 
 template <class N, class K, class T, class P>
-bool tree_node<N, K, T, P>::attach (const K& name, N& node)
+bool tree_node<N, K, T, P>::attach (const K& name, node_ptr node)
 {
     tree_lock lock (this);
-    
-    if (node._isinit || _childs.find (name) != end ())
+
+    N& ref = *node;
+    if (ref._isinit || _childs.find (name) != end ())
 	return false;
 
-    node.init (name, dynamic_cast<N*> (this));
-    _childs [name] = std::unique_ptr<N>(&node);
-    on_new_child (node);
+    ref.init (name, dynamic_cast<N*> (this));
+    _childs [name] = std::move (node);
+    on_new_child (ref);
 
     return true;
 }
 
 template <class N, class K, class T, class P>
-N& tree_node<N, K, T, P>::detach (iterator iter)
-{    
+typename tree_node<N, K, T, P>::node_ptr
+tree_node<N, K, T, P>::detach (iterator iter)
+{   
     if (iter == end ())
 	throw tree_node_error ("Invalid iterator.");
-    
-    N& node = *typename child_map::iterator (iter)->second.release ();
-      
-    _childs.erase (iter);
-    on_remove_child (*iter);
-    iter->uninit ();
+
+    decltype (_childs.begin ()) iter_map = iter;
+    node_ptr node = std::move (iter_map->second);  
+    _childs.erase (iter_map);
+
+    on_remove_child (*node);
+    node->uninit ();
       
     return node;
 }

@@ -1,11 +1,15 @@
 /**
- *  Time-stamp:  <2011-06-07 20:43:06 raskolnikov>
+ *  Time-stamp:  <2011-06-08 12:10:34 raskolnikov>
  *
  *  @file        throw.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
  *  @date        Tue Jun  7 16:11:03 2011
  *
- *  @brief Throwing interface that better swits the logging system.
+ *  @brief Throwing interface that better suits the logging system.
+ *
+ *  @todo Some things here are not nice. There are performance issues
+ *  in forwarding the ostringstream in the log stream adapter. Take a
+ *  look at boost::exception and maybe integrate it.
  */
 
 /*
@@ -75,7 +79,6 @@ private:
     const char*        _where;
     log_stream_adapter _stream;
 };
-
 
 template <class Base>
 class exception_wrapper<Base, false> : public virtual Base
@@ -158,7 +161,8 @@ throw_with<E> operator<< (throw_with<E> ts, const T& what)
     return std::move (ts);
 }
 
-#define PSYNTH_THROW(exception) ::psynth::base::throw_with<exception> (PSYNTH_MODULE_NAME)
+#define PSYNTH_THROW(exception) \
+    ::psynth::base::throw_with<exception> (PSYNTH_MODULE_NAME)
 
 
 } /* namespace base */
