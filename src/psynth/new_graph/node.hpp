@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-09 19:22:56 raskolnikov>
+ *  Time-stamp:  <2011-06-09 21:22:21 raskolnikov>
  *
  *  @file        node.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -60,6 +60,12 @@ private:
     typedef std::map<std::string, output*>  out_map;
     typedef std::map<std::string, control*> ctl_map;
 };
+
+typedef base::restricted_global_factory_manager<std::string, node_ptr>
+node_factory;
+
+#define PSYNTH_REGISTER_NODE_STATIC(node_type) \
+    node_factory::registrant node_type ## _registrant (#node_type);
 
 } /* namespace graph */
 } /* namespace psynth */

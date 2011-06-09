@@ -1,11 +1,11 @@
 /**
- *  Time-stamp:  <2011-03-18 22:40:30 raskolnikov>
+ *  Time-stamp:  <2011-06-09 19:16:52 raskolnikov>
  *
- *  @file        buffers.cpp
+ *  @file        node_fwd.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
- *  @date        Fri Mar 18 12:02:33 2011
+ *  @date        Thu Jun  9 19:05:09 2011
  *
- *  @brief Buffers template instatiations.
+ *  @brief Node class forwards.
  */
 
 /*
@@ -28,12 +28,21 @@
  *
  */
 
-#include "buffers.hpp"
+#ifndef PSYNTH_GRAPH_NODE_FWD_HPP_
+#define PSYNTH_GRAPH_NODE_FWD_HPP_
 
 namespace psynth
 {
 namespace graph
 {
 
+PSYNTH_DECLARE_TYPE (input);
+PSYNTH_DECLARE_TYPE (output);
+PSYNTH_DECLARE_TYPE (control);
+PSYNTH_DECLARE_SHARED_TYPE (node);
+
 } /* namespace graph */
 } /* namespace psynth */
+
+#endif /* PSYNTH_GRAPH_NODE_FWD_HPP_ */
+
