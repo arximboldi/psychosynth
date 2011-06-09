@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-08 23:26:54 raskolnikov>
+ *  Time-stamp:  <2011-06-09 18:12:08 raskolnikov>
  *
  *  @file        hetero_queque.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -133,16 +133,30 @@ public:
     
     Base& back ();
     const Base& back () const;
+    template <class Concrete, typename ...Args>
+    bool push_back (Args&& ... args);
+    template <class Concrete>
+    bool push_back (Concrete&& arg)
+    {
+        return this->push_back<
+            typename std::decay<Concrete>::type,
+            decltype (std::forward<Concrete> (arg))> (
+                std::forward<Concrete> (arg));
+    }
+    bool pop_back ();
 
     Base& front ();
     const Base& front () const;
-
-    template <class Concrete, typename ...Args>
-    bool push_back (Args&& ... args);
-    bool pop_back ();
-    
     template <class Concrete, typename ...Args>
     bool push_front (Args&&... args);
+    template <class Concrete>
+    bool push_front (Concrete&& arg)
+    {
+        return this->push_front<
+            typename std::decay<Concrete>::type,
+            decltype (std::forward<Concrete> (arg))> (
+                std::forward<Concrete> (arg));
+    }
     bool pop_front ();
 
     void clear ();

@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-07 19:56:27 raskolnikov>
+ *  Time-stamp:  <2011-06-09 20:37:53 raskolnikov>
  *
  *  @file        type_traits.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -51,36 +51,56 @@ struct pointee<typename std::unique_ptr<T>> { typedef T type; };
 template <typename T>
 struct pointee<typename std::shared_ptr<T>> { typedef T type; };
 
-// TODO: Remove
+template <typename Ptr>
+struct pointer {};
+
+template <typename Ptr>
+struct pointer <Ptr*>
+{
+    template <typename T>
+    struct apply { typedef T* type; };
+};
+
+template <typename Ptr>
+struct pointer <std::unique_ptr<Ptr> >
+{
+    template <typename T>
+    struct apply { typedef std::unique_ptr<T> type; };
+};
+
+template <typename Ptr>
+struct pointer <std::shared_ptr<Ptr> >
+{
+    template <typename T>
+    struct apply { typedef std::shared_ptr<T> type; };
+};
+
+template <typename Ptr>
+struct pointer <std::auto_ptr<Ptr> >
+{
+    template <typename T>
+    struct apply { typedef std::auto_ptr<T> type; };
+};
 
 #if 0
 
-template<typename T>
-type_traits
+template <typename Ptr>
+struct pointer <boost::unique_ptr<Ptr> >
 {
-    enum { is_pointer = take_pointer<T>::result }
-    typedef typename take_pointer<T>::type pointee_type;
-    typedef volatile T volatile_type;
+    template <typename T>
+    struct apply { typedef boost::unique_ptr<T> type; };
 };
 
-template<typename T>
-struct take_pointer
+template <typename Ptr>
+struct pointer <boost::shared_ptr<Ptr> >
 {
-    enum { result = false };
-    typename T type;
-};
-
-template<typename T>
-struct take_pointer<T*>
-{
-    enum { result = true };
-    typename T type;
+    template <typename T>
+    struct apply { typedef boost::shared_ptr<T> type; };
 };
 
 #endif
 
 } /* namespace base */
 } /* namespace psynth */
-
 
 #endif /* PSYNTH_TYPE_TRAITS_H_ */

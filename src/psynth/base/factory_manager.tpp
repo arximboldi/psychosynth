@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-10-17 19:50:45 raskolnikov>
+ *  Time-stamp:  <2011-06-09 20:45:58 raskolnikov>
  *
  *  @file        factory_manager.tpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -31,40 +31,41 @@
 
 #include <boost/function.hpp>
 #include <psynth/base/factory.hpp>
+#include <psynth/base/type_traits.hpp>
 
 namespace psynth
 {
 namespace base
 {
 
-template <class K, class B, class P>
+template <class K, class B, class... A>
 template <class Concrete>
-void factory_manager<K, B, P>::add (const K& k)
+void restricted_factory_manager<K, B, A...>::add (const K& k)
 {
-    m_map [k] = factory_functor<B, Concrete> ();
+    _map [k] = factory<B, Concrete, A...> ();
 }
 
-template <class K, class B, class P>
-void factory_manager<K, B, P>::add (const K& k, factory_method fn)
+template <class K, class B, class... A>
+void restricted_factory_manager<K, B, A...>::add (const K& k, factory_method fn)
 {
-    m_map [k] = fn;
+    _map [k] = fn;
 }
 
-template <class K, class B, class P>
-void factory_manager<K, B, P>::del (const K& k)
+template <class K, class B, class... A>
+void restricted_factory_manager<K, B, A...>::del (const K& k)
 {
-    m_map.erase (k);
+    _map.erase (k);
 }
 
-template <class K, class B, class P>
-P factory_manager<K, B, P>::create (const K& k)
+template <class K, class B, class... A>
+B restricted_factory_manager<K, B, A...>::create (const K& k, A... args)
 {
-    typename factory_map::iterator it = m_map.find (k);
+    typename factory_map::iterator it = _map.find (k);
 
-    if (it == m_map.end ())
-	throw factory_error;
+    if (it == _map.end ())
+	throw factory_error ();
 
-    return P ((it->second) ());
+    return B ((it->second) (std::forward<A> (args) ...));
 }
 
 } /* namespace base */

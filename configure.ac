@@ -22,7 +22,7 @@ dnl  Global config
 dnl ======================================================================
 
 AC_PREREQ(2.61)
-AC_INIT([psychosynth], [0.2.0], [raskolnikov@es.gnu.org])
+AC_INIT([psychosynth], [0.2.1], [raskolnikov@es.gnu.org])
 AC_CONFIG_MACRO_DIR([m4])
 
 dnl TODO: Make portable makefiles.

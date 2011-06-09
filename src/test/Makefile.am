@@ -36,6 +36,7 @@ psynth_unit_test_SOURCES += \
 	psynth/base/c3_class.cpp \
 	psynth/base/exception.cpp \
 	psynth/base/hetero_deque.cpp \
+	psynth/base/factory.cpp \
 	psynth/sound/sample.cpp \
 	psynth/sound/frame.cpp \
 	psynth/sound/sample_buffer.cpp \

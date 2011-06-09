@@ -1,11 +1,14 @@
 /**
- *  Time-stamp:  <2011-06-07 20:22:38 raskolnikov>
+ *  Time-stamp:  <2011-06-09 20:12:38 raskolnikov>
  *
  *  @file        iterator.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
  *  @date        2007
  *
  *  Iterator wrapper tools.
+ *
+ *  @todo Fix many implementations by using boost::iterator_adaptor
+ *  and boost::iterator_facade.
  */
 
 /*
@@ -28,8 +31,8 @@
  *
  */
 
-#ifndef PSYNTH_ITERATOR_H
-#define PSYNTH_ITERATOR_H
+#ifndef PSYNTH_BASE_ITERATOR_HPP_
+#define PSYNTH_BASE_ITERATOR_HPP_
 
 #include <map>
 #include <iterator>
@@ -145,9 +148,9 @@ public:
 };
   
 /**
- * This class acts as wrapper to a map::iterator. It just changes the
- * opearator* behaviour, which now returns a pointer to the contained value
- * hidding the user the value key.
+ *  This class acts as wrapper to a map::iterator. It just changes the
+ *  opearator* behaviour, which now returns a pointer to the contained
+ *  value hidding the user the value key.
  */
 template <typename Key, typename Data>
 class map_iterator : public std::map<Key, Data>::iterator
@@ -239,12 +242,12 @@ public:
 };
 
 /**
- * This class acts as wrapper to a @c map::const_iterator. It just changes the
- * opearator* behaviour, which now returns a pointer to the contained value
- * hidding the user the value key. Just a @c const version of @c map_iterator
- * to hold constant data.
+ *  This class acts as wrapper to a @c map::const_iterator. It just
+ *  changes the opearator* behaviour, which now returns a pointer to
+ *  the contained value hidding the user the value key. Just a @c
+ *  const version of @c map_iterator to hold constant data.
  *
- * @todo Implement -> operator.
+ *  @todo Implement -> operator.
  */
 template <typename Key, typename Data>
 class map_const_iterator : public std::map<Key, Data>::const_iterator
@@ -267,7 +270,8 @@ public:
     {}
 
     /**
-     * Indirection operator, returns a reference to the referred value.
+     *  Indirection operator, returns a reference to the referred
+     *  value.
      */
     const Data& operator* ()
     {
@@ -275,8 +279,8 @@ public:
     }
 
     /**
-     * Const indirection operator, returns a constant reference to the
-     * referred value.
+     *  Const indirection operator, returns a constant reference to
+     *  the referred value.
      */
     const Data& operator* () const
     {
@@ -284,7 +288,138 @@ public:
     }
 };
 
+/**
+ *  @todo This class was copied from the "Overdose" project:
+ *
+ *     http://sinusoid.es/raskolnikov/overdose-0.1.2.tar.gz
+ *
+ *  A whole refactor of this module would provide more compact clearer
+ *  code, using boost::adaptor, because this is a bit kind of a mess.
+ */
+template <typename Key, typename Data, class Iter>
+class map_iterator_base : public std::map<Key, Data>::iterator
+{
+public:
+    typedef typename std::map<Key, Data>::iterator::iterator_category
+    iterator_category;
+    typedef Data value_type;
+    typedef typename std::map<Key, Data>::iterator::difference_type
+    difference_type;
+    typedef Data* pointer;
+    typedef Data& reference;
+
+    /** Constructor. */
+    map_iterator_base ()
+    {}
+
+    /** Constructor from a map::iterator. */
+    map_iterator_base (const typename std::map<Key, Data>::iterator& i)
+	: std::map<Key, Data>::iterator (i)
+    {}
+
+    /** Copy constructor. */
+    map_iterator_base (const map_iterator_base<Key, Data, Iter>& i)
+	: std::map<Key, Data>::iterator (
+	    static_cast<const typename std::map<Key, Data>::iterator> (i))
+    {}
+    
+    /**
+     * Preincrement operator.
+     */
+    Iter operator++ ()
+    {
+	return std::map<Key, Data>::iterator::operator++();
+    }
+
+    /**
+     * Postincrement operator.
+     */
+    Iter operator++ (int)
+    {
+	return std::map<Key, Data>::iterator::operator++(0);
+    }
+};
+
+template <typename Key, typename Data, class Iter>
+class map_const_iterator_base : public std::map<Key, Data>::const_iterator
+{
+public:
+    typedef typename std::map<Key, Data>::const_iterator::iterator_category
+    iterator_category;
+    typedef Data value_type;
+    typedef typename std::map<Key, Data>::const_iterator::difference_type
+    difference_type;
+    typedef Data* pointer;
+    typedef Data& reference;
+
+    /** Constructor. */
+    map_const_iterator_base ()
+    {}
+
+    /** Constructor from a map::iterator. */
+    map_const_iterator_base (const typename std::map<Key, Data>::const_iterator& i)
+	: std::map<Key, Data>::const_iterator (i)
+    {}
+
+    /** Copy constructor. */
+    map_const_iterator_base (const map_const_iterator_base<Key, Data, Iter>& i)
+	: std::map<Key, Data>::const_iterator (
+	    static_cast<const typename std::map<Key, Data>::const_iterator> (i))
+    {}
+    
+    /**
+     * Preincrement operator.
+     */
+    Iter operator++ ()
+    {
+	return std::map<Key, Data>::const_iterator::operator++ ();
+    }
+
+    /**
+     * Postincrement operator.
+     */
+    Iter operator++ (int)
+    {
+	return std::map<Key, Data>::const_iterator::operator++ (0);
+    }
+};
+
+/**
+ *  This class acts as wrapper to a map::iterator. It just changes the
+ *  opearator* behaviour, allowing dereferencing only the key value.
+ */
+template <typename Key, typename Data>
+class map_key_iterator :
+    public map_iterator_base<Key, Data, map_key_iterator<Key, Data> >
+{
+public:
+    map_key_iterator () {}
+
+    template <class T>
+    map_key_iterator (const T& val)
+	: map_iterator_base<Key, Data, map_key_iterator> (val)
+    {}
+    
+    /**
+     * Const indirection operator, returns a constant reference to the
+     * referred value.
+     */
+    const Key& operator*() const
+    {
+	return std::map<Key, Data>::iterator::operator*().first;
+    }
+
+    /**
+     * Indirection operator, returns a pointer to the referred value const value.
+     */
+    const Key* operator->() const
+    {
+	return &std::map<Key, Data>::iterator::operator*().first;
+    }
+};
+
+
 } /* namespace base */
 } /* namespace psynth */
 
-#endif /* PSYNTH_ITERATOR_H */
+#endif /* PSYNTH_BASE_ITERATOR_HPP_ */

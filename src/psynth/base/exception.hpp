@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-08 11:25:23 raskolnikov>
+ *  Time-stamp:  <2011-06-09 16:14:13 raskolnikov>
  *
  *  @file        exception.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -95,14 +95,10 @@ public:
     virtual ~error_base () throw () {}
 
     virtual const char* what () const throw ()
-    {
-	return _what.empty () ? default_what () : _what.c_str ();
-    }
+    { return _what.empty () ? default_what () : _what.c_str (); }
 
     virtual const char* where () const throw ()
-    {
-	return "psynth";
-    }
+    { return "psynth"; }
 
     virtual int level () const throw ();
 

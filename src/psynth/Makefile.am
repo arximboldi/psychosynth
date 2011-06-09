@@ -83,6 +83,9 @@ nobase_libpsynthinc_HEADERS = \
 	base/concept.hpp\
 	base/hetero_deque.hpp\
 	base/hetero_deque.tpp\
+	base/factory.hpp\
+	base/factory_manager.hpp\
+	base/factory_manager.tpp\
 	synth/audio_info.hpp\
 	synth/filter.hpp\
 	synth/wave_table.hpp\
@@ -194,6 +197,7 @@ libpsynth_la_SOURCES = \
 	base/tree.cpp\
 	base/singleton.cpp\
 	base/hetero_deque.cpp\
+	base/factory_manager.cpp\
 	synth/filter.cpp\
 	world/world.cpp\
 	world/patcher.cpp\

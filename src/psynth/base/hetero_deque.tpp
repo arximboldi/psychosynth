@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-08 23:04:21 raskolnikov>
+ *  Time-stamp:  <2011-06-09 18:09:24 raskolnikov>
  *
  *  @file        hetero_queque.tpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -130,7 +130,7 @@ void hetero_deque<B>::construct (header* data, Args&&... args)
                    "Elements should derived from Base.");
         
     void* obj_data = data + 1;
-    Concrete* obj  = new (obj_data) Concrete (std::forward (args) ...);
+    Concrete* obj  = new (obj_data) Concrete (std::forward<Args> (args) ...);
     *data = header { obj, reinterpret_cast<header*> (obj + 1), 0 };
 }
 

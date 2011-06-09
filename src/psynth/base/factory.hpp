@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-10-17 19:48:24 raskolnikov>
+ *  Time-stamp:  <2011-06-09 20:45:41 raskolnikov>
  *
  *  @file        factory.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -27,51 +27,45 @@
  *
  */
 
-#ifndef PSYNTH_FACTORY_H_
-#define PSYNTH_FACTORY_H_
+#ifndef PSYNTH_BASE_FACTORY_HPP_
+#define PSYNTH_BASE_FACTORY_HPP_
+
+#include <psynth/base/type_traits.hpp>
 
 namespace psynth
 {
 namespace base
 {
 
-template <class Base>
-class factory_functor_base
-{
-public:
-    virtual ~factory_functor_base () {};
-    virtual Base* operator () () = 0;    
-};
-
-template <class Base, class Concrete>
-class factory_functor : public factory_functor_base <Base>
-{
-public:
-    Concrete* operator () ()
-    {
-	return new Concrete;
-    }
-};
-
-template <class Base>
+template <class BasePtr, typename ...Args>
 class factory_base
 {
 public:
+    typedef typename pointee<BasePtr>::type base_type;
+    typedef BasePtr pointer_type;
+    
     virtual ~factory_base () {};
-    virtual Base* create () = 0;
+    virtual BasePtr create (Args... args) = 0;
+
+    BasePtr operator () (Args... args)
+    {
+        return this->create (std::forward<Args> (args)...);
+    }
 };
 
-template <class Base, class Concrete>
-class factory : public factory_base <Base>
+template <class BasePtr, class Concrete, typename ...Args>
+class factory : public factory_base <BasePtr, Args...>
 {
 public:
-    Concrete* create ()
+    typedef Concrete concrete_type;
+        
+    BasePtr create (Args... args)
     {
-	return new Concrete;
+	return BasePtr (new concrete_type (std::forward<Args> (args) ...));
     }
 };
 
 } /* namespace base */
 } /* namespace psynth */
 
-#endif /* PSYNTH_FACTORY_H_ */
+#endif /* PSYNTH_BASE_FACTORY_HPP_ */

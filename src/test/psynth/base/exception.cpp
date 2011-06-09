@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-08 12:52:37 raskolnikov>
+ *  Time-stamp:  <2011-06-09 19:53:23 raskolnikov>
  *
  *  @file        exception.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -30,6 +30,7 @@
 
 #include <boost/test/unit_test.hpp>
 #include <boost/mpl/vector.hpp>
+
 #include <psynth/base/exception.hpp>
 #include <psynth/base/throw.hpp>
 
