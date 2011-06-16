@@ -107,7 +107,7 @@ public:
     }
     
     int get_param_id (const std::string& name) const {
-	return m_nod->param(name).get_id ();
+	return m_nod->get_param(name).get_id ();
     }
 
     const std::string& get_param_name (int id) const {
@@ -119,7 +119,7 @@ public:
     }
 
     int get_param_type (const std::string& name) const {
-	return m_nod->param(name).type();
+	return m_nod->get_param(name).type();
     }
     
     template <typename T>
@@ -129,7 +129,7 @@ public:
 
     template <typename T>
     void get_param (const std::string& name, T& data) const {
-	m_nod->param(name).get(data);
+	m_nod->get_param(name).get(data);
     }
 
     bool operator== (const world_node& o) const {
@@ -295,7 +295,7 @@ public:
 
     template <typename T>
     void set_param_node (world_node& nod, const std::string& name, const T& data) {
-        graph::node_param& param = nod.m_nod->param(name);
+        graph::node_param& param = nod.m_nod->get_param(name);
 	param.set (data);
 	notify_set_param_node (nod, param.get_id());
 	if (m_patcher)

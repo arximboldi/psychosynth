@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-18 17:43:13 raskolnikov>
+ *  Time-stamp:  <2011-06-11 22:11:52 raskolnikov>
  *
  *  @file        director.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -41,7 +41,7 @@
 namespace psynth
 {
 
-class director : public boost::noncopyable
+class director : private boost::noncopyable
 {
     typedef std::map<std::string, output_director_factory*> odf_map;
     odf_map m_outdir;

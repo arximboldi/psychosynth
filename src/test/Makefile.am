@@ -46,8 +46,10 @@ psynth_unit_test_SOURCES += \
 	psynth/sound/ring.cpp \
 	psynth/io/output.cpp \
 	psynth/io/input.cpp \
+	psynth/graph/processor.cpp \
 	psynth/util.cpp \
 	psynth/util.hpp
+
 
 psynth_unit_test_CXXFLAGS = -Wall $(BOOST_CPPFLAGS) \
 	-I$(top_srcdir)/src \

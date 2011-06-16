@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-23 12:20:18 raskolnikov>
+ *  Time-stamp:  <2011-06-11 22:28:54 raskolnikov>
  *
  *  @file        caching_file_reader.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -58,7 +58,7 @@ namespace detail
 template <class Range,
           class InputPtr> // Models file_input_base
 class caching_file_input_impl : public file_input_base<Range>
-                              , public boost::noncopyable
+                              , private boost::noncopyable
 {
 public:
     typedef Range range;
@@ -70,18 +70,18 @@ public:
      * High default values for lower number of seeks when reading
      * backwards which is in our default usecase.
      */
-    static const std::size_t DEFAULT_CHUNK_SIZE  = 1024;
-    static const std::size_t DEFAULT_BUFFER_SIZE = 16384;
-    static const std::size_t DEFAULT_THRESHOLD   = 4096; 
+    static constexpr std::size_t default_chunk_size  = 1024;
+    static constexpr std::size_t default_buffer_size = 16384;
+    static constexpr std::size_t default_threshold   = 4096; 
    
     caching_file_input_impl (
         InputPtr    input       = 0,
-        std::size_t chunk_size  = DEFAULT_CHUNK_SIZE,
-        std::size_t buffer_size = DEFAULT_BUFFER_SIZE,
-        std::size_t threshold   = DEFAULT_THRESHOLD);
+        std::size_t chunk_size  = default_chunk_size,
+        std::size_t buffer_size = default_buffer_size,
+        std::size_t threshold   = default_threshold);
 
-    // caching_file_input_impl (
-    //     caching_file_input_impl&& other) = default;
+    caching_file_input_impl (
+        caching_file_input_impl&& other) = default;
 
     ~caching_file_input_impl ();
     
@@ -151,7 +151,7 @@ public:
     std::ptrdiff_t _read_pos;
     std::ptrdiff_t _new_read_pos;
 
-    bool _finished;
+    std::atomic<bool> _finished;
 
     std::thread             _thread;
     std::mutex              _input_mutex;
@@ -172,9 +172,9 @@ public:
     
     caching_file_input_adapter (
         InputPtr    input       = 0,
-        std::size_t chunk_size  = base::DEFAULT_CHUNK_SIZE,
-        std::size_t buffer_size = base::DEFAULT_BUFFER_SIZE,
-        std::size_t threshold   = base::DEFAULT_THRESHOLD)
+        std::size_t chunk_size  = base::default_chunk_size,
+        std::size_t buffer_size = base::default_buffer_size,
+        std::size_t threshold   = base::default_threshold)
         : base (input, chunk_size, buffer_size, threshold)
     {}
 

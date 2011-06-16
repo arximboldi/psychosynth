@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-09 17:18:52 raskolnikov>
+ *  Time-stamp:  <2011-06-13 15:46:53 raskolnikov>
  *
  *  @file        logger.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -29,7 +29,8 @@
  *
  */
 
-#include "base/logger.hpp"
+#include "tree.tpp"
+#include "logger.hpp"
 
 using namespace std;
 
@@ -37,6 +38,10 @@ namespace psynth
 {
 namespace base
 {
+
+template class tree_node <log>;
+template class PSYNTH_DEFAULT_THREADING <log>;
+template class singleton_holder <log>;
 
 log::~log()
 {

@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-09 19:53:23 raskolnikov>
+ *  Time-stamp:  <2011-06-11 20:03:41 raskolnikov>
  *
  *  @file        exception.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>

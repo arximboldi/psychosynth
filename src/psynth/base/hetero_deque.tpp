@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-09 18:09:24 raskolnikov>
+ *  Time-stamp:  <2011-06-14 20:19:51 raskolnikov>
  *
  *  @file        hetero_queque.tpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -39,6 +39,7 @@
 #ifndef PSYNTH_BASE_HETERO_DEQUE_TPP_
 #define PSYNTH_BASE_HETERO_DEQUE_TPP_
 
+#include <cassert>
 #include <psynth/base/scope_guard.hpp>
 #include <psynth/base/hetero_deque.hpp>
 
@@ -49,16 +50,18 @@ namespace base
 
 template <class B>
 hetero_deque<B>::hetero_deque (std::size_t size)
-    : _size (size + sizeof (header))
-    , _memory (new char [_size])
-    , _front (reinterpret_cast<header*> (_memory.get ()))
-    , _back (reinterpret_cast<header*> (_memory.get ()))
+    : _memory (size + sizeof (header))
+    , _front (reinterpret_cast<header*> (&_memory [0]))
+    , _back (reinterpret_cast<header*> (&_memory [0]))
 {
     *_front = header { 0, 0, 0 };
 }
 
 template <class B>
 hetero_deque<B>::hetero_deque (hetero_deque&& other)
+    : _memory (0)
+    , _front (0)
+    , _back (0)
 {
     std::swap (*this, other);
 }
@@ -70,6 +73,34 @@ hetero_deque<B>& hetero_deque<B>::operator= (hetero_deque&& other)
         std::swap (*this, other);
     return *this;
 }
+
+#if 0
+
+template <class B>
+hetero_deque<B>::hetero_deque (const hetero_deque& other)
+    : _memory (other._memory)
+    , _front (!other._front ? 0 :
+              (header*) &_memory[0] +
+              (other._front - (header*) &other._memory[0]))
+    , _back (!other._back ? 0 :
+             (header*) &_memory[0] +
+             (other._back - (header*) &other._memory[0]))
+{
+}
+
+template <class B>
+hetero_deque<B>& hetero_deque<B>::operator= (const hetero_deque& other)
+{
+    if (&other != this)
+    {
+        hetero_deque aux (other);
+        std::swap (*this, aux);
+    }
+    
+    return *this;
+}
+
+#endif
 
 template <class B>
 hetero_deque<B>::~hetero_deque ()
@@ -146,15 +177,15 @@ bool hetero_deque<B>::push_back (Args&& ... args)
         _back = _back->next;
 
         if (_front < _back &&
-            req_size > _memory.get () + _size - (char*) _back)
-            _back   = reinterpret_cast<header*> (_memory.get ());
+            req_size > &_memory[0] + _memory.size () - (char*) _back)
+            _back   = reinterpret_cast<header*> (&_memory[0]);
         
         if (_back < _front && (char*) _front - (char*) _back < req_size) {
             _back  = old_back;
             return false;
         }
     }
-    else if (req_size > (std::ptrdiff_t) _size)
+    else if (req_size > (std::ptrdiff_t) _memory.size ())
         return false;
     
     auto construct_guard = make_guard ([&] { _back  = old_back; });
@@ -205,10 +236,10 @@ bool hetero_deque<B>::push_front (Args&& ... args)
                 return false;
             }
         }
-        else if ((char*) _front < _memory.get ())
+        else if ((char*) _front < &_memory[0])
         {
             _front = reinterpret_cast<header*> (
-                _memory.get () + _size - req_size);
+                &_memory[0] + _memory.size () - req_size);
             
             if (_front < _back->next + 1) {
                 _front = old_front;
@@ -251,19 +282,21 @@ bool hetero_deque<B>::pop_front ()
 template <class B>
 void hetero_deque<B>::clear ()
 {
+    if (!_front) // Move constructor.
+        return;
     for (auto it = _front; it->next != 0; it = it->next)
         it->access->~B ();
-    _front = _back = reinterpret_cast<header*> (_memory.get ());
+    _front = _back = reinterpret_cast<header*> (&_memory[0]);
     *_front = header { 0, 0, 0 };
 }
 
 template <class B>
 void hetero_deque<B>::swap (hetero_deque& other)
 {
-    std::swap (_size, other._size);
     std::swap (_memory, other._memory);
     std::swap (_front, other._front);
     std::swap (_back, other._back);
+    assert (_front >= &_memory [0]); // TEST
 }
     
 } /* namespace base */

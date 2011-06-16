@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-21 22:32:30 raskolnikov>
+ *  Time-stamp:  <2011-06-11 23:09:37 raskolnikov>
  *
  *  @file        async_base.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -31,8 +31,9 @@
 #ifndef PSYNTH_IO_ASYNC_BASE_H_
 #define PSYNTH_IO_ASYNC_BASE_H_
 
-#include <iostream> // FIXME
 #include <functional>
+#include <atomic>
+
 #include <psynth/io/exception.hpp>
 
 namespace psynth
@@ -44,7 +45,7 @@ PSYNTH_DECLARE_ERROR (error, async_error);
 PSYNTH_DECLARE_ERROR (async_error, async_not_running_error);
 PSYNTH_DECLARE_ERROR (async_error, async_not_idle_error);
 
-enum class async_state
+enum class async_state : int
 {
     idle,
     running
@@ -101,7 +102,7 @@ public:
     typedef std::function<void (std::size_t)> callback_type;
 
     async_base_impl (callback_type cb = callback_type ())
-        : _state (async_state::idle)
+        : _state ((int) async_state::idle)
         , _callback (cb)
     {
     }
@@ -109,7 +110,7 @@ public:
     virtual ~async_base_impl () {}
     
     async_state state () const
-    { return _state; }
+    { return (async_state) (int) _state; }
     
     void set_callback (callback_type cb)
     {
@@ -119,14 +120,15 @@ public:
     
 protected:
     void set_state (async_state state)
-    { _state = state; }
+    { _state = (int) state; }
 
     void process (std::size_t nframes)
     { _callback (nframes); }
     
 private:
-    async_state   _state;
-    callback_type _callback;
+    std::atomic<int> _state; // FIXME: Why does GCC does not support
+                             // this with an enum?
+    callback_type    _callback;
 };
 
 };

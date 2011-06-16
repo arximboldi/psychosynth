@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-08 19:42:07 raskolnikov>
+ *  Time-stamp:  <2011-06-13 11:10:35 raskolnikov>
  *
  *  @file        threads.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -64,6 +64,84 @@ namespace psynth
 namespace base
 {
 
+/**
+ * Utility to avoid writing too many types when locking mutexes.
+ */
+template <class Mutex, typename... Args>
+std::unique_lock<Mutex> make_unique_lock (Mutex& lock, Args... args)
+{
+    return std::unique_lock<Mutex> (lock, args...);
+}
+
+/**
+ *  try_lock_guard, lock_guard and no_lock_guard provide a way to
+ *  design policies that are not bases just on object or class
+ *  locking, but fine-grainedly control wether some internal construct
+ *  should have exclusion, probabilistic exclusion or no exclusion at
+ *  all.
+ */
+template <class Mutex = std::mutex>
+struct try_lock_guard
+{
+    typedef std::unique_lock<Mutex> guard_type;
+
+    guard_type default_guard ()
+    { return guard_type (_mutex, std::try_to_lock); }
+
+    template <typename... Args>
+    guard_type guard (Args... args)
+    { return guard_type (_mutex, args...); }
+
+    void lock ()
+    { _mutex.lock (); }
+
+    bool try_lock ()
+    { return _mutex.try_lock (); }
+
+    void unlock ()
+    { _mutex.unlock (); }
+    
+private:
+    Mutex _mutex;
+};
+
+
+/**
+ * @see try_lock_guard
+ */
+template <class Mutex = std::mutex>
+struct lock_guard : public try_lock_guard<Mutex>
+{
+    typedef std::unique_lock<Mutex> guard_type;
+    
+    guard_type default_guard ()
+    { return guard_type (_mutex); }
+
+private:
+    Mutex _mutex;
+};
+
+
+/**
+ * @see try_lock_guard
+ */
+template <class Mutex = std::mutex>
+struct no_lock_guard
+{
+    struct guard_type
+    {
+        bool owns_lock () { return true; }        
+    };
+    
+    guard_type default_guard () { return {}; }
+    template <typename... Args>
+    guard_type guard (Args...) { assert (false); return {}; }
+    void lock () { assert (false); }
+    bool try_lock () { assert (false); return false; }
+    void unlock () { assert (false); };
+};
+
+
 template <class T>
 class no_threading
 {
@@ -95,28 +173,22 @@ public:
     {
     public:
 	lock (const object_lockable& host)
-	    : m_host (host)
-	{
-	    m_host.m_mutex.lock ();
-	}
+	    : _host (host)
+	{ _host._mutex.lock (); }
 
 	lock (const object_lockable* host)
-	    : m_host (*host)
-	{
-	    m_host.m_mutex.lock ();
-	}
+	    : _host (*host)
+	{ _host._mutex.lock (); }
 	
 	~lock ()
-	{
-	    m_host.m_mutex.unlock ();
-	}
+	{ _host._mutex.unlock (); }
 
     private:
-	const object_lockable& m_host;
+	const object_lockable& _host;
     };
     
 private:
-    mutable Mutex m_mutex;
+    mutable Mutex _mutex;
 };
 
 template <class T, class Mutex = PSYNTH_DEFAULT_MUTEX>
@@ -127,42 +199,30 @@ public:
     {
     public:
 	lock ()
-	{
-	    s_init.m_mutex.lock ();
-	}
+	{ s_init._mutex.lock (); }
 
 	lock (const class_lockable& host)
-	{
-	    s_init.m_mutex.lock ();
-	}
+	{ s_init._mutex.lock (); }
 
 	lock (const class_lockable* host)
-	{
-	    s_init.m_mutex.lock ();
-	}
+	{ s_init._mutex.lock (); }
 	
 	~lock ()
-	{
-	    s_init.m_mutex.unlock ();
-	}
+	{ s_init._mutex.unlock (); }
     };
 	
 private:
     struct initializer
     {
-	bool  m_is_init;
-	Mutex m_mutex;
+	bool  _is_init;
+	Mutex _mutex;
 
 	initializer ()
-	    : m_is_init (false)
-	{
-	    m_is_init = true;
-	}
+	    : _is_init (false)
+	{ _is_init = true; }
 
 	~initializer ()
-	{
-	    assert (m_is_init);
-	}
+	{ assert (_is_init); }
     };
 
     static initializer s_init;

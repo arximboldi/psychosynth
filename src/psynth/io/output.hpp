@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-21 19:57:28 raskolnikov>
+ *  Time-stamp:  <2011-06-16 17:34:22 raskolnikov>
  *
  *  @file        output.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -53,11 +53,12 @@ class output
 {
 public:
     typedef Range range;
-
+    typedef typename Range::const_type const_range;
+    
     /**
      * Write a bunch of data into the device.
      */
-    virtual std::size_t put (const range& data) = 0;
+    virtual std::size_t put (const const_range& data) = 0;
 };
 
 /**
@@ -68,8 +69,9 @@ class dummy_output : public output<Range>
 {
 public:
     typedef Range range;
-    
-    virtual std::size_t put (const range& data)
+    typedef typename Range::const_type const_range;
+        
+    virtual std::size_t put (const const_range& data)
     {
         detail::dummy_output_put_impl ();
         return data.size ();
@@ -96,7 +98,8 @@ class dummy_async_output : public detail::async_base_impl
 {
 public:
     typedef Range range;
-
+    typedef typename Range::const_type const_range;
+    
     dummy_async_output (std::size_t buffer_size)
         : _buffer_size (buffer_size)
     {}

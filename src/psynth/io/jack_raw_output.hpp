@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-21 22:35:48 raskolnikov>
+ *  Time-stamp:  <2011-06-11 22:11:59 raskolnikov>
  *
  *  @file        jack_raw_output.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -46,7 +46,7 @@ PSYNTH_DECLARE_ERROR (jack_error, jack_open_error);
 PSYNTH_DECLARE_ERROR (jack_error, jack_param_error);
 
 class jack_raw_output : public detail::async_base_impl,
-                        public boost::noncopyable
+                        private boost::noncopyable
 {
 public:
     typedef detail::async_base_impl::callback_type callback_type;

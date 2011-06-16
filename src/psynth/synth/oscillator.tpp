@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-22 13:22:05 raskolnikov>
+ *  Time-stamp:  <2011-06-16 22:09:34 raskolnikov>
  *
  *  @file        oscillator.tpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -60,11 +60,14 @@ template <class G>
 template <class Range1>
 void oscillator<G>::update (const Range1& out_buf)
 {
-    generate_frames (out_buf, [&] () -> decltype (_gen (0)) {
-            auto ret = this->_gen (this->_x) * this->_ampl;
+    typedef typename Range1::value_type frame_type;
+    
+    generate_frames (out_buf, [&] () -> frame_type {
+            frame_type ret { this->_gen (this->_x) * this->_ampl };
             this->_x += this->_speed;
             return ret;
         });
+    
     _x = base::phase (_x);
 }
 

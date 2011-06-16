@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-18 19:59:26 raskolnikov>
+ *  Time-stamp:  <2011-06-16 16:58:10 raskolnikov>
  *
  *  @file        alsa_output.tpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -102,7 +102,7 @@ alsa_output<Range>::alsa_output (const std::string& device,
 }
 
 template <typename Range>
-std::size_t alsa_output<Range>::put (const range& data)
+std::size_t alsa_output<Range>::put (const const_range& data)
 {
     return put_on_raw (*this, data);
 }

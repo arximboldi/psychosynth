@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-21 22:24:38 raskolnikov>
+ *  Time-stamp:  <2011-06-16 16:59:53 raskolnikov>
  *
  *  @file        jack_output.tpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -76,7 +76,7 @@ jack_output<Range>::jack_output (const std::string& client,
 }
 
 template <typename Range>
-std::size_t jack_output<Range>::put (const range& data)
+std::size_t jack_output<Range>::put (const const_range& data)
 {
     return put_on_raw (*this, data);
 }

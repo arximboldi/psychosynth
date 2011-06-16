@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-09 19:16:52 raskolnikov>
+ *  Time-stamp:  <2011-06-13 16:57:08 raskolnikov>
  *
  *  @file        node_fwd.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -31,14 +31,13 @@
 #ifndef PSYNTH_GRAPH_NODE_FWD_HPP_
 #define PSYNTH_GRAPH_NODE_FWD_HPP_
 
+#include <psynth/base/declare.hpp>
+
 namespace psynth
 {
 namespace graph
 {
 
-PSYNTH_DECLARE_TYPE (input);
-PSYNTH_DECLARE_TYPE (output);
-PSYNTH_DECLARE_TYPE (control);
 PSYNTH_DECLARE_SHARED_TYPE (node);
 
 } /* namespace graph */

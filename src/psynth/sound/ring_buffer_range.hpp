@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-24 18:40:45 raskolnikov>
+ *  Time-stamp:  <2011-06-15 16:50:56 raskolnikov>
  *
  *  @file        ring_buffer.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -369,7 +369,7 @@ public:
     template <class Position>
     typename buffer_range_type<Range>::type
     sub_buffer_one (const Position& p, size_type slice) const;
-
+    
     template <class Position>
     typename buffer_range_type<Range>::type
     sub_buffer_two (const Position& p, size_type slice) const;

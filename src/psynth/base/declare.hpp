@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-18 19:19:11 raskolnikov>
+ *  Time-stamp:  <2011-06-12 12:52:27 raskolnikov>
  *
  *  @file        declare.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -50,6 +50,7 @@ namespace base
 
 #define PSYNTH_DECLARE_SHARED_POINTER(type_name)                        \
     typedef std::shared_ptr<type_name> type_name ## _ptr;               \
+    typedef std::weak_ptr<type_name> type_name ## _weak_ptr;            \
     template <typename... Args>                                         \
     type_name ## _ptr new_ ## type_name (Args && ... args)              \
     {                                                                   \
@@ -80,6 +81,7 @@ namespace base
 #define PSYNTH_TEMPLATE_PARAMS(param_seq) \
     BOOST_PP_ENUM_PARAMS(BOOST_PP_SEQ_SIZE(param_seq), Par__)
 
+// TODO: Make this generate a weak pointer alias too?
 #define PSYNTH_DECLARE_SHARED_POINTER_TEMPLATE_IMPL(type_name, param_seq) \
     template <PSYNTH_TEMPLATE_PARAMS_FULL(param_seq)>                   \
     struct type_name ## _ptr :                                          \

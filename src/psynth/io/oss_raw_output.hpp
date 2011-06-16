@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-18 20:01:32 raskolnikov>
+ *  Time-stamp:  <2011-06-11 22:12:09 raskolnikov>
  *
  *  @file        oss_raw_output.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -44,7 +44,7 @@ PSYNTH_DECLARE_ERROR (oss_error, oss_open_error);
 PSYNTH_DECLARE_ERROR (oss_error, oss_param_error);
 
 class oss_raw_output : public thread_async,
-                       public boost::noncopyable
+                       private boost::noncopyable
 {
 public:
     typedef thread_async::callback_type callback_type;

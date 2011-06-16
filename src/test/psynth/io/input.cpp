@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-17 21:07:27 raskolnikov>
+ *  Time-stamp:  <2011-06-11 22:29:41 raskolnikov>
  *
  *  @file        input.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -272,7 +272,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE (caching_file_input_test, RangePair,
     io::dummy_file_input<dst_range> fin;
     io::caching_file_input_adapter<src_range, decltype (&fin)> cfin (&fin);
     
-    const std::size_t buffer_size = cfin.DEFAULT_CHUNK_SIZE;
+    const std::size_t buffer_size = cfin.default_chunk_size;
     src_buffer_type buf (buffer_size, src_zero, 0);
     src_buffer_type test_buf (buffer_size, src_zero, 0);
 

@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-09 18:12:08 raskolnikov>
+ *  Time-stamp:  <2011-06-14 20:35:17 raskolnikov>
  *
  *  @file        hetero_queque.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -32,7 +32,7 @@
 #define PSYNTH_BASE_HETERO_DEQUE_HPP_
 
 #include <type_traits>
-#include <memory>
+#include <vector>
 
 #include <boost/iterator/iterator_facade.hpp>
 #include <boost/iterator/reverse_iterator.hpp>
@@ -129,6 +129,10 @@ public:
     explicit hetero_deque (std::size_t size = 0);
     hetero_deque (hetero_deque&&);
     hetero_deque& operator= (hetero_deque&&);
+#if 0
+    hetero_deque (const hetero_deque&);
+    hetero_deque& operator= (const hetero_deque&);
+#endif
     ~hetero_deque ();
     
     Base& back ();
@@ -178,15 +182,15 @@ public:
     { return const_reverse_iterator (_front); }
     
     iterator end ()
-    { return iterator (_back->next); }
+    { return iterator (_back->next ? _back->next : _back); }
     const_iterator end () const
-    { return const_iterator (_back->next); }
+    { return const_iterator (_back->next ? _back->next : _back); }
     const_iterator cend () const
-    { return const_iterator (_back->next); }
+    { return const_iterator (_back->next ? _back->next : _back); }
     reverse_iterator rend ()
-    { return reverse_iterator (_back->next); }
+    { return reverse_iterator (_back->next ? _back->next : _back); }
     const_reverse_iterator rend () const
-    { return const_reverse_iterator (_back->next); }
+    { return const_reverse_iterator (_back->next ? _back->next : _back); }
     
 private:
     typedef detail::hetero_header<Base> header;
@@ -199,9 +203,8 @@ private:
     const Base& access (const header* data) const;
     Base& access (header* data) const;
         
-    typedef std::unique_ptr<char[]> memory_t;
+    typedef std::vector<char> memory_t;
     
-    std::size_t _size;
     memory_t    _memory;
     header*     _front;
     header*     _back;

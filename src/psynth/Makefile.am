@@ -86,6 +86,7 @@ nobase_libpsynthinc_HEADERS = \
 	base/factory.hpp\
 	base/factory_manager.hpp\
 	base/factory_manager.tpp\
+	base/functor.hpp\
 	synth/audio_info.hpp\
 	synth/filter.hpp\
 	synth/wave_table.hpp\
@@ -180,6 +181,14 @@ nobase_libpsynthinc_HEADERS = \
 	sound/typedefs.hpp\
 	sound/util.hpp\
 	sound/variant.hpp\
+	new_graph/exception.hpp\
+	new_graph/processor.hpp\
+	new_graph/processor_fwd.hpp\
+	new_graph/node.hpp\
+	new_graph/node_fwd.hpp\
+	new_graph/process_node.hpp\
+	new_graph/sink_node.hpp\
+	new_graph/sink_node_fwd.hpp\
 	version.hpp
 
 libpsynth_la_SOURCES = \
@@ -223,7 +232,21 @@ libpsynth_la_SOURCES = \
 	io/input.cpp\
 	io/output.cpp\
 	io/file_common.cpp\
-	io/thread_async.cpp
+	io/thread_async.cpp\
+	new_graph/exception.cpp\
+	new_graph/processor.cpp\
+	new_graph/node.cpp\
+	new_graph/sink_node.cpp\
+	new_graph/process_node.cpp\
+	new_graph/control.cpp\
+	new_graph/port.cpp\
+	new_graph/buffer_port.cpp\
+	new_graph/buffers.cpp\
+	new_graph/core/patch.cpp\
+	new_graph/core/passive_output.cpp\
+	new_graph/core/async_output.cpp\
+	new_graph/core/oscillator.cpp
+
 
 if HAVE_SOUNDTOUCH
 libpsynth_la_CXXFLAGS += $(SOUNDTOUCH_CFLAGS)

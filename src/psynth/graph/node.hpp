@@ -323,9 +323,9 @@ public:
 	return *m_params[id];
     }
 
-    node_param& param (const std::string& name);
+    node_param& get_param (const std::string& name);
 
-    const node_param& param (const std::string& name) const;
+    const node_param& get_param (const std::string& name) const;
     
     template <typename SocketDataType>
     const SocketDataType* get_output (int type, int socket) const {

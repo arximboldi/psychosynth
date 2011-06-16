@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-21 21:03:27 raskolnikov>
+ *  Time-stamp:  <2011-06-16 17:37:03 raskolnikov>
  *
  *  @file        buffered_output.tpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -59,9 +59,9 @@ struct buffered_output_put_fn<R, R>
 };
 
 template <class Ir, class Op>
-std::size_t buffered_output_impl<Ir, Op>::put (const range& data)
+std::size_t buffered_output_impl<Ir, Op>::put (const const_range& data)
 {
-    buffered_output_put_fn <range, output_range> p;
+    buffered_output_put_fn <const_range, output_const_range> p;
     return p (*this, data);
 }
 

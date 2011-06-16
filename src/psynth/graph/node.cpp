@@ -115,7 +115,7 @@ void node::del_param(int index)
     m_nparam--;
 }
 
-node_param& node::param(const std::string& name)
+node_param& node::get_param(const std::string& name)
 {
     for (vector<node_param*>::iterator it = m_params.begin();
 	 it != m_params.end();
@@ -126,7 +126,7 @@ node_param& node::param(const std::string& name)
     return m_null_param;
 }
 
-const node_param& node::param (const std::string& name) const
+const node_param& node::get_param (const std::string& name) const
 {
     for (vector<node_param*>::const_iterator it = m_params.begin();
 	 it != m_params.end();
@@ -205,9 +205,9 @@ inline bool node::can_update (const node* caller, int caller_port_type,
     if (m_single_update || !caller)
 	ret = !m_updated;
     else
-	ret =
-	    m_updated_links[caller_port_type].insert(make_pair(caller->get_id (),
-							       caller_port)).second;
+	ret = m_updated_links[caller_port_type].insert(
+            make_pair(caller->get_id (),
+                      caller_port)).second;
     m_updated = true;
     
     return ret;

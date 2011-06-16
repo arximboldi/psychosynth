@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-10-17 20:41:21 raskolnikov>
+ *  Time-stamp:  <2011-06-13 15:47:22 raskolnikov>
  *
  *  @file        file_manager.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -30,7 +30,9 @@
 
 #include <cstring>
 #include <cstdlib>
-#include "base/file_manager.hpp"
+
+#include "tree.tpp"
+#include "file_manager.hpp"
 
 namespace bf = boost::filesystem;
 
@@ -38,6 +40,10 @@ namespace psynth
 {
 namespace base
 {
+
+template class singleton_holder <file_mgr_node>;
+template class tree_node <file_mgr_node>;
+template class PSYNTH_DEFAULT_THREADING <file_mgr_node>;
 
 bf::path file_mgr_node::find_all (const bf::path& file) const
 {

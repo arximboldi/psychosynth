@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-18 20:00:58 raskolnikov>
+ *  Time-stamp:  <2011-06-16 16:59:03 raskolnikov>
  *
  *  @file        oss_output.tpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -101,7 +101,7 @@ oss_output<Range>::oss_output (const std::string& device,
 }
 
 template <typename Range>
-std::size_t oss_output<Range>::put (const range& data)
+std::size_t oss_output<Range>::put (const const_range& data)
 {
     return put_on_raw (*this, data);
 }

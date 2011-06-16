@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-16 23:46:50 raskolnikov>
+ *  Time-stamp:  <2011-06-16 17:00:13 raskolnikov>
  *
  *  @file        file_raw_output.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -47,6 +47,7 @@ class file_output : public file_output_base<Range>
     typedef file_output_base<Range> base;
 public:
     typedef typename base::range range;
+    typedef typename base::const_range const_range;
     
     static_assert (file_support<Range>::is_supported::value,
                    "Audio file format not supported.");
@@ -57,7 +58,7 @@ public:
 
     ~file_output ();
 
-    std::size_t put (const range& data);
+    std::size_t put (const const_range& data);
 
     std::size_t seek (std::ptrdiff_t offset, seek_dir dir);
     

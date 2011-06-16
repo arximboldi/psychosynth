@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-08 12:44:07 raskolnikov>
+ *  Time-stamp:  <2011-06-13 15:48:32 raskolnikov>
  *
  *  @file        tree.tpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -26,8 +26,10 @@
  *
  */
 
-#ifndef PSYNTH_TREE_T_
-#define PSYNTH_TREE_T_
+#ifndef PSYNTH_BASE_TREE_T_
+#define PSYNTH_BASE_TREE_T_
+
+#include <psynth/base/tree.hpp>
 
 namespace psynth
 {
@@ -75,7 +77,7 @@ tree_node<N, K, T, P>::detach (iterator iter)
 
 template <class N, class K, class T, class P>
 typename tree_node <N, K, T, P>::iterator
-tree_node <N, K, T, P>::remove_child (iterator& iter)
+tree_node <N, K, T, P>::remove_child (iterator iter)
 {
     iterator next = std::next (iter);
     
@@ -125,10 +127,16 @@ N& tree_node <N, K, T, P>::child (const K& name)
 template <class N, class K, class T, class P>
 N& tree_node <N, K, T, P>::existing_child (const K& name)
 {
+    return const_cast<N&> (
+        const_cast <const tree_node*> (this)->existing_child (name));
+}
+
+template <class N, class K, class T, class P>
+const N& tree_node <N, K, T, P>::existing_child (const K& name) const
+{
     tree_lock lock (this);
     
-    iterator it = _childs.find (name);
-
+    const_iterator it = _childs.find (name);
     if (it == end ())
 	throw tree_node_error ("Can't find child node.");
 	
@@ -238,4 +246,4 @@ void tree_node <N, K, T, P>::find_base (InputIterator& base_b,
 } /* namespace base */
 } /* namespace psynth */
 
-#endif /* PSYNTH_TREE_T_ */
+#endif /* PSYNTH_BASE_TREE_T_ */

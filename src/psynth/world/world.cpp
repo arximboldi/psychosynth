@@ -112,7 +112,7 @@ world::world (const audio_info& info)
     m_output = new graph::node_output (m_info);
     m_mixer = new graph::node_audio_mixer (m_info, MIXER_CHANNELS);
 
-    m_mixer->param("amplitude").set(0.5f);
+    m_mixer->get_param("amplitude").set(0.5f);
 
     m_node_mgr.add_node (base::manage (m_output), OUTPUT_ID);
     m_node_mgr.add_node (base::manage (m_mixer), MIXER_ID);

@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-21 20:03:13 raskolnikov>
+ *  Time-stamp:  <2011-06-16 22:26:54 raskolnikov>
  *
  *  @file        oscillator.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -157,7 +157,6 @@ private:
     float       _ampl;
     float       _phase;
     bool        _wave_table;
-
     
     void initialize_table ();
 };

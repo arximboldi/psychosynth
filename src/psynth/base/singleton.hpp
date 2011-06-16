@@ -2,7 +2,7 @@
  *  File:       singleton.hpp
  *  Author:     Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
  *  Date:       2007
- *  Time-stamp: <2010-11-02 22:10:15 raskolnikov>
+ *  Time-stamp: <2011-06-13 11:12:20 raskolnikov>
  *
  *  This file implements a policy-based generic singleton. It is a
  *  simplification (less policy implementations are provided) of
@@ -69,7 +69,7 @@ template <
     template <class> class LifetimePolicy  = lifetime_atexit,
     template <class> class ThreadingPolicy = PSYNTH_DEFAULT_NONOBJ_THREADING
     >
-class singleton_holder
+class singleton_holder : private boost::noncopyable
 {
 public:
     typedef T type;
@@ -82,14 +82,10 @@ public:
     
 private:
     /** Hidden constructor. */
-    singleton_holder () {};
+    singleton_holder () = delete;
     /** Hidden destructor. */
     ~singleton_holder () {};
-    /** Hidden copy constructor. */
-    singleton_holder (singleton_holder const&) {};
-    /** Hidden copy operator. */
-    singleton_holder& operator= (singleton_holder const&) {};
-
+    
     /** The single instance pointer type. */
     typedef typename ThreadingPolicy<T*>::volatile_type instance_type;
     /** The single instance pointer. */

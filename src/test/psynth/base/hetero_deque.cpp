@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-09 18:12:29 raskolnikov>
+ *  Time-stamp:  <2011-06-14 20:31:50 raskolnikov>
  *
  *  @file        hetero_queue.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -201,7 +201,12 @@ BOOST_AUTO_TEST_CASE(hetero_deque_clear)
 BOOST_AUTO_TEST_CASE(hetero_deque_no_tpl)
 {
     test_deque q (1024);
-
+    
+    int iter = 0;
+    for (auto& x : q)
+        ++iter;
+    BOOST_CHECK_EQUAL (iter, 0);
+    
     BOOST_CHECK_EQUAL (q.empty (), true);
     BOOST_CHECK_EQUAL (q.push_back (test_count ()), true);
     test_count_dec var1;
@@ -215,8 +220,23 @@ BOOST_AUTO_TEST_CASE(hetero_deque_no_tpl)
         x.method ();
         sum += x.count;
     }
-
     BOOST_CHECK_EQUAL (sum, -1);
+}
+
+BOOST_AUTO_TEST_CASE(hetero_deque_move)
+{
+    test_deque q (1024);
+
+    BOOST_CHECK_EQUAL (q.push_back<test_count> (), true);
+    BOOST_CHECK_EQUAL (q.push_back<test_count_dec> (), true);
+
+    test_deque q2 (std::move (q));
+    
+    q2.front ().method ();
+    q2.back ().method ();
+
+    BOOST_CHECK_EQUAL (q2.front ().count, 1);
+    BOOST_CHECK_EQUAL (q2.back ().count, -1);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

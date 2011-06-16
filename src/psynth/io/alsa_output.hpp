@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-09 18:17:33 raskolnikov>
+ *  Time-stamp:  <2011-06-16 16:58:21 raskolnikov>
  *
  *  @file        alsa_output.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -52,17 +52,21 @@ template <typename Range>
 class alsa_output : public async_output<Range>,
                     public alsa_raw_output
 {
+    typedef async_output<Range> base_type;
+    
 public:
     static_assert (alsa_support<Range>::is_supported::value,
                    "Range output format not supported by ALSA.");
     
-    typedef Range range;
+    typedef typename base_type::range range;
+    typedef typename base_type::const_range const_range;
+    
     alsa_output (const std::string& device,
                  std::size_t        buffer_size,
                  std::size_t        rate,
                  callback_type cb = callback_type ());
 
-    std::size_t put (const range& data);
+    std::size_t put (const const_range& data);
 
     std::size_t buffer_size () const
     { return alsa_raw_output::buffer_size (); }

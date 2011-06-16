@@ -1,0 +1,204 @@
+/**
+ *  Time-stamp:  <2011-06-16 20:54:26 raskolnikov>
+ *
+ *  @file        processor.cpp
+ *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
+ *  @date        Fri Jun 10 16:17:02 2011
+ *
+ *  @brief Synthesis graph processor implementation.
+ */
+
+/*
+ *  Copyright (C) 2011 Juan Pedro Bolívar Puente
+ *
+ *  This file is part of Psychosynth.
+ *   
+ *  Psychosynth is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  Psychosynth is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
+#define PSYNTH_MODULE_NAME "psynth.graph.processor"
+
+#include <iostream>
+
+#include "core/patch.hpp"
+#include "sink_node.hpp"
+#include "process_node.hpp"
+#include "processor.hpp"
+
+namespace psynth
+{
+namespace graph
+{
+
+PSYNTH_DEFINE_ERROR (processor_error);
+PSYNTH_DEFINE_ERROR_WHAT (processor_not_running_error,
+                          "Can not start running processor.");
+PSYNTH_DEFINE_ERROR_WHAT (processor_not_idle_error,
+                          "Can not stop idle processor.");
+
+basic_process_context::basic_process_context (std::size_t block_size,
+                                              std::size_t frame_rate,
+                                              std::size_t queue_size)
+    : _rt_buffers (rt_event_deque (queue_size),
+                   rt_event_deque (queue_size),
+                   rt_event_deque (queue_size))
+    , _async_buffers (async_event_deque (queue_size),
+                      async_event_deque (queue_size),
+                      async_event_deque (queue_size))
+    , _block_size (block_size)
+    , _frame_rate (frame_rate)
+{
+}
+
+processor::processor (core::patch_ptr root,
+                      std::size_t block_size,
+                      std::size_t frame_rate,
+                      std::size_t queue_size)
+    : _root (root ? root : core::new_patch ())
+    , _ctx (block_size, frame_rate, queue_size)
+    , _async_request_flip (false)
+    , _is_running (false)
+{
+    _root->attach_to_process (*this);
+    _explore_graph (_root);
+}
+
+processor::~processor ()
+{
+    if (_is_running)
+        stop ();
+}
+
+void processor::start ()
+{
+    if (_is_running)
+        throw processor_not_idle_error ();
+     _is_running = true;
+    _async_thread = std::thread (
+        std::bind (&processor::_async_loop, this));
+}
+
+void processor::stop ()
+{
+    if (!_is_running)
+        throw processor_not_running_error ();
+    
+    {
+        std::unique_lock<std::mutex> g (_async_mutex);
+        _async_request_flip = false;        
+        _is_running = false;
+        _async_cond.notify_all ();
+    }
+    
+    if (_async_thread.joinable ())
+        _async_thread.join ();
+}
+
+void processor::_async_loop ()
+{
+    while (_is_running)
+    {
+        {
+            std::unique_lock<std::mutex> g (_async_mutex);
+            for (auto& ev : _ctx._async_buffers.front ())
+                ev (_ctx);
+            _ctx._async_buffers.front ().clear ();
+            _async_request_flip = true;
+        }
+        
+        _ctx._async_buffers.flip_local ();
+        for (auto& ev : _ctx._async_buffers.front ())
+            ev (_ctx);
+        _ctx._async_buffers.front ().clear ();
+
+        {
+            std::unique_lock<std::mutex> g (_async_mutex); 
+            while (_async_request_flip)
+                _async_cond.wait (g);
+        }
+    }
+}
+
+void processor::set_block_size (std::size_t new_size)
+{
+    assert (false);
+}
+
+void processor::set_frame_rate (std::size_t new_frame_rate)
+{
+    assert (false);
+}
+
+void processor::rt_request_process (std::ptrdiff_t iterations)
+{
+    while (iterations --> 0)
+        rt_request_process ();
+}
+
+void processor::rt_request_process ()
+{
+    auto request_lock = base::make_unique_lock (_rt_mutex);
+    
+    if (request_lock.owns_lock ())
+        _rt_process_once ();
+    else
+        request_lock.lock ();
+}
+
+void processor::_rt_process_once ()
+{
+    _ctx._rt_buffers.flip_back ();
+    for (auto& ev : _ctx._rt_buffers.front ())
+        ev (_ctx);
+    _ctx._rt_buffers.front ().clear ();
+        
+    for (auto& s : _sinks)
+        s->rt_process (_ctx);
+    _root->rt_advance ();
+    
+    _ctx._rt_buffers.flip_local ();
+    for (auto& ev : _ctx._rt_buffers.front ())
+        ev (_ctx);
+    _ctx._rt_buffers.front ().clear ();
+        
+    std::unique_lock<std::mutex> g (_async_mutex, std::try_to_lock);
+    if (g.owns_lock () && _async_request_flip)
+    {
+        _ctx._async_buffers.flip_back ();
+        _async_request_flip = false;
+        _async_cond.notify_all ();
+    }
+}
+    
+void processor::_explore_graph (core::patch_ptr curr)
+{
+    for (auto& n : curr->childs ())
+    {
+        auto sink = std::dynamic_pointer_cast<sink_node> (n);
+        if (sink)
+            _sinks.push_back (sink);
+
+        auto proc = std::dynamic_pointer_cast<process_node> (n);
+        if (proc)
+            _procs.push_back (proc);
+        
+        auto patch = std::dynamic_pointer_cast<core::patch> (n);
+        if (patch)
+            _explore_graph (patch);
+    }
+}
+
+} /* namespace graph */
+} /* namespace psynth */

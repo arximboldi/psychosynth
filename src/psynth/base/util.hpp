@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-17 00:19:11 raskolnikov>
+ *  Time-stamp:  <2011-06-13 19:34:28 raskolnikov>
  *
  *  @file        util.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -70,6 +70,25 @@ template <typename Ptr1, typename Ptr2>
 bool equal_ptr (Ptr1 a, Ptr2 b)
 {
     return &*a == &*b;
+}
+
+template <typename A>
+struct equal_id
+{
+    const A& elem;
+    
+    equal_id (const A& e) : elem (e) {}
+    
+    bool operator () (const A& b) const
+    {
+        return &elem == &b;
+    }
+};
+
+template <typename A>
+equal_id<A> make_equal_id (const A& e)
+{
+    return equal_id<A> (e);
 }
 
 } /* namespace base */

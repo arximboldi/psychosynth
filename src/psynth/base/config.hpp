@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-16 12:32:14 raskolnikov>
+ *  Time-stamp:  <2011-06-13 11:16:29 raskolnikov>
  *
  *  @file        config.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -351,6 +351,11 @@ void conf_node::set (const T& val, bool overwrite)
 	on_change (*this);
     }
 }
+
+extern template class subject_base <conf_listener>;
+extern template class singleton_holder <conf_node>;
+extern template class tree_node <conf_node>;
+extern template class PSYNTH_DEFAULT_THREADING <conf_node>;
 
 } /* namespace base */
 } /* namespace psynth */

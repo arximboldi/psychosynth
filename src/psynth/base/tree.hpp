@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-08 12:23:01 raskolnikov>
+ *  Time-stamp:  <2011-06-13 15:46:34 raskolnikov>
  *
  *  @file        tree.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -268,7 +268,7 @@ public:
      * @return An iterator to the next child.
      * @return This version of remove child is not thread-safe.
      */
-    iterator remove_child (iterator& iter);
+    iterator remove_child (iterator iter);
 
     /**
      * Removes all childs.
@@ -380,7 +380,5 @@ private:
 
 } /* namespace base */
 } /* namespace psynth */
-
-#include <psynth/base/tree.tpp>
 
 #endif /* PSYNTH_TREE_H  */

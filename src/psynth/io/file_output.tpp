@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-22 17:34:08 raskolnikov>
+ *  Time-stamp:  <2011-06-16 17:30:08 raskolnikov>
  *
  *  @file        file_output.tpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -90,7 +90,7 @@ file_output<Range>::~file_output ()
  * of this library :D
  */
 template <class Range>
-std::size_t file_output<Range>::put (const range& data)
+std::size_t file_output<Range>::put (const const_range& data)
 {
     return detail::file_output_put_impl (
         _file,

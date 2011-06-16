@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-07 19:55:22 raskolnikov>
+ *  Time-stamp:  <2011-06-16 16:57:01 raskolnikov>
  *
  *  @file        buffered_output.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -58,9 +58,11 @@ class buffered_output_impl : public Base
 {
 public:
     typedef typename Base::range range;
+    typedef typename Base::const_range const_range;
     
     typedef typename base::pointee<OutputPtr>::type output_type;
-    typedef typename output_type::range                   output_range;
+    typedef typename output_type::range output_range;
+    typedef typename output_type::const_range output_const_range;
 
     typedef typename sound::buffer_from_range<output_range>::type
     buffer_type;
@@ -70,7 +72,7 @@ public:
         , _output_ptr (output_ptr)
     {}
     
-    std::size_t put (const range& data);
+    std::size_t put (const const_range& data);
     
     template <class Range2>
     std::size_t put (const Range2& data);

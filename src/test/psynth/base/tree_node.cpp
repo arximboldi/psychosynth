@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-08 12:53:08 raskolnikov>
+ *  Time-stamp:  <2011-06-13 15:52:09 raskolnikov>
  *
  *  @file        tree_node_test.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -30,7 +30,7 @@
 
 #include <iostream>
 #include <boost/test/unit_test.hpp>
-#include <psynth/base/tree.hpp>
+#include <psynth/base/tree.tpp>
 
 template <class T>
 struct value_node : public psynth::base::tree_node<value_node<T> >,

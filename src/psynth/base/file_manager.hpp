@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-07 19:43:03 raskolnikov>
+ *  Time-stamp:  <2011-06-13 11:21:56 raskolnikov>
  *
  *  @file        file_manager.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -76,6 +76,10 @@ void file_mgr_node::find_if_all (StringPredicate pred,
 }
 
 typedef singleton_holder<file_mgr_node> file_manager;
+
+extern template class singleton_holder <file_mgr_node>;
+extern template class tree_node <file_mgr_node>;
+extern template class PSYNTH_DEFAULT_THREADING <file_mgr_node>;
 
 } /* namespace base */
 } /* namespace psynth */

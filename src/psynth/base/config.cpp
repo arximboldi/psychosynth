@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-18 19:03:48 raskolnikov>
+ *  Time-stamp:  <2011-06-13 15:51:05 raskolnikov>
  *
  *  @file        config.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -28,6 +28,7 @@
 
 #define PSYNTH_MODULE_NAME "psynth.base.config"
 
+#include "tree.tpp"
 #include "config.hpp"
 
 using namespace std;
@@ -37,9 +38,14 @@ namespace psynth
 namespace base
 {
 
+template class subject_base <conf_listener>;
+template class singleton_holder <conf_node>;
+template class tree_node <conf_node>;
+template class PSYNTH_DEFAULT_THREADING <conf_node>;
+
 PSYNTH_DEFINE_ERROR (config_error);
-PSYNTH_DEFINE_ERROR_WHAT  (config_type_error, "Config node type mismatch.");
-PSYNTH_DEFINE_ERROR_WHAT  (config_backend_error, "Config node has no backend.");
+PSYNTH_DEFINE_ERROR_WHAT (config_type_error, "Config node type mismatch.");
+PSYNTH_DEFINE_ERROR_WHAT (config_backend_error, "Config node has no backend.");
 
 void conf_subject::add_listener (conf_listener& l)
 {    

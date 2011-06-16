@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-07 18:41:40 raskolnikov>
+ *  Time-stamp:  <2011-06-13 11:09:57 raskolnikov>
  *
  *  @file        logger.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -455,6 +455,10 @@ log_stream_adapter::~log_stream_adapter ()
 #else
 #define PSYNTH_LOG_DEBUG ::psynth::base::nop_ostream ()
 #endif
+
+extern template class tree_node <log>;
+extern template class PSYNTH_DEFAULT_THREADING <log>;
+extern template class singleton_holder <log>;
 
 } /* namespace base */
 } /* namespace psynth */

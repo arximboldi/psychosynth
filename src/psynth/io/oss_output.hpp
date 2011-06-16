@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-18 19:53:17 raskolnikov>
+ *  Time-stamp:  <2011-06-16 16:58:53 raskolnikov>
  *
  *  @file        oss_output.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -52,18 +52,21 @@ template <typename Range>
 class oss_output : public oss_raw_output,
                    public async_output<Range>
 {
+    typedef async_output<Range> base_type;
+    
 public:
     static_assert (oss_support<Range>::is_supported::value,
-                   "Range output format not supported by OSS.");
-    
-    typedef Range range;
-    
+                   "Range output format not supported by OSS.");    
+
+    typedef typename base_type::range range;
+    typedef typename base_type::const_range const_range;
+
     oss_output (const std::string& device,
                 std::size_t        buffer_size,
                 std::size_t        rate,
                 callback_type      cb = callback_type ());
 
-    std::size_t put (const range& data);
+    std::size_t put (const const_range& data);
 
     std::size_t buffer_size () const
     { return oss_raw_output::buffer_size (); }
