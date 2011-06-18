@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-16 20:53:02 raskolnikov>
+ *  Time-stamp:  <2011-06-18 12:38:45 raskolnikov>
  *
  *  @file        port.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -53,14 +53,39 @@ port_base::port_base (std::string name, node* owner)
   : _name (name)
   , _owner (owner)
 {
-    assert (owner); // FIXME
+}
+
+void port_base::_set_owner (node* new_owner)
+{
+    _owner = new_owner;
+}
+
+void port_base::_set_name (std::string new_name)
+{
+    _name = new_name;
+}
+
+in_port_base::in_port_base (std::string name, graph::node* owner)
+    : port_base (name, owner)
+    , _source_port (0)
+{
+    if (owner)
+        owner->register_component (*this);
+}
+
+out_port_base::out_port_base (std::string name, node* owner)
+    : port_base (name, owner)
+{
+    if (owner)
+        owner->register_component (*this);
 }
 
 void out_port_base::_add_reference (in_port_base* ref)
 {
     _refs.push_back (ref);
 
-    if (owner ().is_attached_to_process () &&
+    if (_has_owner () &&
+        owner ().is_attached_to_process () &&
         owner ().process ().is_running ())
     {
         auto& ctx = owner ().process ().context ();
@@ -76,7 +101,8 @@ void out_port_base::_del_reference (in_port_base* ref)
 {
     _refs.remove (ref);
     
-    if (owner ().is_attached_to_process () &&
+    if (_has_owner () &&
+        owner ().is_attached_to_process () &&
         owner ().process ().is_running ())
     {
         auto& ctx = owner ().process ().context ();
@@ -89,12 +115,20 @@ void out_port_base::_del_reference (in_port_base* ref)
         _rt_refs.remove_if (base::make_equal_id (*ref));   
 }
 
+bool in_port_base::rt_in_available () const
+{
+    out_port_base* src = _source_port;
+    return src && src->rt_out_available ();
+}
+
 void in_port_base::connect (out_port_base& port)
 {
     // FIXME: Re-think thread safety of having the same variable for
     // all threads. Probably we should again split in rt and non-rt
     // versions of the state.
-    
+
+    if (!_has_owner () || !port._has_owner ())
+        throw port_patch_error ();
     port.owner ().check_attached_to_patch ();
     owner ().check_attached_to_patch ();
     if (&port.owner ().patch () != &owner ().patch ())

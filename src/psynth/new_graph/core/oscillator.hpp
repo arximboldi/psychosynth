@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-16 21:56:41 raskolnikov>
+ *  Time-stamp:  <2011-06-17 15:42:23 raskolnikov>
  *
  *  @file        oscillator.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -55,7 +55,7 @@ namespace core
  *  Params:
  *    "frequency" : float
  *    "amplitude" : float
- *    "modulator" : int (0 : fm, 1 : pm, 2 : am)
+ *    "modulator" : int (0 : am, 1 : fm, 2 : pm)
  *
  *  @todo The audio/sample kind of input difference should finish with
  *  automagic buffer conversion.
@@ -67,9 +67,9 @@ public:
     oscillator ();
     
 protected:
-    void rt_do_update_context (rt_process_context& ctx);
+    void rt_on_context_update (rt_process_context& ctx);
     void rt_do_process (rt_process_context& ctx);
-
+    
     Output _out_output;
     sample_in_port _in_modulator;
     

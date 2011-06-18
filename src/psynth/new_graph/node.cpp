@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-16 20:13:31 raskolnikov>
+ *  Time-stamp:  <2011-06-18 12:48:02 raskolnikov>
  *
  *  @file        node.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -58,11 +58,23 @@ node::node ()
 {
 }
 
+void node::rt_context_update (rt_process_context& ctx)
+{
+    for (auto& in : inputs ())
+        in.rt_context_update (ctx);
+    for (auto& in : outputs ())
+        in.rt_context_update (ctx);
+    rt_on_context_update (ctx);
+}
+
 void node::rt_process (rt_process_context& ctx)
 {
     if (!_rt_processed)
     {
         _rt_processed = true;
+        for (auto& in : inputs ())
+            if (in.rt_connected ())
+                in.rt_source ().owner ().rt_process (ctx);
         this->rt_do_process (ctx);
     }
 }
@@ -186,6 +198,26 @@ void node::register_component (out_control_base& state)
         PSYNTH_THROW (node_component_error)
             << "Duplicate state control name: " << name;
     _states.insert (it, std::make_pair (name, &state));    
+}
+
+void node::unregister_component (in_port_base& in)
+{
+    auto name = in.name ();
+    auto it = _inputs.find (name);
+    if (it == _inputs.end ())
+        PSYNTH_THROW (node_component_error)
+            << "Unregistering wrong component: " << name;
+    _inputs.erase (it);
+}
+
+void node::unregister_component (out_port_base& out)
+{
+    auto name = out.name ();
+    auto it = _outputs.find (name);
+    if (it == _outputs.end ())
+        PSYNTH_THROW (node_component_error)
+            << "Unregistering wrong component: " << name;
+    _outputs.erase (it);
 }
 
 void node::attach_to_process (processor& p)

@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-16 20:53:21 raskolnikov>
+ *  Time-stamp:  <2011-06-18 12:52:00 raskolnikov>
  *
  *  @file        patch.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -30,6 +30,9 @@
 
 #define PSYNTH_MODULE_NAME "psynth.graph.core.patch"
 
+#include <iostream>
+
+#include "new_graph/core/patch_port.hpp"
 #include "new_graph/processor.hpp"
 #include "new_graph/port.hpp"
 #include "patch.hpp"
@@ -50,6 +53,17 @@ void patch::rt_process (rt_process_context& ctx)
     node::rt_process (ctx);
     for (auto& n : _rt_outputs)
         n->rt_process (ctx);
+}
+
+void patch::rt_context_update (rt_process_context& ctx)
+{
+    node::rt_context_update (ctx);
+
+#if 0
+    // Actually not needed by now.
+    for (auto& n : _rt_childs)
+        n->rt_context_update (ctx);
+#endif
 }
 
 void patch::rt_advance ()
@@ -80,6 +94,25 @@ node_ptr patch::add (node_ptr child)
     else
         _rt_childs.push_back (*child);
 
+    if (is_attached_to_process ())
+        process ().notify_add_node (child);
+
+    if (patch_in_port_base_ptr port =
+        std::dynamic_pointer_cast<patch_in_port_base> (child))
+    {
+        auto& p = port->patch_port ();
+        this->register_component (p);
+        p._set_owner (this);
+    }
+
+    if (patch_out_port_base_ptr port =
+        std::dynamic_pointer_cast<patch_out_port_base> (child))
+    {
+        auto& p = port->patch_port ();
+        this->register_component (p);
+        p._set_owner (this);
+    }
+    
     return child;
 }
 
@@ -94,6 +127,24 @@ void patch::remove (node_ptr child)
     for (auto& p : child->outputs ())
         p.disconnect ();
 
+    if (patch_in_port_base_ptr port =
+        std::dynamic_pointer_cast<patch_in_port_base> (child))
+    {
+        auto& p = port->patch_port ();
+        p.disconnect ();
+        this->unregister_component (p);
+        p._set_owner (0);
+    }
+
+    if (patch_out_port_base_ptr port =
+        std::dynamic_pointer_cast<patch_out_port_base> (child))
+    {
+        auto& p = port->patch_port ();
+        p.disconnect ();
+        this->unregister_component (p);
+        p._set_owner (0);
+    }
+    
     child->detach_from_patch ();
     _childs.remove (child);
 
@@ -110,6 +161,9 @@ void patch::remove (node_ptr child)
     {
         _rt_childs.remove_if (base::make_equal_id (*child));
     }
+
+    if (is_attached_to_process ())
+        process ().notify_remove_node (child);
 }
 
 } /* namespace core */

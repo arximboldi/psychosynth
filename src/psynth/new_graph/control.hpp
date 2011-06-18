@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-16 22:24:00 raskolnikov>
+ *  Time-stamp:  <2011-06-18 13:16:39 raskolnikov>
  *
  *  @file        control.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -160,12 +160,12 @@ template <typename T>
 class out_control_impl<T, false> : public out_control_base
 {
 public:
-    const T& rt_get () const
+    virtual const T& rt_get () const
     { return _rt_value; }
 
-    T get () const;
+    virtual T get () const;
     
-    void rt_set (const T& val, rt_process_context& ctx);
+    virtual void rt_set (const T& val, rt_process_context& ctx);
     
 protected:
     out_control_impl (const std::string& name, node* owner, T val)
@@ -236,19 +236,20 @@ public:
     const control_meta& meta () const 
     { return default_control_meta; } // FIXME !!!!
     
-    T get () const
+    virtual T get () const
     { return _value; }
     
-    T rt_get () const
+    virtual T rt_get () const
     { return _rt_value; }
 
+    virtual void set (const T&);
+    
     void str (const std::string& s)
     { set (boost::lexical_cast<T> (s)); }
 
     std::string str () const
     { return boost::lexical_cast<std::string> (this->get ()); }
     
-    void set (const T&);
 
     bool rt_is_updated ()
     { return _is_updated; }

@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-14 21:23:54 raskolnikov>
+ *  Time-stamp:  <2011-06-17 11:19:59 raskolnikov>
  *
  *  @file        processor.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -265,9 +265,19 @@ public:
 
     bool is_running () const
     { return _is_running; }
+
+    /** To be called by patches */
+    void notify_add_node (node_ptr node)
+    { _explore_node_add (node); }
+
+    /** To be called by patches */
+    void notify_remove_node (node_ptr node)
+    { _explore_node_remove (node); }
     
 private:
-    void _explore_graph (core::patch_ptr curr);
+    void _explore_node_add (node_ptr node);
+    void _explore_node_remove (node_ptr node);
+    
     void _async_loop ();
     void _rt_process_once ();
 
@@ -276,8 +286,8 @@ private:
 
     core::patch_ptr         _root;
     
-    process_node_list       _procs;
-    sink_node_list          _sinks;
+    process_node_list       _procs; // Not readed from rt-threads.
+    sink_node_list          _sinks; // Readed from rt-threads.
     
     full_process_context    _ctx;
 

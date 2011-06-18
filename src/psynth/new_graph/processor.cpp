@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-16 20:54:26 raskolnikov>
+ *  Time-stamp:  <2011-06-17 12:05:40 raskolnikov>
  *
  *  @file        processor.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -32,6 +32,7 @@
 
 #include <iostream>
 
+#include "base/throw.hpp"
 #include "core/patch.hpp"
 #include "sink_node.hpp"
 #include "process_node.hpp"
@@ -71,8 +72,7 @@ processor::processor (core::patch_ptr root,
     , _async_request_flip (false)
     , _is_running (false)
 {
-    _root->attach_to_process (*this);
-    _explore_graph (_root);
+    _explore_node_add (_root);
 }
 
 processor::~processor ()
@@ -85,15 +85,20 @@ void processor::start ()
 {
     if (_is_running)
         throw processor_not_idle_error ();
-     _is_running = true;
+    _is_running = true;
     _async_thread = std::thread (
         std::bind (&processor::_async_loop, this));
+    for (auto& n : _procs)
+        n->start ();
 }
 
 void processor::stop ()
 {
     if (!_is_running)
         throw processor_not_running_error ();
+
+    for (auto& n : _procs)
+        n->stop ();
     
     {
         std::unique_lock<std::mutex> g (_async_mutex);
@@ -181,22 +186,77 @@ void processor::_rt_process_once ()
         _async_cond.notify_all ();
     }
 }
-    
-void processor::_explore_graph (core::patch_ptr curr)
-{
-    for (auto& n : curr->childs ())
-    {
-        auto sink = std::dynamic_pointer_cast<sink_node> (n);
-        if (sink)
-            _sinks.push_back (sink);
 
-        auto proc = std::dynamic_pointer_cast<process_node> (n);
-        if (proc)
-            _procs.push_back (proc);
-        
-        auto patch = std::dynamic_pointer_cast<core::patch> (n);
-        if (patch)
-            _explore_graph (patch);
+void processor::_explore_node_add (node_ptr n)
+{
+    // TODO: Maybe we shoudl, add patch visitor to avoid all this
+    // dynamic_cast in case we find this pattern useful in other
+    // parts.
+    
+    n->attach_to_process (*this);
+    n->rt_context_update (_ctx);
+    
+    auto sink = std::dynamic_pointer_cast<sink_node> (n);
+    if (sink)
+    {
+        if (!is_running ())
+            _sinks.push_back (sink);
+        else
+            context ().push_rt_event (
+                make_rt_event ([=] (rt_process_context&) {
+                        this->_sinks.push_back (sink);
+                    }));
+    }
+    
+    auto proc = std::dynamic_pointer_cast<process_node> (n);
+    if (proc)
+    {
+        _procs.push_back (proc);
+        if (is_running ())
+            proc->start ();
+    }
+    
+    auto patch = std::dynamic_pointer_cast<core::patch> (n);
+    if (patch)
+    {
+        for (auto& n : patch->childs ())
+            _explore_node_add (n);
+    }
+}
+
+void processor::_explore_node_remove (node_ptr n)
+{
+    n->check_attached_to_process ();
+    if (&n->process () != this)
+        PSYNTH_THROW (node_attachment_error)
+            << "Removing node attached to other process?";
+    n->detach_from_process ();
+    
+    auto sink = std::dynamic_pointer_cast<sink_node> (n);
+    if (sink)
+    {
+        if (!is_running ())
+            _sinks.remove (sink);
+        else
+            context ().push_rt_event (
+                make_rt_event ([=] (rt_process_context&) {
+                        this->_sinks.remove (sink);
+                    }));
+    }
+    
+    auto proc = std::dynamic_pointer_cast<process_node> (n);
+    if (proc)
+    {
+        if (is_running ())
+            proc->stop ();
+        _procs.remove (proc);
+    }
+    
+    auto patch = std::dynamic_pointer_cast<core::patch> (n);
+    if (patch)
+    {
+        for (auto& n : patch->childs ())
+            _explore_node_remove (n);
     }
 }
 

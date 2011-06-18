@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-16 17:43:51 raskolnikov>
+ *  Time-stamp:  <2011-06-18 12:37:07 raskolnikov>
  *
  *  @file        buffer_port.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -47,35 +47,96 @@ public:
     buffer_out_port (std::string name, node* owner)
         : out_port<T> (name, owner) {}
 
-    typename T::const_range rt_range () const
-    { return const_range (this->rt_get ()); }
-    typename T::range rt_range ()
-    { return range (this->rt_get ()); }
+    virtual typename T::const_range rt_out_range () const
+    { return const_range (this->rt_get_out ()); }
+
+    virtual typename T::range rt_out_range ()
+    { return range (this->rt_get_out ()); }
     
     void rt_context_update (const rt_process_context& ctx)
-    { this->rt_get ().recreate (ctx.block_size ()); }
+    { this->rt_get_out ().recreate (ctx.block_size ()); }
 };
 
 template <typename T>
 class buffer_in_port : public in_port<T>
 {
 public:
-    typename T::const_range rt_range () const
-    { return const_range (this->rt_get ()); }
+    virtual typename T::const_range rt_in_range () const
+    { return const_range (this->rt_get_in ()); }
     
     buffer_in_port (std::string name, node* owner)
         : in_port<T> (name, owner) {}
 };
 
-typedef buffer_out_port<audio_buffer>  audio_out_port;
-typedef buffer_in_port<audio_buffer>   audio_in_port;
+template <typename T>
+class defaulting_buffer_in_port : public buffer_in_port<T>
+{
+public:
+    typedef buffer_in_port<T> base_type;
+
+    const T& rt_get_in () const
+    {
+        if (this->rt_in_available ())
+            return base_type::rt_get_in ();
+        else
+            return _default;
+    }
+        
+    defaulting_buffer_in_port (std::string name,
+                               typename T::value_type defval,
+                               node* owner)
+        : base_type (name, owner)
+        , _default_value (defval)
+    {}
+    
+    void rt_context_update (const rt_process_context& ctx)
+    {
+        base_type::rt_context_update (ctx);
+        _default.recreate (ctx.block_size (), _default_value, 0);
+    }
+    
+private:
+    T _default;
+    typename T::value_type _default_value;
+};
+
+template <typename T>
+struct buffer_forward_port
+    : public forward_port_impl<buffer_in_port<T>,
+                               buffer_out_port<T> >
+{
+    typedef forward_port_impl<buffer_in_port<T>,
+                              buffer_out_port<T> > base_type;
+    
+    buffer_forward_port (std::string in_name,
+                         std::string out_name,
+                         node* in_owner,
+                         node* out_owner)
+        : base_type (in_name, out_name,
+                     in_owner, out_owner)
+    {}
+};
+
+typedef buffer_out_port<audio_buffer>    audio_out_port;
+typedef buffer_in_port<audio_buffer>     audio_in_port;
+typedef defaulting_buffer_in_port<audio_buffer>
+defaulting_audio_in_port;
+typedef buffer_forward_port<audio_buffer> audio_forward_port;
+
 typedef buffer_out_port<sample_buffer> sample_out_port;
 typedef buffer_in_port<sample_buffer>  sample_in_port;
+typedef defaulting_buffer_in_port<sample_buffer>
+defaulting_sample_in_port;
+typedef buffer_forward_port<sample_buffer> sample_forward_port;
 
 extern template class buffer_out_port<audio_buffer>;
 extern template class buffer_in_port<audio_buffer>;
+extern template class defaulting_buffer_in_port<audio_buffer>;
+extern template class buffer_forward_port<audio_buffer>;
 extern template class buffer_out_port<sample_buffer>;
 extern template class buffer_in_port<sample_buffer>;
+extern template class defaulting_buffer_in_port<sample_buffer>;
+extern template class buffer_forward_port<sample_buffer>;
 
 } /* namespace graph */
 } /* namespace psynth */

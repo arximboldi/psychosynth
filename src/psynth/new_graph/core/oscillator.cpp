@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-16 21:48:45 raskolnikov>
+ *  Time-stamp:  <2011-06-18 12:45:11 raskolnikov>
  *
  *  @file        oscillator.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -28,6 +28,7 @@
  *
  */
 
+#include <iostream>
 #include "oscillator.hpp"
 
 namespace psynth
@@ -52,12 +53,12 @@ PSYNTH_REGISTER_NODE_STATIC (sample_moogsaw_oscillator);
 PSYNTH_REGISTER_NODE_STATIC (sample_exp_oscillator);
 
 constexpr float default_frequency = 440.0f;
-constexpr float default_amplitude = 0.7f;
-constexpr int default_modulator = 1;
+constexpr float default_amplitude = 0.5f;
+constexpr int   default_modulator = 1;
 
 template <class G, class O>
 oscillator<G, O>::oscillator ()
-    : _out_output ("input", this)
+    : _out_output ("output", this)
     , _in_modulator ("modulator", this)
     , _ctl_frequency ("frequency", default_frequency, this)
     , _ctl_amplitude ("amplitude", default_amplitude, this)
@@ -69,7 +70,7 @@ oscillator<G, O>::oscillator ()
 }
 
 template <class G, class O>
-void oscillator<G, O>::rt_do_update_context (rt_process_context& ctx)
+void oscillator<G, O>::rt_on_context_update (rt_process_context& ctx)
 {
     _osc.set_frame_rate (ctx.frame_rate ());
 }
@@ -80,23 +81,26 @@ void oscillator<G, O>::rt_do_process (rt_process_context& ctx)
     _osc.set_frequency (_ctl_frequency.rt_get ());
     _osc.set_amplitude (_ctl_amplitude.rt_get ());
 
-    if (!_in_modulator.rt_connected ())
-        _osc.update (_out_output.rt_range ());
+    if (!_in_modulator.rt_in_available ())
+        _osc.update (_out_output.rt_out_range ());
     else
     {
         switch (_ctl_modulator.rt_get ())
         {
         case 0:
-            _osc.update_am (_out_output.rt_range (),
-                            _in_modulator.rt_range ());
+            _osc.update_am (_out_output.rt_out_range (),
+                            _in_modulator.rt_in_range ());
+            break;
         case 1:
-            _osc.update_fm (_out_output.rt_range (),
-                            _in_modulator.rt_range ());
+            _osc.update_fm (_out_output.rt_out_range (),
+                            _in_modulator.rt_in_range ());
+            break;
         case 2:
-            _osc.update_pm (_out_output.rt_range (),
-                            _in_modulator.rt_range ());
+            _osc.update_pm (_out_output.rt_out_range (),
+                            _in_modulator.rt_in_range ());
+            break;
         default:
-            _osc.update (_out_output.rt_range ());
+            _osc.update (_out_output.rt_out_range ());
         }
     }
 }

@@ -243,8 +243,10 @@ libpsynth_la_SOURCES = \
 	new_graph/buffer_port.cpp\
 	new_graph/buffers.cpp\
 	new_graph/core/patch.cpp\
+	new_graph/core/patch_port.cpp\
 	new_graph/core/passive_output.cpp\
 	new_graph/core/async_output.cpp\
+	new_graph/core/mixer.cpp\
 	new_graph/core/oscillator.cpp
 
 

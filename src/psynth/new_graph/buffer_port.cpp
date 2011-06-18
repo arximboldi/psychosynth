@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-13 20:20:15 raskolnikov>
+ *  Time-stamp:  <2011-06-17 17:18:52 raskolnikov>
  *
  *  @file        buffer_port.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -37,8 +37,13 @@ namespace graph
 
 template class buffer_out_port<audio_buffer>;
 template class buffer_in_port<audio_buffer>;
+template class defaulting_buffer_in_port<audio_buffer>;
+template class buffer_forward_port<audio_buffer>;
+
 template class buffer_out_port<sample_buffer>;
 template class buffer_in_port<sample_buffer>;
+template class defaulting_buffer_in_port<sample_buffer>;
+template class buffer_forward_port<sample_buffer>;
 
 } /* namespace graph */
 } /* namespace psynth */

@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-16 19:36:35 raskolnikov>
+ *  Time-stamp:  <2011-06-18 12:38:55 raskolnikov>
  *
  *  @file        port.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -34,6 +34,7 @@
 #include <map>
 #include <list>
 #include <atomic>
+#include <iostream> // FIXME: remove
 
 #include <boost/any.hpp>
 #include <boost/range/iterator_range.hpp>
@@ -66,7 +67,7 @@ public:
     virtual base::type_value type () const = 0;
     virtual const port_meta& meta () const = 0;
     virtual void rt_context_update (const rt_process_context&) {}
-
+    
     std::string name ()
     { return _name; }
     
@@ -75,9 +76,14 @@ public:
     const node& owner () const
     { return *_owner; }
     
+    void _set_owner (node* new_owner = 0);
+    void _set_name (std::string new_name);
+    bool _has_owner () const
+    { return _owner != 0; }
+    
 protected:
     port_base (std::string name, node* owner);
-    
+        
 private:
     std::string _name;
     node* _owner;
@@ -97,10 +103,10 @@ public:
     void connect (out_port_base& port);
     void disconnect ();
     
-    bool connected ()
-    { return _source_port == 0; }
-    bool rt_connected ()
-    { return _source_port == 0; }
+    bool connected () const
+    { return _source_port != 0; }
+    bool rt_connected () const
+    { return _source_port != 0; }
 
     out_port_base& source ()
     { return *_source_port; }
@@ -110,17 +116,15 @@ public:
     { return *_source_port; }
     const out_port_base& rt_source () const
     { return *_source_port; }
+
+    virtual bool rt_in_available () const;
     
 protected:
-    in_port_base (std::string name, graph::node* owner)
-        : port_base (name, owner)
-        , _source_port (0)
-    {}
+    in_port_base (std::string name, graph::node* owner);
     
     // FIXME: Duplicate?
     std::atomic<out_port_base*> _source_port;
 };
-
 
 namespace detail { class out_port_access; }
 
@@ -148,20 +152,23 @@ public:
     void disconnect ();
     
     bool connected ()
-    { return _refs.empty (); }
+    { return !_refs.empty (); }
     
     bool rt_connected ()
-    { return _rt_refs.empty (); } // FIXME: Add concurrent access to refs policy
+    { return !_rt_refs.empty (); }
+    // FIXME: Add concurrent access to refs policy
 
+    virtual bool rt_out_available () const
+    { return true; }
+    
     reference_range references ()
     { return reference_range (_refs.begin (), _refs.end ()); }
     const_reference_range references () const
     { return const_reference_range (_refs.begin (), _refs.end ()); }
     
 protected:
-    out_port_base (std::string name, node* owner)
-        : port_base (name, owner) {}
-
+    out_port_base (std::string name, node* owner);
+    
 private:
     void _add_reference (in_port_base*);
     void _del_reference (in_port_base*);
@@ -191,16 +198,18 @@ template <typename T>
 class out_port : public out_port_base
 {
 public:
+    typedef T port_type;
+    
     out_port (std::string name, node* owner, const T& value = T())
         : out_port_base (name, owner)
         , _data (value){}
     
-    T& rt_get ()
+    virtual T& rt_get_out ()
     { return _data; }
     
-    const T& rt_get () const
+    virtual const T& rt_get_out () const
     { return _data; }
-
+    
     base::type_value type () const
     { return typeid (T); }
 
@@ -215,6 +224,8 @@ template <typename T>
 class in_port : public in_port_base
 {
 public:
+    typedef T port_type;
+    
     in_port (std::string name, node* owner)
         : in_port_base (name, owner) {}
     
@@ -224,13 +235,79 @@ public:
     const port_meta& meta () const 
     { return default_port_meta; } // FIXME !!!
 
-    const T& rt_get () const
+    virtual const T& rt_get_in () const
     {
         // Relies on the connection being made right!
-        return static_cast<const out_port<T>&> (this->source ()).rt_get ();
+        return static_cast<const out_port<T>&> (this->source ()).rt_get_out ();
     }
     
 private:
+};
+
+/**
+ *  It is parametrized such that it works for normal ports and buffer
+ *  ports, instantiate it with proper types ...
+ */
+template <class InPort,
+          class OutPort>
+class forward_port_impl
+    : public InPort
+    , public OutPort
+{
+public:
+    typedef typename InPort::port_type port_type;
+    
+    static_assert (
+        std::is_same<typename InPort::port_type,
+                     typename OutPort::port_type>::value,
+        "Can not forward different types");
+    
+    void rt_context_update (const rt_process_context& ctx)
+    {
+        InPort::rt_context_update (ctx);
+        OutPort::rt_context_update (ctx);
+    }
+
+    base::type_value type () const
+    { return typeid (port_type); }
+
+    const port_meta& meta () const 
+    { return default_port_meta; } // FIXME !!!
+    
+    const port_type& rt_get_out () const
+    {
+        if (InPort::rt_connected ())
+            return this->rt_get_in ();
+        return OutPort::rt_get_out ();
+    }
+
+    bool rt_out_available () const
+    { return InPort::rt_connected (); }
+
+protected:
+    forward_port_impl (std::string in_name,
+                       std::string out_name,
+                       node* in_owner,
+                       node* out_owner)
+        : InPort (in_name, in_owner)
+        , OutPort (out_name, out_owner)
+    {}
+};
+
+template <typename T>
+struct forward_port
+    : public forward_port_impl<in_port<T>,
+                               out_port<T> >
+{
+    typedef forward_port_impl<in_port<T>, out_port<T> > base_type;
+
+    forward_port (std::string in_name,
+                  std::string out_name,
+                  node* in_owner,
+                  node* out_owner)
+        : base_type (in_name, out_name,
+                     in_owner, out_owner)
+    {}
 };
 
 } /* namespace graph */

@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-16 21:52:45 raskolnikov>
+ *  Time-stamp:  <2011-06-17 12:45:39 raskolnikov>
  *
  *  @file        control.tpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -46,7 +46,7 @@ T in_control_base::get () const
 {
     if (type () != base::type_value (typeid (T)))
         throw control_type_error ();
-    return boost::polymorphic_downcast<in_control<T>*>(this)->get ();
+    return boost::polymorphic_downcast<const in_control<T>*>(this)->get ();
 }
 
 template <typename T>
@@ -54,21 +54,21 @@ T out_control_base::get () const
 {
     if (type () != base::type_value (typeid (T)))
         throw control_type_error ();
-    return boost::polymorphic_downcast<out_control<T>*>(this)->get ();
+    return boost::polymorphic_downcast<const out_control<T>*>(this)->get ();
 }
 
 template <typename T>
 const T& in_control_base::rt_get () const
 {
     assert (type () == type_value (typeid (T)));
-    return boost::polymorphic_downcast<in_control<T>*>(this)->rt_get ();
+    return boost::polymorphic_downcast<const in_control<T>*>(this)->rt_get ();
 }
 
 template <typename T>
 const T& out_control_base::rt_get () const
 {
     assert (type () == type_value (typeid (T)));
-    return boost::polymorphic_downcast<out_control<T>*>(this)->rt_get ();
+    return boost::polymorphic_downcast<const out_control<T>*>(this)->rt_get ();
 }
 
 template <typename T>

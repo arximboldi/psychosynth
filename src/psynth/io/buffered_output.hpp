@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-16 16:57:01 raskolnikov>
+ *  Time-stamp:  <2011-06-17 10:50:33 raskolnikov>
  *
  *  @file        buffered_output.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -171,7 +171,8 @@ class buffered_async_output_adapter :
     public detail::buffered_async_output_impl<async_output<Range>, OutputPtr>
 {
 public:
-    typedef detail::buffered_async_output_impl<async_output<Range>, OutputPtr> base;
+    typedef detail::buffered_async_output_impl<async_output<Range>,
+                                               OutputPtr> base;
     
     buffered_async_output_adapter (OutputPtr out = 0)
         : base (out)
@@ -190,7 +191,8 @@ class buffered_async_output :
     public detail::buffered_async_output_impl<async_output<Range>, Output*>
 {
 public:   
-    typedef detail::buffered_async_output_impl<async_output<Range>, Output*> base;
+    typedef detail::buffered_async_output_impl<async_output<Range>,
+                                               Output*> base;
 
     /**
      * @todo Use std::forward when available.

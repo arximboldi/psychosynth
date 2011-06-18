@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-12 12:52:27 raskolnikov>
+ *  Time-stamp:  <2011-06-17 10:42:41 raskolnikov>
  *
  *  @file        declare.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -54,7 +54,8 @@ namespace base
     template <typename... Args>                                         \
     type_name ## _ptr new_ ## type_name (Args && ... args)              \
     {                                                                   \
-        return std::make_shared <type_name> (args ...);                 \
+        return std::make_shared <type_name> (                           \
+            std::forward<Args>(args) ...);                              \
     }
 
 #define PSYNTH_DECLARE_TYPE(type_name)		\

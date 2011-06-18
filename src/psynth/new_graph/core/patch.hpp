@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-16 20:53:53 raskolnikov>
+ *  Time-stamp:  <2011-06-17 12:02:28 raskolnikov>
  *
  *  @file        patch.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -72,6 +72,7 @@ public:
     typedef boost::iterator_range<rt_child_const_iterator> rt_child_const_range;
 
     void rt_process (rt_process_context& ctx);
+    void rt_context_update (rt_process_context& ctx);
     void rt_advance ();
     
     node_ptr add (node_ptr child);
@@ -88,8 +89,6 @@ public:
     { return boost::make_iterator_range (_rt_childs); }
     
 protected:
-    void rt_do_process (rt_process_context&) {}
-
     child_list _childs;
     rt_child_list _rt_childs;
     child_list _rt_outputs;

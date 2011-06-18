@@ -1,11 +1,11 @@
 /**
- *  Time-stamp:  <2011-06-17 17:43:03 raskolnikov>
+ *  Time-stamp:  <2011-06-17 09:43:10 raskolnikov>
  *
- *  @file        passive_output.cpp
+ *  @file        passive_output_fwd.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
- *  @date        Wed Jun 15 17:30:34 2011
+ *  @date        Fri Jun 17 09:41:47 2011
  *
- *  @brief Passive output implementation.
+ *  @brief Forward declarations for passive_output.
  */
 
 /*
@@ -28,8 +28,10 @@
  *
  */
 
-#include "io/output.hpp"
-#include "passive_output.hpp"
+#ifndef PSYNTH_GRAPH_CORE_PASSIVE_OUTPUT_FWD_HPP_
+#define PSYNTH_GRAPH_CORE_PASSIVE_OUTPUT_FWD_HPP_
+
+#include <psynth/base/declare.hpp>
 
 namespace psynth
 {
@@ -38,18 +40,11 @@ namespace graph
 namespace core
 {
 
-passive_output::passive_output (device_ptr out)
-    : _in_input ("input", this)
-    , _output (out)
-{
-}
-
-void passive_output::rt_do_process (rt_process_context& ctx)
-{
-    if (_output)
-        _output->put (_in_input.rt_in_range ());
-}
+PSYNTH_DECLARE_SHARED_TYPE (passive_output);
 
 } /* namespace core */
 } /* namespace graph */
 } /* namespace psynth */
+
+#endif /* PSYNTH_GRAPH_CORE_PASSIVE_OUTPUT_FWD_HPP_ */
+

@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-16 17:29:17 raskolnikov>
+ *  Time-stamp:  <2011-06-17 11:45:18 raskolnikov>
  *
  *  @file        output_node.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -38,6 +38,8 @@
 #include <psynth/new_graph/sink_node.hpp>
 #include <psynth/new_graph/process_node.hpp>
 
+#include <psynth/new_graph/core/async_output_fwd.hpp>
+
 namespace psynth
 {
 namespace graph
@@ -66,12 +68,15 @@ public:
     
     void start ();
     void stop ();
+
+protected:
+    void rt_do_update_context (rt_process_context& ctx);
     void rt_do_process (rt_process_context& ctx);
     
 private:
     void _output_callback (std::size_t nframes);
 
-    audio_in_port _in_input;
+    defaulting_audio_in_port _in_input;
     
     // FIXME: Actually there is unnecesary buffering here, because we
     // buffer first to accumulate the output, then to convert it.

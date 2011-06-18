@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-16 20:13:53 raskolnikov>
+ *  Time-stamp:  <2011-06-18 12:51:47 raskolnikov>
  *
  *  @file        node.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -96,6 +96,7 @@ public:
     node ();
     
     virtual void rt_process (rt_process_context& ctx);
+    virtual void rt_context_update (rt_process_context& ctx);
     virtual void rt_advance ();
     
     in_port_base& in (const std::string& name);
@@ -119,6 +120,9 @@ public:
     void register_component (in_control_base& param);
     void register_component (out_control_base& state);
 
+    void unregister_component (in_port_base& in);
+    void unregister_component (out_port_base& out);
+    
     void attach_to_process (processor& p);
     void detach_from_process ();
 
@@ -167,7 +171,8 @@ public:
     }
 
 private:
-    virtual void rt_do_process (rt_process_context& ctx) = 0;
+    virtual void rt_on_context_update (rt_process_context& ctx) {}
+    virtual void rt_do_process (rt_process_context& ctx) {}
     
     core::patch* _patch;
     processor*   _process;
