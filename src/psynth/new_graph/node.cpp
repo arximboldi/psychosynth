@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-18 12:48:02 raskolnikov>
+ *  Time-stamp:  <2011-06-18 22:15:33 raskolnikov>
  *
  *  @file        node.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -62,8 +62,8 @@ void node::rt_context_update (rt_process_context& ctx)
 {
     for (auto& in : inputs ())
         in.rt_context_update (ctx);
-    for (auto& in : outputs ())
-        in.rt_context_update (ctx);
+    for (auto& out : outputs ())
+        out.rt_context_update (ctx);
     rt_on_context_update (ctx);
 }
 
@@ -73,8 +73,7 @@ void node::rt_process (rt_process_context& ctx)
     {
         _rt_processed = true;
         for (auto& in : inputs ())
-            if (in.rt_connected ())
-                in.rt_source ().owner ().rt_process (ctx);
+            in.rt_process (ctx);
         this->rt_do_process (ctx);
     }
 }

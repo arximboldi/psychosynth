@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-17 17:43:18 raskolnikov>
+ *  Time-stamp:  <2011-06-18 18:58:37 raskolnikov>
  *
  *  @file        output.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -52,7 +52,7 @@ PSYNTH_DEFINE_ERROR_WHAT (async_output_not_bound_error,
 constexpr float default_buffer_factor = 4.0f;
 
 async_output::async_output (device_ptr out)
-    : _in_input ("input", audio_frame (0), this)
+    : _in_input ("input", this, audio_frame (0))
     , _output (out)
     , _buffer (out ? out->buffer_size () * default_buffer_factor : 0)
 {

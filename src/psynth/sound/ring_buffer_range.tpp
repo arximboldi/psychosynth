@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-23 12:37:21 raskolnikov>
+ *  Time-stamp:  <2011-06-19 01:34:49 raskolnikov>
  *
  *  @file        ring_buffer.tpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -63,7 +63,7 @@ typename buffer_range_type<R>::type
 ring_buffer_range_base<R>::sub_buffer_two (const Position& p,
 					   size_type slice) const
 {
-    assert (slice <= avalible (p));
+    assert (slice <= available (p));
     
     if (p._pos + slice > size ())
 	return sub_range (_range, 0, p._pos + slice - size ());

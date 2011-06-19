@@ -26,8 +26,8 @@
 
 #include <cmath>
 
-#define ENV_RISE_SECONDS  0.004f
-#define ENV_FALL_SECONDS  0.004f
+#define ENV_RISE_SECONDS  0.001f
+#define ENV_FALL_SECONDS  0.001f
 #define ENV_DELTA(srate, sec)  (1/((sec)*(srate)))
 
 using namespace std;

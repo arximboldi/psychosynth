@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-20 16:25:43 raskolnikov>
+ *  Time-stamp:  <2011-06-18 21:15:01 raskolnikov>
  *
  *  @file        simple_envelope.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -78,8 +78,10 @@ public:
     
     value_type update ()
     {
-        const sample_type one  = sound::sample_traits<sample_type>::max_value ();
-        const sample_type zero = sound::sample_traits<sample_type>::zero_value ();
+        const sample_type one  =
+            sound::sample_traits<sample_type>::max_value ();
+        const sample_type zero =
+            sound::sample_traits<sample_type>::zero_value ();
         sample_type val = _val;
         
 	_val = _val + _curr_dt;
@@ -92,8 +94,10 @@ public:
 
     value_type update (std::size_t sample)
     {
-        const sample_type one  = sound::sample_traits<sample_type>::max_value ();
-        const sample_type zero = sound::sample_traits<sample_type>::zero_value ();
+        const sample_type one  =
+            sound::sample_traits<sample_type>::max_value ();
+        const sample_type zero =
+            sound::sample_traits<sample_type>::zero_value ();
         sample_type val = _val;
         
 	_val = _val + _curr_dt * sample;
@@ -110,7 +114,16 @@ public:
                 return this->simple_envelope::update ();
             });
     }
-    
+
+    template <class Range2>
+    void update (const Range2& samples)
+    {
+        sound::generate_frames (samples, [&] () {
+                return typename Range2::value_type (
+                    this->simple_envelope::update ());
+            });
+    }
+
     void press ()
     { _curr_dt = _rise_dt; }
 

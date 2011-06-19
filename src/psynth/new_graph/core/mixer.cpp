@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-18 13:22:37 raskolnikov>
+ *  Time-stamp:  <2011-06-18 23:49:01 raskolnikov>
  *
  *  @file        mixer.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -28,9 +28,9 @@
  *
  */
 
-#include <iostream>
 #include <boost/lexical_cast.hpp>
-#include "sound/output.hpp"
+
+#include "synth/util.hpp"
 #include "mixer.hpp"
 
 namespace psynth
@@ -44,14 +44,14 @@ PSYNTH_REGISTER_NODE_STATIC (audio_mixer);
 PSYNTH_REGISTER_NODE_STATIC (sample_mixer);
 
 constexpr float default_gain = 0.5f;
-constexpr int default_inputs = 16;
+constexpr int default_inputs = 3;
 
 template <class B>
 mixer<B>::mixer ()
-    : _in_modulator ("modulator", sample_frame (1.0f), this)
+    : _in_modulator ("modulator", this, 1.0f)
     , _out_output ("output", this)
-    , _ctl_gain ("gain", default_gain, this)
-    , _ctl_inputs ("inputs", default_inputs, this)
+    , _ctl_gain ("gain", this, default_gain)
+    , _ctl_inputs ("inputs", this, default_inputs)
 {
     // FIXME: We are using shared_ptr because for some reason
     // generate_n requires copying. Take a deeper look at it and
@@ -64,7 +64,7 @@ mixer<B>::mixer ()
         [&] () -> in_port_ptr {
             return std::make_shared<in_port_type> (
                 std::string ("input-") +
-                boost::lexical_cast<std::string> (iter ++), this);
+                boost::lexical_cast<std::string> (iter ++), this, 0.0f);
         });
 }
 
@@ -79,26 +79,16 @@ void mixer<B>::rt_do_process (rt_process_context& ctx)
     auto out  = _out_output.rt_out_range ();
     float gain = _ctl_gain.rt_get ();
 
-    sound::fill_frames (out, frame_type (1.0f));    
+    sound::fill_frames (out, frame_type (0.0f));    
     for (auto& in : _in_inputs)
     {
         if (in->rt_in_available ())
         {
-            sound::transform_frames (
-                in->rt_in_range (), out, out,
-                [&] (const frame_type& a, const frame_type& b) {
-                    frame_type res;
-                    // FIXME: This multiplication can be done with the
-                    // numeric algorithms for safety with non float types.
-                    static_transform (a, b, res,
-                                      [&] (sample_type a, sample_type b)
-                                      { return a * b * gain; });
-                    return res;
-                }); 
+            synth::mix (out, in->rt_in_range (), gain, out);
             ++ num_mixed;
         }
     }
-            
+        
     if (num_mixed == 0)
     {
         auto zero = sound::sample_traits<sample_type>::zero_value ();

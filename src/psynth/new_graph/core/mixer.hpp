@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-17 19:25:05 raskolnikov>
+ *  Time-stamp:  <2011-06-18 21:29:01 raskolnikov>
  *
  *  @file        mixer.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -33,7 +33,7 @@
 
 #include <psynth/new_graph/node.hpp>
 #include <psynth/new_graph/control.hpp>
-#include <psynth/new_graph/buffer_port.hpp>
+#include <psynth/new_graph/soft_buffer_port.hpp>
 
 namespace psynth
 {
@@ -51,12 +51,12 @@ public:
 protected:
     void rt_do_process (rt_process_context& ctx);
 
-    typedef buffer_in_port<Buffer> in_port_type;
-    typedef std::shared_ptr<buffer_in_port<Buffer> > in_port_ptr;
+    typedef soft_buffer_in_port<Buffer> in_port_type;
+    typedef std::shared_ptr<in_port_type> in_port_ptr;
     typedef buffer_out_port<Buffer> out_port_type;
     typedef std::vector <in_port_ptr> in_port_vector;
 
-    defaulting_sample_in_port _in_modulator;
+    soft_sample_in_port _in_modulator;
     in_port_vector _in_inputs; 
     out_port_type _out_output;
 

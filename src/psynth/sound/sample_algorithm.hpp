@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-31 20:05:59 raskolnikov>
+ *  Time-stamp:  <2011-06-18 20:15:44 raskolnikov>
  *
  *  @file        sample_algorithm.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -742,7 +742,8 @@ template <typename Sample> // Models SampleConcept (could be a sample reference)
 inline typename sample_traits<Sample>::value_type
 sample_multiply (Sample a, Sample b)
 { 
-    return sample_multiplier<typename sample_traits<Sample>::value_type> () (a, b);
+    return sample_multiplier<
+        typename sample_traits<Sample>::value_type> () (a, b);
 }
 
 /** @} */

@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-21 18:06:55 raskolnikov>
+ *  Time-stamp:  <2011-06-18 23:47:42 raskolnikov>
  *
  *  @file        util.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -32,6 +32,7 @@
 #define PSYNTH_SYNTH_UTIL_H_
 
 #include <psynth/sound/forwards.hpp>
+#include <psynth/sound/algorithm.hpp>
 
 namespace psynth
 {
@@ -44,17 +45,83 @@ namespace synth
 template <class Range>
 std::size_t find_hill (const Range& data, std::size_t start)
 {
-    const auto zero = sound::sample_traits<
-        typename sound::sample_type<Range>::type
-        >::zero_value ();
-   ++start;
+    typedef typename sound::sample_type<Range>::type sample_type; 
+    const auto zero = sound::sample_traits<sample_type>::zero_value ();
+    ++start;
    
-   while (start < (size_t) data.size () &&
-          (data [start-1] != zero ||
-           data [start] == zero))
-       ++start;
+    while (start < (size_t) data.size () &&
+           (data [start-1] != zero ||
+            data [start] == zero))
+        ++start;
     
     return start;
+}
+
+template <class R1, class R2, class R3>
+void mix (const R1& src1, const R2& src2, const R3& dst)
+{
+    typedef typename R1::value_type src1_frame;
+    typedef typename R2::value_type src2_frame;
+    typedef typename R3::value_type dst_frame;
+
+    // FIXME: Only for homogeneous frames!
+    typedef std::plus<typename sound::sample_type<dst_frame>::type> mix_op;
+    
+    sound::transform_frames (
+        src1, src2, dst,
+        [] (const src1_frame& a, const src2_frame& b)
+        {
+            dst_frame res;
+            static_transform (a, b, res, mix_op ());
+            return res;
+        });
+}
+
+template <class R1, class R2, class R3, typename Sample>
+void mix (const R1& src1, const R2& src2, Sample ampl, const R3& dst)
+{
+    typedef typename R1::value_type src1_frame;
+    typedef typename R2::value_type src2_frame;
+    typedef typename R3::value_type dst_frame;
+    typedef typename sound::sample_type<dst_frame>::type sample_type;
+    
+    sound::transform_frames (
+        src1, src2, dst,
+        [&] (const src1_frame& a, const src2_frame& b)
+        {
+            dst_frame res;
+            static_transform (
+                a, b, res,
+                [&] (sample_type a, sample_type b) {
+                    return a + b * ampl;
+                });
+            return res;
+        });
+}
+
+template <class R1, class R2, class R3, typename Sample>
+void blend (const R1& src1, const R2& src2, Sample stable, const R3& dst)
+{
+    typedef typename R1::value_type src1_frame;
+    typedef typename R2::value_type src2_frame;
+    typedef typename R3::value_type dst_frame;
+
+    typedef typename sound::sample_type<src1_frame>::type sample_type; 
+    typedef sound::sample_multiplier<sample_type> blend_op;
+    const auto max_value = sound::sample_traits<sample_type>::max_value ();
+    
+    sound::transform_frames (
+        src1, src2, dst,
+        [&] (const src1_frame& a, const src2_frame& b)
+        {
+            dst_frame res;
+            static_transform (
+                a, b, res, [&] (const sample_type a, sample_type b) {
+                    return // FIXME: sample_multiply ?
+                        a * b + stable * (max_value - b); 
+                });
+            return res;
+        });
 }
 
 } /* namespace synth */

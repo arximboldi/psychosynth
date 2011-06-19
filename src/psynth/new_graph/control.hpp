@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-18 13:16:39 raskolnikov>
+ *  Time-stamp:  <2011-06-18 18:59:39 raskolnikov>
  *
  *  @file        control.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -223,7 +223,7 @@ template <typename T>
 class in_control : public in_control_base
 {
 public:
-    in_control (const std::string& name, const T& value=T(), node* owner=0)
+    in_control (const std::string& name, node* owner=0, const T& value=T())
         : in_control_base (name, owner)
         , _value (value)
         , _rt_value (value)

@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-17 15:42:23 raskolnikov>
+ *  Time-stamp:  <2011-06-18 21:24:48 raskolnikov>
  *
  *  @file        oscillator.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -33,7 +33,7 @@
 
 #include <psynth/synth/oscillator.hpp>
 #include <psynth/new_graph/node.hpp>
-#include <psynth/new_graph/buffer_port.hpp>
+#include <psynth/new_graph/soft_buffer_port.hpp>
 #include <psynth/new_graph/control.hpp>
 
 namespace psynth
@@ -71,7 +71,7 @@ protected:
     void rt_do_process (rt_process_context& ctx);
     
     Output _out_output;
-    sample_in_port _in_modulator;
+    soft_sample_in_port _in_modulator;
     
     in_control<float> _ctl_frequency;
     in_control<float> _ctl_amplitude;

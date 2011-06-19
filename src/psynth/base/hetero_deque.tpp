@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-14 20:19:51 raskolnikov>
+ *  Time-stamp:  <2011-06-19 01:34:15 raskolnikov>
  *
  *  @file        hetero_queque.tpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -296,7 +296,7 @@ void hetero_deque<B>::swap (hetero_deque& other)
     std::swap (_memory, other._memory);
     std::swap (_front, other._front);
     std::swap (_back, other._back);
-    assert (_front >= &_memory [0]); // TEST
+    assert (_front >= (header*) &_memory [0]); // TEST
 }
     
 } /* namespace base */

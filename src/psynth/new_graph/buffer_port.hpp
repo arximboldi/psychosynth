@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-18 12:37:07 raskolnikov>
+ *  Time-stamp:  <2011-06-18 21:46:58 raskolnikov>
  *
  *  @file        buffer_port.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -53,7 +53,7 @@ public:
     virtual typename T::range rt_out_range ()
     { return range (this->rt_get_out ()); }
     
-    void rt_context_update (const rt_process_context& ctx)
+    void rt_context_update (rt_process_context& ctx)
     { this->rt_get_out ().recreate (ctx.block_size ()); }
 };
 
@@ -83,13 +83,13 @@ public:
     }
         
     defaulting_buffer_in_port (std::string name,
-                               typename T::value_type defval,
-                               node* owner)
+                               node* owner,
+                               typename T::value_type defval)
         : base_type (name, owner)
         , _default_value (defval)
     {}
     
-    void rt_context_update (const rt_process_context& ctx)
+    void rt_context_update (rt_process_context& ctx)
     {
         base_type::rt_context_update (ctx);
         _default.recreate (ctx.block_size (), _default_value, 0);

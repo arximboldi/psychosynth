@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-18 12:45:11 raskolnikov>
+ *  Time-stamp:  <2011-06-18 21:26:04 raskolnikov>
  *
  *  @file        oscillator.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -59,10 +59,10 @@ constexpr int   default_modulator = 1;
 template <class G, class O>
 oscillator<G, O>::oscillator ()
     : _out_output ("output", this)
-    , _in_modulator ("modulator", this)
-    , _ctl_frequency ("frequency", default_frequency, this)
-    , _ctl_amplitude ("amplitude", default_amplitude, this)
-    , _ctl_modulator ("modulator", default_modulator, this)
+    , _in_modulator ("modulator", this, 1.0f)
+    , _ctl_frequency ("frequency", this, default_frequency)
+    , _ctl_amplitude ("amplitude", this, default_amplitude)
+    , _ctl_modulator ("modulator", this, default_modulator)
     , _osc (44100.0f,            // Doesn't matter
             default_frequency,
             default_amplitude)
@@ -80,7 +80,7 @@ void oscillator<G, O>::rt_do_process (rt_process_context& ctx)
 {
     _osc.set_frequency (_ctl_frequency.rt_get ());
     _osc.set_amplitude (_ctl_amplitude.rt_get ());
-
+    
     if (!_in_modulator.rt_in_available ())
         _osc.update (_out_output.rt_out_range ());
     else

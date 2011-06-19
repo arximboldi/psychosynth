@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-18 12:38:55 raskolnikov>
+ *  Time-stamp:  <2011-06-18 23:13:52 raskolnikov>
  *
  *  @file        port.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -66,7 +66,7 @@ class port_base : private boost::noncopyable
 public:
     virtual base::type_value type () const = 0;
     virtual const port_meta& meta () const = 0;
-    virtual void rt_context_update (const rt_process_context&) {}
+    virtual void rt_context_update (rt_process_context&) {}
     
     std::string name ()
     { return _name; }
@@ -95,35 +95,47 @@ typedef boost::intrusive::list_member_hook<
     >
 out_port_referee_hook;
 
+void check_port_compatibility (in_port_base& in, out_port_base& out);
+
 class in_port_base : public port_base
 {   
 public:
     out_port_referee_hook _out_port_referee_hook;
     
-    void connect (out_port_base& port);
-    void disconnect ();
+    virtual void connect (out_port_base& port);
+    virtual void disconnect ();
     
     bool connected () const
     { return _source_port != 0; }
     bool rt_connected () const
-    { return _source_port != 0; }
+    { return _rt_source_port != 0; }
 
     out_port_base& source ()
     { return *_source_port; }
     out_port_base& rt_source ()
-    { return *_source_port; }
+    { return *_rt_source_port; }
     const out_port_base& source () const
     { return *_source_port; }
     const out_port_base& rt_source () const
-    { return *_source_port; }
+    { return *_rt_source_port; }
 
     virtual bool rt_in_available () const;
+    virtual void rt_process (rt_process_context& rt);
     
 protected:
     in_port_base (std::string name, graph::node* owner);
-    
-    // FIXME: Duplicate?
-    std::atomic<out_port_base*> _source_port;
+
+    /**
+     * Tools useful for derivates overriding connect.
+     * @see soft_buffer_port.
+     */
+    void _connect (out_port_base* source);
+    void _user_connect (out_port_base* source);
+    void _rt_connect (out_port_base* source);
+
+private:
+    out_port_base* _source_port;
+    out_port_base* _rt_source_port;
 };
 
 namespace detail { class out_port_access; }
@@ -238,7 +250,8 @@ public:
     virtual const T& rt_get_in () const
     {
         // Relies on the connection being made right!
-        return static_cast<const out_port<T>&> (this->source ()).rt_get_out ();
+        return static_cast<const out_port<T>&> (
+            this->rt_source ()).rt_get_out ();
     }
     
 private:
@@ -262,12 +275,12 @@ public:
                      typename OutPort::port_type>::value,
         "Can not forward different types");
     
-    void rt_context_update (const rt_process_context& ctx)
+    void rt_context_update (rt_process_context& ctx)
     {
         InPort::rt_context_update (ctx);
         OutPort::rt_context_update (ctx);
     }
-
+    
     base::type_value type () const
     { return typeid (port_type); }
 

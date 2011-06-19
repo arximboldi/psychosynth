@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-18 13:40:07 raskolnikov>
+ *  Time-stamp:  <2011-06-18 22:36:15 raskolnikov>
  *
  *  @file        patch_port.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -39,16 +39,19 @@ namespace core
 {
 
 PSYNTH_REGISTER_NODE_STATIC (audio_patch_out_port);
-PSYNTH_REGISTER_NODE_STATIC (sample_patch_out_port);
 PSYNTH_REGISTER_NODE_STATIC (audio_patch_in_port);
+PSYNTH_REGISTER_NODE_STATIC (audio_patch_soft_out_port);
+PSYNTH_REGISTER_NODE_STATIC (audio_patch_soft_in_port);
+PSYNTH_REGISTER_NODE_STATIC (sample_patch_out_port);
 PSYNTH_REGISTER_NODE_STATIC (sample_patch_in_port);
+PSYNTH_REGISTER_NODE_STATIC (sample_patch_soft_out_port);
+PSYNTH_REGISTER_NODE_STATIC (sample_patch_soft_in_port);
 
 void patch_in_port_base::rt_do_process (rt_process_context& ctx)
 {
     node::rt_process (ctx);
     auto& p = patch_port ();
-    if (p.rt_connected ())
-        p.rt_source ().owner ().rt_process (ctx);
+    p.rt_process (ctx);
 }
 
 void patch_out_port_base::rt_do_process (rt_process_context& ctx)

@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-17 11:19:59 raskolnikov>
+ *  Time-stamp:  <2011-06-18 23:34:42 raskolnikov>
  *
  *  @file        processor.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -58,7 +58,7 @@ PSYNTH_DECLARE_ERROR (processor_error, processor_not_running_error);
 PSYNTH_DECLARE_ERROR (processor_error, processor_not_idle_error);
 
 constexpr std::size_t default_queue_size = 1 << 20;
-constexpr std::size_t default_block_size = 1 << 8;
+constexpr std::size_t default_block_size = 1 << 6;
 constexpr std::size_t default_frame_rate = 44100;
 
 class processor;

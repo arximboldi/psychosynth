@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-18 13:36:08 raskolnikov>
+ *  Time-stamp:  <2011-06-18 22:00:12 raskolnikov>
  *
  *  @file        patch_port.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -34,6 +34,7 @@
 #include <psynth/new_graph/node.hpp>
 #include <psynth/new_graph/port.hpp>
 #include <psynth/new_graph/buffer_port.hpp>
+#include <psynth/new_graph/soft_buffer_port.hpp>
 #include <psynth/new_graph/control.hpp>
 
 namespace psynth
@@ -74,8 +75,8 @@ class port_name_control : in_control<std::string>
     typedef in_control<std::string> base_type;
 
 public:
-    port_name_control (std::string name, const std::string val, node* owner)
-        : base_type (name, val, owner) {}
+    port_name_control (std::string name, node* owner, const std::string val)
+        : base_type (name, owner, val) {}
     
     void set (const std::string& name);
 };
@@ -92,7 +93,7 @@ public:
     typedef typename ForwardPort::port_type port_type;
 
     patch_in_port_impl ()
-        : _ctl_port_name ("port-name", "input", this)
+        : _ctl_port_name ("port-name", this, "input")
         , _forward_port ("input", "output", 0, this)
     {}
     
@@ -117,6 +118,12 @@ struct patch_buffer_in_port
 {
 };
 
+template <class T>
+struct patch_soft_buffer_in_port
+    : public patch_in_port_impl <soft_buffer_forward_port<T> >
+{
+};
+
 template <class ForwardPort>
 class patch_out_port_impl : public patch_out_port_base
 {
@@ -124,7 +131,7 @@ public:
     typedef typename ForwardPort::port_type port_type;
 
     patch_out_port_impl ()
-        : _ctl_port_name ("port-name", "output", this)
+        : _ctl_port_name ("port-name", this, "output")
         , _forward_port ("input", "output", this, 0)
     {}
     
@@ -148,10 +155,20 @@ struct patch_buffer_out_port
 {
 };
 
+template <class T>
+struct patch_soft_buffer_out_port
+    : public patch_out_port_impl <soft_buffer_forward_port<T> >
+{
+};
+
 typedef patch_buffer_out_port<audio_buffer> audio_patch_out_port;
-typedef patch_buffer_out_port<sample_buffer> sample_patch_out_port;
 typedef patch_buffer_in_port<audio_buffer> audio_patch_in_port;
+typedef patch_soft_buffer_out_port<audio_buffer> audio_patch_soft_out_port;
+typedef patch_soft_buffer_in_port<audio_buffer> audio_patch_soft_in_port;
+typedef patch_buffer_out_port<sample_buffer> sample_patch_out_port;
 typedef patch_buffer_in_port<sample_buffer> sample_patch_in_port;
+typedef patch_soft_buffer_out_port<sample_buffer> sample_patch_soft_out_port;
+typedef patch_soft_buffer_in_port<sample_buffer> sample_patch_soft_in_port;
 
 } /* namespace core */
 } /* namespace graph */

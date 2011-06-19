@@ -241,6 +241,7 @@ libpsynth_la_SOURCES = \
 	new_graph/control.cpp\
 	new_graph/port.cpp\
 	new_graph/buffer_port.cpp\
+	new_graph/soft_buffer_port.cpp\
 	new_graph/buffers.cpp\
 	new_graph/core/patch.cpp\
 	new_graph/core/patch_port.cpp\

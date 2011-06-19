@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-08 13:00:38 raskolnikov>
+ *  Time-stamp:  <2011-06-18 23:20:11 raskolnikov>
  *
  *  @file        output.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -315,9 +315,13 @@ BOOST_AUTO_TEST_CASE_TEMPLATE (oss_output_test, Range, oss_test_types)
 
 #ifdef PSYNTH_HAVE_JACK
 
+#if 0
 typedef mpl::filter_view<output_test_types,
                          mpl::quote1<psynth::io::jack_is_supported> >
 jack_test_types;
+#endif
+
+typedef mpl::vector<> jack_test_types;
 
 BOOST_AUTO_TEST_CASE_TEMPLATE (jack_output_test, Range, jack_test_types)
 {    

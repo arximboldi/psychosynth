@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-18 12:38:45 raskolnikov>
+ *  Time-stamp:  <2011-06-18 23:26:14 raskolnikov>
  *
  *  @file        port.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -68,6 +68,7 @@ void port_base::_set_name (std::string new_name)
 in_port_base::in_port_base (std::string name, graph::node* owner)
     : port_base (name, owner)
     , _source_port (0)
+    , _rt_source_port (0)
 {
     if (owner)
         owner->register_component (*this);
@@ -117,36 +118,72 @@ void out_port_base::_del_reference (in_port_base* ref)
 
 bool in_port_base::rt_in_available () const
 {
-    out_port_base* src = _source_port;
+    out_port_base* src = _rt_source_port;
     return src && src->rt_out_available ();
+}
+
+void check_port_compatibility (in_port_base& in, out_port_base& out)
+{
+    if (!in._has_owner () || !out._has_owner ())
+        throw port_patch_error ();
+    out.owner ().check_attached_to_patch ();
+    in.owner ().check_attached_to_patch ();
+    if (&out.owner ().patch () != &in.owner ().patch ())
+        throw port_patch_error ();
+    if (out.type () != in.type ())
+        throw port_type_error ();
 }
 
 void in_port_base::connect (out_port_base& port)
 {
-    // FIXME: Re-think thread safety of having the same variable for
-    // all threads. Probably we should again split in rt and non-rt
-    // versions of the state.
-
-    if (!_has_owner () || !port._has_owner ())
-        throw port_patch_error ();
-    port.owner ().check_attached_to_patch ();
-    owner ().check_attached_to_patch ();
-    if (&port.owner ().patch () != &owner ().patch ())
-        throw port_patch_error ();
-    if (port.type () != type ())
-        throw port_type_error ();
-    
-    if (_source_port)
-        detail::out_port_access::del_reference (*_source_port, this);
-    _source_port = &port;
-    detail::out_port_access::add_reference (*_source_port, this);
+    _connect (&port);
 }
 
 void in_port_base::disconnect ()
 {
+    _connect (0);
+}
+
+void in_port_base::_connect (out_port_base* source)
+{
+    _user_connect (source);
+
+    // FIXME: I am using this pattern so much we should consider
+    // abstracting it as a method of node.
+    
+    if (_has_owner () &&  // always true here
+        owner ().is_attached_to_process () &&
+        owner ().process ().is_running ())
+    {
+        auto& ctx = owner ().process ().context ();
+        ctx.push_rt_event (make_rt_event ([=] (rt_process_context&) {
+                    this->_rt_connect (source);
+                }));
+    }
+    else
+        this->_rt_connect (source);
+}
+
+void in_port_base::_user_connect (out_port_base* source)
+{
+    if (source)
+        check_port_compatibility (*this, *source);
     if (_source_port)
         detail::out_port_access::del_reference (*_source_port, this);
-    _source_port = 0;
+    _source_port = source;
+    if (source)
+        detail::out_port_access::add_reference (*_source_port, this);
+}
+
+void in_port_base::_rt_connect (out_port_base* source)
+{
+    _rt_source_port = source;
+}
+
+void in_port_base::rt_process (rt_process_context& ctx)
+{
+    if (rt_connected ())
+        rt_source ().owner ().rt_process (ctx);
 }
 
 void out_port_base::disconnect ()
