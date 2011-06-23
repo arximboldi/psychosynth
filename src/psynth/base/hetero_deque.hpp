@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-14 20:35:17 raskolnikov>
+ *  Time-stamp:  <2011-06-22 22:55:01 raskolnikov>
  *
  *  @file        hetero_queque.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>

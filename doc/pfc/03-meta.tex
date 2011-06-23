@@ -1587,14 +1587,20 @@ unneeded this behaviour is not provided by default.
 The \type{buffered\_*} family of classes are adaptors that match from
 a I/O interface in one format to another desired format. Because of
 buffering, the target interface can be have a \texttt{dynamic\_range}
-as parameter. The \type{buffered\_*\_adapter} types \emph{aggregate} the
-adaptee via a pointer or smart pointer such that an already living
+as parameter. The \type{buffered\_*\_adapter} types \emph{aggregate}
+the adaptee via a pointer or smart pointer such that an already living
 device can be adapted, or the buffer can be reused for several
 devices. The other types \emph{compose} the adaptee managing their
 lifetime --- the constructor parameters are forwarded from the
 buffered adaptor constructor.
 
+In order to convert among formats, this uses the
+\emph{sound::co\-py\_and\_con\-vert\_fra\-mes} function that we
+described earlier. This allows the user to provide a custom conversion
+functor to convert among very specific formats.
+
 \subsubsection{Asynchronous operation}
+\label{sec:asyncio}
 
 When data is to be provided in real time to or from a sound card,
 chunks of audio data are to be processed as requested by the
@@ -1634,11 +1640,19 @@ samples or mix full songs. The \texttt{caching\_file\_input} family of
 adaptors allow this kind of operation by reading the data in big
 chunks on a separate thread. Because it has to do buffering anyway, it
 can be used as an interface adaptor from one kind of buffer range to
-another too. 
+another too, avoiding to use a worthless \texttt{buffered\_*\_output}
+adaptor.
 
 Our current implementation uses mutexes and condition variables, which
-should be avoided. It is planned to fix this in the future, section
-\ref{sec:fixringbuffer} further discusses this issue.
+should be avoided, as we will deeply discuss in the next chapter. It
+is planned to fix this in the future, section \ref{sec:fixringbuffer}
+further discusses several solutions to this issue. Also, its
+implementation is designed to aid writing \emph{samplers}. It has
+interesting benefits, such as allowing to read the file
+backwards. Also, when the change from forward to backwards reading is
+made, the front and back pointers of its ring buffer are flipped and
+the direction of reading and writing is reversed, such that the data
+that was already loaded in those big chunk pre-fetchs can be reused.
 
 \subsection{Synthesis module}
 \label{sec:ns-synth}
