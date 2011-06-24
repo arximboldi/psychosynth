@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-17 12:05:40 raskolnikov>
+ *  Time-stamp:  <2011-06-24 16:48:45 raskolnikov>
  *
  *  @file        processor.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -154,7 +154,9 @@ void processor::rt_request_process (std::ptrdiff_t iterations)
 
 void processor::rt_request_process ()
 {
-    auto request_lock = base::make_unique_lock (_rt_mutex);
+    auto request_lock = base::make_unique_lock (
+        _rt_mutex,
+        std::try_to_lock);
     
     if (request_lock.owns_lock ())
         _rt_process_once ();

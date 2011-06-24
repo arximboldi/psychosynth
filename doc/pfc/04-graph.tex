@@ -194,7 +194,7 @@ of control signals --- i.e. the signals that produce only one sample
 per processing block:
 
 \begin{equation}
-  control\mbox{-}rate = \frac{audio\mbox{-}rate}{block\mbox{-}size}  
+  control\_rate = \frac{audio\_rate}{block\_size}  
 \end{equation}
 
 Note that control signals are not restricted to what we labelled as
@@ -498,8 +498,8 @@ LIFO order, we get a \emph{deque}.
     q.method ();
 \end{lstlisting}
 
-The class \type{psynth::\-ba\-se::\-he\-te\-ro\_de\-que<Base>} is
-constant-size deque that can hold elements of any subclass of its type
+The class \type{psynth::\-ba\-se::\-he\-te\-ro\_de\-que<Base>} is a
+cons\-tant-size deque that can hold elements of any subclass of its type
 parameter \type{Base}. The concrete type of the object must be known
 at insertion time for the deque to be able to allocate space for it in
 its internal buffer. Actually, the data structure API offers three
@@ -751,7 +751,17 @@ cards. What is output to each one depends on how the graph is
 interconnected, and it might even be different. This is a common
 usecase, for example, DJ's peek at how it the next track mix's in
 while they adjust its tempo on their headphones without altering what
-is still being played on the loudspeakers.
+is still being played on the loudspeakers. Figure \ref{fig:djscheme}
+shows how a typical DJ setup could be built with Pyschosynth's engine
+and illustrates the most important aspects of the algorithm that we
+just described.
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=\textwidth]{pic/djscheme.png}
+  \caption{A DJ setup built with Psychosynht's engine to illustrate the multiple device output system.}
+  \label{fig:djscheme}
+\end{figure}
 
 The \type{start ()} and \type{stop ()} methods in the \type{processor}
 class is in charge of starting and stopping all the process nodes in
@@ -762,19 +772,242 @@ our program and start manipulating its graph. These methods also
 control the execution of the \emph{async thread}. 
 
 For completeness, we shall mention that there are exists passive
-output nodes that only write data in the event of an external
-request for processing. We can use this, for example, to record a live
-session driven by a second active device to a file. Also, if we only
-want to generate the audio in the file, we can directly call
-\type{rt\_process\_request} in the user thread.
+output nodes that only write data in the event of an external request
+for processing. We can use this, for example, to record a live session
+driven by a second active device to a file. Also, if we only want to
+generate the audio directly in the file without the presence of any
+proactive sink, we may directly call \type{rt\_process\_request} in
+the user thread as many times as needed, taking into account that the
+duration of the file resulting from calling it $i$ times is, in
+seconds:
+\begin{equation}
+  duration(i) = \frac{i \times block\_size}{frame\_rate}   
+\end{equation}
 
-\subsubsection{Thread communication}
+\subsubsection{Communication between threads}
+
+Creating proper abstractions for communicating among the different
+threads is essential for the extensibility of the system. This is, in
+fact, one of the main flaws of the former implementation of this
+layer; the usage of ad-hoc mechanisms for every different feature made
+the system harder to understand, leading to subtle race conditions,
+the overuse of locks and unnecessary busy-wait alike checks in the RT
+thread.
+
+It should be almost clear already why we need our own thread
+communication abstraction instead of just using some traditional
+blocking mechanism --- message passing, monitors, etc. First, the RT
+threads should not wait on non-RT threads like the user thread or the
+async threads. Moreover, most of the processing in the RT thread
+should be done in tight, simple, loops; even if the parameters coming
+from other threads where implemented with atomic variables, this state
+should not change during the execution of these loops. What we do
+instead is to delegate the execution of actions with side-effects
+visible by another thread to that thread itself. We call these actions
+\emph{events}, and they are an instance of the \emph{command} design
+pattern \cite{gamma95design}. Going back to figure
+\ref{fig:graphprocess}, we can distinguish two kinds of events,
+\type{rt\_event}, that are to be executed by the RT thread, and
+\type{async\_event}, that are executed in the asynchronous
+thread. Note that there is no notion of \type{user\_event}, because
+that would add unnecessary complexity. If the async thread wants to
+produce side-effects visible to the user, they can just coordinate
+using locks, because they are not forbidden in the async thread. If
+the RT thread wanted to do so, he can just send an event to the
+asynchronous thread that does the synchronised update in that
+unconstrained environment.
+
+The events are just functors with its overloaded \type{operator()}
+virtual. The \emph{fn\_*\_event} family of concrete events just wrap a
+non-polymorphic functor to match the corresponding interface. This
+recurring pattern of embedding a object with a non-polymorphic
+interface into an adaptor with the same interface implemented with
+virtual methods is called \emph{boxing}. The \type{make\_*\_event}
+family of box factories use template argument deduction to
+automatically box its parameter without explicitly writing its
+type. This is extremely useful with the new C++11 lambdas, because to
+have a compile-time determined size\footnote{Something that gracefully
+  allows us to use them even in our RT-thread as long as we do not
+  erase its type with a \type{std::function<>}}, every lambda
+expression has a distinct, anonymous, compile-time determined type
+\cite{jarvi10lambda}. Using lambda expressions to create events rises
+the conciseness and clarity of the code, because the code that
+asynchronously produces the side-effects follows directly to the
+source of this event. If you are eager to see this pattern of control
+flow abstraction in use, skim to example \ref{lst:nodeexample1}.
+
+The events are stored inside the \emph{process context}. This is where
+the common information that characterises the processing is stored,
+such as the block size or the sample rate. Also the event deques are
+stored there. The \type{basic\_process\_context} holds all this
+information. But, instead of directly exposing access to the event
+queues, three classes that virtually inherit from it offer different
+access methods for them, even though with the same signatures. These
+are the \type{user\_process\_context}, \type{rt\_process\_context} and
+\type{async\_process\_context}. Each event deque is split in a
+triple-buffer fashion. Which internal buffer should we push events in,
+and what kind of lock, if any, should we use when doing so, depends on
+the thread that is the source of the event. These three views on the
+process context manage this implementation logic transparently to the
+user. We designed our API carefully to ensure that the code executed
+in each process has access only to the proper view of the context; in
+this way, the type system ensures that events are sent in the right
+way, giving confidence to the programmer about his own code.
+
+The events received in the RT thread from other threads are processed
+at the beginning of each \type{rt\_request\_process} just before
+executing the synthesis graph. Events that are sent from the RT thread
+to the RT thread itself are instead processed at the end of the
+request. Recursive events are delayed to the next request. Events are
+accumulated and sent in blocks, in this way we avoid the unlikely
+situation in which the user thread is constantly sending events, the
+RT thread processes them, and never advances to execute the synthesis
+graph.
+
+\label{fig:triplebuf}
+The async thread is in an infinite loop waiting to receive and process
+events. Once again, it receives events from the RT thread in blocks
+that are dispatched at the end of every RT process cycle.
+
+There two triple-buffer structures, one associated to the RT thread
+and another one for the async thread. Each triple buffer contains
+three \type{hetero\_deques}\footnote{The interested reader can take a
+  look at the \type{graph::triple\_buffer} class, which is
+  parametrised over the buffer type and the synchronisation policy for
+the ``flip'' operations.} where one can push events of any derivate of
+the \type{rt\_event} and \type{async\_event} respectively. Multiple
+buffering is a technique often associated to computer graphics. Each
+buffer is accessed through a pointer; one part of the system is
+writing data from one of the buffers (the back buffer) and another one
+is concurrently reading from another (the front buffer). When the
+reader is done with the current a simple pointer swap operation
+(called the buffer ``flip'') feeds him with a bunch of new information
+coming from the back buffer, and the writer gets a new fresh blank
+buffer where to dump new data. The three buffers associated to each of
+our triple-buffer structures have the following semantics, as
+exemplified by figure \ref{fig:triplebuf}:
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=\textwidth]{pic/events.png}
+  \caption{Communication with triple buffer event deques.}
+  \label{fig:triplebuf}
+\end{figure}
+
+\begin{description}
+\item[Front buffer] This is the buffer where the events are popped
+  from for processing. Only the RT thread should access the front
+  of its triple buffer, and the same happens in the async thread.
+
+\item[Back buffer] This is, in general, the buffer where events coming
+  from other threads are written to. In the RT triple buffer case, the
+  both the user thread and the async thread do write into it, but they
+  synchronise their insertions with a mutex --- because they can! The
+  \type{flip\_back ()} method exchanges the front and back
+  buffers. The flip is done in the RT thread, at the beginning of each
+  process request, thus should can not contend for the mutex. Instead
+  it does a conditional lock, and if it fails, it skips the flip. This
+  may lead to some events to be delayed more than one request if there
+  is a lot of contention on the mutex --- i.e. the user and async
+  threads are writing a lot of events --- but that does not happen in
+  practise and informal experiments suggest that the approach is
+  enough. However, this could be completely solved by implementing
+  \type{hetero\_deques} lock-free at least for one writer and one
+  reader, we develop this idea in section \ref{sec:improvehetero}. In
+  that case, the user and async thread would still need to serialise
+  their writes, but the RT can flip and read safely without caring
+  about the mutex at all.
+
+  The back of the async triple buffer is slightly different. Here,
+  only the RT thread writes, because if the user thread could write on
+  it at the same time we would need a lock. Indeed, it is also the RT
+  thread who does the flip after filling it, as long as the async
+  thread is not still processing the current front buffer, otherwise
+  the flip is postponed.
+
+\item[Local buffer] The local buffer is where a buffer writes events
+  that he sends to itself. Thanks to this, we can have a notion of
+  ``post-processing'' and also infinitely recursive events that
+  generate a new event each time; this is very useful for implementing
+  tasks and state machines. If a thread wrote his own events in its
+  front buffers, this kind of behaviour would lead to an infinite loop
+  and events sent to the back buffer would never be processed. The
+  \type{flip\_local ()} method exchanges the front and local buffers.
+
+  Note that in the local buffer of the async thread is a bit
+  special. Because the RT thread has exclusive non synchronised access
+  to the back buffer, events from the user thread are sent to the
+  async thread through the local buffer, and they use a mutex to avoid
+  data races.
+\end{description}
+
+While this structure might seem a bit baroque, all the complexity is
+hidden in the \type{processor} and \type{*\_process\_context}
+classes. In most cases, one should only care about making the right
+choice of which thread should execute our event; all the complexity of
+delivering and processing it is hidden and the type system ensures
+we can only do it in a thread safe way.
+
+Listing \ref{lst:nodeexample1} show an example on how to use this
+event passing system. The frequency parameter is set from the user
+thread, but it must be read from the RT thread and the related
+variable \emph{dt} must be updated. Doing this in a portable and
+thread-safe way without using mutexes is tricky. Thanks to our
+structure, we just send an event that does the job of updating the
+variables. There are no possible data races even if reading/writing
+float values is not atomic, because the lambda expression captures a
+local copy of the \type{freq} variable. This is a very convenient
+fact: the event's own state provides an intermediate buffer for
+communicating value updates without data races; the lambda semantics
+in C++0x just provides us the syntactic sugar to make the code
+pleasant to write and read. Please remember that this code is here
+only to illustrate the usage of the event passing system; in practice,
+passing parameters from the user thread to the RT thread is even
+simpler, as we will explain in section \ref{sec:graphcontrols}.
+
+
+\begin{lstlisting}[float=h, label=lst:nodeexample1, caption=A thread communication use-case]
+struct example_oscillator_node : public node
+{
+    example_oscillator_node ()
+        : _freq (440.0f) , _rt_freq (_freq), _rt_phase (0)
+        , _rt_dt (0) // rt_on_context_update will be executed before
+                     // the first process so we can set properly this
+                     // variable that depends on the frame rate.
+    
+    void set_frequency (float freq) {
+        _freq = freq;
+        auto& ctx = process ().context ();
+        ctx.push_rt_event (make_event ([=] (rt_process_context& ctx) {
+            _rt_freq = freq;
+            _rt_dt   = 1 / (freq * ctx.frame_rate ());
+        }));
+    }
+    float frequency () const
+    { return _freq; }
+
+protected:
+    void rt_on_context_update (rt_process_context& ctx)
+    { _rt_dt = 1 / (_rt_freq * ctx.frame_rate ()); }
+
+    void rt_do_process (rt_process_context& ctx) {
+        auto frames = ctx.block_size ();
+        while (frames --> 0) {
+            // We suppose M_PI is defined. The output_sample function
+            // does not actually exist, it is just an example.
+            output_sample (std::sin (_rt_phase * 2 * M_PI));
+            _rt_phase += dt;
+        }
+    }
+
+    float _freq, _rt_freq;
+    float _rt_phase, _rt_dt;
+}
+\end{lstlisting}
 
 \subsection{Indirect object construction}
 
 \label{sec:graphfactory}
-
-
 \label{sec:modports}
 
 \section{Validation}
