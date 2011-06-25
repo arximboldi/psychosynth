@@ -6,12 +6,24 @@
 %% TODO: Add license.
 %%
 
-\documentclass[11pt,a5paper,footinclude=true,headinclude=true]{scrbook}
+\documentclass[11pt]{scrbook}
 
 %\usepackage[left=3.5cm, right=2.5cm, top=2.5cm, bottom=2.5cm]{geometry}
-\usepackage[linedheaders]{classicthesis}
-%\usepackage[a4paper]{geometry}
-%\usepackage{arsclassica}
+
+
+%\usepackage[backref]{classicthesis-preamble}
+%\PassOptionsToPackage{backref}{classicthesis-preamble}
+%\usepackage[hyperpageref]{backref}
+%\usepackage[linedheaders]{classicthesis}
+\usepackage{arsclassica}
+\usepackage[b5paper,centering,top=2.5cm,bottom=2.5cm]{geometry}
+
+\titleformat{\chapter}[hang]% "hang" instead of "block"
+    {\normalfont\Large\sffamily}%
+    {{\color{halfgray}\chapterNumber\thechapter%
+    \hspace{10pt}\vline}  }{10pt}%
+    {\spacedallcaps}
+
 %\RequirePackage[usenames]{color}
 \usepackage{ucs}
 \usepackage[utf8x]{inputenc}
@@ -37,17 +49,20 @@
 %\usepackage[avantgarde]{quotchap}
 \usepackage[framed,thref,hyperref]{ntheorem}
 \usepackage{multirow}
+\usepackage{setspace}
+%\linespread{1.6}
+\onehalfspacing
 
 \newcommand{\type}[1]{\texttt{#1}}
 
 \presetkeys{todonotes}{inline,color=green!40}{}
 
 \lstset{language=C++,
-  basicstyle=\small\sf,
+  basicstyle=\sf,
   columns=fullflexible,
   morekeywords={concept, concept_map, decltype, nullptr, where}}
 
-\hypersetup{ linkbordercolor= 1 0.7 0.7}
+%\hypersetup{ linkbordercolor= 1 0.7 0.7}
 
 % \theoremstyle{marginbreak}
 % \theoremheaderfont{\normalfont\bfseries\sffamily}
@@ -61,6 +76,7 @@
 
 % TODO: IS THIS OK?
 \setcounter{secnumdepth}{3}
+\renewcommand\appendixpagename{\usekomafont{disposition}Appendices}
 
 \def\startappendix{
   \appendix

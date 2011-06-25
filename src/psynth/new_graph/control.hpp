@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-18 18:59:39 raskolnikov>
+ *  Time-stamp:  <2011-06-25 23:39:20 raskolnikov>
  *
  *  @file        control.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -134,14 +134,61 @@ protected:
     out_control_base (const std::string& name, node* owner);
 };
 
-template <typename T, bool IsFundamental>
-class out_control_impl : public out_control_base
+
+template <typename T>
+class typed_out_control_base : public out_control_base
+{
+public:  
+    virtual const T& get () const = 0; 
+    virtual void rt_set (const T& val, rt_process_context& ctx) = 0;
+    virtual const T& rt_get () const = 0;
+    
+    base::type_value type () const
+    { return typeid (T); }    
+
+    std::string str () const
+    { return boost::lexical_cast<std::string> (this->get ()); }
+
+protected:
+    typed_out_control_base (const std::string& name, node* owner)
+        : out_control_base (name, owner) {};
+};
+
+
+template <typename T>
+class typed_in_control_base : public in_control_base
 {
 public:
-    T get () const
+    virtual const T& get () const = 0;
+    virtual const T& rt_get () const = 0;
+    virtual void set (const T&) = 0;
+
+    void str (const std::string& s)
+    { set (boost::lexical_cast<T> (s)); }
+
+    std::string str () const
+    { return boost::lexical_cast<std::string> (this->get ()); }
+
+    base::type_value type () const
+    { return typeid (T); }    
+
+protected:
+    typed_in_control_base (const std::string& name, node* owner)
+        : in_control_base (name, owner) {};
+};
+
+
+namespace detail
+{
+
+template <typename T, bool IsFundamental>
+class out_control_impl : public typed_out_control_base<T>
+{
+public:
+    const T& get () const
     { return _value; }
     
-    T rt_get () const
+    const T& rt_get () const
     { return _value; }
 
     void rt_set (const T& val, rt_process_context& ctx)
@@ -149,7 +196,7 @@ public:
 
 protected:
     out_control_impl (const std::string& name, node* owner, T val)
-        : out_control_base (name, owner), _value (val) {}
+        : typed_out_control_base<T> (name, owner), _value (val) {}
 
 private:
     T _value; // FIXME: Substitute with std::atomic<T> whenever GCC
@@ -157,19 +204,20 @@ private:
 };
 
 template <typename T>
-class out_control_impl<T, false> : public out_control_base
+class out_control_impl<T, false> : public typed_out_control_base<T>
 {
 public:
     virtual const T& rt_get () const
     { return _rt_value; }
 
-    virtual T get () const;
+    T get () const;
     
-    virtual void rt_set (const T& val, rt_process_context& ctx);
+    void rt_set (const T& val, rt_process_context& ctx);
     
 protected:
     out_control_impl (const std::string& name, node* owner, T val)
-        : out_control_base (name, owner), _value (val), _rt_value (val) {}
+        : typed_out_control_base<T> (name, owner)
+        , _value (val), _rt_value (val) {}
 
 private:
     struct async_update_event : public async_event
@@ -189,29 +237,26 @@ private:
     std::mutex _mutex;
 };
 
+} /* namespace detail */
 
 /**
  *  A control for notifying the state of the node from the real time
  *  process out to the user thread.
  */
 template <typename T>
-class out_control : public out_control_impl<T, std::is_fundamental<T>::value>
+class out_control : public detail::out_control_impl<
+    T, std::is_fundamental<T>::value>
 {
-    typedef out_control_impl<T, std::is_fundamental<T>::value> impl_base;
+    typedef detail::out_control_impl<
+        T, std::is_fundamental<T>::value> impl_base;
 
 public:
     out_control (const std::string& name, const T& value=T(), node* owner=0)
         : impl_base (name, owner, value) {}
     
-    base::type_value type () const
-    { return typeid (T); }
-
     const control_meta& meta () const 
     { return default_control_meta; } // FIXME !!!!
     
-    std::string str () const
-    { return boost::lexical_cast<std::string> (this->get ()); }
-
 };
 
 
@@ -220,36 +265,26 @@ public:
  *  node internal state.
  */
 template <typename T>
-class in_control : public in_control_base
+class in_control : public typed_in_control_base<T>
 {
 public:
     in_control (const std::string& name, node* owner=0, const T& value=T())
-        : in_control_base (name, owner)
+        : typed_in_control_base<T> (name, owner)
         , _value (value)
         , _rt_value (value)
         , _is_updated (false)
     {}
 
-    base::type_value type () const
-    { return typeid (T); }
-
     const control_meta& meta () const 
     { return default_control_meta; } // FIXME !!!!
     
-    virtual T get () const
+    const T& get () const
     { return _value; }
     
-    virtual T rt_get () const
+    const T& rt_get () const
     { return _rt_value; }
 
-    virtual void set (const T&);
-    
-    void str (const std::string& s)
-    { set (boost::lexical_cast<T> (s)); }
-
-    std::string str () const
-    { return boost::lexical_cast<std::string> (this->get ()); }
-    
+    void set (const T&);    
 
     bool rt_is_updated ()
     { return _is_updated; }

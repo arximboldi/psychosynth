@@ -142,8 +142,9 @@ classes in the actual code, not even terminologically.
 
 \begin{figure}[h]
   \centering
-  \includegraphics[width=.9\textwidth]{pic/graph-concept.pdf}
-  \caption{Conceptual class diagram of the modular synthesis main entities.}
+  \includegraphics[width=.8\textwidth]{pic/graph-concept.pdf}
+  \caption{Conceptual class diagram of the modular synthesis main
+    entities.}
   \label{fig:graphconcept}
 \end{figure}
 
@@ -310,7 +311,6 @@ It is not worth to concentrate on the actual management of the
 different voices and the triggering mechanisms until sequencing and or
 MIDI support is developed in later stages. However, there are some
 questions that we do have to address now:
-
 \begin{itemize}
 \item We have to split the responsibilities of the different classes
 properly predicting which classes will need to be extended, preferably
@@ -326,7 +326,6 @@ At a later stage, we plan to implement a plug-in system as defined by
 requirements \ref{req:iter3-begin} to \ref{req:iter3-end}. These
 plug-ins shall be in several formats, like LV2, LADSPA, or our own
 defined interface. We should take this in several ways:
-
 \begin{enumerate}
 \item For consistency, the interface that we will define in this
   chapter shall be the same that our own plug-ins will implement
@@ -539,7 +538,7 @@ pointer for a box type. We already have a plan to implement this
 feature using policy-based design \cite{alexandrescu01modern} such
 that it does not cause an overhead to those who do not need it.
 
-\begin{lstlisting}[float=b,caption=Header of heterogeneous deque elements,label=lst:heteroheader]
+\begin{lstlisting}[float=h!,caption=Header of heterogeneous deque elements,label=lst:heteroheader]
   template <class Base>
   struct header {
       header* prev;
@@ -885,11 +884,11 @@ reader is done with the current a simple pointer swap operation
 coming from the back buffer, and the writer gets a new fresh blank
 buffer where to dump new data. The three buffers associated to each of
 our triple-buffer structures have the following semantics, as
-exemplified by figure \ref{fig:triplebuf}:
+exemplified by figure \ref{fig:triplebuf}.
 
 \begin{figure}[h!]
   \centering
-  \includegraphics[width=\textwidth]{pic/events.png}
+  \includegraphics[width=.9\textwidth]{pic/events.png}
   \caption{Communication with triple buffer event deques.}
   \label{fig:triplebuf}
 \end{figure}
@@ -963,17 +962,17 @@ in C++0x just provides us the syntactic sugar to make the code
 pleasant to write and read. Please remember that this code is here
 only to illustrate the usage of the event passing system; in practice,
 passing parameters from the user thread to the RT thread is even
-simpler, as we will explain in section \ref{sec:graphcontrols}.
+simpler, as we will explain in the following.
 
 
-\begin{lstlisting}[float=h, label=lst:nodeexample1, caption=A thread communication use-case]
+\begin{lstlisting}[float=h!, label=lst:nodeexample1, caption=A thread communication use-case]
 struct example_oscillator_node : public node
 {
     example_oscillator_node ()
         : _freq (440.0f) , _rt_freq (_freq), _rt_phase (0)
         , _rt_dt (0) // rt_on_context_update will be executed before
-                     // the first process so we can set properly this
-                     // variable that depends on the frame rate.
+                   // the first process so we can set properly this
+                   // variable that depends on the frame rate.
     
     void set_frequency (float freq) {
         _freq = freq;
@@ -983,6 +982,7 @@ struct example_oscillator_node : public node
             _rt_dt   = 1 / (freq * ctx.frame_rate ());
         }));
     }
+
     float frequency () const
     { return _freq; }
 
@@ -1007,6 +1007,97 @@ protected:
 
 \subsection{Node components}
 
+In the last section we have seen how we can easily build a notion of
+\emph{parameters} similar to the one abstracted in the analysis
+section on top of the event passing infrastructure. However, there are
+a few ways we can criticise the approach in listing
+\ref{lst:nodeexample1}:
+\begin{enumerate}
+\item Even though the code is not too large, in nodes with a lot of
+  parameter we could easily devise a recurring pattern calling for a
+  refactoring. Indeed, for passing information from the user to the
+  node's processing state we do always the same: store a copy public
+  for the user and another one for the node's internal processing in
+  the RT thread --- to update the later from the user thread, we send
+  a RT event. For controls in the other direction, this is, controls
+  intended to send information from the RT thread to the user, this is
+  a bit less trivial because it involves sending the update through
+  the async thread and, if the status control type does not have an
+  atomic assign operation, locking a mutex to avoid data races between
+  the user and async thread. It seems reasonable to abstract this
+  behaviour and relieve the node implementer from rewriting this
+  patterns \emph{ad-nauseum}, moreover, if abstracted as a class,
+  these controls can be later extended by themselves.
+
+\item There are some corner cases that the previous code does not
+  address. Actually, if the node is not attached to a processor that
+  code would throw a \type{node\_attachment\_error} exception when it
+  invokes the node's \type{process ()} method inside
+  \type{set\_frequency ()}. It makes sense to alter the node frequency
+  before attaching it anywhere so this limitation should be
+  avoided. Moreover, even if the node is attached but the process is
+  not started, events would accumulate in the queue. If the node is
+  detached from the processor before the network is run, the internal
+  frequency would never be updated indeed. This shows how there are
+  many corner cases, and isolating this complexity in a class with its
+  own responsibilities yields safer code.
+
+\item Manipulating the frequency parameter as implemented in that code
+  requires knowing the node's concrete type. This is a show stopper
+  for the \emph{plugin} that we shall implement in the next
+  iteration. Instead, parameters should be accessible directly from
+  the node's basic interface, and identified with strings, such that
+  using them requires no compile-time binding at all.
+\end{enumerate}
+
+This results in the notion of \emph{component}, an attribute
+associated to a node, that may be of four kinds; an input port, an
+output port, a input control or an output control. These four kinds of
+components have different properties but there are some commonalities
+among them too:
+\begin{enumerate}
+\item They have an unique name (unique within a node and kind of
+  component) that identifies them.
+\item They have an associated regular type. Regular means that it
+  models the \type{Regular} concept, i.e. is default constructible,
+  copy-constructible and copyable. This is the type of the data that
+  they ``hold'' or ``pass''.
+\item They have some associated metadata, which is just a $String
+  \rightarrow String$ map providing information that may be useful to
+  the user, most of the time to the human user of the application.
+\item They can be queried by their name and enumerated from the node
+  interface. 
+\end{enumerate}
+
+\subsubsection{Control components}
+
+Figure \ref{fig:controls} shows the most important classes and
+interfaces implementing the control components --- i.e. parameter and
+status variables. Parameters or input controls are used to pass
+information from the user thread to the node's internal processing
+state. States or output controls work in the other way, exposing some
+internal processing status to the user.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=.9\textwidth]{pic/graph-ctl.pdf}
+  \caption{UML class diagram of the most important classes for the
+  control components.}
+\label{fig:controls}
+\end{figure}
+
+Note that in the current implementation there is some special
+requirement that somehow couples the control bases and their typed
+version. If you access the control through the control base access
+template method with a type \type{T} and actually \type{type ()}
+method returns \type{typeid (T)} for that control, then that object
+must be a typed control of type $T$; otherwise this is undefined
+behaviour. In practice, this means that you should never inherit from
+\type{in\_control\_base} or \type{out\_control\_base} directly, but
+you should inherit from their typed versions instead.
+
+\subsection{Port components}
+
 \label{sec:modports}
 
 \subsection{Indirect object construction}
@@ -1017,7 +1108,7 @@ protected:
 
 \section{Validation}
 
-\section{Conlusion}
+\section{Conclusion}
 
 %%% Local Variables: 
 %%% mode: latex

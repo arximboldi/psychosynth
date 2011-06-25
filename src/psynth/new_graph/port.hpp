@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-18 23:13:52 raskolnikov>
+ *  Time-stamp:  <2011-06-25 23:27:05 raskolnikov>
  *
  *  @file        port.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -205,26 +205,55 @@ struct out_port_access
 
 } /* namespace detail */
 
+template <typename T>
+class typed_out_port_base : public out_port_base
+{
+public:
+    typedef T port_type;
+    
+    virtual T& rt_get_out () = 0;
+    virtual const T& rt_get_out () const = 0;
+
+    base::type_value type () const
+    { return typeid (T); }
+
+protected:
+    typed_out_port_base (std::string name, node* owner)
+        : out_port_base (name, owner) {}
+};
 
 template <typename T>
-class out_port : public out_port_base
+class typed_in_port_base : public in_port_base
+{
+public:
+    typedef T port_type;
+
+    virtual const T& rt_get_in () const = 0;
+
+    base::type_value type () const
+    { return typeid (T); }
+
+protected:
+    typed_in_port_base (std::string name, node* owner)
+        : in_port_base (name, owner) {}
+};
+
+template <typename T>
+class out_port : public typed_out_port_base<T>
 {
 public:
     typedef T port_type;
     
     out_port (std::string name, node* owner, const T& value = T())
-        : out_port_base (name, owner)
+        : typed_out_port_base<T> (name, owner)
         , _data (value){}
     
-    virtual T& rt_get_out ()
+    T& rt_get_out ()
     { return _data; }
     
-    virtual const T& rt_get_out () const
+    const T& rt_get_out () const
     { return _data; }
     
-    base::type_value type () const
-    { return typeid (T); }
-
     const port_meta& meta () const 
     { return default_port_meta; }  // FIXME !!!
     
@@ -233,21 +262,16 @@ private:
 };
 
 template <typename T>
-class in_port : public in_port_base
+class in_port : public typed_in_port_base<T>
 {
 public:
-    typedef T port_type;
-    
     in_port (std::string name, node* owner)
-        : in_port_base (name, owner) {}
+        : typed_in_port_base<T> (name, owner) {}
     
-    base::type_value type () const
-    { return typeid (T); }
-
     const port_meta& meta () const 
     { return default_port_meta; } // FIXME !!!
 
-    virtual const T& rt_get_in () const
+    const T& rt_get_in () const
     {
         // Relies on the connection being made right!
         return static_cast<const out_port<T>&> (

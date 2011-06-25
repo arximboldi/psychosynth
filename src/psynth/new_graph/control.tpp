@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-19 01:33:43 raskolnikov>
+ *  Time-stamp:  <2011-06-25 23:09:01 raskolnikov>
  *
  *  @file        control.tpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -46,7 +46,8 @@ T in_control_base::get () const
 {
     if (type () != base::type_value (typeid (T)))
         throw control_type_error ();
-    return boost::polymorphic_downcast<const in_control<T>*>(this)->get ();
+    return boost::polymorphic_downcast<
+        const typed_in_control_base<T>*>(this)->get ();
 }
 
 template <typename T>
@@ -54,21 +55,24 @@ T out_control_base::get () const
 {
     if (type () != base::type_value (typeid (T)))
         throw control_type_error ();
-    return boost::polymorphic_downcast<const out_control<T>*>(this)->get ();
+    return boost::polymorphic_downcast<
+        const typed_out_control_base<T>*>(this)->get ();
 }
 
 template <typename T>
 const T& in_control_base::rt_get () const
 {
     assert (type () == base::type_value (typeid (T)));
-    return boost::polymorphic_downcast<const in_control<T>*>(this)->rt_get ();
+    return boost::polymorphic_downcast<
+        const typed_in_control_base<T>*>(this)->rt_get ();
 }
 
 template <typename T>
 const T& out_control_base::rt_get () const
 {
     assert (type () == base::type_value (typeid (T)));
-    return boost::polymorphic_downcast<const out_control<T>*>(this)->rt_get ();
+    return boost::polymorphic_downcast<
+        const typed_out_control_base<T>*>(this)->rt_get ();
 }
 
 template <typename T>
@@ -76,15 +80,20 @@ void in_control_base::set (const T& val)
 {
     if (type () != base::type_value (typeid (T)))
         throw control_type_error ();
-    boost::polymorphic_downcast<in_control<T>*>(this)->set (val);
+    boost::polymorphic_downcast<
+        typed_in_control_base<T>*>(this)->set (val);
 }
     
 template <typename T>
 void out_control_base::rt_set (const T& val, rt_process_context& ctx)
 {
     assert (type () == base::type_value (typeid (T)));
-    boost::polymorphic_downcast<out_control<T>*>(this)->rt_set (val, ctx);
+    boost::polymorphic_downcast<
+        typed_out_control_base<T>*>(this)->rt_set (val, ctx);
 }
+
+namespace detail
+{
 
 template <typename T>
 void out_control_impl<T, false>::rt_set (const T& val, rt_process_context& ctx)
@@ -108,6 +117,9 @@ void out_control_impl<T, false>::async_update_event::operator () (
     auto g = base::make_unique_lock (_ctl.mutex);
     _ctl._value = _new_value;
 }
+
+} /* namespace detail */
+
 
 template <typename T>
 void in_control<T>::set (const T& val)
