@@ -13,7 +13,7 @@
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    inkscape:export-ydpi="300"
    inkscape:export-xdpi="300"
-   inkscape:export-filename="/home/raskolnikov/dev/psynth/trunk/doc/pfc/pic/events.png"
+   inkscape:export-filename="/home/raskolnikov/dev/psynth/trunk/doc/pfc/pic/djscheme.png"
    sodipodi:docname="djscheme.svg"
    inkscape:version="0.48.1 r9760"
    version="1.1"
@@ -3515,7 +3515,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
