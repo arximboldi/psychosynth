@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-18 12:51:47 raskolnikov>
+ *  Time-stamp:  <2011-06-27 00:11:30 raskolnikov>
  *
  *  @file        node.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -191,10 +191,10 @@ base::restricted_global_factory_manager<std::string, node_ptr>
 node_factory;
 
 #define PSYNTH_REGISTER_NODE_STATIC(node_type)                          \
-    node_factory::registrant<node_type> node_type ## _registrant (#node_type);
+    static ::psynth::graph::node_factory::registrant<node_type> node_type ## _registrant_ (#node_type);
 
 #define PSYNTH_REGISTER_NODE_STATIC_AS(node_type, node_name)            \
-    node_factory::registrant<node_type> node_type ## _registrant (node_name);
+    static ::psynth::graph::node_factory::registrant<node_type> node_type ## _registrant_ (node_name);
 
 } /* namespace graph */
 

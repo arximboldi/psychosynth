@@ -1,30 +1,30 @@
 
-%%
+%% 
 %% Proyecto de fin de Carrera -- GNU Psychosynth
 %% (c) 2010-2011 Juan Pedro Bolívar Puente
-%%
+%% 
 %% TODO: Add license.
-%%
+%% 
 
 \documentclass[11pt]{scrbook}
 
-%\usepackage[left=3.5cm, right=2.5cm, top=2.5cm, bottom=2.5cm]{geometry}
+% \usepackage[left=3.5cm, right=2.5cm, top=2.5cm, bottom=2.5cm]{geometry}
 
 
-%\usepackage[backref]{classicthesis-preamble}
-%\PassOptionsToPackage{backref}{classicthesis-preamble}
-%\usepackage[hyperpageref]{backref}
-%\usepackage[linedheaders]{classicthesis}
+% \usepackage[backref]{classicthesis-preamble}
+% \PassOptionsToPackage{backref}{classicthesis-preamble}
+% \usepackage[hyperpageref]{backref}
+% \usepackage[linedheaders]{classicthesis}
 \usepackage{arsclassica}
 \usepackage[b5paper,centering,top=2.5cm,bottom=2.5cm]{geometry}
 
 \titleformat{\chapter}[hang]% "hang" instead of "block"
-    {\normalfont\Large\sffamily}%
-    {{\color{halfgray}\chapterNumber\thechapter%
+{\normalfont\Large\sffamily}%
+{{\color{halfgray}\chapterNumber\thechapter%
     \hspace{10pt}\vline}  }{10pt}%
-    {\spacedallcaps}
+{\spacedallcaps}
 
-%\RequirePackage[usenames]{color}
+% \RequirePackage[usenames]{color}
 \usepackage{ucs}
 \usepackage[utf8x]{inputenc}
 \usepackage{amsmath}
@@ -33,7 +33,7 @@
 \usepackage{url}
 \usepackage{graphicx}
 \usepackage{alltt}
-%\usepackage{fancyhdr}
+% \usepackage{fancyhdr}
 \usepackage{multirow}
 \usepackage{listings}
 \usepackage{algorithm}
@@ -45,12 +45,12 @@
 \usepackage{epigraph}
 \usepackage{subfig}
 \usepackage[textwidth=2cm, textsize=small]{todonotes}
-%\usepackage{theorem}
-%\usepackage[avantgarde]{quotchap}
+% \usepackage{theorem}
+% \usepackage[avantgarde]{quotchap}
 \usepackage[framed,thref,hyperref]{ntheorem}
 \usepackage{multirow}
 \usepackage{setspace}
-%\linespread{1.6}
+% \linespread{1.6}
 \onehalfspacing
 
 \newcommand{\type}[1]{\texttt{#1}}
@@ -62,7 +62,7 @@
   columns=fullflexible,
   morekeywords={concept, concept_map, decltype, nullptr, where}}
 
-%\hypersetup{ linkbordercolor= 1 0.7 0.7}
+% \hypersetup{ linkbordercolor= 1 0.7 0.7}
 
 % \theoremstyle{marginbreak}
 % \theoremheaderfont{\normalfont\bfseries\sffamily}
@@ -87,7 +87,7 @@
 \definecolor{red}{rgb}{0.9,0.1,0.1}
 {
   \theorembodyfont{\color{red}}
-  %\newtheorem{todo}{TO-DO note}
+  % \newtheorem{todo}{TO-DO note}
 }
 
 {
@@ -97,8 +97,8 @@
 }
 
 % \def\disabletodo {
-%   \let\todo=\comment 
-%   \let\endtodo=\endcomment 
+% \let\todo=\comment 
+% \let\endtodo=\endcomment 
 % }
 
 \makeindex
@@ -109,7 +109,7 @@
 \newcommand{\myDegree}{Ingeniería en Informática}
 \newcommand{\myName}{Juan Pedro Bolívar Puente}
 \newcommand{\myProf}{Joaquín Fernandez-Valdivia}
-%\newcommand{\myOtherProf}{Javier Sánchez Monedero}
+% \newcommand{\myOtherProf}{Javier Sánchez Monedero}
 \newcommand{\myFaculty}{Escuela Técnica Superior de Ingenierías Informática y de
   Telecomunicación}
 \newcommand{\myFacultyShort}{E.T.S. de Ingenierías Informática y de
@@ -130,9 +130,9 @@
   pdfproducer = {pdflatex}
 }
 
-%
+% 
 % Heading
-%
+% 
 % \pagestyle{fancy}
 % \fancyhf{}
 % \fancyhead[LO]{\leftmark}
@@ -142,17 +142,17 @@
 % \renewcommand{\sectionmark}[1]{\markright{\textbf{\thesection. #1}}}
 % \setlength{\headheight}{1.5\headheight}
 
-%
+% 
 % No header in white pages
-%
+% 
 \makeatletter
 \def\clearpage{%
   \ifvmode
-    \ifnum \@dbltopnum =\m@ne
-      \ifdim \pagetotal <\topskip
-        \hbox{}
-      \fi
-    \fi
+  \ifnum \@dbltopnum =\m@ne
+  \ifdim \pagetotal <\topskip
+  \hbox{}
+  \fi
+  \fi
   \fi
   \newpage
   \thispagestyle{empty}
@@ -182,6 +182,7 @@
 \input{02-analysis}
 \input{03-meta}
 \input{04-graph}
+\input{05-conclusion}
 
 \bibliography{00-main}
 \bibliographystyle{acm}

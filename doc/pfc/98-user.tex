@@ -156,15 +156,16 @@ $ sudo apt-get install psychosynth-gui psychosynth-samples
 In case you maintain manually your sources.list, here you have the
 detailed manual setup instructions. More information can be found in
 the GNU Psychosynth PPA webpage.
+{\footnotesize
 \begin{verbatim}
 deb https://launchpad.net/~gnu-psychosynth-team/+archive/ppa lucid main
 deb-src https://launchpad.net/~gnu-psychosynth-team/+archive/ppa lucid main
-\end{verbatim}
+\end{verbatim}}
 
-Where it says lucid you may also write a later version of the Ubuntu
-distribution (e.g Maverick). You may need to tell apt to accept those
-repos without issuing a warning when running apt-get update. For that,
-you can just do the following for each warned key:
+  Where it says \type{lucid} you may also write a later version of the
+  Ubuntu distribution (e.g Maverick). You may need to tell apt to
+  accept those repos without issuing a warning when running apt-get
+  update. For that, you can just do the following for each warned key:
 \begin{verbatim}
 $ gpg --keyserver subkeys.pgp.net --recv 4A3B72F02ADA7053
 $ gpg --export --armor 4A3B72F02ADA7053 | sudo apt-key add - 

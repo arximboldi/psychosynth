@@ -2,8 +2,8 @@
 \chapter{A generic sound processing library}
 
 {
-  \setlength{\epigraphwidth}{\textwidth}
-  \renewcommand{\textflush}{flushepinormal}
+  \setlength{\epigraphwidth}{.65\textwidth}
+  %\renewcommand{\textflush}{flushepinormal}
   \epigraph{Numbers it is. All music when you come to think.  Two
     multiplied by two divided by half is twice one.  Vibrations: chords
     those are. One plus two plus six is seven. Do anything you like with
@@ -53,12 +53,21 @@ manipulate it computationally.
 \subsubsection{Temporal quantisation}
 
 Temporal quantisation relates to how many times per second do we store
-the current voltage or air pressure value. The value of the signal
-between to equally spaced in time samples is unknown, but we can use
-some interpolation method to \emph{upsample} a signal --- i.e. to
-figure out what is between two samples. Most of the time we refer to
-the \emph{sampling rate}, in hertz, as the frequency of the temporal
+the current voltage or air pressure value. Figure \ref{fig:sampled-1}
+shows this, every equally spaced vertical line is a discrete
+instantaneous sample and the information in between is lost. The value
+of the signal between two samples is unknown, but we can use some
+interpolation method to \emph{upsample} a signal --- i.e. to figure
+out what is between two samples. Most of the time we refer to the
+\emph{sampling rate}, in hertz, as the frequency of the temporal
 quantisation.
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=.8\textwidth]{pic/sampled-1.pdf}
+  \caption{Temporal quantisation of continuous 1-D signal.}
+  \label{fig:sampled-1}  
+\end{figure}
 
 We know from \emph{Niquist-Shannon sampling theorem} that perfect
 reconstruction of a signal is possible when the sampling frequency is
@@ -81,14 +90,41 @@ samples per second being the biggest constraint.
 
 \subsubsection{Spatial quantisation}
 
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=.8\textwidth]{pic/sampled-2.pdf}
+  \caption{Spatial quantisation of continuous 1-D signal.}
+  \label{fig:sampled-2}  
+\end{figure}
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=.8\textwidth]{pic/sampled-3.pdf}
+  \caption{Fully quantised continuous 1-D signal}
+  \label{fig:sampled-3}
+\end{figure}
+
 Spatial quantisation determines how many possible values can a sample
-take in our finite and discrete scale. In a computer system, this is
+take in our finite and discrete scale. Figure \ref{fig:sampled-2}
+shows a linear spatial quantisation, represented by the dotted lines
+parallel to the abscissa axis. That is a best fit quantisation
+assuming a time continuum, in practise, spatial quantisation is
+applied over an already discreet time, figure \ref{sampled-3} combines
+the quantisations of figures \ref{fig:sampled-1} and
+\ref{sampled-2}. In a computer system, spatial quantisation is mostly
 determined by the size in bits of the underlying type used to store
-the samples. An audio CD uses a \emph{bitdepth} of 16 bit with samples
-that can take $65.536$ possible values while professional audio uses 24
-bit or 32 bit samples. We can even see systems using 64 bit samples
-during the processing to avoid accumulative rounding problems due to
-heavy arithmetic. The \emph{dynamic range} of a signal with $Q$-bits
+the samples. Also, the quantisation is affected by how we space the
+different plausible values. In practise, linear quantisation
+---i.e. equally spaced samples--- is most in audio formats targeted at
+music, but logarithmic and other non-linear divisions are common in
+telephony and other lo-fi systems. Note that using floating point
+values to represent samples, as it is often done in software
+synthesis, provides an implicitly logarithmic audio quantisation. An
+audio CD uses a \emph{bitdepth} of 16 bit with samples that can take
+$65.536$ possible values while professional audio uses 24 bit or 32
+bit samples. We can even see systems using 64 bit samples during the
+processing to avoid accumulative rounding problems due to heavy
+arithmetic. The \emph{dynamic range} of a signal with $Q$-bits
 quantisation is:
 \begin{equation}
   \mathrm{DR_{ADC}} = 20 \times \log_{10}(2^Q) = (6.02 \cdot Q)\, \mathrm{dB}
@@ -131,16 +167,14 @@ and output devices.
 
 \subsubsection{Channel space}
 
-Because our hearing system is dicotomically symmetric, audio
-engineers discovered that much better fidelity can be achieved by
-reproducing the sound with some differences from two separate
-loudspeakers. This is the well-known \emph{stereophonic} sound,
-commonly named just \emph{stereo}.
-
-For representing such a signal, two different streams of information
-are needed for the left and right channels. Moreover, nowdays
-\emph{quadraphonic}, and \emph{surround} sound with varying numbers of
-channels up to 20.2 are used in different systems.
+Because our hearing system is dicotomically symmetric, audio engineers
+discovered that much better fidelity can be achieved by reproducing
+the sound with some differences from two separate loudspeakers. This
+is the well-known \emph{stereophonic} sound, commonly named just
+\emph{stereo}. For representing such a signal, two different streams
+of information are needed for the left and right channels. Moreover,
+nowdays \emph{quadraphonic}, and \emph{surround} sound with varying
+numbers of channels up to 20.2 are used in different systems.
 
 We call \emph{channel space} to the set of semantic channels we use in
 some sort of audio representation --- e.g. stereo audio has channel
@@ -148,6 +182,14 @@ space with $left$ and $right$ elements. We use the term
 \emph{frame} to call a set of samples coincident in time, this is, the
 samples of the various channels at a given time point. Thus, we will
 use most of the time the more accurate term \emph{frame rate}.
+
+\begin{figure}[h]
+  \centering
+  \subfloat[]{\includegraphics[width=2in]{pic/fmt-planar.png}}\;
+  \subfloat[]{\includegraphics[width=3in]{pic/fmt-interleaved.png}}
+  \caption{Multi-channal data in planar (a) and interleaved (b) form.}
+  \label{fig:interleaving}
+\end{figure}
 
 This rises the problem on how to linearise the multi channel data. The
 most common mechanism in domestic hardware is by \emph{interleaving}
@@ -162,20 +204,23 @@ of channels and split the signal to do per-channel filtering. Figure
 \ref{fig:interleaving} compares visually the interleaved and planar
 formats.
 
-\begin{figure}[h]
-  \centering
-  \subfloat[]{\includegraphics[width=2in]{pic/fmt-planar.png}}\;
-  \subfloat[]{\includegraphics[width=3in]{pic/fmt-interleaved.png}}
-  \caption{Multi-channal data in planar (a) and interleaved (b) form.}
-  \label{fig:interleaving}
-\end{figure}
-
 Another issue is the order in which the data from different semantic
 channels is stored. We call a \emph{channel layout} a bijection $L : C
 \rightarrow \mathbb{Z}_{\|C\|}$, where $C$ is a given \emph{channel
   space}. For example, the mapping $\{ left
 \mapsto 0, right \mapsto 1 \}$ is a common layout for stereo sound,
 but $\{ left \mapsto 1, right \mapsto 0 \}$ is sometimes used too.
+
+The last concern related to quantisation is
+\emph{dithering}. Dithering is the process of adding a white noise
+signal in a range similar to that of the quantisation step
+---e.g. $[-2^{-n}, 2^{-n}]$ for a linear $n$-bit quantisation--- prior
+to doing the quantisation itself. While this increases the overall
+SNR, the perceived subjective distortion is much smaller as harmonics
+introduced by the regularity of quantisation error are aliased; with a
+proper noise model we can even push the harmonic artifacts outside the
+audible range to achieve minor distortion \cite{vanderkooy87dither,
+  lipshitz91minimally}.
 
 \subsection{Common solutions}
 
@@ -202,15 +247,16 @@ library.
 
 This is a maintenance hell, but using the common means for abstracting
 orthogonal behaviour variability, i.e. dynamic polymorphism, is simply
-not an option in any audio software which supports real-time operation.
+not an option in any audio software which supports real-time
+operation.
 
 \subsection{A generic approach: Boost.GIL}
 
-However, there is a piece of software that proved that this issue can be
-solved in C++ using static polymorphism. This is the Generic
-Image Library\footnote{\url{http://stlab.adobe.com/gil}} which was developed
-by Lubomir Bourdev et. Al inside Adobe Software Technology Lab that was
-later include inside the Boost library distribution.
+However, there is a piece of software that proved that this issue can
+be solved in C++ using static polymorphism. This is the Generic Image
+Library\footnote{\url{http://stlab.adobe.com/gil}} which was developed
+by Lubomir Bourdev et. Al inside Adobe Software Technology Lab that
+was later include inside the Boost library distribution.
 
 While sound and image manipulation are quite different, specially from
 the psycho-perceptive point of view, they are both a signal processing
@@ -1670,8 +1716,8 @@ will avoid giving a detailed discussion of its design now.
 \section{Validation}
 
 \subsection{Unit testing}
-
-Unit testing serves to ensure that the actual behaviour of a function
+\label{sec:sound-unittest}
+unit testing serves to ensure that the actual behaviour of a function
 matches its documented requirements. In this code it is very important
 because: (1) because it is a library to be used by third party
 developers, the proper functioning of every single method is as

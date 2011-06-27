@@ -26,9 +26,30 @@ TESTS = $(dist_TESTS)
 
 EXTRA_DIST = $(dist_TESTS)
 
-noinst_PROGRAMS = psynth_unit_test
+noinst_PROGRAMS = \
+	psynth_unit_test \
+	example_graph_scale \
+	example_graph_patch
 
-psynth_unit_test_SOURCES = psynth_unit_test.cpp
+examples_cxxflags = \
+	-I$(top_srcdir)/src \
+	-I$(top_builddir)/src
+examples_ldadd = \
+	$(BOOST_FILESYSTEM_LIB) \
+	$(BOOST_SIGNALS_LIB) \
+	-lboost_system-mt \
+	../psynth/libpsynth.la	
+
+example_graph_scale_SOURCES = examples/graph_scale.cpp
+example_graph_scale_CXXFLAGS = $(examples_cxxflags)
+example_graph_scale_LDADD = $(examples_ldadd)
+
+example_graph_patch_SOURCES = examples/graph_patch.cpp
+example_graph_patch_CXXFLAGS = $(examples_cxxflags)
+example_graph_patch_LDADD = $(examples_ldadd)
+
+psynth_unit_test_SOURCES = \
+	psynth_unit_test.cpp
 
 psynth_unit_test_SOURCES += \
 	psynth/base/tree_node.cpp \
@@ -47,9 +68,12 @@ psynth_unit_test_SOURCES += \
 	psynth/io/output.cpp \
 	psynth/io/input.cpp \
 	psynth/graph/processor.cpp \
+	psynth/graph/core.cpp \
+	psynth/graph/port.cpp \
+	psynth/graph/control.cpp \
+	psynth/graph/patch.cpp \
 	psynth/util.cpp \
 	psynth/util.hpp
-
 
 psynth_unit_test_CXXFLAGS = -Wall $(BOOST_CPPFLAGS) \
 	-I$(top_srcdir)/src \

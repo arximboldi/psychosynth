@@ -112,7 +112,7 @@ terminology in our design.
 
 \begin{figure}
   \centering
-  \includegraphics[width=.9\textwidth]{pic/hwmod.png}
+  \includegraphics[width=.9\textwidth]{pic/hwmod.pdf}
   \caption{Components of a synthesis module illustrated in a standard
     \emph{frequency shifter}.}
   \label{fig:hwmod}
@@ -211,7 +211,7 @@ fact, as we saw in the last chapter, some audio output interfaces like
 Jackd control the audio thread themselves invoking the processing
 function through a callback. Our own device API wrapper that we
 developed in the previous chapter promotes this kind of asynchronous
-output and simulate it whenever the output system only provides a
+output and simulates it whenever the output system only provides a
 blocking I/O interface. The inverse of the control rate, that we may
 call the \emph{control period}, provides a very explicit deadline for
 the block processing function. Missing the deadline might not kill
@@ -353,7 +353,7 @@ defined interface. We should take this in several ways:
 
 \subsection{Overview}
 
-Figure \ref{fig:graphoverview} shows an overview of the most important
+Figure \ref{fig:graphoverview} shows an overview of most important
 classes in this layer from the musical point of view. Most of the code
 implementing these classes lives in the \type{psynth::graph}
 namespace, representing the fact that this layer implements the notion
@@ -578,9 +578,9 @@ available in this case, in a circular buffer fashion.
 
 \begin{figure}[h!]
   \centering
-  \subfloat[]{\includegraphics[width=.95\textwidth]{pic/hetero1.png}}
+  \subfloat[]{\includegraphics[width=.95\textwidth]{pic/hetero1.pdf}}
 
-  \subfloat[]{\includegraphics[width=\textwidth]{pic/hetero2.png}}
+  \subfloat[]{\includegraphics[width=\textwidth]{pic/hetero2.pdf}}
 
   \caption{An heterogeneous deque with two elements (a), and after
     adding a third element (b).}
@@ -757,7 +757,7 @@ just described.
 
 \begin{figure}[h!]
   \centering
-  \includegraphics[width=\textwidth]{pic/djscheme.png}
+  \includegraphics[width=\textwidth]{pic/djscheme.pdf}
   \caption{A DJ setup built with Psychosynht's engine to illustrate the multiple device output system.}
   \label{fig:djscheme}
 \end{figure}
@@ -888,7 +888,7 @@ exemplified by figure \ref{fig:triplebuf}.
 
 \begin{figure}[h!]
   \centering
-  \includegraphics[width=.9\textwidth]{pic/events.png}
+  \includegraphics[width=.9\textwidth]{pic/events.pdf}
   \caption{Communication with triple buffer event deques.}
   \label{fig:triplebuf}
 \end{figure}
@@ -1080,9 +1080,9 @@ internal processing status to the user.
 
 \begin{figure}[t]
   \centering
-  \includegraphics[width=.9\textwidth]{pic/graph-ctl.pdf}
+  \includegraphics[width=.8\textwidth]{pic/graph-ctl.pdf}
   \caption{UML class diagram of the most important classes for the
-  control components.}
+    port components.}
 \label{fig:controls}
 \end{figure}
 
@@ -1092,21 +1092,438 @@ version. If you access the control through the control base access
 template method with a type \type{T} and actually \type{type ()}
 method returns \type{typeid (T)} for that control, then that object
 must be a typed control of type $T$; otherwise this is undefined
-behaviour. In practice, this means that you should never inherit from
+behaviour. In practice, this means that you must never inherit from
 \type{in\_control\_base} or \type{out\_control\_base} directly, but
 you should inherit from their typed versions instead.
 
 \subsection{Port components}
-
 \label{sec:modports}
 
-\subsection{Indirect object construction}
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\textwidth]{pic/graph-port.pdf}
+  \caption{UML class diagram of most important classes for the
+  control components.}
+\label{fig:ports}
+\end{figure}
 
+Figure \ref{fig:ports} shows the most relevant classes implementing
+the notion of \emph{ports}. There are two symmetric kinds of ports,
+input and output. Following the analysis in the first section, these
+ports are related in a one-to-many manner --- an output port may be
+connected to many input ports. These ports thus give the graph shape
+to the system of related nodes. As we can see in the diagram, concrete
+ports are parametrised over the signal type but a polymorphic
+interface exists providing its basic functionality. While this diagram
+is very similar to that describing the \emph{controls} in figure
+\ref{fig:controls}, ports have some added complexity and there are
+some extra classes that are worth mentioning.
+
+First, we have to distinguish between audio-rate and control-rate
+signals. Usually, we store audio-rate signals in sound buffers
+modelling the \type{BufferConcept} we developed in the previous
+chapter. These buffers should be able to allocate a whole bunch of
+\type{block\_size} frames; to enforce this invariant, some mechanism
+should react on process context update notifications to ensure that
+the buffer size matches the current processing block size. The
+\type{buffer\_out\_port} and \type{buffer\_in\_port} do this
+transparently to the user, but they impose a \type{BufferConcept}
+requirement on their type parameter $T$. For control rate signals,
+using a simple \type{in\_port} or \type{out\_port} suffices.
+
+Another important issue that we have to address is: how do we add
+ports to a patch? Note that the relation between components and nodes
+is somewhat static --- actually the port or control constructor takes
+care of establishing the relationship. We should expect that, like in
+most modular synthesis software, the user can arbitrarily manipulate
+which ports are exposed from within a patch. The most natural way of
+manipulating a patch is by manipulating nodes, thus, ports are exposed
+by a special kinds of concrete nodes like the ones in the \type{core}
+package in the diagram. The \type{patch} class detects whenever a port
+node is added and exposes it in its interface. An ``patch input port
+node'' would show as an input port in the patch that contains it, and
+the \emph{``port-name''} parameter of the node controls the name that
+the port has in the patch interface. The port node itself has an
+output port, that can be connected to any other node within the
+patch. A ``patch output port node'' works in the opposite way: it
+exposes an output port externally and an input port internally. These
+kind of nodes are implemented using the \emph{forwarding ports}, which
+allow implementing a sort of \emph{identity function} node without the
+overhead of copying the input into the output. When the output is
+requested, they just forward a reference to the input data.
+
+More problems arise when we consider that ports may be disconnected
+and reconnected at any point in time, a precondition for the high
+interactivity that we want to achieve with our system. As a matter of
+bad luck, it may happen that we disconnect a port just when the
+incoming sound signal is at a ``high'' value. Figure
+\ref{fig:soft-port-0} (a) represents the actual signal that is going
+through an hypothetical input port which is connected to a sinusoid
+generator and then suddenly disconnected. If this signal is emitted to
+the speakers, we would hear a very disruptive ``click'' noise at the
+point of disconnection because an instantaneous change can be consider
+of infinite frequency that the DAC in your sound card will just mess.
+
+\begin{figure}[t]
+  \centering 
+
+  \subfloat[A click is produced on a
+  disconnect.]{\includegraphics[width=.8\textwidth]{pic/soft-port-0.pdf}}
+  
+  \subfloat[Solution by delaying the actual disconnection and
+  enveloping the
+  signal.]{\includegraphics[width=.8\textwidth]{pic/soft-port-1.pdf}}
+  \caption{The problem of softening a signal disconnection.}
+\label{fig:soft-port-0}
+\end{figure}
+
+There are few ways to solve this problem. For example, the Audacity
+\footnote{\url{http://audacity.sourceforge.net/}} sound editor
+automatically modify selection edges on the sound wave slightly to the
+closest positive-slope zero crossing when the \emph{Find Zero
+  Crossings} option is enabled. In a similar way, we could delay a
+disconnection until the signal goes back naturally to zero.
+
+While we might implement that behaviour in the future to make it
+optionally available when it makes senses, we have implemented a bit
+more general solution that works sufficiently well even with LFO's
+where the former approach would introduce too much latency. Instead of
+waiting for the source signal to go back to zero, we directly apply a
+linear envelope that goes from 1 to 0 and only wait for the envelope
+to reach the 0. Figure \ref{fig:soft-port-0} (b) illustrates this
+effect. The length of the envelope is fixed and thus the latency
+introduced by the anti-click mechanism is deterministic and we can
+keep it as small as we want. The length of the envelope defaults to a
+conservative value of $4 ms$. The reasoning behind this is that in the
+worst case it would introduce a slope from 1 to 0 of length $4ms$,
+which if where a signal by itself would have a dominant frequency of
+$\sim 50 hz$ that lies around the low threshold that human hearing can
+perceive \cite{goldstein01sensation}. The actual artifacts that this
+mechanism may introduce in the general case are hard to analyse
+formally, but subjective experiments show that it introduces no
+noticeable defects on its own and eliminates the click artifact that
+we wanted to avoid. The \type{soft\_in\_port} implements this
+behaviour and the client can set the envelope length and the stable
+value --- wether the signal should fade out to 0, 1 or some other
+value --- to adapt this mechanism taking the actual nature of the
+expected input into account.
+
+Note that the envelope must be applied both on disconnection and
+connection, otherwise a disastrous situation like the one in figure
+\ref{fig:soft-port-1} (a) may occur. There, at the marked point in
+time the input port of the red signal is disconnected, but the same
+signal is connected back into a second port, represented in green. A
+dotted blue line show the sum of both the old port that is fading out
+and the new port. First of all, the click appears again at the new
+input end. Even worse, the total amplitude is unexpectedly big ---
+maybe even introducing clipping --- during the input signal
+fadeout. If we apply a rising envelope when a new connection is made
+with the same properties that we described previously, the result is
+more close to what the user would usually expect, as shown in
+\ref{fig:soft-port-1} (b).
+
+In the future we may change the linear envelope with an exponential
+envelope, which is suggested to have a better perceived accuracy
+\cite{boulanger10audio}. Also, it seems reasonable to use the second
+half of a Hann window\footnote{Like the one used to slice a signal
+  when applying the Short-time Fourier transform.} as envelope, as it
+is designed to produce low aliasing \cite{blackman59measurement}.
+
+\begin{figure}[t]
+  \centering 
+
+  \subfloat[A click and a power artifact is introduced because of
+  coupling a disconnection and a new
+  connection.]{\includegraphics[width=.8\textwidth]{pic/soft-port-2.pdf}}
+  
+  \subfloat[Solution by enveloping the new
+  connection.]{\includegraphics[width=.8\textwidth]{pic/soft-port-3.pdf}}
+  \caption{The problem of softening a signal connection.}
+\label{fig:soft-port-1}
+\end{figure}
+
+\subsubsection{The oscillator node example revisited}
+
+\begin{lstlisting}[float=h!,caption=The oscillator node implemented
+  using components,label=lst:nodeexample2]
+struct better_example_oscillator_node : public node
+{
+    buffer_out_port<mono32sf_buffer> out_output;
+    soft_in_port<mono32sf_buffer>    in_modulator;
+    
+    in_control<float> param_frequency;
+    in_control<float> param_amplitude;
+
+    better_example_oscillator_node ()
+        : out_output ("output", this)
+        , in_modulator ("modulator", this, 1.0f)
+        , param_frequency ("frequency", this, 440.0f)
+        , param_amplitude ("amplitude", this, 1.0f) {}
+
+protected:
+    void rt_do_process (rt_process_context& ctx)
+    {
+        _osc.set_frequency (param_frequency.rt_get ());
+        _osc.set_amplitude (param_amplitude.rt_get ());
+        _osc.update_fm (out_output.rt_out_range (),
+                        in_modulator.rt_in_range ());
+    }
+
+    void rt_on_context_update (rt_process_context& ctx)
+    { _osc.set_frame_rate (ctx.frame_rate ()); }
+
+    synth::oscillator<synth::sine_generator> _osc;
+};
+\end{lstlisting}
+
+We are now ready to devise a more realistic implementation of the
+oscillator node that we introduced in listing
+\ref{lst:nodeexample1}. The new code in listing \ref{lst:nodeexample2}
+shows that by using the new constructs that we built in this section,
+not only is the code safer and more extensible and featured, it is
+also clearer and more concise. This code introduces the
+\type{synth::oscillator} class (section \ref{sec:ns-synth}). Also,
+this oscillator allows frequency-modulation, this is, to vary the
+oscillator frequency using an optional input signal. We do not need to
+check whether the optional modulator is connected, because an input
+port with envelopment defaults to its \emph{stable value} when it is
+not connected.
+
+\subsection{Indirect object construction}
 \label{sec:graphfactory}
+
+In the presence of plug-ins, the main control flow of the program
+never gets to know at all the concrete type of some objects, and they
+are used only with its abstract interface. Even without plug-ins, it
+is quite convenient when writing a user interface to be able to choose
+the concrete type of an object dynamically --- identified by a
+run-time value like a integer or a string. The \emph{factory method}
+and \emph{abstract factory} design patterns coordinate to provide this
+feature \cite{gamma95design, vlissides98pattern}.
+
+We wrote the pattern as a set of reusable template classes, following
+``Modern C++ Design''s advice \cite{alexandrescu01modern}. We extended
+his implementation with improved safety when using smart pointers,
+decoupled abstract factories and methods, and customisable constructor
+signatures. Many times factories make more sense as \emph{singletons},
+and some of our factories ---restricted static factories--- can only
+be instantiated as a singleton.  The \type{base::singleton\_holder<T,
+  CreationPolicy, Lifetime\-Policy, Threading\-Policy>} may be used build
+a singleton type from any type $T$, offering control over the
+life-time of the object, its construction and the thread safety of the
+singleton access method. The interested reader can read the attached
+source code or the reference manual for further information on these
+classes.
+
+A singleton factory manager for creating nodes is defined as:
+\begin{lstlisting}
+typedef 
+base::restricted_global_factory_manager<std::string, node_ptr>
+node_factory;
+\end{lstlisting}
+
+The \type{self ()} method returns the singleton instance and then the
+\type{create (std::string id)} method returns a new instance wrapped
+in a safe shared pointer \type{node\_ptr} --- remember that this is an
+alias for \type{std::shared\_ptr<node>}. Creating a new instance thus
+does not require including the header that declares the concrete type,
+and it can be chosen based on a value determined by external
+input. For example, we can create an oscillator as simply as in:
+\begin{lstlisting}
+    node_ptr osc = node_factory::self ().create ("audio_sine_oscillator");
+\end{lstlisting}
+
+New types can be registered in the factory only by instantiating an
+instance of the \type{node\_factory::registrant<T>}; its constructor
+takes the name that should identify the type. It is good suited to
+register a type before the \type{main ()} function starts when
+instantiated as a global variable. The following macros easy this use:
+
+\begin{lstlisting}
+#define PSYNTH_REGISTER_NODE_STATIC(node_type) \
+    static ::psynth::graph::node_factory::registrant<node_type> \
+    node_type ## _registrant_ (#node_type);
+
+#define PSYNTH_REGISTER_NODE_STATIC_AS(node_type, node_name) \
+    static ::psynth::graph::node_factory::registrant<node_type> \
+    node_type ## _registrant_ (node_name);
+\end{lstlisting}
+ 
+To register the node that we defined in listing
+\ref{lst:nodeexample2}, we would write in its \type{.cpp}
+implementation file at global scope:
+\begin{lstlisting}
+  PSYNTH_REGISTER_NODE_STATIC(better_example_oscillator_node);
+\end{lstlisting}
+
+This mechanism can be used as a primitive plug-in system. If we open a
+shared library file (e.g a \type{.so} file in GNU/Linux) using the
+Unix \type{dlopen ()} function it would automatically instantiate the
+any global registrant and we could already instantiate those objects
+passing their name as a string to the factory. Indeed, some authors
+propose this mechanism for dynamic loading of C++ classes
+\cite{norton00dynamic, beveridge98self}. However, a practical plug-in
+system must be a bit more sophisticated to do proper versioning, ease
+metadata access and put the main program ---an not the plug-in ---
+into control of the registration \footnote{In these slides we discuss
+  the tricky corners of implementing a plug-in system in C; a lot of
+  what it states applies to C++:
+
+\url{http://colinaroja.org/files/charla_c.pdf}}.
 
 \subsection{Going Model-View-Controller}
 
+So far, we have concentrated on devising the core of the audio
+processing engine. At some point, we will need to write user
+interfaces --- indeed, we already have written a 3D experimental user
+interface and a command line user interface that can inter-operate
+over the network, and we have plans to build a custom user interface
+for tangible devices and another one for multi-touch pads. These user
+interfaces deserve a whole project on their own; as our objective main
+objective states (section \ref{sec:mainobjective}), we shall
+concentrate on the basic framework \emph{enabling} and supporting the
+rapid development of these interfaces. For this purpose, requirement
+\ref{req:views} suggests that we provide the hooks to independently
+write collaborating views.
+
+The Model-View-Controller, which is often regarded as an architecture,
+sometimes a pattern, or in its original paper as \emph{paradigm}
+\cite{krasner88mvc}, provides the basic structure that we shall
+implement to satisfy requirement \ref{req:views}. When decoupling a
+system into a MVC arquitecture, there is this simple guideline, quoted
+in a software arquitects wiki as \emph{the best rubric
+  ever}:\footnote{\url{http://c2.com/cgi/wiki?ModelViewController}}
+\begin{quote}
+  ``We need \emph{smart} models, \emph{thin} controllers, and
+  \emph{dumb} Views''
+\end{quote}
+This translates in our system as the following:
+
+\begin{description}
+\item[Model] Our core of our model is the synthesis network, this is,
+  a \type{patch} and related classes. These classes maintain the
+  invariants and do the work in processing the sound.
+
+  However, the \type{patch} class is not suitable as a model by
+  itself. One of the main properties of a model is that it should be
+  \emph{observable}. This means that it should use some
+  \emph{inversion of control} mechanism to notify the views on any
+  externally visible change of its state. This is usually an instance
+  of the \emph{observer} design pattern \cite{gamma95design,
+    vlissides98pattern}. A separate set of classes wrap the
+  \type{psynth::graph} layer providing this observable interface ---
+  we call this the \type{psynth::world} layer, that should be renamed
+  in the next iteration as the \type{psynth::model} layer. Figure
+  \ref{fig:world} gives an overview of this layer. Observability is
+  decoupled from the graph layer itself because (1) we get an extra
+  design indirection that allows API flexibility in the fast
+  developing graph layer and (2) avoids the sometimes significant
+  overhead and bookkeeping that the observable interface requires
+  enabling the usage of the graph layer in isolation where no flexible
+  UI's are required, in embedded systems or integrated in some other
+  third party system.
+
+\item[Views] Views react to the model events producing, usually,
+  visible side-effects in the real-world. Note that this notion of
+  view is abstract and does not necessarily imply producing a visual
+  representation of the model. An example of such a view is the
+  component that sends network events in reaction to local changes to
+  keep remote synthesisers synchronised. The \type{psynth::net}
+  implements views and controllers required for network
+  synchronisation, using the OSC protocol \cite{center03osc}. Another
+  example of view maintains a 3D visual representation of the
+  synthesis state and is implemented in the \type{gui3d} module.
+
+\item[Controllers] Controllers are usually what glues views and models
+  together. They are usually do not require any special pattern or
+  indirection; controllers are the set of objects that invoke mutating
+  actions on the model. Because the observer pattern is used to notify
+  the views, controller-view pairs are completely independent of
+  each-other and each works should properly regardless or whatever
+  views or controllers are also registered in the model. This clearly
+  simplifies the implementation of a user interface or a network
+  synchronisation system in a completely orthogonal and optional
+  manner.
+\end{description}
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=\textwidth]{pic/world.pdf}
+  \caption{UML class diagram of the \type{world} layer.}
+  \label{fig:world}
+\end{figure}
+
+As we explain in section \ref{sec:graph-integration} integration
+of the new graph layer in the rest of the system has not been done
+already. This means that the work of modifying the \emph{world layer}
+to use the new system is yet to be accomplished. Because the views and
+controllers \emph{never} use the graph layer API directly, but they
+call the methods provided by the \type{world} and related classes
+instead, once this is done the current user interfaces and networking
+modules would require no modification.
+
+The world layer hides directly manipulating the synthesis graph in its
+public API and delegates the topology management to a \type{patcher}
+derivative. This implements the \emph{strategy} design pattern,
+because the \emph{patcher} can be of different kinds --- e.g. dynamic,
+manual, etc. The \emph{dynamic patcher} arranges the network such that
+closest compatible connections are established.
+
+%% Esta descripción es muy formal y queda bonita pero tiene fallos!!!!!
+%
+% Let $I$ and $O$ be the set of all input and output ports of all nodes
+% in a patch, we can define the graph $G = (V, E)$ where the vertex set
+% is $V = I \cup O$, and the edges is $E = \{ (i, o) \mid i \in I \land
+% o \in O \land type(i) = type(o) \land node (i) \neq node (o) \}$ that
+% contains all the possible connections in the graph. Let $distance (a,
+% b)$ be a function that maps two ports to the physical distance in
+% their visual representation, the dynamic patcher produces a subgraph
+% determined by:
+% \begin{align*}E' = \{  (i, o) \mid & (i, o) \in E, \\
+% & \forall i'. (i', o) \in E' \Rightarrow i' = i, \\
+% & \forall o'. (i, o') \in E' \Rightarrow i = o', \\
+% & \forall i'. (i', o) \in E \Rightarrow distance (i', o) \geq
+% distance (i, o) \lor \exists o'. (i', o') \in E', \\
+% & \not \exists (i', o') \in E'. node (o') = node (i) \land node (i') =
+% node (o)
+% \}
+% \end{align*}
+
+The graph is connected constraining port connectivity in a one-to-one
+fashion using distance as criterion to choose connections among the
+possibilities and avoiding cycles. It would look a lot like the
+\emph{minimum spanning tree} of the graph constructed by nodes and all
+possible connections and edges weighted on the spatial distance of the
+interconnecting nodes in the visual representation. In fact the
+problem is almost an instance of the dynamic MST problem
+\cite{spira75dmst} which can handle fast a recomputation of the MST
+when a small update of the input data happens --- e.g. the weight of
+one edge changes, for example, when moving an node.
+
+The main impediment to trivially adapt the world layer to use the new
+graph layer is the \emph{dynamic patcher}, because it uses a matrix
+based on static information about all possible nodes. This static
+information is no longer available and dynamic metadata is provided
+instead to ease implementing a plug-in system, as we long discussed in
+this chapter. We will delay adapting the dynamic patcher until the
+plug-in system is fully implemented in order to avoid rewriting it in
+the presence of unexpected API changes.
+
+
 \section{Validation}
+
+\subsection{Unit testing}
+\label{sec:sound-unittest}
+
+Most of the reasoning favouring the implementation of unit
+tests in section \ref{sec:sound-unittest} applies here. However, there
+are much less unit tests in this chapter.
+
+\subsection{Performance}
+
+\cite{knuth74structured}
+
+\subsection{Integration}
+\label{sec:graph-integration}
 
 \section{Conclusion}
 
