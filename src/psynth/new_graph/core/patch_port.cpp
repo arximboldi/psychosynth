@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-18 22:36:15 raskolnikov>
+ *  Time-stamp:  <2011-06-28 12:43:32 raskolnikov>
  *
  *  @file        patch_port.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -73,7 +73,7 @@ void port_name_control<Base>::set (const std::string& name)
         auto& port  = node.patch_port ();
         auto old    = port.name ();
             
-        patch.unregister_component (port); // Thus must not fail
+        patch.unregister_component (port); // This must not fail
         auto guard = base::make_guard ([&] {
                 port._set_name (old);
                 patch.register_component (port);

@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-13 17:49:43 raskolnikov>
+ *  Time-stamp:  <2011-06-27 22:54:18 raskolnikov>
  *
  *  @file        triple_buffer.tpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -65,7 +65,7 @@ double_buffer<B, G>::double_buffer (B&& x1, B&& x2)
 template <class B, class G>
 bool double_buffer<B, G>::flip_back ()
 {
-    auto g = _back_lock.guard ();
+    auto g = _back_lock.default_guard ();
     if (g.owns_lock ())
     {
         std::swap (_back, _front);
@@ -99,7 +99,7 @@ triple_buffer<B, GB, GL>::triple_buffer (B&& x1, B&& x2, B&& x3)
 template <class B, class GB, class GL>
 bool triple_buffer<B, GB, GL>::flip_local ()
 {
-    auto g = _local_lock.guard ();
+    auto g = _local_lock.default_guard ();
     if (g.owns_lock ())
     {
         std::swap (_local, this->_front);

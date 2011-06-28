@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-25 23:39:20 raskolnikov>
+ *  Time-stamp:  <2011-06-27 22:58:18 raskolnikov>
  *
  *  @file        control.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -81,6 +81,8 @@ public:
 protected:    
     control_base (const std::string& name, node* owner);
 
+    bool _has_owner () const { return _owner != 0; }
+    
 protected:
     std::string _name;
     node*       _owner;
@@ -210,14 +212,16 @@ public:
     virtual const T& rt_get () const
     { return _rt_value; }
 
-    T get () const;
+    const T& get () const;
     
     void rt_set (const T& val, rt_process_context& ctx);
     
 protected:
     out_control_impl (const std::string& name, node* owner, T val)
         : typed_out_control_base<T> (name, owner)
-        , _value (val), _rt_value (val) {}
+        , _ret_value (val)
+        , _value (val)
+        , _rt_value (val) {}
 
 private:
     struct async_update_event : public async_event
@@ -231,10 +235,11 @@ private:
     };
 
     friend class async_update_event;
-    
+
+    mutable T _ret_value;
     T _value;
     T _rt_value;
-    std::mutex _mutex;
+    mutable std::mutex _mutex;
 };
 
 } /* namespace detail */
@@ -251,7 +256,7 @@ class out_control : public detail::out_control_impl<
         T, std::is_fundamental<T>::value> impl_base;
 
 public:
-    out_control (const std::string& name, const T& value=T(), node* owner=0)
+    out_control (const std::string& name, node* owner=0, const T& value=T())
         : impl_base (name, owner, value) {}
     
     const control_meta& meta () const 
@@ -317,10 +322,12 @@ private:
     bool _is_updated;
 };
 
+extern template class in_control<std::string>;
 extern template class in_control<float>;
 extern template class in_control<int>;
 extern template class in_control<bool>;
 
+extern template class out_control<std::string>;
 extern template class out_control<float>;
 extern template class out_control<int>;
 extern template class out_control<bool>;

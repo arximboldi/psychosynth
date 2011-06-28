@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-18 22:00:12 raskolnikov>
+ *  Time-stamp:  <2011-06-28 17:52:48 raskolnikov>
  *
  *  @file        patch_port.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -55,9 +55,17 @@ protected:
 
 typedef std::shared_ptr<patch_in_port_base> patch_in_port_base_ptr;
 
+struct patch_output_hook_tag;
+typedef boost::intrusive::list_member_hook<
+    boost::intrusive::tag<patch_output_hook_tag>
+    >
+patch_output_hook;
+
 class patch_out_port_base : public node
 {
 public:
+    patch_output_hook _patch_output_hook;
+    
     virtual out_port_base& patch_port () = 0;
 
 protected:
@@ -139,7 +147,7 @@ public:
     { return _forward_port; }
     
 private:
-    detail::port_name_control<patch_in_port_base> _ctl_port_name;
+    detail::port_name_control<patch_out_port_base> _ctl_port_name;
     ForwardPort _forward_port;
 };
 

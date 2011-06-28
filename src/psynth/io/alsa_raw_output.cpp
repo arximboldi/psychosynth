@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-07 19:10:27 raskolnikov>
+ *  Time-stamp:  <2011-06-28 15:39:08 raskolnikov>
  *
  *  @file        alsa_raw_output.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -55,7 +55,7 @@ alsa_raw_output::alsa_raw_output (const char*       device,
                                   unsigned int      rate,
                                   unsigned int      channels,
                                   callback_type     cb)
-    : thread_async (cb)
+    : thread_async (cb, true)
     , _buffer_size (buffer_size)
 {
     

@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-25 23:27:05 raskolnikov>
+ *  Time-stamp:  <2011-06-28 12:20:13 raskolnikov>
  *
  *  @file        port.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -91,6 +91,7 @@ private:
 
 struct out_port_referee_hook_tag;
 typedef boost::intrusive::list_member_hook<
+    boost::intrusive::link_mode<boost::intrusive::auto_unlink>,
     boost::intrusive::tag<out_port_referee_hook_tag>
     >
 out_port_referee_hook;
@@ -145,6 +146,7 @@ class out_port_base : public port_base
     typedef std::list<in_port_base*> reference_list;
     typedef boost::intrusive::list<
         in_port_base,
+        boost::intrusive::constant_time_size<false>,
         boost::intrusive::member_hook<
             in_port_base,
             out_port_referee_hook,

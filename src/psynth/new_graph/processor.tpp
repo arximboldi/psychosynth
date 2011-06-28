@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-14 20:29:13 raskolnikov>
+ *  Time-stamp:  <2011-06-28 18:47:39 raskolnikov>
  *
  *  @file        processor.tpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -62,22 +62,23 @@ bool async_process_context::push_rt_event (Args&&... args)
 }
 
 template <class Event, typename... Args>
-bool rt_process_context::push_event (Args&&... args)
+bool rt_process_context::push_async_event (Args&&... args)
 {
     return _async_buffers.back ().push_back<Event> (
         std::forward<Args> (args) ...);
 }
 
 template <class Event, typename... Args>
-bool user_process_context::push_event (Args&&... args)
+bool user_process_context::push_async_event (Args&&... args)
 {
     auto g = _async_buffers.local_policy ().guard ();
     return _async_buffers.local ().push_back<Event> (
         std::forward<Args> (args) ...);
+    _async_cond.notify_all ();
 }
 
 template <class Event, typename... Args>
-bool async_process_context::push_event (Args&&... args)
+bool async_process_context::push_async_event (Args&&... args)
 {
     auto g = _async_buffers.local_policy ().guard ();
     return _async_buffers.local ().push_back<Event> (

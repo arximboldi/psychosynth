@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-17 12:02:28 raskolnikov>
+ *  Time-stamp:  <2011-06-28 17:54:42 raskolnikov>
  *
  *  @file        patch.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -38,6 +38,7 @@
 
 #include <psynth/new_graph/node.hpp>
 #include <psynth/new_graph/core/patch_fwd.hpp>
+#include <psynth/new_graph/core/patch_port.hpp>
 
 namespace psynth
 {
@@ -60,7 +61,15 @@ public:
             patch_child_hook,
             &node::_patch_child_hook> >
     rt_child_list;
-    
+
+    typedef boost::intrusive::list<
+        patch_out_port_base,
+        boost::intrusive::member_hook<
+            patch_out_port_base,
+            patch_output_hook,
+            &patch_out_port_base::_patch_output_hook> >
+    rt_output_list;
+
     typedef child_list::iterator child_iterator;
     typedef child_list::const_iterator child_const_iterator;
     typedef boost::iterator_range<child_iterator> child_range;
@@ -83,6 +92,7 @@ public:
     child_const_range cchilds () const
     { return boost::make_iterator_range (_childs); }
 
+    
     rt_child_range rt_childs ()
     { return boost::make_iterator_range (_rt_childs); }
     rt_child_const_range rt_cchilds () const
@@ -91,7 +101,7 @@ public:
 protected:
     child_list _childs;
     rt_child_list _rt_childs;
-    child_list _rt_outputs;
+    rt_output_list _rt_outputs;
 };
 
 } /* namespace core */

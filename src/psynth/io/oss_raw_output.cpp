@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-07 19:13:56 raskolnikov>
+ *  Time-stamp:  <2011-06-28 15:39:18 raskolnikov>
  *
  *  @file        oss_raw_output.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -61,7 +61,7 @@ oss_raw_output::oss_raw_output (const char* device,
                                 int         rate,
                                 int         channels,
                                 callback_type cb)
-    : thread_async (cb)
+    : thread_async (cb, true)
     , _frame_size (sample_size * channels)
     , _buffer_size (buffer_size)
 {

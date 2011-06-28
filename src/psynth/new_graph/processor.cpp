@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-24 16:48:45 raskolnikov>
+ *  Time-stamp:  <2011-06-28 18:54:58 raskolnikov>
  *
  *  @file        processor.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -60,6 +60,7 @@ basic_process_context::basic_process_context (std::size_t block_size,
                       async_event_deque (queue_size))
     , _block_size (block_size)
     , _frame_rate (frame_rate)
+    , _async_request_flip (false)
 {
 }
 
@@ -69,7 +70,6 @@ processor::processor (core::patch_ptr root,
                       std::size_t queue_size)
     : _root (root ? root : core::new_patch ())
     , _ctx (block_size, frame_rate, queue_size)
-    , _async_request_flip (false)
     , _is_running (false)
 {
     _explore_node_add (_root);
@@ -86,7 +86,7 @@ void processor::start ()
     if (_is_running)
         throw processor_not_idle_error ();
     _is_running = true;
-    _async_thread = std::thread (
+    _ctx._async_thread = std::thread (
         std::bind (&processor::_async_loop, this));
     for (auto& n : _procs)
         n->start ();
@@ -101,38 +101,36 @@ void processor::stop ()
         n->stop ();
     
     {
-        std::unique_lock<std::mutex> g (_async_mutex);
-        _async_request_flip = false;        
+        std::unique_lock<std::mutex> g (_ctx._async_mutex);
         _is_running = false;
-        _async_cond.notify_all ();
+        _ctx._async_cond.notify_all ();
     }
     
-    if (_async_thread.joinable ())
-        _async_thread.join ();
+    if (_ctx._async_thread.joinable ())
+        _ctx._async_thread.join ();
 }
 
 void processor::_async_loop ()
 {
-    while (_is_running)
+    while (_is_running || // HACK!!!!
+           !_ctx._async_buffers.local ().empty ())
     {
-        {
-            std::unique_lock<std::mutex> g (_async_mutex);
-            for (auto& ev : _ctx._async_buffers.front ())
-                ev (_ctx);
-            _ctx._async_buffers.front ().clear ();
-            _async_request_flip = true;
-        }
-        
+        std::unique_lock<std::mutex> g (_ctx._async_mutex);
+
+        for (auto& ev : _ctx._async_buffers.front ())
+            ev (_ctx);
+        _ctx._async_buffers.front ().clear ();
+        _ctx._async_request_flip = true;
+            
         _ctx._async_buffers.flip_local ();
         for (auto& ev : _ctx._async_buffers.front ())
             ev (_ctx);
         _ctx._async_buffers.front ().clear ();
-
-        {
-            std::unique_lock<std::mutex> g (_async_mutex); 
-            while (_async_request_flip)
-                _async_cond.wait (g);
-        }
+            
+        while (_ctx._async_request_flip &&
+               _ctx._async_buffers.local ().empty () &&
+               _is_running)
+            _ctx._async_cond.wait (g);
     }
 }
 
@@ -180,12 +178,13 @@ void processor::_rt_process_once ()
         ev (_ctx);
     _ctx._rt_buffers.front ().clear ();
         
-    std::unique_lock<std::mutex> g (_async_mutex, std::try_to_lock);
-    if (g.owns_lock () && _async_request_flip)
+    std::unique_lock<std::mutex> g (_ctx._async_mutex, std::try_to_lock);
+    if (g.owns_lock () && _ctx._async_request_flip &&
+        !_ctx._async_buffers.back ().empty ())
     {
+        _ctx._async_request_flip = false;
         _ctx._async_buffers.flip_back ();
-        _async_request_flip = false;
-        _async_cond.notify_all ();
+        _ctx._async_cond.notify_all ();
     }
 }
 

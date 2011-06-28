@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-20 16:36:08 raskolnikov>
+ *  Time-stamp:  <2011-06-28 15:26:52 raskolnikov>
  *
  *  @file        thread_async.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -44,7 +44,11 @@ class thread_async : public detail::async_base_impl
 public:
     typedef detail::async_base_impl::callback_type callback_type;
     
-    thread_async (callback_type cb) : detail::async_base_impl (cb) {} 
+    thread_async (callback_type cb, bool realtime = false)
+        : detail::async_base_impl (cb)
+        , _realtime (realtime)
+    {}
+    
     ~thread_async () { soft_stop (); }
     
     void start ();
@@ -55,6 +59,9 @@ protected:
     virtual void iterate () {}
     
 private:
+    void _request_rt ();
+
+    bool        _realtime;
     std::thread _thread;
 };
 

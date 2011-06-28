@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-18 23:34:42 raskolnikov>
+ *  Time-stamp:  <2011-06-28 18:48:08 raskolnikov>
  *
  *  @file        processor.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -99,6 +99,12 @@ protected:
     
     std::size_t _block_size;
     std::size_t _frame_rate;
+    
+    // FIXME: Factor the related functions a bit
+    std::thread             _async_thread;
+    std::condition_variable _async_cond;
+    std::mutex              _async_mutex;
+    bool                    _async_request_flip;
 
     friend class processor;
 };
@@ -110,7 +116,7 @@ public:
     bool push_rt_event (Args&&... args);
 
     template <class Event, typename... Args>
-    bool push_event (Args&&... args);
+    bool push_async_event (Args&&... args);
 
     template <class Concrete>
     bool push_rt_event (Concrete&& arg)
@@ -122,9 +128,9 @@ public:
     }
 
     template <class Concrete>
-    bool push_event (Concrete&& arg)
+    bool push_async_event (Concrete&& arg)
     {
-        return this->push_event<
+        return this->push_async_event<
             typename std::decay<Concrete>::type,
             decltype (std::forward<Concrete> (arg))> (
                 std::forward<Concrete> (arg));
@@ -151,7 +157,7 @@ public:
     bool push_rt_event (Args&&... args);
 
     template <class Event, typename... Args>
-    bool push_event (Args&&... args);
+    bool push_async_event (Args&&... args);
 
     template <class Concrete>
     bool push_rt_event (Concrete&& arg)
@@ -163,9 +169,9 @@ public:
     }
 
     template <class Concrete>
-    bool push_event (Concrete&& arg)
+    bool push_async_event (Concrete&& arg)
     {
-        return this->push_event<
+        return this->push_async_event<
             typename std::decay<Concrete>::type,
             decltype (std::forward<Concrete> (arg))> (
                 std::forward<Concrete> (arg));
@@ -188,7 +194,7 @@ public:
     bool push_rt_event (Args&&... args);
 
     template <class Event, typename... Args>
-    bool push_event (Args&&... args);
+    bool push_async_event (Args&&... args);
 
     template <class Concrete>
     bool push_rt_event (Concrete&& arg)
@@ -200,9 +206,9 @@ public:
     }
 
     template <class Concrete>
-    bool push_event (Concrete&& arg)
+    bool push_async_event (Concrete&& arg)
     {
-        return this->push_event<
+        return this->push_async_event<
             typename std::decay<Concrete>::type,
             decltype (std::forward<Concrete> (arg))> (
                 std::forward<Concrete> (arg));
@@ -221,12 +227,13 @@ class full_process_context : public rt_process_context
                            , public async_process_context
                            , public user_process_context
 {
-private:
+// private:
+public: // Eases unit testing!
     friend class processor;
     
-    full_process_context (std::size_t block_size,
-                          std::size_t frame_rate,
-                          std::size_t queue_size)
+    full_process_context (std::size_t block_size = 1 << 6,
+                          std::size_t frame_rate = 44100,
+                          std::size_t queue_size = 1 << 10)
         : basic_process_context (block_size, frame_rate, queue_size)
         , rt_process_context (block_size, frame_rate, queue_size)
         , async_process_context (block_size, frame_rate, queue_size)
@@ -290,11 +297,6 @@ private:
     sink_node_list          _sinks; // Readed from rt-threads.
     
     full_process_context    _ctx;
-
-    std::thread             _async_thread;
-    std::condition_variable _async_cond;
-    std::mutex              _async_mutex;
-    bool                    _async_request_flip;
 
     std::mutex              _rt_mutex;
     

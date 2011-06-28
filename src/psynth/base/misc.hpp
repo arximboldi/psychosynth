@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-23 01:04:38 raskolnikov>
+ *  Time-stamp:  <2011-06-28 17:09:57 raskolnikov>
  *
  *  @file        misc.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -38,6 +38,12 @@ namespace psynth
 {
 namespace base
 {
+
+template <class T>
+inline T clamp (T x, T min, T max)
+{
+    return std::min (max, std::max (min, x));
+}
 
 /**
  * Returns the sign of a number or zero if zero.

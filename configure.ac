@@ -43,7 +43,7 @@ CXXFLAGS="${CXXFLAGS} -std=c++0x "
 
 AC_ARG_ENABLE([gprof], 
 		[AC_HELP_STRING([--enable-gprof],
-	        [enable fprof [default=disabled] ])],
+	        [enable gprof [default=disabled] ])],
 		[CXXFLAGS="${CXXFLAGS} -pg"], [])
 
 AC_ARG_ENABLE([debug], 

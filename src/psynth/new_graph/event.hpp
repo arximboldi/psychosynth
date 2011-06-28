@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-13 19:21:45 raskolnikov>
+ *  Time-stamp:  <2011-06-27 20:34:53 raskolnikov>
  *
  *  @file        event.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -78,7 +78,7 @@ fn_rt_event<Fn> make_rt_event (Fn&& f)
 template <class Fn>
 fn_async_event<Fn> make_async_event (Fn&& f)
 {
-    return fn_rt_event<Fn> (f);
+    return fn_async_event<Fn> (f);
 }
 
 } /* namespace graph */

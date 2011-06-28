@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-11 17:29:00 raskolnikov>
+ *  Time-stamp:  <2011-06-28 22:30:27 raskolnikov>
  *
  *  @file        thread_async.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -28,7 +28,15 @@
  *
  */
 
+#define PSYNTH_MODULE_NAME "psynth.io.thread_async"
+
+#include "base/logger.hpp"
 #include "thread_async.hpp"
+
+#if __GTHREADS
+#include <pthread.h>
+#include <string.h>
+#endif
 
 namespace psynth
 {
@@ -52,8 +60,29 @@ void thread_async::stop ()
 
 void thread_async::run ()
 {
+    if (_realtime)
+        _request_rt ();
     while (state () == async_state::running)
         iterate ();
+}
+
+void thread_async::_request_rt ()
+{
+#if __GTHREADS
+    auto hdl = _thread.native_handle ();
+    sched_param p;
+    p.sched_priority = 1;
+    auto ret = pthread_setschedparam (hdl, SCHED_FIFO, &p);
+    
+#ifndef PSYNTH_NO_LOG_RT_REQUEST
+    if (ret)
+        PSYNTH_LOG << base::log::warning
+                   << "Could not set RT priority: "
+                   << strerror (ret);
+    else
+        PSYNTH_LOG << "Thread running in RT priority.";
+#endif
+#endif
 }
 
 } /* namespace io */

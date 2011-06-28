@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-27 00:11:30 raskolnikov>
+ *  Time-stamp:  <2011-06-28 18:05:09 raskolnikov>
  *
  *  @file        node.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -41,7 +41,7 @@
 #include <psynth/new_graph/exception.hpp>
 
 #include <psynth/new_graph/core/patch_fwd.hpp>
-#include <psynth/new_graph/processor_fwd.hpp>
+#include <psynth/new_graph/processor.hpp>
 #include <psynth/new_graph/node_fwd.hpp>
 #include <psynth/new_graph/control_fwd.hpp>
 #include <psynth/new_graph/port_fwd.hpp>
@@ -170,7 +170,11 @@ public:
             throw node_attachment_error ();
     }
 
+    template <class Fn>
+    void execute_rt (const Fn& fn);
+    
 private:
+    
     virtual void rt_on_context_update (rt_process_context& ctx) {}
     virtual void rt_do_process (rt_process_context& ctx) {}
     
@@ -196,15 +200,30 @@ node_factory;
 #define PSYNTH_REGISTER_NODE_STATIC_AS(node_type, node_name)            \
     static ::psynth::graph::node_factory::registrant<node_type> node_type ## _registrant_ (node_name);
 
+template <class Fn>
+void node::execute_rt (const Fn& fn)
+{
+    if (is_attached_to_process () &&
+        process ().is_running ())
+    {
+        auto& ctx = process ().context ();
+        ctx.push_rt_event (make_rt_event ([fn] (rt_process_context&) {
+                    fn ();
+                }));
+    }
+    else
+        fn ();
+}
+
 } /* namespace graph */
 
-    namespace base
-    {
+namespace base
+{
 
-    extern template class
-    base::restricted_global_factory_manager<std::string, graph::node_ptr>;
+extern template class
+base::restricted_global_factory_manager<std::string, graph::node_ptr>;
 
-    } /* namespace base */
+} /* namespace base */
 
 } /* namespace psynth */
 

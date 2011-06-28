@@ -1666,6 +1666,18 @@ expected to have a time $O(n)$, where $n$ is the number of requested
 samples, not block, perform no system calls and allocate no dynamic
 memory.
 
+The \type{thread\_async} class uses a thread to provide this kind of
+asynchronous operation by and delegates the actual iteration inside an
+infinite loop to the derived classes. Optionally, this class will try
+to get real-time priority if requested\footnote{The \type{std::thread}
+  standard class does not support priority changing. We use its
+  \type{native\_handle} hook to request the new priority when POSIX
+  threads is the underlying implementation. At this moment, we do not
+  support real-time priority on other platforms.}. We do actually
+request real-time priority in all the I/O devices based on the
+\type{thread\_async} class.
+
+
 \subsubsection{Raw I/O}
 
 Most device management code does not depend on the audio format type,
@@ -1727,11 +1739,10 @@ metaprograms we need to ensure that all ``instantiation paths'' ---
 i.e. code paths of the metaprogram --- compile without errors and lead
 to correct execution.
 
-\todo{Recordar actualizar esto si más adelante se añaden pruebas por
-  lo que sea} The modules described in this chapter are evaluated with
+The modules described in this chapter are evaluated with
 a total 223 unit tests. All of them pass with a total of 1478
 successful assertions. Note \ref{note:gistests} includes a more
-detailed summary of the test cases involving these modules. Not all of
+detailed summary of the test suites involving these modules. Not all of
 those unit tests have been written manually. Using
 \type{BOOST\_UNIT\_TEST\_TEMPLATE} once can define a parametrised over
 a type and that is later instantiated for every type in a given MPL
@@ -1746,8 +1757,9 @@ combinatorial explosion of code to test all instantiation paths.
 \label{note:gistests}
 The user can run the unit tests by herself by running \texttt{make
   check} or running the \texttt{psynth\_unit\_tests} in the
-\texttt{src/test} folder.
-{\small
+\texttt{src/test} folder.  This kind of report may be generated
+passing the \verb|--report=detailed| parameter when running the test
+script directly.  {\small
 \begin{verbatim}
 Test suite "io_input_test_suite" passed with:
   177 assertions out of 177 passed
@@ -1786,6 +1798,7 @@ Test suite "sound_sample_test_suite" passed with:
 \end{mynote}
 
 \subsection{Performance}
+\label{sec:sound-performance}
 
 We claimed that static polymorphism and optimal algorithm selection
 via template metaprogramming allow genericity with no overhead over

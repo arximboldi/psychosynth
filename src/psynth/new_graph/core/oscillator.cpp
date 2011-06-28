@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-18 21:26:04 raskolnikov>
+ *  Time-stamp:  <2011-06-28 17:57:18 raskolnikov>
  *
  *  @file        oscillator.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>

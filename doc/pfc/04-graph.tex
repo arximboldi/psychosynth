@@ -1514,13 +1514,305 @@ the presence of unexpected API changes.
 \subsection{Unit testing}
 \label{sec:sound-unittest}
 
-Most of the reasoning favouring the implementation of unit
-tests in section \ref{sec:sound-unittest} applies here. However, there
-are much less unit tests in this chapter.
+Most of the reasoning favouring the implementation of unit tests in
+section \ref{sec:sound-unittest} applies here. Note
+\ref{note:graph-test} shows a briefing of the test suite results for
+the modules described in this chapter. Note that some suites in the
+\type{base} layer that where developed as support for this module are
+resented there too --- like, for example, generic singletons,
+factories and heterogeneous deques.
+
+\begin{mynote}[\texttt{psynth::graph} and some \texttt{psynth::base}
+  unit tests]
+\label{note:graph-test}
+The user can run the unit tests by herself by running \texttt{make
+  check} or running the \texttt{psynth\_unit\_tests} in the
+\texttt{src/test} folder. This kind of report may be generated passing
+the \verb|--report=detailed| parameter when running the test script
+directly.  {\small
+\begin{verbatim}
+Test suite "c3_class_test_suite" passed with:
+  10 assertions out of 10 passed
+  10 test cases out of 10 passed
+
+Test suite "base_exception_test_suite" passed with:
+  16 assertions out of 16 passed
+  4 test cases out of 4 passed
+
+Test suite "base_hetero_deque_test_suite" passed with:
+  87 assertions out of 87 passed
+  9 test cases out of 9 passed
+
+Test suite "base_factory_test_suite" passed with:
+  8 assertions out of 8 passed
+  4 test cases out of 4 passed
+
+Test suite "graph_processor_test_suite" passed with:
+  23 assertions out of 23 passed
+  9 test cases out of 9 passed
+
+Test suite "graph_core_test_suite" passed with:
+  1 assertion out of 1 passed
+  1 test case out of 1 passed
+
+Test suite "graph_port_test_suite" passed with:
+  1 assertion out of 1 passed
+  1 test case out of 1 passed
+
+Test suite "graph_control_test_suite" passed with:
+  36 assertions out of 36 passed
+  12 test cases out of 12 passed
+
+Test suite "graph_patch_test_suite" passed with:
+  24 assertions out of 24 passed
+  4 test cases out of 4 passed
+\end{verbatim}
+}
+\end{mynote}
 
 \subsection{Performance}
 
-\cite{knuth74structured}
+Quoting Donal Knuth is the best way to illustrate current trends
+towards software optimisation \cite{knuth74structured}:
+\begin{quote}
+  \it Premature optimisation is the root of all evil.
+\end{quote}
+
+The reasoning behind this phrase is that micro-optimising every single
+part of our code is futile. It does not lead to faster programs,
+instead, doing so increases the complexity of the code, leading to
+subtle bugs and making harder, if not impossible, to later redesign
+the code to implement better algorithms that would give a much larger
+performance boost. A much better methodology suggests to concentrate
+on program correctness. When the program have been validated,
+\emph{profiling} provides a way to detect, empirically, what parts of
+the program are consuming most time. Then, if needed, we can optimise
+does slow parts, which usually are deep in the call graph inside the
+most nested loops.
+
+We developed a program that, we believe, is a good stress test for our
+system and executes most relevant code paths of our system. This
+program runs the synthesis graph in figure \ref{fig:perfgraph} for 10
+seconds and generates the following events:
+\begin{itemize}
+\item Every $100 ms$ it randomly changes the value of all the
+  oscillators in the graph.
+\item Every second it randomly connects or disconnects the connection
+  between the modulators and the generators.  
+\end{itemize}
+
+The program source code is in the
+\type{src/test/examples/graph\_perf.cpp} file. The high amount of user
+events stresses the synchronisation channels to find potential
+implementation problems. It also has enough nodes to check if graph
+traversal consumes too much time, and the presence of several patches
+can show whether port forwarding is causing a significant overhead ---
+it should not!
+
+\subsubsection{Call graph profiling}
+
+The Valgrind\footnote{\url{http://valgrind.org}}
+\cite{nethercote07valgrind} binary instrumentation framework provides
+many tools for evaluating the performance and correctness of programs
+by executing them in an instrumentated environment --- a sort of
+machine simulator. In this section, we are most interested in
+Callgrind \cite{weidendorfer04callgrind}, a profiler that provides an
+annotated call graph of a program's execution annotated with the
+amount of time spent under the function and in the function itself. We
+should expect that the time spent in the functions that we developed
+in this chapter is little compared to that of doing the actual sound
+processing and I/O. Because in section \ref{sec:sound-performance} we
+already showed that our sound processing facilities are quite
+efficient, that would evidence that the overall performance of the
+system is acceptable.
+
+\begin{mynote}[Other kinds of profilers]
+  The Gperf\footnote{\url{http://www.gnu.org/software/gperf/}} tool
+  does a similar job with a much more lightweight
+  instrumentation. Heavy instrumentation can be a problem when running
+  a program with real-time conditions like ours causing fake device
+  \emph{buffer underruns}, but a powerful enough machine often
+  compensates. Indeed, \type{gperf} was not valid in our case because
+  of its limitations with multithreading. 
+
+  Statistical profilers like
+  Sysprof\footnote{\url{http://sysprof.com/}} and
+  Oprofile\footnote{\url{http://oprofile.sourceforge.net/news/}} hook
+  in the operating system and sample the current running process from
+  time to time providing the least intrusive profiling. However, they
+  provide much less accurate data and require long running times to
+  yield good results. Actually, because of the barriers that the OS
+  imposes in interrupting real-time threads, they are particularly
+  unsuitable for our needs.
+
+  We indeed tried all these tools and Valgrind provided the most
+  accurate and useful results. The ease of use and polishment of the
+  tools for visualising Callgrind's output also influenced our
+  decision.
+\end{mynote}
+
+We ran the program with the command:
+\begin{verbatim}
+  $ valgrind --tool=callgrind ./example_graph_perf
+\end{verbatim}
+
+This generates a \type{callgrind.out.\$PID} file that can be
+visualised and navigated with the
+Kcachegrind\footnote{\url{http://kcachegrind.sourceforge.net/}}
+tool. It is usually hard to summarise a whole profille data in a
+simple graph or table. Still, the resulting output supports our
+thesis: the graph maintenance and thread communication system produce
+negible overhead and most of the time is spent doing the sound
+processing itself as we expected. Around a $18\%$ of the time was
+spent in the \type{soft\_in\_buffers} because we apply the envelopes
+in a sort of brute-force manner, but this is still little compared to
+the $35\%$ that was spent generating sinusoids or the $38\%$ of time
+that involved I/O with the sound card and thus it is not urgent to
+optimise that and it would be relatively easy to do that anyway. The
+Callgrind output file is included in the CD addendum such that the
+skeptical reader can validate the output by herself. Figures
+\ref{fig:callgrind-1} attempts to present the most significant parts
+of the callgraph too.
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=\textwidth]{pic/callgrind1.png}
+  \caption{Overview of the profiling call graph in the sound
+    processing thread.}
+  \label{fig:callgrind-1}
+\end{figure}
+
+\subsubsection{Validating real-time constraints satisfaction}
+
+The \type{mutrace} and \type{matrace} tools profile the program to
+find much more specific patterns of resource usage. The first one
+traces a program to find which locks are used in a real-time thread,
+the number of contentions and the amount spent both contending and
+withing the lock's critical section. The later finds allocations and
+deallocations that happen within a real-time thread. It uses a much
+more lightweight kind of instrumentation that only relinks the
+application with wrapped versions of \emph{pthreads} and \emph{libc}
+that allow the profiler to collect the statistics. In order to run the
+program with these tools we passed the following extra compile
+flags:
+\begin{verbatim}
+    -rdynamic -DPSYNTH_NO_LOG_RT_REQUEST
+\end{verbatim}
+
+The first option generates extra hooks for accessing the stack trace
+at runtime allowing \type{mutrace} and \type{matrace} provide better
+information. The second disables logging a message into the
+Psychosynth log system to inform the user that we succesfully got
+real-time priority for the audio-thread. When logging that message
+several allocations are performed and critical sections are
+entered. All this happens in the real-time thread, but it is done just
+after it is launched and before we do anything useful, and thus it
+only bloats the profiler output unnecessarily. First, we run the
+program parameter \verb|-r| to track real-time threads and
+\verb|--all| to display all mutexes:
+\begin{verbatim}
+    $ mutrace -r --all ./example_graph_perf 2> mutrace-output
+\end{verbatim}
+
+The most relevant bits of its output is illustrated in note
+\ref{note:mutrace-output}. As we can see, none of the three mutexes
+used in the real-time thread is ever contended. This is not chance,
+repeated execution of the program yields the same results; it is so
+because we always \type{try\_lock} from the real-time thread.
+
+Note that the third mutex in the list --- mutex \#7 --- is the mutex
+that synchronises calls to \type{rt\_request\_process} --- this can be
+elicited from the \type{mutrace} output that was removed from this
+summary. Because this mutex is locked exactly during each iteration of
+the audio processing, two important performance facts can be derived
+from its numbers:
+\begin{itemize}
+\item It was locked for a sum of $248.458 ms$ out of a total of
+  $10065.873 ms$ running time. We can conclude from this that the
+  sound processing took only a $2.465\%$ of the total running time,
+  which insinuates that processing graphs can grow much larger.
+\item It was locked $0.036 ms$ on average and a peak of $0.709
+  ms$. The program was run with a block size of $64$ and a sample rate
+  of $44100$, giving a maximum latency of $1.45 ms$. This suggests
+  that it is extremely unlikely for buffer underruns due to software
+  overload.
+\end{itemize}
+
+However, it is rather intriguing the presence of inconsistent
+mutexes\footnote{A mutex is said to be inconsistent when it remains
+  locked after the owner thread terminates. The threading system
+  unlocks it automatically, but it can be a sign of a software
+  problem.}. The fact is, we are \emph{always} locking mutexes with
+\type{unique\_lock}, so it is impossible for a mutex to remain
+unlocked on scope exit. The further stack traces that \type{mutrace}
+dump and that was removed from the fragment --- it can be checked in
+the CD too --- suggest that it is an incompatibility between
+\emph{mutrace} and the sometimes subtle internal use of
+\type{pthreads} that the C++0x threads API GCC implementation.
+
+\begin{mynote}[\type{mutrace} output for the performance test program]
+\footnotesize\label{mutrace-output}
+\begin{verbatim}
+...
+
+mutrace: Showing 12 most contended mutexes:
+
+ Mutex #   Locked  Changed  Cont. tot.Time[ms] avg.Time[ms] max.Time[ms]  Flags
+       3     7435      205      0        1.820        0.000        0.011 M-R--.
+       6     7028        3      0        1.862        0.000        0.020 M-R--.
+       7     7025        0      0      248.458        0.035        0.709 M-R--.
+      11     1065        0      0        4.427        0.004        0.099 M!---.
+       2      429        0      0        0.294        0.001        0.022 M----.
+       1       26        0      0        0.265        0.010        0.215 M----.
+       0        8        0      0        1.093        0.137        1.046 M----.
+       9        5        0      0        0.087        0.017        0.070 M!---.
+       4        4        0      0        0.011        0.003        0.007 M----.
+       8        4        0      0        0.007        0.002        0.004 M----.
+      10        1        0      0        0.023        0.023        0.023 M----.
+       5        1        0      0        0.000        0.000        0.000 M----.
+                                                                         ||||||
+                                                                         /|||||
+          Object:                                   M = Mutex, W = RWLock /||||
+           State:                               x = dead, ! = inconsistent /|||
+             Use:                               R = used in realtime thread /||
+      Mutex Type:               r = RECURSIVE, e = ERRRORCHECK, a = ADAPTIVE /|
+  Mutex Protocol:                                    i = INHERIT, p = PROTECT /
+     RWLock Kind: r = PREFER_READER, w = PREFER_WRITER, W = PREFER_WRITER_NONREC 
+
+mutrace: Total runtime is 10065.873 ms.
+
+...
+\end{verbatim}
+\end{mynote}
+
+The twin tool \type{matrace} also provides relevant evidence on the
+correctness of our program. We ran it typing:
+\begin{verbatim}
+    $ matrace ./example_graph_perf
+\end{verbatim}
+
+Note \ref{note:matrace-output} shows the most relevant parts of its
+output. There are 5 allocations and 4 frees in the real-time thread
+but they are not alarming at all. The stack traces removed from that
+output summary reveal that they were performed just when the thread
+started --- as a product of copying the \type{std::function} that the
+\type{std::thread} constructor takes as argument --- and just when the
+thread is about to be released --- performed by the \emph{pthreads}
+internal data structures management.
+
+\begin{mynote}[\type{matrace} output for the performance test program]
+\label{note:matrace-output}\footnotesize
+\begin{verbatim}
+matrace: Total of 7381 allocations and 5747 frees in non-realtime 
+threads in process lt-example_grap (pid 1617).
+
+matrace: Total of 5 allocations and 4 frees in realtime threads.
+\end{verbatim}
+\end{mynote}
+
+This section provided enough evidence that the performance of the
+program is quite acceptable and that it meets our minimum guarantees
+to control non-determinism and prevent clicks due to buffer underruns.
 
 \subsection{Integration}
 \label{sec:graph-integration}

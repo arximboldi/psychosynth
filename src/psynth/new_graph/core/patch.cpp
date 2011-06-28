@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-18 22:12:27 raskolnikov>
+ *  Time-stamp:  <2011-06-28 18:08:12 raskolnikov>
  *
  *  @file        patch.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -52,7 +52,7 @@ void patch::rt_process (rt_process_context& ctx)
 {
     node::rt_process (ctx);
     for (auto& n : _rt_outputs)
-        n->rt_process (ctx);
+        n.rt_process (ctx);
 }
 
 void patch::rt_context_update (rt_process_context& ctx)
@@ -82,18 +82,10 @@ node_ptr patch::add (node_ptr child)
     
     child->attach_to_patch (*this);
     _childs.push_back (child);
-
-    if (is_attached_to_process () &&
-        process ().is_running ())
-    {
-        auto& ctx = process ().context ();
-        ctx.push_rt_event (make_rt_event ([=] (rt_process_context&) {
-                    this->_rt_childs.push_back (*child);
-                }));
-    }
-    else
-        _rt_childs.push_back (*child);
-
+    execute_rt ([=] {
+            this->_rt_childs.push_back (*child);
+        });
+    
     if (is_attached_to_process ())
         process ().notify_add_node (child);
 
@@ -111,6 +103,9 @@ node_ptr patch::add (node_ptr child)
         auto& p = port->patch_port ();
         this->register_component (p);
         p._set_owner (this);
+        execute_rt ([=] {
+                this->_rt_outputs.push_back (*port);
+            });
     }
     
     return child;
@@ -139,6 +134,11 @@ void patch::remove (node_ptr child)
     if (patch_out_port_base_ptr port =
         std::dynamic_pointer_cast<patch_out_port_base> (child))
     {
+        // TODO: Maybe we would run the port without being attached at
+        // all. We can do a check before running.
+        execute_rt ([=] {
+                this->_rt_outputs.remove_if (base::make_equal_id (*port));
+            });
         auto& p = port->patch_port ();
         p.disconnect ();
         this->unregister_component (p);
@@ -148,19 +148,10 @@ void patch::remove (node_ptr child)
     child->detach_from_patch ();
     _childs.remove (child);
 
-    if (is_attached_to_process () &&
-        process ().is_running ())
-    {
-        auto& ctx = process ().context ();
-        ctx.push_rt_event (make_rt_event ([=] (rt_process_context&) {
-                    this->_rt_childs.remove_if (
-                        base::make_equal_id (*child));
-                }));
-    }
-    else
-    {
-        _rt_childs.remove_if (base::make_equal_id (*child));
-    }
+    execute_rt ([=] {
+            this->_rt_childs.remove_if (
+                base::make_equal_id (*child));
+        });
 
     if (is_attached_to_process ())
         process ().notify_remove_node (child);

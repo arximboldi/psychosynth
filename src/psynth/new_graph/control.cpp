@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-16 21:51:02 raskolnikov>
+ *  Time-stamp:  <2011-06-27 22:55:28 raskolnikov>
  *
  *  @file        control.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -40,10 +40,12 @@ namespace psynth
 namespace graph
 {
 
+template class in_control<std::string>;
 template class in_control<float>;
 template class in_control<int>;
 template class in_control<bool>;
 
+template class out_control<std::string>;
 template class out_control<float>;
 template class out_control<int>;
 template class out_control<bool>;
@@ -56,13 +58,13 @@ control_base::control_base (const std::string& name, node* owner)
     : _name (name)
     , _owner (owner)
 {
-    assert (owner); // FIXME
+    // assert (owner); // FIXME
 }
 
 in_control_base::in_control_base (const std::string& name, node* owner)
     : control_base (name, owner)
 {
-    assert (owner); // fixme
+    // assert (owner); // fixme
     if (_owner)
         owner->register_component (*this);
 }
@@ -70,7 +72,7 @@ in_control_base::in_control_base (const std::string& name, node* owner)
 out_control_base::out_control_base (const std::string& name, node* owner)
     : control_base (name, owner)
 {
-    assert (owner); // fixme
+    // assert (owner); // fixme
     if (_owner)
         owner->register_component (*this);
 }

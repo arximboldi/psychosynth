@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-16 17:29:34 raskolnikov>
+ *  Time-stamp:  <2011-06-28 12:40:45 raskolnikov>
  *
  *  @file        passive_output.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -36,6 +36,8 @@
 #include <psynth/new_graph/control.hpp>
 #include <psynth/new_graph/buffer_port.hpp>
 #include <psynth/new_graph/sink_node.hpp>
+
+#include <psynth/new_graph/core/passive_output_fwd.hpp>
 
 namespace psynth
 {

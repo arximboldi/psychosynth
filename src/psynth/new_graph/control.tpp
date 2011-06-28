@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-25 23:09:01 raskolnikov>
+ *  Time-stamp:  <2011-06-27 22:58:30 raskolnikov>
  *
  *  @file        control.tpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -99,22 +99,22 @@ template <typename T>
 void out_control_impl<T, false>::rt_set (const T& val, rt_process_context& ctx)
 {
     _rt_value = val;
-    ctx.push_event<async_update_event> (*this, val);
+    ctx.push_async_event<async_update_event> (*this, val);
 }
 
 template <typename T>
-T out_control_impl<T, false>::get () const
+const T& out_control_impl<T, false>::get () const
 {
     auto g = base::make_unique_lock (_mutex);
-    auto ret = _value;
-    return ret;
+    _ret_value = _value;
+    return _ret_value;
 }
 
 template <typename T>
 void out_control_impl<T, false>::async_update_event::operator () (
     async_process_context& ctx)
 {
-    auto g = base::make_unique_lock (_ctl.mutex);
+    auto g = base::make_unique_lock (_ctl._mutex);
     _ctl._value = _new_value;
 }
 
@@ -125,7 +125,8 @@ template <typename T>
 void in_control<T>::set (const T& val)
 {
     _value  = val;
-    if (this->owner ().is_attached_to_process () &&
+    if (this->_has_owner () &&
+        this->owner ().is_attached_to_process () &&
         this->owner ().process ().is_running ())
     {
         user_process_context& ctx = this->owner ().process ().context ();
