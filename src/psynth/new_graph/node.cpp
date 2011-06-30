@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-18 22:15:33 raskolnikov>
+ *  Time-stamp:  <2011-06-29 12:07:34 raskolnikov>
  *
  *  @file        node.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -241,6 +241,12 @@ void node::detach_from_patch ()
 {
     check_attached_to_patch ();
     _patch = 0;
+}
+
+void connect (node_ptr source, const std::string& out_port,
+              node_ptr dest, const std::string& dest_port)
+{
+    dest->in (dest_port).connect (source->out (out_port));
 }
 
 } /* namespace graph */

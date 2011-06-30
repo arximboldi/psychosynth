@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-17 17:43:03 raskolnikov>
+ *  Time-stamp:  <2011-06-29 12:57:52 raskolnikov>
  *
  *  @file        passive_output.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -46,7 +46,7 @@ passive_output::passive_output (device_ptr out)
 
 void passive_output::rt_do_process (rt_process_context& ctx)
 {
-    if (_output)
+    if (_output && _in_input.rt_in_available ())
         _output->put (_in_input.rt_in_range ());
 }
 

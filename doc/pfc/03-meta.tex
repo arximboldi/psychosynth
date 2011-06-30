@@ -2040,7 +2040,7 @@ requirements.
   \label{tab:perf32-46}
 \end{table}
 
-\subsection{Integration}
+\subsection{Integration and deployment}
 
 The module was first developed separately from the main development
 branch in a branch called \texttt{gil-import}. Once the previous tests
@@ -2107,6 +2107,7 @@ novelty. This however delayed our development more than expected in
 our original plan.
 
 \subsection{Benefits and caveats}
+\label{sec:soundbenefits}
 
 The three main advantages in the new code are:
 \begin{enumerate}
@@ -2140,7 +2141,6 @@ use of exceptions and scope guards \cite{alexandrescu00gener}.
 Even though we believe the benefits outweight the drawbacks, we have
 to acknowledge the caveats of our new approach, the most relevant
 being:
-
 \begin{enumerate}
 \item The new code uses advanced C++ programming techniques that many
   programmers find hard to understand. Thus, it might be harder for
@@ -2179,11 +2179,12 @@ things, forbidding the usage of mutexes. However, our ring buffers
 have not been tested for thread safety and mutexes should be used when
 shared among different threads. This happens in our
 \texttt{caching\_file\_input} implementation. The problem is specially
-severe when the audio processing thread is running with higher priority,
-because \emph{priority inversion} occurs \cite{kim03basic}. While our
-current Alsa and OSS output systems do not attempt rising their thread
-priority, the Jackd subsystem executes the audio processing callback
-in a real-time mode thread and thus the problem can become significant.
+severe when the audio processing thread is running with higher
+priority, because \emph{priority inversion} occurs
+\cite{kim03basic}. While our current Alsa and OSS output systems do
+not attempt rising their thread priority, the Jackd subsystem executes
+the audio processing callback in a real-time mode thread and thus the
+problem can become significant.
 
 Locking is done with care and in practice we have experience no buffer
 underruns due to this problem, even with high number of caching file
@@ -2277,7 +2278,19 @@ itself. A expression template framework like Boost.Proto\footnote{The
 \cite{niebler07proto} could be of great help. Moreover, with careful
 studying of the audio DSL's studied in section \ref{sec:dsl} and the
 usage of these same techniques the scope of such effort could be
-broadened to build a full sound synthesis and processing EDSL for C++.
+broadened to build a full sound synthesis and processing EDSL for
+C++. Indeed, this would allow writing specific optimisations in this
+arithmetic layer itself. It would be specially interesting to optimise
+for usage of SIMD\footnote{Single Instruction Multiple Data. These
+  instructions can operate on several arguments at the same time. They
+  are very useful in multimedia applications. For example, all the
+  samples in a multi-channel audio frame could be updated with one
+  single instruction, multiplying the performance. The SSE family of
+  multimedia extensions provided by Intel processors are is the most
+  widespread set of SIMD instructions.} instructions of modern
+processors. While this can be done now in a per-algorithm basis, doing
+so in a frame-arithmetic layer would hide all this complexity to the
+DSP developer providing a significant performance boost for free.
 
 \subsubsection{Submission to Boost}
 

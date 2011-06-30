@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-18 23:49:49 raskolnikov>
+ *  Time-stamp:  <2011-06-29 13:05:55 raskolnikov>
  *
  *  @file        soft_buffer_port.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -40,7 +40,7 @@ namespace psynth
 namespace graph
 {
 
-constexpr float default_soft_port_duration = 0.001f; // Seconds
+constexpr float default_soft_port_duration = 0.004f; // Seconds
 
 template <class Buffer>
 class soft_buffer_in_port : public buffer_in_port<Buffer>

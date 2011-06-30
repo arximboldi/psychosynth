@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-29 01:05:07 raskolnikov>
+ *  Time-stamp:  <2011-06-29 13:00:53 raskolnikov>
  *
  *  @file        port.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -188,8 +188,11 @@ void in_port_base::rt_process (rt_process_context& ctx)
 
 void out_port_base::disconnect ()
 {
-    for (auto& r : _refs)
-        r->disconnect ();
+    // Do not use a for loop, disconnect removes the element
+    // invalidating iterators.
+    
+    while (!_refs.empty ())
+        _refs.front ()->disconnect ();
 }
 
 } /* namespace graph */

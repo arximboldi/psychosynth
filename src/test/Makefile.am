@@ -30,7 +30,9 @@ noinst_PROGRAMS = \
 	psynth_unit_test \
 	example_graph_scale \
 	example_graph_patch \
-	example_graph_perf
+	example_graph_perf \
+	example_graph_soft \
+	example_graph_output
 
 examples_cxxflags = \
 	-I$(top_srcdir)/src \
@@ -52,6 +54,15 @@ example_graph_patch_LDADD = $(examples_ldadd)
 example_graph_perf_SOURCES = examples/graph_perf.cpp
 example_graph_perf_CXXFLAGS = $(examples_cxxflags)
 example_graph_perf_LDADD = $(examples_ldadd)
+
+example_graph_soft_SOURCES = examples/graph_soft.cpp
+example_graph_soft_CXXFLAGS = $(examples_cxxflags)
+example_graph_soft_LDADD = $(examples_ldadd)
+
+example_graph_output_SOURCES = examples/graph_output.cpp
+example_graph_output_CXXFLAGS = $(examples_cxxflags)
+example_graph_output_LDADD = $(examples_ldadd)
+
 
 psynth_unit_test_SOURCES = \
 	psynth_unit_test.cpp

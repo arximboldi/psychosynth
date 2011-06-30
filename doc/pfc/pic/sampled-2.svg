@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="570"
+   height="350"
+   id="svg2851"
+   sodipodi:version="0.32"
+   inkscape:version="0.46"
+   version="1.0"
+   sodipodi:docname="Quantized.signal.svg"
+   inkscape:output_extension="org.inkscape.output.svg.inkscape">
+  <defs
+     id="defs2853" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.98994949"
+     inkscape:cx="298.44476"
+     inkscape:cy="153.2272"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="965"
+     inkscape:window-height="675"
+     inkscape:window-x="224"
+     inkscape:window-y="229">
+    <inkscape:grid
+       type="xygrid"
+       id="grid2875"
+       visible="true"
+       enabled="true" />
+  </sodipodi:namedview>
+  <metadata
+     id="metadata2856">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Ebene 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-75.737121,-184.55099)">
+    <g
+       id="g2879"
+       transform="translate(6,14)">
+      <path
+         id="path2816"
+         d="M 135.95146,465.82579 C 146.53886,465.82579 171.38453,146.92815 242.25067,324.09351 C 313.11681,501.25886 348.54988,76.062011 419.41603,288.66044 C 490.28217,501.25886 525.71524,217.7943 596.58138,359.52658"
+         style="fill:none;fill-opacity:0;stroke:#c1c1c1;stroke-width:3.54330707" />
+      <line
+         id="line2818"
+         y2="465.82578"
+         x2="624.09161"
+         y1="465.82578"
+         x1="100.51839"
+         style="fill:none;fill-opacity:0;stroke:#000000;stroke-width:3.54330707" />
+      <polyline
+         id="polyline2820"
+         points="14.3882,-5.75 14.8882,-6 14.3882,-6.25 "
+         style="fill:none;fill-opacity:0;stroke:#000000;stroke-width:0.1"
+         transform="matrix(35.433071,0,0,35.433071,100.51839,678.42422)" />
+      <line
+         id="line2822"
+         y2="190.28407"
+         x2="135.95146"
+         y1="501.25888"
+         x1="135.95146"
+         style="fill:none;fill-opacity:0;stroke:#000000;stroke-width:3.54330707" />
+      <polyline
+         id="polyline2824"
+         points="1.25,-13.3882 1,-13.8882 0.75,-13.3882 "
+         style="fill:none;fill-opacity:0;stroke:#000000;stroke-width:0.1"
+         transform="matrix(35.433071,0,0,35.433071,100.51839,678.42422)" />
+      <line
+         id="line2826"
+         y2="430.39273"
+         x2="596.58136"
+         y1="430.39273"
+         x1="135.95146"
+         style="fill:none;fill-opacity:0;stroke:#000000;stroke-width:3.54330707;stroke-dasharray:7.0866142" />
+      <line
+         id="line2828"
+         y2="394.95963"
+         x2="596.58136"
+         y1="394.95963"
+         x1="135.95146"
+         style="fill:none;fill-opacity:0;stroke:#000000;stroke-width:3.54330707;stroke-dasharray:7.0866142" />
+      <line
+         id="line2830"
+         y2="359.52658"
+         x2="596.58136"
+         y1="359.52658"
+         x1="135.95146"
+         style="fill:none;fill-opacity:0;stroke:#000000;stroke-width:3.54330707;stroke-dasharray:7.0866142" />
+      <line
+         id="line2832"
+         y2="324.09348"
+         x2="596.58136"
+         y1="324.09348"
+         x1="135.95146"
+         style="fill:none;fill-opacity:0;stroke:#000000;stroke-width:3.54330707;stroke-dasharray:7.0866142" />
+      <line
+         id="line2834"
+         y2="288.66043"
+         x2="596.58136"
+         y1="288.66043"
+         x1="135.95146"
+         style="fill:none;fill-opacity:0;stroke:#000000;stroke-width:3.54330707;stroke-dasharray:7.0866142" />
+      <line
+         id="line2836"
+         y2="253.22737"
+         x2="596.58136"
+         y1="253.22737"
+         x1="135.95146"
+         style="fill:none;fill-opacity:0;stroke:#000000;stroke-width:3.54330707;stroke-dasharray:7.0866142" />
+      <line
+         id="line2838"
+         y2="217.7943"
+         x2="596.58136"
+         y1="217.7943"
+         x1="135.95146"
+         style="fill:none;fill-opacity:0;stroke:#000000;stroke-width:3.54330707;stroke-dasharray:7.0866142" />
+      <text
+         id="text2840"
+         y="501.25888"
+         x="596.58136"
+         style="font-size:42.51968765px;font-style:normal;font-weight:normal;text-anchor:start;fill:#000000;font-family:sans">t</text>
+      <polyline
+         id="polyline2842"
+         points="1,-6 1.175,-6 1.175,-7 1.3625,-7 1.3625,-8 1.54099,-8 1.54099,-9 1.7708,-9 1.7708,-10 2.07132,-10 2.07132,-11 2.77843,-11 2.77843,-12 2.91985,-12 2.91985,-11 3.78605,-11 3.78605,-10 4.228,-10 4.228,-9 5.81899,-9 5.81899,-10 6.34932,-10 6.34932,-11 6.8125,-11 6.8125,-12 7.45,-12 7.45,-13 8.2625,-13 8.2625,-12 8.8125,-12 8.8125,-11 9.17774,-11 9.17774,-10 9.6375,-10 9.6375,-9 11.7625,-9 11.7625,-10 13.725,-10 13.725,-9 14,-9 "
+         style="fill:none;fill-opacity:0;stroke:#ff0000;stroke-width:0.1"
+         transform="matrix(35.433071,0,0,35.433071,100.51839,678.42422)" />
+      <text
+         style="font-size:42.51968765px;font-style:normal;font-weight:normal;text-anchor:start;fill:#000000;font-family:sans"
+         x="75.342651"
+         y="248.72073"
+         id="text2877">f(t)</text>
+    </g>
+  </g>
+</svg>

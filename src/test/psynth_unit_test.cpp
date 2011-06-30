@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-10 14:38:48 raskolnikov>
+ *  Time-stamp:  <2011-06-29 12:35:57 raskolnikov>
  *
  *  @file        psynth_unit_test.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -34,3 +34,4 @@
 #define BOOST_TEST_DYN_LINK
 
 #include <boost/test/unit_test.hpp>
+

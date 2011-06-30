@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-28 18:05:09 raskolnikov>
+ *  Time-stamp:  <2011-06-29 12:54:17 raskolnikov>
  *
  *  @file        node.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -32,6 +32,7 @@
 #define PSYNTH_GRAPH_NODE_HPP_
 
 #include <map>
+#include <iostream> // FIXME!
 
 #include <boost/range/iterator_range.hpp>
 #include <boost/intrusive/list_hook.hpp>
@@ -190,6 +191,9 @@ private:
     bool _rt_post_processed;
 };
 
+void connect (node_ptr source, const std::string& out_port,
+              node_ptr dest, const std::string& dest_port);
+
 typedef
 base::restricted_global_factory_manager<std::string, node_ptr>
 node_factory;
@@ -205,7 +209,7 @@ void node::execute_rt (const Fn& fn)
 {
     if (is_attached_to_process () &&
         process ().is_running ())
-    {
+    {    
         auto& ctx = process ().context ();
         ctx.push_rt_event (make_rt_event ([fn] (rt_process_context&) {
                     fn ();

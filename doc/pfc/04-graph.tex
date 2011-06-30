@@ -1372,6 +1372,7 @@ into control of the registration \footnote{In these slides we discuss
 \url{http://colinaroja.org/files/charla_c.pdf}}.
 
 \subsection{Going Model-View-Controller}
+\label{sec:graphmvc}
 
 So far, we have concentrated on devising the core of the audio
 processing engine. At some point, we will need to write user
@@ -1508,6 +1509,7 @@ this chapter. We will delay adapting the dynamic patcher until the
 plug-in system is fully implemented in order to avoid rewriting it in
 the presence of unexpected API changes.
 
+\todo{Añadir las cosas que había pensado ya sobre los plugins}
 
 \section{Validation}
 
@@ -1600,6 +1602,13 @@ seconds and generates the following events:
 \item Every second it randomly connects or disconnects the connection
   between the modulators and the generators.  
 \end{itemize}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=\textwidth]{pic/graph-perf.pdf}
+  \caption{Synthesis graph of the performance test program.}
+  \label{fig:perfgraph}
+\end{figure}
 
 The program source code is in the
 \type{src/test/examples/graph\_perf.cpp} file. The high amount of user
@@ -1817,7 +1826,226 @@ to control non-determinism and prevent clicks due to buffer underruns.
 \subsection{Integration}
 \label{sec:graph-integration}
 
+In section \ref{sec:graphmvc} we discussed how we chose not to
+integrate this new module into the upper layers of the application
+yet. We shall wait for the next iterations of the project --- which
+are out of the scope of this final project --- to fully stabilise this
+API and make the work of adapting the UI worth. However, we wrote some
+example test programs that test interactions between modules further
+than the unit tests. These programs are built in the \type{src/test}
+directory and are:
+\begin{description}
+\item[example\_graph\_scale] Plays the note $D$ jumping among octaves
+  among other events. It was one of the firsts test programs developed
+  and helped to ensure that the control classes works properly.
+
+\item[example\_graph\_patch] Plays some very strange sounds with
+  patches nested up to several levels, with some patch ports that even
+  change names during the playback and some other things. It helped to
+  ensure that the interacting actors in the hierarchical patches
+  system do work properly.
+
+\item[example\_graph\_perf] This is the program that we described in
+  the last section. It tries to simulate a rather dynamic and
+  stochastic interaction with the system and ease profiling.
+
+\item[example\_graph\_output] Tests outputting to two different
+  proactive devices at the same time. Its synthesis network is very
+  similar to that of the profiler program back in figure
+  \ref{fig:perfgraph}. Apart from the output device that is already
+  shown there, there is a second \emph{async output} connected on the
+  output of the first synthesis patch. There are no random events;
+  each generator-modulator has fixed constants with different out of
+  phase frequencies. On one of the output devices one should listen to
+  the sum of the two vibrating sinusoids, on the other just one of
+  them. The test succeeded emitting at the same time on an on-board
+  ``Intel 5 Series/3400'' sound card and an ``M-Audio Xponent DJ
+  Controller'' USB integrated audio card.
+
+\item[example\_graph\_soft] This program ensures that the ports with
+  automatic reconnection softening actually do work properly. The
+  network it executes is represented in figure. 
+  \ref{fig:examplegraphsoft}. It generates three files,
+  \type{graph-soft-N.wav}. 
+
+  As illustrated in the figure, the program starts with the sine
+  generator connected at the first of the two inputs of the grater
+  patch --- these inputs do connetion softening. It generates 1024
+  samples of a $880 hz$ sinusoid --- a pure $A_5$ in the ISO standard
+  tuning \cite{pitchstd} --- and then it changes the connection to the second port
+  that takes the signal into the patch. The audio output in the three
+  files should then be something like what we described back in figure
+  \ref{fig:soft-port-1} in section \ref{sec:modports}. We should
+  expect the \type{graph-soft-1.wav} file to get something like the
+  red line in that figure, a fade out after the disconnection. Then,
+  the \type{graph-soft-3.wav} should show something like the green
+  signal, a fade in when the generator is changed from one port to the
+  other. Finally, the \type{graph-soft-2.wav} file should contain the
+  sum of those two signals, similar to the dotted blue line in the
+  plot --- it should remain as a stable pure tone without artifacts
+  then reconnection is made.
+
+  The system passes this test as shown in figure
+  \ref{fig:soft-audacity} where the output files are visualised
+  with the Audacity program. When changing the connection the signal
+  is properly faded avoiding any audible distortion.
+\end{description}
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=\textwidth]{pic/graph-soft.pdf}
+  \caption{Synthesis network of the reconnection softnening test
+    program.}
+  \label{fig:examplegraphsoft}
+\end{figure}
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=\textwidth]{pic/sound-vis.pdf}
+  \caption[The three output files in the reconnection softening test
+  program.]{The three output files in the reconnection softening test
+    program. The signals are, in this top-down order:
+    \type{graph-soft-1.wav}, \type{graph-soft-2.wav} and
+    \type{graph-soft-3.wav}}.
+  \label{fig:soft-audacity}
+\end{figure}
+
+\todo{Hacer un release antes de enviar el proyecto a imprimir y poner
+  aquí el changelog!!}
+
 \section{Conclusion}
+
+In this second and last iteration of this project we rewrote the whole
+modular system engine of the Psychosynth software in an attempt to
+solve the design problems of the previous one and set up a solid base
+capable of being extended with all the new features that are planned
+for the future. Influenced by Van Roy's work \cite{roy04concepts},
+multi-paradigm programming aided in writing an scalable design: (1)
+generic programming and policy based design helped in avoiding
+redundancy in the implementation, improves type safety thanks to
+compile-time bound polymorphism and abstracts factors orthogonally,
+(2) object-orientation provides dynamic reconfigurability and aided in
+large-scale design and global system modularity, and (3) functional
+programming allowed abstracting the control flow and helps in
+controlling state and the exponential complexity growth when mixing
+concurrency with stateful algorithms.
+
+\subsection{Benefits and caveats}
+
+There are few advancements in the new code that we should highlight:
+\begin{enumerate}
+\item Writing thread-safe code is usually quite challenging. Doing so
+  in a real-time system is even harder. We abstracted the control flow
+  using the event system that eases extending the program with new
+  facilities that require inter-thread communication.
+
+\item The new system is much more general and type safe in the
+  processing. It is capable of processing signals of any kind in a
+  type-safe manner --- whenever possible --- or throwing exceptions on
+  type violations where dynamism is unavoidable.
+
+\item The new design is much more decoupled, permitting the extension
+  of the different components individually. For example, the fact that
+  ports and controls are now objects instantiated by the node concrete
+  type by itself, allows the development of new patterns of inter-node
+  communication by deriving from these classes. A concrete example of
+  this is the connection softening, that used to require a lot of work
+  from the DSP implementer and is now transparent and optional because
+  an specific port object does the job. Another positive consequence
+  of this new design is that implementing a plug-in system is now much
+  more straightforward.
+\end{enumerate}
+
+There are some many other minor implementation improvements, like much
+better error control, improved compilation process via the usage of
+forward declarations and the absence of data races and dead locks that
+the former implementation suffered.
+
+This new implementation uses C++0x features and advanced C++
+implementation techniques, so most of the reasoning in the conclusions
+of the last chapter on the barrier that this might be for novel
+developers applies (section \ref{sec:soundbenefits}). Still, in this
+layer, most of this complexity is hidden in the implementation and do
+not get through the public interface. This was mostly caused by how
+template programming errors can not be easily transcribed by
+compilers, but most of the time writing new DSP nodes or using the
+external graph and processing interface relies on simpler
+and easier to use object-oriented concepts.
+
+\subsection{Future work}
+
+In spite of this positive general balance, there is much room for
+improvement. Many of them are small improvements that have been
+discussed already while discussing the design and do no require
+evaluating them here. Some other are either specially urgent or of a
+broader scope and we should recapitulate them now.
+
+\subsubsection{Lock-free heterogeneous deques}
+
+Our triple-buffered event deques prevent locking from the RT thread as
+long as the ``flip'' can be done conditionally. This means that if a
+event is being added to back deque from the user thread just when the
+RT thread is attempting the flip, the flip might be skipped and events
+in the back buffer would need to wait for the next control
+iteration. Inserting user event happens sparely enough for this
+pattern to work, as our experiments show. However, this prevents
+implementing some other techniques that are more demanding --- we
+assumed that events are caused by user interaction most of the time,
+but it can be interesting for some applications to generate
+huge amounts of events programatically.
+
+If our heterogeneous deques where lock-free --- i.e. they support one
+reader and one writer at the same time in different threads --- the
+flip would need no locking at all and it could be always achieved
+regardless of what the user thread is doing. We already cited Valois'
+work on lock-free data-structures \cite{valois96lockfree,
+  michael95correction}. Our heterogeneous deques unique nature do not
+have a direct mapping to any of the data structures in the
+bibliography, but some authors provided design techniques to elicit
+our own lock-free datastructures. Harris improvements for node-based
+structures can be of great help \cite{harris01pragmatic}. There is
+plenty of other bibiography we can refer to\footnote{We do not want to
+ flood this document with references to lock-free algorithms
+ bibliography. A good compilation has already been made by Ross
+ Bencina: \url{http://www.rossbencina.com/code/lockfree}}.
+
+\subsubsection{``Futures'' API for the asynchronous events}
+
+We described how the ``asynchronous operation'' thread can be used by
+the RT thread to delegate costly not urgent operations --- like
+allocating heap memory or doing I/O. Very often, that requires
+returning a result back --- for example, the pointer to the allocated
+memory. It is not hard to do so, but it requires adding extra
+redundant code. The C++0x standard includes the notion of
+\emph{future}, a value that is computed, potentially, in a separate
+thread, leading to more declarative concurrency
+\cite{howard06mt}. Still, these are not usable in a real-time context,
+because computing a future requires creating a dynamic functor,
+launching threads, allocating memory and so on. However, its API can
+be emulated on top of our thread communication infrastructure,
+simplifying a lot the common pattern of requesting some computation in
+the ``async thread'' and using its result later. In some way, it just
+extending the event system with a notion of ``event with a return
+value''.
+
+\subsubsection{Compiling static networks}
+
+In this iteration we concentrated on the dynamic features of our
+synthesis system. This often trade-off performance. This is ok as long
+as enabling live music is our most important objective. However,
+getting some nice sounds often requires sitting down in the studio and
+doing \emph{sound design} and implementing complex mathematical
+functions by assembling lots of low-level modules into a patch. These
+patches are too low-level to be manipulated in a live performance and
+thus dynamism can be exchanged for a performance gain, needed to
+handle such big amounts of small nodes. Some software implementing
+these kind of features, like Reaktor ``Core Modules'' traduce the
+network into a compiled form optimised for fast execution. This can be
+a very interesting development to broaden the scope of the
+project. However, it requires a lot of effort and is not very urgent
+--- sound design and DSP programming can already be done either
+directly in C++, or in other synthesis systems and then plugged in
+when the plug-in system is ready --- so we propose it later work.
 
 %%% Local Variables: 
 %%% mode: latex
