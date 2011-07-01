@@ -1,5 +1,6 @@
 
 \chapter{A modular synthesis engine}
+\label{sec:04-graph}
 
 \epigraph{We can now see that the whole becomes not merely more, but
   very different from the sum of its parts.}{\emph{More is Different:
@@ -1693,17 +1694,17 @@ of the callgraph too.
 
 \subsubsection{Validating real-time constraints satisfaction}
 
-The \type{mutrace} and \type{matrace} tools profile the program to
-find much more specific patterns of resource usage. The first one
-traces a program to find which locks are used in a real-time thread,
-the number of contentions and the amount spent both contending and
-withing the lock's critical section. The later finds allocations and
-deallocations that happen within a real-time thread. It uses a much
-more lightweight kind of instrumentation that only relinks the
-application with wrapped versions of \emph{pthreads} and \emph{libc}
-that allow the profiler to collect the statistics. In order to run the
-program with these tools we passed the following extra compile
-flags:
+The \type{mutrace}\index{mutrace} and \type{matrace}\index{Matrace}
+tools profile the program to find much more specific patterns of
+resource usage. The first one traces a program to find which locks are
+used in a real-time thread, the number of contentions and the amount
+spent both contending and withing the lock's critical section. The
+later finds allocations and deallocations that happen within a
+real-time thread. It uses a much more lightweight kind of
+instrumentation that only relinks the application with wrapped
+versions of \emph{pthreads} and \emph{libc} that allow the profiler to
+collect the statistics. In order to run the program with these tools
+we passed the following extra compile flags:
 \begin{verbatim}
     -rdynamic -DPSYNTH_NO_LOG_RT_REQUEST
 \end{verbatim}

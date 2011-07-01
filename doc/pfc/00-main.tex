@@ -15,6 +15,8 @@
 % \PassOptionsToPackage{backref}{classicthesis-preamble}
 % \usepackage[hyperpageref]{backref}
 % \usepackage[linedheaders]{classicthesis}
+\usepackage[hyphens]{url}
+
 \usepackage{arsclassica}
 \usepackage[b5paper,centering,top=2.5cm,bottom=2.5cm]{geometry}
 
@@ -30,7 +32,6 @@
 \usepackage{amsmath}
 \usepackage{amsfonts}
 \usepackage{amssymb}
-\usepackage{url}
 \usepackage{graphicx}
 \usepackage{alltt}
 % \usepackage{fancyhdr}
@@ -48,6 +49,9 @@
 % \usepackage{theorem}
 % \usepackage[avantgarde]{quotchap}
 \usepackage[framed,thref,hyperref]{ntheorem}
+
+\usepackage{makeidx}
+
 \usepackage{multirow}
 \usepackage{setspace}
 % \linespread{1.6}
@@ -100,8 +104,6 @@
 % \let\todo=\comment 
 % \let\endtodo=\endcomment 
 % }
-
-\makeindex
 
 \newcommand{\myTitle}{GNU Psychosynth: A framework for modular,
   interactive and collaborative sound synthesis and live music
@@ -162,6 +164,8 @@
 }
 \makeatother
 
+\makeindex
+
 \begin{document}
 
 \input{00-preface}
@@ -183,14 +187,18 @@
 \input{04-graph}
 \input{05-conclusion}
 
-\bibliography{00-main}
-\bibliographystyle{acm}
-\addcontentsline{toc}{chapter}{Bibliography}
-
 \startappendix
 
 \input{98-user}
 \input{99-fdl}
+
+\bibliography{00-main}
+\bibliographystyle{acm}
+\addcontentsline{toc}{chapter}{Bibliography}
+
+\clearpage
+\printindex
+\addcontentsline{toc}{chapter}{Index}
 
 \end{document}
 
