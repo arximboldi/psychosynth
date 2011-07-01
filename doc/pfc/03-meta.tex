@@ -6,82 +6,92 @@
   \setlength{\epigraphwidth}{.65\textwidth}
   %\renewcommand{\textflush}{flushepinormal}
   \epigraph{Numbers it is. All music when you come to think.  Two
-    multiplied by two divided by half is twice one.  Vibrations: chords
-    those are. One plus two plus six is seven. Do anything you like with
-    figures juggling. Always find out this equal to that. Symmetry under
-    a cemetery wall. He doesn’t see my mourning. Callous: all for his
-    own gut. Musemathematics. And you think you’re listening to the
-    etherial. But suppose you said it like: Martha, seven times nine
-    minus $x$ is thirtyfive thousand.  Fall quite flat. It’s on account of
-    the sounds it is.}{\emph{Ulysses}\\\textsc{James Joyce}}
+    multiplied by two divided by half is twice one.  Vibrations:
+    chords those are. One plus two plus six is seven. Do anything you
+    like with figures juggling. Always find out this equal to
+    that. Symmetry under a cemetery wall. He doesn’t see my
+    mourning. Callous: all for his own gut. Musemathematics. And you
+    think you’re listening to the etherial. But suppose you said it
+    like: Martha, seven times nine minus $x$ is thirtyfive thousand.
+    Fall quite flat. It’s on account of the sounds it
+    is.}{\emph{Ulysses}\\\textsc{James Joyce}} 
 }
 
 \section{Analysis}
 
-Requirements \ref{req:iter1-begin} to \ref{req:iter1-end} and
-\ref{req:iter1-begin2} to \ref{req:iter1-end2} refer to the second
-layer of our system --- in a bottom-up approach. The most crucial
-question here: how do we represent a sound in a computer? Then, a new
-question arises: how do we get the sound to the speakers? The later
-question has a trivial answer --- use whatever API your operating
-system exposes for delivering sound to the soundcard --- but the first
-question is still to be answered. Actually, the solution to this first
-question mostly subsumes the issue of how to interface with these
-external interfaces, thus, shall we debate it with care.
-\todo{Añadir más dibujitos.}
+\index{analysis}Requirements \ref{req:iter1-begin} to
+\ref{req:iter1-end} and \ref{req:iter1-begin2} to \ref{req:iter1-end2}
+refer to the second layer of our system --- in a bottom-up
+approach. The most crucial question here is: how do we represent a
+sound in a computer? Then, a new question arises: how do we get the
+sound to the speakers? The later question has a trivial answer --- use
+whatever API your operating system exposes for delivering sound to the
+soundcard --- but the first question is still to be
+answered. Actually, the solution to this first question mostly
+subsumes the issue of how to interface with these external interfaces,
+thus, we shall debate it with care.
 
 \subsection{Factors of sound representation}
 
-A sound signal is a longitudinal wave of air in motion. We can
-analogically record the \emph{proximal stimuli} --- i.e. the physical
+\index{signal (sound)}A sound signal is a longitudinal
+wave\index{wave} of air in motion. We can analogically record the
+\emph{proximal stimuli}\index{proximal stimuli} --- i.e. the physical
 stimuli leading to the subjective act of perception
-\cite{goldstein01sensation} --- sound by measuring the successive
+\cite{goldstein01sensation} --- of sound by measuring the successive
 oscillating values of air pressure in the observer's point in
-space. Note that an static air pressure value can not be perceived and
-the sensation of sound is caused by the relative oscillation of this
-measure. The \emph{amplitude} of this change is associated to our
-perception of \emph{loudness}, the frequency of this oscillation
-mostly logarithmically determines our perception of pitch. We phrased
-this conditionally because these two variables are actually
-interrelated and our actual subjective perception of loudness might
-vary with pitch and otherwise \cite{fletcher37loudness}.
+space. Note that a constant air pressure value can not be perceived
+and the sensation of sound is caused by the relative oscillation of
+this measure. The \emph{amplitude}\index{amplitude} of this change is
+associated to our perception of \emph{loudness}\index{loudness}, and
+the frequency of this oscillation mostly logarithmically determines
+our perception of \emph{pitch}\index{pitch}. We phrased this
+conditionally because these two variables are actually interrelated
+and our actual subjective perception of loudness might vary with pitch
+and vice-versa \cite{fletcher37loudness}. The \emph{sound pressure
+  level} (SPL) is a logarithmic measure of the effective sound
+pressure of a sound relative to a reference value. It is measured in
+\emph{decibels (dB)}\index{dB, decibel} above a standard reference
+level.
 
-Most of the time, we represent the relative air pressure value as a
-voltage, that varies at some range --- e.g. $[ -5, 5 ] V$. This is an
-analogous signal that we have to discretise somehow in order to
+Most of the time, in hardware, we represent the SPL value as a voltage
+value, that varies within some range --- e.g. $[ -5, 5 ] V$. This is
+an analog signal that we have to discretise somehow in order to
 manipulate it computationally.
 
 \subsubsection{Temporal quantisation}
 
-Temporal quantisation relates to how many times per second do we store
-the current voltage or air pressure value. Figure \ref{fig:sampled-1}
-shows this, every equally spaced vertical line is a discrete
-instantaneous sample and the information in between is lost. The value
-of the signal between two samples is unknown, but we can use some
-interpolation method to \emph{upsample} a signal --- i.e. to figure
-out what is between two samples. Most of the time we refer to the
-\emph{sampling rate}, in hertz, as the frequency of the temporal
-quantisation.
+\index{quantisation!temporal}Temporal quantisation relates to how many
+times per second do we measure the current voltage or air pressure
+value. Figure \ref{fig:sampled-1} illustrates this, every equally
+spaced vertical line is a discrete instantaneous sample and the
+information in between is lost. The value of the signal between two
+samples is unknown, but we can use some interpolation method to
+\index{upsampling}\emph{upsample} a signal --- i.e. to figure out what
+is between two samples. Most of the time we refer to the
+\emph{sampling rate}\index{sample rate}, in hertz, as the frequency of
+the temporal quantisation.\index{hertz}
 
 \begin{figure}[h!]
   \centering
-  \includegraphics[width=.8\textwidth]{pic/sampled-1.pdf}
+  \includegraphics[width=.7\textwidth]{pic/sampled-1.pdf}
   \caption{Temporal quantisation of continuous 1-D signal.}
   \label{fig:sampled-1}  
 \end{figure}
 
-We know from \emph{Niquist-Shannon sampling theorem} that perfect
+We know from \emph{Niquist-Shannon sampling
+  theorem}\index{Niquist-Shannon sampling theorem} that perfect
 reconstruction of a signal is possible when the sampling frequency is
 greater than twice the maximum frequency of the signal being sampled,
-or equivalently, when the \emph{Nyquist frequency} (half the sample
-rate) exceeds the highest frequency of the signal being
-sampled. Because the hearing range in most human beings is 20 Hz--20
-kHz, audio compact discs use a 44.1 kHz sampling rate. Other popular
-rates in audio production are 48 kHz, 96 kHz and 192 kHz. Sampling
-rates bellow 44.1 kHz are used also in old computer games that were
-limited by the computing power and low bandwidth systems such as
-telephone, where low cost and proper understanding of human speech is
-more important than audio fidelity.
+or equivalently, when the \index{Nyquist frequency} \emph{Nyquist
+  frequency} (half the sample rate) exceeds the highest frequency of
+the signal being sampled. Because the audible frequency range in best
+hearing human beings is 20 Hz--20 kHz, audio compact discs use a 44.1
+kHz sampling rate. Other popular rates in audio production are 48 kHz
+(DVD), 96 kHz (DVD-Audio, Blue Ray) and 192 kHz (High Definition
+DVD-Audio, Blue Ray). Sampling rates bellow 44.1 kHz are used also in
+old computer games that were limited by the computing power, and in
+low bandwidth systems such as telephone, where low cost and proper
+understanding of human speech is more important than audio fidelity.
 
 The sound representation mechanism itself does not vary with the
 sampling rate, and thus supporting various rates depends more on the
@@ -93,56 +103,58 @@ samples per second being the biggest constraint.
 
 \begin{figure}[h!]
   \centering
-  \includegraphics[width=.8\textwidth]{pic/sampled-2.pdf}
+  \includegraphics[width=.7\textwidth]{pic/sampled-2.pdf}
   \caption{Spatial quantisation of continuous 1-D signal.}
   \label{fig:sampled-2}  
 \end{figure}
 
 \begin{figure}[h!]
   \centering
-  \includegraphics[width=.8\textwidth]{pic/sampled-3.pdf}
+  \includegraphics[width=.7\textwidth]{pic/sampled-3.pdf}
   \caption{Fully quantised continuous 1-D signal}
   \label{fig:sampled-3}
 \end{figure}
 
-Spatial quantisation determines how many possible values can a sample
-take in our finite and discrete scale. Figure \ref{fig:sampled-2}
-shows a linear spatial quantisation, represented by the dotted lines
-parallel to the abscissa axis. That is a best fit quantisation
-assuming a time continuum, in practise, spatial quantisation is
-applied over an already discreet time, figure \ref{sampled-3} combines
-the quantisations of figures \ref{fig:sampled-1} and
-\ref{sampled-2}. In a computer system, spatial quantisation is mostly
-determined by the size in bits of the underlying type used to store
-the samples. Also, the quantisation is affected by how we space the
-different plausible values. In practise, linear quantisation
----i.e. equally spaced samples--- is most in audio formats targeted at
-music, but logarithmic and other non-linear divisions are common in
-telephony and other lo-fi systems. Note that using floating point
-values to represent samples, as it is often done in software
-synthesis, provides an implicitly logarithmic audio quantisation. An
-audio CD uses a \emph{bitdepth} of 16 bit with samples that can take
+\index{quantisation!spatial}Spatial quantisation determines how many
+possible values can a sample take in a finite and discrete
+scale. Figure \ref{fig:sampled-2} shows a linear spatial quantisation,
+represented by the dotted lines parallel to the abscissa axis. That is
+a best fit quantisation assuming a time continuum, in practise,
+spatial quantisation is applied over an already discreet time, figure
+\ref{fig:sampled-3} combines the quantisations of figures
+\ref{fig:sampled-1} and \ref{fig:sampled-2}. In a computer system,
+spatial quantisation is mostly determined by the size in bits of the
+underlying type used to store the samples. Also, the quantisation is
+affected by how we space the different plausible values. In practise,
+linear quantisation --- i.e. equally spaced samples --- is most used
+in audio formats targeted at music and multimedia, but logarithmic and
+other non-linear divisions are common in telephony and other lo-fi
+systems. Note that using floating point values to represent samples,
+as it is often done in software synthesis, provides an implicitly
+logarithmic audio quantisation. An audio CD uses a
+\index{bitdepth}\emph{bitdepth} of 16 bit with samples that can take
 $65.536$ possible values while professional audio uses 24 bit or 32
-bit samples. We can even see systems using 64 bit samples during the
+bit samples. We can even find systems using 64 bit samples during the
 processing to avoid accumulative rounding problems due to heavy
-arithmetic. The \emph{dynamic range} of a signal with $Q$-bits
-quantisation is:
+arithmetic. The \index{dynamic range}\emph{dynamic range} of a signal
+with $Q$-bits quantisation is:
 \begin{equation}
   \mathrm{DR_{ADC}} = 20 \times \log_{10}(2^Q) = (6.02 \cdot Q)\, \mathrm{dB}
 \end{equation}
-The maximum \emph{signal-to-noise} ratio for such a system is:
+\index{SNR, signal to noise ratio} The maximum \emph{signal-to-noise}
+ratio (SNR) for such a system is:
 \begin{equation}
   \mathrm{SNR_{ADC}} =  \left (1.76 + 6.02 \cdot Q \right )\ \mathrm{dB}
 \end{equation}
 
 Most analog systems are said to have a dynamic range of around 80 dB
-\cite{fries05digital}. Digital audio CD have a theoretical
-dynamic range of 96 db --- actual value is around 90 db due to
-processing. Human hearing pain level is at 135 db but actually
+\cite{fries05digital}. Digital audio CD have a theoretical dynamic
+range of 96 dB --- actual value is around 90 dB due to
+processing. Human hearing pain threshold is at 135 dB but actually
 prolonged exposure to such loud sound can cause damage. A loud rock
-concert is around 120 dB and a classical music performance is at
-110 db \cite{ludwig09music}, thus requiring bitdepth of at least 24
-bit (theoretical dynamic range of 144 dB) for perfect fidelity.
+concert is around 120 dB and a classical music performance is at 110
+dB \cite{ludwig09music}, thus requiring bitdepth of at least 24 bit
+(theoretical dynamic range of 144 dB) for perfect fidelity.
 
 There are some other aspects related to representation of samples in a
 computer, such as the \emph{signedness} of the underlying type. Signed
@@ -155,78 +167,92 @@ representation in current audio software as nowadays processors are
 optimised for SIMD\footnote{Single Instruction Multimple Data, as
   supported by MMX, 3D Now! and SSE extensions in Intel and AMD chips}
 floating point arithmetic. Moreover, the algorithms implementation is
-much harder to encode because products produce greater values and
-there are many ways on how to account the carry.  Actually, even while
-the actual bitdepth (the bit for the mantissa) of a 32 bit floating
-point is the same of a 24 bit fixed point, then a 32 bit fixed point
-will have a quite lower \emph{quantization error}, but the dynamic
-range and SNR of a floating point is much higher because the
-values are spaced logarithmically over a huge range
+much harder to encode with fixed point arithmetic because products
+yield greater values and there are many issues on how to account the
+carry.  Actually, even while the actual bitdepth (the bit for the
+mantissa) of a 32 bit floating point is the same of a 24 bit fixed
+point, then a 32 bit fixed point will have a quite lower
+\emph{quantization error}\index{quantisation!error}, but the dynamic
+range and SNR of a floating point is much higher because the values
+are spaced logarithmically over a huge range
 \cite{smith02dsp}. Another factor is the \emph{endianess} of fixed
-point values but is relevant only when interfacing with file formats
-and output devices.
+point values but is this relevant only when interfacing with file
+formats and output devices.
+
+The last concern related to quantisation is
+\emph{dithering}\index{dithering}. Dithering is the process of adding
+a white noise signal in a range similar to that of the quantisation
+step --- e.g. $[-2^{-n}, 2^{-n}]$ for a linear $n$-bit quantisation
+--- prior to doing the quantisation itself. While this increases the
+overall SNR, the perceived subjective distortion is much smaller as
+harmonics introduced by the regularity of quantisation error are
+softened; with a proper noise model we can even push the harmonic
+artifacts outside the audible range to achieve minor distortion
+\cite{vanderkooy87dither, lipshitz91minimally}.
 
 \subsubsection{Channel space}
 
-Because our hearing system is dicotomically symmetric, audio engineers
-discovered that much better fidelity can be achieved by reproducing
-the sound with some differences from two separate loudspeakers. This
-is the well-known \emph{stereophonic} sound, commonly named just
+\index{channel}Because our hearing system is dicotomically
+symmetric, audio engineers discovered that much better fidelity can be
+achieved by reproducing the sound with some differences from two
+separate loudspeakers. This is the well-known
+\emph{stereophonic}\index{stereophonic} sound, commonly named just
 \emph{stereo}. For representing such a signal, two different streams
 of information are needed for the left and right channels. Moreover,
-nowdays \emph{quadraphonic}, and \emph{surround} sound with varying
-numbers of channels up to 20.2 are used in different systems.
+nowdays \emph{quadraphonic}\index{quadraphonic}, and \index{surround
+  (audio)}\emph{surround} sound with varying numbers of channels up to
+20.2 are used in different systems.
 
-We call \emph{channel space} to the set of semantic channels we use in
-some sort of audio representation --- e.g. stereo audio has channel
-space with $left$ and $right$ elements. We use the term
-\emph{frame} to call a set of samples coincident in time, this is, the
-samples of the various channels at a given time point. Thus, we will
-use most of the time the more accurate term \emph{frame rate}.
+We call \emph{channel space}\index{channel!space} to the set of
+semantic channels we use in some sort of audio representation ---
+e.g. stereo sound has a channel space with $left$ and $right$
+elements. We use the term \index{frame (audio)}\emph{frame} to call a
+set of samples coincident in time, this is, the samples of the various
+channels at a given time point. Thus, we will use most of the time the
+more accurate term \emph{frame rate}\index{frame rate} to characterise
+the temporal quantisation regardless of the number of channels in the
+sound signal. Under this definition:
+\begin{equation}
+sample\_rate = num\_channels \times frame\_rate
+\end{equation}
+Still, many texts use the term samples rate and frame rate
+interchangeably, so one must be careful and pay attention to the
+context.
 
 \begin{figure}[h]
   \centering
   \subfloat[]{\includegraphics[width=2in]{pic/fmt-planar.png}}\;
   \subfloat[]{\includegraphics[width=3in]{pic/fmt-interleaved.png}}
-  \caption{Multi-channal data in planar (a) and interleaved (b) form.}
+  \caption{Multi-channel data in planar (a) and interleaved (b) form.}
   \label{fig:interleaving}
 \end{figure}
 
 This rises the problem on how to linearise the multi channel data. The
-most common mechanism in domestic hardware is by \emph{interleaving}
-the samples of different channels, this is, by storing the frames
-sequentially. However, high-end hardware often accepts data in
-non-interleaved form where the samples of each channel is stored in a
-separate sequence. In this document, we borrow from the image
-processing world the term \emph{planar} to refer to non-interleaved
-data. Software doing a lot of processing of the audio signal often
-chooses this representation as it is easier to scale to varying number
-of channels and split the signal to do per-channel filtering. Figure
-\ref{fig:interleaving} compares visually the interleaved and planar
-formats.
+most common mechanism in domestic hardware is by
+\emph{interleaving}\index{interleaving} the samples of different
+channels, this is, by storing the frames sequentially. However,
+high-end hardware often accepts data in non-interleaved form where the
+samples of each channel is stored in a separate sequence. In this
+document, we borrow from the image processing world the term
+\emph{planar}\index{planar (non-interleaved)} to refer to
+non-interleaved data. Software doing a lot of processing of the audio
+signal often chooses this representation as it is easier to scale to
+varying number of channels and split the signal to do per-channel
+filtering. Figure \ref{fig:interleaving} compares the
+interleaved and planar formats visually.
 
 Another issue is the order in which the data from different semantic
-channels is stored. We call a \emph{channel layout} a bijection $L : C
-\rightarrow \mathbb{Z}_{\|C\|}$, where $C$ is a given \emph{channel
-  space}. For example, the mapping $\{ left
-\mapsto 0, right \mapsto 1 \}$ is a common layout for stereo sound,
-but $\{ left \mapsto 1, right \mapsto 0 \}$ is sometimes used too.
-
-The last concern related to quantisation is
-\emph{dithering}. Dithering is the process of adding a white noise
-signal in a range similar to that of the quantisation step
----e.g. $[-2^{-n}, 2^{-n}]$ for a linear $n$-bit quantisation--- prior
-to doing the quantisation itself. While this increases the overall
-SNR, the perceived subjective distortion is much smaller as harmonics
-introduced by the regularity of quantisation error are aliased; with a
-proper noise model we can even push the harmonic artifacts outside the
-audible range to achieve minor distortion \cite{vanderkooy87dither,
-  lipshitz91minimally}.
+channels is stored. We call \index{channel
+  layout}\emph{channel!layout} to a bijection $L : C \rightarrow
+\mathbb{Z}_{\|C\|}$, where $C$ is a given \emph{channel space}. For
+example, the mapping $\{ left \mapsto 0, right \mapsto 1 \}$ is a
+common layout for stereo sound, but $\{ left \mapsto 1, right \mapsto
+0 \}$ is sometimes used too.
 
 \subsection{Common solutions}
 
 As we have already noticed, 32 bit floating point sound with planar
-left-right layout the most common in software of our kind during
+left-right layout is the most common in software of our kind during
 internal processing. As most of this software is written in C, a
 simple \texttt{float**} does the job. This was, actually, the internal
 representation used in GNU Psychosynth in versions prior to 0.2.0,
@@ -239,30 +265,34 @@ the \texttt{audio\_buffer} class provided different
 asterisk can be substituted by different sample formats like
 \texttt{s16} or \texttt{s32} (fixed point signed 16 bit and 32 bit
 respectively). This is very inconvenient because, as we have seen
-through this section, many orthogonal factor affect audio
+through this section, many orthogonal factors affect audio
 representation inducing a combinatorial explosion of format conversion
-functions. Take a look at the 64 different read and write functions in
-the \texttt{pcm.c} file of the
+functions. If the reader wants more evidence, we invite she to take a
+look at the 128 different read and write functions in the
+\texttt{pcm.c} file of the
 LibSndfile\footnote{\url{http://www.mega-nerd.com/libsndfile/}}
 library.
 
 This is a maintenance hell, but using the common means for abstracting
-orthogonal behaviour variability, i.e. dynamic polymorphism, is simply
-not an option in any audio software which supports real-time
-operation.
+orthogonal behaviour variability, i.e. dynamic
+polymorphism\index{polymorphism!dynamic}, are simply not an option in
+any audio software which supports real-time operation because of the
+associated overhead.
 
 \subsection{A generic approach: Boost.GIL}
 
 However, there is a piece of software that proved that this issue can
-be solved in C++ using static polymorphism. This is the Generic Image
+be solved in C++ using static
+polymorphism\index{polymorphism!static}. This is the Generic Image
 Library\footnote{\url{http://stlab.adobe.com/gil}} which was developed
 by Lubomir Bourdev et. Al inside Adobe Software Technology Lab that
-was later include inside the Boost library distribution.
+was later include inside the Boost library
+distribution. \index{Generic Image Library}
 
 While sound and image manipulation are quite different, specially from
 the psycho-perceptive point of view, they are both a signal processing
-problem and thus share a lot in the representational issue. By
-realising of a proper conceptual mapping between both worlds (table
+problems and thus share a lot in the representational issue. By
+realising a proper conceptual mapping between both worlds (table
 \ref{tab:gilmap}), most of the library design and even quite a lot of
 code of Boost.GIL can be reused to build a unique state-of-the-art
 sound processing library that addresses the aforementioned issues in
@@ -285,16 +315,17 @@ performance.
   \label{tab:gilmap}
 \end{table}
 
-An \emph{image} is bidimensional matrix of \emph{pixels}, that capture
-the properties of light electromagnetic waveform at those discrete
-points. Each pixel, however, is decomposed in several \emph{colors}
-that, for example, capture the intensity in the red, green and blue
-sensors of a CCD camera. As there are different ways of decomposing an
-audio frame (e.g, stereo, surround, etc.), there are different ways of
+An \emph{image}\index{image} is bidimensional matrix of
+\index{pixel}\emph{pixels}, that capture the properties of light
+electromagnetic waveform at those discrete points. Each pixel,
+however, is decomposed in several \index{colour}\emph{colours} that,
+for example, capture the intensity in the red, green and blue sensors
+of a CCD camera. As there are different ways of decomposing an audio
+frame (e.g, stereo, surround, etc.), there are different ways of
 decomposing a pixel into several values, known as the \emph{color
   space} (e.g, RGB, CMYK, YUV, etc.). Boost.GIL uses the term
 \emph{channel} to name the individual value of one those color
-components.
+components.\index{colour space}
 
 In our audio framework, a \emph{buffer} is unidimensional array of
 \emph{frames} that represent a sound or part of a sound --- sound is
@@ -316,56 +347,61 @@ to describe in the following section.
 
 \section{Design}
 
-This section describes the design of the modules implemented in this
-layer. We will first introduce some advanced techniques used in the
-design that the reader might be unfamiliar with. Then, sections
-\ref{sec:ns-sound-beg} to \ref{sec:ns-sound-end} will describe the
-classes in the \texttt{psynth::sound} namespace, section
-\ref{sec:ns-io} will be dedicated to the \texttt{psynth::io} namespace
-and finally section \ref{sec:ns-synth} to the \texttt{psynth::synth}
+\index{design}\index{namespace}This section describes the design of
+the modules implemented in this layer. We will first introduce some
+advanced techniques used in the design that the reader might be
+unfamiliar with. Then, sections \ref{sec:ns-sound-beg} to
+\ref{sec:ns-sound-end} will describe the classes in the
+\texttt{psynth::sound} namespace, section \ref{sec:ns-io} will be
+dedicated to the \texttt{psynth::io} namespace and finally section
+\ref{sec:ns-synth} to the \texttt{psynth::synth}
 namespace. \texttt{psynth::io} and \texttt{psynth::synth} are
 independent from eachother and both depend on
 \texttt{psynth::sound}. Still, from the architectural point of view
-they are all considered to be on the same layer --- the ``synth''
-layer dedicated to mostly statically arranged sound synthesis and
+they are all considered to be on the same layer --- the \emph{synth}
+layer dedicated to all the statically arranged sound synthesis and
 processing.
 
 \subsection{Core techniques}
 
-The Boost.GIL and thus the Psynth.Sound modules design makes heavy use
-of static polymorphism and generic programming via C++ templates to
-achieve generality without runtime overhead. We are going to introduce
-advanced techniques used in generic programming for the reader
-unfamiliar with this programming paradigm.
+The Boost.GIL and thus the Psynth.Sound modules design make heavy use
+of static polymorphism and \index{generic programming}generic
+programming via C++ templates to achieve generality without runtime
+overhead. We are going to introduce advanced techniques used in
+generic programming for the reader unfamiliar with this programming
+paradigm.
 
 \subsubsection{Concepts}
 \label{sec:concepts}.
 
-\emph{Concepts} \cite{jarvi10concept} are to generic programming what
+\index{interface (OOP)}\index{concepts (C++)}\emph{Concepts}
+\cite{jarvi10concept} are to generic programming what
 \emph{interfaces} --- pure abstract classes in C++ --- are to object
 oriented programming: they specify the requirements on some
-type. However there, are few substantial differences. (1) While
+type. However, there are few substantial differences. (1) While
 interfaces can only specify the method signatures of its instances, a
 concept can specify most syntactic constraints on a type, like the
-existence of free functions, operators, nested types, etc. (2) While
-dispatching through interfaces requires, at least, a dereference,
-addition and function call \cite{driesen96direct}, when using concepts
-the concrete function to be executed can be determined and even
-inlined at compile-time. (3) One can not declare that a type satisfies
-an interface separately from the type definition, but one can say that
-a type models a concept at any point of the program. (4) Thus, no
-primitive type defines any virtual interface, but one can turn any
-primitive type into an instance of any concept via a
-\texttt{concept\_map}. (5) Actually, the syntactic properties defined
-by a concept its models may differ, but they are matched via the
-\texttt{concept\_map}. In fact, C++ concepts are more similar to
-Haskell \emph{type classes}, with \texttt{instace} doing the job of
-\texttt{concept\_map} \cite{bernardy08comparison}.
+existence of related free functions, operators, nested types, etc. (2)
+While dispatching through interfaces requires, at least, a
+dereference, addition and function call \cite{driesen96direct}, when
+using concepts the concrete function to be executed can be determined
+and even inlined at compile-time. (3) One can not declare that a type
+satisfies an interface separately from the type definition, but one
+can say that a type models a concept at any point of the program. (4)
+Thus, no primitive type defines any virtual interface, but one can
+turn any primitive type into an instance of any concept via a
+\index{concept\_map}\texttt{concept\_map}. (5) Actually, the syntactic
+properties defined by a concept its models may differ, but they are
+matched via the \texttt{concept\_map}. In fact, C++ concepts are more
+similar to \index{Haskell}Haskell \emph{type classes}, with
+\texttt{instance} doing the job of \texttt{concept\_map}
+\cite{bernardy08comparison}.
 
-Concepts are an extension to the template mechanism to add type
-checking for it. In fact, checking and dispatching on requirements can
-be achieved with techniques like SFINAE (Substitution Failure Is Not
-an Error) \cite{vandervoorde08templates}. Property (5) of our concepts
+Concepts are an extension to the template mechanism to add some sort
+of type checking for its template parameters. In fact, without
+concepts, checking and dispatching based on requirements can be
+achieved with techniques like SFINAE (Substitution Failure Is Not an
+Error) \cite{vandervoorde08templates}. Property (5) of our concepts
 can be simulated with \emph{traits} \cite{c++traits}. However, both
 compiler errors and the code using templates without concepts is
 usually much more unreadable.
@@ -404,12 +440,12 @@ existence of a less-than comparator for the parametrised type:
 \begin{lstlisting}
 template<LessThanComparable T>
 const T& min (const T& x, const T& y) {
-  return x < y? x : y;
+  return x < y ? x : y;
 }
 \end{lstlisting}
 
-An alternative syntax for specifying that \texttt{T} must satisify the
-\texttt{LessThanComparable} concept is the \texttt{where} clause:
+An alternative syntax for specifying that \texttt{T} must satisfy a
+concept is the \texttt{where} clause:
 
 \begin{lstlisting}
 template<typename T>
@@ -451,18 +487,18 @@ This should suffice as an introduction to concepts in order to
 understand the concept definitions that we will later show when
 modelling our system. A more detailed view can be read in the cited
 bibliography, with \cite{jarvi10concept} being the most updated and
-useful from a programmer point of view.
+useful from a programmer's point of view.
 
 \subsubsection{Metaprogramming}
 
-The C++ template system is Turing complete
+\index{metaprogramming}The C++ template system is Turing complete
 \cite{veldhuizen03templates}, thus it can be used to perform any
 computation at \emph{compile time}. This was first noted in 1994 by
 Erwin Unruh who, in the middle of a C++ standardisation committee,
 wrote a template meta-program that outputted the first $N$ prime
 numbers on the console using compiler errors \cite{unruh94prime}. Even
 though this might seem just a crazy puzzle game, it can be used in
-practise and actually new Boost libraries use it extensively. A very
+practise and, actually, new Boost libraries use it extensively. A very
 gentle introduction to template metaprogramming can be found in
 \cite{alexandrescu01modern}, where Alexandrescu uses them to
 instantiate design patterns as generic C++ libraries. A deeper
@@ -476,16 +512,18 @@ metaprogramming\footnote{It is often called ``the STL of template
   metaprogramming''.} and we will use it in our implementation.
 
 Template metaprogramming is possible thanks to \emph{partial template
-  specialisation}, that allows giving an alternate definition for a
-pattern matched subset of its possible parameter values. A
-\emph{metafunction} is thus just a template \texttt{class} or
-\texttt{struct} with a public member that holds the result of the
-function. It is up to the programmer to choose the naming convention
-for the result members of the metafunctions, in the following, we will
-use Abraham's style calling \texttt{type} for result values that are a
-type, and \texttt{value} for integral values. Listing \ref{lst:fib}
-illustrates how can we write and use a metafunction for computing the
-$n$-th Fibonacci number.
+  specialisation}\index{template specialisation}, that allows giving
+an alternate definition of a template for a pattern matched subset of
+its possible parameter values. A
+\emph{metafunction}\index{metafunction} is thus just a template
+\texttt{class} or \texttt{struct} with a public member that holds the
+result of the compile-time function. It is up to the programmer to
+choose the naming convention for the result members of the
+metafunctions. In the following, we will use Abraham's style calling
+\texttt{type} for result values that are a type, and \texttt{value}
+for integral value results. Listing \ref{lst:fib} illustrates how 
+we can write and use a metafunction for computing the $n$-th Fibonacci
+number.\index{Fibonacci number}
 
 \begin{lstlisting}[float=h!, 
   caption=Metaprogram for computing the Nth Fibonacci number,
@@ -514,29 +552,30 @@ int main () {
 
 The program returns the forty-second Fibonacci value. However, it will
 take no time to execute, because the number is computed at compile
-time. We use recursion to define the metafunction for the general case
-and the specialise for the base cases.
+time. We use a recursive template to define the metafunction for the
+general case and then specialise for the base cases.
 
-If we consider the template system as a meta-language on its own, we
-should describe its most outstanding semantic properties. It is a pure
-functional programming language, because variables are immutable. It
-is lexically scoped. It supports both lazy and strict evaluation,
-depending on whether we choose to access the nested \texttt{type}
-result name at call site or value usage type. When we look at the meta
-type system, we find three meta types: types (which are duck-typed
-records), integrals (e.g. \texttt{int}, \texttt{char}, \texttt{bool}
-...) and meta-functions (i.e. templates).
+If we consider the template system as a
+\index{meta-language}meta-language on its own, we should describe its
+most outstanding semantic properties. It is a pure functional
+programming language, because variables are immutable. It is lexically
+scoped. It supports both lazy and strict evaluation, depending on
+whether we choose to access the nested \texttt{type} result name at
+call site or value usage type. When we look at the meta type system,
+we find three meta types: types (which are duck-typed records),
+integrals (e.g. \texttt{int}, \texttt{char}, \texttt{bool} ...) and
+meta-functions (i.e. templates).\index{functional programming}
 
 The fact that records are duck typed but integrals and metafunctions
-cause several inconveniences in practice, specially when dealing with
-the later. For example, in the absence of template aliases, returning
-a metafunction produced by another function requires defining a nested
-struct that inherits from the actual synthesised value. Also, the
-template signature should be specified on a template parameter
-expecting a template.
+are type checked cause several inconveniences in practice, specially
+when dealing with the later. For example, in the absence of template
+aliases, returning a metafunction produced by another function
+requires defining a nested struct that inherits from the actual
+synthesised value. Also, the template signature should be specified on
+a template parameter expecting a template.
 
 In order to simplify our meta type system we shall wrap constants in a
-type like on listing \ref{lst:integral_c}.
+type like in listing \ref{lst:integral_c}.
 
 \begin{lstlisting}[float, 
   caption=Integral constant nullary metafunction  wrapper.,
@@ -554,7 +593,8 @@ explaining. First, the \texttt{BOOST\_STATIC\_CONSTANT} macro is used
 to define a constant. Internally, it will try to use \texttt{enum} or
 any other mechanism available to actually define the constant such
 that the compiler is not tempted to allocate static memory for the
-constant. Second, the \texttt{typedef} referring to itself turns a
+constant --- like \type{constexpr} in C++0x supporting
+compilers. Second, the \texttt{typedef} referring to itself turns a
 constant value into a self returning nullary meta-function. This can
 be very convenient because, for example, it allows using
 \emph{value}\texttt{::type::value} always on the value usage point,
@@ -568,11 +608,11 @@ type --- template or not --- that has a nested type called
 
 Now we should also turn metafunctions into first class entities of the
 meta-language. We just add a new level of indirection and define a
-\emph{metafunction class} as a type with a nested template
-metafunction called \texttt{apply}. The example in listing
-\ref{lst:high_order_fib} also illustrates the metafunction forwarding
-technique when defining the nested \texttt{apply} metafunction by
-inheriting from \texttt{fib}.
+\emph{metafunction class}\index{metafunction class} as a type with a
+nested template metafunction called \texttt{apply}. The example in
+listing \ref{lst:high_order_fib} also illustrates the metafunction
+forwarding technique when defining the nested \texttt{apply}
+metafunction by inheriting from \texttt{fib}.
 
 \begin{lstlisting}[float, caption=Metafunction class for
   computing Fibonacci numbers. We suppose that the previous
@@ -590,12 +630,12 @@ int main ()
 \end{lstlisting}
 
 Using this convention the MPL library defines many useful high order
-metafunctions that take metafunction classes as input, like
-\texttt{mpl::fold} and \texttt{mpl::transform}. Note that it is not
-needed to define metafunction classes for all our metafunctions,
-instead, we shall convert them when needed using the
-\texttt{mpl::quote}\emph{N} functions and the \texttt{mpl::lambda}
-facility.
+metafunctions\index{high order metafunction} that take metafunction
+classes as input, like \texttt{mpl::fold} and
+\texttt{mpl::transform}. Note that it is not needed to define
+metafunction classes for all our metafunctions, instead, we shall
+convert them when needed using the \texttt{mpl::quote}\emph{N}
+functions and the \texttt{mpl::lambda} facility.
 
 \subsection{Core concepts}
 \label{sec:ns-sound-beg}
@@ -608,7 +648,7 @@ suggested in section \ref{sec:concepts}. Thus, traditional modelling
 techniques like the Unified Modelling Language are not useful since
 they are intended for object oriented design.
 
-We are going to follow the following methodology for describing the
+We are going to use the following methodology for describing the
 library. First, we will name a concept and give a brief description of
 its purpose. Then, we will define the concept using the notation
 described in section \ref{sec:concepts} and finally we will enumerate
@@ -621,9 +661,9 @@ reader can find most of them in \cite{stepanov09elements}.
 
 \subsubsection{{ChannelSpaceConcept}}
 
-A channel space is a MPL sequence (like \type{mpl::list}) of whose
-elements channel tags (empty types giving a name for the semantic
-channel).
+A channel space\index{channel space} is a MPL sequence (like
+\type{mpl::list}) of whose elements channel tags (empty types giving a
+name for the semantic channel).
 
 \begin{lstlisting}
 concept ChannelSpaceConcept<MPLRandomAccessSequence Cs> 
@@ -631,8 +671,8 @@ concept ChannelSpaceConcept<MPLRandomAccessSequence Cs>
 \end{lstlisting}
 
 Some example models include \texttt{stereo\-\_space} or
-\texttt{surround\-\_space}. An example on how a user of the library can
-define his own channel space follows.
+\texttt{surround\-\_space}. An example on how a user of the library
+can define his own channel space follows.
 
 \begin{lstlisting}
 struct left_channel {};
@@ -651,17 +691,17 @@ incompatible, but it suffices in practise.
 \subsubsection{{SampleMappingConcept}}
 
 An MPL Random Access Sequence, whose elements model
-\texttt{MPLIntegralConstant} (like \texttt{mpl::int\_}) representing a
-permutation of the channels in the channel space, thus specifying the
-layout.
+\texttt{MPL\-Integral\-Constant} (like \texttt{mpl::int\_})
+representing a permutation of the channels in the channel space, thus
+specifying the layout.
 
 \begin{lstlisting}
 concept SampleMappingConcept<MPLRandomAccessSequence CM> {
 };
 \end{lstlisting}
 
-The \emph{layout} of a frame based type is a channel space plus a
-sample mapping, as defined by:
+The \emph{layout}\index{layout} of a frame based type is a channel
+space plus a sample mapping, as defined by:
 
 \begin{lstlisting}
 template <typename ChannelSpace,
@@ -685,8 +725,8 @@ typedef layout<stereo_space, mpl::vector2_c<int, 1, 0>> rlstereo_layout;
 
 \subsubsection{{SampleConcept}}
 
-A \emph{sample} is the type we use to represent the amplitude of a
-channel at certain point in time.
+A \emph{sample}\index{sample} is the type we use to represent the
+amplitude of a channel at certain point in time.
 
 \begin{lstlisting}
 concept SampleConcept<typename T> :
@@ -740,7 +780,8 @@ User defined types should specialise \texttt{sample\-\_traits} to map
 the concept.
 
 Related trivial concepts are \texttt{MutableSampleConcept} and
-\texttt{SampleValueConcept} (a sample that is also \texttt{Regular}).
+\texttt{SampleValue\-Concept} (a sample that is also
+\texttt{Regular}).
 
 \subsubsection{{SampleConvertibleConcept}}
 
@@ -760,8 +801,8 @@ most supplied sample types being convertible too.
 
 \subsubsection{{ChannelBaseConcept}}
 
-A \emph{channel base} is a container of channel elements (such as
-samples, sample references or sample pointers).
+A \emph{channel base}\index{channel base} is a container of channel
+elements (such as samples, sample references or sample pointers).
 
 The most common use of channel base is in the implementation of a
 frame, in which case the channel elements are sample values. The
@@ -807,7 +848,7 @@ concept ChannelBaseConcept<typename T> :
 
 A channel base must have an associated layout (which consists of a
 channel space, as well as an ordering of the samples).  There are two
-ways to index the elements of a channel base: A physical index
+ways to index the elements of a channel base: a physical index
 corresponds to the way they are ordered in memory, and a semantic
 index corresponds to the way the elements are ordered in their channel
 space.  For example, in the stereo channel space the elements are
@@ -874,14 +915,15 @@ concept FrameBasedConcept<typename T> {
 \end{lstlisting}
 
 There are many models for this in the library, like \type{buffer},
-\type{buffer\_range}, \type{frame}, \type{bitaligned\_frame\_iterator},\\
-\type{bitaligned\_frame\_reference}, \type{packed\_frame} and so on.
+\type{buffer\_range}, \type{frame}, \type{bitaligned\_frame\_iterator},
+\type{bit\-aligned\_\-frame\_\-reference}, \type{packed\-\_frame} and so on.
 
 \subsubsection{{HomogeneousFrameBasedConcept}}
 
 Concept for homogeneous frame-based constructs --- frame based with
 the same sample type for all its channels. These should allow access
-to the underlying sample type.
+to the underlying sample type with the \type{sample\_type}
+metafunction.
 
 \begin{lstlisting}
 concept HomogeneousFrameBasedConcept<FrameBasedConcept T> {
@@ -930,11 +972,10 @@ Related concepts are \type{MutableFrame\-Concept} and
 Frame compatibility should be tested with the
 \texttt{Frames\-Compatible\-Concept}.  Frames are compatible if their
 samples and channel space types are compatible. Compatible frames can
-be assigned and copy constructed from one another.
-
+be assigned and copy constructed from one to another.
 
 Provided models include \type{frame}, \type{packed\-\_frame},
-\type{planar\-\_frame\-\_reference} and
+\type{planar\-\_frame\-\_re\-fe\-rence} and
 \type{bit\-\_aligned\-\_frame\-\_reference}.
 
 \subsubsection{{HomogeneousFrameConcept}}
@@ -962,7 +1003,7 @@ Provided models include \type{planar\_frame\_reference} and
 \subsubsection{{FrameConvertibleConcept}}
 
 A frame type is convertible to another frame type if there exist a
-\texttt{channel\_convert} overload. Convertibility is non-symmetric
+\texttt{channel\_\-convert} overload. Convertibility is non-symmetric
 and implies that one frame can be converted to another, approximating
 the value. Conversion is explicit and sometimes lossy.
 
@@ -1006,8 +1047,8 @@ channel conversion.
 \subsubsection{{FrameIteratorConcept}}
 
 An STL random access traversal iterator over a model of
-\type{FrameConcept}. Our iterators must provide some extra
-metafunctions.
+\type{FrameConcept}. These iterators must provide some extra
+metafunctions, as in:
 
 \begin{lstlisting}
 concept FrameIteratorConcept<typename Iterator> 
@@ -1102,14 +1143,16 @@ concept IteratorAdaptorConcept<
 };
 \end{lstlisting}
 
-There exist a related \type{MutableIteratorAdaptor\-Con\-cept} with the
-usual definition. Classes \type{dereference\-\_iterator\-\_adaptor} and
+There exist a related \type{MutableIteratorAdaptor\-Con\-cept} with
+the usual definition. Classes
+\type{dereference\-\_iterator\-\_adaptor} and
 \type{memory\-\_based\-\_step\-\_iterator} do model the concept.
 
 \subsubsection{RandomAccessBufferRangeConcept}
 
-This is a range, similar to the new STL range defined in C++0x, but
-with some extra members for random access.
+This is a range, similar to the new STL range defined in C++0x (i.e. a
+pair of iterators determining the \emph{begin} and \emph{end} of a
+sequence), but with some extra members for random access.
 
 \begin{lstlisting}
 concept RandomAccessBufferRangeConcept<base::Regular Range> 
@@ -1156,7 +1199,7 @@ semantics.
 
 \subsubsection{BufferRangeConcept}
 
-A random access range over frames, it has extra information to get the
+A random access range over frames. It has extra information to get the
 number of channels of the underlying frame type.
 
 \begin{lstlisting}
@@ -1169,25 +1212,25 @@ concept BufferRangeConcept<RandomAccessBufferRangeConcept Range>
 
 There exists a related \type{MutableBufferRangeConcept} with the
 expected definition. Also, there is a
-\type{RangesAre\-Compati\-ble\-Concept}. Ranges are compatible if they have
-the same channel spaces and compatible sample values. Constness and
-layout are not important for compatibility.
+\type{RangesAre\-Compati\-ble\-Concept}. Ranges are compatible if they
+have the same channel spaces and compatible sample values. Constness
+and layout are not important for compatibility.
 
 The library provides the
 \texttt{buffer\_range<Iterator>} model. There exists also a whole
 family of \emph{range factories} that build a range or transform one
 kind of range into another. These allow to build a buffer range on
 top of raw data provided by an external library, lazily converting
-from once frame type to another, obtaining sub parts of a frame, etc.
+from one frame type to another, obtaining sub parts of a frame, etc.
 
 \subsubsection{RandomAccessBufferConcept}
 
 A container of values. The values are accessible via an associated
 range. Buffers are not ranges by themselves, because that generates
 boilerplate due to constness problems --- a \type{const} range may
-give mutable access to its frames, but a \type{const} buffer does
-not, thus an algorithm that may mutate the frames but not the range
-would have to provide two overloads.
+give mutable access to its referred frames, but a \type{const} buffer
+does not, thus an algorithm that may mutate the frames but not the
+range would have to provide two overloads.
 
 \begin{lstlisting}
 concept RandomAccessBufferConcept<typename Buf> : 
@@ -1224,12 +1267,13 @@ The \type{buffer} class models the concept.
 
 \subsubsection{RandomAccessRingBufferRangeConcept}
 
-Circular or ring buffers provide a virtual continuous flow of data
-where one can write at one end and read from the other. There ring
-buffer has a fixed size and the amount of available data plus free
-space in the structure remains constant during operation, as seen in
-figure \ref{fig:ringbuf}. This data structure is specially important
-for passing audio data through different threads.
+\index{ring buffer}Circular or ring buffers provide a virtual
+continuous flow of data where one can write at one end and read from
+the other. There ring buffer has a fixed size and the amount of
+available data plus free space in the structure remains constant
+during operation, as seen in figure \ref{fig:ringbuf}. This data
+structure is specially important for passing audio data through
+different threads.
 
 \begin{figure}[h!]
   \centering
@@ -1240,9 +1284,12 @@ for passing audio data through different threads.
 
 Our ring buffers wrap and underlying buffer range. Note that each ring
 buffer range keeps its own write pointer, so using multiple ring
-buffer ranges on the same data might lead to subtle problems.
+buffer ranges on the same data might lead to subtle problems. There
+might be multiple readers at different pace in our ring buffers.
 
-\todo{A este concepto le faltan restricciones}.
+%
+% A este concepto le faltan restricciones!!!
+%
 
 \begin{lstlisting}
 concept RandomAccessRingBufferRangeConcept<Regular R> 
@@ -1254,11 +1301,13 @@ concept RandomAccessRingBufferRangeConcept<Regular R>
     typename value_type = range::size_type;
     typename difference_type = range::difference_type;
     
-    typename unsafe_position;
-    typename position;
+    typename unsafe_position; where PositionConcept<unsafe_position>;
+    typename position; where PositionConcept<Position>
 
-    typename unsafe_iterator;
+    typename unsafe_iterator; 
+        where RandomAccessIteratorConcept<unsafe_iterator>;
     typename iterator;
+        where RandomAccessIteratorConcept<iterator>
     
     R (const range& range);
     R& R::operator= (const range& r);
@@ -1282,21 +1331,25 @@ concept RandomAccessRingBufferRangeConcept<Regular R>
     size_type R::available () const;
     ring_buffer_error R::check_position (const position& reader) const;
 
-    template <class Position> range
+    template <PositionConcept Position> range
     R::sub_range_one (const Position& p, size_type slice) const;
-    template <class Position> range
+    template <PositionConcept Position> range
     R::sub_range_two (const Position& p, size_type slice) const;
     
-    template<class Position, class Range2>
+    template<PositionConcept Position, class Range2>
+        where RangesAreCompatibleConcept<R, Range2>
     size_t R::read (Position& r, const Range2& range) const;
-    template<class Position, class Range2, 
+    template<PositionConcept Position, class Range2, 
              class CC = default_channel_converter>
+        where FrameConvertibleConcept<R::value_type, Range2::value_type>
     size_t R::read_and_convert (Position& r, const Range2& range, 
                                 CC cc = CC ()) const;
    
     template <class Range2>
+        where RangesAreCompatibleConcept<R, Range2>
     void R::write (const Range2& range);
     template <class Range2, class CC = default_channel_converter>
+        where FrameConvertibleConcept<R::value_type, Range2::value_type>
     void write_and_convert (const Range2& range, CC cc = CC ());
 
     bool is_backwards () const;
@@ -1310,27 +1363,27 @@ concept RandomAccessRingBufferRangeConcept<Regular R>
 };
 \end{lstlisting}
 
-There are some things worth mentioning about this concept. It supports
-two different ways of manipulation. The STL alike iterator based
-interface is provided for compatibility, but one should try to avoid
-it for performance issues --- it has to check for having to wrap
-around the end of the buffer on every iterator increment. Instead,
-data should be added in chunks as large as possible with the
-\emph{position} based interface --- the \type{read*} and \type{write*}
-functions. When this is not possible, sometimes the
+There are some things worth mentioning about this concept. Ring
+buffers support two different ways of manipulation. The STL alike
+iterator based interface is provided for compatibility, but one should
+try to avoid it for performance issues --- it has to check whether is
+must wrap around the end of the buffer on every iterator
+increment. Instead, data should be added in chunks as large as
+possible with the \emph{position} based interface --- the \type{read*}
+and \type{write*} functions. When this is not possible, sometimes the
 \type{sub\_range\_*} functions can provide a solution, allowing to
 obtain the slices of the underlying range that represent a sub range
 of the ring buffer.
 
-\todo{Tal vez podrían desacoplarse las dos formas de manipular en dos
-  conceptos diferentes...}
+%\todo{Tal vez podrían desacoplarse las dos formas de manipular en dos
+%  conceptos diferentes...}
 
-Also, note that the ring buffer supports backwards operation. This is
-used such that whenever we are reading a file and we eventually want
-to read it backwards, we can reuse the data already in the
-buffer. 
+Also, note that our ring buffers support backwards operation. This is
+useful when we are reading a file and we eventually want to read it
+backwards, we can reuse the data already in the buffer.
 
-Note that non mutable ring buffers do not make sense.
+Note that non mutable ring buffers usually do not make sense. The sub
+ranges should be used to pass its data to non mutating algorithms.
 
 \subsubsection{RingBufferRangeConcept}
 
@@ -1364,7 +1417,6 @@ of the ring range associated to the buffer.
 \subsubsection{RingBuffer}
 
 A ring buffer over frames.
-
 \begin{lstlisting}
 concept RingBufferConcept<RandomAccessRingBufferConcept Buf> {
     where MutableBufferRangeConcept<Buf::range>;
@@ -1375,24 +1427,25 @@ The main model for this is the \texttt{ring\_buffer} template.
 
 \subsection{Algorithms}
 
-The library provides a series of generic algorithms similar to those
-of the Standard Template Library \cite{stepanov94stl}. Hand coding
-most loops often makes user code not generic as it is easy to be
-tempted to make assumptions on the data format when doing so. Using
-these algorithms it is easier to write concise generic code with no
+\index{STL, standard template library} \index{algorithm}The library
+provides a series of generic algorithms similar to those of the
+Standard Template Library \cite{stepanov94stl}. Hand coding most loops
+often makes user code not generic, because one easily to be tempted to
+make assumptions on the data format when doing so. Using these
+algorithms it is easier to write concise generic code with no
 performance overhead.  We can distinguish between \emph{sample
   algorithms}, \emph{frame algorithms} and \emph{range algorithms}.
 
 The first include sample conversion functions and limited arithmetic
 support --- proportional multiplication and inversion.
 
-Frame algorithms allow abstract iteration over the samples of a
+Frame algorithms abstract iteration over the samples of a
 frame. They are the \type{static\_*} alternatives, including STL alike
 \emph{transform}, \emph{for each}, \emph{fill}, \emph{generate},
 \emph{equal} ... Because the number of channels is encoded in the
 type, they do perform static unrolling such that no looping overhead
 is added. Also, there are the aforementioned frame conversion
-overload that make our frame types convertible.
+overloads that make our frame types convertible.
 
 The last family of algorithms include STL alike \emph{copy}, \emph{for
 each}, etc. over buffer ranges. They are the \type{*\_frames}
@@ -1400,17 +1453,18 @@ functions. Also, those algorithms can mostly be safely used with their
 original iterator based versions in the \type{std} namespace because
 optimised overloads are provided.
 
-\subsection{Concrete types}
+\subsection{Concrete types associated metafunctions}
 
 A bunch of macros generate a whole range of typedefs for concrete
 types such that user code does not need to mess with long template
-instantiation. The naming pattern for these concrete types is:
+instantiations. The naming pattern for these concrete types is:
 \begin{equation}
 \begin{aligned}
 ColorSpace+BitDepth+[\mbox{\tt f}]+[\mbox{\tt s}]+[\mbox{\tt c}]+&\\
 [\mbox{\tt \_planar}] + [\mbox{\tt\_step}] + ClassType&
 \end{aligned}
 \end{equation}
+
 $ColorSpace$ may be \type{mono}, \type{stereo}, \type{quad} or
 \type{surround}. The optional $f$ indicates floating point arithmetic
 samples, $s$ is for signed samples, the $c$ denotes immutability,
@@ -1440,25 +1494,26 @@ metafunctions can be found in the reference manual.
 \subsection{Going dynamic}
 \label{sec:ns-sound-end}
 
-Until now, we have described a very generic system for sound data
-representation and manipulation that uses static
-polymorphism. However, we do not always know what kind of sound data
-we need to use at compile time.
+\index{polymorphism!dynamic}Until now, we have described a very
+generic system for sound data representation and manipulation that
+uses static polymorphism. However, we do not always know what kind of
+sound data we need to use at compile time.
 
-For this purpose we use the \texttt{variant} class, which implements a
-generic type safe disjoint union. Our variant class, taken from GIL,
-is very similar to the Boost.Variant class\footnote{The Boost.Variant
-  library: \url{www.boost.org/doc/html/variant.html}} --- the main
-differences being that our library takes a MPL sequence as parameter
-while Boost takes the types directly on the template argument list,
-and that our visitation function is \type{apply\_operation} in
-contrast with Boost.Variant's \type{apply\_visitor}.
+\index{disjoint union}\index{variant}For this purpose we use the
+\texttt{variant} class, which implements a generic and type-safe
+disjoint union. Our variant class, taken from GIL, is very similar to
+the Boost.Variant class\footnote{The Boost.Variant library:
+  \url{www.boost.org/doc/html/variant.html}} --- the main differences
+being that our library takes a MPL sequence as parameter while Boost
+takes the types directly on the template argument list, and that our
+visitation function is \type{apply\_operation} in contrast with
+Boost.Variant's \type{apply\_visitor}.
 
 We provide the subclasses of variant \type{dynamic\_buffer} and
 \type{dynamic\_buffer\_range}. Note that the interface of these types
 is more limited than the one of \type{buffer} and
 \type{buffer\-\_range}. Specifically, they do not model
-\type{RandomAccessBuffer} and \type{RandomAccessBufferRange} or nor
+\type{RandomAccess\-Buffer} and \type{RandomAccessBufferRange} nor
 their more concrete frame based counterparts. There
 are obvious reasons for this: (1) there is no specific associated
 frame type associated to these so the static metafunctions associated
@@ -1471,11 +1526,11 @@ However, there are overloads taking a dynamic buffer or range for most
 algorithms and buffer factories supplied by the library, so they can
 be used as if they where a concrete static type most of the
 time. Moreover, with the \texttt{apply\_operation} function we can
-execute a function object ``inside'' the variant, this is, taking as
-an argument the concrete type that we want. This function object
-should provide an \type{operator()} overload of every file format from
-the variant that it supports. The \texttt{operator ()} can of course
-be a template for improved generality.
+execute a function object ``inside'' the variant, this is, taking the
+concrete type that we want as an argument. This function object should
+provide an \type{operator()} overload for every format from the
+variant that it supports. The \texttt{operator ()} can of course be a
+template for improved generality.
 
 A clarifying example follows:
 
@@ -1551,7 +1606,8 @@ representative for each subset of the types --- the generic algorithm
 is then instantiated only for the representatives. This escapes the
 C++ type system and thus the safety relies on the programmer properly
 matching the types taking into account the properties of the
-algorithm. Whether by using this technique or by just avoiding dynamic
+algorithm. Basic support for this technique is provide by our library.
+Anyway, whether by using this technique or by just avoiding dynamic
 buffers over too many types, special care should be taken when using
 dynamic buffers.
 
@@ -1577,19 +1633,19 @@ be used over dynamic buffers and ranges.
   \label{fig:outputuml}
 \end{figure}
 
-When talking about input and output, runtime polymorphism is more
-important than static generality. We have to map the previous
-facilities with the data that is out there in formats not always known
-beforehand and provided by devices and interfaces whose availability
-depend from one user system to another. Object orientation comes back
-into play.
+\index{I/O, input and output} When talking about input and output,
+runtime polymorphism is more important than static generality. We have
+to map the previous facilities with the data that is out there in
+formats not always known beforehand and provided by devices and
+interfaces whose availability depend from one user system to
+another. Object orientation comes back into play.
 
 Figures \ref{fig:inputuml} and \ref{fig:outputuml} show the class
-diagrams for the input and output parts of the module. We use the
-Unified Modelling Language notation \cite{umlspec}. The doted boxes over
-the corner of some classes list the formal parameter of generic
-entities, an extension that was introduced in the 2.3 version of
-UML. 
+diagrams for the input and output parts of the module,
+respectively. We use the Unified Modelling Language notation. The
+doted boxes over the corner of some classes list the formal parameter
+of generic entities, an extension that was introduced in the 2.3
+version of UML \cite{umlspec}.\index{UML, unified modelling language}
 
 One should start reading the diagrams from the \type{input} and
 \type{output} classes. They are the basic interfaces on which we build
@@ -1601,33 +1657,39 @@ templates themselves, these classes, when instantiated, provide
 through those methods a hook for polymorphically sending or receiving
 data to and from the external systems \emph{in only one
   format}. The next section shows how to work around this. Note also
-that not every device support every format. Sometimes this is known
+that not every device supports every format. Sometimes this is known
 only at runtime --- and an exception will be thrown if trying to open
 it in the wrong format --- but sometimes it can be known at compile
-time (e.g., the OSS interface itself can not output planar data) 
+time (e.g., the OSS interface itself can not output planar data).
 
-Note that none of our I/O devices support \emph{open} and \emph{close}
-functions. After our experience in previous versions of Psychosynth,
-we have decided to simplify the interface and force specialisations to
-use RAII --- opening the resource occurs in the constructor and closing it
-in the destructor. This makes life easier to implementer of
-specialisations (who are released from having to implement a state
-machine) and for users of the library (who can be sure that a living
-object is ready to use). If the same variable is to be used for
-opening several files, one can use \type{swap} or the \emph{move
-  constructor}. If the lifetime of variable does not match the one of
-the resource \type{boost::optional} or a smart pointer should be used.
+\index{RAII, resource adquisition is initialisation} Note that none of
+our I/O devices support \emph{open} and \emph{close} functions. After
+our experience in previous versions of Psychosynth, we have decided to
+simplify the interface and force specialisations to use RAII (Resource
+Adquisition Is Initialiation) --- i.e. opening the resource occurs in
+the constructor and closing it in the destructor. This makes life
+easier to implementer of specialisations (who are released from having
+to implement a state machine) and for users of the library (who can be
+sure that a living object is ready to use). If the same variable is to
+be used for opening several files, one can use \type{swap} or the
+\emph{move constructor}. If the lifetime of variable does not match
+the one of the resource \type{boost::optional} or a smart pointer
+should be used.
 
 \subsubsection{Buffering}
 
-For the reader who paid attention to our discussion on dynamic buffers
-and ranges in section \ref{sec:ns-sound-beg} it might seem that
-constraint of having to interface with only one type can be easily
-solved by instantiating the I/O devices with a dynamic range. However,
-in most cases that is not possible, because the device is opened to be
-used in one mode of operation only and it will not be able to change
-it until it is reopened. The most sensible solution is to use an
-intermediate buffer where we convert the data before sending it or
+\index{buffering}For the reader who paid attention to our discussion
+on dynamic buffers and ranges in section \ref{sec:ns-sound-beg}, it
+might seem that the constraint of having to interface with only one
+type can be easily solved by instantiating the I/O devices with a
+dynamic range. However, in most cases that is not possible, because
+the device is opened to be used in one mode of operation only and it
+will not be able to change it until it is reopened --- this
+contradicts dynamic buffers mode of operation with visitors that
+operate on a family of types. Indeed, the basic I/O constructs require
+their \type{Range} parameter to model
+\type{FrameBufferRange\-Concept}. The most sensible solution is to use
+an intermediate buffer where we convert the data before sending it or
 receiving it. In order to avoid overhead due to buffering when
 unneeded this behaviour is not provided by default.
 
@@ -1635,13 +1697,13 @@ The \type{buffered\_*} family of classes are adaptors that match from
 a I/O interface in one format to another desired format. Because of
 buffering, the target interface can be have a \texttt{dynamic\_range}
 as parameter. The \type{buffered\_*\_adapter} types \emph{aggregate}
-the adaptee via a pointer or smart pointer such that an already living
-device can be adapted, or the buffer can be reused for several
-devices. The other types \emph{compose} the adaptee managing their
-lifetime --- the constructor parameters are forwarded from the
+the adaptee I/O system via a pointer or smart pointer such that an
+already living device can be adapted, or the buffer can be reused for
+several devices. The other types \emph{compose} the adaptee managing
+their lifetime --- the constructor parameters are forwarded from the
 buffered adaptor constructor.
 
-In order to convert among formats, this uses the
+In order to convert among formats, buffering uses the
 \emph{sound::co\-py\_and\_con\-vert\_fra\-mes} function that we
 described earlier. This allows the user to provide a custom conversion
 functor to convert among very specific formats.
@@ -1651,40 +1713,41 @@ functor to convert among very specific formats.
 
 When data is to be provided in real time to or from a sound card,
 chunks of audio data are to be processed as requested by the
-device. All the descendants of \type{async\_base} are of this
-kind. That interface provides \type{start ()} and \type{stop ()}
-methods for controlling the state of the asynchronous
-operation, plus others for checking its current status.
+device. All the descendants of \type{async\_base} are I/O systems of
+this kind. That interface provides \type{start ()} and \type{stop ()}
+methods for controlling the state of the asynchronous operation, plus
+others for checking its current status.\index{asynchronous (I/O)}
 
 Whenever new data is sent or required by the device, a user specified
-callback is executed with the number of frames as parameter, which
-should in turn call \type{put ()} or \type{take ()} once the data is
-ready or it can consume new information. Unless otherwise specified by
-an specialisation, we assume that these functions can only be called
-from the asynchronous callback. Also, we shall assume that the
-callback is running under real time conditions, and thus it is
-expected to have a time $O(n)$, where $n$ is the number of requested
-samples, not block, perform no system calls and allocate no dynamic
-memory.
+callback\index{callback} is executed with the number of frames as
+parameter, which should in turn call \type{put ()} or \type{take ()}
+once the data is ready or it can consume new information. Unless
+otherwise specified by an specialisation, we assume that these
+functions can only be called from the asynchronous callback. Also, we
+shall assume that the callback is running under real time conditions,
+and thus it is expected to have a time $O(n)$, where $n$ is the number
+of requested samples, not block, perform no system calls and allocate
+no dynamic memory.
 
 The \type{thread\_async} class uses a thread to provide this kind of
 asynchronous operation by and delegates the actual iteration inside an
 infinite loop to the derived classes. Optionally, this class will try
 to get real-time priority if requested\footnote{The \type{std::thread}
-  standard class does not support priority changing. We use its
-  \type{native\_handle} hook to request the new priority when POSIX
-  threads is the underlying implementation. At this moment, we do not
-  support real-time priority on other platforms.}. We do actually
-request real-time priority in all the I/O devices based on the
-\type{thread\_async} class.
+  standard class does not support changing its priority. We use its
+  \type{native\_handle} hook to request the new priority using the
+  \type{pthreads} API directly when POSIX threads is the underlying
+  implementation. At this moment, we do not support real-time priority
+  on other platforms.}. Actually, we do request real-time priority in
+all the I/O devices based on the \type{thread\_async}
+class.\index{real-time}
 
 
 \subsubsection{Raw I/O}
 
 Most device management code does not depend on the audio format type,
-and unnecessary object code bloat would be produced if it where in the
-templates over the buffer range type. It is then abstracted in the
-``raw'' I/O classes --- named after the pattern
+and unnecessary object code bloat would be produced if it were
+programmed in the templates over the buffer range type. It is then
+abstracted in the ``raw'' I/O classes --- named after the pattern
 \type{*\_raw\_\{input|output\}}. They can perform the I/O in an type
 unsafe manner with incoming data in a void pointer. They are mostly an
 implementation detail, but some users might find them handy as a
@@ -1692,15 +1755,15 @@ lightweight RAII wrapper over the underlying C interface.
 
 \subsubsection{Caching input}
 
-As we have noted, system calls should be avoided in the audio
-processing thread. However, files should be read from disk, and
-potentially decoded from hard formats, in order to play pre-recorded
-samples or mix full songs. The \texttt{caching\_file\_input} family of
-adaptors allow this kind of operation by reading the data in big
-chunks on a separate thread. Because it has to do buffering anyway, it
-can be used as an interface adaptor from one kind of buffer range to
-another too, avoiding to use a worthless \texttt{buffered\_*\_output}
-adaptor.
+\index{caching (I/O)}As we have noted, system calls should be avoided
+in the audio processing thread. However, files should be read from
+disk, and potentially decoded from hard formats, in order to play
+pre-recorded samples or mix full songs. The
+\texttt{caching\_file\_input} family of adaptors allow this kind of
+operation by reading the data in big chunks on a separate
+thread. Because it has to do buffering anyway, it can be used as an
+interface adaptor from one kind of buffer range to another too,
+avoiding to use a worthless \texttt{buffered\_*\_output} adaptor.
 
 Our current implementation uses mutexes and condition variables, which
 should be avoided, as we will deeply discuss in the next chapter. It
@@ -1730,28 +1793,30 @@ will avoid giving a detailed discussion of its design now.
 
 \subsection{Unit testing}
 \label{sec:sound-unittest}
-unit testing serves to ensure that the actual behaviour of a function
-matches its documented requirements. In this code it is very important
-because: (1) because it is a library to be used by third party
-developers, the proper functioning of every single method is as
-important as the observable behaviour of the final application that we
-may deploy alongside; and (2) because of the duck typing in template
-metaprograms we need to ensure that all ``instantiation paths'' ---
-i.e. code paths of the metaprogram --- compile without errors and lead
-to correct execution.
 
-The modules described in this chapter are evaluated with
-a total 223 unit tests. All of them pass with a total of 1478
-successful assertions. Note \ref{note:gistests} includes a more
-detailed summary of the test suites involving these modules. Not all of
-those unit tests have been written manually. Using
-\type{BOOST\_UNIT\_TEST\_TEMPLATE} once can define a parametrised over
-a type and that is later instantiated for every type in a given MPL
-sequence. For example, we can compute the product of a MPL sequence of
-buffer types with a metafunction and pass the result to the templated
-unit test that checks proper conversion among buffer types,
-simplifying a lot the amount of testing code --- avoiding
-combinatorial explosion of code to test all instantiation paths.
+\index{unit test}Unit testing serves to ensure that the actual
+behaviour of a function matches its documented requirements. In this
+code it is very important because: (1) being a library to be
+used by third party developers, the proper functioning of every single
+method is as important as the observable behaviour of the final
+application that we may deploy alongside; and (2) because of the duck
+typing in template metaprograms we need to ensure that all
+``instantiation paths'' --- i.e. code paths of the metaprogram ---
+compile without errors and lead to correct execution.
+
+The modules described in this chapter are evaluated with a total of
+223 unit tests. All of them pass with a total of 1478 successful
+assertions. Note \ref{note:gistests} includes a more detailed summary
+of the test suites involving these modules. Not all of those unit
+tests have been written manually. Using
+\type{BOOST\_UNIT\_TEST\_TEMPLATE} one can define a test case
+parametrised over some type variable, and that is later instantiated
+for every type in a given MPL sequence. For example, we can compute
+the product of a MPL sequence of buffer types with a metafunction and
+pass the result to the templated unit test that checks proper
+conversion among buffer types, simplifying a lot the amount of testing
+code --- avoiding combinatorial explosion of code to test all
+instantiation paths.
 
 \begin{mynote}[\texttt{psynth::sound} and \texttt{psynth::io} unit
   tests]
@@ -1811,8 +1876,8 @@ compares the efficiency of the generic algorithm building blocks
 provided by the library with hand-rolled loops performing the same
 function. Listing \ref{lst:perf-gen} shows an example of such generic
 function that you can compare with its concrete implementation in
-\ref{lst:perf-nongen}. Note that for simplicity and because it does
-not affect the results the non generic version is still parametrised
+\ref{lst:perf-nongen}. Note that, for simplicity and because it does
+not affect the results, the non generic version is still parametrised
 over the sample type $T$. One can read the whole performance test
 suite in \texttt{src/test/psynth/sound/performance.cpp}.
 
@@ -1841,16 +1906,16 @@ while (first != last) {
 We check the performance on some different cases that try to stress
 different potential overhead corners, like using a different layout
 from the natural order in the channel space, planar and interleaved
-buffers, etc. Each test case test a kind of loop over a buffer of a
-certain size. We test sizes of 32 and 4092 samples, as those are the
-common bounds of buffer sizes used in audio (the lower the buffer
-size, the better ---lower--- latency). This way we ensure that both
-the per buffer and per sample overhead is minimal. Each test is
-repeated $2^{21}$ times for buffers with 4096 samples, and $2^{26}$
+buffers, etc. Each test case tests a kind of loop abstraction over a
+buffer of a certain size. We test sizes of 32 and 4092 samples, as
+those are the common bounds of buffer sizes used in audio (the lower
+the buffer size, the better --- lower --- latency). This way we ensure
+that both the per buffer and per sample overhead is minimal. Each test
+is repeated $2^{21}$ times for buffers with 4096 samples, and $2^{26}$
 times for buffers of 32 samples.
 
 \begin{table}[h!]
-  \centering\small
+  \centering
   \begin{tabular}{rl}
     Name & Meaning \\ \hline
     \type{s8b} & Interleaved stereo buffer with 8 bit samples.\\
@@ -1865,7 +1930,7 @@ times for buffers of 32 samples.
 \end{table}
 
 We ran the tests in a Intel i5 M460 with four 2.53FHz cores. We
-compiled tested the code with different versions of GCC compiled with
+compiled the code with different versions of GCC 
 options \texttt{-O3 -std=c++0x}. Tables \ref{tab:perf4096} and
 \ref{tab:perf32} show the results for GCC 4.5.2 with 4096 and 32
 buffer size respectively and \ref{tab:perf4096-46} and
@@ -1881,25 +1946,25 @@ is faster and a value smaller than one implies that there is some
 overhead.
 
 The tables show interesting results. With GCC 4.5 the generic versions
-performs as efficiently or better most of the time for larger buffer
-sizes, however, there seems to be an additive constant that makes the
+performs as efficiently or better most of the time for large buffer
+sizes; however, there seems to be an additive constant that makes the
 hand coded version slightly better when the buffer size is very
 small. Surprisingly, GCC 4.6 changes this tendency and the generic
 version actually gets more favourable results with short buffer
-sizes. Actually the results are more even with this compiler in a
-probable tendency in making optimisation techniques more general ---
-i.e. dependent on the actual semantics of the code and not on
-how you express it --- which is very desirable for generic code.
+sizes. Indeed, the results are more even with this compiler in a
+probable tendency towards making optimisation techniques more general
+--- i.e. dependent on the actual semantics of the code and not on how
+you express it --- which is very desirable for generic code.
 
 In any case, these results supports our claims that the performance
 overhead, if any, is negligible. Sometimes the generic code is even
 more efficient than a carefully hand-coded algorithm for a specific
 audio format. The results also show that as soon as you add arithmetic
-computations like in the \texttt{transform} test micro-optimisation in
-the looping constructs is futile. Maybe testing with a wider variety
-of compilers should be done, but that is not possible because few
-support C++0x. Anyway, it is to expect that a compiler supporting
-C++0x also has a decent optimiser and the we would get similar
+computations, like in the \texttt{transform} test, micro-optimisation
+in the looping constructs is futile. Maybe testing with a wider
+variety of compilers should be done, but that is not possible because
+few support C++0x. Anyway, it is to expect that a compiler supporting
+C++0x also has a decent optimiser and then we would get similar
 results. Comparison of the generated object code would can be another
 interesting mechanism for assuring the lack of overhead due to
 generality. We did informal tests confirming our hypotheses that can
@@ -1914,7 +1979,7 @@ We can safely state that the library passes the performance
 requirements.
 
 \begin{table}[p]
-  \centering\small
+  \centering
   \begin{tabular}{c|c|c|c|c|c}
     Algo. & \multicolumn{2}{c|}{Parameters} & Psynth & Non-Psynth & Gain \\ \hline\hline
 
@@ -1946,7 +2011,7 @@ requirements.
 \end{table}
 
 \begin{table}[p]
-  \centering\small
+  \centering
   \begin{tabular}{c|c|c|c|c|c}
     Algo. & \multicolumn{2}{c|}{Parameters} & Psynth & Non-Psynth & Gain \\ \hline\hline
 
@@ -1978,7 +2043,7 @@ requirements.
 \end{table}
 
 \begin{table}[p]
-  \centering\small
+  \centering
   \begin{tabular}{c|c|c|c|c|c}
     Algo. & \multicolumn{2}{c|}{Parameters} & Psynth & Non-Psynth & Gain \\ \hline\hline
 
@@ -2010,7 +2075,7 @@ requirements.
 \end{table}
 
 \begin{table}[p]
-  \centering\small
+  \centering
   \begin{tabular}{c|c|c|c|c|c}
     Algo. & \multicolumn{2}{c|}{Parameters} & Psynth & Non-Psynth & Gain \\ \hline\hline
 
@@ -2044,17 +2109,17 @@ requirements.
 \subsection{Integration and deployment}
 
 The module was first developed separately from the main development
-branch in a branch called \texttt{gil-import}. Once the previous tests
-were passed, the former signal representation classes and I/O code was
-removed from the code base. The upper layers --- mainly the
+branch, in a branch called \texttt{gil-import}. Once the previous
+tests were passed, the former signal representation classes and I/O
+code was removed from the code base. The upper layers --- mainly the
 \texttt{graph} layer --- was adapted to use the new library. Note
 that, given that we will mostly rewrite the \texttt{graph} layer in
 the next iteration we tried to make minimal changes to get the project
 compile and run properly again.
 
-The system was then \emph{peer reviewed} by project collaborators,
-mainly by the maintainer of the Ubuntu/Trinux packages Aleksander
-Morgado\footnote{Aleksander Morgado's web blog:
+The system was then \emph{peer reviewed}\index{peer review} by project
+collaborators, mainly by the maintainer of the Ubuntu/Trinux packages
+Aleksander Morgado\footnote{Aleksander Morgado's web blog:
   \url{http://sigquit.wordpress.com}}. After minor bugfixing, we
 agreed to make a new Psychosynth 0.2.0 release that included the new
 code described in this chapter and some other fixes and modifications
@@ -2066,18 +2131,18 @@ The official changelog briefing for this release is included in note
 \begin{mynote}[Changelog of Psychosynth 0.2.0]
 \label{note:changelog02}
 \begin{itemize}
-\item New audio processing and I/O subsystem based on template programming
-for generic yet efficient sound signals.
+\item New audio processing and I/O subsystem based on template
+  programming for generic yet efficient sound signals.
 
 \item The extreme latency when using ALSA bug seems to be fixed in
   some cases.
 
-\item No longer depend on libvorbis, libsndfile can now handle ogg and flac
-files too.
+\item No longer depend on libvorbis, libsndfile can now handle OGG and
+  FLAC files too.
 
-\item No longer depend on \texttt{libsigc++}, using \texttt{boost::signals}
-  which, which is a bit slower but neglibe and this simplifies the
-  dependencies.
+\item No longer depend on \texttt{libsigc++}, using
+  \texttt{boost::signals} which, which is a bit slower but neglibe and
+  this simplifies the dependencies.
 
 \item The mouse wheel now scrolls in the object selector.
 
@@ -2091,7 +2156,8 @@ files too.
 
 \item C++0x features are being used in the code. For GCC, this means
   version 4.5 shall be used. We doubt it will compile with any other
-  compiler (maybe latest VS), but users are welcomed to try and report.
+  compiler (maybe latest VS), but users are welcomed to try and
+  report.
 
 \item For this same reason, Boost.Threads is no longer a dependency,
   we use STL threads instead.
@@ -2101,11 +2167,11 @@ files too.
 \section{Conclusions}
 
 In this iteration we developed a generic approach to representation
-and input and output of audio data. We do not have any records of
-any audio software using such paradigm in their code, so this
-development have been exploratory and has a lot of value in its
-novelty. This however delayed our development more than expected in
-our original plan.
+and input and output of audio data. We do not have any records of any
+audio software using such paradigm in their code, so this development
+have been research oriented, and has a lot of value in its
+novelty. This, admittedly, delayed our development more than expected
+in our original plan too.
 
 \subsection{Benefits and caveats}
 \label{sec:soundbenefits}
@@ -2116,16 +2182,16 @@ The three main advantages in the new code are:
   representation while retaining near optimal performance. Because
   generality allowed decoupling orthogonal concepts, each audio
   representation factor can be optimised and tuned for computational
-  accuracy on its own, leading to higher quality code with lower
+  accuracy on its own. This leads to higher quality code with lower
   maintenance cost as we avoid the combinatorial explosion that
   happens otherwise.
 
 \item Algorithms correctly written with our generic facilities have a
-  performance equivalent to the hand-written code. When a certain
-  algorithm has not general interpretation or can not be efficiently
-  implemented generally, the library still allows for the algorithm to
-  be written with for a concrete or a constrained family of audio
-  formats.
+  performance equivalent to that of the hand-written code. When a
+  certain algorithm has not general interpretation or can not be
+  efficiently implemented generally, the library still allows for the
+  algorithm to be written for a concrete or a constrained family
+  of audio formats.
 
 \item Because the signal format is encoded in the data type, we can
   either statically check that the data is in the correct format
@@ -2137,10 +2203,11 @@ The three main advantages in the new code are:
 
 Also, because a lot of learning have happened since the old code base
 was written, the new code is better written and quite safer, making
-use of exceptions and scope guards \cite{alexandrescu00gener}.
+use of exceptions and \emph{scope guards}\index{scope guard}
+\cite{alexandrescu00gener}.
 
-Even though we believe the benefits outweight the drawbacks, we have
-to acknowledge the caveats of our new approach, the most relevant
+Even though we believe that the benefits outweight the drawbacks, we
+have to acknowledge the caveats of our new approach, the most relevant
 being:
 \begin{enumerate}
 \item The new code uses advanced C++ programming techniques that many
@@ -2174,41 +2241,42 @@ is worth enumerating them:
 \subsubsection{Lock free ring buffers}
 \label{sec:fixringbuffer}
 
-The audio processing thread has real time constraints. As we
-introduced in note \ref{note:realtime} this implies, among other
-things, forbidding the usage of mutexes. However, our ring buffers
-have not been tested for thread safety and mutexes should be used when
-shared among different threads. This happens in our
-\texttt{caching\_file\_input} implementation. The problem is specially
-severe when the audio processing thread is running with higher
-priority, because \emph{priority inversion} occurs
-\cite{kim03basic}. While our current Alsa and OSS output systems do
-not attempt rising their thread priority, the Jackd subsystem executes
-the audio processing callback in a real-time mode thread and thus the
-problem can become significant.
+\index{lock-free (algorithm)}The audio processing thread has real time
+constraints. As we introduced in note \ref{note:realtime}, this
+implies, among other things, forbidding the usage of mutexes. However,
+our ring buffers have not been tested for thread safety and mutexes
+should be used when shared among different threads. This happens in
+our \texttt{caching\_file\_input} implementation. The problem is
+specially severe when the audio processing thread is running with
+higher priority, because \index{priority inversion}\emph{priority
+  inversion} occurs \cite{kim03basic}. Our output subsystems execute
+the audio processing callback in a real-time mode thread whenever
+possible, and thus the problem can become significant.
 
-Locking is done with care and in practice we have experience no buffer
-underruns due to this problem, even with high number of caching file
-readers in execution.  However, for correctness and better support of
-Jackd, we should implement a lock-free ring buffer
-\cite{valois94lock, michael95correction} that does not require
-using special synchronisation. Jackd actually provides a C
+Locking is done with care and in practice we haven't experienced any
+buffer underrun\index{buffer underrun} due to this problem, even with
+high number of caching file readers in execution.  However, for
+correctness and better support of Jackd, we should implement a
+lock-free ring buffer \cite{valois94lock, michael95correction} that
+does not require using special synchronisation to support one reader
+and one writer on different threads. Jackd actually provides a C
 implementation that can serve as a basis for ours. The most important
 interface change is that only one reader should be permitted --- we
 can embed the read pointer inside the data structure. Also, the
 ``backwards'' operation mode in our current implementation might
-introduce an unexpected complexity in the implementation.
+introduce an unexpected complexity in the implementation --- if not
+probably making a lock-free version completely impossible.
 
 \subsubsection{Virtual and adapted iterators and ranges}
 \label{sec:fixsynth}
 
 Boost.GIL included a ``locator adapter'' and ``virtual locator''
 notions that allowed creating or modifying images lazily via a
-function object. We discarded implementing the virtual ones because
-they were coupled to their \texttt{locator} concept which is specific
-to the problem of image representation --- locators are in practice 2D
-iterators. Moreover, they used the indexed position in the image as
-the parameter to the function object that synthesised the
+function object. We discarded implementing virtual ranges because, in
+GIL, they were coupled to their \texttt{locator} concept which is
+specific to the problem of image representation --- locators are in
+practice 2D iterators. Moreover, they used the indexed position in the
+image as the parameter to the function object that synthesised the
 image. However, because audio is processed in chunks, the position in
 the audio buffer is meaningless for the synthesis or filter function
 --- instead, some stateful function object which includes a notion of
@@ -2250,54 +2318,60 @@ operations that can be done per channel or per pair of channels which
 could be the basis for arithmetic operations.''
 \end{quotation}
 
-Nonetheless with time and effort the problem could be
-approached making some compromises. Some of the issues Lubomir states
-have different answers for sound processing, in fact, allowing out of
-range values is the best answer for the first question given the fact
-that sound amplitude is not naturally constrained and clipping is
-introduced only by the DAC hardware or when moving from floating to a
-fixed point representation. Maybe, not all those questions have to be
-answered in order to improve the arithmetic support.
+Nonetheless, with time and effort the problem could be approached, at
+least, when making some compromises. Some of the issues Lubomir states
+have different answers for sound processing. In fact, allowing out of
+range values seems to be the best answer for the first question given
+the fact that sound amplitude is not naturally constrained and
+clipping is introduced only by the DAC hardware or when moving from
+floating to a fixed point representation. Maybe, not all those
+questions have to be answered in order to improve the arithmetic
+support anyway.
 
-One of the main annoyances when writing a generic algorithm is using
-the per sample \texttt{static\_*} algorithms. Using them we could
-write a simple arithmetic layer for frames that would simplify the
-user code. However, even though we do not have experimental data, we
+If we where to implement such support, one of the main drawbacks when
+writing a generic sample algorithm is using the per sample
+\texttt{static\_*} algorithms. Using them we could write a simple
+arithmetic layer for frames that would simplify the user
+code. However, even though we do not have experimental data, we
 believe this straightforward solution could introduce overhead. This
 is because every \texttt{static\_*} unrolls one statement per
 channel. Thus, a simple frame arithmetic expression would in fact
 result into many sequence points that is yet to be tested whether
-compilers can optimise properly.
+compilers can optimise properly, specially when nesting complex
+arithmetic expressions.
 
-This is not a dead end. Using the \emph{expressions templates}
-\cite{veldhuizen95expression} technique and r-value references we can
-perform transformations with the aid of metaprogramming such that
-sequence points are not introduced by the arithmetic expression
-itself. A expression template framework like Boost.Proto\footnote{The
-  Boost Proto library:
+\index{SIMD, single instruction multiple data}
+This is not a dead end. Using the \index{expression template}
+\emph{expression template} \cite{veldhuizen95expression} technique and
+r-value references we can perform transformations with the aid of
+metaprogramming such that sequence points are not introduced by the
+arithmetic expression itself. A expression template framework like
+Boost.Proto\footnote{The Boost Proto library:
   \url{http://www.boost.org/doc/libs/release/libs/proto}}
 \cite{niebler07proto} could be of great help. Moreover, with careful
-studying of the audio DSL's studied in section \ref{sec:dsl} and the
-usage of these same techniques the scope of such effort could be
-broadened to build a full sound synthesis and processing EDSL for
-C++. Indeed, this would allow writing specific optimisations in this
-arithmetic layer itself. It would be specially interesting to optimise
-for usage of SIMD\footnote{Single Instruction Multiple Data. These
-  instructions can operate on several arguments at the same time. They
-  are very useful in multimedia applications. For example, all the
-  samples in a multi-channel audio frame could be updated with one
-  single instruction, multiplying the performance. The SSE family of
-  multimedia extensions provided by Intel processors are is the most
-  widespread set of SIMD instructions.} instructions of modern
-processors. While this can be done now in a per-algorithm basis, doing
-so in a frame-arithmetic layer would hide all this complexity to the
-DSP developer providing a significant performance boost for free.
+studying of the audio DSL's discussed in section \ref{sec:dsl} and
+trying to mimic some of their interface, the scope of such effort
+could be broadened to build a full sound synthesis and processing EDSL
+for C++. Indeed, this would allow writing specific optimisations in
+this arithmetic layer itself. It would be specially interesting to
+optimise for the usage of SIMD\footnote{Single Instruction Multiple
+  Data. These instructions can operate on several arguments at the
+  same time. They are very useful in multimedia applications. For
+  example, all the samples in a multi-channel audio frame could be
+  updated with one single instruction, multiplying the
+  performance. The SSE family of multimedia extensions provided by
+  Intel processors are is the most widespread set of SIMD
+  instructions.} instructions of modern processors. While this can be
+done now in a per-algorithm basis, doing so in a frame-arithmetic
+layer would hide all this complexity to the DSP developer providing a
+significant performance boost for free. 
 
 \subsubsection{Submission to Boost}
 
-In our conversations with Lubomir Bourdev he suggested submitting our
-library for inclusion in the Boost package. However, there are few
-issues that we should tackle before that:
+\index{Boost library}In our conversations with Lubomir Bourdev he
+suggested submitting our library for inclusion in the Boost
+package. However, there are few issues that we should tackle before
+that:
 
 \begin{enumerate}
 \item A lot of code is algorithmically identical to that of Boost.GIL
@@ -2310,12 +2384,14 @@ issues that we should tackle before that:
   possible issues and unneeded incompatibilities with those libraries
   should be solved before submission into Boost.
 
-\item Boost is written in C++03 standard, while our code uses
-  C++0x. Moreover, our code has dependencies with other submodules in
-  \texttt{psynth::base}, specially the expection and logging
-  system. While these dependencies are not too strong, the effort made
-  to polish these corners is outside the scope of the current project.
+\item Boost is compatible with the C++03 standard, while our code
+  requires C++0x. Moreover, our code has dependencies with other
+  submodules in \texttt{psynth::base}, specially the exception and
+  logging system. While these dependencies are not too strong, the
+  effort made to polish these corners is outside the scope of the
+  current project.
 \end{enumerate}
+
 
 %%% Local Variables: 
 %%% mode: latex
