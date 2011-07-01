@@ -134,7 +134,7 @@ in the parent level.\index{hierarchy, node}
 \end{requirement}
 
 \begin{requirement}
-\label{req:iter2-end}
+\label{req:iter2-end}\label{req:polyphony}
 Nodes can be either monophonic or polyphonic. A polyphonic node,
 internally, has several copies of its processing state, called
 \emph{voices}, that are dispatched accordingly trough trigger signals.
@@ -1130,59 +1130,71 @@ semester.
 \subsubsection{First iteration: A metaprogramming based sound
   processing foundational library}
 
-This iteration is here to deeply re-design the core data structures
-using the latest techniques in C++. This requires special research and
-performance requirements deeply rely on the success of this
-iteration. 
+\begin{description}
+\item[Description] In this iteration involves a deeply re-design the
+  core data structures using the latest techniques in C++. This
+  requires special research. Performance requirements deeply rely on
+  the success of this iteration.
 
-Requirements \ref{req:iter1-begin} to \ref{req:iter1-end} and
-\ref{req:iter1-begin2} to \ref{req:iter1-end2} should be satisfied for
-its success.
+\item[Criterion] Requirements \ref{req:iter1-begin} to
+  \ref{req:iter1-end} and \ref{req:iter1-begin2} to
+  \ref{req:iter1-end2} should be satisfied for its success.
 
-Estimated time cost: 4 months.
+\item[Estimated time cost:] 4 months.
+\end{description}
 
-\subsubsection{Second iteration: Redesign of the \texttt{node} layer
-  for hierarchy and polyphony}
+\subsubsection{Second iteration: Redesign of the \texttt{node} layer}
 
-The \texttt{node} layer requires a redesign if we want to satisfy all
-our purposes. Polyphony and hierarchy would be specially tricky to
-implement directly on top of the current code base. A special
-evaluation of how the new design interacts with the MVC architecture
-and networking is required. The \texttt{world} layer may be affected
-too. All the design changes should be implemented too.
+\begin{description}
+\item[Description] The \texttt{node} layer requires a redesign if we
+  want it to scale to satisfy all our long-term purposes. Polyphony
+  and hierarchy would be specially tricky to implement directly on top
+  of the current code base. A special evaluation of how the new design
+  interacts with the MVC architecture and networking is required. The
+  \texttt{world} layer may be affected too. The whole layer should be
+  reimplemented and validated.
 
-Requirements \ref{req:iter2-begin} to \ref{req:iter2-end} should be
-satisfied for its success. Requirement \ref{req:persistence} may be
-optionally considered for its implementation in this iteration too.
+\item[Criterion] Requirements \ref{req:iter2-begin} to
+  \ref{req:iter2-end} should be satisfied for its success. Requirement
+  \ref{req:persistence} may be optionally considered for its
+  implementation in this iteration too.
 
-Estimated time cost: 4 months.
+  \item[Estimated time cost] Estimated time cost: 4 months.
+\end{description}
 
 \subsubsection{Third iteration: Dynamic loading of nodes}
 
-In this iteration the plugin system is to be developed.
+\begin{description}
+\item[Description] In this iteration the plugin system is to be
+  developed. This involves loading of nodes with our own interface ---
+  as designed in the previous iteration --- and with external
+  interfaces, implementing interface adaptors when needed.
 
-Requirements \ref{req:iter3-begin} to \ref{req:iter3-end} should be
-satisfied for its success.
+\item[Criterion] Requirements \ref{req:iter3-begin} to
+  \ref{req:iter3-end} should be satisfied for its success.
 
-Estimated time cost: 3 months.
-
+\item[Estimated time cost] 3 months.
+\end{description}
 \subsubsection{Fourth iteration: Adding MIDI and synchronisation}
 
-Synchronisation and MIDI support is one of the most important
-features and it is also one of the features we know the least about,
-thus, we should put special care on research and design. This will
-affect the node and world layers mostly.
+\begin{description}
+\item[Description] Synchronisation and MIDI support is one of the most
+  important features and it is also one of the features we know the
+  least about, thus, we should put special care on research and
+  design. This will affect the node and world layers mostly.
 
-Requirements \ref{req:iter4-begin} to \ref{req:iter4-end} should be
-satisfied for its success.
+\item[Criterion] Requirements \ref{req:iter4-begin} to
+  \ref{req:iter4-end} should be satisfied for its success. Requirement
+  \ref{req:polyphony} might be implemented in this iteration too.
 
-Estimated time cost: 5 months.
+\item[Estimated time cost] 5 months.
+\end{description}
 
 \subsubsection{Post mortem analysis}
 
 After the conclusion of all the previous iterations, we should write a
-conclusive report and evaluation of its success. Also, we should
-prepare a final presentation for its evaluation.
+conclusive report and evaluation of the project's success. Also, we
+should prepare a final presentation for the project evaluation.
 
 \begin{mynote}[Structure of the rest of the documment]
   The rest of the documment is devoted for documenting the modules
