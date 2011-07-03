@@ -1509,18 +1509,17 @@ takes the types directly on the template argument list, and that our
 visitation function is \type{apply\_operation} in contrast with
 Boost.Variant's \type{apply\_visitor}.
 
-We provide the subclasses of variant \type{dynamic\_buffer} and
-\type{dynamic\_buffer\_range}. Note that the interface of these types
-is more limited than the one of \type{buffer} and
+We provide the \type{variant} subclasses \type{dynamic\-\_buffer} and
+\type{dynamic\-\_buffer\-\_range}. Note that the interface of these
+types is more limited than the one of \type{buffer} and
 \type{buffer\-\_range}. Specifically, they do not model
 \type{RandomAccess\-Buffer} and \type{RandomAccessBufferRange} nor
-their more concrete frame based counterparts. There
-are obvious reasons for this: (1) there is no specific associated
-frame type associated to these so the static metafunctions associated
-to these models would have no sensible definition and (2) there is no
-efficient way to implement iteration with dynamic polymorphism ---
-this is the very same reason why we used generic programming in the
-first place!
+their more concrete frame based counterparts. There are obvious
+reasons for this: (1) there is no specific associated frame type
+associated to these so the static metafunctions associated to these
+models would have no sensible definition and (2) there is no efficient
+way to implement iteration with dynamic polymorphism --- this is the
+very same reason why we used generic programming in the first place!
 
 However, there are overloads taking a dynamic buffer or range for most
 algorithms and buffer factories supplied by the library, so they can

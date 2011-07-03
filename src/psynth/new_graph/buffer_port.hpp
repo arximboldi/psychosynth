@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-18 21:46:58 raskolnikov>
+ *  Time-stamp:  <2011-07-03 10:42:20 raskolnikov>
  *
  *  @file        buffer_port.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -34,6 +34,7 @@
 #include <psynth/new_graph/processor.hpp>
 #include <psynth/new_graph/buffers.hpp>
 #include <psynth/new_graph/port.hpp>
+#include <psynth/new_graph/buffer_port_fwd.hpp>
 
 namespace psynth
 {

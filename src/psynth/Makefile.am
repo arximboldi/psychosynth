@@ -72,6 +72,7 @@ nobase_libpsynthinc_HEADERS = \
 	base/exception.hpp\
 	base/throw.hpp\
 	base/type_value.hpp\
+	base/type_traits.hpp\
 	base/threads.hpp\
 	base/util.hpp\
 	base/meta.hpp\
@@ -182,13 +183,37 @@ nobase_libpsynthinc_HEADERS = \
 	sound/util.hpp\
 	sound/variant.hpp\
 	new_graph/exception.hpp\
+	new_graph/event.hpp\
+	new_graph/buffers.hpp\
+	new_graph/triple_buffer.hpp\
+	new_graph/triple_buffer.tpp\
 	new_graph/processor.hpp\
+	new_graph/processor.tpp\
 	new_graph/processor_fwd.hpp\
 	new_graph/node.hpp\
 	new_graph/node_fwd.hpp\
+	new_graph/port.hpp\
+	new_graph/port.tpp\
+	new_graph/port_fwd.hpp\
+	new_graph/control.hpp\
+	new_graph/control.tpp\
+	new_graph/control_fwd.hpp\
+	new_graph/buffer_port.hpp\
+	new_graph/buffer_port_fwd.hpp\
+	new_graph/soft_buffer_port.hpp\
 	new_graph/process_node.hpp\
+	new_graph/process_node_fwd.hpp\
 	new_graph/sink_node.hpp\
 	new_graph/sink_node_fwd.hpp\
+	new_graph/core/patch.hpp\
+	new_graph/core/patch_fwd.hpp\
+	new_graph/core/patch_port.hpp\
+	new_graph/core/async_output.hpp\
+	new_graph/core/async_output_fwd.hpp\
+	new_graph/core/passive_output.hpp\
+	new_graph/core/passive_output_fwd.hpp\
+	new_graph/core/oscillator.hpp\
+	new_graph/core/mixer.hpp\
 	version.hpp
 
 libpsynth_la_SOURCES = \
