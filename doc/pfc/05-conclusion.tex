@@ -7,13 +7,14 @@
 
 This master's thesis project served, mainly, two purposes. First, to
 recapitulate, rationalise and re-focus a long-term project that has
-served its authors as learning sketchbook for many years. Second, to
+served its author as learning sketchbook for many years. Second, to
 give the first big steps in lifting the software to a professional
-quality grade. Of course, there is a lot of work to be done. In the
-analysis chapter the project was planned for a long-term development
-in a iterative process. This allows us to concentrate on feasible
-mid-term goals while building a broadly scoped system. Two of these
-iterations have been successfully accomplished. 
+quality grade. Of course, there is a lot of work to be done, yet
+crucial achievements have been made during the last year. In
+the analysis chapter the project was planned for a long-term
+development in an iterative process. This allows us to concentrate on
+feasible mid-term goals while building a broadly scoped system. Two of
+these iterations have been successfully accomplished.
 
 Coming from a computer-science background, admittedly, we are still
 quite amateur in many musical and even digital signal processing
@@ -28,10 +29,10 @@ metaprogramming and concept-based design allowed us to write a sound
 processing library that is generic yet efficient and safe. The last
 stage also included relevant novelties --- like our polymorphic event
 system for real-time processing --- yet being more pragmatical and
-focused on requirement satisfaction and enabling future concrete
-features, like a hierarchical patches, a plug-in system, and so on. We
-should not, though, look at these advancements indulgently. Their own
-chapters further discusses their benefits, caveats, and open issues
+focused on requirement satisfaction and enabling concrete features,
+like a hierarchical patches, a plug-in system, and so on. We should
+not, though, look at these advancements indulgently. Their own
+chapters further discusses their benefits, caveats, and open ground
 for improvement.
 
 \begin{figure}[h!]
@@ -46,19 +47,20 @@ code, measured automatically from the sources repository by the Ohloh
 webpage\footnote{Ohloh is a social network for Free Software
   development. Visit Psychosynth's page for further statistics:
   \url{https://www.ohloh.net/p/12930}}. Around 30000 new lines of code
-have been added. Most of our work have involved refactoring --- in
-other statistics, Ohloh states that around 100000 lines of code have
-been changed during all the commits. This have been the biggest effort
-since the participation of the project in the Free Software
-Contest. Including \emph{``logic code only''} Ohloh estimates that the
-total effort of the project --- since its beginning in mid 2007 --- in
-12 person-years. It used the \emph{Basic COCOMO} \cite{bohem00cocomo}
-method with coefficients $a = 2.4, b = 1.05$ to yield such result.
+have been added during the last year. However, most of our work have
+involved fully rewriting legacy code --- in other statistics, Ohloh
+states that around 100000 lines of code have been changed during all
+the commits. This have been the biggest effort since the participation
+of the project in the Free Software Contest. Including \emph{``logic
+  code only''} Ohloh estimates that the total effort of the project
+--- since its beginning in mid 2007 --- in 12 person-years. It used
+the \emph{Basic COCOMO} \cite{bohem00cocomo} method with coefficients
+$a = 2.4, b = 1.05$ to yield such result.
 
 When looking into the future there are many possibilities. We are half
 way to fulfil the long-term goals that were proposed in the first two
 chapters. Apart from following our current plan blindfolded, there are
-some developments that may makes re-plan part of our future work.
+some developments that may make us re-plan part of our future work.
 
 \begin{figure}[h!]
   \centering
@@ -67,21 +69,22 @@ some developments that may makes re-plan part of our future work.
   \label{fig:webpage}
 \end{figure}
 
-First, there is the \emph{Collaborative Roadmap}. As part of the
-redesign of the project's web-page that we did in March (see figure
-\ref{fig:webpage}) we included a feature request voting system based
-on micro-donations. The Flattr\footnote{\url{http://flattr.com}}
-social micro-payment network works as follows: each person puts some
-money into his account each month. Then, different \emph{things} ---
-music, software, pictures --- have a web button that users can press
-to show support. At the end of the month, the money in someones'
-account is distributed among all the creators of the things he
-supported. Usually, each individual thing do not get much, but very
-popular things can get a significant amount. Also, each Flattr button
-has a counter with the number of people that pressed it. We use this
-system in an special way: each potential feature not yet developed has
-its own Flattr button. If someone thinks some feature is more urgent
-than another, he can push for his opinion to be taken into account by
+First, there is the \index{collaborative roadmap}\emph{Collaborative
+  Roadmap}. As part of the redesign of the project's web-page that we
+did in March (see figure \ref{fig:webpage}) we included a feature
+request voting system based on micro-donations. The
+\index{Flattr}Flattr\footnote{\url{http://flattr.com}} social
+micro-payment network works as follows: each person puts some money
+into her account each month. Then, different \emph{things} --- music,
+software, pictures --- get a web button that users can press to show
+support. At the end of the month, the money in someones' account is
+distributed among all the creators of the things she clicked. Usually,
+each individual click does not give much, but very popular things can
+get a significant amount of money. Also, each Flattr button has a
+counter with the number of people that pressed it. We use this system
+in an special way: each potential feature not yet developed has its
+own Flattr button. If someone thinks some feature is more urgent than
+another, he can push for his opinion to be taken into account by
 showing some commitment by making a micro-donation in this
 system. Table \ref{tab:flattr} shows the current ranking in the
 Collaborative Roadmap.
@@ -90,7 +93,7 @@ Collaborative Roadmap.
   \centering
   \begin{tabular}{r|l}
     Votes & Thing \\ \hline
-    10 & GNU Psychosynth --- general \\
+    11 & GNU Psychosynth --- general \\
     6 & Audio input \\
     4 & MIDI support \\
     1 & Plug-in system \\
@@ -110,19 +113,19 @@ so... why not?
 
 Moreover, the growing interest in the project are opening the doors
 for quite interesting collaborations. The ArtQuimia Music Production
-School\footnote{\url{http://www.artquimia.net/}} have been supporting
+School\footnote{\url{http://www.artquimia.net/}} has been supporting
 the project since we started our requirement elicitation a year ago,
 and we are grateful for this. More recently, Miguel Vazquez-Prada
 contacted us to join efforts in building experimental tangible
 instruments. He has already built a ReacTable clone called
 Tangiblex\footnote{\url{http://www.tangiblex.net/}} with impressive
 results (figure \ref{fig:tangiblex}). Hopefully this is the beginning
-of a very fruitful collaboration. Indeed, hardware-software pair is
+of a very fruitful collaboration. Indeed, a hardware-software pair is
 probably one of the best ways to build a business model for a consumer
 oriented application while respecting user's freedom with
 non-privative licenses. Also, Intel is offering a wide range of grants
-and other kinds of support and partnership to promote their Meego
-platform and Atom-based devices. That might be a good chance to
+and other kinds of support and partnership programs to promote their
+Meego platform and Atom-based devices. That might be a good chance to
 prioritise a port for multi-touch devices --- a very interesting
 development with open grounds for experimentation and innovation.
 

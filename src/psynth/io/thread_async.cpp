@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-28 22:30:27 raskolnikov>
+ *  Time-stamp:  <2011-07-03 13:02:47 raskolnikov>
  *
  *  @file        thread_async.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -80,7 +80,7 @@ void thread_async::_request_rt ()
                    << "Could not set RT priority: "
                    << strerror (ret);
     else
-        PSYNTH_LOG << "Thread running in RT priority.";
+        PSYNTH_LOG << "Thread running with RT priority.";
 #endif
 #endif
 }

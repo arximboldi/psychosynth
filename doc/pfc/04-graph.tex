@@ -1559,7 +1559,99 @@ chapter. We will delay adapting the dynamic patcher until the plug-in
 system is fully implemented in order to avoid rewriting it in the
 presence of unexpected API changes.
 
-\todo{Añadir las cosas que había pensado ya sobre los plugins}
+\subsection{Polyphonic nodes basic interface}
+
+\index{polyphony}While a full implementation of polyphonic audio will
+be later done when implementing MIDI support, an interface for
+polyphonic nodes has already been designed.
+
+The most important aspect is how to decouple the state that is common
+to all voices and the per-voice internal state. Listing
+\ref{lst:polynode} shows an example of how a polyphonic oscillator
+could be implemented on top of our proposed interface. The reader can
+compare it with listing \ref{lst:nodeexample2} to assure that there is
+minimal boilerplate compared to a equivalent non-polyphonic node.
+
+\begin{lstlisting}[float=h!,
+  label=lst:polynode,
+  caption=Example polyphonic node.]
+struct poly_oscillator_node : public poly_node<poly_oscillator_node>
+{
+    poly_buffer_out_port<mono32sf_buffer> out_output;
+    poly_soft_in_port<mono32sf_buffer> in_modulator;
+    
+    in_control<float> param_frequency;
+    in_control<float> param_amplitude;
+
+    struct voice
+    {
+        void rt_do_process (poly_oscillator_node& n,
+                            voice_id idx,
+                            rt_process_context& ctx)
+        {
+            _osc.set_frequency (n.param_frequency.rt_get ());
+            _osc.set_amplitude (n.param_amplitude.rt_get ());
+            _osc.update_fm (n.out_port.rt_out_range (idx),
+                            n.in_modulator.rt_in_range (idx));
+        }
+
+    private:
+        synth::oscillator<synth::sine_generator> _osc;
+    }; 
+
+    poly_oscillator_node ()
+        : out_output ("output", this)
+        , in_modulator ("modulator", this, 1.0f)
+        , param_frequency ("frequency", this, 440.0f)
+        , param_amplitude ("amplitude", this, 1.0f) {}
+
+};
+\end{lstlisting}
+
+The \type{poly\_node<Deriv>} template class is the common base of all
+polyphonic nodes. It uses the ``Curiously Recurring Template Pattern''
+\index{curiously recurring template pattern}, first documented by
+Coplien \cite{coplien95crt}, to get full type information about its
+subclass. This allows it to both handle voices efficiently and
+minimise boilerplate code. Then, there are three kinds of objects that
+intervene.\index{voice (polyphony)}
+\begin{enumerate}
+\item State that belongs naturally to the node itself and is common to
+  all voices. A clear example of these are \emph{controls}. As we can
+  see in the above code, no special classes are implemented for
+  polyphonic controls, because in fact there is no way that polyphony
+  makes a difference for them, and they live in the node's common
+  state.
+
+\item Objects that keep both some per-voice state and some common
+  state. A clear example of these are the \emph{ports}. In the
+  presence of polyphony, a port should handle a different buffer for
+  each voice. However, the connection information is still common for
+  all voices and should not be repeated. The \type{poly\_*\_port}
+  family of port classes provides ports for polyphonic nodes. The main
+  difference with normal ports in its interface is that the access
+  methods take the current voice index as parameter.
+
+\item State that changes with each voice. A nested \type{voice} class
+  stores this state and its instances are managed transparently by the
+  \type{poly\_node<>} class. An example of a per-voice state is the
+  current oscillator position. This \emph{voice} class has a
+  \type{rt\_do\_process} method similar to that in normal nodes;
+  however, this method takes the actual node it belongs to as first
+  parameter --- such that it can access its common state --- and its
+  voice index --- such that it can access its buffers from the ports,
+  and any other information provided by objects with both per-voice
+  and common data. 
+\end{enumerate}
+
+Implementing polyphony in this manner requires minimal, if any,
+modifications in the code that we have already implemented in the rest
+of this chapter. In fact, only implementing the \type{poly\_*\_port}
+and \type{poly\_node<>} classes, that should specialise their non
+polyphonic counterparts, is needed. The user code is kept as simple as
+and type-safe as possible, yet allowing the most efficient
+implementation because no dynamic polymorphism is involved in the
+voice management.
 
 \section{Validation}
 
@@ -1878,7 +1970,7 @@ This section provided enough evidence that the performance of the
 program is quite acceptable and that it meets our minimum guarantees
 to control non-determinism and prevent clicks due to buffer underruns.
 
-\subsection{Integration}
+\subsection{Integration and deployment}
 \label{sec:graph-integration}
 
 Section \ref{sec:graphmvc} discussed how we chose not to integrate
@@ -1915,7 +2007,10 @@ directory and are:
   the sum of the two vibrating sinusoids, on the other just one of
   them. The test succeeded emitting at the same time on an on-board
   ``Intel 5 Series/3400'' sound card and an ``M-Audio Xponent DJ
-  Controller'' USB integrated audio card.
+  Controller'' USB integrated audio card. We ran the test for as long
+  as 15 minutes to check whether clicks would be produced eventually
+  --- due to, for example, some small speed differences in such
+  dissimilar devices --- with no single clicks.
 
 \item[example\_graph\_soft] This program ensures that the ports with
   automatic reconnection softening actually do work properly. The
@@ -1966,8 +2061,39 @@ directory and are:
   \label{fig:soft-audacity}
 \end{figure}
 
-\todo{Hacer un release antes de enviar el proyecto a imprimir y poner
-  aquí el changelog!!}
+There have been several bug fixes that has happened parallel to this
+development. Also, while not used by the user interface code yet, it
+seemed reasonable to make the new API available to the public such
+that it can be validated by third parties. Thus, Psychosynth $0.2.1$
+was released at the end of this iteration. It was \index{peer-review}
+peer reviewed by project collaborators, mainly by the maintainer of
+the Ubuntu/Trinux packages Aleksander Morgado. The official
+\emph{changelog} briefing for this release is included in note
+\ref{note:changelog021}.\index{changelog} Note that Ubuntu packages
+have not been built yet for this release because we have to wait until
+Oneiric's release in October to get GCC 4.6 as the default compiler in
+Ubuntu.
+
+\begin{mynote}[Changelog of Psychosynth 0.2.1]
+  \label{note:changelog021}
+  \begin{itemize}
+  \item Now real-time priority is properly acquired for the audio
+    thread in POSIX systems whenever possible.
+  \item New modular synthesis engine included in the framework --- not
+    yet used by the UI, providing:
+    \begin{itemize}
+    \item Hierarchical patches. One can have a full patch inside one
+      node that may be later store and or loaded from the hard drive.
+    \item Any kind of signal can be processed now.
+    \item Multiple output and input ports can coexist.
+    \item Plug-in system is much easier to implement on top of the new
+      system.
+    \end{itemize}
+  \item New code uses some new C++0x features implemented in new
+    compilers only. With this release, GNU Psychosynth requires GCC
+    4.6 to compile.
+  \end{itemize}
+\end{mynote}
 
 \section{Conclusion}
 
@@ -2033,11 +2159,10 @@ messages.
 
 \subsection{Future work}
 
-In spite of this positive general balance, there is much room for
-improvement. There are many small improvements that have been
-discussed already while describing the design and do no require
-evaluating them here. Some other are either specially urgent or of a
-broader scope and we should recapitulate them now.
+Our requirements being already met, there are few ways we can later
+develop this module. Some small advancements have been proposed
+already during the design description, yet we can recapitulate some
+larger side projects that could implemented in the future.
 
 \subsubsection{Lock-free heterogeneous deques}
 \label{sec:improvehetero}

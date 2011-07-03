@@ -35,17 +35,42 @@ entitled "GNU Free Documentation License".
 \clearpage
 \thispagestyle{empty}
 \begin{center}
-{\large\bfseries \myTitle}\\
+{\large\bfseries GNU Psychosynth: Un framework para la síntesis de audio modular, interactiva y colaborativa y la ejecución de música en directo.}\\
 \end{center}
 \begin{center}
 \myName
 \end{center}
 %\vspace{0.7cm}
-\noindent{\textbf{Palabras clave}: }\\
+\noindent{\textbf{Palabras clave}: síntesis modular, interactividad,
+  sistemas colaborativos, programación genérica, tiempo real, redes,
+  C++0x, software libre, GNU}\\
 \vspace{0.7cm}
 
 \noindent{\textbf{Resumen}}\\
-\todo{Escribir el abstract en español.}
+En este proyecto de fin de carrera desarrollamos un sístema de
+síntesis de audio modular, interactiva y colaborativa orientado a la
+interpretación de música en directo. El sistema puede mezclar y
+manipular sonidos desde ficheros, una amplia variedad de generadores y
+aplicar filtros y efectos de toda clase. La interactividad se consigue
+mediante la técnica de \emph{conexionado dinámico}, que permite
+alterar la topología del grafo de síntesis con simples movimientos de
+los módulos de síntesis, así como prestando especial atención en la
+implementación para que cualquier operación sea aplicable en tiempo
+real sin generar distorsiones apreciables. La colaboratividad se logra
+con un sistema de sincronización en red que permite configurar la
+generación del sonido desde varios ordenadores simultaneamente
+conectados en red.
+
+En este desarrollo nos centramos en el \emph{framework} que provee el
+sistema. Por un lado, desarrollamos una bilioteca  de
+procesamiento de audio utilizando los últimos avances en programación
+genérica. Además, construimos un entorno de síntesis modular,
+jerárquico y desacoplado con novedosas abstracciones de comunicación
+entre hebras para facilitar el desarrollo de procesadores digitales de
+señales altamente interactivos.
+
+Todo el software desarrollado es libre y sigue una metodología de
+desarrollo continua y abierta. Es parte del proyecto GNU.
 
 % Abstract en inglés
 % --------------------------------------------------------------
@@ -58,11 +83,36 @@ entitled "GNU Free Documentation License".
 \begin{center}
 \myName
 \end{center}
-\noindent{\textbf{Keywords}: }\\
+\noindent{\textbf{Keywords}: modular synthesis, interactivity,
+  collaborative systems, generic programming, real-time, networking,
+  C++0x, free software, GNU}\\
 \vspace{0.7cm}
 
 \noindent{\textbf{Abstract}}\\
-\todo{Escribir el abstract en inglés.}
+In this mater's thesis project we develop a system for modular,
+interactive and collaborative sound synthesis and live music
+performance. The system is capable of mixing and manipulating sounds
+from files, a wide range of generators and can apply filters of all
+kinds. Interactivity is achieved with the \emph{dynamic patching}
+technique, that allows altering the topology of the synthesis graph
+with simple movements on the synthesis modules, and also taking
+special care on the implementation such that any operation can be done
+in real-time without introducing noticeable
+distortions. Collaborativity is managed through a network based
+synchronisation mechanism that enables modifying the sound generation
+through several computers simultaneously connected through the
+network.
+
+In this development we concentrate on the \emph{framework} that the
+system provides. On the one hand, we develop a library for audio
+processing using latest advancements in generic programming. Then, we
+build an modular synthesis environment that is hierarchical and lowly
+coupled with novel inter-thread communication abstractions to ease the
+development of highly interactive digital signal processors. 
+
+All this software is free --- as in freedom --- and follows a
+continuous and open development methodology. It is part of the GNU
+project.
 
 % Permiso biblioteca
 % --------------------------------------------------------------
