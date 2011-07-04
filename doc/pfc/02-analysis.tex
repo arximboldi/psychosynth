@@ -157,10 +157,10 @@ components.
 \begin{requirement}
   \label{req:iter3-begin}
   The system must be able to dynamically load modules developed with
-  standard interfaces, at least using the LADSPA\index{LADSPA
-    (plug-in)} standard\footnote{Linux Audio Developer's Simple
-    Plugin: \url{http://www.ladspa.org/}}, but LV2\footnote{LADSPA
-    Version 2: \url{http://lv2plug.in}}\index{LV2 (plug-in)} and
+  standard interfaces, at least using the \index{LADSPA (plug-in)}
+  LADSPA standard\footnote{Linux Audio Developer's Simple Plugin:
+    \url{http://www.ladspa.org/}}, but LV2\footnote{LADSPA Version 2:
+    \url{http://lv2plug.in}}\index{LV2 (plug-in)} and
   VST\footnote{Steinberg's Virtual Studio Technology:
     \url{http://ygrabit.steinberg.de/}}\index{VST (plug-in)} are
   proposed too in this order of priority. Note that, in some cases,
@@ -335,8 +335,8 @@ The software should be able to use arbitrary precision samples. Up to
 
 \subsubsection{Performance}
 
-\begin{requirement}[Latency]\index{block size}
-  The software should be able to work with a block size as low as
+\begin{requirement}\index{block size}
+  \label{req:latency} The software should be able to work with a block size as low as
   possible down to 64 frames, as long as the underlying hardware
   permits it.
 \end{requirement}
@@ -688,8 +688,8 @@ blocks.  For a more detailed description from the user point of view,
 please refer to the user manual that can be checked online on the
 project webpage
 \footnote{\url{http://psychosynth.com/index.php/Documentation}} or in
-appendix \ref{98-user}. In the project web page and the addendum CD
-demonstration videos and other multimedia material will be
+appendix \ref{sec:98-user}. In the project web page and the addendum
+CD demonstration videos and other multimedia material will be
 included. The article \cite{bolivar08psychosynth} published in the
 Novatica journal in 2008 gives a good introduction to the project too.
 

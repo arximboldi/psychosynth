@@ -242,8 +242,8 @@ filtering. Figure \ref{fig:interleaving} compares the
 interleaved and planar formats visually.
 
 Another issue is the order in which the data from different semantic
-channels is stored. We call \index{channel
-  layout}\emph{channel!layout} to a bijection $L : C \rightarrow
+channels is stored. We call \index{channel!layout}
+\emph{channel!layout} to a bijection $L : C \rightarrow
 \mathbb{Z}_{\|C\|}$, where $C$ is a given \emph{channel space}. For
 example, the mapping $\{ left \mapsto 0, right \mapsto 1 \}$ is a
 common layout for stereo sound, but $\{ left \mapsto 1, right \mapsto
@@ -661,7 +661,7 @@ reader can find most of them in \cite{stepanov09elements}.
 
 \subsubsection{{ChannelSpaceConcept}}
 
-A channel space\index{channel space} is a MPL sequence (like
+A channel space\index{channel!space} is a MPL sequence (like
 \type{mpl::list}) of whose elements channel tags (empty types giving a
 name for the semantic channel).
 
@@ -801,7 +801,7 @@ most supplied sample types being convertible too.
 
 \subsubsection{{ChannelBaseConcept}}
 
-A \emph{channel base}\index{channel base} is a container of channel
+A \emph{channel base}\index{channel!base} is a container of channel
 elements (such as samples, sample references or sample pointers).
 
 The most common use of channel base is in the implementation of a
@@ -1419,11 +1419,11 @@ of the ring range associated to the buffer.
 A ring buffer over frames.
 \begin{lstlisting}
 concept RingBufferConcept<RandomAccessRingBufferConcept Buf> {
-    where MutableBufferRangeConcept<Buf::range>;
-};
+    where MutableBufferRangeConcept<Buf::range>;  };
 \end{lstlisting}
 
-The main model for this is the \texttt{ring\_buffer} template.
+The main model for this concept is the \texttt{ring\_buffer} template
+class.
 
 \subsection{Algorithms}
 
@@ -2363,6 +2363,7 @@ optimise for the usage of SIMD\footnote{Single Instruction Multiple
 done now in a per-algorithm basis, doing so in a frame-arithmetic
 layer would hide all this complexity to the DSP developer providing a
 significant performance boost for free. 
+\index{DSL, domain specific language}
 
 \subsubsection{Submission to Boost}
 

@@ -167,7 +167,7 @@ click --- as it might involve doing non-linear computations or locking
 certain mutexes to synchronise the state with the user
 thread. Actually, the port reconnection issue requires special care,
 as we will discuss in section \ref{sec:modports}. Because of
-\emph{dynamic-patching}\index{dynamic-patching}, we should expect the
+\emph{dynamic patching}\index{dynamic patching}, we should expect the
 topology of the synthesis graph to change a lot during a live
 performance.
 
@@ -292,9 +292,9 @@ the whole harmonic depth of the music
 played at the same time; for example, by pressing simultaneously
 several keys of a keyboard. Actually, polyphony is also present
 without simultaneously pressing several keys, as instruments usually
-have a significant \emph{decay time}\index{decay time} --- i.e. the
-time between the key release and the sound fully fades out ---
-blending the sounds of successive key strokes.
+have a significant \emph{decay time}\index{decay (envelope)} ---
+i.e. the time between the key release and the sound fully fades out
+--- blending the sounds of successive key strokes.
 
 Because in a modular synthesiser a generator is producing a single
 tone at a time, it is not trivial to implement polyphony. In practise,
@@ -683,8 +683,8 @@ thread some method is expected to be used:
 
 \subsubsection{Processing the graph}
 
-The \type{processor} class is a \emph{facade}\index{facade (design
-  pattern)} that manages the execution of the synthesis graph
+The \type{processor} class is a \index{facade (design pattern)}
+\emph{facade} that manages the execution of the synthesis graph
 described by a given root node. Of course, a whole graph can be
 attached to one and only processor and an exception would be thrown if
 we try to attach it to several.
@@ -926,7 +926,7 @@ by figure \ref{fig:triplebuf}. \index{local buffer}
 \end{figure}
 
 \begin{description}
-\item[Front buffer] \index{flip (multiple-buffering)}This is the
+\item[Front buffer] \index{flip (multiple buffering)}This is the
   buffer where the events are popped from for processing. Only the RT
   thread should access the front of its triple buffer, and the same
   happens in the async thread.
@@ -1185,7 +1185,7 @@ node itself has an output port, that can be connected to any other
 node within the patch. A ``patch output port node'' works in the
 opposite way: it exposes an output port externally and an input port
 internally. These kind of nodes are implemented using the
-\index{forwarding prot}\emph{forwarding ports}, which allow
+\index{forwarding port}\emph{forwarding ports}, which allow
 implementing a sort of \emph{identity function} node without the
 overhead of copying the input into the output. When its output is
 requested, they just return a reference to its input data.
@@ -1907,7 +1907,7 @@ the CD too --- suggest that it is an incompatibility between
 \type{pthreads} in the C++0x threads API GCC implementation.
 
 \begin{mynote}[\type{mutrace} output for the performance test program]
-\scriptsize\label{mutrace-output}
+\scriptsize\label{note:mutrace-output}
 \begin{verbatim}
 ...
 
