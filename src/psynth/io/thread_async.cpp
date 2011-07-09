@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-07-03 13:02:47 raskolnikov>
+ *  Time-stamp:  <2011-07-07 10:52:54 raskolnikov>
  *
  *  @file        thread_async.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
