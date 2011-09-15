@@ -300,19 +300,23 @@ if HAVE_LIBLO
 libpsynth_la_CXXFLAGS += $(LIBLO_CFLAGS)
 libpsynth_la_LIBADD += $(LIBLO_LIBS)
 nobase_libpsynthinc_HEADERS += \
+	net/exception.hpp\
 	net/osc_broadcast.hpp\
 	net/osc_server.hpp\
 	net/osc_client.hpp\
+	net/osc_passive.hpp\
 	net/osc_server_logger.hpp\
 	net/osc_client_logger.hpp\
 	net/osc_controller.hpp\
 	net/osc_misc.hpp\
 	net/osc_protocol.hpp
 libpsynth_la_SOURCES += \
+	net/exception.cpp\
 	net/osc_broadcast.cpp\
 	net/osc_controller.cpp\
 	net/osc_server.cpp\
-	net/osc_client.cpp
+	net/osc_client.cpp\
+	net/osc_passive.cpp
 endif
 
 if HAVE_ALSA

@@ -24,7 +24,7 @@
 #include "net/osc_client.hpp"
 #include "net/osc_protocol.hpp"
 
-static const int MAX_ALIVE_DELAY = 20000;
+static const int MAX_ALIVE_DELAY = 60000;
 static const int MIN_ALIVE_DELAY = 1000;
 
 using namespace std;

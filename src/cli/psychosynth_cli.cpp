@@ -23,8 +23,11 @@
 #include <algorithm>
 #include <config.h>
 
+#include <boost/optional.hpp>
+
 #include <psynth/net/osc_client.hpp>
 #include <psynth/net/osc_server.hpp>
+#include <psynth/net/osc_passive.hpp>
 #include <psynth/net/osc_client_logger.hpp>
 #include <psynth/net/osc_server_logger.hpp>
 #include <psynth/base/timer.hpp>
@@ -52,7 +55,8 @@ void psychosynth_cli::print_help()
 	"  -S, --server          Run a server.\n"
 	"  -C, --client <host>   Connect to the specified port.\n"
 	"  -p, --port            Use this server port instead of the default.\n"
-	"  -P, --client-port     Use this client port instead of the default.\n";
+	"  -P, --client-port     Use this client port instead of the default.\n"
+    	"  -o, --osc <port>      Start passive OSC interface.\n";
 }
 
 void psychosynth_cli::print_version()
@@ -74,6 +78,7 @@ void psychosynth_cli::prepare (psynth::base::arg_parser& ap)
     ap.add ('C', "client", &m_host);
     ap.add ('p', "port", &m_server_port);
     ap.add ('P', "client-port", &m_client_port);
+    ap.add ('o', "osc", &m_osc_port);
 }
 
 int psychosynth_cli::execute ()
@@ -88,7 +93,9 @@ int psychosynth_cli::execute ()
 	    ret_val = run_server ();
 	else if (!m_host.empty())
 	    ret_val = run_client ();
-	close_synth ();
+        else if (!m_osc_port.empty ())
+            ret_val = run_osc ();
+        close_synth ();
     }
     
     return ret_val;
@@ -158,6 +165,26 @@ int psychosynth_cli::run_server ()
 	
 	if (server.get_state () == osc_server::IDLE)
 	    ret_val = -1;
+    }
+
+    return ret_val;
+}
+
+int psychosynth_cli::run_osc ()
+{
+    base::timer timer;
+    net::osc_passive server (m_osc_port.c_str ());
+    int ret_val = 0;
+    
+    server.set_world (get_world ());
+    server.activate ();
+    
+    timer.update();
+    while (ret_val == 0) {
+	timer.update ();
+
+	while (server.receive (TIME_OUT));
+        get_world ()->update ();
     }
 
     return ret_val;

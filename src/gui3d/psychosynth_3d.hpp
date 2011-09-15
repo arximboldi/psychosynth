@@ -42,6 +42,7 @@
 #include "gui3d/task_manager.hpp"
 #include "gui3d/element_manager.hpp"
 #include "gui3d/window_list.hpp"
+#include "gui3d/network_window.hpp"
 #include "gui3d/camera_controller_default.hpp"
 
 class psychosynth_3d : public psynth::psynth_app,
@@ -77,8 +78,7 @@ private:
     psynth::base::timer m_timer;
 
 #ifdef PSYNTH_HAVE_OSC
-    psynth::osc_client* m_oscclient;
-    psynth::osc_server* m_oscserver;
+    network_window*     m_netwindow;
 #endif
     
     bool   m_must_quit;

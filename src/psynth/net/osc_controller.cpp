@@ -175,7 +175,7 @@ void osc_controller::add_methods (lo_server s)
 }
 
 int osc_controller::_add_cb(const char* path, const char* types,
-			   lo_arg** argv, int argc, lo_message msg)
+                            lo_arg** argv, int argc, lo_message msg)
 {
     if (is_target(lo_message_get_source(msg))) {
 	pair<int,int> net_id(argv[0]->i, argv[1]->i);

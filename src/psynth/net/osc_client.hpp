@@ -70,7 +70,7 @@ public:
 };
 
 class osc_client : public osc_controller,
-		  public osc_client_subject
+                   public osc_client_subject
 {
 public:
     enum state {
@@ -101,7 +101,7 @@ public:
     osc_client();
     ~osc_client();
 
-    state get_state() {
+    state get_state() const {
 	return m_state;
     }
     

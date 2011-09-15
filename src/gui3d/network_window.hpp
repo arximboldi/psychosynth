@@ -25,6 +25,7 @@
 
 #include <psynth/net/osc_client.hpp>
 #include <psynth/net/osc_server.hpp>
+#include <psynth/net/osc_passive.hpp>
 #include <psynth/net/osc_client_logger.hpp>
 #include <psynth/net/osc_server_logger.hpp>
 
@@ -56,7 +57,7 @@ class client_tab : public psynth::osc_client_listener,
     void set_connected (bool con);
 
 public:
-    client_tab(psynth::osc_client* client);
+    client_tab(psynth::world* world);
     ~client_tab();
     
     CEGUI::Window* create_window ();    
@@ -65,6 +66,8 @@ public:
     void external_dependant (CEGUI::Window* win) {
 	m_ext_disable = win;
     }
+
+    void update (int ticks);
 };
 
 class server_tab : public psynth::osc_server_listener,
@@ -95,9 +98,11 @@ class server_tab : public psynth::osc_server_listener,
     void set_listening (bool listening);
     
 public:
-    server_tab (psynth::osc_server* server);
+    server_tab (psynth::world* world);
     ~server_tab ();
     CEGUI::Window* create_window ();
+
+    void update (int ticks);
     
     bool on_button_click (const CEGUI::EventArgs &e);
 
@@ -105,17 +110,43 @@ public:
 	m_ext_disable = win;
     }
 };
+
+
+class passive_tab : public std::enable_shared_from_this<passive_tab>
+{
+    psynth::world* m_world;
+    psynth::net::osc_passive* m_passive;
+    bool m_listening;
     
+    CEGUI::Window* m_button;
+    CEGUI::Spinner* m_lport;
+    std::shared_ptr<gui_log_sink> m_logsink;
+    
+public:
+    void update (int ticks);
+    
+    passive_tab (psynth::world* world);
+    ~passive_tab ();
+    CEGUI::Window* create_window ();
+    
+    bool on_button_click (const CEGUI::EventArgs &e);
+};
+
+
 class network_window : public toggable_window
 {
-    std::shared_ptr<client_tab> m_client_tab;
-    std::shared_ptr<server_tab> m_server_tab;
-
+    std::shared_ptr<client_tab>  m_client_tab;
+    std::shared_ptr<server_tab>  m_server_tab;
+    std::shared_ptr<passive_tab> m_passive_tab;
+    
     virtual CEGUI::FrameWindow* create_window ();
+    
 public:
 
-    network_window (psynth::osc_client* client, psynth::osc_server* server);
+    network_window (psynth::world* world);
     ~network_window ();
+
+    void update (int ticks);
 };
 
 #endif /* NETWORKWINDOW_H */

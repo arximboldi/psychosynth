@@ -22,7 +22,7 @@ dnl  Global config
 dnl ======================================================================
 
 AC_PREREQ(2.61)
-AC_INIT([psychosynth], [0.2.1], [raskolnikov@es.gnu.org])
+AC_INIT([psychosynth], [0.3.0], [raskolnikov@es.gnu.org])
 AC_CONFIG_MACRO_DIR([m4])
 
 dnl TODO: Make portable makefiles.
@@ -286,24 +286,18 @@ if test "x${psynth3d}" != xno ; then
    BUILD_PSYNTH3D=yes
    
    dnl Check OGRE
-   PKG_CHECK_MODULES(OGRE, [OGRE >= 1.2], BUILD_PSYNTH3D=yes, BUILD_PSYNTH3D=no)
+   PKG_CHECK_MODULES(OGRE, [OGRE >= 1.2], HAVE_OGRE=yes, BUILD_PSYNTH3D=no)
    
    dnl Check CEGUI
-   if test "x$BUILD_PSYNTH3D" = xyes; then
-       PKG_CHECK_MODULES(CEGUI, [CEGUI >= 0.5], BUILD_PSYNTH3D=yes, BUILD_PSYNTH3D=no)
-   fi
-   
+   PKG_CHECK_MODULES(CEGUI, [CEGUI >= 0.5], HAVE_CEGUI=yes, BUILD_PSYNTH3D=no)
+      
    dnl Check CEGUI OGRE backend
-   if test "x$BUILD_PSYNTH3D" = xyes; then
-       PKG_CHECK_MODULES(CEGUIOGRE, [CEGUI-OGRE >= 1.2], BUILD_PSYNTH3D=yes, BUILD_PSYNTH3D=no)
-   fi
-   
+   PKG_CHECK_MODULES(CEGUIOGRE, [CEGUI-OGRE >= 1.2], HAVE_CEGUIOGRE=yes, BUILD_PSYNTH3D=no)
+      
    dnl Check OIS
-   if test "x$BUILD_PSYNTH3D" = xyes; then   
-       PKG_CHECK_MODULES(OIS, [OIS >= 1.0], BUILD_PSYNTH3D=yes, BUILD_PSYNTH3D=no)
-   fi
+   PKG_CHECK_MODULES(OIS, [OIS >= 1.0], HAVE_OIS=yes, BUILD_PSYNTH3D=no)
 else
-   BUILD_PSYNTH3D=no
+   BUILD_PSYNTH3D=disabled
 fi
 
 dnl  psynth dependencies
@@ -436,19 +430,71 @@ AC_MSG_RESULT([
  
     Configuration summary:
  
-       3D client (psynth3d) ..... $BUILD_PSYNTH3D
-       CLI client (psynth) ...... $BUILD_PSYNTH
-  
-       OSC support: ............. $HAVE_LIBLO
-       XML config support: ...... $HAVE_LIBXML
-       SoundTouch support: ...... $HAVE_SOUNDTOUCH
-       PCM support: ............. $HAVE_SNDFILE
-       OGG support: ............. $HAVE_SNDFILE
-       OSS support: ............. $HAVE_OSS
-       ALSA support: ............ $HAVE_ALSA
-       Jack support: ............ $HAVE_JACK
-       Unit tests support: ...... $HAVE_BOOST_TEST
-  
+       3D client (psynth3d) ..... $BUILD_PSYNTH3D])
+if test "x$psynth3d" != xno; then
+if test "x$HAVE_OGRE" != xyes; then
+AC_MSG_RESULT([           > Ogre >= 1.6 not installed.]);
+fi
+if test "x$HAVE_CEGUI" != xyes; then
+AC_MSG_RESULT([           > Cegui >= 0.5 not installed.]);
+fi
+if test "x$HAVE_CEGUIOGRE" != xyes; then
+AC_MSG_RESULT([           > Cegui-Ogre >= 0.5 not installed.]);
+fi
+if test "x$HAVE_OIS" != xyes; then
+AC_MSG_RESULT([           > OIS >= 1.0 not installed.]);
+fi
+fi
+
+AC_MSG_RESULT([       CLI client (psynth) ...... $BUILD_PSYNTH])
+if test "x$psynth" != xno; then
+if test "x$HAVE_LIBLO" != xyes; then
+AC_MSG_RESULT([           > liblo >= 0.26 not installed.]);
+fi
+fi
+
+AC_MSG_RESULT([
+       OSC support: ............. $HAVE_LIBLO])
+if test "x$HAVE_LIBLO" != xyes; then
+AC_MSG_RESULT([           > liblo >= 0.26 not installed.]);
+fi
+
+AC_MSG_RESULT([       XML config support: ...... $HAVE_LIBXML])
+if test "x$HAVE_LIBXML" != xyes; then
+AC_MSG_RESULT([           > libxml >= 2.0 not installed.]);
+fi
+
+AC_MSG_RESULT([       Time-stretch support: .... $HAVE_SOUNDTOUCH])
+if test "x$HAVE_SOUNDTOUCH" != xyes; then
+AC_MSG_RESULT([           > libSoundTouch not installed.]);
+fi
+
+AC_MSG_RESULT([       Samples support: ......... $HAVE_SNDFILE])
+if test "x$HAVE_SNDFILE" != xyes; then
+AC_MSG_RESULT([           > libsndfile >= 1.0.18 not installed.]);
+fi
+
+AC_MSG_RESULT([       OSS support: ............. $HAVE_OSS])
+if test "x$HAVE_OSS" != xyes; then
+AC_MSG_RESULT([           > No 'sys/soundcard.h']);
+fi
+
+AC_MSG_RESULT([       ALSA support: ............ $HAVE_ALSA])
+if test "x$HAVE_ALSA" != xyes; then
+AC_MSG_RESULT([           > No alsa >= 1.0]);
+fi
+
+AC_MSG_RESULT([       Jack support: ............ $HAVE_JACK])
+if test "x$HAVE_ALSA" != xyes; then
+AC_MSG_RESULT([           > No libjack >= 1.0]);
+fi
+
+AC_MSG_RESULT([       Unit tests support: ...... $HAVE_BOOST_TEST])
+if test "x$HAVE_ALSA" != xyes; then
+AC_MSG_RESULT([           > No Boost.UTF >= 1.42]);
+fi
+
+AC_MSG_RESULT([  
     Installation directories:
   
        Program: ................. $PACKAGE_BIN_DIR
@@ -461,8 +507,6 @@ AC_MSG_RESULT([
     Then type 'make install' to install.
     
     Have fun!
-  
-*************************************************************
 ])
 
 fi

@@ -34,11 +34,12 @@ const char* DEFAULT_HOST = "localhost";
 const int NW_HEIGHT = 300;
 const int NW_WIDTH  = 300;
 
-client_tab::client_tab (osc_client* client) :
-    m_client(client),
+client_tab::client_tab (psynth::world* world) :
+    m_client(new osc_client),
     m_connected(false),
     m_logsink (new gui_log_sink)
 {
+    m_client->set_world (world);
     m_client->add_listener(this);
     m_client->add_listener(&m_logger);
     
@@ -52,6 +53,7 @@ client_tab::~client_tab ()
  
     logger::self ().child ("oscclient").del_sink (m_logsink);
     m_logsink->set_window (0);
+    delete m_client;
 }
 
 Window* client_tab::create_window ()
@@ -170,11 +172,18 @@ bool client_tab::handle_client_disconnect (osc_client* client, osc_client_error 
     return false;
 }
 
-server_tab::server_tab (osc_server* server) :
-    m_server(server),
+void client_tab::update (int ticks)
+{
+    while (m_client->receive ());
+    m_client->update (ticks);
+}
+
+server_tab::server_tab (psynth::world* world) :
+    m_server(new osc_server),
     m_listening(false),
     m_logsink (new gui_log_sink)
 {
+    m_server->set_world (world);
     m_server->add_listener(this);
     m_server->add_listener(&m_logger);
  
@@ -188,6 +197,7 @@ server_tab::~server_tab ()
     
     logger::self ().child ("oscserver").del_sink (m_logsink);
     m_logsink->set_window (0);
+    delete m_server;
 }
 
 Window* server_tab::create_window ()
@@ -277,14 +287,106 @@ bool server_tab::on_button_click (const CEGUI::EventArgs &e)
     return true;
 }
 
-network_window::network_window(osc_client* client, osc_server* server) :
-    m_client_tab (new client_tab (client)),
-    m_server_tab (new server_tab (server))
+void server_tab::update (int ticks)
+{
+    while (m_server->receive ());
+    m_server->update (ticks);
+}
+
+passive_tab::passive_tab (psynth::world* world)
+    : m_world (world),
+    m_passive (0),
+    m_listening (false),
+    m_logsink (new gui_log_sink)
+{
+    logger::self ().child ("oscpassive").add_sink (m_logsink);
+}
+
+passive_tab::~passive_tab ()
+{
+    logger::self ().child ("oscpassive").del_sink (m_logsink);
+    m_logsink->set_window (0);
+    delete m_passive;
+}
+
+Window* passive_tab::create_window ()
+{
+    WindowManager& wmgr = WindowManager::getSingleton();
+	
+    Window* root = wmgr.createWindow("DefaultGUISheet");
+    root->setPosition( UVector2(UDim(0, 10), UDim(0, 10)) );
+    root->setSize    ( UVector2(UDim(1, -20),     UDim(1, -20)) );
+    root->setText("Passive OSC");
+    
+    Window* lport_label = wmgr.createWindow("TaharezLook/StaticText");
+    lport_label->setText("Port");
+    lport_label->setPosition(UVector2(UDim(0, 0), UDim(0, 0)));
+    lport_label->setSize    (UVector2(UDim(0.5, 0), UDim(0, 20)));
+
+    m_lport = dynamic_cast<Spinner*>(wmgr.createWindow("TaharezLook/Spinner"));
+    m_lport->setPosition(UVector2(UDim(0.5, 0), UDim(0, 0)));
+    m_lport->setSize    (UVector2(UDim(0.5, 0), UDim(0, 20)));
+    m_lport->setCurrentValue(PSYNTH_DEFAULT_PASSIVE_PORT);
+
+    m_button = wmgr.createWindow("TaharezLook/Button");
+    m_button->setText("Start");
+    m_button->setPosition(UVector2(UDim(0, 0), UDim(0, 25)));
+    m_button->setSize    (UVector2(UDim(1, 0), UDim(0, 20)));
+    m_button->setWantsMultiClickEvents(false);
+    m_button->subscribeEvent(PushButton::EventClicked, 
+			     Event::Subscriber(&passive_tab::on_button_click, this));
+
+    MultiLineEditbox* log_viewer = dynamic_cast<MultiLineEditbox*>(wmgr.createWindow("TaharezLook/MultiLineEditbox"));
+    log_viewer->setPosition(UVector2(UDim(0, 0), UDim(0, 50)));
+    log_viewer->setSize    (UVector2(UDim(1, 0), UDim(1, -50)));
+    log_viewer->setReadOnly(true);
+    m_logsink->set_window (log_viewer);
+    
+    root->addChildWindow(lport_label);
+    root->addChildWindow(m_lport);
+    
+    root->addChildWindow(m_button);
+    root->addChildWindow(log_viewer);
+    
+    return root;
+}
+
+bool passive_tab::on_button_click (const CEGUI::EventArgs &e)
+{
+    if (!m_passive) {
+	m_passive = new net::osc_passive (itoa(m_lport->getCurrentValue(), 10));
+        m_passive->set_world (m_world);
+    } else {
+	delete m_passive;
+        m_passive = 0;
+    }
+    return true;
+}
+
+void passive_tab::update (int ticks)
+{
+    if (m_passive) {
+        while (m_passive->receive ());
+    }
+}
+
+
+network_window::network_window(psynth::world* world) :
+    m_client_tab (new client_tab (world)),
+    m_server_tab (new server_tab (world)),
+    m_passive_tab (new passive_tab (world))
 {
 }
 
 network_window::~network_window()
 {
+}
+
+void network_window::update (int ticks)
+{
+    m_client_tab->update (ticks);
+    m_server_tab->update (ticks);
+    m_passive_tab->update (ticks);
 }
 
 FrameWindow* network_window::create_window ()
@@ -304,6 +406,7 @@ FrameWindow* network_window::create_window ()
 
     Window* client_win = m_client_tab->create_window ();
     Window* server_win = m_server_tab->create_window ();
+    Window* passive_win = m_passive_tab->create_window ();
     
     m_server_tab->external_dependant (client_win);
     m_client_tab->external_dependant (server_win);
@@ -311,6 +414,7 @@ FrameWindow* network_window::create_window ()
     window->addChildWindow(container);
     container->addChildWindow(client_win);
     container->addChildWindow(server_win);
+    container->addChildWindow(passive_win);
     
     return window;
 }

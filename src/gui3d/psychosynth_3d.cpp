@@ -199,10 +199,7 @@ bool psychosynth_3d::frameStarted (const Ogre::FrameEvent& evt)
     m_elemmgr->update ();
 
 #ifdef PSYNTH_HAVE_OSC
-    while(m_oscclient->receive ());
-    m_oscclient->update (m_timer.delta_ticks ());
-    while(m_oscserver->receive());
-    m_oscserver->update (m_timer.delta_ticks());
+    m_netwindow->update (m_timer.delta_ticks ());
 #endif
 
     if (m_window->isClosed ())
@@ -351,11 +348,6 @@ void psychosynth_3d::setup_gui ()
 #ifdef PSYNTH_HAVE_OSC
 void psychosynth_3d::setup_net ()
 {
-    m_oscclient = new osc_client();
-    m_oscserver = new osc_server();
-
-    m_oscclient->set_world (get_world());
-    m_oscserver->set_world (get_world());
 }
 #endif
 
@@ -459,11 +451,11 @@ void psychosynth_3d::setup_menus ()
 			      OIS::KC_UNASSIGNED);
 #endif
 #ifdef PSYNTH_HAVE_OSC
+    m_netwindow = new network_window (get_world ());
     m_windowlist->add_window ("NetworkWindowButton.imageset",
 			      "NetworkWindowButton.layout",
 			      "Create or join network sessions.",
-			      new network_window (m_oscclient,
-						  m_oscserver),
+                              m_netwindow,
 			      OIS::KC_UNASSIGNED);
 #endif
     m_windowlist->add_window ("ConfWindowButton.imageset",
@@ -500,8 +492,6 @@ void psychosynth_3d::close_menus ()
 #ifdef PSYNTH_HAVE_OSC
 void psychosynth_3d::close_net ()
 {
-    delete m_oscclient;
-    delete m_oscserver;
 }
 #endif
 

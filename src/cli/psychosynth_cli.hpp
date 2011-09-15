@@ -36,6 +36,7 @@ private:
     std::string m_client_port;
     std::string m_server_port;
     std::string m_host;
+    std::string m_osc_port;
     
     void print_help ();
     void print_version ();
@@ -45,6 +46,7 @@ private:
     int execute ();
     int run_server ();
     int run_client ();
+    int run_osc ();
 };
 
 #endif /* PSYCHOSYNTH_CLI_H */
