@@ -43,7 +43,8 @@ class osc_controller : public world_listener,
     int m_id;
     bool m_activated;
     bool m_broadcast;
-    
+    bool m_restricted;
+
     LO_HANDLER (osc_controller, add);
     LO_HANDLER (osc_controller, delete);
     LO_HANDLER (osc_controller, param);
@@ -61,7 +62,8 @@ class osc_controller : public world_listener,
     }
     
 public:
-    osc_controller (bool broadcast = false);
+    osc_controller (bool broadcast = false,
+                    bool restricted = true);
     ~osc_controller ();
 
     void set_id (int id) {

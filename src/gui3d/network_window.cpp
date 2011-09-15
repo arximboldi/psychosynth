@@ -355,8 +355,16 @@ bool passive_tab::on_button_click (const CEGUI::EventArgs &e)
 {
     if (!m_passive) {
 	m_passive = new net::osc_passive (itoa(m_lport->getCurrentValue(), 10));
+        m_button->setText("Stop");
+        logger::self ().child ("oscpassive") (
+            log::info,
+            std::string ("Passive OSC listening on port ") +
+            std::string (itoa(m_lport->getCurrentValue(), 10)));
         m_passive->set_world (m_world);
     } else {
+        logger::self ().child ("oscpassive") (
+            log::info, "Passive OSC stopped.");
+        m_button->setText("Start");
 	delete m_passive;
         m_passive = 0;
     }

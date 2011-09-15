@@ -29,12 +29,13 @@ using namespace std;
 namespace psynth
 {
 
-osc_controller::osc_controller(bool broadcast) :
+osc_controller::osc_controller(bool broadcast, bool restricted) :
     m_world(NULL),
     m_skip(0),
     m_id(0),
     m_activated(false),
-    m_broadcast(broadcast)
+    m_broadcast(broadcast),
+    m_restricted(restricted)
 {
 }
 
@@ -177,7 +178,7 @@ void osc_controller::add_methods (lo_server s)
 int osc_controller::_add_cb(const char* path, const char* types,
                             lo_arg** argv, int argc, lo_message msg)
 {
-    if (is_target(lo_message_get_source(msg))) {
+    if (!m_restricted || is_target(lo_message_get_source(msg))) {
 	pair<int,int> net_id(argv[0]->i, argv[1]->i);
 
 	m_skip++;
@@ -206,7 +207,7 @@ int osc_controller::_add_cb(const char* path, const char* types,
 int osc_controller::_delete_cb(const char* path, const char* types,
 			      lo_arg** argv, int argc, lo_message msg)
 {
-    if (is_target(lo_message_get_source(msg))) {
+    if (!m_restricted || is_target(lo_message_get_source(msg))) {
 	pair<int,int> net_id(argv[0]->i, argv[1]->i);
 
 	map<pair<int,int>, int>::iterator it = m_local_id.find(net_id);
@@ -238,7 +239,7 @@ int osc_controller::_delete_cb(const char* path, const char* types,
 int osc_controller::_param_cb(const char* path, const char* types,
 			     lo_arg** argv, int argc, lo_message msg)
 {
-    if (is_target(lo_message_get_source(msg))) {
+    if (!m_restricted || is_target(lo_message_get_source(msg))) {
 	pair<int,int> net_id(argv[0]->i, argv[1]->i);
 
 	map<pair<int,int>, int>::iterator it = m_local_id.find(net_id);
@@ -305,7 +306,7 @@ int osc_controller::_param_cb(const char* path, const char* types,
 int osc_controller::_activate_cb(const char* path, const char* types,
 				lo_arg** argv, int argc, lo_message msg)
 {
-    if (is_target(lo_message_get_source(msg))) {
+    if (!m_restricted || is_target(lo_message_get_source(msg))) {
 	pair<int,int> net_id(argv[0]->i, argv[1]->i);
 
 	map<pair<int,int>, int>::iterator it = m_local_id.find(net_id);
@@ -334,7 +335,7 @@ int osc_controller::_activate_cb(const char* path, const char* types,
 int osc_controller::_deactivate_cb(const char* path, const char* types,
 				  lo_arg** argv, int argc, lo_message msg)
 {
-    if (is_target (lo_message_get_source(msg))) {
+    if (!m_restricted || is_target (lo_message_get_source(msg))) {
 	pair<int,int> net_id(argv[0]->i, argv[1]->i);
 
 	map<pair<int,int>, int>::iterator it = m_local_id.find(net_id);
