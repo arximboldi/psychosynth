@@ -205,7 +205,7 @@ int osc_controller::_add_cb(const char* path, const char* types,
 }
 
 int osc_controller::_delete_cb(const char* path, const char* types,
-			      lo_arg** argv, int argc, lo_message msg)
+                               lo_arg** argv, int argc, lo_message msg)
 {
     if (!m_restricted || is_target(lo_message_get_source(msg))) {
 	pair<int,int> net_id(argv[0]->i, argv[1]->i);
@@ -237,8 +237,11 @@ int osc_controller::_delete_cb(const char* path, const char* types,
 }
 
 int osc_controller::_param_cb(const char* path, const char* types,
-			     lo_arg** argv, int argc, lo_message msg)
+                              lo_arg** argv, int argc, lo_message msg)
 {
+    if (argc < 4)
+        return 0;
+    
     if (!m_restricted || is_target(lo_message_get_source(msg))) {
 	pair<int,int> net_id(argv[0]->i, argv[1]->i);
 
@@ -248,26 +251,69 @@ int osc_controller::_param_cb(const char* path, const char* types,
 	if (it != m_local_id.end() &&
 	    !(obj = m_world->find_node(it->second)).is_null()) {
 
-	    int param_id = argv[2]->i;
 	    
+            
 	    m_skip++;
-	    switch(obj.get_param_type(param_id)) {
-	    case graph::node_param::FLOAT:
-		m_world->set_param_node(obj, param_id, argv[3]->f);
-		break;
-	    case graph::node_param::INT:
-		m_world->set_param_node(obj, param_id, argv[3]->i);
-		break;
-	    case graph::node_param::STRING:
-		m_world->set_param_node(obj, param_id, string(&argv[3]->s));
-		break;
-	    case graph::node_param::VECTOR2F:
-		m_world->set_param_node(obj, param_id,
-					base::vector_2f(argv[3]->f, argv[4]->f));
-		break;
-	    default:
-		break;
-	    }
+            int param_type = 0;
+            
+            // TODO: CLEAN this shit!
+            switch (types[2])
+            {
+            case 'i':
+            {
+                int param_id = argv[2]->i;
+                switch(param_type = obj.get_param_type(param_id)) {
+                case graph::node_param::FLOAT:
+                    m_world->set_param_node(obj, param_id, argv[3]->f);
+                    break;
+                case graph::node_param::INT:
+                    m_world->set_param_node(obj, param_id, argv[3]->i);
+                    break;
+                case graph::node_param::STRING:
+                    m_world->set_param_node(obj, param_id, string(&argv[3]->s));
+                    break;
+                case graph::node_param::VECTOR2F:
+                    if (argc < 5)
+                        return 0;
+                    m_world->set_param_node(
+                        obj, param_id, base::vector_2f(argv[3]->f, argv[4]->f));
+                    break;
+                default:
+                    return 0;
+                }
+                break;
+            }   
+
+            case 's':
+            {
+                std::string param_id = &argv[2]->s;
+                switch(param_type = obj.get_param_type(param_id)) {
+                case graph::node_param::FLOAT:
+                    m_world->set_param_node(obj, param_id, argv[3]->f);
+                    break;
+                case graph::node_param::INT:
+                    m_world->set_param_node(obj, param_id, argv[3]->i);
+                    break;
+                case graph::node_param::STRING:
+                    m_world->set_param_node(obj, param_id, string(&argv[3]->s));
+                    break;
+                case graph::node_param::VECTOR2F:
+                    if (argc < 5)
+                        return 0;
+                    m_world->set_param_node(
+                        obj, param_id, base::vector_2f(argv[3]->f, argv[4]->f));
+                    break;
+                default:
+                    return 0;
+                }   
+                break;
+            }
+            
+            default:
+                return 0;
+            }
+            
+	    
 	    m_skip--;
 
 	    if (m_broadcast) {   
@@ -276,7 +322,7 @@ int osc_controller::_param_cb(const char* path, const char* types,
 		lo_message_add_int32(newmsg, argv[1]->i);
 		lo_message_add_int32(newmsg, argv[2]->i);
 		
-		switch(obj.get_param_type(param_id)) {
+		switch(param_type) {
 		case graph::node_param::FLOAT:
 		    lo_message_add_float(newmsg, argv[3]->f);
 		    break;
@@ -304,7 +350,7 @@ int osc_controller::_param_cb(const char* path, const char* types,
 }
 
 int osc_controller::_activate_cb(const char* path, const char* types,
-				lo_arg** argv, int argc, lo_message msg)
+                                 lo_arg** argv, int argc, lo_message msg)
 {
     if (!m_restricted || is_target(lo_message_get_source(msg))) {
 	pair<int,int> net_id(argv[0]->i, argv[1]->i);
@@ -333,7 +379,7 @@ int osc_controller::_activate_cb(const char* path, const char* types,
 }
 
 int osc_controller::_deactivate_cb(const char* path, const char* types,
-				  lo_arg** argv, int argc, lo_message msg)
+                                   lo_arg** argv, int argc, lo_message msg)
 {
     if (!m_restricted || is_target (lo_message_get_source(msg))) {
 	pair<int,int> net_id(argv[0]->i, argv[1]->i);

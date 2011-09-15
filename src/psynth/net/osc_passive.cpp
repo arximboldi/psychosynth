@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-09-14 21:48:19 raskolnikov>
+ *  Time-stamp:  <2011-09-15 22:47:17 raskolnikov>
  *
  *  @file        osc_passive_client.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -41,6 +41,7 @@ namespace net
 PSYNTH_DEFINE_ERROR(osc_passive_error);
 
 osc_passive::osc_passive (const char* port)
+    : osc_controller (false, false)
 {
     _server = lo_server_new_with_proto (port, LO_UDP, NULL);
     if (!_server)
