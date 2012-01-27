@@ -286,14 +286,16 @@ if test "x${psynth3d}" != xno ; then
    BUILD_PSYNTH3D=yes
    
    dnl Check OGRE
-   PKG_CHECK_MODULES(OGRE, [OGRE >= 1.2], HAVE_OGRE=yes, BUILD_PSYNTH3D=no)
-   
+   PKG_CHECK_MODULES(OGRE, [OGRE >= 1.6], HAVE_OGRE=yes, BUILD_PSYNTH3D=no)
+   OGRE_PLUGIN_DIR=`pkg-config --variable=plugindir OGRE`
+   AC_SUBST(OGRE_PLUGIN_DIR)
+
    dnl Check CEGUI
-   PKG_CHECK_MODULES(CEGUI, [CEGUI >= 0.5], HAVE_CEGUI=yes, BUILD_PSYNTH3D=no)
+   PKG_CHECK_MODULES(CEGUI, [CEGUI >= 0.7], HAVE_CEGUI=yes, BUILD_PSYNTH3D=no)
       
    dnl Check CEGUI OGRE backend
-   PKG_CHECK_MODULES(CEGUIOGRE, [CEGUI-OGRE >= 1.2], HAVE_CEGUIOGRE=yes, BUILD_PSYNTH3D=no)
-      
+   PKG_CHECK_MODULES(CEGUIOGRE, [CEGUI-OGRE >= 0.7], HAVE_CEGUIOGRE=yes, BUILD_PSYNTH3D=no)
+   
    dnl Check OIS
    PKG_CHECK_MODULES(OIS, [OIS >= 1.0], HAVE_OIS=yes, BUILD_PSYNTH3D=no)
 else
@@ -400,6 +402,7 @@ AC_OUTPUT(libpsynth.pc
 	  data/Makefile
 	  data/desktop/Makefile
 	  data/gui3d/Makefile
+	  data/gui3d/plugins.cfg
 	  src/Makefile
 	  src/psynth/Makefile
 	  src/psynth/version.hpp
@@ -436,10 +439,10 @@ if test "x$HAVE_OGRE" != xyes; then
 AC_MSG_RESULT([           > Ogre >= 1.6 not installed.]);
 fi
 if test "x$HAVE_CEGUI" != xyes; then
-AC_MSG_RESULT([           > Cegui >= 0.5 not installed.]);
+AC_MSG_RESULT([           > Cegui >= 0.7 not installed.]);
 fi
 if test "x$HAVE_CEGUIOGRE" != xyes; then
-AC_MSG_RESULT([           > Cegui-Ogre >= 0.5 not installed.]);
+AC_MSG_RESULT([           > Cegui-Ogre >= 0.7 not installed.]);
 fi
 if test "x$HAVE_OIS" != xyes; then
 AC_MSG_RESULT([           > OIS >= 1.0 not installed.]);
@@ -501,6 +504,9 @@ AC_MSG_RESULT([
        Library: ................. $PACKAGE_LIB_DIR
        Includes: ................ $PACKAGE_INCLUDE_DIR
        Data: .................... $PACKAGE_DATA_DIR
+
+       Prefix: .................. $prefix
+       Exec. prefix: ............ $exec_prefix
 
      
     Type 'make' to compile.

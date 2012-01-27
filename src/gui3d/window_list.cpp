@@ -31,7 +31,7 @@ window_list::button::button (const std::string& imageset,
     m_toggable(window),
     m_key(key)
 {
-    ImagesetManager::getSingleton().createImageset(imageset);
+    ImagesetManager::getSingleton().create(imageset);
 	 
     m_window = WindowManager::getSingleton().loadWindowLayout(layout);
 

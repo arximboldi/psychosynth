@@ -187,9 +187,10 @@ bool psychosynth_3d::frameStarted (const Ogre::FrameEvent& evt)
 
 	CEGUI::Size size = CEGUI::Size(static_cast<float> (m_curr_width),
 				       static_cast<float> (m_curr_height));	
-	dynamic_cast<CEGUI::OgreCEGUIRenderer*> (m_gui->getRenderer())->setDisplaySize (size);
-	CEGUI::ImagesetManager::getSingleton().notifyScreenResolution(size);	
-	CEGUI::FontManager::getSingleton().notifyScreenResolution(size);
+	dynamic_cast<CEGUI::OgreRenderer*> (m_gui->getRenderer())->setDisplaySize (size);
+	CEGUI::ImagesetManager::getSingleton().notifyDisplaySizeChanged(size);
+	CEGUI::FontManager::getSingleton().notifyDisplaySizeChanged(size);
+        CEGUI::System::getSingleton().notifyDisplaySizeChanged(size);	
     }
     
     m_timer.update ();
@@ -213,9 +214,8 @@ void psychosynth_3d::setup_settings (conf_node& conf)
     try
     {
 #ifdef PSYNTH_HAVE_XML
-	conf.set_backend (
-	    new_conf_backend_xml (
-		(get_config_path() / "psynth3d.xml").string ()));
+        const auto conf_fname = (get_config_path() / "psynth3d.xml").string ();
+	conf.set_backend (new_conf_backend_xml (conf_fname));
 #endif
 	conf.def_load();
     }
@@ -270,7 +270,7 @@ void psychosynth_3d::setup_ogre (conf_node& conf)
 				 "FileSystem", "GUI");
 
     if (!m_ogre->restoreConfig() && !m_ogre->showConfigDialog())
-	m_ogre->setRenderSystem( *(m_ogre->getAvailableRenderers()->begin()) );
+	m_ogre->setRenderSystem( *(m_ogre->getAvailableRenderers().begin()) );
 
     m_ogre->initialise(false);
 
@@ -320,20 +320,24 @@ void psychosynth_3d::setup_input ()
 
 void psychosynth_3d::setup_gui ()
 {   
-    m_ceguirender = new CEGUI::OgreCEGUIRenderer(m_window,
-						 Ogre::RENDER_QUEUE_OVERLAY,
-						 false, 3000, m_scene);
-    
-    m_gui = new CEGUI::System (m_ceguirender, 0, 0, 0, "",
-			       (get_config_path () / "psynth3d_CEGUI.log").string ());
+    m_gui = &CEGUI::System::create (
+        CEGUI::OgreRenderer::create (*m_window),
+        0, 0, 0, 0, "",
+        (get_config_path () / "psynth3d_CEGUI.log").string ());
 
-    CEGUI::SchemeManager::getSingleton().loadScheme("TaharezLook.scheme");
+    CEGUI::DefaultResourceProvider* rp =
+        static_cast<CEGUI::DefaultResourceProvider*>(        
+            CEGUI::System::getSingleton().getResourceProvider());
+    rp->setResourceGroupDirectory("", (get_data_path () / "gui3d/gui").string ());
+    
+    CEGUI::SchemeManager::getSingleton().create("TaharezLook.scheme");
     m_gui->setDefaultMouseCursor("TaharezLook", "MouseArrow");
-    m_gui->setDefaultFont(CEGUI::FontManager::getSingleton().
-			  createFont("DejaVuSans-9.font"));
-	
+    CEGUI::FontManager::getSingleton().create("DejaVuSans-9.font");
+    m_gui->setDefaultFont("DejaVuSans-9");
+    
     CEGUI::WindowManager *win = CEGUI::WindowManager::getSingletonPtr();
     CEGUI::Window *sheet = win->createWindow("DefaultGUISheet", "root"); // TODO: root?
+    sheet->setMousePassThroughEnabled(true);
     m_gui->setGUISheet(sheet);
     m_gui->setDefaultTooltip("TaharezLook/Tooltip");
     
@@ -500,7 +504,7 @@ void psychosynth_3d::close_gui ()
     delete m_guiinput;
 // TODO
 //	delete m_ceguirender;
-//	delete m_gui; /
+//	delete m_gui; 
 }
 
 void psychosynth_3d::close_input ()

@@ -38,4 +38,5 @@ nobase_pkgdata_DATA = \
 	$(wildcard texture/*.jpg)\
 	gui/DejaVuSans.ttf
 
-EXTRA_DIST = $(nobase_pkgdata_DATA)
+EXTRA_DIST = $(nobase_pkgdata_DATA) plugins.cfg.in
+

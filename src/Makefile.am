@@ -75,8 +75,9 @@ psynth3d_CXXFLAGS = \
 	$(SIGC_CFLAGS)\
 	$(OGRE_CFLAGS) \
 	$(CEGUI_CFLAGS) \
-	$(OIS_CFLAGS) \
-	$(CEGUIOGRE_CFLAGS)
+	$(CEGUIOGRE_CFLAGS) \
+	$(OIS_CFLAGS) 
+
 
 # libboost_system is a hack
 psynth3d_LDFLAGS = 
@@ -87,9 +88,10 @@ psynth3d_LDADD = \
 	$(SIGC_LIBS) \
 	$(OGRE_LIBS) \
 	$(CEGUI_LIBS) \
-	$(OIS_LIBS) \
 	$(CEGUIOGRE_LIBS) \
+	$(OIS_LIBS) \
 	./psynth/libpsynth.la
+
 
 psynth3d_SOURCES = \
 	gui3d/camera_controller_default.cpp \

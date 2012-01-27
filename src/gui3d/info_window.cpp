@@ -145,7 +145,7 @@ CEGUI::FrameWindow* info_window::create_window ()
     window->setText("Info");
     
     Imageset* logoimg =
-	ImagesetManager::getSingleton().createImageset("Logo.imageset");
+	&ImagesetManager::getSingleton().create("Logo.imageset");
     Window* logo = wmgr.createWindow("TaharezLook/StaticImage");
     logo->setProperty("Image", "set:Logo image:the_logo");
     logo->setPosition(UVector2(UDim(0.5, -logoimg->getImageWidth("the_logo")/2),

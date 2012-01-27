@@ -26,7 +26,7 @@
 #include <OGRE/Ogre.h>
 #include <cstddef> // CEGUI bugfix.
 #include <CEGUI/CEGUI.h>
-#include <OgreCEGUIRenderer.h>
+#include <CEGUI/RendererModules/Ogre/CEGUIOgreRenderer.h>
 
 #include <psynth/version.hpp>
 #include <psynth/base/timer.hpp>
@@ -65,9 +65,8 @@ private:
     Ogre::Camera*        m_camera;
     Ogre::Viewport*      m_viewport;
 	
-    CEGUI::System*            m_gui;
-    CEGUI::OgreCEGUIRenderer* m_ceguirender;
-
+    CEGUI::System*       m_gui;
+    
     default_selector_populator m_populator;
     input_manager*      m_inputmgr;
     cegui_injecter*     m_guiinput;

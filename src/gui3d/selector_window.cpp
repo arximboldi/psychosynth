@@ -46,7 +46,7 @@ selector_window::category::button::button (const std::string& name,
     m_window->setSize ( UVector2(CEGUI::UDim(0, BUT_WIDTH),
                                  CEGUI::UDim(0, BUT_HEIGHT)));
 
-    m_window->setMousePassThroughEnabled (false);
+    //m_window->setMousePassThroughEnabled (false);
     //m_window->setWantsMultiClickEvents(false);
     m_window->setEnabled(true);
     m_window->subscribeEvent(

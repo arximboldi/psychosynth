@@ -56,7 +56,7 @@ element_manager::~element_manager()
     for (elem_map_iter it = m_elems.begin(); it != m_elems.end(); ++it)
 	delete it->second;
 
-    for (list<connection*>::iterator it = m_cons.begin(); it != m_cons.end(); ++it)
+    for (std::list<connection*>::iterator it = m_cons.begin(); it != m_cons.end(); ++it)
 	delete *it;
 
     delete m_rayquery;
@@ -267,8 +267,9 @@ bool element_manager::get_world_pointer (Vector2& res)
 {
     CEGUI::Point mousepos = CEGUI::MouseCursor::getSingleton().getPosition();	
     Ray ray =  Ray(m_camera->getCameraToViewportRay(
-		       mousepos.d_x/m_camera->getViewport()->getActualWidth(),
-		       mousepos.d_y/m_camera->getViewport()->getActualHeight()));
+		       float(mousepos.d_x)/m_camera->getViewport()->getActualWidth(),
+		       float(mousepos.d_y)/m_camera->getViewport()->getActualHeight()));
+    
     pair<bool, Ogre::Real>  inter = ray.intersects(Plane(Vector3(0.0,1.0,0.0),
 							 Ogre::Real(0.0)));
 
@@ -314,7 +315,7 @@ bool element_manager::mousePressed(const OIS::MouseEvent &e, OIS::MouseButtonID 
 	if (ret)
 	    return ret;
 	
-	for (list<connection*>::iterator it = m_cons.begin(); it != m_cons.end(); ++it)
+	for (std::list<connection*>::iterator it = m_cons.begin(); it != m_cons.end(); ++it)
 	    if ((*it)->pointer_clicked (pos, id))
 		return true;//ret = true;
     }
@@ -425,7 +426,7 @@ void element_manager::update()
     for (elem_iter it = m_clear_elems.begin(); it != m_clear_elems.end(); ++it)
 	delete *it;
     
-    for (list<connection*>::iterator it = m_cons.begin(); it != m_cons.end(); ++it)
+    for (std::list<connection*>::iterator it = m_cons.begin(); it != m_cons.end(); ++it)
 	(*it)->update();
     
     m_clear_elems.clear();
@@ -443,7 +444,7 @@ void element_manager::handle_link_added (const world_patcher_event& ev)
 void element_manager::handle_link_deleted (const world_patcher_event& ev)
 {
     /* TODO */
-    for (list<connection*>::iterator it = m_cons.begin(); it != m_cons.end();)
+    for (std::list<connection*>::iterator it = m_cons.begin(); it != m_cons.end();)
 	if ((*it)->get_source () == ev.src &&
 	    (*it)->get_destiny () == ev.dest) {
 	    delete *it;

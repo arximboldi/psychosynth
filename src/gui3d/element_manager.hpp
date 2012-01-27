@@ -36,9 +36,9 @@
 const int N_MB = OIS::MB_Button7+1;
 
 class element_manager : public OIS::MouseListener,
-		       public OIS::KeyListener,
-		       public psynth::world_listener,
-		       public psynth::world_patcher_listener
+                        public OIS::KeyListener,
+                        public psynth::world_listener,
+                        public psynth::world_patcher_listener
 {
     typedef std::list<element*> elem_list;
     typedef std::map<int, element*> elem_map; /* TODO: turn back into a list? */

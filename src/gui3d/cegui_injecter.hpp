@@ -43,17 +43,17 @@ class cegui_injecter : public OIS::MouseListener, public OIS::KeyListener
 {
 public:
     bool mouseMoved(const OIS::MouseEvent& e) {
-	return
+	auto result =
             CEGUI::System::getSingleton().injectMousePosition(
                 e.state.X.abs, e.state.Y.abs) ||
             CEGUI::System::getSingleton().injectMouseWheelChange(
                 e.state.Z.rel * .01);
-
-	//return CEGUI::System::getSingleton().injectMouseMove(e.state.X.rel, e.state.Y.rel);
+        return result;
     }
 	
     bool mousePressed(const OIS::MouseEvent &e, OIS::MouseButtonID id) {
-	return CEGUI::System::getSingleton().injectMouseButtonDown (convert_button(id));
+	auto result = CEGUI::System::getSingleton().injectMouseButtonDown (convert_button(id));
+        return result;
     }
 	
     bool mouseReleased(const OIS::MouseEvent &e, OIS::MouseButtonID id) {
