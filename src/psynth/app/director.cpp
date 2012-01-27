@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-18 17:42:09 raskolnikov>
+ *  Time-stamp:  <2012-01-27 13:59:21 raskolnikov>
  *
  *  @file        director.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -63,27 +63,34 @@ void director::stop_output ()
 
 void director::start_output ()
 {
-    std::string out_name;
+    try
+    {
+        std::string out_name;
 
-    m_config->child ("output").get (out_name);
+        m_config->child ("output").get (out_name);
     
-    odf_map::iterator i = m_outdir.find(out_name);
-    if (i != m_outdir.end()) {
-	m_output = i->second->create_output_director();
-	m_output->start (m_config->child (i->second->get_name()));
+        odf_map::iterator i = m_outdir.find(out_name);
+        if (i != m_outdir.end()) {
+            m_output = i->second->create_output_director();
+            m_output->start (m_config->child (i->second->get_name()));
 
-	m_world->attach_output (m_output->get_output());
+            m_world->attach_output (m_output->get_output());
 
 #if 0 // FIXME: Pass this information somehow!
-	m_output->get_output()->set_info(m_info);
-	m_output->get_output()->open();
+            m_output->get_output()->set_info(m_info);
+            m_output->get_output()->open();
 #endif
-	m_output->get_output()->start();
-    } else {
-	m_config->child ("output").set (string (PSYNTH_DEFAULT_OUTPUT));
-    }
+            m_output->get_output()->start();
+        } else {
+            m_config->child ("output").set (string (PSYNTH_DEFAULT_OUTPUT));
+        }
 
-    m_old_output = out_name;
+        m_old_output = out_name;
+    }
+    catch (base::exception& err)
+    {
+        err.log();
+    }
 }
 
 void director::register_config ()

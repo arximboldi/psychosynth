@@ -121,6 +121,7 @@ public:
     {
 	for (std::list<slot*>::iterator i = m_slots.begin(); i != m_slots.end();) {
 	    if ((*i)->m_out == out) {
+                (*i)->m_out->soft_stop ();
 		(*i)->m_out->set_callback (0);
                 /* This should take threading into account. */
 		(*i)->m_out.reset ();
