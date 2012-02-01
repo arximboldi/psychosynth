@@ -30,10 +30,10 @@ using namespace CEGUI;
 using namespace std;
 
 #define CW_WIDTH  300
-#define CW_HEIGHT 250
+#define CW_HEIGHT 270
 
 #define PW_WIDTH  400
-#define PW_HEIGHT 200
+#define PW_HEIGHT 220
 
 bool path_conf_window::on_generic (const CEGUI::EventArgs &e)
 {

@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2012-02-01 23:37:23 raskolnikov>
+ *  Time-stamp:  <2012-02-02 00:31:06 raskolnikov>
  *
  *  @file        alsa_raw_output.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -242,8 +242,8 @@ int alsa_xrun_recovery (snd_pcm_t* handle)
 std::size_t alsa_raw_output::put_i (const void* data, std::size_t frames)
 {
     snd_pcm_sframes_t res;
-    
-    while ((res = snd_pcm_writei (_handle, data, frames)) == -EAGAIN);
+
+    res = snd_pcm_writei (_handle, data, frames);
     
     if (res < 0 && alsa_xrun_recovery (_handle) < 0)
     {
@@ -256,10 +256,9 @@ std::size_t alsa_raw_output::put_i (const void* data, std::size_t frames)
 
 std::size_t alsa_raw_output::put_n (const void* const* data, std::size_t frames)
 {
-    
     snd_pcm_sframes_t res;
-    
-    while ((res = snd_pcm_writen (_handle, (void**) data, frames)) == -EAGAIN);
+
+    res = snd_pcm_writen (_handle, (void**) data, frames);
 
     if (res < 0 && alsa_xrun_recovery (_handle) < 0)
     {
@@ -302,7 +301,7 @@ void alsa_raw_output::iterate ()
 {
     snd_pcm_sframes_t nframes_or_err = 0;
 
-    nframes_or_err = snd_pcm_wait (_handle, 1000);  
+    nframes_or_err = snd_pcm_wait (_handle, 1000);
     if (nframes_or_err < 0)
         PSYNTH_LOG << "snd_pcm_wait () error: "
                    << snd_strerror (nframes_or_err);
@@ -317,8 +316,6 @@ void alsa_raw_output::iterate ()
     {
         process (std::min<std::size_t> (nframes_or_err, _buffer_size));
     }
-
-    process (_buffer_size);
 }
 
 } /* namespace io */

@@ -35,7 +35,7 @@ FrameWindow* quit_window::create_window ()
 	wmgr.createWindow("TaharezLook/FrameWindow", "window_menu"));
 	
     window->setPosition( UVector2(UDim(0.5, -100), UDim(0.5, -50)) );
-    window->setSize    ( UVector2(UDim(0, 240),     UDim(0, 100)) );
+    window->setSize    ( UVector2(UDim(0, 240),     UDim(0, 120)) );
     window->setText("Quit Window");
 
     Window* label = wmgr.createWindow("TaharezLook/StaticText");
