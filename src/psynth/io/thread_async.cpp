@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-07-07 10:52:54 raskolnikov>
+ *  Time-stamp:  <2012-01-28 18:14:41 raskolnikov>
  *
  *  @file        thread_async.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -62,6 +62,7 @@ void thread_async::run ()
 {
     if (_realtime)
         _request_rt ();
+    prepare ();
     while (state () == async_state::running)
         iterate ();
 }

@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-16 16:58:10 raskolnikov>
+ *  Time-stamp:  <2012-02-01 22:22:46 raskolnikov>
  *
  *  @file        alsa_output.tpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -88,12 +88,14 @@ struct alsa_support
 
 template <typename Range>
 alsa_output<Range>::alsa_output (const std::string& device,
-                                 std::size_t        buffer_size,
+                                 std::size_t        nperiods,
+                                 std::size_t        period_size,
                                  std::size_t        rate,
                                  callback_type      cb)
     : alsa_raw_output (device.c_str (),
                        alsa_support<Range>::format::value,
-                       buffer_size,
+                       nperiods,
+                       period_size,
                        alsa_support<Range>::access::value,
                        rate,
                        alsa_support<Range>::channels::value,

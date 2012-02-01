@@ -65,7 +65,7 @@ class output_director_alsa : public output_director
         auto device = conf.child ("out_device").get<std::string> ();
 	m_output = io::new_buffered_async_output<
             graph::audio_const_range,
-            io::alsa_output<sound::stereo16sc_range> >(device, 1024, 44100);
+            io::alsa_output<sound::stereo16sc_range> >(device, 2, 512, 44100);
 	return m_output;
     }
 

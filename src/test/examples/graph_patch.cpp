@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-27 20:08:36 raskolnikov>
+ *  Time-stamp:  <2012-02-01 23:13:11 raskolnikov>
  *
  *  @file        graph_patch.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -52,7 +52,7 @@ int main ()
             io::new_buffered_async_output<
                 graph::audio_range,
                 io::alsa_output<sound::stereo16sc_range> >(
-                    test_alsa_device, 256, 44100)));
+                    test_alsa_device, 2, 128, 44100)));
 
     auto in1 = patch->add (factory.create ("audio_patch_soft_in_port"));
     in1->param ("port-name").set<std::string> ("mix-in-one");

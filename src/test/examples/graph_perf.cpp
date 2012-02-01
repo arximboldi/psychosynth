@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-29 01:05:19 raskolnikov>
+ *  Time-stamp:  <2012-02-01 23:13:35 raskolnikov>
  *
  *  @file        graph_perf.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -58,7 +58,7 @@ graph::core::patch_ptr make_output_patch ()
             io::new_buffered_async_output<
                 graph::audio_range,
                 io::alsa_output<sound::stereo16sc_range> >(
-                    test_alsa_device, 256, 44100)));
+                    test_alsa_device, 2, 128, 44100)));
     auto mixer = p->add (factory.create ("audio_mixer"));
 
     auto in1 = p->add (factory.create ("audio_patch_soft_in_port"));

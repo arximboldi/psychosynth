@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-28 15:39:18 raskolnikov>
+ *  Time-stamp:  <2012-02-01 23:09:50 raskolnikov>
  *
  *  @file        oss_raw_output.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -70,9 +70,8 @@ oss_raw_output::oss_raw_output (const char* device,
     do {                                                                \
         int err = fun;                                                  \
         if (err == -1) {                                                \
-            PSYNTH_THROW (except) << "Problem opening ("                \
-                                  << device                             \
-                                  << ::strerror (errno);                \
+            PSYNTH_THROW (except) <<                                    \
+                "Problem opening (" << device << ") " << ::strerror (errno); \
         }                                                               \
     } while (0)
 

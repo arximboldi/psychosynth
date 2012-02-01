@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-28 15:26:52 raskolnikov>
+ *  Time-stamp:  <2012-01-28 18:14:17 raskolnikov>
  *
  *  @file        thread_async.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -57,6 +57,7 @@ public:
 protected:
     virtual void run ();
     virtual void iterate () {}
+    virtual void prepare () {}
     
 private:
     void _request_rt ();

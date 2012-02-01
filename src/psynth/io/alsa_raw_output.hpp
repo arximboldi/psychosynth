@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-23 15:56:39 raskolnikov>
+ *  Time-stamp:  <2012-02-01 22:21:48 raskolnikov>
  *
  *  @file        alsa_raw_output.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -54,7 +54,8 @@ public:
     
     alsa_raw_output (const char*       device,
                      snd_pcm_format_t  format,
-                     snd_pcm_uframes_t buffer_size,
+                     unsigned int      nperiods,
+                     snd_pcm_uframes_t period_size,
                      snd_pcm_access_t  access,
                      unsigned int      rate,
                      unsigned int      channels,
@@ -73,6 +74,7 @@ public:
     
 protected:
     void iterate ();
+    void prepare ();
     
 private:
     snd_pcm_uframes_t    _buffer_size;

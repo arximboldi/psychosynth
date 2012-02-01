@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-27 19:35:40 raskolnikov>
+ *  Time-stamp:  <2012-02-01 23:12:35 raskolnikov>
  *
  *  @file        graph_scale.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -50,7 +50,7 @@ int main ()
             io::new_buffered_async_output<
                 graph::audio_range,
                 io::alsa_output<sound::stereo16sc_range> >(
-                    test_alsa_device, 1024, 44100)));
+                    test_alsa_device, 2, 512, 44100)));
     
     auto osc = root->add (factory.create ("audio_sine_oscillator"));
     auto mod = root->add (factory.create ("sample_sine_oscillator"));

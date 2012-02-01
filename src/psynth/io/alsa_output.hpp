@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-16 16:58:21 raskolnikov>
+ *  Time-stamp:  <2012-02-01 22:22:13 raskolnikov>
  *
  *  @file        alsa_output.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -62,7 +62,8 @@ public:
     typedef typename base_type::const_range const_range;
     
     alsa_output (const std::string& device,
-                 std::size_t        buffer_size,
+                 std::size_t        nperiods,
+                 std::size_t        period_size,
                  std::size_t        rate,
                  callback_type cb = callback_type ());
 

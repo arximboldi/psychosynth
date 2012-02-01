@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-18 23:20:11 raskolnikov>
+ *  Time-stamp:  <2012-02-01 23:11:50 raskolnikov>
  *
  *  @file        output.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -242,7 +242,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE (alsa_output_test, Range, alsa_test_types)
         std::size_t async_nframes = 0;
         
         io::alsa_output<Range> device (
-            TEST_DEVICE_ALSA, buffer_size, sample_rate, [&] (std::size_t)
+            TEST_DEVICE_ALSA, 2, buffer_size/2, sample_rate, [&] (std::size_t)
             { async_nframes = device.put (range (buf)); });
 
         nframes = device.put (range (buf));
