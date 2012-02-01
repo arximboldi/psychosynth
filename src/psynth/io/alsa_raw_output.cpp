@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2012-02-01 23:08:42 raskolnikov>
+ *  Time-stamp:  <2012-02-01 23:37:23 raskolnikov>
  *
  *  @file        alsa_raw_output.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -38,6 +38,8 @@
 #include "base/throw.hpp"
 #include "base/scope_guard.hpp"
 #include "alsa_raw_output.hpp"
+
+#define PSYNTH_ALSA_REPORT_XRUN 0
 
 namespace psynth
 {
@@ -116,7 +118,7 @@ alsa_raw_output::alsa_raw_output (const char*       device,
     if (actual_nperiods != nperiods)
         PSYNTH_LOG << base::log::warning
                    << "ALSA could not set the requested periods. "
-                   << "Actual periods is: " << period_size;
+                   << "Actual periods is: " << actual_nperiods;
 
     dir = 0;
     snd_pcm_uframes_t actual_period_size = period_size;
@@ -126,7 +128,7 @@ alsa_raw_output::alsa_raw_output (const char*       device,
     if (actual_period_size != period_size)
         PSYNTH_LOG << base::log::warning
                    << "ALSA could not set the requested buffer size. "
-                   << "Actual period size is: " << period_size;
+                   << "Actual period size is: " << actual_period_size;
 
     _buffer_size = nperiods * period_size;
     PSYNTH_ALSA_CHECK (snd_pcm_hw_params_set_buffer_size_near (
@@ -198,41 +200,41 @@ namespace
 
 int alsa_xrun_recovery (snd_pcm_t* handle)
 {
-	snd_pcm_status_t *status;
-	int res;
-
-	snd_pcm_status_alloca(&status);
-
-        if ((res = snd_pcm_status(handle, status)) < 0)
-        {
+    snd_pcm_status_t *status;
+    int res;
+    
+    snd_pcm_status_alloca(&status);
+    
+    if ((res = snd_pcm_status(handle, status)) < 0)
+    {
+        PSYNTH_LOG << base::log::error <<
+            "Status error: " << snd_strerror(res);
+    }
+    
+    if (snd_pcm_status_get_state(status) == SND_PCM_STATE_SUSPENDED)
+    {
+        PSYNTH_LOG << "ALSA output is in suspended state.";
+        
+        if ((res = snd_pcm_prepare(handle)) < 0)
             PSYNTH_LOG << base::log::error <<
-                "Status error: " << snd_strerror(res);
-        }
-
-	if (snd_pcm_status_get_state(status) == SND_PCM_STATE_SUSPENDED)
-	{
-            PSYNTH_LOG << "ALSA output is in suspended state.";
-            
-            if ((res = snd_pcm_prepare(handle)) < 0)
-                PSYNTH_LOG << base::log::error <<
-                    "Error preparing after suspend: " << snd_strerror(res);
-	}
-
-	if (snd_pcm_status_get_state(status) == SND_PCM_STATE_XRUN) {
+                "Error preparing after suspend: " << snd_strerror(res);
+    }
+    
+    if (snd_pcm_status_get_state(status) == SND_PCM_STATE_XRUN) {
 #if PSYNTH_ALSA_REPORT_XRUN
-		struct timeval now, diff, tstamp;
-                snd_pcm_status_get_tstamp (status,&now);
-		snd_pcm_status_get_trigger_tstamp (status, &tstamp);
-		timersub(&now, &tstamp, &diff);
-                float delayed_usecs = diff.tv_sec * 1000000.0 + diff.tv_usec;
-                
-		PSYNTH_LOG << base::log::error <<
-                    "Buffer underrun of at least %.3f msecs",
-                    delayed_usecs / 1000.0);
+        struct timeval now, diff, tstamp;
+        snd_pcm_status_get_tstamp (status,&now);
+        snd_pcm_status_get_trigger_tstamp (status, &tstamp);
+        timersub(&now, &tstamp, &diff);
+        float delayed_usecs = diff.tv_sec * 1000000.0 + diff.tv_usec;
+        
+        PSYNTH_LOG << base::log::error <<
+            "Buffer underrun of at least " <<
+            delayed_usecs / 1000.0 << " msecs.";
 #endif
-	}
+    }
 
-	return snd_pcm_start (handle);
+    return res;
 }
 
 } /* namespace anonymous */

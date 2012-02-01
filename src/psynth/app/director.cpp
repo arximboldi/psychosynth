@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2012-01-27 13:59:21 raskolnikov>
+ *  Time-stamp:  <2012-02-01 23:44:34 raskolnikov>
  *
  *  @file        director.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -27,8 +27,6 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-
-
 
 #include <cstring>
 #include <algorithm>
@@ -73,19 +71,12 @@ void director::start_output ()
         if (i != m_outdir.end()) {
             m_output = i->second->create_output_director();
             m_output->start (m_config->child (i->second->get_name()));
-
             m_world->attach_output (m_output->get_output());
-
-#if 0 // FIXME: Pass this information somehow!
-            m_output->get_output()->set_info(m_info);
-            m_output->get_output()->open();
-#endif
             m_output->get_output()->start();
         } else {
             m_config->child ("output").set (string (PSYNTH_DEFAULT_OUTPUT));
         }
 
-        m_old_output = out_name;
     }
     catch (base::exception& err)
     {
@@ -100,12 +91,13 @@ void director::register_config ()
     m_config->child ("num_channels").def (int (PSYNTH_DEFAULT_NUM_CHANNELS));
     m_config->child ("output")      .def (string (PSYNTH_DEFAULT_OUTPUT));
 
-    m_config->on_nudge.connect (boost::bind (&director::on_config_nudge, this, _1));
+    m_on_output_change_slot =
+        m_config->on_nudge.connect (boost::bind (&director::on_config_nudge, this, _1));
 }
 
 void director::unregister_config()
 {
-    m_config->on_nudge.connect (boost::bind (&director::on_config_nudge, this, _1));
+    m_config->on_nudge.disconnect (m_on_output_change_slot);
 }
 
 void director::start (base::conf_node& conf, const boost::filesystem::path& home_path)
@@ -114,11 +106,10 @@ void director::start (base::conf_node& conf, const boost::filesystem::path& home
 
     m_filemgr.start (conf.child ("file_manager"), home_path);
     
-    /* A bit dirty... */
-    for (odf_map::iterator i = m_outdir.begin(); i != m_outdir.end(); ++i) {
-	output_director* od = i->second->create_output_director();
+    for (auto i = m_outdir.begin(); i != m_outdir.end(); ++i)
+    {
+        std::unique_ptr<output_director> od (i->second->create_output_director());
 	od->defaults(m_config->child (i->first));
-	delete od;
     }
     
     register_config();
@@ -147,20 +138,6 @@ void director::stop()
     m_config = NULL;
 }
 
-void director::update_info ()
-{
-#if 0 // FIXME FIXME!
-    m_world->set_info (m_info);
-
-    output::state old_state;
-    old_state = m_output->get_output()->get_state();
-    
-    m_output->get_output()->goto_state (output::NOTINIT);
-    m_output->get_output()->set_info(m_info);
-    m_output->get_output()->goto_state (old_state);
-#endif
-}
-
 void director::on_config_nudge (base::conf_node& node)
 {
     string out;
@@ -172,52 +149,9 @@ void director::on_config_nudge (base::conf_node& node)
     
     m_world->set_info (m_info);
 
-    if (m_output && out == m_old_output) {    
-#if 0
-        output::state old_state;
-	old_state = m_output->get_output()->get_state();
-	m_output->get_output()->goto_state (output::NOTINIT);
-	m_output->get_output()->set_info (m_info);
-	m_output->get_output()->goto_state (old_state);
-#endif
-    } else {
-	stop_output ();
-	start_output ();
-    }
-}
-
-#if 0
-bool director::on_sample_rate_change(base::conf_node& node)
-{
-    cout << "SAMPLE_RATE_CHANGE!\n";
-    node.get(m_info.sample_rate);
-    update_info ();
-    
-    return false;
-}
-
-bool director::on_block_Size_change (base::conf_node& node)
-{
-    node.get(m_info.block_size);
-    update_info ();
-    
-    return false;
-}
-
-bool director::on_num_channels_change (base::conf_node& node)
-{
-    node.get(m_info.num_channels);
-    update_info ();
-    
-    return false;
-}
-
-bool director::on_output_change (base::conf_node& node)
-{
     stop_output ();
     start_output ();
-    return false;
 }
-#endif
+
 
 } /* namespace psynth */

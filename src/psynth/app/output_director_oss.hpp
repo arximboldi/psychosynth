@@ -43,10 +43,12 @@ class output_director_oss : public output_director
     
     void on_device_change (base::conf_node& conf)
     {
+#if PSYNTH_ON_DEVICE_CHANGE_LISTENER 
         auto old_state = m_output->state ();
         build_output (*conf.parent ());
         if (old_state == io::async_state::running)
             m_output->start ();
+#endif
     }
     
     virtual graph::audio_async_output_ptr

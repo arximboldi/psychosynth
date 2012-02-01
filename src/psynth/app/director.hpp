@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-11 22:11:52 raskolnikov>
+ *  Time-stamp:  <2012-02-01 23:44:45 raskolnikov>
  *
  *  @file        director.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -46,7 +46,6 @@ class director : private boost::noncopyable
     typedef std::map<std::string, output_director_factory*> odf_map;
     odf_map m_outdir;
 
-    std::string m_old_output;
     file_manager_director m_filemgr;
     output_director* m_output;
     world* m_world;
@@ -55,20 +54,14 @@ class director : private boost::noncopyable
     audio_info m_info;
 
     void on_config_nudge (base::conf_node& node);
-    
-#if 0
-    bool on_sample_rate_change (base::conf_node& node);
-    bool on_block_size_change (base::conf_node& node);
-    bool on_num_channels_change (base::conf_node& node);
-    bool on_output_change (base::conf_node& node);
-#endif
-    
+        
     void register_config();
     void unregister_config();
     
     void start_output();
     void stop_output();
-    void update_info();
+
+    boost::signals::connection m_on_output_change_slot;
 
 public:
     director()

@@ -115,7 +115,7 @@ public:
 	m_slots.push_back(
             new slot (out, this, range (m_buffer).begin_pos(), get_info()));
 	//m_buflock.unlock();
-    };
+    }
     
     void detach_output (audio_async_output_ptr out)
     {
@@ -130,7 +130,7 @@ public:
 	    } else
 		++i;
 	}
-    };
+    }
 
     void attach_passive_output (audio_output_ptr out) {
 	//m_passive_lock.lock();
