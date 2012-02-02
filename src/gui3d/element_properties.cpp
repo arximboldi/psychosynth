@@ -234,7 +234,7 @@ FrameWindow* element_properties::create_window ()
     window = dynamic_cast<FrameWindow*>(wmgr.createWindow("TaharezLook/FrameWindow"));
     
     window->setPosition(UVector2(UDim(0.06, 0), UDim(0.2, 0)));
-    window->setSize(UVector2(UDim(0, 200), UDim(0, 40)));
+    window->setSize(UVector2(UDim(0, 240), UDim(0, 60)));
     window->setText("Properties");
 
     m_container = dynamic_cast<Window*>(wmgr.createWindow("TaharezLook/ScrollablePane"));
@@ -257,7 +257,7 @@ void element_properties::add_parameter (elem_gui_param* e)
     window->setSize(UVector2(UDim(1, -10), UDim(0, 20)));
     m_y_offset += 25;
 
-    get_window()->setHeight(UDim(0, 40 + m_y_offset));
+    get_window()->setHeight(UDim(0, 40 + m_y_offset + 30));
     
     m_container->addChildWindow(window);
     

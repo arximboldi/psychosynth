@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2012-02-02 00:31:06 raskolnikov>
+ *  Time-stamp:  <2012-02-02 00:37:07 raskolnikov>
  *
  *  @file        alsa_raw_output.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -215,7 +215,7 @@ int alsa_xrun_recovery (snd_pcm_t* handle)
     {
         PSYNTH_LOG << "ALSA output is in suspended state.";
         
-        if ((res = snd_pcm_prepare(handle)) < 0)
+        if ((res = snd_pcm_prepare (handle)) < 0)
             PSYNTH_LOG << base::log::error <<
                 "Error preparing after suspend: " << snd_strerror(res);
     }

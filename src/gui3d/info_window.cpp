@@ -32,7 +32,7 @@ using namespace CEGUI;
 using namespace std;
 
 #define IW_WIDTH   400
-#define IW_HEIGHT  400
+#define IW_HEIGHT  460
 
 static const char* HELP_TEXT =
     "To place objects in the table click on the blue button in the lower menu. "
