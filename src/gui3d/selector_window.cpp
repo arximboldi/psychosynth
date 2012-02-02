@@ -131,7 +131,7 @@ CEGUI::FrameWindow* selector_window::create_window ()
     //window->setPosition(UVector2(UDim(0, 10), UDim(0, 10)) );
     //window->setSize    ( UVector2(UDim(1, -20),UDim(0, 100)) );
     window->setPosition( UVector2(UDim(0, 10), UDim(0, 10)) );
-    window->setSize    ( UVector2(UDim(1, -20),UDim(0, 134)) );
+    window->setSize    ( UVector2(UDim(1, -20),UDim(0, 150)) );
     window->setText("Object Selector");
 	
     m_container = wmgr.createWindow("TaharezLook/TabControl", "container_selector");

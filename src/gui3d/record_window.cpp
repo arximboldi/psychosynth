@@ -32,7 +32,7 @@ using namespace CEGUI;
 using namespace psynth;
 
 #define RW_WIDTH  220
-#define RW_HEIGHT 90
+#define RW_HEIGHT 110
 
 #define DEFAULT_FILE "record.au"
 
