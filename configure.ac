@@ -484,16 +484,16 @@ fi
 
 AC_MSG_RESULT([       ALSA support: ............ $HAVE_ALSA])
 if test "x$HAVE_ALSA" != xyes; then
-AC_MSG_RESULT([           > No alsa >= 1.0]);
+AC_MSG_RESULT([           > No ALSA >= 1.0]);
 fi
 
 AC_MSG_RESULT([       Jack support: ............ $HAVE_JACK])
-if test "x$HAVE_ALSA" != xyes; then
+if test "x$HAVE_JACK" != xyes; then
 AC_MSG_RESULT([           > No libjack >= 1.0]);
 fi
 
 AC_MSG_RESULT([       Unit tests support: ...... $HAVE_BOOST_TEST])
-if test "x$HAVE_ALSA" != xyes; then
+if test "x$HAVE_BOOST_TEST" != xyes; then
 AC_MSG_RESULT([           > No Boost.UTF >= 1.42]);
 fi
 
