@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2010-11-05 13:39:47 raskolnikov>
+ *  Time-stamp:  <2012-02-05 08:33:07 raskolnikov>
  *
  *  @file        sample.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -1034,10 +1034,6 @@ bits32sf;
 namespace boost
 {
 
-/**
- * @todo Integrate in C++0x type_traits?
- */
-
 template <int NumBits>
 struct is_integral<psynth::sound::packed_sample_value<NumBits> > :
 	public boost::mpl::true_ {};
@@ -1057,6 +1053,37 @@ template <typename BaseSampleValue,
 struct is_integral<psynth::sound::scoped_sample_value<
 		       BaseSampleValue, MinVal, MaxVal, ZeroVal> > :
 	public is_integral<BaseSampleValue> {};
+
+} /* namespace boost */
+
+namespace std
+{
+
+template <int NumBits>
+struct is_integral<psynth::sound::packed_sample_value<NumBits> > :
+	public std::true_type {};
+
+template <typename BitField, int FirstBit, int NumBits, bool IsMutable>
+struct is_integral<psynth::sound::packed_sample_reference<
+		       BitField, FirstBit, NumBits, IsMutable> > :
+	public std::true_type {};
+
+template <typename BitField, int NumBits, bool IsMutable>
+struct is_integral<psynth::sound::packed_dynamic_sample_reference<
+		       BitField, NumBits, IsMutable> > :
+	public std::true_type {};
+
+template <typename BaseSampleValue,
+	  typename MinVal, typename MaxVal, typename ZeroVal> 
+struct is_integral<psynth::sound::scoped_sample_value<
+		       BaseSampleValue, MinVal, MaxVal, ZeroVal> > :
+	public is_integral<BaseSampleValue> {};
+
+template <typename BaseSampleValue,
+	  typename MinVal, typename MaxVal, typename ZeroVal> 
+struct is_floating_point<psynth::sound::scoped_sample_value<
+                             BaseSampleValue, MinVal, MaxVal, ZeroVal> > :
+	public is_floating_point<BaseSampleValue> {};
 
 } /* namespace boost */
 

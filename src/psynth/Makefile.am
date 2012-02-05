@@ -99,6 +99,8 @@ nobase_libpsynthinc_HEADERS = \
 	synth/multi_point_envelope.tpp\
 	synth/envelope.hpp\
 	synth/util.hpp\
+	synth/noise.hpp\
+	synth/noise.tpp\
 	world/world.hpp\
 	world/patcher.hpp\
 	world/patcher_dynamic.hpp\
@@ -214,6 +216,7 @@ nobase_libpsynthinc_HEADERS = \
 	new_graph/core/passive_output_fwd.hpp\
 	new_graph/core/oscillator.hpp\
 	new_graph/core/mixer.hpp\
+	new_graph/core/noise.hpp\
 	version.hpp
 
 libpsynth_la_SOURCES = \
@@ -273,7 +276,8 @@ libpsynth_la_SOURCES = \
 	new_graph/core/passive_output.cpp\
 	new_graph/core/async_output.cpp\
 	new_graph/core/mixer.cpp\
-	new_graph/core/oscillator.cpp
+	new_graph/core/oscillator.cpp\
+	new_graph/core/noise.cpp
 
 
 if HAVE_SOUNDTOUCH

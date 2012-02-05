@@ -1,11 +1,13 @@
 /**
- *  Time-stamp:  <2011-06-18 23:47:42 raskolnikov>
+ *  Time-stamp:  <2012-02-05 08:42:55 raskolnikov>
  *
  *  @file        util.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
  *  @date        Mon Mar 21 18:04:40 2011
  *
  *  @brief Synthesis utilities of various kinds.
+ *
+ *  @todo Use more generic arithmetic.
  */
 
 /*
@@ -65,6 +67,7 @@ void mix (const R1& src1, const R2& src2, const R3& dst)
     typedef typename R3::value_type dst_frame;
 
     // FIXME: Only for homogeneous frames!
+
     typedef std::plus<typename sound::sample_type<dst_frame>::type> mix_op;
     
     sound::transform_frames (
@@ -98,6 +101,50 @@ void mix (const R1& src1, const R2& src2, Sample ampl, const R3& dst)
             return res;
         });
 }
+
+template <class R1, class R2, class R3>
+void modulate (const R1& src1, const R2& src2, const R3& dst)
+{
+    typedef typename R1::value_type src1_frame;
+    typedef typename R2::value_type src2_frame;
+    typedef typename R3::value_type dst_frame;
+
+    // FIXME: Only for homogeneous frames!
+
+    typedef std::multiplies<typename sound::sample_type<dst_frame>::type> mix_op;
+    
+    sound::transform_frames (
+        src1, src2, dst,
+        [] (const src1_frame& a, const src2_frame& b)
+        {
+            dst_frame res;
+            static_transform (a, b, res, mix_op ());
+            return res;
+        });
+}
+
+template <class R1, class R2, class R3, typename Sample>
+void modulate (const R1& src1, const R2& src2, Sample ampl, const R3& dst)
+{
+    typedef typename R1::value_type src1_frame;
+    typedef typename R2::value_type src2_frame;
+    typedef typename R3::value_type dst_frame;
+    typedef typename sound::sample_type<dst_frame>::type sample_type;
+    
+    sound::transform_frames (
+        src1, src2, dst,
+        [&] (const src1_frame& a, const src2_frame& b)
+        {
+            dst_frame res;
+            static_transform (
+                a, b, res,
+                [&] (sample_type aa, sample_type bb) {
+                    return aa * bb * ampl;
+                });
+            return res;
+        });
+}
+
 
 template <class R1, class R2, class R3, typename Sample>
 void blend (const R1& src1, const R2& src2, Sample stable, const R3& dst)
