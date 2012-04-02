@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-13 11:09:57 raskolnikov>
+ *  Time-stamp:  <2012-04-02 23:38:49 raskolnikov>
  *
  *  @file        logger.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>

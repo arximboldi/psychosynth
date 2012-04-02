@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-09 20:12:38 raskolnikov>
+ *  Time-stamp:  <2012-04-02 23:36:28 raskolnikov>
  *
  *  @file        iterator.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -61,6 +61,7 @@ public:
 
     ptr_iterator () = default;
     ptr_iterator (const ptr_iterator& it) = default;
+    ptr_iterator& operator= (const ptr_iterator& it) = default;
 
     ptr_iterator (ptr_iterator&& it)
         : Iterator (std::move (it))
@@ -174,9 +175,7 @@ public:
 
     /** Copy constructor. */
     map_iterator (const map_iterator& i)
-	: base_type (
-	    static_cast<const base_type&>(i)
-	    )
+	: base_type (static_cast<const base_type&>(i))
     {}
 
     /** Constructor from a map::iterator. */
@@ -185,11 +184,15 @@ public:
 
     /** Copy constructor. */
     map_iterator (map_iterator&& i)
-	: base_type (
-            std::move (
-                static_cast<const base_type&>(i)
-            ))
+	: base_type (std::move (static_cast<const base_type&>(i)))
     {}
+
+        /** Copy constructor. */
+    map_iterator& operator= (const map_iterator& i)
+    {
+        base_type::operator= (static_cast<const base_type&>(i));
+        return *this;
+    }
 
     /**
      * Indirection operator, returns a reference to the referred value.

@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-28 18:48:08 raskolnikov>
+ *  Time-stamp:  <2012-04-02 23:53:48 raskolnikov>
  *
  *  @file        processor.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -34,6 +34,7 @@
 #include <thread>
 #include <atomic>
 #include <list>
+#include <condition_variable>
 
 #include <psynth/new_graph/core/patch_fwd.hpp>
 #include <psynth/new_graph/node_fwd.hpp>

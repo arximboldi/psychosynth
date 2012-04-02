@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-08 12:10:34 raskolnikov>
+ *  Time-stamp:  <2012-04-02 23:52:38 raskolnikov>
  *
  *  @file        throw.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -58,7 +58,6 @@ public:
     }
 
     exception_wrapper (const exception_wrapper&) = default;
-    exception_wrapper (exception_wrapper&&) = default;
     exception_wrapper& operator= (const exception_wrapper&) = default;
 
     ~exception_wrapper () throw () {}
@@ -95,7 +94,6 @@ public:
     }
 
     exception_wrapper (const exception_wrapper&) = default;
-    exception_wrapper (exception_wrapper&&) = default;
     exception_wrapper& operator= (const exception_wrapper&) = default;
 
     ~exception_wrapper () throw () {}

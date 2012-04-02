@@ -37,6 +37,7 @@ public:
     virtual void set_info (const audio_info& info) {}
     virtual void update (const sample_const_range& buf) {}
     virtual void update (const audio_const_range& buf) {}
+    virtual ~watch() {}
 };
 
 } /* namespace graph */

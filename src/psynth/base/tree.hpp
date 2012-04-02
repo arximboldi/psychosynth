@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-13 15:46:34 raskolnikov>
+ *  Time-stamp:  <2012-04-02 23:39:10 raskolnikov>
  *
  *  @file        tree.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -129,7 +129,7 @@ public:
     };
 
     /** Destructor */
-    ~tree_node ();
+    virtual ~tree_node ();
 
     /**
      * Returns an iterator to the first child of this node.

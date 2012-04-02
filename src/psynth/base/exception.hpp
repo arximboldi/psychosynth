@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-09 16:14:13 raskolnikov>
+ *  Time-stamp:  <2012-04-02 23:49:20 raskolnikov>
  *
  *  @file        exception.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -48,6 +48,12 @@ namespace base
 class exception
 {
 public:
+    exception () = default;
+    exception (const exception&) = default;
+    exception (exception&&) = default;
+    exception& operator= (const exception&) = default;
+    exception& operator= (exception&&) = default;
+    
     virtual ~exception () throw () {}
 
     /**
@@ -84,8 +90,9 @@ class error_base : public virtual exception,
 {
 public:
     /** Constructor */
-    error_base ()
-    {}
+    error_base () = default;
+    error_base (const error_base&) = default;
+    error_base& operator= (const error_base&) = default;
 
     /** Constructor specifying the error message. */
     error_base (const std::string& what)
@@ -119,7 +126,9 @@ int default_error_level () throw ();
     {									\
     public:								\
 	typedef d_parent base_type;					\
-	d_error () {}							\
+	d_error () = default;                                           \
+        d_error (const d_error&) = default;                             \
+        d_error& operator= (const d_error&) = default;                  \
 	d_error (const std::string& s) : base_type (s) {}		\
 	virtual const char* where () const throw ();			\
     protected:								\
