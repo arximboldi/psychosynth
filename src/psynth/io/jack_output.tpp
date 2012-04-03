@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-16 16:59:53 raskolnikov>
+ *  Time-stamp:  <2012-04-03 13:49:33 jbo>
  *
  *  @file        jack_output.tpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -12,7 +12,7 @@
  *  Copyright (C) 2011 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -35,15 +35,18 @@
 #include <boost/mpl/if.hpp>
 #include <psynth/io/jack_output.hpp>
 
+
 namespace psynth
 {
 namespace io
 {
 
+namespace mpl = boost::mpl;
+
 template <typename Range>
 struct jack_support
 {
-    typedef typename sound::num_samples<Range>::type channels;    
+    typedef typename sound::num_samples<Range>::type channels;
     typedef typename mpl::and_<
         boost::is_same<typename sound::sample_type<Range>::type, sound::bits32sf>,
         typename sound::is_planar<Range> >::type
