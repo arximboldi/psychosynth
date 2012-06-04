@@ -34,25 +34,25 @@ namespace psynth
 namespace graph
 {
 
-class node_filter : public node
+class node_filter : public node0
 {
-public:	
+public:
     enum in_audio_socket_id {
 	IN_A_INPUT,
 	N_IN_A_SOCKETS
     };
-	
+
     enum in_control_socket_id {
 	IN_C_CUTOFF,
 	IN_C_EMPHASIS,
 	N_IN_C_SOCKETS
     };
-	
+
     enum out_audio_socket_id {
 	OUT_A_OUTPUT,
 	N_OUT_A_SOCKETS
     };
-	
+
     enum out_control_socket_id {
 	N_OUT_C_SOCKETS
     };
@@ -68,7 +68,7 @@ public:
     };
 
     enum param_id {
-	PARAM_TYPE = node::N_COMMON_PARAMS,
+	PARAM_TYPE = node0::N_COMMON_PARAMS,
 	PARAM_CUTOFF,
 	PARAM_RESONANCE,
 	N_PARAM
@@ -76,7 +76,7 @@ public:
 
     static constexpr float DEFAULT_CUTOFF    = 660.0f;
     static constexpr float DEFAULT_RESONANCE = 0.5f;
-    
+
 private:
     int m_param_type;
     float m_param_cutoff;
@@ -84,11 +84,11 @@ private:
 
     filter_values m_filter_values;
     std::vector<filter> m_filter;
-    
-    void do_update (const node* caller, int caller_port_type, int caller_port);
+
+    void do_update (const node0* caller, int caller_port_type, int caller_port);
     void do_advance () {}
     void on_info_change () {}
-    
+
 public:
     node_filter (const audio_info& prop, int mode = FILTER_LOWPASS);
     ~node_filter ();

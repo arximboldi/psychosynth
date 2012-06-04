@@ -32,13 +32,13 @@ namespace psynth
 namespace graph
 {
 
-class node_noise : public node
-{		
-public:	
+class node_noise : public node0
+{
+public:
     enum in_audio_socket_id {
 	N_IN_A_SOCKETS
     };
-	
+
     enum in_control_socket_id {
 	IN_C_AMPLITUDE,
 	IN_C_TRIGGER,
@@ -50,24 +50,24 @@ public:
 	NOISE_PINK,
 	N_TYPES
     };
-    
+
     enum param_id {
-	PARAM_TYPE = node::N_COMMON_PARAMS,
+	PARAM_TYPE = node0::N_COMMON_PARAMS,
 	PARAM_AMPLITUDE,
 	N_PARAM
     };
 
     static constexpr float DEFAULT_AMPL = 0.3f;
-    
+
 protected:
     sample update_pink ();
     sample update_white ();
     void update_noise (sample* buf);
-    
+
 private:
     int   m_param_type;
     float m_param_ampl;
-    
+
     /* Pink noise factors. */
     sample m_b0;
     sample m_b1;
@@ -76,16 +76,16 @@ private:
     sample m_b4;
     sample m_b5;
     sample m_b6;
-    
+
     //bool  m_restart;
-    
+
 public:
     node_noise (const audio_info& prop,
 		int obj_type,
 		const std::string& name,
 		int n_audio_out,
 		int n_control_out);
-    
+
     ~node_noise ();
 };
 
@@ -98,7 +98,7 @@ public:
     };
 
 private:
-    void do_update (const node* caller, int caller_port_type, int caller_port);
+    void do_update (const node0* caller, int caller_port_type, int caller_port);
     void do_advance () {}
     void on_info_change () {}
 
@@ -114,17 +114,17 @@ public:
 
 class node_control_noise : public node_noise
 {
-public:	
+public:
     enum out_control_socket_id {
 	OUT_C_OUTPUT,
 	N_OUT_C_SOCKETS
     };
 
 private:
-    void do_update (const node* caller, int caller_port_type, int caller_port);
+    void do_update (const node0* caller, int caller_port_type, int caller_port);
     void do_advance () {}
     void on_info_change () {}
-    
+
 public:
     node_control_noise (const audio_info& prop) :
 	node_noise (prop,

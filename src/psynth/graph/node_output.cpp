@@ -73,10 +73,10 @@ void node_output::on_info_change ()
     //.set_info (get_info());
     for (std::list<slot*>::iterator i = m_slots.begin(); i != m_slots.end(); ++i)
 	(*i)->m_buf.recreate (get_info ().block_size); //.set_info (get_info());
-    
+
 }
 
-void node_output::do_update (const node* caller,
+void node_output::do_update (const node0* caller,
 			      int caller_port_type, int caller_port)
 {
     const audio_buffer* in;
@@ -85,7 +85,7 @@ void node_output::do_update (const node* caller,
 	//m_buflock.writeLock();
     	range (m_buffer).write (const_range (*in));
 	//m_buflock.unlock();
-	
+
 	//m_passive_lock.lock();
 	for (auto it = m_passive_slots.begin();
 	     it != m_passive_slots.end();
@@ -102,10 +102,10 @@ void node_output::do_update (const node* caller,
 }
 
 node_output::node_output (const audio_info& info) :
-    node (info,
+    node0 (info,
 	  NODE_OUTPUT,
 	  "name",
-	  N_IN_A_SOCKETS, 
+	  N_IN_A_SOCKETS,
 	  N_IN_C_SOCKETS,
 	  N_OUT_A_SOCKETS,
 	  N_OUT_C_SOCKETS),
@@ -132,7 +132,7 @@ void node_output::do_output (slot& slot, size_t nframes)
 
     if (m_manager) {
 	size_t avail;
-        auto& rng = range (m_buffer);        
+        auto& rng = range (m_buffer);
 	avail = rng.available (slot.m_ptr);
 
 	while (avail < nframes)
@@ -143,7 +143,7 @@ void node_output::do_output (slot& slot, size_t nframes)
     }
 
     range (m_buffer).read (slot.m_ptr, range (slot.m_buf), nframes);
-    
+
     slot.m_out->put (sub_range (range (slot.m_buf), 0, nframes));
 }
 

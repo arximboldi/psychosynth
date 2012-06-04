@@ -38,13 +38,13 @@ namespace graph
 
 class mutex;
 
-class node_sampler : public node
+class node_sampler : public node0
 {
 public:
     enum in_audio_socket_id {
 	N_IN_A_SOCKETS
     };
-	
+
     enum in_control_socket_id {
 	IN_C_RATE,
 	IN_C_TRIGGER,
@@ -52,14 +52,14 @@ public:
     };
 
     enum param_id {
-	PARAM_FILE = node::N_COMMON_PARAMS,
+	PARAM_FILE = node0::N_COMMON_PARAMS,
 	PARAM_AMPLITUDE,
 	PARAM_RATE,
 	PARAM_TEMPO,
 	PARAM_PITCH,
 	N_PARAM
     };
-    
+
     enum out_audio_socket_id {
 	OUT_A_OUTPUT,
 	N_OUT_A_SOCKETS
@@ -68,39 +68,39 @@ public:
     enum out_control_socket_id {
 	N_OUT_C_SOCKETS
     };
-    
+
 private:
     typedef sound::stereo32sf_range  interleaved_range;
     typedef sound::stereo32sf_buffer interleaved_buffer;
-    
+
     io::file_input_ptr<interleaved_range> m_reader;
     io::caching_file_input_adapter<interleaved_range,
                                    decltype (m_reader)> m_fetcher;
-    
+
     interleaved_buffer m_inbuf;;
     synth::scaler<interleaved_range> m_scaler;
-    
+
     float m_ctrl_pos;
-    
+
     float m_param_ampl;
     float m_param_rate;
     float m_param_tempo;
     float m_param_pitch;
 
     bool m_restart;
-    
+
     std::string m_param_file;
-    
+
     std::mutex m_update_mutex;
-    
+
     void on_file_change (node_param& par);
     void read (audio_buffer& buf, int start, int end);
     void restart();
-    
-    void do_update (const node* caller, int caller_port_type, int caller_port);
+
+    void do_update (const node0* caller, int caller_port_type, int caller_port);
     void do_advance ();
     void on_info_change ();
-    
+
 public:
     node_sampler (const audio_info& info);
     ~node_sampler ();

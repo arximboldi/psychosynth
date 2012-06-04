@@ -36,16 +36,16 @@ namespace graph
 PSYNTH_DEFINE_NODE_FACTORY (node_audio_mixer);
 PSYNTH_DEFINE_NODE_FACTORY (node_control_mixer);
 
-void node_control_mixer::do_update (const node* caller,
+void node_control_mixer::do_update (const node0* caller,
 				    int caller_port_type, int caller_port)
 {
     sample_buffer* buf = get_output<sample_buffer>(LINK_CONTROL, OUT_C_OUTPUT);
     const sample_buffer* in  = NULL;
     size_t j;
     bool input = false;
-    
+
     init ((sample*) &range (*buf)[0], get_info().block_size);
-    
+
     for (j = 0; j < m_numchan; ++j)
 	if ((in = get_input <sample_buffer> (LINK_CONTROL, j))) {
 	    link_envelope env = get_in_envelope (LINK_CONTROL, j);
@@ -61,7 +61,7 @@ void node_control_mixer::do_update (const node* caller,
 
 }
 
-void node_audio_mixer::do_update (const node* caller,
+void node_audio_mixer::do_update (const node0* caller,
 				  int caller_port_type,
 				  int caller_port)
 {
@@ -70,7 +70,7 @@ void node_audio_mixer::do_update (const node* caller,
     const sample_buffer* ampl = get_input<sample_buffer> (LINK_CONTROL, IN_C_AMPLITUDE);
     size_t i, j;
     bool input = false;
-    
+
     for (i = 0; i < get_info().num_channels; ++i)
     {
 	init ((sample*) &range (*buf) [0][i],
@@ -87,7 +87,7 @@ void node_audio_mixer::do_update (const node* caller,
 		else {
 		    link_envelope ctrl_env = get_in_envelope(LINK_CONTROL,
                                                              IN_C_AMPLITUDE);
-                    
+
 		    mix((sample*) &range (*buf) [0][i],
                         (const sample*) &const_range (*in) [0][i],
                         (const sample*) &const_range (*ampl) [0],
@@ -108,11 +108,11 @@ node_mixer::node_mixer (const audio_info& info,
 			const std::string& name,
 			int num_audio_out,
 			int num_ctrl_out,
-			int num_in): 
-    node (info,
+			int num_in):
+    node0 (info,
 	  node_type,
 	  name,
-	  num_audio_out ? num_in : 0, 
+	  num_audio_out ? num_in : 0,
 	  num_ctrl_out  ? num_in : N_IN_C_SOCKETS,
 	  num_audio_out,
 	  num_ctrl_out),
@@ -133,7 +133,7 @@ void node_mixer::mix (sample* dest, const sample* src, size_t n_samples)
 	while (n_samples--)
 	    *dest++ *= *src++ * m_param_ampl;
 }
-  
+
 void node_mixer::mix (sample* dest, const sample* src,
 		      const sample* ampl, size_t n_samples)
 {
@@ -157,7 +157,7 @@ void node_mixer::mix (sample* dest, const sample* src,
 	    *dest++ *= *src++ * m_param_ampl *
                 (float) (link_envelope::sample_type) env.update();
 }
-  
+
 void node_mixer::mix (sample* dest, const sample* src,
 		      const sample* ampl,
 		      link_envelope& env,

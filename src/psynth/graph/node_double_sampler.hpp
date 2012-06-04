@@ -34,13 +34,13 @@ namespace psynth
 namespace graph
 {
 
-class node_double_sampler : public node
+class node_double_sampler : public node0
 {
 public:
     enum in_audio_socket_id {
 	N_IN_A_SOCKETS
     };
-	
+
     enum in_control_socket_id {
 	IN_C_BLEND,
 	IN_C_TRIGGER,
@@ -48,13 +48,13 @@ public:
     };
 
     enum param_id {
-	PARAM_FILE_ONE = node::N_COMMON_PARAMS,
+	PARAM_FILE_ONE = node0::N_COMMON_PARAMS,
 	PARAM_FILE_TWO,
 	PARAM_AMPLITUDE,
 	PARAM_BLEND,
 	N_PARAM
     };
-    
+
     enum out_audio_socket_id {
 	OUT_A_OUTPUT,
 	N_OUT_A_SOCKETS
@@ -63,7 +63,7 @@ public:
     enum out_control_socket_id {
 	N_OUT_C_SOCKETS
     };
-    
+
 private:
     typedef sound::stereo32sf_range  interleaved_range;
     typedef sound::stereo32sf_buffer interleaved_buffer;
@@ -75,29 +75,29 @@ private:
     io::file_input_ptr<interleaved_range> m_reader_two;
     io::caching_file_input_adapter<interleaved_range, decltype (m_reader_two)>
     m_fetcher_two;
-    
+
     interleaved_buffer m_inbuf_one;
     interleaved_buffer m_inbuf_two;
-        
+
     float m_param_ampl;
     float m_param_blend;
 
     bool m_restart;
-    
+
     std::string m_param_file_one;
     std::string m_param_file_two;
-    
+
     std::mutex m_update_mutex;
-    
+
     void on_file_one_change (node_param& par);
     void on_file_two_change (node_param& par);
     void read (audio_buffer& buf, int start, int end);
     void restart();
-    
-    void do_update (const node* caller, int caller_port_type, int caller_port);
+
+    void do_update (const node0* caller, int caller_port_type, int caller_port);
     void do_advance ();
     void on_info_change ();
-    
+
 public:
     node_double_sampler (const audio_info& info);
     ~node_double_sampler ();

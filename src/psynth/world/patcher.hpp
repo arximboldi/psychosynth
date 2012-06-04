@@ -32,13 +32,13 @@ namespace psynth
 {
 
 struct patcher_event {
-    graph::node* src;
-    graph::node* dest;
+    graph::node0* src;
+    graph::node0* dest;
     int src_socket;
     int dest_socket;
     int socket_type;
 
-    patcher_event (graph::node* s, graph::node* d, int ss, int ds, int st):
+    patcher_event (graph::node0* s, graph::node0* d, int ss, int ds, int st):
 	src(s), dest(d), src_socket(ss), dest_socket(ds), socket_type(st) {};
 };
 
@@ -58,18 +58,18 @@ protected:
 	     it != m_list.end(); )
 	    (*it++)->handle_link_added (ev);
     };
-    
+
     void notify_link_deleted (const patcher_event& ev) {
 	for (std::list<patcher_listener*>::iterator it = m_list.begin();
 	     it != m_list.end(); )
 	    (*it++)->handle_link_deleted (ev);
     };
-    
+
 public:
     void add_listener (patcher_listener* l) {
 	m_list.push_back (l);
     };
-    
+
     void delete_listener (patcher_listener* l) {
 	m_list.remove (l);
     };
@@ -79,10 +79,10 @@ class patcher : public patcher_subject
 {
 public:
     virtual ~patcher () {};
-    
-    virtual bool add_node (graph::node* obj) = 0;
-    virtual bool delete_node (graph::node* obj) = 0;
-    virtual void set_param_node (graph::node* obj, int param) = 0;
+
+    virtual bool add_node (graph::node0* obj) = 0;
+    virtual bool delete_node (graph::node0* obj) = 0;
+    virtual void set_param_node (graph::node0* obj, int param) = 0;
     virtual void update () = 0;
     virtual void clear () = 0;
 };

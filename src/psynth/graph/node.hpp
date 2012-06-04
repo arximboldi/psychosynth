@@ -45,18 +45,18 @@ namespace psynth
 namespace graph
 {
 
-class node
+class node0
 {
 public:
     static const int NULL_ID = -1;
-    
+
     enum link_type {
 	LINK_NONE = -1,
 	LINK_AUDIO,
 	LINK_CONTROL,
 	LINK_TYPES
     };
-    
+
     enum commom_params {
 	PARAM_POSITION = 0,
 	PARAM_RADIOUS,
@@ -65,12 +65,12 @@ public:
     };
 
     typedef synth::simple_envelope<sample_range> link_envelope;
-    
+
     class out_socket {
-	friend class node;
+	friend class node0;
 
 	int m_type;
-	std::list<std::pair<node*, int> > m_ref; /* Objetos y puertos destino */
+	std::list<std::pair<node0*, int> > m_ref; /* Objetos y puertos destino */
 
     protected:
 	out_socket (int type)
@@ -80,17 +80,17 @@ public:
 	bool is_empty () {
 	    return m_ref.empty();
 	}
-	
-	void add_reference (node* obj, int port) {
-	    m_ref.push_back(std::pair<node*, int>(obj, port));
+
+	void add_reference (node0* obj, int port) {
+	    m_ref.push_back(std::pair<node0*, int>(obj, port));
 	}
 
-	void remove_reference (node* obj, int port) {
-	    m_ref.remove(std::pair<node*, int>(obj, port));
+	void remove_reference (node0* obj, int port) {
+	    m_ref.remove(std::pair<node0*, int>(obj, port));
 	}
-	
+
 	void clear_references () {
-	    std::list<std::pair<node*, int> >::iterator i, r;
+	    std::list<std::pair<node0*, int> >::iterator i, r;
 	    for (i = m_ref.begin(); i != m_ref.end(); ) {
 		r = i++;
 		r->first->connect_in (m_type, r->second, NULL, 0);
@@ -98,14 +98,14 @@ public:
 	}
 
     public:
-	const std::list<std::pair<node*, int> >& get_references () const {
+	const std::list<std::pair<node0*, int> >& get_references () const {
 	    return m_ref;
 	}
     };
-	
+
     class in_socket
     {
-	friend class node;
+	friend class node0;
 
 	void attach_watch (watch* watch) {
 	    m_watchs.push_back(watch);
@@ -114,26 +114,26 @@ public:
 	void detach_watch (watch* watch) {
 	    m_watchs.remove(watch);
 	};
-	
+
     protected:
 	int m_type;
-	node* m_srcobj;
+	node0* m_srcobj;
 	int m_srcport;
 	std::list<watch*> m_watchs;
-	
+
 	in_socket (int type) :
 	    m_type(type), m_srcobj(NULL), m_srcport(0) {}
-	
+
 	bool is_empty () {
 	    return m_srcobj == NULL;
 	}
-	
-	void set(node* srcobj, int port) {
+
+	void set(node0* srcobj, int port) {
 	    m_srcobj = srcobj;
 	    m_srcport = port;
 	}
-		
-	void update_input (const node* caller, int caller_port_type, int caller_port);
+
+	void update_input (const node0* caller, int caller_port_type, int caller_port);
 
 	template <typename SocketDataType>
 	const SocketDataType* get_data (int type) const {
@@ -142,13 +142,13 @@ public:
 	    else
 		return NULL;
 	}
-	
+
     public:
 	virtual ~in_socket() {
 	    for_each (m_watchs.begin(), m_watchs.end(), base::deleter<watch*>());
 	}
-	
-	virtual node* get_source_node () const {
+
+	virtual node0* get_source_node () const {
 	    return m_srcobj;
 	}
 
@@ -156,13 +156,13 @@ public:
 	    return m_srcport;
 	}
     };
-    
+
     class in_socket_manual : public in_socket
     {
-	friend class node;
-	
+	friend class node0;
+
 	bool must_update;
-	node* src_obj;
+	node0* src_obj;
 	int src_sock;
 
     public:
@@ -172,13 +172,13 @@ public:
 	    src_obj(NULL),
 	    src_sock(-1) {}
 
-	virtual node* get_source_node () const {
+	virtual node0* get_source_node () const {
 	    return src_obj;
 	}
 
 	virtual int get_source_socket () const {
 	    return src_sock;
-	}	
+	}
     };
 
 private:
@@ -192,27 +192,27 @@ private:
     std::vector<in_socket_manual> m_in_sockets[LINK_TYPES];
     std::vector<link_envelope> m_in_envelope[LINK_TYPES];
     link_envelope m_out_envelope;
-    
+
     std::vector<node_param*> m_params;
     node_param m_null_param;
     int m_nparam;
-    
+
     int m_id;
     int m_type;
     std::string m_name;
-    
+
     base::vector_2f m_param_position;
     float m_param_radious;
     int m_param_mute;
-    
+
     /* For !m_single_update, contains the nodes that has
      * been updated (<obj_id, port_id>) */
     std::set<std::pair<int,int> > m_updated_links[LINK_TYPES];
     bool m_updated;
     bool m_single_update;
-    
+
     std::mutex m_paramlock;
-    
+
     void blend_buffer (sample* buf,
                        int n_elem,
 		       sample stable_value,
@@ -223,7 +223,7 @@ private:
     void update_in_sockets ();
     void set_envelopes_deltas ();
     void update_envelopes ();
-    bool can_update (const node* caller, int caller_port_type,
+    bool can_update (const node0* caller, int caller_port_type,
 		     int caller_port);
 
 protected:
@@ -231,7 +231,7 @@ protected:
     SocketDataType* get_output (int type, int socket) {
 	if (m_param_mute && m_out_envelope.finished())
 	    return NULL;
-	
+
 	/* TODO: Find a way to do type checking */
 	switch(type) {
 	case LINK_AUDIO:
@@ -243,15 +243,15 @@ protected:
 	default:
 	    break;
 	}
-	
+
 	return NULL;
     }
 
     void set_output_stable_value (int sock_type, int sock_num, sample value) {
 	m_out_stable_value[sock_type][sock_num] = value;
     }
-    
-    virtual void do_update (const node* caller, int caller_port_type, int caller_port) = 0;
+
+    virtual void do_update (const node0* caller, int caller_port_type, int caller_port) = 0;
     virtual void do_advance () = 0;
     virtual void on_info_change () = 0;
 
@@ -263,14 +263,14 @@ protected:
     { return m_in_envelope[type][sock]; }
 
 public:
-    node (const audio_info& prop, int type,
+    node0 (const audio_info& prop, int type,
 	  const std::string& name,
 	  int inaudiosocks, int incontrolsocks,
 	  int outaudiosocks, int outcontrolsocks,
 	  bool single_update = true);
-    
-    virtual ~node();
-    
+
+    virtual ~node0();
+
     int get_type () const {
 	return m_type;
     };
@@ -280,8 +280,8 @@ public:
     }
 
     void update_params_in ();
-    void update (const node* caller, int caller_port_type, int caller_port);
-	
+    void update (const node0* caller, int caller_port_type, int caller_port);
+
     void advance () {
 	m_updated = false;
 	if (!m_single_update) {
@@ -291,7 +291,7 @@ public:
 
 	do_advance();
     }
-	
+
     const audio_info& get_info () const {
 	return m_audioinfo;
     }
@@ -306,15 +306,15 @@ public:
     void detach_watch (int type, int in_socket, watch* watch) {
 	m_in_sockets[type][in_socket].detach_watch(watch);
     }
-    
-    void connect_in (int type, int in_socket, node* src, int out_socket);
 
-    void force_connect_in (int type, int in_socket, node* src, int out_socket);
+    void connect_in (int type, int in_socket, node0* src, int out_socket);
+
+    void force_connect_in (int type, int in_socket, node0* src, int out_socket);
 
     void clear_connections ();
 
     bool has_connections ();
-    
+
     node_param& param (int id) {
 	return *m_params[id];
     }
@@ -326,7 +326,7 @@ public:
     node_param& get_param (const std::string& name);
 
     const node_param& get_param (const std::string& name) const;
-    
+
     template <typename SocketDataType>
     const SocketDataType* get_output (int type, int socket) const {
 	return get_output <SocketDataType> (type, socket);
@@ -340,47 +340,47 @@ public:
     const out_socket& get_out_socket(int type, int socket) const {
 	return m_out_sockets[type][socket];
     }
-    
+
     const in_socket& get_in_socket(int type, int socket) const {
 	return m_in_sockets[type][socket];
     }
-    
+
     int get_num_output (int type) const {
 	return m_out_sockets[type].size();
     }
-	
+
     int get_num_input (int type) const {
 	return m_in_sockets[type].size();
     }
-    
+
     int get_id () const {
 	return m_id;
     }
-	
+
     void set_id (int id) {
 	m_id = id;
     }
-        
-    float distance_to (const node &obj) const {
+
+    float distance_to (const node0 &obj) const {
 	return m_param_position.distance(obj.m_param_position);
     }
-	
-    float sqr_distance_to (const node &obj) const {
+
+    float sqr_distance_to (const node0 &obj) const {
 	return m_param_position.sqr_distance (obj.m_param_position);
     }
 
     float distance_to_center () const {
 	return m_param_position.length();
     }
-	
+
     float sqr_distance_to_center () const {
 	return m_param_position.sqr_length();
     }
-    
+
     float distance_to (const base::vector_2f& obj) const {
 	return m_param_position.distance(obj);
     }
-	
+
     float sqr_distance_to (const base::vector_2f &obj) const {
 	return m_param_position.sqr_distance(obj);
     }

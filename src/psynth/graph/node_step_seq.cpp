@@ -36,7 +36,7 @@ namespace graph
 PSYNTH_DEFINE_NODE_FACTORY(node_step_seq);
 
 node_step_seq::node_step_seq(const audio_info& info) :
-    node (info,
+    node0 (info,
 	  NODE_STEPSEQ,
 	  "stepseq",
 	  N_IN_A_SOCKETS,
@@ -54,14 +54,14 @@ node_step_seq::node_step_seq(const audio_info& info) :
     m_cur_step(0)
 {
     int i;
-    
+
     add_param ("bpm", node_param::FLOAT, &m_param_bpm);
     add_param ("shape", node_param::INT, &m_param_shape);
     add_param ("high", node_param::FLOAT, &m_param_high);
     add_param ("slope", node_param::FLOAT, &m_param_slope);
     add_param ("current_step", node_param::INT, &m_cur_step);
     add_param ("num_steps", node_param::INT, &m_param_num_steps);
-	
+
     for (i = 0; i < MAX_STEPS; ++i) {
 	m_param_step[i] = DEFAULT_STEP;
 	add_param (string("step") + base::itoa(i, 10), node_param::INT, &m_param_step[i]);
@@ -76,7 +76,7 @@ node_step_seq::node_step_seq(const audio_info& info) :
 	m_env.set_values (&m_lo_env_vals);
 }
 
-void node_step_seq::do_update (const node* caller,
+void node_step_seq::do_update (const node0* caller,
 			       int caller_port_type,
 			       int caller_port)
 {
@@ -87,12 +87,12 @@ void node_step_seq::do_update (const node* caller,
     size_t i;
 
     update_envelope_values ();
-    
+
     for (i = 0; i < get_info ().block_size; ++i) {
 	if (bpm)
 	    update_envelope_factor (*bpm++);
 	*output++ = (float) (audio_sample) m_env.update ();
-	
+
 	if (m_env.finished ()) {
 	    m_cur_step = (m_cur_step + 1) % m_param_num_steps;
 	    m_env.press();
@@ -124,7 +124,7 @@ void node_step_seq::init_envelope_values ()
     m_lo_env_vals[1] = synth::envelope_point<audio_sample> { 1.0f, 0.0f };
 
     create_shape ();
-    
+
     update_envelope_factor (0);
 }
 
@@ -145,7 +145,7 @@ void node_step_seq::create_shape ()
 
     m_hi_env_vals[0] = { 0.0f, 0.0f };
     m_hi_env_vals[m_hi_env_vals.size()-1] = { 1.0f, 0.0f };
-    
+
     update_shape ();
 }
 
@@ -185,7 +185,7 @@ void node_step_seq::update_envelope_values ()
 	update_shape ();
 	m_env.set_time (m_env.time() * m_param_high/m_old_param_high);
     }
-    
+
     update_envelope_factor (0);
 }
 

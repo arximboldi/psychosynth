@@ -33,8 +33,8 @@ namespace graph
 
 PSYNTH_DEFINE_NODE_FACTORY(node_filter);
 
-node_filter::node_filter(const audio_info& prop, int mode) : 
-    node (prop,
+node_filter::node_filter(const audio_info& prop, int mode) :
+    node0 (prop,
 	  NODE_FILTER,
 	  "filter",
 	  N_IN_A_SOCKETS,
@@ -63,12 +63,12 @@ node_filter::~node_filter()
 {
 }
 
-void node_filter::do_update (const node* caller,
+void node_filter::do_update (const node0* caller,
 			      int caller_port_type, int caller_por)
 {
     const audio_buffer* input = get_input<audio_buffer>(LINK_AUDIO, IN_A_INPUT);
     const sample_buffer* cutoff = get_input<sample_buffer>(LINK_CONTROL, IN_C_CUTOFF);
-    audio_buffer* output = get_output<audio_buffer>(LINK_AUDIO, IN_A_INPUT);    
+    audio_buffer* output = get_output<audio_buffer>(LINK_AUDIO, IN_A_INPUT);
 
     if (input) {
 	if (m_param_type != m_filter_values.get_type() ||
@@ -78,7 +78,7 @@ void node_filter::do_update (const node* caller,
 				      m_param_cutoff,
 				      m_param_resonance,
 				      get_info().sample_rate);
-	
+
 	for (size_t i = 0; i < get_info().num_channels; ++i) {
 	    sample* outbuf = (sample*) &range (*output) [0][i];
 	    const sample* inbuf = (sample*) &const_range (*input) [0][i];;
@@ -92,7 +92,7 @@ void node_filter::do_update (const node* caller,
 		link_envelope mod_env = get_in_envelope (LINK_CONTROL,
                                                          IN_C_CUTOFF);
 		const sample* cutoff_buf = (const sample*) &const_range (*cutoff) [0];
-		
+
 		for (size_t j = 0; j < (size_t) output->size(); ++j) {
 		    /* FIXME: Slow */
 		    m_filter_values.calculate(m_param_cutoff

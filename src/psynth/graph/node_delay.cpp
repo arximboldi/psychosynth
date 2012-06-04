@@ -33,8 +33,8 @@ namespace graph
 
 PSYNTH_DEFINE_NODE_FACTORY(node_delay);
 
-node_delay::node_delay(const audio_info& prop) : 
-    node (prop,
+node_delay::node_delay(const audio_info& prop) :
+    node0 (prop,
 	  NODE_DELAY,
 	  "delay",
 	  N_IN_A_SOCKETS,
@@ -66,7 +66,7 @@ int node_delay::do_update_channel (int chan)
     const audio_buffer* _input = get_input<audio_buffer>(LINK_AUDIO, IN_A_INPUT);
     const sample_buffer* _delay = get_input<sample_buffer>(LINK_CONTROL, IN_C_DELAY);
     const sample_buffer* _depth = get_input<sample_buffer>(LINK_CONTROL, IN_C_DEPTH);
-    audio_buffer* _output = get_output<audio_buffer>(LINK_AUDIO, IN_A_INPUT);    
+    audio_buffer* _output = get_output<audio_buffer>(LINK_AUDIO, IN_A_INPUT);
 
     const sample* in_buf = _input ? (const sample*)&const_range (*_input)[0][chan] : 0;
     const sample* dep_buf = _depth ? (const sample*)&const_range (*_depth)[0] : 0;
@@ -75,21 +75,21 @@ int node_delay::do_update_channel (int chan)
     sample* tmp_buf = (sample*)&range (m_buffer)[0][chan];
 
     link_envelope in_env = get_in_envelope (LINK_AUDIO, IN_A_INPUT);
-    
+
     float delay, the_delay;
     size_t i;
     int   pos = m_pos;
     float prev, next, frac;
     float delayed_sample;
     float in_val;
-    
+
     delay = m_param_delay * get_info().sample_rate;
     for (i = 0; i < get_info().block_size; ++i) {
 	if (in_buf)
 	    in_val = *in_buf++ * (float) (audio_sample) in_env.update();
 	else
 	    in_val = 0;
-	
+
 	tmp_buf[pos++] = in_val;
 	if (pos > m_max_delay_pos)
 	    pos = 0;
@@ -114,7 +114,7 @@ int node_delay::do_update_channel (int chan)
     return pos;
 }
 
-void node_delay::do_update (const node* caller,
+void node_delay::do_update (const node0* caller,
 			     int caller_port_type, int caller_por)
 {
     /*
@@ -122,12 +122,12 @@ void node_delay::do_update (const node* caller,
       m_buffer.zero();
       m_old_param_delay = m_param_delay;
     */
-    
+
     int new_pos = m_pos;
- 
+
     for (size_t i = 0; i < get_info().num_channels; ++i)
 	new_pos = do_update_channel (i);
-    
+
     m_pos = new_pos;
 }
 

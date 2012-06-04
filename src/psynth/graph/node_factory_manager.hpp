@@ -35,10 +35,10 @@ class node_factory_manager
 {
     typedef std::map<std::string, node_factory*> node_factory_map;
     node_factory_map m_node_fact;
-    
+
 public:
     void register_factory (node_factory& of);
-    node* create (const std::string& name, const audio_info& info);
+    node0* create (const std::string& name, const audio_info& info);
 };
 
 } /* namespace graph */

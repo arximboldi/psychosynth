@@ -38,14 +38,14 @@ namespace graph
 class node_manager
 {
 public:
-    typedef base::map_iterator <int, base::mgr_ptr<node>> iterator;
-    typedef base::map_const_iterator <int, base::mgr_ptr<node>> const_iterator;
+    typedef base::map_iterator <int, base::mgr_ptr<node0>> iterator;
+    typedef base::map_const_iterator <int, base::mgr_ptr<node0>> const_iterator;
 
 private:
-    base::mgr_assoc <std::map <int, base::mgr_ptr <node>>> m_node_map;
+    base::mgr_assoc <std::map <int, base::mgr_ptr <node0>>> m_node_map;
     std::list <node_output*> m_outputs;
-    std::list <node*> m_delete_list;
-    
+    std::list <node0*> m_delete_list;
+
     std::mutex m_update_mutex;
 
     void do_delete_node (iterator it);
@@ -53,8 +53,8 @@ private:
 public:
     node_manager ();
     ~node_manager ();
-	
-    bool add_node (base::mgr_ptr<node> obj, int id);
+
+    bool add_node (base::mgr_ptr<node0> obj, int id);
 
     bool delete_node (int id);
     void delete_node (iterator it);
@@ -62,7 +62,7 @@ public:
     const_iterator begin () const {
 	return m_node_map.begin();
     }
-    
+
     iterator begin () {
 	return m_node_map.begin();
     }
@@ -70,11 +70,11 @@ public:
     const_iterator end () const {
 	return m_node_map.end();
     }
-    
+
     iterator end () {
 	return m_node_map.end();
     }
-    
+
     iterator find (int id) {
 	return m_node_map.find(id);
     }

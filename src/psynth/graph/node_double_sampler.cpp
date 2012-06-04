@@ -45,11 +45,11 @@ namespace graph
 
 PSYNTH_DEFINE_NODE_FACTORY (node_double_sampler);
 
-node_double_sampler::node_double_sampler(const audio_info& info): 
-    node (info,
+node_double_sampler::node_double_sampler(const audio_info& info):
+    node0 (info,
 	  NODE_DOUBLE_SAMPLER,
 	  "double_sampler",
-	  N_IN_A_SOCKETS, 
+	  N_IN_A_SOCKETS,
 	  N_IN_C_SOCKETS,
 	  N_OUT_A_SOCKETS,
 	  N_OUT_C_SOCKETS),
@@ -84,11 +84,11 @@ void node_double_sampler::on_file_one_change (node_param& par)
 {
     std::string val;
     boost::filesystem::path path;
-    
+
     par.get (val);
     path = base::file_manager::self ().path("psychosynth.samples").find (val);
-    
-    std::unique_lock<mutex> (m_update_mutex);    
+
+    std::unique_lock<mutex> (m_update_mutex);
     m_reader_one = io::new_file_input <interleaved_range> (path.string ());
     m_fetcher_one.set_input (m_reader_one);
 
@@ -103,11 +103,11 @@ void node_double_sampler::on_file_two_change (node_param& par)
 {
     std::string val;
     boost::filesystem::path path;
-    
+
     par.get (val);
     path = base::file_manager::self ().path("psychosynth.samples").find (val);
 
-    std::unique_lock<mutex> (m_update_mutex);    
+    std::unique_lock<mutex> (m_update_mutex);
     m_reader_two = io::new_file_input <interleaved_range> (path.string ());
     m_fetcher_two.set_input (m_reader_two);
 
@@ -115,14 +115,14 @@ void node_double_sampler::on_file_two_change (node_param& par)
         m_inbuf_two.recreate (get_info ().block_size);
         // m_scaler.set_channels (2); // HACK HACK
 	// m_scaler.setSampleRate(m_fetcher.get_info().sample_rate);
-    }        
+    }
 }
 
 
-void node_double_sampler::do_update (const node* caller, int caller_port_type, int caller_port)
+void node_double_sampler::do_update (const node0* caller, int caller_port_type, int caller_port)
 {
-    audio_buffer* out = get_output<audio_buffer> (node::LINK_AUDIO, OUT_A_OUTPUT);
-    const sample_buffer* trig = get_input<sample_buffer> (node::LINK_CONTROL, IN_C_TRIGGER);
+    audio_buffer* out = get_output<audio_buffer> (node0::LINK_AUDIO, OUT_A_OUTPUT);
+    const sample_buffer* trig = get_input<sample_buffer> (node0::LINK_CONTROL, IN_C_TRIGGER);
     const sample* trig_buf = trig ? (const sample*) &const_range (*trig)[0] : 0;
     link_envelope trig_env =  get_in_envelope (LINK_CONTROL, IN_C_TRIGGER);
 
@@ -139,21 +139,21 @@ void node_double_sampler::do_update (const node* caller, int caller_port_type, i
 		    m_restart = false;
 		}
 	    }
-	    
+
 	    if (trig)
 		end = synth::find_hill (const_range (*trig), start);
 
 	    read (*out, start, end);
-	
+
 	    float env_val = (float) (audio_sample) trig_env.update (end - start);
 	    if (env_val == 1.0f && trig_buf && trig_buf[end - 1] == 0.0f)
 		m_restart = true;
-	    
+
 	    start = end;
-	} 
+	}
     } else
         fill_frames (range (*out), audio_frame (0));
-    
+
     /* Set amplitude. */
     sample* buf = (sample*) &range (*out)[0][0];
     int count = get_info ().block_size * get_info ().num_channels;
@@ -176,7 +176,7 @@ void node_double_sampler::do_update (const node* caller, int caller_port_type, i
 		++trig_buf;
 	    }
 	}
-    }    
+    }
 }
 
 void node_double_sampler::restart()
@@ -187,7 +187,7 @@ void node_double_sampler::restart()
 
 void node_double_sampler::read (audio_buffer& buf, int start, int end)
 {
-    const sample_buffer* blend = get_input<sample_buffer> (node::LINK_CONTROL,
+    const sample_buffer* blend = get_input<sample_buffer> (node0::LINK_CONTROL,
                                                            IN_C_BLEND);
     const sample* blend_buf = blend ?
         (const sample*) &const_range (*blend)[0] : 0;
@@ -200,10 +200,10 @@ void node_double_sampler::read (audio_buffer& buf, int start, int end)
 
     must_read = end - start;
     tbeg = tend = 0;
-    
+
     while (must_read) {
 	nread = m_fetcher_one.take (sub_range (range (m_inbuf_one), 0, must_read));
-        
+
 	if (nread) {
 	    must_read -= nread;
 	    tend += nread;

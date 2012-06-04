@@ -63,224 +63,224 @@ const patcher_data PATCHER_TABLE[N_NODES][N_NODES] =
 {
     /* node_output */
     {
-	{node::LINK_NONE, 0, 0},  /* node_output */
-	{node::LINK_NONE, 0, 0},  /* node_audio_mixer */
-	{node::LINK_NONE, 0, 0}, /* node_control_mixer */
-	{node::LINK_NONE, 0, 0},  /* node_audio_oscillator */
-	{node::LINK_NONE, 0, 0},  /* node_lfo */
-	{node::LINK_NONE, 0, 0},   /* node_filter */
-	{node::LINK_NONE, 0, 0}, /* node_sampler */
-	{node::LINK_NONE, 0, 0}, /* node_step_seq */
-	{node::LINK_NONE, 0, 0}, /* node_audio_noise */	
-	{node::LINK_NONE, 0, 0}, /* node_control_noise */
-	{node::LINK_NONE, 0, 0}, /* node_echo */
-	{node::LINK_NONE, 0, 0}, /* node_delay */
-	{node::LINK_NONE, 0, 0}, /* node_double_sampler */
+	{node0::LINK_NONE, 0, 0},  /* node_output */
+	{node0::LINK_NONE, 0, 0},  /* node_audio_mixer */
+	{node0::LINK_NONE, 0, 0}, /* node_control_mixer */
+	{node0::LINK_NONE, 0, 0},  /* node_audio_oscillator */
+	{node0::LINK_NONE, 0, 0},  /* node_lfo */
+	{node0::LINK_NONE, 0, 0},   /* node_filter */
+	{node0::LINK_NONE, 0, 0}, /* node_sampler */
+	{node0::LINK_NONE, 0, 0}, /* node_step_seq */
+	{node0::LINK_NONE, 0, 0}, /* node_audio_noise */
+	{node0::LINK_NONE, 0, 0}, /* node_control_noise */
+	{node0::LINK_NONE, 0, 0}, /* node_echo */
+	{node0::LINK_NONE, 0, 0}, /* node_delay */
+	{node0::LINK_NONE, 0, 0}, /* node_double_sampler */
     },
 
     /* node_audio_mixer */
     {
-	{node::LINK_AUDIO, node_audio_mixer::OUT_A_OUTPUT, node_output::IN_A_INPUT},  /* node_output */
-	{node::LINK_AUDIO, node_audio_mixer::OUT_A_OUTPUT, PATCHER_ANY}, /* node_audio_mixer */
-	{node::LINK_NONE, 0, 0}, /* node_control_mixer */
-	{node::LINK_NONE, 0, 0}, /* node_audio_oscillator */
-	{node::LINK_NONE, 0, 0}, /* node_lfo */
-	{node::LINK_AUDIO, node_audio_mixer::OUT_A_OUTPUT, node_filter::IN_A_INPUT}, /* node_filter */
-	{node::LINK_NONE, 0, 0}, /* node_sampler */
-	{node::LINK_NONE, 0, 0}, /* node_step_seq */
-	{node::LINK_NONE, 0, 0}, /* node_audio_noise */
-	{node::LINK_NONE, 0, 0}, /* node_control_noise */
-	{node::LINK_AUDIO, node_audio_mixer::OUT_A_OUTPUT, node_echo::IN_A_INPUT}, /* node_echo */
-	{node::LINK_AUDIO, node_audio_mixer::OUT_A_OUTPUT, node_delay::IN_A_INPUT}, /* node_delay */
-	{node::LINK_NONE, 0, 0}, /* node_double_sampler */
+	{node0::LINK_AUDIO, node_audio_mixer::OUT_A_OUTPUT, node_output::IN_A_INPUT},  /* node_output */
+	{node0::LINK_AUDIO, node_audio_mixer::OUT_A_OUTPUT, PATCHER_ANY}, /* node_audio_mixer */
+	{node0::LINK_NONE, 0, 0}, /* node_control_mixer */
+	{node0::LINK_NONE, 0, 0}, /* node_audio_oscillator */
+	{node0::LINK_NONE, 0, 0}, /* node_lfo */
+	{node0::LINK_AUDIO, node_audio_mixer::OUT_A_OUTPUT, node_filter::IN_A_INPUT}, /* node_filter */
+	{node0::LINK_NONE, 0, 0}, /* node_sampler */
+	{node0::LINK_NONE, 0, 0}, /* node_step_seq */
+	{node0::LINK_NONE, 0, 0}, /* node_audio_noise */
+	{node0::LINK_NONE, 0, 0}, /* node_control_noise */
+	{node0::LINK_AUDIO, node_audio_mixer::OUT_A_OUTPUT, node_echo::IN_A_INPUT}, /* node_echo */
+	{node0::LINK_AUDIO, node_audio_mixer::OUT_A_OUTPUT, node_delay::IN_A_INPUT}, /* node_delay */
+	{node0::LINK_NONE, 0, 0}, /* node_double_sampler */
     },
 
     /* node_control_mixer */
     {
-	{node::LINK_NONE, 0, 0},  /* node_output */
-	{node::LINK_CONTROL, node_control_mixer::OUT_C_OUTPUT, node_mixer::IN_C_AMPLITUDE}, /* node_audio_mixer */
+	{node0::LINK_NONE, 0, 0},  /* node_output */
+	{node0::LINK_CONTROL, node_control_mixer::OUT_C_OUTPUT, node_mixer::IN_C_AMPLITUDE}, /* node_audio_mixer */
 	/* TODO: Decide a way to allow controlling control signals amplitude. */
-	{node::LINK_CONTROL, node_control_mixer::OUT_C_OUTPUT, PATCHER_ANY}, /* node_control_mixer */
-	{node::LINK_CONTROL, node_control_mixer::OUT_C_OUTPUT, node_oscillator::IN_C_FREQUENCY},/* node_audio_oscillator */
-	{node::LINK_CONTROL, node_control_mixer::OUT_C_OUTPUT, node_oscillator::IN_C_FREQUENCY}, /* node_lfo */
-	{node::LINK_CONTROL, node_control_mixer::OUT_C_OUTPUT, node_filter::IN_C_CUTOFF}, /* node_filter */
-	{node::LINK_CONTROL, node_control_mixer::OUT_C_OUTPUT, node_sampler::IN_C_RATE}, /* node_sampler */
-	{node::LINK_CONTROL, node_control_mixer::OUT_C_OUTPUT, node_step_seq::IN_C_BPM}, /* node_step_seq */
-	{node::LINK_CONTROL, node_control_mixer::OUT_C_OUTPUT, node_audio_noise::IN_C_AMPLITUDE}, /* node_audio_noise */
-	{node::LINK_CONTROL, node_control_mixer::OUT_C_OUTPUT, node_control_noise::IN_C_AMPLITUDE}, /* node_control_noise */
-	{node::LINK_CONTROL, node_control_mixer::OUT_C_OUTPUT, node_echo::IN_C_FEEDBACK}, /* node_echo */
-	{node::LINK_CONTROL, node_control_mixer::OUT_C_OUTPUT, node_echo::IN_C_DELAY}, /* node_delay */
-	{node::LINK_CONTROL, node_control_mixer::OUT_C_OUTPUT, node_double_sampler::IN_C_BLEND}, /* node_double_sampler */
+	{node0::LINK_CONTROL, node_control_mixer::OUT_C_OUTPUT, PATCHER_ANY}, /* node_control_mixer */
+	{node0::LINK_CONTROL, node_control_mixer::OUT_C_OUTPUT, node_oscillator::IN_C_FREQUENCY},/* node_audio_oscillator */
+	{node0::LINK_CONTROL, node_control_mixer::OUT_C_OUTPUT, node_oscillator::IN_C_FREQUENCY}, /* node_lfo */
+	{node0::LINK_CONTROL, node_control_mixer::OUT_C_OUTPUT, node_filter::IN_C_CUTOFF}, /* node_filter */
+	{node0::LINK_CONTROL, node_control_mixer::OUT_C_OUTPUT, node_sampler::IN_C_RATE}, /* node_sampler */
+	{node0::LINK_CONTROL, node_control_mixer::OUT_C_OUTPUT, node_step_seq::IN_C_BPM}, /* node_step_seq */
+	{node0::LINK_CONTROL, node_control_mixer::OUT_C_OUTPUT, node_audio_noise::IN_C_AMPLITUDE}, /* node_audio_noise */
+	{node0::LINK_CONTROL, node_control_mixer::OUT_C_OUTPUT, node_control_noise::IN_C_AMPLITUDE}, /* node_control_noise */
+	{node0::LINK_CONTROL, node_control_mixer::OUT_C_OUTPUT, node_echo::IN_C_FEEDBACK}, /* node_echo */
+	{node0::LINK_CONTROL, node_control_mixer::OUT_C_OUTPUT, node_echo::IN_C_DELAY}, /* node_delay */
+	{node0::LINK_CONTROL, node_control_mixer::OUT_C_OUTPUT, node_double_sampler::IN_C_BLEND}, /* node_double_sampler */
     },
-    
+
     /* node_audio_oscillator */
     {
-	{node::LINK_NONE, 0, 0}, /* node_output */
-	{node::LINK_AUDIO, node_audio_oscillator::OUT_A_OUTPUT, PATCHER_ANY}, /* node_audio_mixer */
-	{node::LINK_NONE, 0, 0}, /* node_control_mixer */
-	{node::LINK_NONE, 0, 0}, /* node_audio_oscillator */
-	{node::LINK_NONE, 0, 0}, /* node_lfo */
-	{node::LINK_AUDIO, node_audio_oscillator::OUT_A_OUTPUT, node_filter::IN_A_INPUT}, /* node_filter */
-	{node::LINK_NONE, 0, 0}, /* node_sampler */
-	{node::LINK_NONE, 0, 0}, /* node_step_seq */
-	{node::LINK_NONE, 0, 0}, /* node_audio_noise */
-	{node::LINK_NONE, 0, 0}, /* node_control_noise */
-	{node::LINK_AUDIO, node_audio_oscillator::OUT_A_OUTPUT, node_echo::IN_A_INPUT}, /* node_echo */
-	{node::LINK_AUDIO, node_audio_oscillator::OUT_A_OUTPUT, node_delay::IN_A_INPUT}, /* node_delay */
-	{node::LINK_NONE, 0, 0}, /* node_double_sampler */
+	{node0::LINK_NONE, 0, 0}, /* node_output */
+	{node0::LINK_AUDIO, node_audio_oscillator::OUT_A_OUTPUT, PATCHER_ANY}, /* node_audio_mixer */
+	{node0::LINK_NONE, 0, 0}, /* node_control_mixer */
+	{node0::LINK_NONE, 0, 0}, /* node_audio_oscillator */
+	{node0::LINK_NONE, 0, 0}, /* node_lfo */
+	{node0::LINK_AUDIO, node_audio_oscillator::OUT_A_OUTPUT, node_filter::IN_A_INPUT}, /* node_filter */
+	{node0::LINK_NONE, 0, 0}, /* node_sampler */
+	{node0::LINK_NONE, 0, 0}, /* node_step_seq */
+	{node0::LINK_NONE, 0, 0}, /* node_audio_noise */
+	{node0::LINK_NONE, 0, 0}, /* node_control_noise */
+	{node0::LINK_AUDIO, node_audio_oscillator::OUT_A_OUTPUT, node_echo::IN_A_INPUT}, /* node_echo */
+	{node0::LINK_AUDIO, node_audio_oscillator::OUT_A_OUTPUT, node_delay::IN_A_INPUT}, /* node_delay */
+	{node0::LINK_NONE, 0, 0}, /* node_double_sampler */
     },
 
     /* node_lfo */
     {
-	{node::LINK_NONE, 0, 0}, /* node_output */	
-	{node::LINK_CONTROL, node_lfo::OUT_C_OUTPUT, node_mixer::IN_C_AMPLITUDE}, /* node_audio_mixer */
-	{node::LINK_CONTROL, node_lfo::OUT_C_OUTPUT, PATCHER_ANY}, /* node_control_mixer */
-	{node::LINK_CONTROL, node_lfo::OUT_C_OUTPUT, node_oscillator::IN_C_FREQUENCY}, /* node_audio_oscillator */
-	{node::LINK_CONTROL, node_lfo::OUT_C_OUTPUT, node_oscillator::IN_C_FREQUENCY}, /* node_lfo */
-	{node::LINK_CONTROL, node_lfo::OUT_C_OUTPUT, node_filter::IN_C_CUTOFF},  /* node_filter */
-	{node::LINK_CONTROL, node_lfo::OUT_C_OUTPUT, node_sampler::IN_C_RATE}, /* node_sampler */
-	{node::LINK_CONTROL, node_lfo::OUT_C_OUTPUT, node_step_seq::IN_C_BPM}, /* node_step_seq */
-	{node::LINK_CONTROL, node_lfo::OUT_C_OUTPUT, node_audio_noise::IN_C_AMPLITUDE}, /* node_audio_noise */
-	{node::LINK_CONTROL, node_lfo::OUT_C_OUTPUT, node_control_noise::IN_C_AMPLITUDE}, /* node_control_noise */
-	{node::LINK_CONTROL, node_lfo::OUT_C_OUTPUT, node_echo::IN_C_FEEDBACK}, /* node_echo */
-	{node::LINK_CONTROL, node_lfo::OUT_C_OUTPUT, node_delay::IN_C_DELAY}, /* node_delay */
-	{node::LINK_CONTROL, node_lfo::OUT_C_OUTPUT, node_double_sampler::IN_C_BLEND}, /* node_sampler */
+	{node0::LINK_NONE, 0, 0}, /* node_output */
+	{node0::LINK_CONTROL, node_lfo::OUT_C_OUTPUT, node_mixer::IN_C_AMPLITUDE}, /* node_audio_mixer */
+	{node0::LINK_CONTROL, node_lfo::OUT_C_OUTPUT, PATCHER_ANY}, /* node_control_mixer */
+	{node0::LINK_CONTROL, node_lfo::OUT_C_OUTPUT, node_oscillator::IN_C_FREQUENCY}, /* node_audio_oscillator */
+	{node0::LINK_CONTROL, node_lfo::OUT_C_OUTPUT, node_oscillator::IN_C_FREQUENCY}, /* node_lfo */
+	{node0::LINK_CONTROL, node_lfo::OUT_C_OUTPUT, node_filter::IN_C_CUTOFF},  /* node_filter */
+	{node0::LINK_CONTROL, node_lfo::OUT_C_OUTPUT, node_sampler::IN_C_RATE}, /* node_sampler */
+	{node0::LINK_CONTROL, node_lfo::OUT_C_OUTPUT, node_step_seq::IN_C_BPM}, /* node_step_seq */
+	{node0::LINK_CONTROL, node_lfo::OUT_C_OUTPUT, node_audio_noise::IN_C_AMPLITUDE}, /* node_audio_noise */
+	{node0::LINK_CONTROL, node_lfo::OUT_C_OUTPUT, node_control_noise::IN_C_AMPLITUDE}, /* node_control_noise */
+	{node0::LINK_CONTROL, node_lfo::OUT_C_OUTPUT, node_echo::IN_C_FEEDBACK}, /* node_echo */
+	{node0::LINK_CONTROL, node_lfo::OUT_C_OUTPUT, node_delay::IN_C_DELAY}, /* node_delay */
+	{node0::LINK_CONTROL, node_lfo::OUT_C_OUTPUT, node_double_sampler::IN_C_BLEND}, /* node_sampler */
     },
 
     /* node_filter */
     {
-	{node::LINK_NONE, 0, 0}, /* node_output */
-	{node::LINK_AUDIO, node_filter::OUT_A_OUTPUT, PATCHER_ANY}, /* node_audio_mixer */
-	{node::LINK_NONE, 0, 0}, /* node_control_mixer */
-	{node::LINK_NONE, 0, 0}, /* node_audio_oscillator */
-	{node::LINK_NONE, 0, 0}, /* node_lfo */
-	{node::LINK_AUDIO, node_filter::OUT_A_OUTPUT, node_filter::IN_A_INPUT}, /* node_filter */
-	{node::LINK_NONE, 0, 0}, /* node_sampler */
-	{node::LINK_NONE, 0, 0}, /* node_step_seq */
-	{node::LINK_NONE, 0, 0}, /* node_audio_noise */
-	{node::LINK_NONE, 0, 0}, /* node_control_noise */
-	{node::LINK_AUDIO, node_filter::OUT_A_OUTPUT, node_echo::IN_A_INPUT}, /* node_echo */
-	{node::LINK_AUDIO, node_filter::OUT_A_OUTPUT, node_delay::IN_A_INPUT}, /* node_delay */
-	{node::LINK_NONE, 0, 0}, /* node_double_sampler */
+	{node0::LINK_NONE, 0, 0}, /* node_output */
+	{node0::LINK_AUDIO, node_filter::OUT_A_OUTPUT, PATCHER_ANY}, /* node_audio_mixer */
+	{node0::LINK_NONE, 0, 0}, /* node_control_mixer */
+	{node0::LINK_NONE, 0, 0}, /* node_audio_oscillator */
+	{node0::LINK_NONE, 0, 0}, /* node_lfo */
+	{node0::LINK_AUDIO, node_filter::OUT_A_OUTPUT, node_filter::IN_A_INPUT}, /* node_filter */
+	{node0::LINK_NONE, 0, 0}, /* node_sampler */
+	{node0::LINK_NONE, 0, 0}, /* node_step_seq */
+	{node0::LINK_NONE, 0, 0}, /* node_audio_noise */
+	{node0::LINK_NONE, 0, 0}, /* node_control_noise */
+	{node0::LINK_AUDIO, node_filter::OUT_A_OUTPUT, node_echo::IN_A_INPUT}, /* node_echo */
+	{node0::LINK_AUDIO, node_filter::OUT_A_OUTPUT, node_delay::IN_A_INPUT}, /* node_delay */
+	{node0::LINK_NONE, 0, 0}, /* node_double_sampler */
     },
 
     /* node_sampler */
     {
-	{node::LINK_NONE, 0, 0}, /* node_output */
-	{node::LINK_AUDIO, node_sampler::OUT_A_OUTPUT, PATCHER_ANY}, /* node_audio_mixer */
-	{node::LINK_NONE, 0, 0}, /* node_control_mixer */
-	{node::LINK_NONE, 0, 0}, /* node_audio_oscillator */
-	{node::LINK_NONE, 0, 0}, /* node_lfo */
-	{node::LINK_AUDIO, node_sampler::OUT_A_OUTPUT, node_filter::IN_A_INPUT}, /* node_filter */
-	{node::LINK_NONE, 0, 0}, /* node_sampler */
-	{node::LINK_NONE, 0, 0}, /* node_step_seq */
-	{node::LINK_NONE, 0, 0}, /* node_audio_noise */
-	{node::LINK_NONE, 0, 0}, /* node_control_noise */
-	{node::LINK_AUDIO, node_sampler::OUT_A_OUTPUT, node_echo::IN_A_INPUT}, /* node_echo */
-	{node::LINK_AUDIO, node_sampler::OUT_A_OUTPUT, node_delay::IN_A_INPUT}, /* node_delay */
-	{node::LINK_NONE, 0, 0}, /* node_double_sampler */
+	{node0::LINK_NONE, 0, 0}, /* node_output */
+	{node0::LINK_AUDIO, node_sampler::OUT_A_OUTPUT, PATCHER_ANY}, /* node_audio_mixer */
+	{node0::LINK_NONE, 0, 0}, /* node_control_mixer */
+	{node0::LINK_NONE, 0, 0}, /* node_audio_oscillator */
+	{node0::LINK_NONE, 0, 0}, /* node_lfo */
+	{node0::LINK_AUDIO, node_sampler::OUT_A_OUTPUT, node_filter::IN_A_INPUT}, /* node_filter */
+	{node0::LINK_NONE, 0, 0}, /* node_sampler */
+	{node0::LINK_NONE, 0, 0}, /* node_step_seq */
+	{node0::LINK_NONE, 0, 0}, /* node_audio_noise */
+	{node0::LINK_NONE, 0, 0}, /* node_control_noise */
+	{node0::LINK_AUDIO, node_sampler::OUT_A_OUTPUT, node_echo::IN_A_INPUT}, /* node_echo */
+	{node0::LINK_AUDIO, node_sampler::OUT_A_OUTPUT, node_delay::IN_A_INPUT}, /* node_delay */
+	{node0::LINK_NONE, 0, 0}, /* node_double_sampler */
     },
 
     /* node_step_seq */
     {
-	{node::LINK_NONE, 0, 0}, /* node_output */
-	{node::LINK_NONE, 0, 0}, /* node_audio_mixer */
-	{node::LINK_NONE, 0, 0}, /* node_control_mixer */
-	{node::LINK_CONTROL, node_step_seq::OUT_C_OUTPUT, node_oscillator::IN_C_TRIGGER}, /* node_audio_oscillator */
-	{node::LINK_CONTROL, node_step_seq::OUT_C_OUTPUT, node_oscillator::IN_C_TRIGGER}, /* node_lfo */
-	{node::LINK_NONE, 0, 0}, /* node_filter */
-	{node::LINK_CONTROL, node_step_seq::OUT_C_OUTPUT, node_sampler::IN_C_TRIGGER}, /* node_sampler */
-	{node::LINK_NONE, 0, 0}, /* node_step_seq */
-	{node::LINK_CONTROL, node_step_seq::OUT_C_OUTPUT, node_noise::IN_C_TRIGGER}, /* node_audio_noise */
-	{node::LINK_CONTROL, node_step_seq::OUT_C_OUTPUT, node_noise::IN_C_TRIGGER}, /* node_control_noise */
-	{node::LINK_NONE, 0, 0}, /* node_echo */
-	{node::LINK_NONE, 0, 0}, /* node_delay */
-	{node::LINK_CONTROL, node_step_seq::OUT_C_OUTPUT, node_double_sampler::IN_C_TRIGGER}, /* node_sampler */
+	{node0::LINK_NONE, 0, 0}, /* node_output */
+	{node0::LINK_NONE, 0, 0}, /* node_audio_mixer */
+	{node0::LINK_NONE, 0, 0}, /* node_control_mixer */
+	{node0::LINK_CONTROL, node_step_seq::OUT_C_OUTPUT, node_oscillator::IN_C_TRIGGER}, /* node_audio_oscillator */
+	{node0::LINK_CONTROL, node_step_seq::OUT_C_OUTPUT, node_oscillator::IN_C_TRIGGER}, /* node_lfo */
+	{node0::LINK_NONE, 0, 0}, /* node_filter */
+	{node0::LINK_CONTROL, node_step_seq::OUT_C_OUTPUT, node_sampler::IN_C_TRIGGER}, /* node_sampler */
+	{node0::LINK_NONE, 0, 0}, /* node_step_seq */
+	{node0::LINK_CONTROL, node_step_seq::OUT_C_OUTPUT, node_noise::IN_C_TRIGGER}, /* node_audio_noise */
+	{node0::LINK_CONTROL, node_step_seq::OUT_C_OUTPUT, node_noise::IN_C_TRIGGER}, /* node_control_noise */
+	{node0::LINK_NONE, 0, 0}, /* node_echo */
+	{node0::LINK_NONE, 0, 0}, /* node_delay */
+	{node0::LINK_CONTROL, node_step_seq::OUT_C_OUTPUT, node_double_sampler::IN_C_TRIGGER}, /* node_sampler */
     },
 
     /* node_audio_noise */
     {
-	{node::LINK_NONE, 0, 0}, /* node_output */
-	{node::LINK_AUDIO, node_audio_noise::OUT_A_OUTPUT, PATCHER_ANY}, /* node_audio_mixer */
-	{node::LINK_NONE, 0, 0}, /* node_control_mixer */
-	{node::LINK_NONE, 0, 0}, /* node_audio_oscillator */
-	{node::LINK_NONE, 0, 0}, /* node_lfo */
-	{node::LINK_AUDIO, node_audio_noise::OUT_A_OUTPUT, node_filter::IN_A_INPUT}, /* node_filter */
-	{node::LINK_NONE, 0, 0}, /* node_sampler */
-	{node::LINK_NONE, 0, 0}, /* node_step_seq */
-	{node::LINK_NONE, 0, 0}, /* node_audio_noise */
-	{node::LINK_NONE, 0, 0}, /* node_control_noise */
-	{node::LINK_AUDIO, node_audio_noise::OUT_A_OUTPUT, node_echo::IN_A_INPUT}, /* node_echo */
-	{node::LINK_AUDIO, node_audio_noise::OUT_A_OUTPUT, node_delay::IN_A_INPUT}, /* node_delay */
-	{node::LINK_NONE, 0, 0}, /* node_double_sampler */
+	{node0::LINK_NONE, 0, 0}, /* node_output */
+	{node0::LINK_AUDIO, node_audio_noise::OUT_A_OUTPUT, PATCHER_ANY}, /* node_audio_mixer */
+	{node0::LINK_NONE, 0, 0}, /* node_control_mixer */
+	{node0::LINK_NONE, 0, 0}, /* node_audio_oscillator */
+	{node0::LINK_NONE, 0, 0}, /* node_lfo */
+	{node0::LINK_AUDIO, node_audio_noise::OUT_A_OUTPUT, node_filter::IN_A_INPUT}, /* node_filter */
+	{node0::LINK_NONE, 0, 0}, /* node_sampler */
+	{node0::LINK_NONE, 0, 0}, /* node_step_seq */
+	{node0::LINK_NONE, 0, 0}, /* node_audio_noise */
+	{node0::LINK_NONE, 0, 0}, /* node_control_noise */
+	{node0::LINK_AUDIO, node_audio_noise::OUT_A_OUTPUT, node_echo::IN_A_INPUT}, /* node_echo */
+	{node0::LINK_AUDIO, node_audio_noise::OUT_A_OUTPUT, node_delay::IN_A_INPUT}, /* node_delay */
+	{node0::LINK_NONE, 0, 0}, /* node_double_sampler */
     },
 
     /* node_control_noise */
     {
-	{node::LINK_NONE, 0, 0}, /* node_output */	
-	{node::LINK_CONTROL, node_control_noise::OUT_C_OUTPUT, node_mixer::IN_C_AMPLITUDE}, /* node_audio_mixer */
-	{node::LINK_CONTROL, node_control_noise::OUT_C_OUTPUT, PATCHER_ANY}, /* node_control_mixer */
-	{node::LINK_CONTROL, node_control_noise::OUT_C_OUTPUT, node_oscillator::IN_C_FREQUENCY}, /* node_audio_oscillator */
-	{node::LINK_CONTROL, node_control_noise::OUT_C_OUTPUT, node_oscillator::IN_C_FREQUENCY}, /* node_lfo */
-	{node::LINK_CONTROL, node_control_noise::OUT_C_OUTPUT, node_filter::IN_C_CUTOFF},  /* node_filter */
-	{node::LINK_CONTROL, node_control_noise::OUT_C_OUTPUT, node_sampler::IN_C_RATE}, /* node_sampler */
-	{node::LINK_CONTROL, node_control_noise::OUT_C_OUTPUT, node_step_seq::IN_C_BPM}, /* node_step_seq */
-	{node::LINK_CONTROL, node_control_noise::OUT_C_OUTPUT, node_audio_noise::IN_C_AMPLITUDE}, /* node_audio_noise */
-	{node::LINK_CONTROL, node_control_noise::OUT_C_OUTPUT, node_control_noise::IN_C_AMPLITUDE}, /* node_control_noise */
-	{node::LINK_CONTROL, node_control_noise::OUT_C_OUTPUT, node_echo::IN_C_FEEDBACK}, /* node_echo */
-	{node::LINK_CONTROL, node_control_noise::OUT_C_OUTPUT, node_delay::IN_C_DELAY}, /* node_delay */
-	{node::LINK_CONTROL, node_control_noise::OUT_C_OUTPUT, node_double_sampler::IN_C_BLEND}, /* node_sampler */
+	{node0::LINK_NONE, 0, 0}, /* node_output */
+	{node0::LINK_CONTROL, node_control_noise::OUT_C_OUTPUT, node_mixer::IN_C_AMPLITUDE}, /* node_audio_mixer */
+	{node0::LINK_CONTROL, node_control_noise::OUT_C_OUTPUT, PATCHER_ANY}, /* node_control_mixer */
+	{node0::LINK_CONTROL, node_control_noise::OUT_C_OUTPUT, node_oscillator::IN_C_FREQUENCY}, /* node_audio_oscillator */
+	{node0::LINK_CONTROL, node_control_noise::OUT_C_OUTPUT, node_oscillator::IN_C_FREQUENCY}, /* node_lfo */
+	{node0::LINK_CONTROL, node_control_noise::OUT_C_OUTPUT, node_filter::IN_C_CUTOFF},  /* node_filter */
+	{node0::LINK_CONTROL, node_control_noise::OUT_C_OUTPUT, node_sampler::IN_C_RATE}, /* node_sampler */
+	{node0::LINK_CONTROL, node_control_noise::OUT_C_OUTPUT, node_step_seq::IN_C_BPM}, /* node_step_seq */
+	{node0::LINK_CONTROL, node_control_noise::OUT_C_OUTPUT, node_audio_noise::IN_C_AMPLITUDE}, /* node_audio_noise */
+	{node0::LINK_CONTROL, node_control_noise::OUT_C_OUTPUT, node_control_noise::IN_C_AMPLITUDE}, /* node_control_noise */
+	{node0::LINK_CONTROL, node_control_noise::OUT_C_OUTPUT, node_echo::IN_C_FEEDBACK}, /* node_echo */
+	{node0::LINK_CONTROL, node_control_noise::OUT_C_OUTPUT, node_delay::IN_C_DELAY}, /* node_delay */
+	{node0::LINK_CONTROL, node_control_noise::OUT_C_OUTPUT, node_double_sampler::IN_C_BLEND}, /* node_sampler */
     },
 
     /* node_echo */
     {
-	{node::LINK_NONE, 0, 0}, /* node_output */
-	{node::LINK_AUDIO, node_echo::OUT_A_OUTPUT, PATCHER_ANY}, /* node_audio_mixer */
-	{node::LINK_NONE, 0, 0}, /* node_control_mixer */
-	{node::LINK_NONE, 0, 0}, /* node_audio_oscillator */
-	{node::LINK_NONE, 0, 0}, /* node_lfo */
-	{node::LINK_AUDIO, node_echo::OUT_A_OUTPUT, node_filter::IN_A_INPUT}, /* node_filter */
-	{node::LINK_NONE, 0, 0}, /* node_sampler */
-	{node::LINK_NONE, 0, 0}, /* node_step_seq */
-	{node::LINK_NONE, 0, 0}, /* node_audio_noise */
-	{node::LINK_NONE, 0, 0}, /* node_control_noise */
-	{node::LINK_AUDIO, node_echo::OUT_A_OUTPUT, node_echo::IN_A_INPUT}, /* node_echo */
-	{node::LINK_AUDIO, node_echo::OUT_A_OUTPUT, node_delay::IN_A_INPUT}, /* node_delay */
-	{node::LINK_NONE, 0, 0}, /* node_double_sampler */
+	{node0::LINK_NONE, 0, 0}, /* node_output */
+	{node0::LINK_AUDIO, node_echo::OUT_A_OUTPUT, PATCHER_ANY}, /* node_audio_mixer */
+	{node0::LINK_NONE, 0, 0}, /* node_control_mixer */
+	{node0::LINK_NONE, 0, 0}, /* node_audio_oscillator */
+	{node0::LINK_NONE, 0, 0}, /* node_lfo */
+	{node0::LINK_AUDIO, node_echo::OUT_A_OUTPUT, node_filter::IN_A_INPUT}, /* node_filter */
+	{node0::LINK_NONE, 0, 0}, /* node_sampler */
+	{node0::LINK_NONE, 0, 0}, /* node_step_seq */
+	{node0::LINK_NONE, 0, 0}, /* node_audio_noise */
+	{node0::LINK_NONE, 0, 0}, /* node_control_noise */
+	{node0::LINK_AUDIO, node_echo::OUT_A_OUTPUT, node_echo::IN_A_INPUT}, /* node_echo */
+	{node0::LINK_AUDIO, node_echo::OUT_A_OUTPUT, node_delay::IN_A_INPUT}, /* node_delay */
+	{node0::LINK_NONE, 0, 0}, /* node_double_sampler */
     },
 
     /* node_delay */
     {
-	{node::LINK_NONE, 0, 0}, /* node_output */
-	{node::LINK_AUDIO, node_delay::OUT_A_OUTPUT, PATCHER_ANY}, /* node_audio_mixer */
-	{node::LINK_NONE, 0, 0}, /* node_control_mixer */
-	{node::LINK_NONE, 0, 0}, /* node_audio_oscillator */
-	{node::LINK_NONE, 0, 0}, /* node_lfo */
-	{node::LINK_AUDIO, node_delay::OUT_A_OUTPUT, node_filter::IN_A_INPUT}, /* node_filter */
-	{node::LINK_NONE, 0, 0}, /* node_sampler */
-	{node::LINK_NONE, 0, 0}, /* node_step_seq */
-	{node::LINK_NONE, 0, 0}, /* node_audio_noise */
-	{node::LINK_NONE, 0, 0}, /* node_control_noise */
-	{node::LINK_AUDIO, node_delay::OUT_A_OUTPUT, node_echo::IN_A_INPUT}, /* node_echo */
-	{node::LINK_AUDIO, node_delay::OUT_A_OUTPUT, node_delay::IN_A_INPUT}, /* node_delay */
-	{node::LINK_NONE, 0, 0}, /* node_double_sampler */
+	{node0::LINK_NONE, 0, 0}, /* node_output */
+	{node0::LINK_AUDIO, node_delay::OUT_A_OUTPUT, PATCHER_ANY}, /* node_audio_mixer */
+	{node0::LINK_NONE, 0, 0}, /* node_control_mixer */
+	{node0::LINK_NONE, 0, 0}, /* node_audio_oscillator */
+	{node0::LINK_NONE, 0, 0}, /* node_lfo */
+	{node0::LINK_AUDIO, node_delay::OUT_A_OUTPUT, node_filter::IN_A_INPUT}, /* node_filter */
+	{node0::LINK_NONE, 0, 0}, /* node_sampler */
+	{node0::LINK_NONE, 0, 0}, /* node_step_seq */
+	{node0::LINK_NONE, 0, 0}, /* node_audio_noise */
+	{node0::LINK_NONE, 0, 0}, /* node_control_noise */
+	{node0::LINK_AUDIO, node_delay::OUT_A_OUTPUT, node_echo::IN_A_INPUT}, /* node_echo */
+	{node0::LINK_AUDIO, node_delay::OUT_A_OUTPUT, node_delay::IN_A_INPUT}, /* node_delay */
+	{node0::LINK_NONE, 0, 0}, /* node_double_sampler */
     },
 
     /* node_double_sampler */
     {
-	{node::LINK_NONE, 0, 0}, /* node_output */
-	{node::LINK_AUDIO, node_double_sampler::OUT_A_OUTPUT, PATCHER_ANY}, /* node_audio_mixer */
-	{node::LINK_NONE, 0, 0}, /* node_control_mixer */
-	{node::LINK_NONE, 0, 0}, /* node_audio_oscillator */
-	{node::LINK_NONE, 0, 0}, /* node_lfo */
-	{node::LINK_AUDIO, node_double_sampler::OUT_A_OUTPUT, node_filter::IN_A_INPUT}, /* node_filter */
-	{node::LINK_NONE, 0, 0}, /* node_sampler */
-	{node::LINK_NONE, 0, 0}, /* node_step_seq */
-	{node::LINK_NONE, 0, 0}, /* node_audio_noise */
-	{node::LINK_NONE, 0, 0}, /* node_control_noise */
-	{node::LINK_AUDIO, node_double_sampler::OUT_A_OUTPUT, node_echo::IN_A_INPUT}, /* node_echo */
-	{node::LINK_AUDIO, node_double_sampler::OUT_A_OUTPUT, node_delay::IN_A_INPUT}, /* node_delay */
-	{node::LINK_NONE, 0, 0}, /* node_double_sampler */
+	{node0::LINK_NONE, 0, 0}, /* node_output */
+	{node0::LINK_AUDIO, node_double_sampler::OUT_A_OUTPUT, PATCHER_ANY}, /* node_audio_mixer */
+	{node0::LINK_NONE, 0, 0}, /* node_control_mixer */
+	{node0::LINK_NONE, 0, 0}, /* node_audio_oscillator */
+	{node0::LINK_NONE, 0, 0}, /* node_lfo */
+	{node0::LINK_AUDIO, node_double_sampler::OUT_A_OUTPUT, node_filter::IN_A_INPUT}, /* node_filter */
+	{node0::LINK_NONE, 0, 0}, /* node_sampler */
+	{node0::LINK_NONE, 0, 0}, /* node_step_seq */
+	{node0::LINK_NONE, 0, 0}, /* node_audio_noise */
+	{node0::LINK_NONE, 0, 0}, /* node_control_noise */
+	{node0::LINK_AUDIO, node_double_sampler::OUT_A_OUTPUT, node_echo::IN_A_INPUT}, /* node_echo */
+	{node0::LINK_AUDIO, node_double_sampler::OUT_A_OUTPUT, node_delay::IN_A_INPUT}, /* node_delay */
+	{node0::LINK_NONE, 0, 0}, /* node_double_sampler */
     }
 };
 
@@ -295,20 +295,20 @@ patcher_dynamic::~patcher_dynamic ()
 	delete *i;
 }
 
-bool patcher_dynamic::add_node (node* obj)
+bool patcher_dynamic::add_node (node0* obj)
 {
     if (m_nodes.insert(pair<int, pnode>(obj->get_id(), pnode(obj))).second) {
 	map<int, pnode>::iterator i;
 	int this_type = obj->get_type ();
 	int other_type;
-	
+
 	for (i = m_nodes.begin(); i != m_nodes.end(); ++i) {
 	    if (i->first == obj->get_id ())
 		continue;
-	    
-	    other_type = i->second.obj->get_type (); 
 
-	    if (PATCHER_TABLE[this_type][other_type].socket_type != node::LINK_NONE) {
+	    other_type = i->second.obj->get_type ();
+
+	    if (PATCHER_TABLE[this_type][other_type].socket_type != node0::LINK_NONE) {
 		m_links.insert(new link(obj, (*i).second.obj,
 					obj->sqr_distance_to(*i->second.obj),
 					i->second.obj->sqr_distance_to_center (),
@@ -317,7 +317,7 @@ bool patcher_dynamic::add_node (node* obj)
 					PATCHER_TABLE[this_type][other_type].dest_socket));
 	    }
 
-	    if (PATCHER_TABLE[other_type][this_type].socket_type != node::LINK_NONE) {
+	    if (PATCHER_TABLE[other_type][this_type].socket_type != node0::LINK_NONE) {
 		m_links.insert(new link(i->second.obj, obj,
 					i->second.obj->sqr_distance_to(*obj),
 					obj->sqr_distance_to_center(),
@@ -326,15 +326,15 @@ bool patcher_dynamic::add_node (node* obj)
 					PATCHER_TABLE[other_type][this_type].dest_socket));
 	    }
 	}
-	
+
 	m_changed = true;
 	return true;
     }
-    
+
     return false;
 }
 
-bool patcher_dynamic::delete_node (node* obj)
+bool patcher_dynamic::delete_node (node0* obj)
 {
     if (m_nodes.erase (obj->get_id()))
     {
@@ -351,15 +351,15 @@ bool patcher_dynamic::delete_node (node* obj)
 	m_changed = true;
 	return true;
     }
-    
+
     return false;
 }
 
-void patcher_dynamic::set_param_node(node* obj, int id)
+void patcher_dynamic::set_param_node(node0* obj, int id)
 {
-    if (id == node::PARAM_POSITION) {
+    if (id == node0::PARAM_POSITION) {
         list<link*> readd;
-    
+
 	for (auto i = m_links.begin(); i != m_links.end();) {
 	    if ((*i)->src == obj || (*i)->dest == obj) {
 		auto r = i++;
@@ -385,14 +385,14 @@ void patcher_dynamic::make_link (link& l)
 {
     //cout << "making link, source: " << l.src->getID() << " dest: "<< l.dest->getID() << endl;
 
-    node* old_src = l.dest->get_in_socket (l.sock_type, l.actual_in_sock).get_source_node();
+    node0* old_src = l.dest->get_in_socket (l.sock_type, l.actual_in_sock).get_source_node();
     if (old_src != NULL) {
 	notify_link_deleted (patcher_event (old_src, l.dest,
 					    l.out_sock, l.actual_in_sock,
 					    l.sock_type));
 	//cout << "undoing link, source: " << old_src->getID() << " dest: "<< l.dest->getID() << endl;
     }
-    
+
     l.dest->connect_in(l.sock_type, l.actual_in_sock, l.src, l.out_sock);
     notify_link_added (patcher_event (l.src, l.dest,
 				      l.out_sock, l.actual_in_sock,
@@ -425,14 +425,14 @@ bool patcher_dynamic::is_linked (link& l)
 void patcher_dynamic::find_in_sock(link &l)
 {
     float max_dist = l.dist;
-    
-    l.actual_in_sock = -1; 
+
+    l.actual_in_sock = -1;
 
     if (l.in_sock == -1) {
 	for (int i = 0; i < l.dest->get_num_input (l.sock_type); i++) {
-	    node* obj = l.dest->get_in_socket (l.sock_type, i).get_source_node (); 
+	    node0* obj = l.dest->get_in_socket (l.sock_type, i).get_source_node ();
 	    float dist;
-	    
+
 	    if (obj == NULL) {
 		l.actual_in_sock = i;
 		return;
@@ -443,7 +443,7 @@ void patcher_dynamic::find_in_sock(link &l)
 	    }
 	}
     } else {
-	node* obj = l.dest->get_in_socket (l.sock_type, l.in_sock).get_source_node (); 
+	node0* obj = l.dest->get_in_socket (l.sock_type, l.in_sock).get_source_node ();
 	if (obj == NULL || l.src->sqr_distance_to (*l.dest) < obj->sqr_distance_to (*l.dest))
 	    l.actual_in_sock = l.in_sock;
     }
@@ -453,7 +453,7 @@ void patcher_dynamic::update ()
 {
     if (!m_changed)
 	return;
-    
+
     for (map<int, pnode>::iterator i = m_nodes.begin();
 	 i != m_nodes.end();
 	 ++i)
@@ -468,12 +468,12 @@ void patcher_dynamic::update ()
 	if (n == m_nodes.end()) {
 	    logger::self () ("dynamic_patcher", log::warning, "Object not found.");
 	}
-	
+
 	pnode& node_src = (*n).second;
 	pnode& node_dest = (*n2).second;
 	link& link = **i;
 
-	//cout << "trying, src: " << link.src->getID() << " dest: " << link.dest->getID() << " out: " << node_src.out_used << endl; 
+	//cout << "trying, src: " << link.src->getID() << " dest: " << link.dest->getID() << " out: " << node_src.out_used << endl;
 
 	if (!node_src.out_used &&
 	    !(node_dest.out_used == true && node_dest.dest == link.src))
@@ -493,7 +493,7 @@ void patcher_dynamic::update ()
 	    link.actual_in_sock = -1;
 	}
     }
-    
+
     //cout << "---" << endl;
 
     m_changed = false;

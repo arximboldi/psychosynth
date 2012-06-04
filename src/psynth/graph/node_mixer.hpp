@@ -32,20 +32,20 @@ namespace psynth
 namespace graph
 {
 
-class node_mixer : public node
+class node_mixer : public node0
 {
 public:
        /*enum {
       N_IN_A_SOCKETS
       };*/
-	
+
     enum in_control_socket_id {
 	IN_C_AMPLITUDE,
 	N_IN_C_SOCKETS
     };
 
     enum param_id {
-	PARAM_AMPLITUDE = node::N_COMMON_PARAMS,
+	PARAM_AMPLITUDE = node0::N_COMMON_PARAMS,
 	PARAM_MIXOP,
 	N_PARAM
     };
@@ -61,7 +61,7 @@ protected:
     size_t m_numchan;
 
     void mix (sample* dest, const sample* src, size_t n_samples);
-    
+
     void mix (sample* dest, const sample* src,
 	     const sample* ampl, size_t n_samples);
 
@@ -71,13 +71,13 @@ protected:
     void mix (sample* dest, const sample* src, const sample* ampl,
               link_envelope& env, link_envelope& ctrl_env,
               size_t n_samples);
-    
+
     void init (sample* dest, size_t n_samples);
-    
+
 private:
     float m_param_ampl;
-    int m_param_mixop;    
-    
+    int m_param_mixop;
+
 public:
     node_mixer (const audio_info& info,
 		int obj_type,
@@ -98,13 +98,13 @@ public:
     enum out_control_socket_id {
 	N_OUT_C_SOCKETS
     };
-    
+
 private:
-    void do_update (const node* caller, int caller_port_type, int caller_port);
+    void do_update (const node0* caller, int caller_port_type, int caller_port);
     void do_advance () {}
     void on_info_change () {}
-    
-public:  
+
+public:
     node_audio_mixer (const audio_info& prop, int n_chan = 2) :
 	node_mixer (prop,
 		    NODE_MIXER,
@@ -126,13 +126,13 @@ public:
 	OUT_C_OUTPUT,
 	N_OUT_C_SOCKETS
     };
-    
+
 private:
-    void do_update (const node* caller, int caller_port_type, int caller_port);
+    void do_update (const node0* caller, int caller_port_type, int caller_port);
     void do_advance () {}
     void on_info_change () {}
-    
-public:  
+
+public:
     node_control_mixer (const audio_info& prop, int n_chan = 2) :
 	node_mixer (prop,
 		    NODE_CONTROLMIXER,

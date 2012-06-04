@@ -48,11 +48,11 @@ namespace graph
 
 PSYNTH_DEFINE_NODE_FACTORY (node_sampler);
 
-node_sampler::node_sampler(const audio_info& info): 
-    node (info,
+node_sampler::node_sampler(const audio_info& info):
+    node0 (info,
 	  NODE_SAMPLER,
 	  "sampler",
-	  N_IN_A_SOCKETS, 
+	  N_IN_A_SOCKETS,
 	  N_IN_C_SOCKETS,
 	  N_OUT_A_SOCKETS,
 	  N_OUT_C_SOCKETS),
@@ -72,7 +72,7 @@ node_sampler::node_sampler(const audio_info& info):
     add_param ("rate", node_param::FLOAT, &m_param_rate);
     add_param ("tempo", node_param::FLOAT, &m_param_tempo);
     add_param ("pitch", node_param::FLOAT, &m_param_pitch);
-    
+
     m_scaler.set_rate (1.0);
     m_scaler.set_frame_rate (info.sample_rate);
 
@@ -89,12 +89,12 @@ void node_sampler::on_file_change (node_param& par)
 {
     std::string val;
     boost::filesystem::path path;
-    
+
     par.get (val);
     path = base::file_manager::self ().path("psychosynth.samples").find (val);
-    
+
     std::unique_lock<std::mutex> lock (m_update_mutex);
-        
+
     m_reader = io::new_file_input <interleaved_range> (path.string ());
     m_fetcher.set_input (m_reader);
 
@@ -105,10 +105,10 @@ void node_sampler::on_file_change (node_param& par)
     }
 }
 
-void node_sampler::do_update (const node* caller, int caller_port_type, int caller_port)
+void node_sampler::do_update (const node0* caller, int caller_port_type, int caller_port)
 {
-    audio_buffer* out = get_output<audio_buffer> (node::LINK_AUDIO, OUT_A_OUTPUT);
-    const sample_buffer* trig = get_input<sample_buffer> (node::LINK_CONTROL, IN_C_TRIGGER);
+    audio_buffer* out = get_output<audio_buffer> (node0::LINK_AUDIO, OUT_A_OUTPUT);
+    const sample_buffer* trig = get_input<sample_buffer> (node0::LINK_CONTROL, IN_C_TRIGGER);
     const sample* trig_buf = trig ? (const sample*) &const_range(*trig)[0] : 0;
     link_envelope trig_env =  get_in_envelope (LINK_CONTROL, IN_C_TRIGGER);
 
@@ -125,21 +125,21 @@ void node_sampler::do_update (const node* caller, int caller_port_type, int call
 		    m_restart = false;
 		}
 	    }
-	
+
 	    if (trig)
 		end = synth::find_hill (const_range (*trig), start);
 
 	    read(*out, start, end);
-	
+
 	    float env_val = (float) (audio_sample) trig_env.update (end - start);
 	    if (env_val == 1.0f && trig_buf && trig_buf[end - 1] == 0.0f)
 		m_restart = true;
-	    
+
 	    start = end;
-	} 
+	}
     } else
 	fill_frames (range (*out), audio_frame (0));
-    
+
     /* Set amplitude. */
     transform_frames (
         range (*out), range (*out),
@@ -149,7 +149,7 @@ void node_sampler::do_update (const node* caller, int caller_port_type, int call
                 });
             return in;
         });
-    
+
     /* Apply trigger envelope. */
     if (trig_buf) {
 	for (size_t i = 0; i < get_info ().num_channels; ++i) {
@@ -166,7 +166,7 @@ void node_sampler::do_update (const node* caller, int caller_port_type, int call
 	    }
 	}
     }
-    
+
 }
 
 void node_sampler::restart()
@@ -178,9 +178,9 @@ void node_sampler::restart()
 void node_sampler::read (audio_buffer& buf, int start, int end)
 {
     const sample_buffer* rate = get_input<sample_buffer> (
-        node::LINK_CONTROL, IN_C_RATE);
+        node0::LINK_CONTROL, IN_C_RATE);
     const sample* rate_buf = rate ? (const sample*) &const_range (*rate) [0] : 0;
-    
+
     float base_factor =
 	(float) m_reader->frame_rate () / get_info ().sample_rate * m_param_rate;
 
@@ -190,14 +190,14 @@ void node_sampler::read (audio_buffer& buf, int start, int end)
 
     bool backwards = false;;
     bool high_latency = false;
-    
+
     if (m_update_mutex.try_lock ())
     {
         m_scaler.set_tempo (m_param_tempo);
         m_scaler.set_pitch (m_param_pitch);
         m_update_mutex.unlock ();
     }
-    
+
     if (m_param_tempo != 1.0f ||
 	m_param_pitch != 1.0f)
 	high_latency = true;
@@ -213,10 +213,10 @@ void node_sampler::read (audio_buffer& buf, int start, int end)
 				  end - start)) {
 	if (rate)
 	    factor = base_factor + base_factor * rate_buf[(int) m_ctrl_pos];
-	    
+
 	if (backwards != m_fetcher.is_backwards ())
 	    m_fetcher.set_backwards (backwards);
-	    
+
 	if (factor < 0.2)
 	    factor = 0.2;
 
@@ -225,7 +225,7 @@ void node_sampler::read (audio_buffer& buf, int start, int end)
 	    must_read = (float)must_read * factor * m_param_tempo;
 	else
 	    must_read = must_read;
-        
+
 	m_update_mutex.lock();
 	nread = m_fetcher.take (sub_range (range (m_inbuf), 0, must_read));
 
@@ -239,7 +239,7 @@ void node_sampler::read (audio_buffer& buf, int start, int end)
             m_scaler.set_rate (factor);
 	    m_scaler.update (sub_range (range (m_inbuf), 0, nread));
 	}
-        
+
 	m_update_mutex.unlock();
     }
 

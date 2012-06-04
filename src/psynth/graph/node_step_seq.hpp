@@ -32,7 +32,7 @@ namespace psynth
 namespace graph
 {
 
-class node_step_seq : public node
+class node_step_seq : public node0
 {
 public:
     static constexpr int MAX_STEPS = 32;
@@ -49,18 +49,18 @@ public:
 	SHAPE_BWSAWTOOTH,
 	N_SHAPES
     };
-    
+
     enum in_audio_socket_id {
 	N_IN_A_SOCKETS
     };
-	
+
     enum in_control_socket_id {
 	IN_C_BPM,
 	N_IN_C_SOCKETS
     };
 
     enum param_id {
-	PARAM_BPM = node::N_COMMON_PARAMS,
+	PARAM_BPM = node0::N_COMMON_PARAMS,
 	PARAM_SHAPE,
 	PARAM_HIGH,
 	PARAM_SLOPE,
@@ -100,7 +100,7 @@ public:
 	PARAM_STEP_31,
 	N_PARAM,
     };
-    
+
     enum out_audio_socket_id {
 	N_OUT_A_SOCKETS
     };
@@ -109,14 +109,14 @@ public:
 	OUT_C_OUTPUT,
 	N_OUT_C_SOCKETS
     };
-    
+
 private:
-    void do_update (const node* caller, int caller_port_type, int caller_port);
+    void do_update (const node0* caller, int caller_port_type, int caller_port);
     void do_advance ();
     void on_info_change ();
     void create_shape ();
     void update_shape ();
-    
+
     float m_param_bpm;
     int m_param_shape;
     float m_param_high;
@@ -126,7 +126,7 @@ private:
 
     float m_old_param_high;
     int m_old_param_shape;
-    
+
     synth::envelope_values<sound::bits32sf> m_hi_env_vals;
     synth::envelope_values<sound::bits32sf> m_lo_env_vals;
     synth::multi_point_envelope<sample_range> m_env;
@@ -137,7 +137,7 @@ private:
     void update_envelope_factor (float mod);
 
 public:
-    node_step_seq(const audio_info& info);   
+    node_step_seq(const audio_info& info);
 };
 
 PSYNTH_DECLARE_NODE_FACTORY(node_step_seq, "stepseq");

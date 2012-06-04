@@ -44,11 +44,11 @@ class world_node_listener;
 class world_node
 {
     friend class world;
-    
-    graph::node* m_nod; /* TODO: Use node_manager::Iterator instead? */
+
+    graph::node0* m_nod; /* TODO: Use node_manager::Iterator instead? */
     world* m_world;
 
-    world_node (graph::node* nod, world* world) :
+    world_node (graph::node0* nod, world* world) :
 	m_nod (nod), m_world (world) {};
 
 public:
@@ -56,7 +56,7 @@ public:
 	: m_nod (NULL)
 	, m_world (NULL)
 	{}
-    
+
     world_node(const world_node& o)
 	: m_nod(o.m_nod)
 	, m_world(o.m_world)
@@ -69,7 +69,7 @@ public:
     int get_id () const {
 	return m_nod->get_id ();
     };
-    
+
     int get_type () const {
 	return m_nod->get_type ();
     };
@@ -77,17 +77,17 @@ public:
     const std::string& get_name () {
 	return m_nod->get_name ();
     };
-    
+
     world* get_world() {
 	return m_world;
     }
-    
+
     inline void add_listener (world_node_listener* cl);
 
     inline void delete_listener (world_node_listener* cl);
 
     inline void delete_me ();
-    
+
     inline void activate ();
 
     inline void deactivate ();
@@ -105,7 +105,7 @@ public:
     void detach_watch (int type, int in_sock, graph::watch* watch) {
 	m_nod->detach_watch (type, in_sock, watch);
     }
-    
+
     int get_param_id (const std::string& name) const {
 	return m_nod->get_param(name).get_id ();
     }
@@ -113,7 +113,7 @@ public:
     const std::string& get_param_name (int id) const {
 	return m_nod->param(id).get_name ();
     }
-    
+
     int get_param_type (int id) const {
 	return m_nod->param(id).type();
     }
@@ -121,7 +121,7 @@ public:
     int get_param_type (const std::string& name) const {
 	return m_nod->get_param(name).type();
     }
-    
+
     template <typename T>
     void get_param (int id, T& data) const {
 	m_nod->param(id).get(data);
@@ -165,7 +165,7 @@ struct world_patcher_event
     int src_socket;
     int dest_socket;
     int socket_type;
-    
+
     world_patcher_event (const world_node& s, const world_node& d,
 			 int ss, int ds, int st) :
 	src(s), dest(d), src_socket(ss), dest_socket(ds), socket_type(st) {}
@@ -183,12 +183,12 @@ class world_subject
 {
     typedef std::list<world_node_listener*>::iterator node_listener_iter;
     typedef std::list<world_listener*>::iterator listener_iter;
-    
+
     std::list<world_listener*> m_listeners;
     std::list<world_patcher_listener*> m_patch_list;
-    std::map<int, std::list<world_node_listener*> > m_nod_listeners; 
+    std::map<int, std::list<world_node_listener*> > m_nod_listeners;
     std::list<world_node_listener*> m_all_nod_list;
-    
+
 protected:
     void notify_add_node (world_node& nod);
     void notify_delete_node (world_node& nod);
@@ -197,7 +197,7 @@ protected:
     void notify_set_param_node (world_node& nod, int param_id);
     void notify_link_added (const world_patcher_event& ev);
     void notify_link_deleted (const world_patcher_event& ev);
-    
+
 public:
     void add_world_listener (world_listener* cl) {
 	m_listeners.push_back(cl);
@@ -210,14 +210,14 @@ public:
     void add_world_node_listener (world_node_listener* cl) {
 	m_all_nod_list.push_back(cl);
     };
-    
+
     void add_world_node_listener (world_node& nod, world_node_listener* cl) {
 	std::map<int, std::list<world_node_listener*> >::iterator it;
-	
+
 	if ((it = m_nod_listeners.find(nod.get_id ())) != m_nod_listeners.end())
 	    it->second.push_back(cl);
     };
-    
+
     void delete_world_listener (world_listener* cl) {
 	m_listeners.remove(cl);
     };
@@ -229,10 +229,10 @@ public:
     void delete_world_node_listener (world_node_listener* cl) {
 	m_all_nod_list.remove(cl);
     };
-    
+
     void delete_world_node_listener (world_node& nod, world_node_listener* cl) {
 	std::map<int, std::list<world_node_listener*> >::iterator it;
-	
+
 	if ((it = m_nod_listeners.find(nod.get_id())) != m_nod_listeners.end())
 	    it->second.remove(cl);
     };
@@ -240,33 +240,33 @@ public:
 
 class world : public world_subject,
 	      public patcher_listener
-{    
+{
     audio_info m_info;
 
     base::mgr_auto_ptr<patcher> m_patcher;
-    
+
     graph::node_manager m_node_mgr;
     graph::node_output* m_output;
     graph::node_audio_mixer* m_mixer;
     int m_last_id;
     graph::node_factory_manager m_nodfact;
-    
+
     static const int MIXER_CHANNELS = 16;
 
     void register_default_node_factory ();
-    
+
 public:
     enum {
 	OUTPUT_ID = 0,
 	MIXER_ID,
 	MIN_USER_ID = 1024
     };
-    
+
     world (const audio_info& info);
     ~world ();
 
     void clear ();
-    
+
     const audio_info& get_info () const {
 	return m_info;
     };
@@ -279,12 +279,12 @@ public:
     void register_node_factory (graph::node_factory& f) {
 	m_nodfact.register_factory (f);
     }
-    
+
     world_node find_node (int id);
 
     world_node add_node (int type);
     world_node add_node (const std::string& type_name);
-    
+
     template <typename T>
     void set_param_node (world_node& nod, int id, const T& data) {
 	nod.m_nod->param(id).set(data);
@@ -301,7 +301,7 @@ public:
 	if (m_patcher)
 	    m_patcher->set_param_node (nod.m_nod, param.get_id());
     }
-    
+
     void delete_node (world_node& nod);
 
     void activate_node (world_node& nod);
@@ -315,7 +315,7 @@ public:
     void attach_passive_output (graph::audio_output_ptr out) {
 	m_output->attach_passive_output (out);
     };
-    
+
     void detach_output (graph::audio_async_output_ptr out) {
 	m_output->detach_output (out);
     };
@@ -327,7 +327,7 @@ public:
     void set_patcher (base::mgr_ptr<patcher> pat);
 
     void unset_patcher ();
-    
+
     void update () {
 	if (m_patcher)
 	    m_patcher->update();
@@ -340,7 +340,7 @@ public:
 						ev.dest_socket,
 						ev.socket_type));
     };
-    
+
     void handle_link_deleted (const patcher_event& ev) {
 	notify_link_deleted (world_patcher_event (world_node(ev.src,this),
 						  world_node(ev.dest,this),

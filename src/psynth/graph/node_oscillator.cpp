@@ -40,10 +40,10 @@ namespace
 struct do_update_osc : public boost::static_visitor<void>
 {
     const sample_range& _data;
-    
+
     do_update_osc (const sample_range& data)
         : _data (data) {}
-    
+
     template <class Osc>
     void operator () (Osc& osc) const
     {
@@ -58,20 +58,20 @@ struct do_update_osc : public boost::static_visitor<void>
 struct do_update_osc_mod : public boost::static_visitor<void>
 {
     int _mod_type;
-    node::link_envelope& _mod_env;
+    node0::link_envelope& _mod_env;
     const sample_const_range& _mod;
     const sample_range& _data;
-    
+
     do_update_osc_mod (int mod_type,
-                       node::link_envelope& mod_env,
-                       const sample_const_range& mod, 
+                       node0::link_envelope& mod_env,
+                       const sample_const_range& mod,
                        const sample_range& data)
         : _mod_type (mod_type)
         , _mod_env (mod_env)
         , _mod (mod)
         , _data (data)
     {}
-    
+
     template <class Osc>
     void operator () (Osc& osc) const
     {
@@ -82,7 +82,7 @@ struct do_update_osc_mod : public boost::static_visitor<void>
             break;
         case node_oscillator::MOD_AM:
             osc.update_am (_data, _mod);
-            break;            
+            break;
 	case node_oscillator::MOD_PM:
             osc.update_pm (_data, _mod);
             break;
@@ -117,20 +117,20 @@ PSYNTH_DEFINE_NODE_FACTORY (node_lfo);
 PSYNTH_DEFINE_NODE_FACTORY (node_audio_oscillator);
 
 void node_audio_oscillator::do_update (
-    const node* caller, int caller_port_type, int caller_port)
+    const node0* caller, int caller_port_type, int caller_port)
 {
     audio_buffer* buf = get_output<audio_buffer> (LINK_AUDIO, OUT_A_OUTPUT);
     sample* out = (sample*) &range (*buf) [0][0];
 
     update_osc (out);
-	
+
     /* Copy on the other channels. */
     for (size_t i = 1; i < (size_t) get_info().num_channels; i++)
 	memcpy(&range (*buf)[0][i], &range (*buf)[0][0],
                sizeof(sample) * get_info().block_size);
 }
 
-void node_lfo::do_update (const node* caller,
+void node_lfo::do_update (const node0* caller,
 			   int caller_port_type, int caller_port)
 {
     sample_buffer* buf = get_output <sample_buffer>(LINK_CONTROL, OUT_C_OUTPUT);
@@ -143,8 +143,8 @@ node_oscillator::node_oscillator (const audio_info& prop,
 				  int obj_type,
 				  const std::string& name,
 				  int n_audio_out,
-				  int n_control_out) : 
-    node (prop,
+				  int n_control_out) :
+    node0 (prop,
 	  obj_type,
 	  name,
 	  N_IN_A_SOCKETS,
@@ -158,7 +158,7 @@ node_oscillator::node_oscillator (const audio_info& prop,
     m_param_freq (DEFAULT_FREQ),
     m_param_ampl (DEFAULT_AMPL),
     m_restart (false)
-{    
+{
     add_param ("wave", node_param::INT, &m_param_wave);
     add_param ("modulator", node_param::INT, &m_param_mod);
     add_param ("frequency", node_param::FLOAT, &m_param_freq);
@@ -185,10 +185,10 @@ void node_oscillator::update_osc_params ()
         case OSC_EXP: m_oscillator = synth::oscillator<synth::exp_generator> (get_info ().sample_rate); break;
         default: assert (false);
         }
- 
+
         m_param_wave_new = m_param_wave;
     }
-    
+
     boost::apply_visitor (do_update_osc_params (this), m_oscillator);
 }
 
@@ -198,9 +198,9 @@ void node_oscillator::update_osc (sample* out)
     const sample_buffer* trig_buf = get_input<sample_buffer> (LINK_CONTROL, IN_C_TRIGGER);
     link_envelope mod_env = get_in_envelope (LINK_CONTROL, IN_C_FREQUENCY);
     link_envelope trig_env =  get_in_envelope (LINK_CONTROL, IN_C_TRIGGER);
-    
+
     const sample* mod = pitch_buf ? (const sample*) &const_range (*pitch_buf) [0] : 0;
-    
+
     update_osc_params ();
 
     /* Fill the output. */
@@ -213,10 +213,10 @@ void node_oscillator::update_osc (sample* out)
                 boost::apply_visitor (do_restart (), m_oscillator);
 	    m_restart = false;
 	}
-	
+
 	if (trig_buf)
 	    end = synth::find_hill (const_range (*trig_buf), start);
-	
+
 	if (mod)
         {
             boost::apply_visitor (
@@ -234,11 +234,11 @@ void node_oscillator::update_osc (sample* out)
                     sample_range (end - start, (sample_frame*) out + start)),
                 m_oscillator);
         }
-        
+
 	float env_val = (float) (audio_sample) trig_env.update (end - start);
 	if (env_val == 1.0f && trig_buf && const_range (*trig_buf) [end - 1] == 0.0f)
 	    m_restart = true;
-	    
+
 	start = end;
     }
 

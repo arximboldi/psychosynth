@@ -35,14 +35,14 @@ void node_factory_manager::register_factory (node_factory& of)
     m_node_fact [of.get_name ()] = &of;
 }
 
-node* node_factory_manager::create (const std::string& name,
+node0* node_factory_manager::create (const std::string& name,
 				    const audio_info& info)
 {
     node_factory_map::iterator it = m_node_fact.find (name);
 
     if (it != m_node_fact.end ())
 	return it->second->create (info);
-    
+
     return NULL;
 }
 

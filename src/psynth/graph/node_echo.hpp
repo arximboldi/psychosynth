@@ -33,31 +33,31 @@ namespace psynth
 namespace graph
 {
 
-class node_echo : public node
+class node_echo : public node0
 {
-public:	
+public:
     enum in_audio_socket_id {
 	IN_A_INPUT,
 	N_IN_A_SOCKETS
     };
-	
+
     enum in_control_socket_id {
 	IN_C_DELAY,
 	IN_C_FEEDBACK,
 	N_IN_C_SOCKETS
     };
-	
+
     enum out_audio_socket_id {
 	OUT_A_OUTPUT,
 	N_OUT_A_SOCKETS
     };
-	
+
     enum out_control_socket_id {
 	N_OUT_C_SOCKETS
     };
 
     enum param_id {
-	PARAM_DELAY = node::N_COMMON_PARAMS,
+	PARAM_DELAY = node0::N_COMMON_PARAMS,
 	PARAM_FEEDBACK,
 	PARAM_HIDAMP,
 	N_PARAM
@@ -67,7 +67,7 @@ public:
     static constexpr float DEFAULT_DELAY = 0.5f;
     static constexpr float DEFAULT_FEEDBACK = 0.5f;
     static constexpr float DEFAULT_HIDAMP = 0.5f;
-    
+
 private:
     float m_param_delay;
     float m_old_param_delay;
@@ -76,14 +76,14 @@ private:
     int m_pos;
 
     std::vector<sample> m_old_val;
-    
+
     audio_buffer m_buffer;
 
     int do_update_channel (int chan);
-    void do_update (const node* caller, int caller_port_type, int caller_port);
+    void do_update (const node0* caller, int caller_port_type, int caller_port);
     void on_info_change ();
     void do_advance () {}
-    
+
 public:
     node_echo(const audio_info& prop);
     ~node_echo();

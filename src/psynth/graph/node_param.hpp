@@ -60,7 +60,7 @@ public:
 	m_changed(false) {
 	configure(obj.m_id, obj.m_name, obj.m_type, obj.m_dest, obj.m_event);
     }
-    
+
     ~node_param () {
 	clear();
     }
@@ -71,7 +71,7 @@ public:
 
 	return *this;
     }
-    
+
     int get_id () const {
 	return m_id;
     }
@@ -79,11 +79,11 @@ public:
     const std::string& get_name () const {
 	return m_name;
     }
-	
+
     int type() const {
 	return m_type;
     };
-	
+
     template <typename T>
     void set (const T& d) {
 	{
@@ -102,8 +102,8 @@ public:
     }
 
 private:
-    friend class node;
-	
+    friend class node0;
+
     mutable std::mutex m_mutex;
 
     std::string m_name;
@@ -113,7 +113,7 @@ private:
     event m_event;
     void* m_src;
     void* m_dest;
-    
+
     void clear ();
     void configure (int id, std::string name, int type, void* dest);
     void configure (int id, std::string name, int type, void* dest, event ev);

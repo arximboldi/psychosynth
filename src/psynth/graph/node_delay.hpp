@@ -33,31 +33,31 @@ namespace psynth
 namespace graph
 {
 
-class node_delay : public node
+class node_delay : public node0
 {
-public:	
+public:
     enum in_audio_socket_id {
 	IN_A_INPUT,
 	N_IN_A_SOCKETS
     };
-	
+
     enum in_control_socket_id {
 	IN_C_DELAY,
 	IN_C_DEPTH,
 	N_IN_C_SOCKETS
     };
-	
+
     enum out_audio_socket_id {
 	OUT_A_OUTPUT,
 	N_OUT_A_SOCKETS
     };
-	
+
     enum out_control_socket_id {
 	N_OUT_C_SOCKETS
     };
 
     enum param_id {
-	PARAM_DELAY = node::N_COMMON_PARAMS,
+	PARAM_DELAY = node0::N_COMMON_PARAMS,
 	PARAM_DEPTH,
 	N_PARAM
     };
@@ -65,20 +65,20 @@ public:
     static constexpr float MAX_DELAY = 0.1f;
     static constexpr float DEFAULT_DELAY = 0.0015f;
     static constexpr float DEFAULT_DEPTH = 0.5f;
-    
+
 private:
     float m_param_delay;
     float m_param_depth;
     int m_pos;
     int m_max_delay_pos;
-    
+
     audio_buffer m_buffer;
 
     int do_update_channel (int chan);
-    void do_update (const node* caller, int caller_port_type, int caller_port);
+    void do_update (const node0* caller, int caller_port_type, int caller_port);
     void on_info_change ();
     void do_advance () {}
-    
+
 public:
     node_delay (const audio_info& prop);
     ~node_delay ();

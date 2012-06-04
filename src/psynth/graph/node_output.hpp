@@ -19,7 +19,7 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
  *                                                                         *
  ***************************************************************************/
- 
+
 #ifndef PSYNTH_NODE_OUTPUT_H
 #define PSYNTH_NODE_OUTPUT_H
 
@@ -40,7 +40,7 @@ class node_manager;
 typedef io::output_ptr<audio_const_range> audio_output_ptr;
 typedef io::async_output_ptr<audio_const_range> audio_async_output_ptr;
 
-class node_output : public node
+class node_output : public node0
 {
     struct slot
     {
@@ -48,17 +48,17 @@ class node_output : public node
         audio_async_output_ptr      m_out;
 	node_output* m_parent;
 	audio_buffer m_buf;
-	
+
 	slot (audio_async_output_ptr out,
               node_output* parent,
               audio_ring_range::position ptr,
               const audio_info& info);
-        
-        void callback (std::size_t nframes);    
+
+        void callback (std::size_t nframes);
     };
-	
+
     audio_ring_buffer m_buffer;
-    
+
     node_manager* m_manager;
     std::list<slot*> m_slots;
     std::list<audio_output_ptr > m_passive_slots;
@@ -68,27 +68,27 @@ class node_output : public node
       Mutex m_passive_lock;
       Mutex m_global_lock;
     */
-    
+
     void do_output (slot& slot, size_t nframes);
-	
-    void do_update (const node* caller, int caller_port_type, int caller_port);
+
+    void do_update (const node0* caller, int caller_port_type, int caller_port);
     void do_advance () {}
     void on_info_change ();
-    
+
 public:
     enum in_audio_socket_id {
 	IN_A_INPUT,
 	N_IN_A_SOCKETS
     } ;
-	
+
     enum in_control_socket_id {
 	N_IN_C_SOCKETS
     };
-	
+
     enum out_audio_socket_id {
 	N_OUT_A_SOCKETS
     };
-	
+
     enum  out_control_socket_id {
 	N_OUT_C_SOCKETS
     };
@@ -96,19 +96,19 @@ public:
     enum param_id {
 	N_PARAM
     };
-	
+
     node_output (const audio_info& info);
 
     ~node_output ();
-	
+
     bool set_manager (node_manager* mgr) {
-	if (m_manager != NULL && mgr != NULL) 
+	if (m_manager != NULL && mgr != NULL)
 	    return false; /* Already attached */
-		
+
 	m_manager = mgr;
 	return true;
     }
-	
+
     void attach_output (audio_async_output_ptr out)
     {
 	//m_buflock.readLock();
@@ -116,7 +116,7 @@ public:
             new slot (out, this, range (m_buffer).begin_pos(), get_info()));
 	//m_buflock.unlock();
     }
-    
+
     void detach_output (audio_async_output_ptr out)
     {
 	for (std::list<slot*>::iterator i = m_slots.begin(); i != m_slots.end();) {

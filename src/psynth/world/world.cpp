@@ -53,24 +53,24 @@ void world_subject::notify_delete_node (world_node& nod)
     for (listener_iter i = m_listeners.begin(); i != m_listeners.end(); i++)
 	(*i)->handle_delete_node (nod);
 }
-    
+
 void world_subject::notify_activate_node (world_node& nod)
 {
     for (node_listener_iter i = m_all_nod_list.begin(); i != m_all_nod_list.end(); i++)
 	(*i)->handle_activate_node (nod);
-    
+
     std::map<int, std::list<world_node_listener*> >::iterator it;
     if ((it = m_nod_listeners.find (nod.get_id ())) != m_nod_listeners.end()) {
 	for (node_listener_iter i = it->second.begin(); i != it->second.end(); i++)
 	    (*i)->handle_activate_node (nod);
     }
 }
-    
+
 void world_subject::notify_deactivate_node (world_node& nod)
 {
     for (node_listener_iter i = m_all_nod_list.begin(); i != m_all_nod_list.end(); i++)
 	(*i)->handle_deactivate_node (nod);
-    
+
     std::map<int, std::list<world_node_listener*> >::iterator it;
     if ((it = m_nod_listeners.find(nod.get_id ())) != m_nod_listeners.end()) {
 	for (node_listener_iter i = it->second.begin(); i != it->second.end(); i++)
@@ -82,11 +82,11 @@ void world_subject::notify_set_param_node (world_node& nod, int param_id)
 {
     for (node_listener_iter i = m_all_nod_list.begin(); i != m_all_nod_list.end(); i++)
 	(*i)->handle_set_param_node (nod, param_id);
-    
+
     std::map<int, std::list<world_node_listener*> >::iterator it;
     if ((it = m_nod_listeners.find (nod.get_id ())) != m_nod_listeners.end()) {
 	for (node_listener_iter i = it->second.begin(); i != it->second.end(); i++)
-	    (*i)->handle_set_param_node (nod, param_id);	
+	    (*i)->handle_set_param_node (nod, param_id);
     }
 }
 
@@ -169,7 +169,7 @@ world_node world::find_node (int id)
 #if 0
 world_node world::add_node (int type)
 {
-    graph::node* nod;
+    graph::node0* nod;
 
     switch (type) {
     case NOD_OSCILLATOR:
@@ -194,7 +194,7 @@ world_node world::add_node (int type)
 	nod = NULL;
 	return world_node(NULL, NULL);
     }
-    
+
     if (!m_node_mgr.attachNode(nod, m_last_id++))
 	return world_node(NULL, NULL);
 
@@ -206,19 +206,19 @@ world_node world::add_node (int type)
 
 world_node world::add_node (const std::string& name)
 {
-    graph::node* nod;
+    graph::node0* nod;
     world_node tnod;
-	
+
     nod = m_nodfact.create (name, m_info);
 
     if (nod) {
 	if (!m_node_mgr.add_node (base::manage (nod), m_last_id++))
 	    return world_node (0, 0);
-    
+
 	tnod = world_node (nod, this);
 	notify_add_node (tnod);
     }
-    
+
     return tnod;
 }
 
@@ -236,7 +236,7 @@ void world::activate_node (world_node& nod)
 {
     /* HACK */
     nod.m_nod->update_params_in ();
-     
+
     if (m_patcher)
 	m_patcher->add_node (nod.m_nod);
     notify_activate_node (nod);

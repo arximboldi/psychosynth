@@ -29,12 +29,12 @@
     class T ## _factory : public ::psynth::graph::node_factory  \
     {                                                           \
     public:                                                     \
-        psynth::graph::node* create (const audio_info& info)    \
+        psynth::graph::node0* create (const audio_info& info)    \
         {                                                       \
             return new T (info);                                \
         }                                                       \
                                                                 \
-        void destroy (psynth::graph::node* obj)                 \
+        void destroy (psynth::graph::node0* obj)                 \
         {                                                       \
             delete obj;                                         \
         }                                                       \
@@ -61,8 +61,8 @@ class node_factory
 public:
 
     virtual const char* get_name () = 0;
-    virtual node* create (const audio_info& m_info) = 0;
-    virtual void destroy (node* nod) = 0;
+    virtual node0* create (const audio_info& m_info) = 0;
+    virtual void destroy (node0* nod) = 0;
 };
 
 } /* namespace graph */

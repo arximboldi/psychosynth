@@ -33,8 +33,8 @@ namespace graph
 
 PSYNTH_DEFINE_NODE_FACTORY(node_echo);
 
-node_echo::node_echo(const audio_info& prop) : 
-    node (prop,
+node_echo::node_echo(const audio_info& prop) :
+    node0 (prop,
 	  NODE_ECHO,
 	  "echo",
 	  N_IN_A_SOCKETS,
@@ -70,7 +70,7 @@ int node_echo::do_update_channel (int chan)
     const audio_buffer* _input     = get_input<audio_buffer>(LINK_AUDIO, IN_A_INPUT);
     // TODO: const sample_buffer* _delay    = get_input<sample_buffer>(LINK_CONTROL, IN_C_DELAY);
     const sample_buffer* _feedback = get_input<sample_buffer>(LINK_CONTROL, IN_C_FEEDBACK);
-    audio_buffer* _output          = get_output<audio_buffer>(LINK_AUDIO, IN_A_INPUT);    
+    audio_buffer* _output          = get_output<audio_buffer>(LINK_AUDIO, IN_A_INPUT);
 
     const sample* in_buf  = _input    ? (const sample*)&const_range (*_input)[0][chan] : 0;
     const sample* fb_buf  = _feedback ? (const sample*)&const_range (*_feedback)[0] : 0;
@@ -80,22 +80,22 @@ int node_echo::do_update_channel (int chan)
     sample* tmp_buf = (sample*)&range (m_buffer)[0][chan];
 
     link_envelope in_env = get_in_envelope (LINK_AUDIO, IN_A_INPUT);
-    
+
     float delay;
     float in_val;
     std::size_t i;
     int pos = m_pos;
     float val;
-  
+
     delay = m_param_delay * get_info ().sample_rate;
     for (i = 0; i < get_info ().block_size; ++i) {
 	if (pos > delay)
 	    pos = 0;
-	
+
 	in_val = in_buf ? *in_buf++ * (float)(audio_sample)in_env.update() : 0;
 	val = tmp_buf[pos];
 
-	//*out_buf++ = val;	
+	//*out_buf++ = val;
 	if (fb_buf)
 	    val = in_val - val * (m_param_feedback + m_param_feedback * *fb_buf++);
 	else
@@ -112,7 +112,7 @@ int node_echo::do_update_channel (int chan)
     return pos;
 }
 
-void node_echo::do_update (const node* caller,
+void node_echo::do_update (const node0* caller,
 			    int caller_port_type, int caller_por)
 {
     if (m_param_delay != m_old_param_delay)
@@ -120,10 +120,10 @@ void node_echo::do_update (const node* caller,
     m_old_param_delay = m_param_delay;
 
     std::size_t new_pos = m_pos;
- 
+
     for (size_t i = 0; i < get_info ().num_channels; ++i)
 	new_pos = do_update_channel (i);
-    
+
     m_pos = new_pos;
 }
 

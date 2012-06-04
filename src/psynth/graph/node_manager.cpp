@@ -39,13 +39,13 @@ node_manager::~node_manager ()
 {
 }
 
-bool node_manager::add_node (base::mgr_ptr<node> obj, int id)
+bool node_manager::add_node (base::mgr_ptr<node0> obj, int id)
 {
     if (!m_node_map.insert(make_pair (id, obj)).second)
 	return false;
 
     obj->set_id (id);
-    
+
     node_output* out = dynamic_cast<node_output*> (obj.get ());
 
     if (out) {
@@ -53,32 +53,32 @@ bool node_manager::add_node (base::mgr_ptr<node> obj, int id)
 	    m_node_map.erase (id);
 	    return false; /* Already attached to a node_manager! */
 	}
-	
+
 	m_outputs.push_back (out);
     }
-    
+
     return true;
 }
 
 void node_manager::do_delete_node (iterator it)
 {
     //map<int, mgr_ptr<node> >::iterator& iter = it;
-    
+
     node_output* out = dynamic_cast<node_output*> (it->get ());
     if (out != 0) {
 	m_outputs.remove (out);
 	out->set_manager (0);
     }
 
-    (*it)->set_id (node::NULL_ID);
+    (*it)->set_id (node0::NULL_ID);
     m_node_map.erase (it);
 }
 
 bool node_manager::delete_node (int id)
 {
-    map<int, base::mgr_ptr<node> >::iterator iter;
+    map<int, base::mgr_ptr<node0> >::iterator iter;
     iter = m_node_map.find (id);
-    
+
     if (iter == m_node_map.end())
 	return false;
 
@@ -89,8 +89,8 @@ bool node_manager::delete_node (int id)
 
 void node_manager::delete_node (iterator it)
 {
-    node* obj = *it;
-    
+    node0* obj = *it;
+
     obj->clear_connections ();
     if (!obj->has_connections ())
 	do_delete_node (it);
@@ -102,7 +102,7 @@ void node_manager::set_info (const audio_info& info)
 {
     unique_lock<mutex> lock (m_update_mutex);
 
-    map<int, base::mgr_ptr<node> >::iterator map_iter;
+    map<int, base::mgr_ptr<node0> >::iterator map_iter;
     for (map_iter = m_node_map.begin();
 	 map_iter != m_node_map.end();
 	 ++map_iter)
@@ -114,15 +114,15 @@ void node_manager::set_info (const audio_info& info)
 void node_manager::update()
 {
     unique_lock<mutex> lock (m_update_mutex);
-    
-    map<int, base::mgr_ptr<node> >::iterator map_iter;
+
+    map<int, base::mgr_ptr<node0> >::iterator map_iter;
     for (map_iter = m_node_map.begin();
 	 map_iter != m_node_map.end();
 	 ++map_iter)
     {
 	(*map_iter).second->advance();
     }
-	
+
     list<node_output*>::iterator out_iter;
     for (out_iter = m_outputs.begin();
 	 out_iter != m_outputs.end();
@@ -131,7 +131,7 @@ void node_manager::update()
 	(*out_iter)->update (0, -1, -1);
     }
 
-    list<node*>::iterator del_iter;
+    list<node0*>::iterator del_iter;
     for (del_iter = m_delete_list.begin();
 	 del_iter != m_delete_list.end();)
     {

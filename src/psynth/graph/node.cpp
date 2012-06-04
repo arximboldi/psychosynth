@@ -37,7 +37,7 @@ namespace psynth
 namespace graph
 {
 
-node::node(const audio_info& info, int type,
+node0::node0(const audio_info& info, int type,
 	       const std::string& name,
 	       int n_in_audio, int n_in_control,
 	       int n_out_audio, int n_out_control,
@@ -58,7 +58,7 @@ node::node(const audio_info& info, int type,
     add_param("position", node_param::VECTOR2F, &m_param_position);
     add_param("radious", node_param::FLOAT, &m_param_radious);
     add_param("mute", node_param::INT, &m_param_mute);
-    
+
     m_out_sockets[LINK_AUDIO].resize(n_out_audio, out_socket(LINK_AUDIO));
     m_out_sockets[LINK_CONTROL].resize(n_out_control, out_socket(LINK_CONTROL));
     m_in_sockets[LINK_AUDIO].resize(n_in_audio, in_socket_manual(LINK_AUDIO));
@@ -67,19 +67,19 @@ node::node(const audio_info& info, int type,
     m_in_envelope[LINK_CONTROL].resize(n_in_control);
     m_out_stable_value[LINK_AUDIO].resize(n_out_audio, 0.0f);
     m_out_stable_value[LINK_CONTROL].resize(n_out_control, 0.0f);
-    
+
     set_envelopes_deltas();
 }
 
-node::~node()
+node0::~node0()
 {
     for_each(m_params.begin(), m_params.end(), base::deleter<node_param*>());
 }
 
-void node::set_envelopes_deltas()
+void node0::set_envelopes_deltas()
 {
     int i;
-    
+
     float rise_dt = ENV_DELTA(m_audioinfo.sample_rate, ENV_RISE_SECONDS);
     float fall_dt = -ENV_DELTA(m_audioinfo.sample_rate, ENV_FALL_SECONDS);
 
@@ -94,14 +94,14 @@ void node::set_envelopes_deltas()
     m_out_envelope.set (1.0f);
 }
 
-void node::add_param (const std::string& name, int type, void* val)
+void node0::add_param (const std::string& name, int type, void* val)
 {
     m_params.push_back(new node_param);
     m_params[m_nparam]->configure(m_nparam, name, type, val);
-    m_nparam++;   
+    m_nparam++;
 }
 
-void node::add_param(const std::string& name, int type, void* val,
+void node0::add_param(const std::string& name, int type, void* val,
 		     node_param::event ev)
 {
     m_params.push_back(new node_param);
@@ -109,50 +109,50 @@ void node::add_param(const std::string& name, int type, void* val,
     m_nparam++;
 }
 
-void node::del_param(int index)
+void node0::del_param(int index)
 {
-    
+
     m_nparam--;
 }
 
-node_param& node::get_param(const std::string& name)
+node_param& node0::get_param(const std::string& name)
 {
     for (vector<node_param*>::iterator it = m_params.begin();
 	 it != m_params.end();
 	 ++it)
 	if (name == (*it)->get_name())
 	    return **it;
-    
+
     return m_null_param;
 }
 
-const node_param& node::get_param (const std::string& name) const
+const node_param& node0::get_param (const std::string& name) const
 {
     for (vector<node_param*>::const_iterator it = m_params.begin();
 	 it != m_params.end();
 	 ++it)
 	if (name == (*it)->get_name())
 	    return **it;
-    
+
     return m_null_param;
 }
 
-void node::clear_connections()
+void node0::clear_connections()
 {
     size_t i, j;
 
     for (i = 0; i < LINK_TYPES; ++i)
 	for (j = 0; j < m_in_sockets[i].size(); ++j)
 	    if (!m_in_sockets[i][j].is_empty())
-		connect_in(i, j, NULL, 0);    
-    
+		connect_in(i, j, NULL, 0);
+
     for (i = 0; i < LINK_TYPES; ++i)
 	for (j = 0; j < m_out_sockets[i].size(); ++j)
 	    if (!m_out_sockets[i][j].is_empty())
 		m_out_sockets[i][j].clear_references();
 }
 
-bool node::has_connections ()
+bool node0::has_connections ()
 {
     size_t i, j;
 
@@ -160,7 +160,7 @@ bool node::has_connections ()
 	for (j = 0; j < m_in_sockets[i].size(); ++j)
 	    if (!m_in_sockets[i][j].is_empty())
 		return true;
-    
+
     for (i = 0; i < LINK_TYPES; ++i)
 	for (j = 0; j < m_out_sockets[i].size(); ++j)
 	    if (!m_out_sockets[i][j].is_empty())
@@ -169,7 +169,7 @@ bool node::has_connections ()
     return false;
 }
 
-void node::connect_in (int type, int in_socket, node* src, int out_socket)
+void node0::connect_in (int type, int in_socket, node0* src, int out_socket)
 {
     m_in_sockets[type][in_socket].src_obj = src;
     m_in_sockets[type][in_socket].src_sock = out_socket;
@@ -183,21 +183,21 @@ void node::connect_in (int type, int in_socket, node* src, int out_socket)
     }
 }
 
-void node::force_connect_in (int type, int in_socket, node* src, int out_socket)
+void node0::force_connect_in (int type, int in_socket, node0* src, int out_socket)
 {
     m_in_envelope[type][in_socket].press();
-    
+
     if (m_in_sockets[type][in_socket].m_srcobj)
 	m_in_sockets[type][in_socket].m_srcobj->
 	    m_out_sockets[type][out_socket].remove_reference (this, in_socket);
-    
+
     m_in_sockets[type][in_socket].set(src, out_socket);
-    
+
     if (src)
-	src->m_out_sockets[type][out_socket].add_reference (this, in_socket);    
+	src->m_out_sockets[type][out_socket].add_reference (this, in_socket);
 }
 
-inline bool node::can_update (const node* caller, int caller_port_type,
+inline bool node0::can_update (const node0* caller, int caller_port_type,
 			      int caller_port)
 {
     bool ret;
@@ -209,11 +209,11 @@ inline bool node::can_update (const node* caller, int caller_port_type,
             make_pair(caller->get_id (),
                       caller_port)).second;
     m_updated = true;
-    
+
     return ret;
 }
 
-void node::in_socket::update_input (const node* caller, int caller_port_type,
+void node0::in_socket::update_input (const node0* caller, int caller_port_type,
 				    int caller_port)
 {
     if (m_srcobj) {
@@ -238,7 +238,7 @@ void node::in_socket::update_input (const node* caller, int caller_port_type,
     }
 }
 
-void node::blend_buffer (sample* buf, int n_elem,
+void node0::blend_buffer (sample* buf, int n_elem,
 			 sample stable_value, link_envelope env)
 {
     while (n_elem--)
@@ -249,10 +249,10 @@ void node::blend_buffer (sample* buf, int n_elem,
     }
 }
 
-void node::update_envelopes ()
+void node0::update_envelopes ()
 {
     size_t i, j;
-    
+
     for (i = 0; i < LINK_TYPES; ++i)
 	for (vector<link_envelope>::iterator it = m_in_envelope[i].begin();
 	     it != m_in_envelope[i].end();
@@ -267,7 +267,7 @@ void node::update_envelopes ()
                           m_audioinfo.block_size,
                           m_out_stable_value[LINK_AUDIO][i], m_out_envelope);
     }
-    
+
     for (i = 0; i < m_outdata_control.size(); ++i)
 	blend_buffer((sample*)&range (m_outdata_control[i])[0],
                      m_audioinfo.block_size,
@@ -276,7 +276,7 @@ void node::update_envelopes ()
     m_out_envelope.update(m_audioinfo.block_size);
 }
 
-void node::update_in_sockets ()
+void node0::update_in_sockets ()
 {
     size_t i, j;
 
@@ -293,7 +293,7 @@ void node::update_in_sockets ()
 	}
 }
 
-void node::update_params_in ()
+void node0::update_params_in ()
 {
   for (vector<node_param*>::iterator i = m_params.begin(); i != m_params.end(); ++i)
 	(*i)->update_in ();
@@ -304,13 +304,13 @@ void node::update_params_in ()
 	m_out_envelope.press ();
 }
 
-void node::update_params_out ()
-{    
+void node0::update_params_out ()
+{
     for (vector<node_param*>::iterator i = m_params.begin(); i != m_params.end(); ++i)
 	(*i)->update_out ();
 }
 
-void node::update_inputs ()
+void node0::update_inputs ()
 {
     size_t j, i;
 
@@ -319,27 +319,27 @@ void node::update_inputs ()
 	    m_in_sockets[i][j].update_input(this, i, j);
 }
 
-void node::update (const node* caller, int caller_port_type, int caller_port)
+void node0::update (const node0* caller, int caller_port_type, int caller_port)
 {
     if (can_update (caller, caller_port_type, caller_port)) {
 	update_params_in();
 
 	if (!m_param_mute || !m_out_envelope.finished()) {
 	    update_inputs ();
-	    do_update (caller, caller_port_type, caller_port); 
-	    
+	    do_update (caller, caller_port_type, caller_port);
+
 	}
-	
+
 	update_params_out ();
 	update_envelopes ();
 	update_in_sockets ();
     }
 }
 
-void node::set_info (const audio_info& info)
+void node0::set_info (const audio_info& info)
 {
     size_t i;
-    
+
     for (i = 0; i < m_outdata_audio.size(); ++i)
 	m_outdata_audio[i].recreate (info.block_size); //.set_info(info);
 
@@ -350,7 +350,7 @@ void node::set_info (const audio_info& info)
     m_audioinfo = info;
 
     set_envelopes_deltas ();
-}   
+}
 
 } /* namespace graph */
 } /* namespace psynth */

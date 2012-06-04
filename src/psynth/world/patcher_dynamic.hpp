@@ -32,35 +32,35 @@ namespace psynth
 {
 
 class patcher_dynamic : public patcher
-{    
+{
     struct link {
-	graph::node* src;
-	graph::node* dest;
+	graph::node0* src;
+	graph::node0* dest;
 	float dist;
 	float dist_to_center;
 	int sock_type;
 	int out_sock;
 	int in_sock;
 	int actual_in_sock;
-	
-	link (graph::node* s, graph::node* d, float ds, float dc, int t, int os, int is) :
+
+	link (graph::node0* s, graph::node0* d, float ds, float dc, int t, int os, int is) :
 	    src(s), dest(d), dist(ds), dist_to_center(dc),
 	    sock_type(t), out_sock(os), in_sock(is), actual_in_sock(-1)
 	    {}
-	
+
 	bool operator< (const link& l) const {
 	    return dist == l.dist ? dist_to_center < l.dist_to_center : dist < l.dist;
 	}
     };
 
     struct pnode {
-	graph::node* obj;
-	graph::node* dest;
+	graph::node0* obj;
+	graph::node0* dest;
 	bool out_used; /* We output to one object only */
 	int actual_sock_type;
-	int actual_in_sock; 
+	int actual_in_sock;
 
-	pnode (graph::node* o = NULL) :
+	pnode (graph::node0* o = NULL) :
 	    obj(o),
 	    dest(NULL),
 	    out_used(false),
@@ -76,7 +76,7 @@ class patcher_dynamic : public patcher
     };
 
     bool m_changed;
-    
+
     std::map<int, pnode> m_nodes;
     std::multiset<link*, link_ptr_cmp> m_links;
 
@@ -84,14 +84,14 @@ class patcher_dynamic : public patcher
     inline void make_link (link& l);
     inline void find_in_sock (link& l);
     inline bool is_linked (link& l);
-    
+
 public:
     patcher_dynamic ();
     ~patcher_dynamic ();
-    
-    bool add_node (graph::node* obj);
-    bool delete_node (graph::node* obj);
-    void set_param_node (graph::node* obj, int id);
+
+    bool add_node (graph::node0* obj);
+    bool delete_node (graph::node0* obj);
+    void set_param_node (graph::node0* obj, int id);
     void update ();
     void clear ();
 };
