@@ -1,0 +1,117 @@
+GNU Psychosynth
+===============
+
+[![GNU](http://www.gnu.org/graphics/gnubanner-2.png)](http://www.gnu.org)
+[![GPL](http://psychosynth.com/images/gplv3.png)](http://gplv3.fsf.org/)
+
+The Psychosynth project aims to create an interactive modular
+soft-synth inspired by the ideas of the Reactable. We will try to
+provide a clean object oriented API to allow the creation of new
+innovative interfaces for the synthetizer and a 3D simulator of a
+Reactable-alike device with support for collaborative music creation
+over the internet.
+
+![Screenshot](http://psychosynth.com/upload/d/d3/Psynth2.png)
+
+More information at the **official website**: http://psychosynth.com
+
+This package provides
+---------------------
+
+  * **libpsynth**: This is a powerful modern C++ library for the
+    building of synthesis software. Type-safe audio buffer and I/O
+    abstractions, inspired by
+    [Boost.GIL](http://www.boost.org/doc/libs/1_58_0/libs/gil/doc/index.html),
+    a generic system modular synthesis engine, classes for the
+    synchronization of synths over the network using OSC, a framework
+    for easy application creation, among other stug....
+
+  * **psynth3d**: An interactive synth with an look similar to the
+    Reactable's and a 3D interface which makes use of all the power of
+    libpsynth.
+
+  * **psynth**: A command line version of the synth that can be used
+      as OSC server or client with low resource usage.
+
+
+Depdencies
+----------
+
+To try the software you will need these third party libraries and programs:
+
+   * GNU Autotools (only for the development version)
+   * Ogre (needed by the 3D interface)
+   * CEGUI (needed by the 3D interface)
+   * OIS (needed by the 3D interface)
+   * liblo (needed for the network support)
+   * libxml2 (needed for XML config support)
+   * Alsa (needed for ALSA sound output)
+   * Jack (needed for Jack sound ouput)
+   * libsndfile (needed for pcm file support)
+   * libvorbis (needed for OGG vorbis file support)
+   * SoundTouch (needed for sample stretching)
+   * Boost
+
+In Debian and Ubuntu you can install all those dependencies with the
+following command. Anyways, I suggest installing `liblo` from the
+original sources because the version in the repositories is outdated
+and contains a bug:
+
+> ```
+> apt-get install automake libtool libogre-dev libceguiogre-dev libois-dev \
+>                 libcegui-mk2-dev libasound2-dev libjack-dev liblo0-dev \
+>                 libsndfile-dev libxml2-dev libsoundtouch1-dev libvorbis-dev \
+>                 libboost-serialization1.35-dev libboost1.35-dev libsigc++-2.0-dev
+> ```
+
+Installing
+----------
+
+If you downloaded the program from Git you will first need to generate the compilation scripts:
+
+> ```
+> autoreconf
+> ```
+
+Now you will need to run the configuration script to detect the the libraries and set up the compilation settings.
+
+> ```
+> ./configure
+> ```
+
+Check that everything has been detected correctly and then compile the program:
+
+> ```
+> make
+> ```
+
+At last we must run these commands with superuser privileges to install:
+
+> ```
+> make install
+> ldconfig
+> ```
+
+We can now run the 3D simulator:
+
+> ```
+> psynth3d
+> ```
+
+License
+-------
+
+>  Copyright (C) 2007-2015 Juan Pedro Bolívar Puente
+>
+>  This program is free software: you can redistribute it and/or
+>  modify it under the terms of the GNU General Public License as
+>  published by the Free Software Foundation, either version 3 of the
+>  License, or (at your option) any later version.
+>
+>  This program is distributed in the hope that it will be useful,
+>  but WITHOUT ANY WARRANTY; without even the implied warranty of
+>  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+>  GNU General Public License for more details.
+>
+>  You should have received a copy of the GNU General Public License
+>  along with this program.  If not, see <http://www.gnu.org/licenses/>.
