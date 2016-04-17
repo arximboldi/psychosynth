@@ -49,7 +49,7 @@
 
 #ifdef PSYNTH_HAVE_ALSA
 #include <psynth/io/alsa_output.hpp>
-#define TEST_DEVICE_ALSA "hdmi"
+#define TEST_DEVICE_ALSA "null"
 //#define TEST_DEVICE_ALSA "default"
 #endif
 
