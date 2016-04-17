@@ -1,6 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<Imageset Name="Logo" Imagefile="Logo.tga" >
-	<Image Name="the_logo" XPos="0" YPos="0" Width="266" Height="68" />
+<Imageset version="2" name="Logo" imagefile="Logo.png" >
+	<Image name="the_logo" XPos="0" YPos="0" Width="266" Height="68" />
 </Imageset>
-

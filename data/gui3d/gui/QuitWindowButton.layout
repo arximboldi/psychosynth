@@ -1,12 +1,20 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<GUILayout>
-<Window Type="TaharezLook/ImageButton" Name="btnQuitWindow">
-	<Property Name="UnifiedPosition" Value="{{1,-32},{1,-32}}" />
-	<Property Name="UnifiedSize" Value="{{0,32},{0,32}}" />
-	<Property Name="NormalImage"     Value="set:QuitWindowButton image:btnNormal" />
-	<Property Name="HoverImage"      Value="set:QuitWindowButton image:btnHover"  />
-	<Property Name="PushedImage"     Value="set:QuitWindowButton image:btnPushed" />
-	<Property Name="DisabledImage"   Value="set:QuitWindowButton image:btnDisabl" />
-</Window>
+<GUILayout version="4">
+  <Window type="TaharezLook/ImageButton" name="btnQuitWindow">
+    <Property name="Position" value="{{1,-32},{1,-32}}" />
+    <Property name="Size"     value="{{0,32},{0,32}}" />
+    <Property name="NormalImage"     value="QuitWindowButton/btnNormal" />
+    <Property name="HoverImage"      value="QuitWindowButton/btnHover"  />
+    <Property name="PushedImage"     value="QuitWindowButton/btnPushed" />
+    <Property name="DisabledImage"   value="QuitWindowButton/btnDisabl" />
+    <Window type="TaharezLook/StaticText" name="btnNewGame_text__">
+      <Property name="Position"   value="{{0,0},{0,0}}" />
+      <Property name="Size"       value="{{1,0},{1,0}}" />
+      <Property name="FrameEnabled"      value="False" />
+      <Property name="BackgroundEnabled" value="False" />
+      <Property name="HorzFormatting"    value="WordWrapCentred" />
+      <Property name="VertFormatting"    value="Middle" />
+      <Property name="Disabled"          value="True" />
+    </Window>
+  </Window>
 </GUILayout>
-

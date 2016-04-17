@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<Imageset Name="QuitWindowButton" Imagefile="QuitWindowButton.tga" >
-	<Image Name="btnNormal" XPos="0" YPos="0" Width="32" Height="32" />
-	<Image Name="btnHover"  XPos="32" YPos="0" Width="32" Height="32" />
-	<Image Name="btnPushed" XPos="64" YPos="0" Width="32" Height="32" />
-	<Image Name="btnDisabl" XPos="96" YPos="0" Width="32" Height="32" />
+<Imageset version="2" name="QuitWindowButton" imagefile="QuitWindowButton.png" >
+  <Image name="btnNormal" xPos="0"  yPos="0" width="32" height="32" />
+  <Image name="btnHover"  xPos="32" yPos="0" width="32" height="32" />
+  <Image name="btnPushed" xPos="64" yPos="0" width="32" height="32" />
+  <Image name="btnDisabl" xPos="96" yPos="0" width="32" height="32" />
 </Imageset>
-

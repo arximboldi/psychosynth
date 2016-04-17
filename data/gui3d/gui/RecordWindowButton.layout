@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<GUILayout>
-<Window Type="TaharezLook/ImageButton" Name="btnRecordWindow">
-	<Property Name="UnifiedPosition" Value="{{1,-32},{1,-32}}" />
-	<Property Name="UnifiedSize" Value="{{0,32},{0,32}}" />
-	<Property Name="NormalImage"     Value="set:RecordWindowButton image:btnNormal" />
-	<Property Name="HoverImage"      Value="set:RecordWindowButton image:btnHover"  />
-	<Property Name="PushedImage"     Value="set:RecordWindowButton image:btnPushed" />
-	<Property Name="DisabledImage"   Value="set:RecordWindowButton image:btnDisabl" />
-</Window>
+<GUILayout version="4">
+  <Window type="TaharezLook/ImageButton" name="btnRecordWindow">
+    <Property name="Position" value="{{1,-32},{1,-32}}" />
+    <Property name="Size"     value="{{0,32},{0,32}}" />
+    <Property name="NormalImage"     value="RecordWindowButton/btnNormal" />
+    <Property name="HoverImage"      value="RecordWindowButton/btnHover"  />
+    <Property name="PushedImage"     value="RecordWindowButton/btnPushed" />
+    <Property name="DisabledImage"   value="RecordWindowButton/btnDisabl" />
+  </Window>
 </GUILayout>
-
