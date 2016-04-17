@@ -1,8 +1,0 @@
-#!/bin/sh
-
-USER=$1
-BRANCH=$2
-bzr push $3 bzr+ssh://$USER@bzr.savannah.gnu.org/psychosynth/$BRANCH
-bzr push $3 https+urllib://$USER@forja.rediris.es/svn/cusl5-psynth/$BRANCH
-
-
