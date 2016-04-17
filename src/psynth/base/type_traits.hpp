@@ -80,24 +80,6 @@ struct pointer <std::auto_ptr<Ptr> >
     struct apply { typedef std::auto_ptr<T> type; };
 };
 
-#if 0
-
-template <typename Ptr>
-struct pointer <boost::unique_ptr<Ptr> >
-{
-    template <typename T>
-    struct apply { typedef boost::unique_ptr<T> type; };
-};
-
-template <typename Ptr>
-struct pointer <boost::shared_ptr<Ptr> >
-{
-    template <typename T>
-    struct apply { typedef boost::shared_ptr<T> type; };
-};
-
-#endif
-
 } /* namespace base */
 } /* namespace psynth */
 
