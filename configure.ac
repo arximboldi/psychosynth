@@ -42,7 +42,7 @@ dnl  Options
 dnl ======================================================================
 
 dnl CXX=gfilt
-CXXFLAGS="${CXXFLAGS} -std=c++0x "
+CXXFLAGS="${CXXFLAGS} -std=c++0x -Wno-unused-local-typedefs"
 
 AC_ARG_ENABLE([gprof], 
 		[AC_HELP_STRING([--enable-gprof],
