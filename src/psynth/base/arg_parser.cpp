@@ -7,7 +7,7 @@
  */
 
 /*
- *  Copyright (C) 2007, 2009 Juan Pedro Bolívar Puente
+ *  Copyright (C) 2007, 2009, 2016 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
  *   
@@ -67,11 +67,6 @@ arg_type get_type (const char *arg)
     }
 	
     return arg_free;
-}
-    
-bool is_free (const char *arg)
-{
-    return arg [0] != '-';
 }
 
 }
