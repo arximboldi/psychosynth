@@ -9,10 +9,10 @@
  */
 
 /*
- *  Copyright (C) 2009 Juan Pedro Bolívar Puente
+ *  Copyright (C) 2009, 2016 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -51,8 +51,8 @@ public:
     exception (exception&&) = default;
     exception& operator= (const exception&) = default;
     exception& operator= (exception&&) = default;
-    
-    virtual ~exception () throw () {}
+
+    virtual ~exception () noexcept {}
 
     /**
      * Logs the exception somewhere. Probably this somewhere is:
@@ -66,17 +66,17 @@ public:
      * Returns a message in natural language describing the
      * exception and/or its context.
      */
-    virtual const char* what () const throw () = 0;
+    virtual const char* what () const noexcept = 0;
 
     /**
      * Returns the module where the exception was produced.
      */
-    virtual const char* where () const throw () = 0;
+    virtual const char* where () const noexcept = 0;
 
     /**
      * Returns the severity of the exception.
      */
-    virtual int level () const throw () = 0;
+    virtual int level () const noexcept = 0;
 };
 
 /**
@@ -96,28 +96,28 @@ public:
     error_base (const std::string& what)
 	: _what (what)
     {}
-    
-    virtual ~error_base () throw () {}
 
-    virtual const char* what () const throw ()
+    virtual ~error_base () noexcept {}
+
+    virtual const char* what () const noexcept
     { return _what.empty () ? default_what () : _what.c_str (); }
 
-    virtual const char* where () const throw ()
+    virtual const char* where () const noexcept
     { return "psynth"; }
 
-    virtual int level () const throw ();
+    virtual int level () const noexcept;
 
 protected:
     /**
      * Returns a default message for the exception.
      */
-    virtual const char* default_what () const throw ();
+    virtual const char* default_what () const noexcept;
 
 private:
     std::string _what;
 };
 
-int default_error_level () throw ();
+int default_error_level () noexcept;
 
 #define PSYNTH_DECLARE_ERROR(d_parent, d_error)				\
     class d_error : public d_parent					\
@@ -128,9 +128,9 @@ int default_error_level () throw ();
         d_error (const d_error&) = default;                             \
         d_error& operator= (const d_error&) = default;                  \
 	d_error (const std::string& s) : base_type (s) {}		\
-	virtual const char* where () const throw ();			\
+	virtual const char* where () const noexcept;			\
     protected:								\
-	virtual const char* default_what () const throw ();		\
+	virtual const char* default_what () const noexcept;		\
     };
 
 #define PSYNTH_DEFINE_ERROR_WHERE_WHAT(d_error, d_where, d_what)	\
@@ -140,21 +140,21 @@ int default_error_level () throw ();
     { return d_what; }
 
 #define PSYNTH_DEFINE_ERROR_WHERE(d_error, d_where)			\
-    const char* d_error::default_what () const throw ()			\
+    const char* d_error::default_what () const noexcept			\
     { return base_type::default_what (); }				\
-    const char* d_error::where () const	throw ()			\
+    const char* d_error::where () const	noexcept                        \
     { return d_where; }							\
 
 #define PSYNTH_DEFINE_ERROR_WHAT(d_error, d_what)			\
-    const char* d_error::default_what () const throw ()			\
+    const char* d_error::default_what () const noexcept			\
     { return d_what; }							\
-    const char* d_error::where () const	throw ()			\
+    const char* d_error::where () const	noexcept                        \
     { return PSYNTH_MODULE_NAME; }
 
 #define PSYNTH_DEFINE_ERROR(d_error)					\
-    const char* d_error::default_what () const	throw ()		\
+    const char* d_error::default_what () const	noexcept                \
     { return base_type::default_what (); }				\
-    const char* d_error::where () const	throw ()			\
+    const char* d_error::where () const	noexcept                        \
     { return PSYNTH_MODULE_NAME; }
 
 PSYNTH_DECLARE_ERROR (error_base, error);

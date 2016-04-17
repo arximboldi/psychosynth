@@ -47,7 +47,7 @@ namespace base
 class scope_guard_impl_base : public boost::noncopyable
 {
 public:
-    void dismiss () const throw()
+    void dismiss () const noexcept
     { _dismissed = true; }
 
 protected:

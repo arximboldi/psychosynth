@@ -11,10 +11,10 @@
  */
 
 /*
- *  Copyright (C) 2011 Juan Pedro Bolívar Puente
+ *  Copyright (C) 2011, 2016 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -58,20 +58,20 @@ public:
     exception_wrapper (const exception_wrapper&) = default;
     exception_wrapper& operator= (const exception_wrapper&) = default;
 
-    ~exception_wrapper () throw () {}
-    
-    const char* where () const throw ()
+    ~exception_wrapper () noexcept {}
+
+    const char* where () const noexcept
     { return _where; }
 
-    const char* what () const throw ()
+    const char* what () const noexcept
     { return _stream.message ().c_str (); }
 
-    int level () const throw ()
+    int level () const noexcept
     { return _stream.level (); }
 
     log_stream_adapter& stream ()
     { return _stream; }
-    
+
 private:
     const char*        _where;
     log_stream_adapter _stream;
@@ -94,20 +94,20 @@ public:
     exception_wrapper (const exception_wrapper&) = default;
     exception_wrapper& operator= (const exception_wrapper&) = default;
 
-    ~exception_wrapper () throw () {}
-    
-    const char* what () const throw ()
+    ~exception_wrapper () noexcept {}
+
+    const char* what () const noexcept
     { return _stream.message ().c_str (); }
 
-    const char* where () const throw ()
+    const char* where () const noexcept
     { return _where; }
-    
-    int level () const throw ()
+
+    int level () const noexcept
     { return _stream.level (); }
 
     log_stream_adapter& stream ()
     { return _stream; }
-    
+
 private:
     const char*        _where;
     log_stream_adapter _stream;
@@ -165,5 +165,3 @@ throw_with<E> operator<< (throw_with<E> ts, const T& what)
 } /* namespace psynth */
 
 #endif /* PSYNTH_BASE_THROW_HPP_ */
-
-

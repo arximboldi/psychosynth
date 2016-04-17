@@ -7,10 +7,10 @@
  */
 
 /*
- *  Copyright (C) 2009 Juan Pedro Bolívar Puente
+ *  Copyright (C) 2009, 2016 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -38,17 +38,17 @@ namespace base
 
 PSYNTH_DEFINE_ERROR (error);
 
-int default_error_level () throw ()
+int default_error_level () noexcept
 {
     return log::error;
 }
 
-int error_base::level () const throw ()
+int error_base::level () const noexcept
 {
     return default_error_level ();
 }
 
-const char* error_base::default_what () const throw ()
+const char* error_base::default_what () const noexcept
 {
     return "unknown error";
 }
@@ -60,4 +60,3 @@ void exception::log () const
 
 } /* namespace base */
 } /* namespace psynth */
-
