@@ -55,6 +55,12 @@ AC_ARG_ENABLE([debug],
 		[CXXFLAGS="${CXXFLAGS} -g3 -O0"], 
 		[CXXFLAGS="${CXXFLAGS} -DNDEBUG"])
 
+AC_ARG_ENABLE([local-data],
+		[AC_HELP_STRING([--enable-local-data],
+	        [enable localdata [default=disabled] ])],
+		[localdata=$enableval],
+                [localdata=no])
+
 dnl  Compulsory libraries
 dnl ======================================================================
 
@@ -340,8 +346,9 @@ PACKAGE_INCLUDE_DIR="$includedir/psynth"
 PACKAGE_BIN_DIR=$bindir
 PACKAGE_LIB_DIR=$libdir
 
-dnl Uncomment only for development purposes
-dnl PACKAGE_DATA_DIR="./data"
+if test "x$localdata" == xyes; then
+   PACKAGE_DATA_DIR="./data"
+fi
 
 AC_SUBST(PACKAGE_DATA_DIR)
 AC_SUBST(PACKAGE_BIN_DIR)
