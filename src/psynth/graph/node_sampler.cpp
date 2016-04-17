@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) Juan Pedro Bolivar Puente 2008                          *
+ *   Copyright (C) Juan Pedro Bolivar Puente 2008, 2016                    *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -208,10 +208,12 @@ void node_sampler::read (audio_buffer& buf, int start, int end)
     }
     factor = base_factor;
 
-    while(m_scaler.available() < (high_latency ?
-				  TIME_STRETCH_MIN_SAMPLES :
-				  end - start)) {
-	if (rate)
+    assert(end >= start);
+    while(m_scaler.available() < static_cast<std::size_t>(
+            (high_latency ?
+             TIME_STRETCH_MIN_SAMPLES :
+             end - start))) {
+        if (rate)
 	    factor = base_factor + base_factor * rate_buf[(int) m_ctrl_pos];
 
 	if (backwards != m_fetcher.is_backwards ())
