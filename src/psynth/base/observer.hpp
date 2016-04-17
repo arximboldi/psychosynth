@@ -1,6 +1,4 @@
 /**
- *  Time-stamp:  <2011-03-18 19:04:03 raskolnikov>
- *
  *  @file        observer.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
  *  @date        Wed Apr  8 13:42:05 2009

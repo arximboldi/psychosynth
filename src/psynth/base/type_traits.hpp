@@ -1,6 +1,4 @@
 /**
- *  Time-stamp:  <2011-06-09 20:37:53 raskolnikov>
- *
  *  @file        type_traits.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
  *  @date        Tue Apr  7 14:34:06 2009

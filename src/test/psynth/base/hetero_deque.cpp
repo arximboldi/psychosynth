@@ -1,6 +1,4 @@
 /**
- *  Time-stamp:  <2011-06-14 20:31:50 raskolnikov>
- *
  *  @file        hetero_queue.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
  *  @date        Wed Jun  8 13:02:15 2011

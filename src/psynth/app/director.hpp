@@ -1,6 +1,4 @@
 /**
- *  Time-stamp:  <2012-02-01 23:44:45 raskolnikov>
- *
  *  @file        director.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
  *  @date        2007

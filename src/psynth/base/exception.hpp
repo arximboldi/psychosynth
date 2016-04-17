@@ -1,6 +1,4 @@
 /**
- *  Time-stamp:  <2012-04-02 23:49:20 raskolnikov>
- *
  *  @file        exception.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
  *  @date        2009

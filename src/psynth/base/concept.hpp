@@ -1,6 +1,4 @@
 /**
- *  Time-stamp:  <2010-11-03 11:29:16 raskolnikov>
- *
  *  @file        concept.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
  *  @date        Wed Oct 20 19:58:39 2010

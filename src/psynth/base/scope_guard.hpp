@@ -1,6 +1,4 @@
 /**
- *  Time-stamp:  <2011-03-17 00:19:22 raskolnikov>
- *
  *  @file        scope_guard.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
  *  @date        Fri Mar  4 18:49:32 2011

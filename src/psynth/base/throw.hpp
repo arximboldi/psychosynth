@@ -1,6 +1,4 @@
 /**
- *  Time-stamp:  <2012-04-02 23:52:38 raskolnikov>
- *
  *  @file        throw.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
  *  @date        Tue Jun  7 16:11:03 2011

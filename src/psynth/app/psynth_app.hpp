@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-03-18 17:43:41 raskolnikov>
+ *  Time-stamp:  <2016-04-15 15:11:06 raskolnikov>
  *
  *  @file        psynth_app.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>

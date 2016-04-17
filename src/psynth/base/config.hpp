@@ -1,6 +1,4 @@
 /**
- *  Time-stamp:  <2011-06-13 11:16:29 raskolnikov>
- *
  *  @file        config.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
  *  @date        2007

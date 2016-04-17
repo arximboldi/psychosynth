@@ -1,6 +1,4 @@
 /**
- *  Time-stamp:  <2011-03-08 21:11:26 raskolnikov>
- *
  *  @file        arg_parser.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
  *  @date        2007

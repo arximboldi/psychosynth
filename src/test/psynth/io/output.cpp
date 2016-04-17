@@ -1,6 +1,4 @@
 /**
- *  Time-stamp:  <2012-02-01 23:11:50 raskolnikov>
- *
  *  @file        output.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
  *  @date        Wed Mar  9 14:03:53 2011
