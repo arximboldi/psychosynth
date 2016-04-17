@@ -10,7 +10,7 @@
 
 /*
  *  Copyright (C) 2009 Juan Pedro Bolívar Puente
- *  
+ *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -39,4 +39,3 @@ PSYNTH_DEFINE_ERROR_WHAT (singleton_error, "Dead reference to singleton.")
 
 } /* namespace base */
 } /* namespace psynth */
-

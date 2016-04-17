@@ -12,7 +12,7 @@
  *  Copyright (C) 2011 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -49,7 +49,7 @@ BOOST_AUTO_TEST_CASE (patch_in_port_noattach)
     auto& factory = node_factory::self ();
     auto root = graph::core::new_patch ();
     auto patch = graph::core::new_patch ();
-    
+
     auto mixer = patch->add (factory.create ("audio_mixer"));
     auto in1 = patch->add (factory.create ("audio_patch_soft_in_port"));
     BOOST_CHECK_NO_THROW (patch->in ("input"));
@@ -76,7 +76,7 @@ BOOST_AUTO_TEST_CASE (patch_out_port_noattach)
     auto& factory = node_factory::self ();
     auto root = graph::core::new_patch ();
     auto patch = graph::core::new_patch ();
-    
+
     auto mixer = patch->add (factory.create ("audio_mixer"));
     auto in1 = patch->add (factory.create ("audio_patch_soft_out_port"));
     BOOST_CHECK_NO_THROW (patch->out ("output"));
@@ -85,7 +85,7 @@ BOOST_AUTO_TEST_CASE (patch_out_port_noattach)
     BOOST_CHECK_THROW (patch->out ("output"), node_component_error);
     BOOST_CHECK_NO_THROW (patch->out ("mix-out"));
     in1->in ("input").connect (mixer->out ("output"));
-                               
+
     root->add (patch);
     auto osc = root->add (core::new_passive_output ());
 
@@ -106,26 +106,26 @@ BOOST_AUTO_TEST_CASE (patch_in_port_attach)
     auto patch = graph::core::new_patch ();
 
     p.start ();
-    
+
     auto mixer = patch->add (factory.create ("audio_mixer"));
     auto in1 = patch->add (factory.create ("audio_patch_soft_in_port"));
     BOOST_CHECK_NO_THROW (patch->in ("input"));
-    
+
     p.rt_request_process ();
-    
+
     in1->param ("port-name").set<std::string> ("mix-in-one");
     BOOST_CHECK_THROW (patch->in ("input"), node_component_error);
     p.rt_request_process ();
     BOOST_CHECK_NO_THROW (patch->in ("mix-in-one"));
     mixer->in ("input-0").connect (in1->out ("output"));
-    
+
     p.rt_request_process ();
-    
+
     root->add (patch);
     auto osc = root->add (factory.create ("audio_sine_oscillator"));
 
     p.rt_request_process ();
-    
+
     BOOST_CHECK_NO_THROW (
         patch->in ("mix-in-one").connect (osc->out ("output")));
     in1->param("port-name").str ("mix-in-two");
@@ -136,27 +136,27 @@ BOOST_AUTO_TEST_CASE (patch_in_port_attach)
 BOOST_AUTO_TEST_CASE (patch_out_port_attach)
 {
     using namespace psynth;
-    
+
     processor p;
-    auto root = p.root ();    
+    auto root = p.root ();
     auto& factory = node_factory::self ();
     auto patch = graph::core::new_patch ();
 
     p.start ();
-    
+
     auto mixer = patch->add (factory.create ("audio_mixer"));
     auto in1 = patch->add (factory.create ("audio_patch_soft_out_port"));
     BOOST_CHECK_NO_THROW (patch->out ("output"));
 
     p.rt_request_process ();
-    
+
     in1->param ("port-name").set<std::string> ("mix-out");
     BOOST_CHECK_THROW (patch->out ("output"), node_component_error);
     BOOST_CHECK_NO_THROW (patch->out ("mix-out"));
     in1->in ("input").connect (mixer->out ("output"));
 
     p.rt_request_process ();
-    
+
     root->add (patch);
     auto osc = root->add (core::new_passive_output ());
 
@@ -164,7 +164,7 @@ BOOST_AUTO_TEST_CASE (patch_out_port_attach)
     in1->param("port-name").str ("mix-out-wtf");
 
     p.rt_request_process ();
-    
+
     BOOST_CHECK_THROW (patch->out ("mix-out"), node_component_error);
     BOOST_CHECK_NO_THROW (patch->out ("mix-out-wtf"));
 }

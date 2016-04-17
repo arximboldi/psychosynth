@@ -36,9 +36,9 @@ class record_window : public toggable_window
 
     CEGUI::Window* m_button;
     CEGUI::Editbox* m_file;
-    
+
     bool m_recording;
-    
+
     virtual CEGUI::FrameWindow* create_window ();
 
 public:

@@ -12,7 +12,7 @@
  *  Copyright (C) 2011 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -72,7 +72,7 @@ multi_point_envelope<R, Vp>::update (std::size_t sample)
         val =
             _val->get (_cur_point).val +
             (_val->get (_cur_point + 1).val - _val->get (_cur_point).val) /
-            (_val->get (_cur_point + 1).dt  - _val->get (_cur_point).dt) * 
+            (_val->get (_cur_point + 1).dt  - _val->get (_cur_point).dt) *
             (_time - _val->get (_cur_point).dt);
     }
     else if (_cur_point == _val->size() - 1)
@@ -88,5 +88,3 @@ multi_point_envelope<R, Vp>::update (std::size_t sample)
 } /* namespace psynth */
 
 #endif /* PSYNTH_SYNTH_MULTI_POINT_ENVELOPE_TPP_ */
-
-

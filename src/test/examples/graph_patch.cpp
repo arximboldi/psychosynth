@@ -12,7 +12,7 @@
  *  Copyright (C) 2011 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -40,7 +40,7 @@ const char* test_alsa_device = "default";
 int main ()
 {
     using namespace psynth;
-    
+
     graph::processor p;
     auto root     = p.root ();
     auto& factory = graph::node_factory::self ();
@@ -56,14 +56,14 @@ int main ()
 
     auto in1 = patch->add (factory.create ("audio_patch_soft_in_port"));
     in1->param ("port-name").set<std::string> ("mix-in-one");
-    
+
     mixer->in ("input-0").connect (in1->out ("output"));
     out->in ("input").connect (mixer->out ("output"));
-    
+
     root->add (patch);
     auto osc = root->add (factory.create ("audio_sine_oscillator"));
     auto osc2 = patch->add (factory.create ("audio_sine_oscillator"));
-        
+
     p.start ();
     ::sleep (1);
     patch->in ("mix-in-one").connect (osc->out ("output"));

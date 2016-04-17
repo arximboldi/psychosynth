@@ -34,7 +34,7 @@ class output_director
 protected:
     base::conf_node* m_conf;
     graph::audio_async_output_ptr m_output;
-    
+
     virtual graph::audio_async_output_ptr
     do_start (base::conf_node& conf) = 0;
 
@@ -43,12 +43,12 @@ protected:
 
 public:
     virtual void defaults (base::conf_node& conf) = 0;
-    
+
     output_director ()
 	: m_conf (0)
 	, m_output ()
 	{}
-    
+
     virtual ~output_director () {}
 
     void start (base::conf_node& conf)
@@ -62,7 +62,7 @@ public:
 	do_stop (*m_conf);
 	m_output.reset ();
     }
-    
+
     graph::audio_async_output_ptr get_output() const
     { return m_output; }
 };

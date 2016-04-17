@@ -12,7 +12,7 @@
  *  Copyright (C) 2010 Juan Pedro Bolivar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -46,7 +46,7 @@ namespace sound
    \ingroup ChannelNameModel
    \brief Center
 */
-struct center_channel {};    
+struct center_channel {};
 
 typedef boost::mpl::vector5<
     left_channel, right_channel,

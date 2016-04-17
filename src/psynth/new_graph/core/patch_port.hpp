@@ -12,7 +12,7 @@
  *  Copyright (C) 2011 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -65,7 +65,7 @@ class patch_out_port_base : public node
 {
 public:
     patch_output_hook _patch_output_hook;
-    
+
     virtual out_port_base& patch_port () = 0;
 
 protected:
@@ -85,7 +85,7 @@ class port_name_control : in_control<std::string>
 public:
     port_name_control (std::string name, node* owner, const std::string val)
         : base_type (name, owner, val) {}
-    
+
     void set (const std::string& name);
 };
 
@@ -104,11 +104,11 @@ public:
         : _ctl_port_name ("port-name", this, "input")
         , _forward_port ("input", "output", 0, this)
     {}
-    
+
     in_port<port_type>& patch_port ()
     { return _forward_port; }
-    
-private:    
+
+private:
     detail::port_name_control<patch_in_port_base> _ctl_port_name;
     ForwardPort _forward_port;
 };
@@ -142,10 +142,10 @@ public:
         : _ctl_port_name ("port-name", this, "output")
         , _forward_port ("input", "output", this, 0)
     {}
-    
+
     out_port<port_type>& patch_port ()
     { return _forward_port; }
-    
+
 private:
     detail::port_name_control<patch_out_port_base> _ctl_port_name;
     ForwardPort _forward_port;
@@ -183,4 +183,3 @@ typedef patch_soft_buffer_in_port<sample_buffer> sample_patch_soft_in_port;
 } /* namespace psynth */
 
 #endif /* PSYNTH_GRAPH_CORE_PATCH_PORT_HPP_ */
-

@@ -12,7 +12,7 @@
  *  Copyright (C) 2011 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -62,25 +62,25 @@ class async_output : public sink_node
 {
 public:
     typedef io::async_output_ptr<audio_range> device_ptr;
-    
+
     async_output (device_ptr out = device_ptr ());
     void set_output (device_ptr out = device_ptr ());
-    
+
     void start ();
     void stop ();
 
 protected:
     void rt_do_update_context (rt_process_context& ctx);
     void rt_do_process (rt_process_context& ctx);
-    
+
 private:
     void _output_callback (std::size_t nframes);
 
     defaulting_audio_in_port _in_input;
-    
+
     // FIXME: Actually there is unnecesary buffering here, because we
     // buffer first to accumulate the output, then to convert it.
-    
+
     device_ptr         _output;
     audio_ring_buffer  _buffer;
     audio_ring_buffer::range::position _pos;
@@ -91,4 +91,3 @@ private:
 } /* namespace psynth */
 
 #endif /* PSYNTH_GRAPH_CORE_ASYNC_OUTPUT_NODE_HPP_ */
-

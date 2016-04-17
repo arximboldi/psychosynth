@@ -12,7 +12,7 @@
  *  Copyright (C) 2011 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -80,7 +80,7 @@ void oscillator<G, O>::rt_do_process (rt_process_context& ctx)
 {
     _osc.set_frequency (_ctl_frequency.rt_get ());
     _osc.set_amplitude (_ctl_amplitude.rt_get ());
-    
+
     if (!_in_modulator.rt_in_available ())
         _osc.update (_out_output.rt_out_range ());
     else

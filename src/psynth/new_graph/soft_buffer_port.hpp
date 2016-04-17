@@ -12,7 +12,7 @@
  *  Copyright (C) 2011 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -46,22 +46,22 @@ template <class Buffer>
 class soft_buffer_in_port : public buffer_in_port<Buffer>
 {
     typedef buffer_in_port<Buffer> base_type;
-    
+
 public:
     soft_buffer_in_port (
         std::string name,
         node* owner,
-        audio_sample stable_value = 0.0f, 
+        audio_sample stable_value = 0.0f,
         float duration  = default_soft_port_duration);
 
     const Buffer& rt_get_in () const
     { return _local_buffer; }
-    
+
     void disconnect ();
     void connect (out_port_base& dest);
     void rt_process (rt_process_context& ctx);
     void rt_context_update (rt_process_context& ctx);
-    
+
 private:
     typedef synth::simple_envelope<sample_range> envelope_type;
 
@@ -76,7 +76,7 @@ private:
 template <class B>
 soft_buffer_in_port<B>::soft_buffer_in_port (std::string name,
                                              node* owner,
-                                             audio_sample stable_value, 
+                                             audio_sample stable_value,
                                              float duration)
     : base_type (name, owner)
     , _stable_value (stable_value)
@@ -94,7 +94,7 @@ struct soft_buffer_forward_port
 {
     typedef forward_port_impl<soft_buffer_in_port<T>,
                               buffer_out_port<T> > base_type;
-    
+
     soft_buffer_forward_port (std::string in_name,
                               std::string out_name,
                               node* in_owner,

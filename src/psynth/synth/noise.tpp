@@ -12,7 +12,7 @@
  *  Copyright (C) 2012 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -67,7 +67,7 @@ pink_noise_distribution<Sample>::pink_noise_distribution()
 template <class Sample>
 template <class Engine>
 Sample pink_noise_distribution<Sample>::operator()(Engine& engine)
-{        
+{
     Sample white = 0.2 * white_noise_distribution<Sample>::operator()(engine);
 
     _b0 = 0.99886f * _b0 + white * 0.0555179f;
@@ -88,4 +88,3 @@ Sample pink_noise_distribution<Sample>::operator()(Engine& engine)
 } /* namespace psynth */
 
 #endif /* PSYNTH_SYNTH_NOISE_TPP_ */
-

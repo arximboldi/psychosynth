@@ -30,7 +30,7 @@ class toggable_window
 {
     CEGUI::FrameWindow* m_window;
     bool m_active;
-	
+
     virtual CEGUI::FrameWindow* create_window () = 0;
     void build_window ();
 
@@ -38,22 +38,22 @@ protected:
     CEGUI::FrameWindow* get_window () {
 	return m_window;
     }
-    
+
 public:
     toggable_window ();
     virtual ~toggable_window ();
-	
+
     void set_active (bool active);
 
     bool is_active() {
 	return m_active;
     }
-    
+
     bool toggle () {
 	set_active (!m_active);
 	return m_active;
     };
-	
+
     bool on_close (const CEGUI::EventArgs &e) {
 	set_active (false);
 	return true;

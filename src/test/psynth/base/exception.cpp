@@ -12,7 +12,7 @@
  *  Copyright (C) 2011 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -61,7 +61,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(base_test_throw_psynth,
         Error,
         std::is_base_of<psynth::base::exception, Error>::value>
         error_actual_type;
-    
+
     BOOST_CHECK_THROW (test_throw<Error> (), error_actual_type);
     BOOST_CHECK_THROW (test_throw<Error> (), Error);
     BOOST_CHECK_THROW (test_throw<Error> (), std::exception);
@@ -73,7 +73,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(base_test_catch,
                               test_errors)
 {
     bool entered = false;
-    
+
     try { test_throw<Error> (); }
     catch (psynth::base::exception& err)
     {
@@ -82,7 +82,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(base_test_catch,
         BOOST_CHECK (strcmp (err.where (), PSYNTH_MODULE_NAME) == 0);
         BOOST_CHECK (err.level () == TEST_ERROR_LEVEL);
     }
-    
+
     BOOST_CHECK (entered);
 }
 

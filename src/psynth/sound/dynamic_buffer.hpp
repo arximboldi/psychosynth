@@ -12,7 +12,7 @@
  *  Copyright (C) 2010 Juan Pedro Bolivar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -30,7 +30,7 @@
 
 /*
  *  Copyright 2005-2007 Adobe Systems Incorporated
- * 
+ *
  *  Use, modification and distribution are subject to the Boost
  *  Software License, Version 1.0. (See accompanying file
  *  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt).
@@ -117,7 +117,7 @@ template <typename AnyConstRange>  // Models AnyConstRangeConcept
 struct dynamic_buffer_get_const_range
 {
     typedef AnyConstRange result_type;
-        
+
     template <typename Buffer>
     result_type operator () (const Buffer& img) const
     {
@@ -164,11 +164,11 @@ public:
 
     dynamic_buffer ()
 	: parent_type () {}
-    
+
     template <typename T>
     explicit dynamic_buffer (const T& obj)
 	: parent_type (obj) {}
-    
+
     template <typename T>
     explicit dynamic_buffer (T& obj, bool do_swap)
 	: parent_type (obj, do_swap) {}
@@ -182,7 +182,7 @@ public:
 	parent_type::operator= (obj);
 	return *this;
     }
-    
+
     dynamic_buffer& operator= (const dynamic_buffer& v)
     {
 	parent_type::operator= ((const parent_type&) v);
@@ -218,7 +218,7 @@ public:
 template <typename Types>  PSYNTH_FORCEINLINE // Models BufferVectorConcept
 typename dynamic_buffer<Types>::range
 range (dynamic_buffer<Types>& buf)
-{ 
+{
     return apply_operation (
 	buf, detail::dynamic_buffer_get_range<
 	    typename dynamic_buffer<Types>::range> ());
@@ -231,7 +231,7 @@ range (dynamic_buffer<Types>& buf)
 template <typename Types> PSYNTH_FORCEINLINE // Models BufferVectorConcept
 typename dynamic_buffer<Types>::const_range
 const_range (const dynamic_buffer<Types>& buf)
-{ 
+{
     return apply_operation (
 	buf, detail::dynamic_buffer_get_const_range <
 	    typename dynamic_buffer<Types>::const_range> ());

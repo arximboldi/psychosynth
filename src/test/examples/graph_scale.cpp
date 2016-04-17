@@ -12,7 +12,7 @@
  *  Copyright (C) 2011 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -40,24 +40,24 @@ const char* test_alsa_device = "default";
 int main ()
 {
     using namespace psynth;
-    
+
     graph::processor p;
     auto root     = p.root ();
     auto& factory = graph::node_factory::self ();
-    
+
     auto out = root->add (
         graph::core::new_async_output (
             io::new_buffered_async_output<
                 graph::audio_range,
                 io::alsa_output<sound::stereo16sc_range> >(
                     test_alsa_device, 2, 512, 44100)));
-    
+
     auto osc = root->add (factory.create ("audio_sine_oscillator"));
     auto mod = root->add (factory.create ("sample_sine_oscillator"));
 
     osc->in ("modulator").connect (mod->out ("output"));
     out->in ("input").connect (osc->out ("output"));
-    
+
     osc->param ("modulator").set<int> (1);
     mod->param ("frequency").set<float> (4.0f);
     mod->param ("amplitude").set<float> (0.3f);
@@ -69,9 +69,9 @@ int main ()
         freq.set<float> (freq.get<float> () * 2);
         ::sleep (1);
     }
-    
+
     p.stop ();
 
-    
+
     return 0;
 }

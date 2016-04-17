@@ -11,7 +11,7 @@
 
 /*
  *  Copyright (C) 2009 Juan Pedro Bolívar Puente
- *  
+ *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -43,7 +43,7 @@ class factory_base
 public:
     typedef typename pointee<BasePtr>::type base_type;
     typedef BasePtr pointer_type;
-    
+
     virtual ~factory_base () {};
     virtual BasePtr create (Args... args) = 0;
 
@@ -58,7 +58,7 @@ class factory : public factory_base <BasePtr, Args...>
 {
 public:
     typedef Concrete concrete_type;
-        
+
     BasePtr create (Args... args)
     {
 	return BasePtr (new concrete_type (std::forward<Args> (args) ...));

@@ -12,7 +12,7 @@
  *  Copyright (C) 2008, 2009 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -66,7 +66,7 @@ void director::start_output ()
         std::string out_name;
 
         m_config->child ("output").get (out_name);
-    
+
         odf_map::iterator i = m_outdir.find(out_name);
         if (i != m_outdir.end()) {
             m_output = i->second->create_output_director();
@@ -105,13 +105,13 @@ void director::start (base::conf_node& conf, const boost::filesystem::path& home
     m_config = &conf;
 
     m_filemgr.start (conf.child ("file_manager"), home_path);
-    
+
     for (auto i = m_outdir.begin(); i != m_outdir.end(); ++i)
     {
         std::unique_ptr<output_director> od (i->second->create_output_director());
 	od->defaults(m_config->child (i->first));
     }
-    
+
     register_config();
 
     m_info.sample_rate = conf.child ("sample_rate").get<int> ();
@@ -120,19 +120,19 @@ void director::start (base::conf_node& conf, const boost::filesystem::path& home
 
     m_world = new world (m_info);
     m_world->set_patcher (base::manage (new patcher_dynamic));
-    
+
     start_output ();
 }
 
 void director::stop()
 {
     unregister_config();
-    
+
     stop_output ();
     delete m_world;
 
     m_filemgr.stop();
-    
+
     m_world = NULL;
     m_output = NULL;
     m_config = NULL;
@@ -141,12 +141,12 @@ void director::stop()
 void director::on_config_nudge (base::conf_node& node)
 {
     string out;
-    
+
     m_info.sample_rate  = node.child ("sample_rate").get<int> ();
     m_info.block_size   = node.child ("block_size").get<int> ();
     m_info.num_channels = node.child ("num_channels").get<int> ();
     node.child ("output").get (out);
-    
+
     m_world->set_info (m_info);
 
     stop_output ();

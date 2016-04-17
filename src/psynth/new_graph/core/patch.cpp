@@ -12,7 +12,7 @@
  *  Copyright (C) 2011 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -72,20 +72,20 @@ void patch::rt_advance ()
     for (auto& n : _rt_childs)
         n.rt_advance ();
 }
-    
+
 node_ptr patch::add (node_ptr child)
 {
     if (child->is_attached_to_patch () &&
         &child->patch () == this)
         return child;
     child->check_attached_to_patch (false);
-    
+
     child->attach_to_patch (*this);
     _childs.push_back (child);
     execute_rt ([=] {
             this->_rt_childs.push_back (*child);
         });
-    
+
     if (is_attached_to_process ())
         process ().notify_add_node (child);
 
@@ -107,7 +107,7 @@ node_ptr patch::add (node_ptr child)
                 this->_rt_outputs.push_back (*port);
             });
     }
-    
+
     return child;
 }
 
@@ -144,7 +144,7 @@ void patch::remove (node_ptr child)
         this->unregister_component (p);
         p._set_owner (0);
     }
-    
+
     child->detach_from_patch ();
     _childs.remove (child);
 

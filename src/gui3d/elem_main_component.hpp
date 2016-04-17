@@ -34,7 +34,7 @@ class elem_main_component : public elem_component
 
     flat_ring* m_indicator;
     flat_ring* m_indicator_fill;
-    
+
     Ogre::Vector2 m_last_mouse_pos;
 
     int m_param;
@@ -43,13 +43,13 @@ class elem_main_component : public elem_component
     float m_max_val;
     float m_old_value;
     bool m_rotating;
-    
+
 public:
     elem_main_component (const std::string& mesh,
 			 int param,
 			 float min_val, float max_val);
     ~elem_main_component ();
-    
+
     void set_mesh (const std::string& mesh);
 
     void init ();
@@ -64,16 +64,15 @@ class elem_multi_main_component : public elem_main_component
 {
     int m_param;
     const char** m_names;
-    
+
 public:
     elem_multi_main_component (int param_1,
 			       float min_val, float max_val,
 			       int param_2,
 			       const char** names);
-    
+
     void handle_param_change (psynth::world_node& obj,
 			      int id);
 };
 
 #endif /* ELEMMAIMCOMPONENT */
-

@@ -12,7 +12,7 @@
  *  Copyright (C) 2010 Juan Pedro Bolivar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -30,7 +30,7 @@
 
 /*
  *  Copyright 2005-2007 Adobe Systems Incorporated
- * 
+ *
  *  Use, modification and distribution are subject to the Boost
  *  Software License, Version 1.0. (See accompanying file
  *  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt).
@@ -127,18 +127,18 @@ public:
     typedef dynamic_buffer_range<
     typename detail::ranges_get_const_type<BufferRangeTypes>::type>
     const_range;
-    
+
     typedef std::size_t    size_type;
     typedef std::ptrdiff_t difference_type;
 
     dynamic_buffer_range ()
 	: parent_type () {}
-    
+
     template <typename T>
     explicit dynamic_buffer_range (const T& obj) throw ()
 	: parent_type (obj) {}
-    
-    dynamic_buffer_range (const dynamic_buffer_range& v) 
+
+    dynamic_buffer_range (const dynamic_buffer_range& v)
 	: parent_type ((const parent_type&) v)
     {}
 
@@ -148,7 +148,7 @@ public:
 	parent_type::operator= (obj);
 	return *this;
     }
-    
+
     dynamic_buffer_range& operator= (const dynamic_buffer_range& v)
     {
 	parent_type::operator= ((const parent_type&) v);
@@ -159,7 +159,7 @@ public:
     {
 	return apply_operation (*this, detail::dynamic_type_get_num_samples ());
     }
-    
+
     size_type size () const
     {
 	return apply_operation (*this, detail::dynamic_type_get_size ());

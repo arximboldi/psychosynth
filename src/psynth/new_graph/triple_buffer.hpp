@@ -12,7 +12,7 @@
  *  Copyright (C) 2011 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -45,28 +45,28 @@ class double_buffer : private boost::noncopyable
 {
 public:
     typedef Buffer buffer_type;
-        
+
     double_buffer ();
     double_buffer (const Buffer&);
     double_buffer (Buffer&&, Buffer&&);
-    
+
     GuardPolicy& back_policy () const
     { return _back_lock; };
-    
+
     buffer_type& front ()
     { return *_front; }
-    
+
     buffer_type& back ()
     { return *_back; }
 
     const buffer_type& front () const
     { return *_front; }
-    
+
     const buffer_type& back () const
     { return *_back; }
 
     bool flip_back ();
-    
+
 protected:
     std::tuple<buffer_type, buffer_type> _storage;
 
@@ -89,9 +89,9 @@ public:
 
     LocalGuardPolicy& local_policy () const
     { return _local_lock; };
-    
+
     bool flip_local ();
-    
+
     buffer_type& local ()
     { return *_local; }
 

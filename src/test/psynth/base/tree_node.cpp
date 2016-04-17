@@ -12,7 +12,7 @@
  *  Copyright (C) 2009 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -51,7 +51,7 @@ struct value_node<int> : public psynth::base::tree_node<value_node<int> >
 struct tree_node_fixture
 {
     value_node<int> root;
-    
+
     tree_node_fixture ()
     {
 	root.path ("1.2.3.4").value = -1;
@@ -135,11 +135,11 @@ BOOST_AUTO_TEST_CASE(tree_node_test_6)
 {
     auto ptr1 = root.detach (std::string ("1"));
     BOOST_CHECK_EQUAL (ptr1->path ("2.3.4").value, -1);
-        
+
     BOOST_CHECK_EQUAL (ptr1->name (), "");
     BOOST_CHECK_THROW (root.existing_path ("1.2.3.4"),
 		       psynth::base::tree_node_error);
-    
+
     BOOST_CHECK_EQUAL (root.attach ("1", std::move (ptr1)), true);
     BOOST_CHECK_NO_THROW (root.existing_path ("1.2.3.4"));
     BOOST_CHECK_EQUAL (root.path ("1.2.3.4").value, -1);
@@ -153,7 +153,7 @@ BOOST_AUTO_TEST_CASE(tree_node_test_6)
     BOOST_CHECK_THROW (root.path ("1.2.3").detach (std::string ("")),
 		       psynth::base::tree_node_error);
     BOOST_CHECK_NO_THROW (root.path ("1.2.3").detach (std::string ("5")).release ());
-	
+
     auto ptr2 = root.path ("1.2.3").detach (std::string ("4"));
     BOOST_CHECK_EQUAL (ptr2->value, -1);
 }

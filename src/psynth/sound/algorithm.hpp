@@ -16,7 +16,7 @@
  *  Copyright (C) 2010 Juan Pedro Bolivar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -34,7 +34,7 @@
 
 /*
  *  Copyright 2005-2007 Adobe Systems Incorporated
- * 
+ *
  *  Use, modification and distribution are subject to the Boost
  *  Software License, Version 1.0. (See accompanying file
  *  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt).
@@ -84,7 +84,7 @@ struct error_type {};
    \defgroup ImageRangeSTLAlgorithms STL-like Algorithms
    \ingroup ImageRangeAlgorithm
    \brief Image range-equivalents of STL algorithms
-   
+
    Image ranges provide 1D iteration of their frames via \p begin() and
    \p end() methods, which makes it possible to use STL algorithms
    with them. However, using nested loops over X and Y is in many
@@ -161,7 +161,7 @@ struct binary_operation_obj
     {
 	throw std::bad_cast();
     }
-    
+
 private:
 
     // dispatch from apply overload to a function with distinct name
@@ -204,12 +204,12 @@ namespace std
    \brief Copy when both src and dst are interleaved and of the same
    type can be just memmove
 */
-template<typename T, typename Cs> 
-PSYNTH_FORCEINLINE psynth::sound::frame<T,Cs>* 
+template<typename T, typename Cs>
+PSYNTH_FORCEINLINE psynth::sound::frame<T,Cs>*
 copy (psynth::sound::frame<T,Cs>* first,
-      psynth::sound::frame<T,Cs>* last, 
+      psynth::sound::frame<T,Cs>* last,
       psynth::sound::frame<T,Cs>* dst)
-{ 
+{
     return (psynth::sound::frame<T,Cs>*) std::copy (
 	(unsigned char*) first,
 	(unsigned char*) last,
@@ -221,12 +221,12 @@ copy (psynth::sound::frame<T,Cs>* first,
    \brief Copy when both src and dst are interleaved and of the same
    type can be just memmove
 */
-template<typename T, typename Cs> 
-PSYNTH_FORCEINLINE psynth::sound::frame<T,Cs>* 
+template<typename T, typename Cs>
+PSYNTH_FORCEINLINE psynth::sound::frame<T,Cs>*
 copy (const psynth::sound::frame<T,Cs>* first,
-      const psynth::sound::frame<T,Cs>* last, 
+      const psynth::sound::frame<T,Cs>* last,
       psynth::sound::frame<T,Cs>* dst)
-{ 
+{
     return (psynth::sound::frame<T,Cs>*) std::copy(
 	(unsigned char*) first,
 	(unsigned char*) last,
@@ -244,11 +244,11 @@ namespace detail
 
 template <typename I, typename O>
 struct copy_fn
-{ 
+{
     PSYNTH_FORCEINLINE I operator() (I first, I last, O dst) const
     {
 	return std::copy (first, last, dst);
-    } 
+    }
 };
 
 } /* namespace detail */
@@ -268,7 +268,7 @@ psynth::sound::planar_frame_iterator<IC2,Cs>
 copy (psynth::sound::planar_frame_iterator<IC1,Cs> first,
       psynth::sound::planar_frame_iterator<IC1,Cs> last,
       psynth::sound::planar_frame_iterator<IC2,Cs> dst)
-{ 
+{
     psynth::base::psynth_function_requires <
 	psynth::sound::SamplesCompatibleConcept<
 	    typename std::iterator_traits<IC1>::value_type,
@@ -291,7 +291,7 @@ namespace sound
 */
 template <typename Range1, typename Range2> PSYNTH_FORCEINLINE
 void copy_frames (const Range1& src, const Range2& dst)
-{ 
+{
     assert (src.size () == dst.size ());
     std::copy (src.begin(), src.end(), dst.begin());
 }
@@ -328,10 +328,10 @@ public:
     copy_and_convert_frames_fn (CC cc_in)
 	: _cc(cc_in)
     {}
-    
+
     // when the two channel spaces are incompatible, a channel
     // conversion is performed
-    template <typename V1, typename V2> PSYNTH_FORCEINLINE 
+    template <typename V1, typename V2> PSYNTH_FORCEINLINE
     result_type apply_incompatible (const V1& src, const V2& dst) const
     {
         copy_frames (channel_converted_range<typename V2::value_type>(src, _cc),
@@ -340,7 +340,7 @@ public:
 
     // If the two channel spaces are compatible, copy_and_convert is
     // just copy
-    template <typename V1, typename V2> PSYNTH_FORCEINLINE 
+    template <typename V1, typename V2> PSYNTH_FORCEINLINE
     result_type apply_compatible (const V1& src, const V2& dst) const
     {
          copy_frames (src,dst);
@@ -352,8 +352,8 @@ public:
 /**
    \ingroup ImageRangeSTLAlgorithmsCopyAndConvertFrames
 */
-template <typename V1, typename V2,typename CC> 
-PSYNTH_FORCEINLINE 
+template <typename V1, typename V2,typename CC>
+PSYNTH_FORCEINLINE
 void copy_and_convert_frames (const V1& src, const V2& dst, CC cc)
 {
     detail::copy_and_convert_frames_fn<CC> ccp (cc);
@@ -365,10 +365,10 @@ struct default_channel_converter;
 /**
    \ingroup ImageRangeSTLAlgorithmsCopyAndConvertFrames
 */
-template <typename Range1, typename Range2> 
-PSYNTH_FORCEINLINE 
+template <typename Range1, typename Range2>
+PSYNTH_FORCEINLINE
 void copy_and_convert_frames (const Range1& src, const Range2& dst)
-{ 
+{
     detail::copy_and_convert_frames_fn<default_channel_converter> ccp;
     ccp (src, dst);
 }
@@ -404,9 +404,9 @@ struct std_fill_type
     }
 };
 
-/** std::fill for planar iterators */ 
+/** std::fill for planar iterators */
 template <typename It, typename P>
-PSYNTH_FORCEINLINE 
+PSYNTH_FORCEINLINE
 void fill_aux (It first, It last, const P& p, boost::mpl::true_)
 {
     static_for_each (first, last, p, std_fill_type ());
@@ -414,7 +414,7 @@ void fill_aux (It first, It last, const P& p, boost::mpl::true_)
 
 /** std::fill for interleaved iterators */
 template <typename It, typename P>
-PSYNTH_FORCEINLINE 
+PSYNTH_FORCEINLINE
 void fill_aux(It first, It last, const P& p, boost::mpl::false_)
 {
     std::fill (first, last, p);
@@ -426,10 +426,10 @@ void fill_aux(It first, It last, const P& p, boost::mpl::false_)
    \ingroup ImageRangeSTLAlgorithmsFillFrames
    \brief std::fill for image ranges
 */
-template <typename Range, typename Value> PSYNTH_FORCEINLINE 
+template <typename Range, typename Value> PSYNTH_FORCEINLINE
 void fill_frames (const Range& buf_range, const Value& val)
 {
-    detail::fill_aux (buf_range.begin (), buf_range.end (), 
+    detail::fill_aux (buf_range.begin (), buf_range.end (),
 		      val, is_planar<Range>());
 }
 
@@ -437,10 +437,10 @@ void fill_frames (const Range& buf_range, const Value& val)
    \ingroup ImageRangeSTLAlgorithmsFillFrames
    \brief std::fill for image ranges
 */
-template <typename Range, typename Value> PSYNTH_FORCEINLINE 
+template <typename Range, typename Value> PSYNTH_FORCEINLINE
 void fill_frames (Range& buf_range, const Value& val)
 {
-    detail::fill_aux (buf_range.begin (), buf_range.end (), 
+    detail::fill_aux (buf_range.begin (), buf_range.end (),
 		      val, is_planar<Range>());
 }
 
@@ -478,7 +478,7 @@ struct std_destruct_t
 
 /** destruct for planar iterators */
 template <typename It>
-PSYNTH_FORCEINLINE 
+PSYNTH_FORCEINLINE
 void destruct_aux (It first, It last, boost::mpl::true_)
 {
     static_for_each (first, last, std_destruct_t ());
@@ -486,7 +486,7 @@ void destruct_aux (It first, It last, boost::mpl::true_)
 
 /** destruct for interleaved iterators */
 template <typename It>
-PSYNTH_FORCEINLINE 
+PSYNTH_FORCEINLINE
 void destruct_aux (It first, It last, boost::mpl::false_)
 {
     destruct_range (first,last);
@@ -498,7 +498,7 @@ void destruct_aux (It first, It last, boost::mpl::false_)
    \ingroup ImageRangeSTLAlgorithmsDestructFrames
    \brief Invokes the in-place destructor on every frame of the range
 */
-template <typename Range> PSYNTH_FORCEINLINE 
+template <typename Range> PSYNTH_FORCEINLINE
 void destruct_frames (const Range& buf_range)
 {
     detail::destruct_aux (buf_range.begin (), buf_range.end (),
@@ -509,7 +509,7 @@ void destruct_frames (const Range& buf_range)
 /**
    \defgroup ImageRangeSTLAlgorithmsUninitializedFillFrames
    uninitialized_fill_frames
-   
+
    \ingroup ImageRangeSTLAlgorithms
    \brief std::uninitialized_fill for image ranges
 */
@@ -523,7 +523,7 @@ namespace detail
    objects
 */
 template <typename It, typename P>
-PSYNTH_FORCEINLINE 
+PSYNTH_FORCEINLINE
 void uninitialized_fill_aux (It first, It last,
 			     const P& p, boost::mpl::true_)
 {
@@ -532,7 +532,7 @@ void uninitialized_fill_aux (It first, It last,
         typedef typename std::iterator_traits<It>::value_type frame_t;
         while (sample < num_samples<frame_t>::value) {
             std::uninitialized_fill (dynamic_at_c (first, sample),
-				     dynamic_at_c (last,  sample), 
+				     dynamic_at_c (last,  sample),
 				     dynamic_at_c (p,     sample));
             ++ sample;
         }
@@ -551,7 +551,7 @@ void uninitialized_fill_aux (It first, It last,
    objects
 */
 template <typename It, typename P>
-PSYNTH_FORCEINLINE 
+PSYNTH_FORCEINLINE
 void uninitialized_fill_aux (It first, It last,
 			     const P& p, boost::mpl::false_)
 {
@@ -567,19 +567,19 @@ void uninitialized_fill_aux (It first, It last,
    If an exception is thrown destructs any in-place copy-constructed
    frames
 */
-template <typename Range, typename Value> 
+template <typename Range, typename Value>
 PSYNTH_FORCEINLINE
 void uninitialized_fill_frames (const Range& buf_range, const Value& val)
 {
     detail::uninitialized_fill_aux (buf_range.begin(),
-				    buf_range.end(), 
+				    buf_range.end(),
 				    val, is_planar<Range>());
 }
 
 /**
    \defgroup ImageRangeSTLAlgorithmsDefaultConstructFrames
    default_construct_frames
-   
+
    \ingroup ImageRangeSTLAlgorithms
    \brief invokes the default constructor on every frame of an image
    range
@@ -588,7 +588,7 @@ void uninitialized_fill_frames (const Range& buf_range, const Value& val)
 namespace detail
 {
 
-template <typename It> PSYNTH_FORCEINLINE 
+template <typename It> PSYNTH_FORCEINLINE
 void default_construct_range_impl (It first, It last, boost::mpl::true_)
 {
     typedef typename std::iterator_traits<It>::value_type value_t;
@@ -604,10 +604,10 @@ void default_construct_range_impl (It first, It last, boost::mpl::true_)
     }
 }
 
-template <typename It> PSYNTH_FORCEINLINE 
+template <typename It> PSYNTH_FORCEINLINE
 void default_construct_range_impl (It, It, boost::mpl::false_) {}
 
-template <typename It> PSYNTH_FORCEINLINE 
+template <typename It> PSYNTH_FORCEINLINE
 void default_construct_range (It first, It last)
 {
     default_construct_range_impl (
@@ -616,7 +616,7 @@ void default_construct_range (It first, It last)
 
 /** uninitialized_default_construct for planar iterators */
 template <typename It>
-PSYNTH_FORCEINLINE 
+PSYNTH_FORCEINLINE
 void default_construct_aux (It first, It last, boost::mpl::true_)
 {
     int sample=0;
@@ -636,7 +636,7 @@ void default_construct_aux (It first, It last, boost::mpl::true_)
 
 /** uninitialized_default_construct for interleaved iterators */
 template <typename It>
-PSYNTH_FORCEINLINE 
+PSYNTH_FORCEINLINE
 void default_construct_aux (It first, It last, boost::mpl::false_)
 {
     default_construct_range (first, last);
@@ -657,19 +657,19 @@ struct has_trivial_frame_constructor<Range, true> :
    \ingroup ImageRangeSTLAlgorithmsDefaultConstructFrames
    \brief Invokes the in-place default constructor on every frame of
    the (uninitialized) range.
-   
+
    Does not support planar heterogeneous ranges.
    If an exception is thrown destructs any in-place
    default-constructed frames
 */
-template <typename Range> 
+template <typename Range>
 PSYNTH_FORCEINLINE
 void default_construct_frames (const Range& buf_range)
 {
     if (detail::has_trivial_frame_constructor<
 	    Range, is_planar<Range>::value>::value)
         return;
- 
+
     detail::default_construct_aux (buf_range.begin (),
 				   buf_range.end (),
 				   is_planar<Range>());
@@ -680,7 +680,7 @@ namespace detail
 
 /** std::uninitialized_copy for pairs of planar iterators */
 template <typename It1, typename It2>
-PSYNTH_FORCEINLINE 
+PSYNTH_FORCEINLINE
 void uninitialized_copy_aux (It1 first1, It1 last1,
 			     It2 first2, boost::mpl::true_)
 {
@@ -705,7 +705,7 @@ void uninitialized_copy_aux (It1 first1, It1 last1,
 
 /** std::uninitialized_copy for interleaved or mixed iterators */
 template <typename It1, typename It2>
-PSYNTH_FORCEINLINE 
+PSYNTH_FORCEINLINE
 void uninitialized_copy_aux (It1 first1, It1 last1,
 			     It2 first2, boost::mpl::false_)
 {
@@ -728,8 +728,8 @@ void uninitialized_copy_frames (const Range1& range1, const Range2& range2)
     typedef boost::mpl::bool_<is_planar<Range1>::value &&
 			      is_planar<Range2>::value> is_planar;
     assert (range1.size () == range2.size ());
-    
-    detail::uninitialized_copy_aux (range1.begin (), range1.end (), 
+
+    detail::uninitialized_copy_aux (range1.begin (), range1.end (),
 				    range2.begin (), is_planar ());
 }
 
@@ -737,7 +737,7 @@ void uninitialized_copy_frames (const Range1& range1, const Range2& range2)
    \defgroup ImageRangeSTLAlgorithmsForEachFrame for_each_frame
    \ingroup ImageRangeSTLAlgorithms
    \brief std::for_each for image ranges
-   
+
    For contiguous images (i.e. images that have no alignment gap at
    the end of each row) it is more efficient to use the underlying
    frame iterator that does not check for the end of rows.  For
@@ -756,11 +756,11 @@ F for_each_frame (const V& buf, F fun)
 /**
    \defgroup ImageRangeSTLAlgorithmsForEachFramePosition
    for_each_frame_position
-   
+
    \ingroup ImageRangeSTLAlgorithms
    \brief adobe::for_each_position for image ranges (passes locators,
    instead of frame references, to the function object)
-   
+
    \ingroup ImageRangeSTLAlgorithmsForEachFramePosition
 */
 
@@ -770,7 +770,7 @@ F for_each_frame_position (const Range& buf, F fun)
 {
     for (auto loc = buf.begin (); loc != buf.end (); ++loc)
 	fun (loc);
-    
+
     return fun;
 }
 
@@ -811,7 +811,7 @@ struct equal_n_fn
 };
 
 /**
-   Equal when both ranges are interleaved and of the same type. 
+   Equal when both ranges are interleaved and of the same type.
    PSYNTH frames are bitwise comparable, so memcmp is used. User-defined
    frames that are not bitwise comparable need to provide an overload
 */
@@ -821,7 +821,7 @@ struct equal_n_fn<const frame<T,Cs>*, const frame<T,Cs>*>
     PSYNTH_FORCEINLINE
     bool operator () (const frame<T,Cs>* i1, std::ptrdiff_t n,
 		      const frame<T,Cs>* i2) const
-    { 
+    {
         return memcmp (i1, i2, n * sizeof (frame<T,Cs>)) == 0;
     }
 };
@@ -845,7 +845,7 @@ struct equal_n_fn<planar_frame_iterator<IC,Cs>,
     bool operator () (const planar_frame_iterator<IC,Cs> i1,
 		      std::ptrdiff_t n,
 		      const planar_frame_iterator<IC,Cs> i2) const
-    { 
+    {
         ptrdiff_t num_bytes = n * sizeof (
 	    typename std::iterator_traits<IC>::value_type);
 
@@ -901,14 +901,14 @@ namespace sound
    \ingroup ImageRangeSTLAlgorithmsEqualFrames
    \brief std::equal for image ranges
 */
-template <typename Range1, typename Range2> PSYNTH_FORCEINLINE 
+template <typename Range1, typename Range2> PSYNTH_FORCEINLINE
 bool equal_frames (const Range1& v1, const Range2& v2)
 {
     assert (v1.size() == v2.size());
     return std::equal (v1.begin (), v1.end (), v2.begin ());
     // std::equal has overloads with PSYNTH iterators for optimal
     // performance
-    // @todo Not anymore actually. 
+    // @todo Not anymore actually.
 }
 
 /**
@@ -921,7 +921,7 @@ bool equal_frames (const Range1& v1, const Range2& v2)
 
    @todo Implement with STL?
 */
-template <typename Range1, typename Range2, typename F> PSYNTH_FORCEINLINE 
+template <typename Range1, typename Range2, typename F> PSYNTH_FORCEINLINE
 F transform_frames (const Range1& src, const Range2& dst, F fun)
 {
     assert (src.size() == dst.size());
@@ -935,7 +935,7 @@ F transform_frames (const Range1& src, const Range2& dst, F fun)
    \brief transform_frames with two sources
 */
 template <typename Range1, typename Range2, typename Range3, typename F>
-PSYNTH_FORCEINLINE 
+PSYNTH_FORCEINLINE
 F transform_frames (const Range1& src1, const Range2& src2,
 		    const Range3& dst, F fun)
 {
@@ -952,12 +952,12 @@ F transform_frames (const Range1& src1, const Range2& src2,
    \ingroup ImageRangeSTLAlgorithms
    \brief adobe::transform_positions for image ranges (passes locators,
    instead of frame references, to the function object)
-   
+
    \ingroup ImageRangeSTLAlgorithmsTransformFramePositions
    \brief Like transform_frames but passes to the function object
    frame locators instead of frame references
-*/ 
-template <typename Range1, typename Range2, typename F> PSYNTH_FORCEINLINE 
+*/
+template <typename Range1, typename Range2, typename F> PSYNTH_FORCEINLINE
 F transform_frame_positions (const Range1& src,const Range2& dst, F fun)
 {
     assert (src.size () == dst.size ());
@@ -965,7 +965,7 @@ F transform_frame_positions (const Range1& src,const Range2& dst, F fun)
 
     for (std::ptrdiff_t x = 0; x < src.size (); ++x, ++loc)
 	dst [x] = fun (loc);
-        
+
     return fun;
 }
 
@@ -974,7 +974,7 @@ F transform_frame_positions (const Range1& src,const Range2& dst, F fun)
    \brief transform_frame_positions with two sources
 */
 template <typename Range1, typename Range2, typename Range3, typename F>
-PSYNTH_FORCEINLINE 
+PSYNTH_FORCEINLINE
 F transform_frame_positions (const Range1& src1,
 			     const Range2& src2,
 			     const Range3& dst, F fun)
@@ -986,7 +986,7 @@ F transform_frame_positions (const Range1& src1,
     for (std::ptrdiff_t x = 0; x < src1.width();
 	 ++x, ++loc1, ++loc2)
 	dst [x] = fun (loc1, loc2);
-        
+
     return fun;
 }
 

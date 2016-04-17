@@ -15,7 +15,7 @@
  *  Copyright (C) 2010 Juan Pedro Bolivar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -79,7 +79,7 @@ struct every_p
 {
     template <class X>
     struct not_pred : public mpl::not_<typename mpl::apply<Pred, X>::type> {};
-    
+
     typedef typename boost::is_same<
         typename mpl::find_if<Sequence, mpl::quote1<not_pred> >::type,
         typename mpl::end<Sequence>::type>::type type;
@@ -94,31 +94,31 @@ struct any_p
             typename mpl::end<Sequence>::type> >::type type;
 };
 
-struct join 
-{ 
-    template <class Seq1, class Seq2> 
-    struct apply 
-    { 
+struct join
+{
+    template <class Seq1, class Seq2>
+    struct apply
+    {
         typedef typename mpl::reverse<
-            typename boost::mpl::copy< 
-                Seq2, 
-                boost::mpl::front_inserter<Seq1> 
-                >::type >::type type; 
-    }; 
+            typename boost::mpl::copy<
+                Seq2,
+                boost::mpl::front_inserter<Seq1>
+                >::type >::type type;
+    };
 };
 
 /**
  *
  * @todo Use join_view instead?
  */
-template<class Sequence> 
-struct flatten 
-{ 
-    typedef typename boost::mpl::fold< 
-        Sequence, 
-        typename boost::mpl::clear<Sequence>::type, 
-        join 
-        >::type type; 
+template<class Sequence>
+struct flatten
+{
+    typedef typename boost::mpl::fold<
+        Sequence,
+        typename boost::mpl::clear<Sequence>::type,
+        join
+        >::type type;
 };
 
 template <class Element, class Sequence>
@@ -132,4 +132,3 @@ struct pair_seq : public mpl::transform<
 } /* namespace psynth */
 
 #endif /* PSYNTH_BASE_META_H_ */
-

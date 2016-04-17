@@ -12,7 +12,7 @@
  *  Copyright (C) 2011 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -47,10 +47,10 @@ class file_input : public file_input_base<Range>
     typedef file_input_base<Range> base;
 public:
     typedef typename base::range range;
-    
+
     static_assert (file_support<Range>::is_supported::value,
                    "Audio file format not supported.");
-    
+
     file_input (const std::string& fname);
 
     ~file_input ();
@@ -64,7 +64,7 @@ public:
 
     std::size_t length () const
     { return _info.frames; }
-    
+
 private:
     SNDFILE* _file;
     SF_INFO  _info;
@@ -76,5 +76,3 @@ private:
 #include <psynth/io/file_input.tpp>
 
 #endif /* PSYNTH_IO_FILE_INPUT_H_ */
-
-

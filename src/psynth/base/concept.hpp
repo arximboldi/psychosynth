@@ -7,10 +7,10 @@
  */
 
 /*
- *  Copyright (C) 2010 Juan Pedro Bolivar Puente
+ *  Copyright (C) 2010, 2016 Juan Pedro Bolivar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -44,7 +44,7 @@ template <typename C> void psynth_function_requires ()
     boost::function_requires<C>();
 }
 #else
-#define PSYNTH_CLASS_REQUIRE(T, NS, C) 
+#define PSYNTH_CLASS_REQUIRE(T, NS, C)
 template <typename C> void psynth_function_requires() {}
 #endif
 
@@ -52,7 +52,7 @@ template <typename C> void psynth_function_requires() {}
 /**
 \code
 auto concept DefaultConstructible<typename T> {
-    T::T();    
+    T::T();
 };
 \endcode
 */
@@ -86,7 +86,7 @@ struct CopyConstructible
 \code
 auto concept Assignable<typename T, typename U = T> {
     typename result_type;
-    result_type operator=(T&, U);    
+    result_type operator=(T&, U);
 };
 \endcode
 */
@@ -102,7 +102,7 @@ struct Assignable
 /**
 \code
 auto concept EqualityComparable<typename T, typename U = T> {
-    bool operator==(T x, T y);    
+    bool operator==(T x, T y);
     bool operator!=(T x, T y) { return !(x==y); }
 };
 \endcode
@@ -152,7 +152,7 @@ struct Swappable
 /**
 \code
 auto concept Regular<typename T> :
-     DefaultConstructible<T>, CopyConstructible<T>, EqualityComparable<T>, 
+     DefaultConstructible<T>, CopyConstructible<T>, EqualityComparable<T>,
      Assignable<T>, Swappable<T> {};
 \endcode
 */
@@ -163,7 +163,7 @@ struct Regular
         psynth_function_requires< boost::DefaultConstructibleConcept<T> >();
         psynth_function_requires< boost::CopyConstructibleConcept<T> >();
 	// ==, !=
-        psynth_function_requires< boost::EqualityComparableConcept<T> >(); 
+        psynth_function_requires< boost::EqualityComparableConcept<T> >();
         psynth_function_requires< boost::AssignableConcept<T> >();
         psynth_function_requires< Swappable<T> >();
     }
@@ -181,7 +181,7 @@ template <typename T>
 struct Metafunction
 {
     void constraints() {
-        typedef typename T::type type;
+        // typedef typename T::type type;
     }
 };
 
@@ -189,4 +189,3 @@ struct Metafunction
 } /* namespace psynth */
 
 #endif /* PSYNTH_BASE_CONCEPT_H_ */
-

@@ -12,7 +12,7 @@
  *  Copyright (C) 2011 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -47,4 +47,3 @@ PSYNTH_DECLARE_SHARED_TYPE (passive_output);
 } /* namespace psynth */
 
 #endif /* PSYNTH_GRAPH_CORE_PASSIVE_OUTPUT_FWD_HPP_ */
-

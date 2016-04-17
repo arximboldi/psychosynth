@@ -88,5 +88,3 @@ std::size_t jack_output<Range>::put (const const_range& data)
 } /* namespace psynth */
 
 #endif /* PSYNTH_IO_JACK_OUTPUT_TPP_ */
-
-

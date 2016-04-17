@@ -142,4 +142,3 @@ PSYNTH_DECLARE_NODE_FACTORY (node_audio_noise,   "audio_noise");
 } /* namespace psynth */
 
 #endif /* PSYNTH_OBJECTNOISE_H */
-

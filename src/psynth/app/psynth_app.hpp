@@ -10,8 +10,8 @@
  */
 
 /*
- *  Copyright (C) 2007, 2008, 2009 Juan Pedro Bolívar Puente
- *  
+ *  Copyright (C) 2007, 2008, 2009, 2016 Juan Pedro Bolívar Puente
+ *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -48,18 +48,18 @@ public:
 	ERR_GENERIC = -1,
 	SUCCESS = 0
     };
-    
+
     director m_director;
 
     boost::filesystem::path m_cfg_dir;
     boost::filesystem::path m_data_dir;
-    
+
     void generate_paths ();
     bool parse_args (int argc, const char* argv[]);
-    
+
     boost::filesystem::path get_config_path ();
     boost::filesystem::path get_data_path ();
-    
+
     virtual void prepare (base::arg_parser& args) {}
     virtual int execute () { return ERR_GENERIC; }
 
@@ -68,16 +68,16 @@ public:
 
 protected:
     void print_base_options (std::ostream& out);
-    
+
 public:
     world* get_world () {
 	return m_director.get_world ();
     };
-    
+
     graph::audio_async_output_ptr get_output () {
 	return m_director.get_output ();
     };
-    
+
     int run (int argc, const char* argv[]);
 
     void setup_synth ();

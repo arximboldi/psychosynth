@@ -12,7 +12,7 @@
  *  Copyright (C) 2010 Juan Pedro Bolivar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -30,7 +30,7 @@
 
 /*
  *  Copyright 2005-2007 Adobe Systems Incorporated
- * 
+ *
  *  Use, modification and distribution are subject to the Boost
  *  Software License, Version 1.0. (See accompanying file
  *  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt).
@@ -98,7 +98,7 @@ public:
     typedef typename std::iterator_traits<Iterator>::reference reference;
 
     step_iterator_adaptor () {}
-    
+
     step_iterator_adaptor (const Iterator& it, SFn step_fn = SFn ())
 	: parent_type (it)
 	, _step_fn (step_fn) {}
@@ -135,43 +135,43 @@ private:
 template <typename D,typename Iterator,typename SFn> inline
 bool operator> (const step_iterator_adaptor<D,Iterator,SFn>& p1,
 		 const step_iterator_adaptor<D,Iterator,SFn>& p2)
-{ 
-    return p1.step() > 0 ? p1.base() > p2.base() : p1.base() < p2.base(); 
+{
+    return p1.step() > 0 ? p1.base() > p2.base() : p1.base() < p2.base();
 }
 
 template <typename D,typename Iterator,typename SFn> inline
 bool operator< (const step_iterator_adaptor<D,Iterator,SFn>& p1,
 		 const step_iterator_adaptor<D,Iterator,SFn>& p2)
-{ 
-    return p1.step()>0 ? p1.base()< p2.base() : p1.base()> p2.base(); 
+{
+    return p1.step()>0 ? p1.base()< p2.base() : p1.base()> p2.base();
 }
 
 template <typename D,typename Iterator,typename SFn> inline
 bool operator>= (const step_iterator_adaptor<D,Iterator,SFn>& p1,
 		  const step_iterator_adaptor<D,Iterator,SFn>& p2)
-{ 
-    return p1.step()>0 ? p1.base()>=p2.base() : p1.base()<=p2.base(); 
+{
+    return p1.step()>0 ? p1.base()>=p2.base() : p1.base()<=p2.base();
 }
 
 template <typename D,typename Iterator,typename SFn> inline
 bool operator<= (const step_iterator_adaptor<D,Iterator,SFn>& p1,
 		 const step_iterator_adaptor<D,Iterator,SFn>& p2)
-{ 
-    return p1.step()>0 ? p1.base()<=p2.base() : p1.base()>=p2.base(); 
+{
+    return p1.step()>0 ? p1.base()<=p2.base() : p1.base()>=p2.base();
 }
 
 template <typename D,typename Iterator,typename SFn> inline
 bool operator== (const step_iterator_adaptor<D,Iterator,SFn>& p1,
 		 const step_iterator_adaptor<D,Iterator,SFn>& p2)
-{ 
-    return p1.base()==p2.base(); 
+{
+    return p1.base()==p2.base();
 }
 
 template <typename D,typename Iterator,typename SFn> inline
 bool operator!= (const step_iterator_adaptor<D,Iterator,SFn>& p1,
 		 const step_iterator_adaptor<D,Iterator,SFn>& p2)
-{ 
-    return p1.base()!=p2.base(); 
+{
+    return p1.base()!=p2.base();
 }
 
 } /* namespace detail */
@@ -232,7 +232,7 @@ struct memunit_step_fn
     {
 	memunit_advance (it, d * _step);
     }
-    
+
     difference_type step () const { return _step; }
 
     void set_step (std::ptrdiff_t step) { _step = step; }
@@ -244,26 +244,26 @@ private:
 
 template <typename Iterator>
 class memory_based_step_iterator :
-    public detail::step_iterator_adaptor<memory_based_step_iterator<Iterator>, 
-					 Iterator, 
+    public detail::step_iterator_adaptor<memory_based_step_iterator<Iterator>,
+					 Iterator,
 					 memunit_step_fn<Iterator> >
 {
     PSYNTH_CLASS_REQUIRE(Iterator, psynth::sound, MemoryBasedIteratorConcept)
 
     public:
-    typedef detail::step_iterator_adaptor<memory_based_step_iterator<Iterator>, 
-                                          Iterator, 
+    typedef detail::step_iterator_adaptor<memory_based_step_iterator<Iterator>,
+                                          Iterator,
                                           memunit_step_fn<Iterator> > parent_type;
     typedef typename parent_type::reference        reference;
     typedef typename parent_type::difference_type  difference_type;
     typedef Iterator                               base_iterator;
-    
+
     memory_based_step_iterator ()
 	: parent_type (Iterator()) {}
     memory_based_step_iterator (Iterator it, std::ptrdiff_t memunit_step)
 	: parent_type(it, memunit_step_fn<Iterator>(memunit_step)) {}
 
-    template <typename I2> 
+    template <typename I2>
     memory_based_step_iterator (const memory_based_step_iterator<I2>& it)
         : parent_type(it.base(), memunit_step_fn<Iterator>(it.step())) {}
 
@@ -358,24 +358,24 @@ inline std::ptrdiff_t memunit_step (
 
 template <typename Iterator>
 inline std::ptrdiff_t memunit_distance (
-    const memory_based_step_iterator<Iterator>& p1, 
+    const memory_based_step_iterator<Iterator>& p1,
     const memory_based_step_iterator<Iterator>& p2)
-{ 
-    return memunit_distance (p1.base(),p2.base()); 
+{
+    return memunit_distance (p1.base(),p2.base());
 }
 
 template <typename Iterator>
 inline void memunit_advance (
-    memory_based_step_iterator<Iterator>& p, 
+    memory_based_step_iterator<Iterator>& p,
     std::ptrdiff_t diff)
-{ 
+{
     memunit_advance (p.base(), diff);
 }
 
 template <typename Iterator>
-inline memory_based_step_iterator<Iterator> 
+inline memory_based_step_iterator<Iterator>
 memunit_advanced (
-    const memory_based_step_iterator<Iterator>& p, 
+    const memory_based_step_iterator<Iterator>& p,
     std::ptrdiff_t diff)
 {
     return memory_based_step_iterator<Iterator>(
@@ -383,11 +383,11 @@ memunit_advanced (
 }
 
 template <typename Iterator>
-inline typename std::iterator_traits<Iterator>::reference 
+inline typename std::iterator_traits<Iterator>::reference
 memunit_advanced_ref (
-    const memory_based_step_iterator<Iterator>& p, 
+    const memory_based_step_iterator<Iterator>& p,
     std::ptrdiff_t diff)
-{ 
+{
     return memunit_advanced_ref(p.base(), diff);
 }
 
@@ -437,7 +437,7 @@ namespace detail
 
 /* if the iterator is a plain base iterator (non-adaptor), wraps it in
    memory_based_step_iterator */
-template <typename I> 
+template <typename I>
 typename dynamic_step_type<I>::type make_step_iterator_impl (
     const I& it, std::ptrdiff_t step, boost::mpl::false_)
 {
@@ -445,7 +445,7 @@ typename dynamic_step_type<I>::type make_step_iterator_impl (
 }
 
 // If the iterator is compound, put the step in its base
-template <typename I> 
+template <typename I>
 typename dynamic_step_type<I>::type make_step_iterator_impl (
     const I& it, std::ptrdiff_t step, boost::mpl::true_)
 {
@@ -453,7 +453,7 @@ typename dynamic_step_type<I>::type make_step_iterator_impl (
 }
 
 // If the iterator is memory_based_step_iterator, change the step
-template <typename BaseIt> 
+template <typename BaseIt>
 memory_based_step_iterator<BaseIt> make_step_iterator_impl(
     const memory_based_step_iterator<BaseIt>& it,
     std::ptrdiff_t step, boost::mpl::true_)

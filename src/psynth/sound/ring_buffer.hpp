@@ -12,7 +12,7 @@
  *  Copyright (C) 2010 Juan Pedro Bolivar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -53,7 +53,7 @@ public:
     typedef typename range_base::size_type       size_type;
     typedef typename range_base::unsafe_position unsafe_position;
     typedef typename range_base::position        position;
-    
+
     /* Create with size and optional initial value and
      * alignment */
 
@@ -70,7 +70,7 @@ public:
 	: _buffer (size, alignment, alloc_in)
 	, _range  (range_base (range (_buffer)))
     {}
-    
+
     explicit ring_buffer_base (const Buffer& buf)
 	: _buffer (buf)
 	, _range (range_base (range (_buffer)))
@@ -113,14 +113,14 @@ public:
         swap (_buffer, buf._buffer);
         swap (_range,  buf._range);
     }
-    
+
     void recreate (size_type size,
 		   std::size_t alignment = 0)
     {
 	_buffer.recreate (size, alignment);
 	_range = range_base (range (_buffer));
     }
-    
+
     template <typename Allocator>
     void recreate (size_type size,
 		   std::size_t alignment,
@@ -130,7 +130,7 @@ public:
 	_range = range_base (range (_buffer));
     }
 
-    
+
 #ifdef PSYNTH_BUFFER_MODEL_RANGE
 
     position begin_pos () const
@@ -161,7 +161,7 @@ public:
     template<class Position, class Range>
     size_type read (Position& r, Range& buf) const
     { return _range.read (r, buf, buf.size ()); };
-    
+
     /** @see range_buffer_base::read */
     template<class Position, class Range>
     size_type read (Position& r, Range& buf, size_type samples) const
@@ -188,7 +188,7 @@ public:
     size_type read_and_convert (Position& r, Range& buf,
 				size_type samples, CC cc = CC ()) const
     { return _range.read_and_convert (r, buf, samples, cc); }
-    
+
     /** @see range_buffer_base::write */
     template <class Range>
     void write (const Range& buf)
@@ -198,12 +198,12 @@ public:
     template <class Range>
     void write (const Range& buf, size_type samples)
     { _range.write (buf, samples); }
-    
+
     /** @see range_buffer_base::write_and_convert */
     template <class Range, class CC = default_channel_converter>
     void write_and_convert (const Range& buf, CC cc = CC ())
     { _range.write_and_convert (buf, buf.size (), cc); }
-    
+
     /** @see range_buffer_base::write_and_convert */
     template <class Range, class CC = default_channel_converter>
     void write_and_convert (const Range& buf, size_type samples, CC cc = CC ())
@@ -216,7 +216,7 @@ public:
     /** @see range_buffer_base::backwards */
     bool is_backwards () const
     { return _range.is_backwards (); }
-    
+
     /** @see range_buffer_base::set_backwards */
     void set_backwards ()
     { return _range.set_backwards (); }
@@ -238,12 +238,12 @@ public:
 
     difference_type count () const
     { return _range.count (); }
-    
+
     safe_position sync (const safe_position& r) const
     { return _range.sync (); }
 
 #endif /* PSYNTH_BUFFER_MODEL_RANGE */
-    
+
 protected:
     Buffer      _buffer;
     range_base  _range;
@@ -257,13 +257,13 @@ class ring_buffer : public ring_buffer_base<Buffer, ring_buffer_range>
 
 public:
     typedef typename Buffer::allocator_type allocator_type;
-    
+
     typedef typename parent_type::range_base       range;
     typedef typename parent_type::const_range_base const_range;
-    
+
     typedef typename range::value_type          value_type;
     typedef typename range::reference           reference;
-    
+
     typedef typename range::unsafe_iterator            unsafe_iterator;
     typedef typename const_range::unsafe_iterator      const_unsafe_iterator;
     typedef typename range::iterator                   iterator;
@@ -280,7 +280,7 @@ public:
 			  alloc_in = typename Buffer::allocator_type ())
 	: parent_type (size, alignment, alloc_in)
     {}
-    
+
     explicit ring_buffer (const Buffer& buf)
 	: parent_type (buf)
     {}
@@ -305,7 +305,7 @@ public:
     }
 
     using parent_type::recreate;
-    
+
     void recreate (typename parent_type::size_type size,
                    typename Buffer::range::value_type val,
 		   std::size_t alignment = 0)
@@ -315,7 +315,7 @@ public:
     }
 
 #ifdef PSYNTH_BUFFER_MODELS_RANGE
-    
+
     iterator begin ()
     { return this->_range.begin (); }
 
@@ -338,10 +338,10 @@ public:
     { return this->_range.safe_begin (); }
 
     const_safe_iterator safe_end () const
-    { return this->_range.safe_end (); }    
+    { return this->_range.safe_end (); }
 
 #endif /* PSYNTH_BUFFER_MODEL_RANGE */
-    
+
     allocator_type&       allocator ()
     { return this->_buffer.allocator (); }
 
@@ -349,11 +349,11 @@ public:
     { return this->_buffer.allocator (); }
 
 private:
-    template <typename B> friend 
+    template <typename B> friend
     typename ring_buffer<B>::range&
     range (ring_buffer<B>& buf);
 
-    template <typename B> friend 
+    template <typename B> friend
     const typename ring_buffer<B>::const_range
     const_range (const ring_buffer<B>& buf);
 };
@@ -386,34 +386,33 @@ const_range (const ring_buffer<B>& buf)
 /*
  *
  *  FrameBasedConcept
- *  
+ *
  */
 
 template <typename Buffer>
 struct sample_type<ring_buffer<Buffer> > :
-    public sample_type<Buffer> {}; 
+    public sample_type<Buffer> {};
 
 template <typename Buffer>
 struct channel_space_type<ring_buffer<Buffer> > :
-    public channel_space_type<Buffer> {}; 
+    public channel_space_type<Buffer> {};
 
 template <typename Buffer>
 struct sample_mapping_type<ring_buffer<Buffer> > :
-    public sample_mapping_type<Buffer> {}; 
+    public sample_mapping_type<Buffer> {};
 
 template <typename Buffer>
 struct is_planar<ring_buffer<Buffer> > :
-    public is_planar<Buffer> {}; 
+    public is_planar<Buffer> {};
 
 
 /*
  *
  *  @todo DynamicStepTypeConcept
- *  
+ *
  */
-    
+
 } /* namespace sound */
 } /* namespace psynth */
 
 #endif /* PSYNTH_SOUND_RING_BUFFER_H_ */
-

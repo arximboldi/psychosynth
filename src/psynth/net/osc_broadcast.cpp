@@ -36,7 +36,7 @@ void osc_broadcast::clear()
     for (list<lo_address>::iterator it = m_dest.begin();
 	 it != m_dest.end(); ++it)
 	lo_address_free(*it);
-    
+
     m_dest.clear();
     m_sender = NULL;
 }
@@ -59,7 +59,7 @@ bool osc_broadcast::is_target (lo_address adr)
 	 it != m_dest.end(); ++it)
 	if (lo_address_equals(*it, adr))
 	    return true;
-	    
+
     return false;
 }
 

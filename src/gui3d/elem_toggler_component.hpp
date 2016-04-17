@@ -36,28 +36,27 @@ class elem_toggler_component : public elem_component,
     int m_param_num;
     int m_param_first;
     int m_param_step;
-    
+
     int m_step;
-    
+
     void create_toggles ();
     void destroy_toggles();
     void update_current_step_colour (int step);
     void update_step_colour (int step);
-    
+
 public:
     elem_toggler_component (int num_param,
 			    int first_param,
 			    int step_param);
     ~elem_toggler_component ();
-    
+
     void init ();
     void update (int ms);
     bool handle_pointer_move (Ogre::Vector2 pos);
     bool handle_pointer_click (Ogre::Vector2 pos, OIS::MouseButtonID id);
     bool handle_pointer_release (Ogre::Vector2 pos, OIS::MouseButtonID id);
     void handle_param_change (psynth::world_node& obj,
-			   int param_id);   
+			   int param_id);
 };
 
 #endif /* ELEMTOGGLERCOMPONENT_H */
-

@@ -12,7 +12,7 @@
  *  Copyright (C) 2009 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -77,7 +77,7 @@ BOOST_AUTO_TEST_CASE (arg_paser_test_1)
     bool arg_bool = false;
     float arg_float = 0;
     int arg_int = 0;
-    
+
     psynth::base::arg_parser p;
     p.add ('a', 0, &arg_bool);
     p.add ('b', "bold", &arg_float);
@@ -99,7 +99,7 @@ BOOST_AUTO_TEST_CASE (arg_parser_test_2)
     bool arg_bool = false;
     float arg_float = 0;
     int arg_int = 0;
-    
+
     psynth::base::arg_parser p;
     p.add ('t', "true", &arg_bool);
     p.add ('n', "not", new psynth::base::option_not_flag (&arg_bool));
@@ -118,7 +118,7 @@ BOOST_AUTO_TEST_CASE (arg_parser_test_3)
     bool arg_bool = false;
     float arg_float = 0;
     int arg_int = 0;
-    
+
     psynth::base::arg_parser p;
     p.add ('t', "true", &arg_bool);
     p.add ('n', "not", new psynth::base::option_not_flag (&arg_bool));

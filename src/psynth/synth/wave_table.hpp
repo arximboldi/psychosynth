@@ -12,7 +12,7 @@
  *  Copyright (C) 2007 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -46,12 +46,12 @@ class wave_table
 {
 public:
     typedef typename Buffer::range::value_type frame_type;
-    
+
     wave_table () = default;
     wave_table (const wave_table&) = default;
     wave_table (wave_table&&) = default;
     wave_table& operator= (const wave_table&) = default;
-    
+
     wave_table (std::size_t size)
         : _table (size) {}
 
@@ -63,7 +63,7 @@ public:
     }
 
     frame_type get (float x) const;
-    
+
     template <class Func>
     void fill (std::size_t new_size, Func func)
     {

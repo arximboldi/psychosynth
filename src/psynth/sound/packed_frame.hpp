@@ -12,7 +12,7 @@
  *  Copyright (C) 2010 Juan Pedro Bolivar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -30,7 +30,7 @@
 
 /*
  *  Copyright 2005-2007 Adobe Systems Incorporated
- * 
+ *
  *  Use, modification and distribution are subject to the Boost
  *  Software License, Version 1.0. (See accompanying file
  *  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt).
@@ -53,7 +53,7 @@ namespace sound
 {
 
 /**
-   \defgroup ChannelBaseModelPackedFrame packed_frame 
+   \defgroup ChannelBaseModelPackedFrame packed_frame
    \ingroup ChannelBaseModel
 
    \brief A heterogeneous channel base whose elements are reference
@@ -62,7 +62,7 @@ namespace sound
 */
 
 /**
-   \defgroup FrameModelPackedFrame packed_frame 
+   \defgroup FrameModelPackedFrame packed_frame
    \ingroup FrameModel
 
    \brief A heterogeneous frame used to represent packed frames with
@@ -79,7 +79,7 @@ namespace sound
    get_channel(r565,red_t())   = 31;
    get_channel(r565,green_t()) = 63;
    get_channel(r565,blue_t())  = 31;
-   assert(r565 == rgb565_frame_t((uint16_t)0xFFFF));    
+   assert(r565 == rgb565_frame_t((uint16_t)0xFFFF));
 \endcode
 */
 
@@ -89,7 +89,7 @@ namespace sound
    \brief Heterogeneous frame value whose sample references can be
    constructed from the frame bitfield and their index. Models
    ChannelBaseValueConcept, FrameValueConcept, FrameBasedConcept
-   
+
    Typical use for this is a model of a packed frame (like 565 RGB)
 */
 
@@ -118,14 +118,14 @@ struct packed_frame
 			      >::is_mutable);
 
     packed_frame () {}
-    
+
     explicit packed_frame (const BitField& bitfield)
 	: _bitfield (bitfield) {}
 
     // Construct from another compatible frame type
     packed_frame (const packed_frame& p)
 	: _bitfield (p._bitfield) {}
-    
+
     template <typename P>
     packed_frame (const P& p,
 		  typename boost::enable_if_c<is_frame<P>::value>::type* d=0)
@@ -133,44 +133,44 @@ struct packed_frame
 	check_compatible<P> ();
 	static_copy (p, *this);
     }
-    
+
     packed_frame (int chan0, int chan1)
 	: _bitfield(0)
-    { 
-        BOOST_STATIC_ASSERT((num_samples<packed_frame>::value == 2)); 
-        sound::at_c<0>(*this) = chan0;
-	sound::at_c<1>(*this) = chan1; 
-    }
-    
-    packed_frame (int chan0, int chan1, int chan2)
-	: _bitfield(0)
-    { 
-        BOOST_STATIC_ASSERT((num_samples<packed_frame>::value == 3)); 
+    {
+        BOOST_STATIC_ASSERT((num_samples<packed_frame>::value == 2));
         sound::at_c<0>(*this) = chan0;
 	sound::at_c<1>(*this) = chan1;
-	sound::at_c<2>(*this) = chan2; 
     }
-    
-    packed_frame(int chan0, int chan1, int chan2, int chan3)
-	: _bitfield (0)
-    { 
-        BOOST_STATIC_ASSERT((num_samples<packed_frame>::value==4)); 
+
+    packed_frame (int chan0, int chan1, int chan2)
+	: _bitfield(0)
+    {
+        BOOST_STATIC_ASSERT((num_samples<packed_frame>::value == 3));
         sound::at_c<0>(*this) = chan0;
 	sound::at_c<1>(*this) = chan1;
 	sound::at_c<2>(*this) = chan2;
-	sound::at_c<3>(*this) = chan3; 
     }
-    
+
+    packed_frame(int chan0, int chan1, int chan2, int chan3)
+	: _bitfield (0)
+    {
+        BOOST_STATIC_ASSERT((num_samples<packed_frame>::value==4));
+        sound::at_c<0>(*this) = chan0;
+	sound::at_c<1>(*this) = chan1;
+	sound::at_c<2>(*this) = chan2;
+	sound::at_c<3>(*this) = chan3;
+    }
+
     packed_frame(int chan0, int chan1, int chan2, int chan3, int chan4)
 	: _bitfield(0)
-    { 
-        BOOST_STATIC_ASSERT((num_samples<packed_frame>::value == 5)); 
+    {
+        BOOST_STATIC_ASSERT((num_samples<packed_frame>::value == 5));
         sound::at_c<0>(*this) = chan0;
 	sound::at_c<1>(*this) = chan1;
 	sound::at_c<2>(*this) = chan2;
 	sound::at_c<3>(*this) = chan3;
 	sound::at_c<4>(*this) = chan4;
-    } 
+    }
 
     packed_frame& operator= (const packed_frame& p)
     {
@@ -184,12 +184,12 @@ struct packed_frame
 	assign (p, boost::mpl::bool_<is_frame<P>::value>());
 	return *this;
     }
-    
+
     template <typename P>
     bool operator== (const P& p) const
     {
 	return equal (p, boost::mpl::bool_<is_frame<P>::value>());
-    } 
+    }
 
     template <typename P>
     bool operator!= (const P& p) const
@@ -203,34 +203,34 @@ struct packed_frame
 	sound::at_c<0>(*this) = chan;
 	return *this;
     }
-    
+
     bool operator== (int chan) const
     {
 	check_mono ();
 	return sound::at_c<0>(*this) == chan;
     }
-    
-private:    
+
+private:
     template <typename Frame>
     static void check_compatible()
     {
 	base::psynth_function_requires<
 	    FramesCompatibleConcept<Frame, packed_frame> >();
     }
-    
+
     template <typename Frame>
     void assign(const Frame& p, boost::mpl::true_)
     {
 	check_compatible<Frame>();
 	static_copy (p,*this);
     }
-    
+
     template <typename Frame>
     bool  equal (const Frame& p, boost::mpl::true_) const
     {
 	check_compatible<Frame>();
 	return static_equal(*this,p);
-    } 
+    }
 
     // Support for assignment/equality comparison of a sample with a
     // monoscale frame
@@ -239,14 +239,14 @@ private:
 	BOOST_STATIC_ASSERT((boost::is_same<typename Layout::channel_space,
 			     mono_space>::value));
     }
-    
+
     template <typename Sample>
     void assign (const Sample& chan, boost::mpl::false_)
     {
 	check_mono ();
 	sound::at_c<0>(*this) = chan;
     }
-    
+
     template <typename Sample>
     bool equal (const Sample& chan, boost::mpl::false_) const
     {
@@ -262,15 +262,15 @@ private:
  *
  */
 
-template <typename BitField, typename SampleRefVec, typename Layout, int K>  
+template <typename BitField, typename SampleRefVec, typename Layout, int K>
 struct kth_element_type<packed_frame<BitField,SampleRefVec,Layout>,K> :
 	public boost::mpl::at_c<SampleRefVec, K> {};
 
-template <typename BitField, typename SampleRefVec, typename Layout, int K>  
+template <typename BitField, typename SampleRefVec, typename Layout, int K>
 struct kth_element_reference_type<packed_frame<BitField,SampleRefVec,Layout>,K> :
 	public boost::mpl::at_c<SampleRefVec, K> {};
 
-template <typename BitField, typename SampleRefVec, typename Layout, int K>  
+template <typename BitField, typename SampleRefVec, typename Layout, int K>
 struct kth_element_const_reference_type<
     packed_frame<BitField, SampleRefVec, Layout>, K>
 {
@@ -279,17 +279,17 @@ struct kth_element_const_reference_type<
 };
 
 template <int K, typename P, typename C, typename L> inline
-typename kth_element_reference_type<packed_frame<P,C,L>, K>::type 
+typename kth_element_reference_type<packed_frame<P,C,L>, K>::type
 at_c (packed_frame<P,C,L>& p)
 {
     return typename kth_element_reference_type<
-	packed_frame<P,C,L>, K>::type (&p._bitfield); 
+	packed_frame<P,C,L>, K>::type (&p._bitfield);
 }
 
 template <int K, typename P, typename C, typename L> inline
-typename kth_element_const_reference_type<packed_frame<P,C,L>, K>::type 
+typename kth_element_const_reference_type<packed_frame<P,C,L>, K>::type
 at_c (const packed_frame<P,C,L>& p)
-{ 
+{
     return typename kth_element_const_reference_type<
 	packed_frame<P,C,L>, K>::type (&p._bitfield);
 }
@@ -303,7 +303,7 @@ at_c (const packed_frame<P,C,L>& p)
 
 /* Metafunction predicate that flags packed_frame as a model of
  * FrameConcept. Required by FrameConcept */
-template <typename BitField, typename SampleRefVec, typename Layout>  
+template <typename BitField, typename SampleRefVec, typename Layout>
 struct is_frame<packed_frame<BitField, SampleRefVec, Layout> > :
     public boost::mpl::true_ {};
 
@@ -317,15 +317,15 @@ struct is_frame<packed_frame<BitField, SampleRefVec, Layout> > :
 template <typename P, typename C, typename Layout>
 struct channel_space_type<packed_frame<P,C,Layout> > {
     typedef typename Layout::channel_space type;
-}; 
+};
 
 template <typename P, typename C, typename Layout>
 struct sample_mapping_type<packed_frame<P,C,Layout> > {
     typedef typename Layout::sample_mapping type;
-}; 
+};
 
 template <typename P, typename C, typename Layout>
-struct is_planar<packed_frame<P,C,Layout> > : boost::mpl::false_ {}; 
+struct is_planar<packed_frame<P,C,Layout> > : boost::mpl::false_ {};
 
 
 /*
@@ -337,7 +337,7 @@ struct is_planar<packed_frame<P,C,Layout> > : boost::mpl::false_ {};
 /**
   \defgroup FrameIteratorModelPackedInterleavedPtr Pointer to
   packed_frame<P,CR,Layout>
-  
+
   \ingroup FrameIteratorModel
   \brief Iterators over interleaved frames.
 
@@ -345,11 +345,11 @@ struct is_planar<packed_frame<P,C,Layout> > : boost::mpl::false_ {};
   interleaved frames of packed format. Models FrameIteratorConcept,
   HasDynamicXStepTypeConcept, MemoryBasedIteratorConcept
 */
-template <typename P, typename C, typename L>  
+template <typename P, typename C, typename L>
 struct iterator_is_mutable<packed_frame<P,C,L>*> :
     public boost::mpl::bool_<packed_frame<P,C,L>::is_mutable> {};
 
-template <typename P, typename C, typename L>  
+template <typename P, typename C, typename L>
 struct iterator_is_mutable<const packed_frame<P,C,L>*> :
     public boost::mpl::false_ {};
 

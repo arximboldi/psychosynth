@@ -10,7 +10,7 @@
  *  Copyright (C) 2011, 2016 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -41,14 +41,14 @@ struct test_base
 };
 
 struct test_count : test_base
-{ 
+{
     void method () { ++count; }
 };
 
 struct test_count_dec : test_base
 {
     int dec_count;
-    test_count_dec () : dec_count (0) {} 
+    test_count_dec () : dec_count (0) {}
     void method () { ++dec_count; --count; }
 };
 
@@ -82,7 +82,7 @@ BOOST_AUTO_TEST_CASE(hetero_deque_test_some_back)
     BOOST_CHECK_EQUAL (q.push_back<test_count> (), true);
     BOOST_CHECK_EQUAL (q.push_back<test_count_dec> (), true);
     BOOST_CHECK_EQUAL (q.empty (), false);
-    
+
     q.front ().method ();
     q.back ().method ();
 
@@ -110,7 +110,7 @@ BOOST_AUTO_TEST_CASE(hetero_deque_test_some_front)
     BOOST_CHECK_EQUAL (q.push_front<test_count> (), true);
     BOOST_CHECK_EQUAL (q.push_front<test_count_dec> (), true);
     BOOST_CHECK_EQUAL (q.empty (), false);
-    
+
     q.front ().method ();
     q.back ().method ();
 
@@ -139,7 +139,7 @@ BOOST_AUTO_TEST_CASE(hetero_deque_test_some_mixed)
     q.pop_back ();
     q.pop_back ();
     while (q.push_back<test_count_dec> ());
-        
+
     q.front ().method ();
     q.back ().method ();
 
@@ -154,7 +154,7 @@ BOOST_AUTO_TEST_CASE(hetero_deque_test_except)
     BOOST_CHECK_EQUAL (q.push_back<test_count> (), true);
     BOOST_CHECK_EQUAL (q.push_back<test_count_dec> (), true);
     BOOST_CHECK_THROW (q.push_back<test_except> (), std::logic_error);
-    
+
     q.front ().method ();
     q.back ().method ();
 
@@ -165,7 +165,7 @@ BOOST_AUTO_TEST_CASE(hetero_deque_test_except)
 BOOST_AUTO_TEST_CASE(hetero_deque_iter)
 {
     test_deque q (1024);
-    
+
     for (int i = 0; i < 8; ++i)
     {
         BOOST_CHECK_EQUAL (q.push_back<test_count> (), true);
@@ -227,7 +227,7 @@ BOOST_AUTO_TEST_CASE(hetero_deque_move)
     BOOST_CHECK_EQUAL (q.push_back<test_count_dec> (), true);
 
     test_deque q2 (std::move (q));
-    
+
     q2.front ().method ();
     q2.back ().method ();
 

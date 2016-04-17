@@ -12,7 +12,7 @@
  *  Copyright (C) 2011 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -44,7 +44,7 @@ namespace detail
 template <class R, class I>
 caching_file_input_impl<R, I>::~caching_file_input_impl ()
 {
-    // TODO!! 
+    // TODO!!
     //if (!_finished)
     //    stop ();
 }
@@ -92,14 +92,14 @@ void caching_file_input_impl<R, I>::set_backwards (bool backwards)
         std::unique_lock<std::mutex> input_lock  (_input_mutex);
 
         std::ptrdiff_t old_avail = _range.available (_read_ptr);
-	
+
 	_backwards = backwards;
 	_range.set_backwards ();
 	_read_ptr = _range.sync (_read_ptr);
-        
+
         std::ptrdiff_t new_avail  = _range.available (_read_ptr);
         std::ptrdiff_t diff_avail = new_avail - old_avail;
-        
+
 	/* Fix reading position. */
 	if (_backwards) {
 	    _new_read_pos = _read_pos + diff_avail;
@@ -150,13 +150,13 @@ std::size_t caching_file_input_impl<R, I>::take (const Range& buf)
 
 	while (_range.available (_read_ptr) <= 0)
             _cond.wait (lock);
-        
+
 	nread = std::min<std::size_t> (nsamples, _range.available (_read_ptr));
 
         if (nread)
         {
             _range.read_and_convert (_read_ptr, sub_range (buf, 0, nread));
-            
+
             // TODO: Why is ring_buffer_range::size_type signed?
 	    if ((std::size_t) _range.available (_read_ptr) < _threshold)
 		_cond.notify_all ();
@@ -166,7 +166,7 @@ std::size_t caching_file_input_impl<R, I>::take (const Range& buf)
                 std::reverse (buf.begin (), buf.begin () + nread);
 	}
     }
-    
+
     return nread;
 }
 
@@ -188,7 +188,7 @@ void caching_file_input_impl<R, I>::run ()
 	{
 	    nread = 0;
 	    std::unique_lock<std::mutex> lock (_input_mutex);
-	
+
 	    if (_input)
             {
 		must_read = _threshold;
@@ -204,24 +204,24 @@ void caching_file_input_impl<R, I>::run ()
                         _new_read_pos = 0;
                     }
                 }
-                
+
                 if (_new_read_pos >= (std::ptrdiff_t) _input->length ())
                     _new_read_pos = 0;
-                
+
                 assert (_new_read_pos >= 0);
                 assert (_new_read_pos <= _input->length ());
-                
+
                 /* Do we have to seek */
                 if (_new_read_pos != _read_pos)
                 {
                     _read_pos = _new_read_pos;
                     do_seek (_read_pos, seek_dir::beg);
                 }
-                
+
                 auto block = sound::sub_range (
                     sound::range (_tmp_buffer), 0, must_read);
 		nread = _input->take (block);
-                
+
 		/* Check wether whe have finished reading and loop. */
                 if (!_backwards)
                 {
@@ -232,7 +232,7 @@ void caching_file_input_impl<R, I>::run ()
                 }
 	    }
 	} /* lock _input_mutex */
-	
+
 	/* Add it to the buffer. */
 	if (nread)
         {

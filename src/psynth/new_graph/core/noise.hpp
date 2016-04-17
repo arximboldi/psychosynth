@@ -12,7 +12,7 @@
  *  Copyright (C) 2012 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -49,10 +49,10 @@ class noise : public node
 {
 public:
     noise ();
-    
+
 protected:
     void rt_do_process (rt_process_context& ctx);
-    
+
     Output               _out_output;
     soft_sample_in_port  _in_modulator;
     in_control<float>    _ctl_amplitude;
@@ -73,4 +73,3 @@ typedef noise<synth::pink_noise_distribution,  sample_out_port> sample_pink_nois
 } /* namespace psynth */
 
 #endif /* PSYNTH_GRAPH_CORE_NOISE_HPP_ */
-

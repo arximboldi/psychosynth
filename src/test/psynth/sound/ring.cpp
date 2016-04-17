@@ -12,7 +12,7 @@
  *  Copyright (C) 2010 Juan Pedro Bolivar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -48,7 +48,7 @@ BOOST_AUTO_TEST_SUITE (sound_ring_test);
 BOOST_AUTO_TEST_CASE (test_ring_buffer)
 {
     stereo32sf_planar_buffer bbuf (buffer_size);
-    stereo32sf_planar_buffer::range buf (range (bbuf)); 
+    stereo32sf_planar_buffer::range buf (range (bbuf));
     fill_frames (buf, stereo32sf_frame (.0f));
 
     stereo32sf_ring_buffer rring (buffer_size * 1.3);
@@ -86,8 +86,8 @@ BOOST_AUTO_TEST_CASE (test_ring_buffer_nr)
 BOOST_AUTO_TEST_CASE (test_ring_buffer_iterator)
 {
     stereo32sf_ring_buffer rring (buffer_size * 1.3);
-    stereo32sf_ring_buffer::range ring (range (rring)); 
-        
+    stereo32sf_ring_buffer::range ring (range (rring));
+
     ring.write (sample_range);
     BOOST_CHECK (std::equal (ring.begin_unsafe (), ring.end_unsafe (),
 			     sample_range.begin ()));
@@ -99,7 +99,7 @@ BOOST_AUTO_TEST_CASE (test_ring_buffer_iterator)
 			     sample_range.begin ()));
     BOOST_CHECK (std::equal (ring.end () - buffer_size, ring.end (),
 			     sample_range.begin ()));
-    
+
 }
 
 typedef

@@ -26,13 +26,13 @@
 #include "gui3d/toggable_window.hpp"
 
 class quit_window : public toggable_window
-{	
+{
     CEGUI::FrameWindow* create_window ();
 
 public:
     quit_window ();
     ~quit_window ();
-	
+
     bool on_quit (const CEGUI::EventArgs &e);
     bool on_cancel (const CEGUI::EventArgs &e);
 };

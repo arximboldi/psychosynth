@@ -52,10 +52,10 @@ class director : private boost::noncopyable
     audio_info m_info;
 
     void on_config_nudge (base::conf_node& node);
-        
+
     void register_config();
     void unregister_config();
-    
+
     void start_output();
     void stop_output();
 
@@ -67,11 +67,11 @@ public:
 	, m_world(NULL) {}
 
     ~director();
-    
+
     void attach_output_director_factory (output_director_factory* fact);
     void start (base::conf_node& conf, const boost::filesystem::path& home_path);
     void stop ();
-    
+
     world* get_world () {
 	return m_world;
     }
@@ -86,4 +86,3 @@ public:
 } /* namespace psynth */
 
 #endif /* PSYNTH_DIRECTOR_H */
-

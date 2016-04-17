@@ -12,7 +12,7 @@
  *  Copyright (C) 2010 Juan Pedro Bolivar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -30,7 +30,7 @@
 
 /*
  *  Copyright 2005-2007 Adobe Systems Incorporated
- * 
+ *
  *  Use, modification and distribution are subject to the Boost
  *  Software License, Version 1.0. (See accompanying file
  *  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt).
@@ -81,7 +81,7 @@ namespace sound
 
 template <typename Frame,
 	  bool IsPlanar,
-	  typename Alloc = std::allocator<unsigned char> >    
+	  typename Alloc = std::allocator<unsigned char> >
 class buffer
 {
 public:
@@ -89,17 +89,17 @@ public:
 
     typedef typename range_type_from_frame<Frame, IsPlanar>::type range;
     typedef typename range::const_type  const_range;
-    
+
     typedef typename range::size_type        size_type;
     typedef typename range::value_type       value_type;
     typedef typename range::difference_type  difference_type;
     typedef typename range::reference        reference;
-    
+
     typedef typename range::iterator               iterator;
     typedef typename const_range::iterator         const_iterator;
     typedef typename range::reverse_iterator       reverse_iterator;
     typedef typename const_range::reverse_iterator const_reverse_iterator;
-        
+
     /* Create with size and optional initial value and
      * alignment */
     explicit buffer (size_type size = 0,
@@ -111,8 +111,8 @@ public:
     {
         allocate_and_default_construct (size);
     }
-    
-    buffer (size_type size, 
+
+    buffer (size_type size,
 	    const Frame& frame_in,
 	    std::size_t alignment,
 	    const Alloc alloc_in = Alloc())
@@ -122,7 +122,7 @@ public:
     {
         allocate_and_fill (size, frame_in);
     }
-    
+
     buffer (const buffer& buf)
 	: _memory (0)
 	, _align_in_bytes (buf._align_in_bytes)
@@ -176,16 +176,16 @@ public:
     {
 	return _range.size ();
     }
-    
+
     void swap (buffer& buf)
     {
         // required by MutableContainerConcept
         using std::swap;
         swap (_align_in_bytes, buf._align_in_bytes);
         swap (_memory,         buf._memory);
-        swap (_range,          buf._range); 
+        swap (_range,          buf._range);
         swap (_alloc,          buf._alloc);
-    }    
+    }
 
     void recreate (size_type size,
 		   std::size_t alignment=0,
@@ -199,8 +199,8 @@ public:
             swap (tmp);
         }
     }
-    
-    void recreate (size_type size_, 
+
+    void recreate (size_type size_,
 		   const Frame& frame_in,
 		   std::size_t alignment,
 		   const Alloc alloc_in = Alloc())
@@ -215,67 +215,67 @@ public:
     }
 
 #ifdef PSYNTH_BUFFER_MODEL_RANGE
-    
-    iterator frames () 
+
+    iterator frames ()
     { return _range.frames (); }
 
-    const_iterator frames () const 
+    const_iterator frames () const
     { return _range.frames (); }
-    
+
     iterator begin ()
     { return _range.begin (); }
-    
+
     iterator end ()
     { return _range.end (); } // potential performance problem!
 
     const_iterator begin () const
     { return _range.begin (); }
-    
+
     const_iterator end () const
     { return _range.end (); } // potential performance problem!
-    
+
     reverse_iterator rbegin ()
     { return _range.rbegin (); }
-    
+
     reverse_iterator rend ()
     { return _range.rend (); }
-    
+
     const_reverse_iterator rbegin () const
     { return _range.rbegin (); }
-    
+
     const_reverse_iterator rend () const
     { return _range.rend (); }
-    
+
     reference operator [] (difference_type i)
     { return begin () [i]; } // potential performance problem!
 
     const reference operator [] (difference_type i) const
     { return begin () [i]; } // potential performance problem!
-    
+
     iterator at (difference_type i)
     { return begin () + i; }
-    
+
     const_iterator at (difference_type i) const
     { return begin () + i; }
 
 #endif /* PSYNTH_BUFFER_MODEL_RANGE */
-    
+
 private:
-    template <typename F, bool P, typename A> friend 
+    template <typename F, bool P, typename A> friend
     const typename buffer<F, P, A>::range&
     range (buffer<F, P, A>& buf);
 
-    template <typename F, bool P, typename A> friend 
+    template <typename F, bool P, typename A> friend
     const typename buffer<F, P, A>::const_range
     const_range (const buffer<F, P, A>& buf);
-    
+
     unsigned char* _memory;
     std::size_t    _align_in_bytes;
     allocator_type _alloc;
     range          _range;
-    
+
     void allocate_and_default_construct (size_type size)
-    { 
+    {
         try {
             allocate_ (size, boost::mpl::bool_<IsPlanar>());
             default_construct_frames (_range);
@@ -298,7 +298,7 @@ private:
 
     template <typename Range>
     void allocate_and_copy (size_type size, const Range& v)
-    { 
+    {
         try {
             allocate_ (size, boost::mpl::bool_<IsPlanar>());
             uninitialized_copy_frames (v, _range);
@@ -309,7 +309,7 @@ private:
     }
 
     void deallocate (size_type size)
-    { 
+    {
         if (_memory)
 	    _alloc.deallocate (_memory, total_allocated_size_in_bytes (size));
     }
@@ -320,7 +320,7 @@ private:
 	    typename range::iterator ());
         if (IsPlanar)
             size_in_units = size_in_units * num_samples<range>::value;
-	
+
         // return the size rounded up to the nearest byte
         return (size_in_units +
 		byte_to_memunit<typename range::iterator>::value - 1) /
@@ -342,7 +342,7 @@ private:
         }
         return size_in_memunits;
     }
-    
+
     void allocate_ (const size_type& size, boost::mpl::false_)
     {
 	// if it throws and _memory!=0 the client must deallocate _memory
@@ -351,7 +351,7 @@ private:
 	unsigned char* tmp = (_align_in_bytes > 0) ?
 	    (unsigned char*) align ((std::size_t) _memory, _align_in_bytes) :
 	    _memory;
-	
+
         _range = range (size, typename range::iterator (tmp));
     }
 
@@ -360,18 +360,18 @@ private:
         // if it throws and _memory!=0 the client must deallocate _memory
         std::size_t plane_size = get_size_in_memunits (size);
         _memory = _alloc.allocate (total_allocated_size_in_bytes (size));
-	
+
         unsigned char* tmp = (_align_in_bytes > 0) ?
 	    (unsigned char*) align ((std::size_t)_memory, _align_in_bytes) :
 	    _memory;
-	
-        typename range::iterator first; 
+
+        typename range::iterator first;
         for (int i = 0; i < num_samples<range>::value; ++i)
 	{
             dynamic_at_c (first, i) = (typename sample_type<range>::type *) tmp;
             memunit_advance (dynamic_at_c (first, i), plane_size * i);
         }
-	
+
         _range = range (size, first);
     }
 };
@@ -380,7 +380,7 @@ template <typename Frame, bool IsPlanar, typename Alloc>
 void swap (buffer<Frame, IsPlanar, Alloc>& buf1,
 	   buffer<Frame, IsPlanar, Alloc>& buf2)
 {
-    buf1.swap (buf2); 
+    buf1.swap (buf2);
 }
 
 template <typename Frame1, bool IsPlanar1, typename Alloc1,
@@ -411,7 +411,7 @@ bool operator != (const buffer<Frame1, IsPlanar1, Alloc1>& buf1,
 
    \brief Returns the non-constant-frame range of an buffer
 */
-template <typename Frame, bool IsPlanar, typename Alloc> inline 
+template <typename Frame, bool IsPlanar, typename Alloc> inline
 const typename buffer<Frame, IsPlanar, Alloc>::range&
 range (buffer<Frame, IsPlanar, Alloc>& buf)
 {
@@ -421,11 +421,11 @@ range (buffer<Frame, IsPlanar, Alloc>& buf)
 /**
    \brief Returns the constant-frame range of an buffer
 */
-template <typename Frame, bool IsPlanar, typename Alloc> inline 
+template <typename Frame, bool IsPlanar, typename Alloc> inline
 const typename buffer <Frame, IsPlanar, Alloc>::const_range
 const_range (const buffer<Frame,IsPlanar,Alloc>& buf)
-{ 
-    return typename buffer<Frame, IsPlanar, Alloc>::const_range (buf._range); 
+{
+    return typename buffer<Frame, IsPlanar, Alloc>::const_range (buf._range);
 }
 /** @} */
 
@@ -437,7 +437,7 @@ const_range (const buffer<Frame,IsPlanar,Alloc>& buf)
 
 template <typename Frame, bool IsPlanar, typename Alloc>
 struct sample_type<buffer<Frame,IsPlanar,Alloc> > :
-    public sample_type<Frame> {}; 
+    public sample_type<Frame> {};
 
 template <typename Frame, bool IsPlanar, typename Alloc>
 struct channel_space_type<buffer<Frame,IsPlanar,Alloc> >  :

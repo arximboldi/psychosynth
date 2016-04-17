@@ -25,25 +25,25 @@
 input_manager::input_manager(OIS::ParamList& pl)
 {
     m_inputmgr = OIS::InputManager::createInputSystem(pl);
-	
+
     m_keyboard = static_cast<OIS::Keyboard*>(
 	m_inputmgr->createInputObject(OIS::OISKeyboard, true));
     m_mouse = static_cast<OIS::Mouse*>(
 	m_inputmgr->createInputObject(OIS::OISMouse, true));
-	
+
     m_keyboard->setEventCallback(this);
-    m_mouse->setEventCallback(this);   
+    m_mouse->setEventCallback(this);
 }
 
 input_manager::input_manager(size_t window_hnd)
 {
     m_inputmgr = OIS::InputManager::createInputSystem(window_hnd);
-	
+
     m_keyboard = static_cast<OIS::Keyboard*>(
 	m_inputmgr->createInputObject(OIS::OISKeyboard, true));
     m_mouse = static_cast<OIS::Mouse*>(
 	m_inputmgr->createInputObject(OIS::OISMouse, true));
-	
+
     m_keyboard->setEventCallback (this);
     m_mouse->setEventCallback (this);
 }

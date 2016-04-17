@@ -31,7 +31,7 @@
 #include "gui3d/element_manager.hpp"
 
 class selector_window : public toggable_window
-{	
+{
 public:
     class category {
 	class button {
@@ -39,43 +39,43 @@ public:
 	    CEGUI::Window* m_window;
 	    int m_index;
 	    psynth::world_node_creator m_creator;
-	    
+
 	public:
 	    button (const std::string& name, element_manager* m_mgr,
 		   const psynth::world_node_creator& objcre, int index);
-			
+
 	    ~button () {
 		//delete m_window;
 		//delete m_creator;
 	    }
-			
+
 	    CEGUI::Window* getWindow() {
 		return m_window;
 	    };
-			
+
 	    void set_position ();
-			
+
 	    bool on_click (const CEGUI::EventArgs &e) {
 		m_mgr->add_element (m_creator);
 		return true;
 	    }
-			
+
 	    bool on_parent_resize (const CEGUI::EventArgs &e) {
 		set_position ();
 		return true;
 	    }
 	};
-		
+
 	std::list<button*> m_buts;
 	CEGUI::Window* m_window;
 	element_manager* m_mgr;
 	int m_nbut;
-		
+
     public:
 	category (const std::string& name, element_manager* mgr);
-		
+
 	~category ();
-		
+
 	CEGUI::Window* get_window () {
 	    return m_window;
 	};
@@ -83,16 +83,16 @@ public:
 	void clear_buttons ();
 	void add_button (const std::string& name, const psynth::world_node_creator& objcre);
     };
-	
-private:	
+
+private:
     std::map<std::string, category*> m_cat;
     CEGUI::Window* m_window;
     CEGUI::Window* m_container;
     element_manager* m_mgr;
-	
+
     CEGUI::FrameWindow* create_window ();
 
-public:	
+public:
     selector_window (element_manager* emgr);
     category* add_category (const std::string& name);
     category* find_category (const std::string& name);

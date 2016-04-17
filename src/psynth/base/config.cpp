@@ -10,7 +10,7 @@
 
 /*
  *  Copyright (C) 2007, 2009 Juan Pedro Bolívar Puente
- *  
+ *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -48,7 +48,7 @@ PSYNTH_DEFINE_ERROR_WHAT (config_type_error, "Config node type mismatch.");
 PSYNTH_DEFINE_ERROR_WHAT (config_backend_error, "Config node has no backend.");
 
 void conf_subject::add_listener (conf_listener& l)
-{    
+{
     on_change.connect (boost::bind (&conf_listener::handle_conf_change, &l, _1));
     on_nudge.connect (boost::bind (&conf_listener::handle_conf_nudge, &l, _1));
     on_add_child.connect (boost::bind (&conf_listener::handle_conf_add_child, &l, _1));
@@ -66,7 +66,7 @@ void conf_subject::del_listener (conf_listener& l)
 void conf_node::save ()
 {
     lock lock (this);
-    
+
     if (_backend)
 	_backend->save (*this);
     else
@@ -76,7 +76,7 @@ void conf_node::save ()
 void conf_node::load ()
 {
     lock lock (this);
-    
+
     if (_backend)
 	_backend->load (*this);
     else
@@ -86,7 +86,7 @@ void conf_node::load ()
 void conf_node::def_load ()
 {
     lock lock (this);
-    
+
     if (_backend)
 	_backend->def_load (*this);
     else
@@ -96,7 +96,7 @@ void conf_node::def_load ()
 void conf_node::set_backend (conf_backend_ptr backend)
 {
     lock lock (this);
-    
+
     if (_backend)
 	unset_backend ();
     _backend = backend;
@@ -106,7 +106,7 @@ void conf_node::set_backend (conf_backend_ptr backend)
 void conf_node::unset_backend ()
 {
     lock lock (this);
-    
+
     if (_backend) {
 	_backend->datach (*this);
 	_backend.reset ();

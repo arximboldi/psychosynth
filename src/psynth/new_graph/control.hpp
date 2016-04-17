@@ -12,7 +12,7 @@
  *  Copyright (C) 2011 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -67,7 +67,7 @@ public:
     virtual base::type_value type () const = 0;
     virtual const control_meta& meta () const = 0;
 
-    virtual std::string str () const = 0;    
+    virtual std::string str () const = 0;
 
     const node& owner () const
     { return *_owner; }
@@ -77,12 +77,12 @@ public:
 
     std::string name ()
     { return _name; }
-    
-protected:    
+
+protected:
     control_base (const std::string& name, node* owner);
 
     bool _has_owner () const { return _owner != 0; }
-    
+
 protected:
     std::string _name;
     node*       _owner;
@@ -108,7 +108,7 @@ public:
 
     template <typename T>
     void set (const T&);
-        
+
 protected:
     in_control_base (const std::string& name, node* owner);
 };
@@ -140,13 +140,13 @@ protected:
 template <typename T>
 class typed_out_control_base : public out_control_base
 {
-public:  
-    virtual const T& get () const = 0; 
+public:
+    virtual const T& get () const = 0;
     virtual void rt_set (const T& val, rt_process_context& ctx) = 0;
     virtual const T& rt_get () const = 0;
-    
+
     base::type_value type () const
-    { return typeid (T); }    
+    { return typeid (T); }
 
     std::string str () const
     { return boost::lexical_cast<std::string> (this->get ()); }
@@ -172,7 +172,7 @@ public:
     { return boost::lexical_cast<std::string> (this->get ()); }
 
     base::type_value type () const
-    { return typeid (T); }    
+    { return typeid (T); }
 
 protected:
     typed_in_control_base (const std::string& name, node* owner)
@@ -189,7 +189,7 @@ class out_control_impl : public typed_out_control_base<T>
 public:
     const T& get () const
     { return _value; }
-    
+
     const T& rt_get () const
     { return _value; }
 
@@ -213,9 +213,9 @@ public:
     { return _rt_value; }
 
     const T& get () const;
-    
+
     void rt_set (const T& val, rt_process_context& ctx);
-    
+
 protected:
     out_control_impl (const std::string& name, node* owner, T val)
         : typed_out_control_base<T> (name, owner)
@@ -258,10 +258,10 @@ class out_control : public detail::out_control_impl<
 public:
     out_control (const std::string& name, node* owner=0, const T& value=T())
         : impl_base (name, owner, value) {}
-    
-    const control_meta& meta () const 
+
+    const control_meta& meta () const
     { return default_control_meta; } // FIXME !!!!
-    
+
 };
 
 
@@ -280,20 +280,20 @@ public:
         , _is_updated (false)
     {}
 
-    const control_meta& meta () const 
+    const control_meta& meta () const
     { return default_control_meta; } // FIXME !!!!
-    
+
     const T& get () const
     { return _value; }
-    
+
     const T& rt_get () const
     { return _rt_value; }
 
-    void set (const T&);    
+    void set (const T&);
 
     bool rt_is_updated ()
     { return _is_updated; }
-    
+
 private:
     struct rt_update_event : public rt_event
     {
@@ -304,16 +304,16 @@ private:
         in_control& _ctl;
         T _new_rt_value;
     };
-    
+
     struct rt_post_update_event : public rt_event
     {
         rt_post_update_event (in_control& ctl)
             : _ctl (ctl) {}
-        void operator () (rt_process_context& ctx);        
+        void operator () (rt_process_context& ctx);
     private:
         in_control& _ctl;
     };
-    
+
     friend class rt_update_event;
     friend class rt_post_update_event;
 

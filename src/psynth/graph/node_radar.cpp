@@ -29,12 +29,12 @@ namespace psynth
 
 PSYNTH_DEFINE_OBJECT_FACTORY(ObjectRadar);
 
-ObjectRadar::ObjectRadar(const AudioInfo& prop, int numchan) : 
+ObjectRadar::ObjectRadar(const AudioInfo& prop, int numchan) :
     Object(prop,
 	   OBJ_RADAR,
 	   "radar",
 	   N_PARAM,
-	   N_IN_A_SOCKETS, 
+	   N_IN_A_SOCKETS,
 	   N_IN_C_SOCKETS,
 	   N_OUT_A_SOCKETS,
 	   N_OUT_C_SOCKETS),
@@ -53,7 +53,7 @@ void ObjectRadar::doUpdate(const Object* caller, int caller_port_type, int calle
 
 	for (size_t i = 0; i < getInfo().block_size; ++i) {
 	    new_angle += 1 / getInfo().sample_rate;
-	    *out_buf++ = 
+	    *out_buf++ =
 	}
     }
 }
@@ -64,4 +64,3 @@ void ObjectRadar::doAdvance()
 }
 
 } /* namespace psynth */
-

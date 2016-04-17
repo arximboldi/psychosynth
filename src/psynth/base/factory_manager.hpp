@@ -10,7 +10,7 @@
 
 /*
  *  Copyright (C) 2009 Juan Pedro Bolívar Puente
- *  
+ *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -54,7 +54,7 @@ struct factory_access
 {
     typedef typename FactoryManager::key_type key_type;
     typedef typename FactoryManager::factory_method factory_method;
-    
+
     template <class Concrete>
     static void add (FactoryManager& self, const key_type& k)
     { self.add <Concrete> (k); }
@@ -80,10 +80,10 @@ public:
     typedef Key                                key_type;
     typedef BasePtr                            pointer_type;
     typedef typename pointee<BasePtr>::type    base_type;
-    
+
     typedef std::function<pointer_type (Args ...)> factory_method;
     typedef map_key_iterator<Key, factory_method>  iterator;
-    
+
     pointer_type create (const Key&, Args...);
 
     size_t size ()
@@ -113,15 +113,15 @@ class factory_manager :
 {
     typedef restricted_factory_manager <Key, BasePtr, Args...> base;
     typedef typename base::factory_method factory_method;
-    
+
 public:
     template <class Concrete>
     void add (const Key& k)
     { this->base::template add <Concrete> (k); }
-    
+
     void add (const Key& k, factory_method fn)
     { this->base::add (k, fn); }
-    
+
     void del (const Key& k)
     { this->base::del (k); }
 };

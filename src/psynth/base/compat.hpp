@@ -13,7 +13,7 @@
  *  Copyright (C) 2010 Juan Pedro Bolivar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -53,7 +53,7 @@
 /**
    Enable PSYNTH_NONWORD_POINTER_ALIGNMENT_SUPPORTED if your platform
    supports dereferencing on non-word memory boundary.
-   
+
    Enabling the flag results in performance improvement
 */
 #if !defined(__hpux) && !defined(sun) && \

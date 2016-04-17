@@ -16,7 +16,7 @@
  *  Copyright (C) 2011 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -72,8 +72,8 @@ public:
      */
     static constexpr std::size_t default_chunk_size  = 1024;
     static constexpr std::size_t default_buffer_size = 16384;
-    static constexpr std::size_t default_threshold   = 4096; 
-   
+    static constexpr std::size_t default_threshold   = 4096;
+
     caching_file_input_impl (
         InputPtr    input       = 0,
         std::size_t chunk_size  = default_chunk_size,
@@ -84,12 +84,12 @@ public:
         caching_file_input_impl&& other) = default;
 
     ~caching_file_input_impl ();
-    
+
 #if 0 // TODO
     caching_file_input_impl& operator= (
         caching_file_input_impl&& other) = default;
 #endif
-    
+
     void start ();
     void stop ();
 
@@ -101,10 +101,10 @@ public:
 
     const input_type& input () const
     { return *_input; }
-    
+
     bool is_backwards () const
     { return _backwards; }
-    
+
     void set_backwards (bool backwards);
 
     /** @todo Synchronization? */
@@ -113,7 +113,7 @@ public:
 
     void soft_seek (std::size_t pos);
     std::size_t seek (std::ptrdiff_t pos, seek_dir dir);
-    
+
     std::size_t take (const range& buf)
     { return this->template take<range> (buf); }
 
@@ -122,31 +122,31 @@ public:
 
 protected:
     InputPtr      _input;
-    
+
 public:
     typedef typename sound::buffer_from_range<input_range>::type
     input_buffer_type;
 
     typedef typename sound::buffer_from_range<range>::type
     buffer_type;
-    
+
     typedef sound::ring_buffer<buffer_type> ring_buffer_type;
 
     void set_input (InputPtr ptr);
 
     void do_seek (std::ptrdiff_t offst, seek_dir dir);
-    
+
     std::size_t   _chunk_size; // TODO: This substitutes
                                // get_info().block_size, but there
                                // might be problems.
     std::size_t   _buffer_size;
     std::size_t   _threshold;
-    
+
     input_buffer_type                   _tmp_buffer;
     ring_buffer_type                    _buffer;
     typename ring_buffer_type::range&   _range;
     typename ring_buffer_type::position _read_ptr;
-    
+
     bool           _backwards;
     std::ptrdiff_t _read_pos;
     std::ptrdiff_t _new_read_pos;
@@ -157,7 +157,7 @@ public:
     std::mutex              _input_mutex;
     std::mutex              _buffer_mutex;
     std::condition_variable _cond;
-    
+
     void run ();
 };
 
@@ -169,7 +169,7 @@ class caching_file_input_adapter :
 {
 public:
     typedef detail::caching_file_input_impl<Range, InputPtr> base;
-    
+
     caching_file_input_adapter (
         InputPtr    input       = 0,
         std::size_t chunk_size  = base::default_chunk_size,
@@ -192,4 +192,3 @@ public:
 #include <psynth/io/caching_file_input.tpp>
 
 #endif /* PSYNTH_IO_CACHING_FILE_INPUT_H_ */
-

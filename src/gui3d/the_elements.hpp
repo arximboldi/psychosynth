@@ -26,14 +26,14 @@
 #include "gui3d/element.hpp"
 
 class element_mixer : public element
-{  
+{
 public:
     element_mixer (psynth::world_node& obj,
 		   Ogre::SceneManager* m_scene);
 };
 
 class element_control_mixer : public element
-{  
+{
 public:
     element_control_mixer (psynth::world_node& obj,
 			Ogre::SceneManager* m_scene);

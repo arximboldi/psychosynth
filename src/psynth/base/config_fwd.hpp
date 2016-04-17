@@ -12,7 +12,7 @@
  *  Copyright (C) 2010 Juan Pedro Bolivar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -46,4 +46,3 @@ PSYNTH_DECLARE_TYPE (config)
 } /* namespace psynth */
 
 #endif /* PSYNTH_CONFIG_DEF_H_ */
-

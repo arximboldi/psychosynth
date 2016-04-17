@@ -67,13 +67,13 @@ void psychosynth_cli::print_version()
     "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n"
 
     "\nWritten by Juan Pedro Bolivar Puente";
-    
+
 }
 
 void psychosynth_cli::prepare (psynth::base::arg_parser& ap)
 {
     init ();
-    
+
     ap.add ('S', "server", &m_run_server);
     ap.add ('C', "client", &m_host);
     ap.add ('p', "port", &m_server_port);
@@ -84,7 +84,7 @@ void psychosynth_cli::prepare (psynth::base::arg_parser& ap)
 int psychosynth_cli::execute ()
 {
     int ret_val = -1;
-    
+
     if (m_host.empty() && !m_run_server)
 	cout << "Not enough parameters. Use -h or --help." << endl;
     else {
@@ -97,7 +97,7 @@ int psychosynth_cli::execute ()
             ret_val = run_osc ();
         close_synth ();
     }
-    
+
     return ret_val;
 }
 
@@ -116,24 +116,24 @@ int psychosynth_cli::run_client ()
     osc_client_logger logger;
     lo_address add;
     int ret_val = 0;
-    
+
     add = lo_address_new (m_host.c_str(), m_server_port.c_str());
 
     client.set_world (get_world());
     client.activate ();
-    
+
     client.add_listener (&logger);
     client.connect (add, m_client_port.c_str());
-    
+
     timer.update();
     while (ret_val == 0) {
 	timer.update();
-	
+
 	while (client.receive (TIME_OUT));
 	client.update (timer.delta_ticks());
 
 	get_world ()->update ();
-	
+
 	if (client.get_state () == osc_client::IDLE)
 	    ret_val = -1;
     }
@@ -147,13 +147,13 @@ int psychosynth_cli::run_server ()
     osc_server server;
     osc_server_logger logger;
     int ret_val = 0;
-    
+
     server.add_listener (&logger);
     server.listen (m_server_port.c_str());
 
     server.set_world (get_world ());
     server.activate();
-    
+
     timer.update();
     while (ret_val == 0) {
 	timer.update ();
@@ -162,7 +162,7 @@ int psychosynth_cli::run_server ()
 	server.update (timer.delta_ticks ());
 
 	get_world ()->update ();
-	
+
 	if (server.get_state () == osc_server::IDLE)
 	    ret_val = -1;
     }
@@ -175,10 +175,10 @@ int psychosynth_cli::run_osc ()
     base::timer timer;
     net::osc_passive server (m_osc_port.c_str ());
     int ret_val = 0;
-    
+
     server.set_world (get_world ());
     server.activate ();
-    
+
     timer.update();
     while (ret_val == 0) {
 	timer.update ();

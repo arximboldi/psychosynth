@@ -56,13 +56,13 @@ element_mixer::element_mixer(world_node& obj,
 		       0.0f, 1.0f,
 		       graph::node_mixer::PARAM_MIXOP,
 		       mesh_names));
-	
+
     get_gui_properties().add_parameter (new elem_gui_param_multi(
 					graph::node_mixer::PARAM_MIXOP,
 					graph::node_mixer::N_MIXOPS,
 					mixop_names,
 					"Operation"));
-    
+
     get_gui_properties().add_parameter (new elem_gui_param_float(
 					graph::node_mixer::PARAM_AMPLITUDE,
 					0.0f, 1.0f,
@@ -85,13 +85,13 @@ element_control_mixer::element_control_mixer(world_node& obj,
 		       0.0f, 1.0f,
 		       graph::node_mixer::PARAM_MIXOP,
 		       mesh_names));
-	
+
     get_gui_properties().add_parameter (new elem_gui_param_multi(
 					graph::node_mixer::PARAM_MIXOP,
 					graph::node_mixer::N_MIXOPS,
 					mixop_names,
 					"Operation"));
-    
+
     get_gui_properties().add_parameter (new elem_gui_param_float(
 					graph::node_mixer::PARAM_AMPLITUDE,
 					0.0f, 1.0f,
@@ -111,17 +111,17 @@ element_oscillator::element_oscillator(world_node& obj,
 
     static const char* mod_names[graph::node_oscillator::N_MOD_TYPES] =
 	{"Frequency", "Amplitude", "Phase"};
-    
+
     add_component (new elem_multi_main_component(
 		       graph::node_oscillator::PARAM_FREQUENCY,
 		       20.0f, 5000.0f,
 		       graph::node_oscillator::PARAM_WAVE,
 		       mesh_names));
-    
+
     add_component (new elem_second_component(
 		       graph::node_oscillator::PARAM_AMPLITUDE,
 		       0.0f, 1.0f));
-    
+
     get_gui_properties().add_parameter (new elem_gui_param_multi(
 					graph::node_oscillator::PARAM_WAVE,
 					graph::node_oscillator::N_OSC_TYPES,
@@ -133,12 +133,12 @@ element_oscillator::element_oscillator(world_node& obj,
 					graph::node_oscillator::N_MOD_TYPES,
 					mod_names,
 					"Modulator"));
-    
+
     get_gui_properties().add_parameter (new elem_gui_param_float(
 					graph::node_oscillator::PARAM_FREQUENCY,
 					20.0f, 5000.0f,
 					"Frequency"));
-    
+
     get_gui_properties().add_parameter (new elem_gui_param_float(
 					graph::node_oscillator::PARAM_AMPLITUDE,
 					0.0f, 1.0f,
@@ -158,18 +158,18 @@ element_lfo::element_lfo (world_node& obj,
 
     static const char* mod_names[graph::node_oscillator::N_MOD_TYPES] =
 	{"Frequency", "Amplitude", "Phase"};
-    
+
     add_component (new elem_multi_main_component(
 		       graph::node_oscillator::PARAM_FREQUENCY,
 		       0.01f, 30.0f,
 		       graph::node_oscillator::PARAM_WAVE,
 		       mesh_names));
-    
+
     add_component (new elem_second_component(
 		       graph::node_oscillator::PARAM_AMPLITUDE,
 		       0.0f, 1.0f));
 
-    
+
     get_gui_properties().add_parameter (new elem_gui_param_multi(
 					graph::node_oscillator::PARAM_WAVE,
 					graph::node_oscillator::N_OSC_TYPES,
@@ -181,12 +181,12 @@ element_lfo::element_lfo (world_node& obj,
 					graph::node_oscillator::N_MOD_TYPES,
 					mod_names,
 					"Modulator"));
-    
+
     get_gui_properties().add_parameter (new elem_gui_param_float(
 					graph::node_oscillator::PARAM_FREQUENCY,
 					0.01f, 30.0f,
 					"Frequency"));
-    
+
     get_gui_properties().add_parameter (new elem_gui_param_float(
 					graph::node_oscillator::PARAM_AMPLITUDE,
 					0.0f, 1.0f,
@@ -196,7 +196,7 @@ element_lfo::element_lfo (world_node& obj,
 element_filter::element_filter (world_node& obj,
 			       Ogre::SceneManager* m_scene) :
     element (obj, m_scene)
-{	    
+{
     static const char* mesh_names[graph::node_filter::N_FILTER_TYPES] =
 	{"filter_lowpass.mesh", "filter_highpass.mesh",
 	 "filter_bandpass.mesh", "filter_bandpass.mesh",
@@ -206,29 +206,29 @@ element_filter::element_filter (world_node& obj,
 	{"Lowpass", "Highpass",
 	 "Bandpass CSG", "Bandpass CZPG",
 	 "Notch", "Moog"};
-    
+
     add_component (new elem_multi_main_component(
 		       graph::node_filter::PARAM_CUTOFF,
 		       20.0f, 5000.0f,
 		       graph::node_filter::PARAM_TYPE,
 		       mesh_names));
-    
+
     add_component (new elem_second_component(
 		       graph::node_filter::PARAM_RESONANCE,
 		       0.0f, 1.0f));
 
-    
+
     get_gui_properties().add_parameter (new elem_gui_param_multi(
 					graph::node_filter::PARAM_TYPE,
 					graph::node_filter::N_FILTER_TYPES,
 					filter_names,
 					"Filter"));
-    
+
     get_gui_properties().add_parameter (new elem_gui_param_float(
 					graph::node_filter::PARAM_CUTOFF,
 					20.0f, 5000.0f,
 					"Cut-off Freq."));
-    
+
     get_gui_properties().add_parameter (new elem_gui_param_float(
 					graph::node_filter::PARAM_RESONANCE,
 					0.0f, 1.0f,
@@ -239,14 +239,14 @@ element_filter::element_filter (world_node& obj,
 element_sampler::element_sampler (world_node& obj,
 				 Ogre::SceneManager* m_scene) :
     element (obj, m_scene)
-{	    
+{
     static const char* mesh_name = "sampler.mesh";
-    
+
     add_component (new elem_main_component(
-		       string(mesh_name), 
+		       string(mesh_name),
 		       graph::node_sampler::PARAM_RATE,
 		       -3.0f, 3.0f));
-    
+
     add_component (new elem_second_component(
 		       graph::node_sampler::PARAM_AMPLITUDE,
 		       0.0f, 1.0f));
@@ -256,7 +256,7 @@ element_sampler::element_sampler (world_node& obj,
 					graph::node_sampler::PARAM_AMPLITUDE,
 					0.0f, 1.0f,
 					"Amplitude"));
-    
+
     get_gui_properties().add_parameter (new elem_gui_param_float(
 					graph::node_sampler::PARAM_RATE,
 					-3.0f, 3.0f,
@@ -281,14 +281,14 @@ element_step_seq::element_step_seq (world_node& obj,
 
     static const char* shape_names[graph::node_oscillator::N_OSC_TYPES] =
 	{"Square", "Triangle", "FW Sawtooth", "BW Sawtooth"};
-    
+
 
     add_component (new elem_multi_main_component(
 		       graph::node_step_seq::PARAM_BPM,
 		       40.0f, 400.0f,
 		       graph::node_step_seq::PARAM_SHAPE,
 		       mesh_names));
-    
+
     add_component (new elem_second_component(
 		       graph::node_step_seq::PARAM_HIGH,
 		       0.1f, 1.0f));
@@ -326,13 +326,13 @@ element_audio_noise::element_audio_noise (world_node& obj,
 
     static const char* type_names[graph::node_oscillator::N_OSC_TYPES] =
 	{"White", "Pink"};
-    
+
     add_component (new elem_multi_main_component(
 		       graph::node_noise::PARAM_AMPLITUDE,
 		       0.0f, 1.0f,
 		       graph::node_noise::PARAM_TYPE,
 		       mesh_names));
-        
+
     get_gui_properties().add_parameter  (new elem_gui_param_multi(
 					    graph::node_noise::PARAM_TYPE,
 					    graph::node_noise::N_TYPES,
@@ -354,13 +354,13 @@ element_control_noise::element_control_noise (world_node& obj,
 
     static const char* type_names[graph::node_oscillator::N_OSC_TYPES] =
 	{"White", "Pink"};
-    
+
     add_component (new elem_multi_main_component(
 		       graph::node_noise::PARAM_AMPLITUDE,
 		       0.0f, 1.0f,
 		       graph::node_noise::PARAM_TYPE,
 		       mesh_names));
-        
+
     get_gui_properties().add_parameter (new elem_gui_param_multi(
 					graph::node_noise::PARAM_TYPE,
 					graph::node_noise::N_TYPES,
@@ -376,14 +376,14 @@ element_control_noise::element_control_noise (world_node& obj,
 element_echo::element_echo (world_node& obj,
 			   Ogre::SceneManager* m_scene) :
     element (obj, m_scene)
-{	    
+{
     static const char* mesh_name = "echo.mesh";
-    
+
     add_component (new elem_main_component(
-		       string(mesh_name), 
+		       string(mesh_name),
 		       graph::node_echo::PARAM_DELAY,
 		       0.0f, 1.0f));
-    
+
     add_component (new elem_second_component(
 		       graph::node_echo::PARAM_FEEDBACK,
 		       0.0f, 1.0f));
@@ -393,7 +393,7 @@ element_echo::element_echo (world_node& obj,
 					graph::node_echo::PARAM_DELAY,
 					0.0f, 1.0f,
 					"Delay"));
-    
+
     get_gui_properties().add_parameter (new elem_gui_param_float(
 					graph::node_echo::PARAM_FEEDBACK,
 					0.0f, 1.0f,
@@ -403,14 +403,14 @@ element_echo::element_echo (world_node& obj,
 element_delay::element_delay (world_node& obj,
 			      Ogre::SceneManager* m_scene) :
     element (obj, m_scene)
-{	    
+{
     static const char* mesh_name = "delay.mesh";
-    
+
     add_component (new elem_main_component (
-		       string(mesh_name), 
+		       string(mesh_name),
 		       graph::node_delay::PARAM_DELAY,
 		       0.0f, 0.01f));
-    
+
     add_component (new elem_second_component(
 		       graph::node_delay::PARAM_DEPTH,
 		       0.0f, 1.0f));
@@ -420,7 +420,7 @@ element_delay::element_delay (world_node& obj,
 					graph::node_delay::PARAM_DELAY,
 					0.0f, 0.01f,
 					"Delay"));
-    
+
     get_gui_properties().add_parameter (new elem_gui_param_float(
 					graph::node_delay::PARAM_DEPTH,
 					0.0f, 1.0f,
@@ -430,14 +430,14 @@ element_delay::element_delay (world_node& obj,
 element_double_sampler::element_double_sampler (world_node& obj,
 						Ogre::SceneManager* m_scene) :
     element (obj, m_scene)
-{	    
+{
     static const char* mesh_name = "double_sampler.mesh";
-    
+
     add_component (new elem_main_component(
-		       string(mesh_name), 
+		       string(mesh_name),
 		       graph::node_double_sampler::PARAM_BLEND,
 		       0.0f, 1.0f));
-    
+
     add_component (new elem_second_component(
 		       graph::node_double_sampler::PARAM_AMPLITUDE,
 		       0.0f, 1.0f));
@@ -447,7 +447,7 @@ element_double_sampler::element_double_sampler (world_node& obj,
 					graph::node_double_sampler::PARAM_AMPLITUDE,
 					0.0f, 1.0f,
 					"Amplitude"));
-    
+
     get_gui_properties().add_parameter (new elem_gui_param_float(
 					graph::node_double_sampler::PARAM_BLEND,
 					0.0f, 1.0f,

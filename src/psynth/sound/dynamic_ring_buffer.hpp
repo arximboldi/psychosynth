@@ -39,8 +39,8 @@ public:
     explicit dynamic_ring_buffer ()
 	: parent_type ()
     {}
-    
-    explicit dynamic_ring_buffer (const DBuffer& buf) 
+
+    explicit dynamic_ring_buffer (const DBuffer& buf)
 	: parent_type (buf)
     {}
 
@@ -48,7 +48,7 @@ public:
     explicit dynamic_ring_buffer (const buffer<F2, IP2, Alloc2>& buf)
 	: parent_type (buf)
     {}
-    
+
     dynamic_ring_buffer& operator= (const dynamic_ring_buffer& buf)
     {
 	parent_type::operator= (buf);
@@ -66,7 +66,7 @@ private:
     template <typename B> friend
     const typename dynamic_ring_buffer<B>::range&
     range (dynamic_ring_buffer<B>& buf);
-    
+
     template <typename B> friend
     const typename dynamic_ring_buffer<B>::const_range
     const_range (const dynamic_ring_buffer<B>& buf);

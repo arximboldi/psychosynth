@@ -32,7 +32,7 @@ class default_selector_populator
 
     void populate_samples (selector_window::category* cat);
     void on_samples_conf_nudge (psynth::base::conf_node& conf);
-    
+
 public:
     void populate (selector_window* sel);
 };

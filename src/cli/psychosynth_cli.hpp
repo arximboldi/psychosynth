@@ -37,7 +37,7 @@ private:
     std::string m_server_port;
     std::string m_host;
     std::string m_osc_port;
-    
+
     void print_help ();
     void print_version ();
     void prepare (psynth::base::arg_parser& arg_parser);

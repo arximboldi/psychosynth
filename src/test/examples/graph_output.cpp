@@ -12,7 +12,7 @@
  *  Copyright (C) 2011 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -65,15 +65,15 @@ graph::core::patch_ptr make_output_patch (const char* device_name)
     in2->param ("port-name").set<std::string> ("in-two");
     mixer->in ("input-0").connect (in1->out ("output"));
     mixer->in ("input-1").connect (in2->out ("output"));
-    
+
     out->in ("input").connect (mixer->out ("output"));
-    
+
     return p;
 }
 
 std::mt19937 random_engine;
 std::normal_distribution<float> freq_dist (440.0f, 200.0f);
-std::normal_distribution<float> lfo_dist (2.0f, 1); 
+std::normal_distribution<float> lfo_dist (2.0f, 1);
 
 auto freq_gen = std::bind (
     base::clamp<float>,
@@ -124,7 +124,7 @@ struct synth_patch
             }
         }
     }
-    
+
     void update_params ()
     {
         float new_freq = freq_gen ();
@@ -138,13 +138,13 @@ struct synth_patch
 int main ()
 {
     base::logger::self ().add_sink (base::new_log_std_sink ());
-        
+
     graph::processor p;
     auto root     = p.root ();
 
     synth_patch synth_one;
     synth_patch synth_two;
-    
+
     auto out1 = root->add (make_output_patch ("hw:0,0"));
     auto out2 = root->add (make_output_patch ("hw:1,0"));
 
@@ -154,13 +154,12 @@ int main ()
     graph::connect (synth_one._patch, "output", out1, "in-one");
     graph::connect (synth_two._patch, "output", out1, "in-two");
     graph::connect (synth_one._patch, "output", out2, "in-one");
-    
+
     p.start ();
 
     ::sleep (3600);
-    
+
     p.stop ();
 
     return 0;
 }
-

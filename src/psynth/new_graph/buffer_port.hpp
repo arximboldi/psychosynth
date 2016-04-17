@@ -12,7 +12,7 @@
  *  Copyright (C) 2011 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -53,7 +53,7 @@ public:
 
     virtual typename T::range rt_out_range ()
     { return range (this->rt_get_out ()); }
-    
+
     void rt_context_update (rt_process_context& ctx)
     { this->rt_get_out ().recreate (ctx.block_size ()); }
 };
@@ -64,7 +64,7 @@ class buffer_in_port : public in_port<T>
 public:
     virtual typename T::const_range rt_in_range () const
     { return const_range (this->rt_get_in ()); }
-    
+
     buffer_in_port (std::string name, node* owner)
         : in_port<T> (name, owner) {}
 };
@@ -82,20 +82,20 @@ public:
         else
             return _default;
     }
-        
+
     defaulting_buffer_in_port (std::string name,
                                node* owner,
                                typename T::value_type defval)
         : base_type (name, owner)
         , _default_value (defval)
     {}
-    
+
     void rt_context_update (rt_process_context& ctx)
     {
         base_type::rt_context_update (ctx);
         _default.recreate (ctx.block_size (), _default_value, 0);
     }
-    
+
 private:
     T _default;
     typename T::value_type _default_value;
@@ -108,7 +108,7 @@ struct buffer_forward_port
 {
     typedef forward_port_impl<buffer_in_port<T>,
                               buffer_out_port<T> > base_type;
-    
+
     buffer_forward_port (std::string in_name,
                          std::string out_name,
                          node* in_owner,

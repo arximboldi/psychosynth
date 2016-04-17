@@ -12,7 +12,7 @@
  *  Copyright (C) 2011 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -55,7 +55,7 @@ struct other_concrete : some_base
 typedef std::unique_ptr<some_base> some_base_ptr;
 
 BOOST_AUTO_TEST_CASE (factory_test)
-{    
+{
     psynth::base::factory<some_base_ptr, some_concrete> f1;
     psynth::base::factory<some_base_ptr, other_concrete> f2;
 
@@ -88,7 +88,7 @@ BOOST_AUTO_TEST_CASE (factory_test_manager)
 
     mgr.add<some_concrete> ("some");
     mgr.add<other_concrete> ("other");
-    
+
     auto res = mgr.create ("some");
     BOOST_CHECK_EQUAL (res->_x, 1);
     res = mgr.create ("other");

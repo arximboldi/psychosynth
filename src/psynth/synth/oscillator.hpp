@@ -93,7 +93,7 @@ class oscillator
 public:
     /** @todo Parametrize? */
     static const std::size_t default_table_size = 1 << 12;
-    
+
     oscillator (std::size_t frame_rate,
                 float       freq       = 220.0f,
 		float       ampl       = 1.0f,
@@ -125,14 +125,14 @@ public:
 
     void set_phase (float phase)
     { _x += phase - _phase; _phase = phase; }
-    
+
     void set_wave_table (bool wave_table)
     {
 	if (wave_table && !s_table_init)
 	    initialize_table ();
 	_wave_table = wave_table;
     }
-    
+
     template <class Range1>
     void update (const Range1& out_buf);
 
@@ -144,11 +144,11 @@ public:
 
     template <class Range1, class Range2>
     void update_am (const Range1& out_buf, const Range2& mod_buf);
-    
+
 private:
     static wave_table<sound::mono32sf_buffer> s_wave_table;
     static bool                               s_table_init;
-    
+
     Generator   _gen;
     std::size_t _frame_rate;
     float       _speed;
@@ -157,7 +157,7 @@ private:
     float       _ampl;
     float       _phase;
     bool        _wave_table;
-    
+
     void initialize_table ();
 };
 

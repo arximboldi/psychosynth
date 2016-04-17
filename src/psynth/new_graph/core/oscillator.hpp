@@ -12,7 +12,7 @@
  *  Copyright (C) 2011 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -65,18 +65,18 @@ class oscillator : public node
 {
 public:
     oscillator ();
-    
+
 protected:
     void rt_on_context_update (rt_process_context& ctx);
     void rt_do_process (rt_process_context& ctx);
-    
+
     Output _out_output;
     soft_sample_in_port _in_modulator;
-    
+
     in_control<float> _ctl_frequency;
     in_control<float> _ctl_amplitude;
     in_control<int>   _ctl_modulator;
-    
+
     synth::oscillator<Generator> _osc;
 };
 
@@ -111,4 +111,3 @@ sample_exp_oscillator;
 } /* namespace psynth */
 
 #endif /* PSYNTH_GRAPH_CORE_OSCILLATOR_HPP_ */
-

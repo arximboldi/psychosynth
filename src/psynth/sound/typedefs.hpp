@@ -13,7 +13,7 @@
  *  Copyright (C) 2010 Juan Pedro Bolivar Puente
  *
  *  This file is part of Psychosynh.
- *   
+ *
  *  Psychosynh is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -31,7 +31,7 @@
 
 /*
  *  Copyright 2005-2007 Adobe Systems Incorporated
- * 
+ *
  *  Use, modification and distribution are subject to the Boost
  *  Software License, Version 1.0. (See accompanying file
  *  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt).
@@ -78,7 +78,7 @@
     CS##T##_buffer;							\
     typedef ring_buffer_range<CS##T##_range> CS##T##_ring_range;	\
     typedef ring_buffer_range<CS##T##c_range> CS##T##c_ring_range;	\
-    typedef ring_buffer<CS##T##_buffer> CS##T##_ring_buffer;		
+    typedef ring_buffer<CS##T##_buffer> CS##T##_ring_buffer;
 
 // CS = 'bgr' CS_FULL = 'rgb' LAYOUT='bgr_layout'
 #define PSYNTH_SOUND_DEFINE_ALL_TYPEDEFS_INTERNAL(T,CS,CS_FULL,LAYOUT)	\

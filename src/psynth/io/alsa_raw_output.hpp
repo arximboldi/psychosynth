@@ -12,7 +12,7 @@
  *  Copyright (C) 2011 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -51,7 +51,7 @@ class alsa_raw_output : public thread_async,
 {
 public:
     typedef thread_async::callback_type callback_type;
-    
+
     alsa_raw_output (const char*       device,
                      snd_pcm_format_t  format,
                      unsigned int      nperiods,
@@ -60,22 +60,22 @@ public:
                      unsigned int      rate,
                      unsigned int      channels,
                      callback_type     cb = callback_type ());
-    
+
     ~alsa_raw_output ();
 
     std::size_t put_i (const void*        data, std::size_t frames);
     std::size_t put_n (const void* const* data, std::size_t frames);
-    
+
     std::size_t buffer_size () const
     { return _buffer_size; }
 
     void start ();
     void stop ();
-    
+
 protected:
     void iterate ();
     void prepare ();
-    
+
 private:
     snd_pcm_uframes_t    _buffer_size;
     snd_pcm_t*           _handle;
@@ -87,4 +87,3 @@ private:
 } /* namespace psynth */
 
 #endif /* PSYNTH_IO_ALSA_RAW_OUTPUT_H_ */
-

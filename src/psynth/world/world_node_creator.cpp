@@ -59,7 +59,7 @@ world_node world_node_creator::create (world& table)
 	     ++it)
 	    it->second->apply(obj, it->first);
     }
-    
+
     return obj;
 }
 

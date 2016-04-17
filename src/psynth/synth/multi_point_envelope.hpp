@@ -11,14 +11,14 @@
  *  maybe we should consider making that generic too.
  *
  *  @todo I have the feeling that many of these classes should substitute
- *  update by operator () and just use xxx_frames algorithms. 
+ *  update by operator () and just use xxx_frames algorithms.
  */
 
 /*
  *  Copyright (C) 2008, 2009 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -68,12 +68,12 @@ class envelope_values
 
 public:
     typedef envelope_point<Sample> point;
-    
+
     envelope_values ()
         : _sustain (1)
         , _factor (1.0f)
 	{}
-    
+
     void set_asr (point a, point s, point r);
     void set_adsr (point a, point d, point s, point r);
 
@@ -82,16 +82,16 @@ public:
 
     float factor () const
     { return _factor; }
-    
+
     void set_sustain (std::size_t sustain)
     { _sustain = sustain; }
-    
+
     void set (const std::vector<point>& p, std::size_t sustain)
     {
 	_points  = p;
 	_sustain = sustain;
     }
-    
+
     point& get (std::size_t index)
     { return _points [index]; }
 
@@ -125,7 +125,7 @@ public:
     typedef Range                      range;
     typedef typename Range::value_type value_type;
     typedef ValuesPtr                  values_ptr;
-    
+
     multi_point_envelope (values_ptr val)
 	: _val (val)
 	, _cur_point (0)
@@ -150,7 +150,7 @@ public:
 	_time = 0;
 	_cur_point = 0;
     }
-    
+
     void press ()
     {
 	if (multi_point_envelope::finished ())
@@ -163,7 +163,7 @@ public:
 
     PSYNTH_FORCEINLINE value_type update ()
     { return multi_point_envelope::update (1); }
-    
+
     value_type update (std::size_t sample);
 
     void update (const range& samples)

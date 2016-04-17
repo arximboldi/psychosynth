@@ -12,7 +12,7 @@
  *  Copyright (C) 2011 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -59,7 +59,7 @@ file_input<Range>::file_input (const std::string& fname)
     // should fix that such that we can actually read files with any
     // kind of number of channels onto buffers of any number of
     // channels.
-    
+
     _info.channels = sound::num_samples<Range>::value;
     _file = detail::file_open_impl (fname.c_str (), SFM_READ, &_info);
 }
@@ -92,4 +92,3 @@ std::size_t file_input<Range>::seek (std::ptrdiff_t offset, seek_dir dir)
 } /* namespace psynth */
 
 #endif /* PSYNTH_IO_FILE_INPUT_TPP_ */
-

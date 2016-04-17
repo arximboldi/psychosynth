@@ -33,7 +33,7 @@
 class connection_line : public Ogre::ManualObject
 {
     Ogre::ColourValue m_colour;
-    
+
     void build (const Ogre::Vector2& src,
 		const Ogre::Vector2& dest);
 public:
@@ -41,7 +41,7 @@ public:
 		     const Ogre::ColourValue& colour,
 		     const Ogre::Vector2& src,
 		     const Ogre::Vector2& dest);
-    
+
     void update (const Ogre::Vector2& src,
 		 const Ogre::Vector2& dest);
 
@@ -49,14 +49,14 @@ public:
 	m_colour = colour;
 	create_colour_material (getName(), m_colour);
     };
-    
+
     ~connection_line ();
 };
 
 class connection_wave : public Ogre::ManualObject
 {
     Ogre::ColourValue m_colour;
-    
+
     void build (const Ogre::Vector2& src,
 		const Ogre::Vector2& dest,
 		const psynth::sample* samples, int n_samples);
@@ -66,7 +66,7 @@ public:
 		     const Ogre::ColourValue& colour,
 		     const Ogre::Vector2& src,
 		     const Ogre::Vector2& dest);
-    
+
     void update (const Ogre::Vector2& src,
 		 const Ogre::Vector2& dest,
 		 const psynth::sample* samples, int n_samples);
@@ -75,7 +75,7 @@ public:
 	m_colour = colour;
 	create_colour_material (getName(), m_colour);
     };
-    
+
     ~connection_wave ();
 };
 
@@ -87,14 +87,14 @@ class connection : public psynth::world_node_listener
     psynth::graph::watch* m_watch;
     connection_line* m_line;
     connection_wave* m_wave;
-    
+
     psynth::world_patcher_event m_link;
 
     Ogre::Vector2 m_src;
     Ogre::Vector2 m_dest;
 
     bool m_is_muted;
-    
+
 public:
 
     connection (Ogre::SceneManager* scene, const psynth::world_patcher_event& ev);
@@ -107,14 +107,14 @@ public:
     bool pointerReleased(const Ogre::Vector2& pos, OIS::MouseButtonID id);
     bool pointerMoved(const Ogre::Vector2& pos);
 */
-    
+
     void handle_activate_node (psynth::world_node& obj) {};
     void handle_deactivate_node (psynth::world_node& obj) {};
     void handle_set_param_node (psynth::world_node& ob,
 				int param_id);
 
     void update ();
-    
+
     const psynth::world_node& get_source () {
 	return m_link.src;
     }

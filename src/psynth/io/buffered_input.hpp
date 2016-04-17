@@ -12,7 +12,7 @@
  *  Copyright (C) 2011 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -42,12 +42,12 @@ namespace io
 namespace detail
 {
 
-template <class Range, class InputPtr> 
+template <class Range, class InputPtr>
 class buffered_input_impl : public input<Range>
 {
 public:
     typedef Range range;
-    
+
     typedef typename base::pointee<InputPtr>::type input_type;
     typedef typename input_type::range                   input_range;
 
@@ -58,9 +58,9 @@ public:
         : _buffer (default_input_buffer_size)
         , _input_ptr (input_ptr)
     {}
-    
+
     std::size_t take (const range& data);
-    
+
     template <class Range2>
     std::size_t take (const Range2& data);
 
@@ -72,7 +72,7 @@ public:
 
     const buffer_type& buffer () const
     { return _buffer; }
-    
+
     void set_buffer_size (std::size_t new_size)
     { _buffer.recreate (new_size); }
 
@@ -88,13 +88,13 @@ protected:
 };
 
 
-template <class Range, class InputPtr> 
+template <class Range, class InputPtr>
 class buffered_async_input_impl :
         public buffered_input_impl<Range, InputPtr>
 {
 public:
     typedef  buffered_input_impl<Range, InputPtr> base;
-    
+
     buffered_async_input_impl (InputPtr input_ptr = 0)
         : base (input_ptr)
     {}
@@ -111,11 +111,11 @@ class buffered_input_adapter :
 {
 public:
     typedef detail::buffered_input_impl<Range, InputPtr> base;
-    
+
     buffered_input_adapter (InputPtr in = 0)
         : base (in)
     { }
-    
+
     void set_input (InputPtr in = 0)
     { base::set_input (in); }
 };
@@ -126,11 +126,11 @@ class buffered_async_input_adapter :
 {
 public:
     typedef detail::buffered_input_impl<Range, InputPtr> base;
-    
+
     buffered_async_input_adapter (InputPtr in = 0)
         : base (in)
     { this->fit_buffer (); }
-    
+
     void set_input (InputPtr in = 0)
     {
         this->set_input (in);
@@ -143,7 +143,7 @@ template <class Range, class Input>
 class buffered_async_input :
     public detail::buffered_async_input_impl<Range, Input*>
 {
-public:   
+public:
     typedef detail::buffered_async_input_impl<Range, Input*> base;
 
     /**
@@ -163,10 +163,10 @@ private:
 template <class Range, class Input>
 class buffered_input :
     public detail::buffered_input_impl<Range, Input*>
-{   
+{
 public:
     typedef detail::buffered_input_impl<Range, Input*> base;
- 
+
     template <typename... Args>
     buffered_input (Args... args)
         : base (&_input)
@@ -213,4 +213,3 @@ make_buffered_input (InputPtr in)
 #include <psynth/io/buffered_input.tpp>
 
 #endif /* PSYNTH_IO_BUFFERED_INPUT_H_ */
-

@@ -12,7 +12,7 @@
  *  Copyright (C) 2010 Juan Pedro Bolivar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -52,7 +52,7 @@ class dynamic_ring_buffer_range : public ring_buffer_range_base<Range>
 
 public:
     typedef dynamic_ring_buffer_range<typename Range::const_range> const_range;
-    
+
     dynamic_ring_buffer_range () {}
 
     dynamic_ring_buffer_range (const dynamic_ring_buffer_range& range)
@@ -61,7 +61,7 @@ public:
     template<class Range2>
     explicit dynamic_ring_buffer_range (Range2& range)
 	: parent_type (range) {}
-    
+
     template<class Range2>
     explicit dynamic_ring_buffer_range (const Range2& range)
 	: parent_type (range) {}
@@ -75,4 +75,3 @@ public:
 } /* namespace psynth */
 
 #endif /* PSYNTH_SOUND_DYNAMIC_RING_BUFFER_RANGE_H_ */
-

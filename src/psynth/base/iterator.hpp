@@ -15,7 +15,7 @@
  *  Copyright (C) 2007 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -50,10 +50,10 @@ class ptr_iterator : public Iterator
 {
 public:
     typedef std::iterator_traits<Iterator> base_traits;
-    
+
     typedef typename std::iterator_traits<Iterator>::value_type ptr_value_type;
     typedef typename pointee<ptr_value_type>::type value_type;
-    
+
     typedef typename Iterator::iterator_category iterator_category;
     typedef typename Iterator::difference_type difference_type;
     typedef value_type* pointer;
@@ -74,7 +74,7 @@ public:
     ptr_iterator (Iterator&& it)
  	: Iterator (std::move (it))
     {}
-    
+
     template<class OtherIterator>
     ptr_iterator (const OtherIterator& it)
 	: Iterator (it)
@@ -84,7 +84,7 @@ public:
     ptr_iterator (OtherIterator&& it)
 	: Iterator (std::move (it))
     {}
-    
+
     /**
      * Const indirection operator, returns a constant reference to the
      * referred value.
@@ -109,12 +109,12 @@ class ptr_const_iterator : public Iterator
 public:
     typedef typename std::iterator_traits<Iterator>::value_type ptr_value_type;
     typedef typename pointee<ptr_value_type>::type value_type;
-    
+
     typedef typename Iterator::iterator_category iterator_category;
     typedef typename Iterator::difference_type difference_type;
     typedef value_type* pointer;
     typedef value_type& reference;
-    
+
     ptr_const_iterator () {}
 
     ptr_const_iterator (const Iterator& it)
@@ -125,7 +125,7 @@ public:
     ptr_const_iterator (const OtherIterator& it)
 	: Iterator (it)
     {}
-    
+
     ptr_const_iterator (const ptr_const_iterator& it)
 	: Iterator (it)
     {}
@@ -147,7 +147,7 @@ public:
 	return &*Iterator::operator* ();
     }
 };
-  
+
 /**
  *  This class acts as wrapper to a map::iterator. It just changes the
  *  opearator* behaviour, which now returns a pointer to the contained
@@ -158,13 +158,13 @@ class map_iterator : public std::map<Key, Data>::iterator
 {
 public:
     typedef typename std::map<Key, Data>::iterator base_type;
-    
+
     typedef typename base_type::iterator_category iterator_category;
     typedef Data value_type;
     typedef typename base_type::difference_type difference_type;
     typedef Data* pointer;
     typedef Data& reference;
-    
+
     /** Constructor. */
     map_iterator ()
     {}
@@ -325,7 +325,7 @@ public:
 	: std::map<Key, Data>::iterator (
 	    static_cast<const typename std::map<Key, Data>::iterator> (i))
     {}
-    
+
     /**
      * Preincrement operator.
      */
@@ -369,7 +369,7 @@ public:
 	: std::map<Key, Data>::const_iterator (
 	    static_cast<const typename std::map<Key, Data>::const_iterator> (i))
     {}
-    
+
     /**
      * Preincrement operator.
      */
@@ -402,7 +402,7 @@ public:
     map_key_iterator (const T& val)
 	: map_iterator_base<Key, Data, map_key_iterator> (val)
     {}
-    
+
     /**
      * Const indirection operator, returns a constant reference to the
      * referred value.

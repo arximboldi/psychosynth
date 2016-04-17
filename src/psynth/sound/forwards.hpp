@@ -13,7 +13,7 @@
  *  Copyright (C) 2011 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -93,11 +93,11 @@ typename boost::add_reference<typename boost::add_const<E>::type>::type at_c (
 #if !defined(_MSC_VER)  || _MSC_VER > 1310
 template <typename P, typename C, typename L> struct packed_frame;
 template <int K, typename P, typename C, typename L>
-typename kth_element_reference_type<packed_frame<P,C,L>, K>::type 
+typename kth_element_reference_type<packed_frame<P,C,L>, K>::type
 at_c (packed_frame<P,C,L>& p);
 
 template <int K, typename P, typename C, typename L>
-typename kth_element_const_reference_type<packed_frame<P,C,L>,K>::type 
+typename kth_element_const_reference_type<packed_frame<P,C,L>,K>::type
 at_c (const packed_frame<P,C,L>& p);
 
 template <typename B, typename C, typename L, bool M>

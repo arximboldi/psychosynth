@@ -30,4 +30,3 @@ enum query_masks {
 };
 
 #endif /* QUERYMASKS_H */
-

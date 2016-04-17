@@ -30,19 +30,19 @@
 class camera_controller : public OIS::MouseListener,
 			  public OIS::KeyListener
 {
-protected:	
+protected:
     Ogre::Camera* m_camera;
 
 public:
     camera_controller (Ogre::Camera* camera = NULL)
 	: m_camera(camera) {}
-	
+
     virtual ~camera_controller() {};
 
     const Ogre::Camera* get_camera () const {
 	return m_camera;
     }
-    
+
     Ogre::Camera* get_camera () {
 	return m_camera;
     }

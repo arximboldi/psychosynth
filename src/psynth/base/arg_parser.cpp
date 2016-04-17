@@ -10,7 +10,7 @@
  *  Copyright (C) 2007, 2009, 2016 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -65,7 +65,7 @@ arg_type get_type (const char *arg)
 	else
 	    return arg_short;
     }
-	
+
     return arg_free;
 }
 
@@ -74,10 +74,10 @@ arg_type get_type (const char *arg)
 void arg_parser::add (unsigned char flag, const char* str, option* op)
 {
     // FIXME: Potential memory leak. push_back can throw.
-    
+
     if (op == 0)
 	op = new option;
-    
+
     if (flag != null_flag)
 	_short[flag].push_back (op);
 
@@ -90,7 +90,7 @@ void arg_parser::add (unsigned char flag, const char* str, option* op)
 void arg_parser::parse (int argc, const char *argv[])
 {
     const char** argv_end = argv++ + argc;
-    
+
     _free.clear ();
 
     try {
@@ -128,7 +128,7 @@ const char** arg_parser::parse_short (const char** argv, const char** argv_end)
 	option_iterator iter = _short [(size_t) *s].begin ();
 	if (iter == _short [(size_t) *s].end ())
 	    throw unknown_option_error (std::string ("Unknown option: ") + *s);
-	
+
 	for (; iter != _short [(size_t) *s].end (); ++iter)
 	{
 	    if (argv_next >= argv_end ||
@@ -151,7 +151,7 @@ const char** arg_parser::parse_long (const char** argv, const char** argv_end)
     if (opt == _long.end ())
 	throw unknown_option_error (std::string ("Unknown option: ") +
 				    (*argv + 2));
-    
+
     for (option_iterator iter = opt->second.begin ();
 	 iter != opt->second.end ();
 	 ++iter)
@@ -168,4 +168,3 @@ const char** arg_parser::parse_long (const char** argv, const char** argv_end)
 
 } /* namespace base */
 } /* namespace psynth */
-

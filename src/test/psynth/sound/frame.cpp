@@ -12,7 +12,7 @@
  *  Copyright (C) 2010 Juan Pedro Bolivar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -30,7 +30,7 @@
 
 /*
  *  Copyright 2005-2007 Adobe Systems Incorporated
- * 
+ *
  *  Use, modification and distribution are subject to the Boost
  *  Software License, Version 1.0. (See accompanying file
  *  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt).
@@ -70,13 +70,13 @@ using namespace boost;
 
 BOOST_AUTO_TEST_SUITE (sound_frame_test_suite);
 
-struct increment { 
+struct increment {
     template <typename Incrementable>
-    void operator () (Incrementable& x) const { ++x; } 
+    void operator () (Incrementable& x) const { ++x; }
 };
 
-struct prev { 
-    template <typename Subtractable> 
+struct prev {
+    template <typename Subtractable>
     typename sample_traits<Subtractable>::value_type
     operator () (const Subtractable& x) const { return x-1; }
 };
@@ -163,12 +163,12 @@ struct do_basic_test : public C1, public C2
         typedef typename boost::add_reference<typename C1::type>::type p1_ref;
         test_swap(
             boost::mpl::bool_<
-                frame_reference_is_mutable<p1_ref>::value && 
+                frame_reference_is_mutable<p1_ref>::value &&
                 boost::is_same<frame1_value,frame2_value>::value> ());
     }
-     
+
     void test_swap (boost::mpl::false_) {}
-    
+
     void test_swap (boost::mpl::true_)
     {
 	// test swap
@@ -235,9 +235,9 @@ public:
  * binary check would be too big/expensive.
  */
 typedef mpl::vector<
-    value_core     <mono8_frame>, 
+    value_core     <mono8_frame>,
     reference_core <mono16_frame&>
-/*    reference_core <mono32fs_frame&>, 
+/*    reference_core <mono32fs_frame&>,
     value_core     <rlstereo8_frame>,
     reference_core <stereo8_planar_ref>,
     value_core     <quad32_frame>,
@@ -317,14 +317,14 @@ struct ccv2
 
         Frame1 p1;
         frame2_mutable p2;
-        
+
         channel_convert_impl (p1._frame, p2._frame);
     }
 };
 
 struct ccv1
 {
-    template <typename Frame> 
+    template <typename Frame>
     void operator () (Frame)
     {
 	detail::for_each<representative_frames> (ccv2<Frame>());
@@ -337,7 +337,7 @@ BOOST_AUTO_TEST_CASE (test_channel_convert)
 }
 
 BOOST_AUTO_TEST_CASE (test_packed_frame_0)
-{    
+{
     typedef packed_frame_type<uint16_t,
 			      mpl::vector2_c<unsigned,7,9>,
 			      stereo_layout >::type
@@ -350,7 +350,7 @@ BOOST_AUTO_TEST_CASE (test_packed_frame_0)
 			      mpl::vector2_c<unsigned,9,7>,
 			      rlstereo_layout>::type
 	rlstereo97_frame;
-    
+
     boost::function_requires<FrameValueConcept<rlstereo97_frame> >();
 
     // Create a zero packed frame and a full regular unpacked frame.
@@ -365,15 +365,15 @@ BOOST_AUTO_TEST_CASE (test_packed_frame_0)
     get_channel(r79, right_channel ())  = sample_convert <
 	kth_element_type<stereo79_frame, 1>::type>(
 	    get_channel (stereo_full, right_channel ()));
-    
-    BOOST_CHECK_EQUAL (r79, stereo79_frame ((uint16_t) 65535));    
-    
+
+    BOOST_CHECK_EQUAL (r79, stereo79_frame ((uint16_t) 65535));
+
     // stereo79 is compatible with rlstereo97. Test interoperability
     boost::function_requires<FramesCompatibleConcept<
 	stereo79_frame, rlstereo97_frame> >();
 
     do_basic_test<value_core<stereo79_frame,0>,
-		  value_core<rlstereo97_frame,1> >(r79).test_heterogeneous (); 
+		  value_core<rlstereo97_frame,1> >(r79).test_heterogeneous ();
 
     channel_convert (r79, stereo_full);
     channel_convert (stereo_full, r79);
@@ -430,15 +430,15 @@ BOOST_AUTO_TEST_CASE (test_packed_frame_1)
 BOOST_AUTO_TEST_CASE (test_frame)
 {
     stereo8_frame stereo8 (1, 2);
-    
+
     do_basic_test<value_core<stereo8_frame,0>,
 		  reference_core<stereo8_frame&,1> >(stereo8).test_all();
     do_basic_test<value_core<rlstereo8_frame,0>,
-		  reference_core<stereo8_planar_ref,1> >(stereo8).test_all(); 
+		  reference_core<stereo8_planar_ref,1> >(stereo8).test_all();
     do_basic_test<reference_core<stereo8_planar_ref,0>,
-		  reference_core<rlstereo8_frame&,1> >(stereo8).test_all(); 
+		  reference_core<rlstereo8_frame&,1> >(stereo8).test_all();
     do_basic_test<reference_core<const stereo8_frame&,0>,
-		  reference_core<stereo8_frame&,1> >(stereo8).test_all(); 
+		  reference_core<stereo8_frame&,1> >(stereo8).test_all();
 
     // Semantic vs physical sample accessors. Named sample accessors
     rlstereo8_frame rlstereo8(stereo8);
@@ -462,4 +462,3 @@ BOOST_AUTO_TEST_CASE (test_frame)
 }
 
 BOOST_AUTO_TEST_SUITE_END ();
-

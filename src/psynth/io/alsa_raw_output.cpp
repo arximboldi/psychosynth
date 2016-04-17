@@ -12,7 +12,7 @@
  *  Copyright (C) 2011 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -62,7 +62,7 @@ alsa_raw_output::alsa_raw_output (const char*       device,
     : thread_async (cb, true)
     , _buffer_size (nperiods * period_size)
 {
-    
+
 #define PSYNTH_ALSA_CHECK(fun, except)                                  \
     do {                                                                \
         int err = fun;                                                  \
@@ -80,7 +80,7 @@ alsa_raw_output::alsa_raw_output (const char*       device,
     auto grd_handle = base::make_guard ([&] { snd_pcm_close (_handle); });
 
     // Hardware paremeters
-    
+
     PSYNTH_ALSA_CHECK (snd_pcm_hw_params_malloc (&_hw_params),
                        alsa_param_error);
     auto grd_hw_params = base::make_guard (
@@ -114,7 +114,7 @@ alsa_raw_output::alsa_raw_output (const char*       device,
     unsigned int actual_nperiods = nperiods;
     PSYNTH_ALSA_CHECK (snd_pcm_hw_params_set_periods_near (
                            _handle, _hw_params, &actual_nperiods, &dir),
-                       alsa_param_error); 
+                       alsa_param_error);
     if (actual_nperiods != nperiods)
         PSYNTH_LOG << base::log::warning
                    << "ALSA could not set the requested periods. "
@@ -124,7 +124,7 @@ alsa_raw_output::alsa_raw_output (const char*       device,
     snd_pcm_uframes_t actual_period_size = period_size;
     PSYNTH_ALSA_CHECK (snd_pcm_hw_params_set_period_size_near (
                            _handle, _hw_params, &actual_period_size, &dir),
-                       alsa_param_error); 
+                       alsa_param_error);
     if (actual_period_size != period_size)
         PSYNTH_LOG << base::log::warning
                    << "ALSA could not set the requested buffer size. "
@@ -133,7 +133,7 @@ alsa_raw_output::alsa_raw_output (const char*       device,
     _buffer_size = nperiods * period_size;
     PSYNTH_ALSA_CHECK (snd_pcm_hw_params_set_buffer_size_near (
                            _handle, _hw_params, &_buffer_size),
-                       alsa_param_error); 
+                       alsa_param_error);
     if (_buffer_size != nperiods * period_size)
         PSYNTH_LOG << base::log::warning
                    << "ALSA could not set the requested buffer size. "
@@ -141,9 +141,9 @@ alsa_raw_output::alsa_raw_output (const char*       device,
 
     PSYNTH_ALSA_CHECK (snd_pcm_hw_params (_handle, _hw_params),
                        alsa_param_error);
-    
+
     // Software parameters
-    
+
     PSYNTH_ALSA_CHECK (snd_pcm_sw_params_malloc (&_sw_params),
                        alsa_param_error);
 
@@ -152,7 +152,7 @@ alsa_raw_output::alsa_raw_output (const char*       device,
 
     PSYNTH_ALSA_CHECK (snd_pcm_sw_params_current (_handle, _sw_params),
                        alsa_param_error);
-    
+
     PSYNTH_ALSA_CHECK (snd_pcm_sw_params_set_start_threshold (
                            _handle, _sw_params, 0),
                        alsa_param_error);
@@ -172,21 +172,21 @@ alsa_raw_output::alsa_raw_output (const char*       device,
                            _handle, _sw_params, 0),
                        alsa_param_error);
 #endif
-    
+
     PSYNTH_ALSA_CHECK (snd_pcm_sw_params_set_avail_min (
                            _handle, _sw_params, actual_period_size),
                        alsa_param_error);
 
     PSYNTH_ALSA_CHECK (snd_pcm_sw_params (_handle, _sw_params),
                        alsa_param_error);
-    
+
     grd_handle.dismiss ();
     grd_hw_params.dismiss ();
     grd_sw_params.dismiss ();
 
 #undef PSYNTH_ALSA_CHECK
 }
-    
+
 alsa_raw_output::~alsa_raw_output ()
 {
     soft_stop ();
@@ -202,24 +202,24 @@ int alsa_xrun_recovery (snd_pcm_t* handle)
 {
     snd_pcm_status_t *status;
     int res;
-    
+
     snd_pcm_status_alloca(&status);
-    
+
     if ((res = snd_pcm_status(handle, status)) < 0)
     {
         PSYNTH_LOG << base::log::error <<
             "Status error: " << snd_strerror(res);
     }
-    
+
     if (snd_pcm_status_get_state(status) == SND_PCM_STATE_SUSPENDED)
     {
         PSYNTH_LOG << "ALSA output is in suspended state.";
-        
+
         if ((res = snd_pcm_prepare (handle)) < 0)
             PSYNTH_LOG << base::log::error <<
                 "Error preparing after suspend: " << snd_strerror(res);
     }
-    
+
     if (snd_pcm_status_get_state(status) == SND_PCM_STATE_XRUN) {
 #if PSYNTH_ALSA_REPORT_XRUN
         struct timeval now, diff, tstamp;
@@ -227,7 +227,7 @@ int alsa_xrun_recovery (snd_pcm_t* handle)
         snd_pcm_status_get_trigger_tstamp (status, &tstamp);
         timersub(&now, &tstamp, &diff);
         float delayed_usecs = diff.tv_sec * 1000000.0 + diff.tv_usec;
-        
+
         PSYNTH_LOG << base::log::error <<
             "Buffer underrun of at least " <<
             delayed_usecs / 1000.0 << " msecs.";
@@ -244,13 +244,13 @@ std::size_t alsa_raw_output::put_i (const void* data, std::size_t frames)
     snd_pcm_sframes_t res;
 
     res = snd_pcm_writei (_handle, data, frames);
-    
+
     if (res < 0 && alsa_xrun_recovery (_handle) < 0)
     {
         PSYNTH_LOG << "Write error: " << snd_strerror (res);
         return 0;
     }
-    
+
     return res;
 }
 
@@ -265,7 +265,7 @@ std::size_t alsa_raw_output::put_n (const void* const* data, std::size_t frames)
         PSYNTH_LOG << "Write error: " << snd_strerror (res);
         return 0;
     }
-    
+
     return res;
 }
 
@@ -278,7 +278,7 @@ void alsa_raw_output::stop ()
 {
     thread_async::stop ();
     snd_pcm_drop(_handle);
-}   
+}
 
 void alsa_raw_output::prepare()
 {

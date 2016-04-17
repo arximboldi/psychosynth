@@ -48,7 +48,7 @@ public:
 class lo_address_equals_func
 {
     lo_address m_ref;
-    
+
 public:
     lo_address_equals_func(lo_address ref) : m_ref(ref) {}
 
@@ -61,12 +61,12 @@ class osc_broadcast
 {
     std::list<lo_address> m_dest;
     lo_server m_sender;
-    
+
 public:
     osc_broadcast()
 	: m_sender(NULL)
 	{}
-    
+
     ~osc_broadcast() {
 	clear();
     }
@@ -74,20 +74,20 @@ public:
     void set_sender(lo_server s) {
 	m_sender = s;
     }
-    
+
     void add_target (lo_address dest) {
 	m_dest.push_back(dest);
     }
-    
+
     void delete_target (lo_address dest);
     /*{
       m_dest.remove_if(lo_address_equals_func(dest));
     }*/
 
     void clear ();
-    
+
     bool is_target (lo_address dest);
-    
+
     void broadcast_message (const char* path, lo_message msg);
 
     void broadcast_message_from (const char* path, lo_message msg, lo_address from);

@@ -12,7 +12,7 @@
  *  Copyright (C) 2011 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -58,11 +58,11 @@ class passive_output : public sink_node
 {
 public:
     typedef io::output_ptr<audio_range> device_ptr;
-    
+
     passive_output (device_ptr out = device_ptr ());
     void set_output (device_ptr out = device_ptr ());
     void rt_do_process (rt_process_context& ctx);
-    
+
 private:
     audio_in_port      _in_input;
     device_ptr         _output;
@@ -73,4 +73,3 @@ private:
 } /* namespace psynth */
 
 #endif /* PSYNTH_GRAPH_CORE_PASSIVE_OUTPUT_HPP_ */
-

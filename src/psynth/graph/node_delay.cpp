@@ -133,4 +133,3 @@ void node_delay::do_update (const node0* caller,
 
 } /* namespace graph */
 } /* namespace psynth */
-

@@ -71,27 +71,27 @@ void osc_client::connect(lo_address target, const char* local_port)
 {
     if (m_state == IDLE) {
 	notify_client_connect(this);
-	
+
 	m_server = lo_server_new_with_proto(local_port, LO_UDP, NULL);
 
 	if (!m_server) {
 	    notify_client_disconnect(this, CE_PORT_BINDING);
 	    return;
 	}
-	
+
 	m_last_alive_recv = 0;
 	m_last_alive_sent = 0;
 	m_count_next = 1;
-	
+
 	add_methods ();
 	set_sender (m_server);
-	
+
 	lo_message msg = lo_message_new();
 	lo_send_message_from(target, m_server, PSYNTH_OSC_MSG_CONNECT, msg);
 	lo_message_free(msg);
 
 	lo_address_free(target);
-	
+
 	m_state = PENDING;
     }
 }
@@ -109,7 +109,7 @@ void osc_client::disconnect()
 	lo_message msg = lo_message_new();
 	broadcast_message (PSYNTH_OSC_MSG_DISCONNECT, msg);
 	lo_message_free(msg);
-	
+
 	close ();
 	notify_client_disconnect(this, CE_NONE);
     }
@@ -130,8 +130,8 @@ int osc_client::receive(int time_out)
 }
 
 int osc_client::update(int msec)
-{    
-    if (m_state != IDLE) {	
+{
+    if (m_state != IDLE) {
 	if (!m_count_next) {
 	    m_last_alive_recv += msec;
 	    m_last_alive_sent += msec;
@@ -149,7 +149,7 @@ int osc_client::update(int msec)
 	    notify_client_disconnect(this, CE_SERVER_TIMEOUT);
 	    close();
 	}
-	
+
 	if (m_state == CLOSING) {
 	    close();
 	    notify_client_disconnect(this, CE_SERVER_DROP);
@@ -164,7 +164,7 @@ void osc_client::add_methods()
     /*
       lo_server_add_method(m_server, NULL, NULL, &lo_generic_handler, NULL);
     */
-    
+
     lo_server_add_method(m_server, PSYNTH_OSC_MSG_DROP, "", &drop_cb, this);
     lo_server_add_method(m_server, PSYNTH_OSC_MSG_ACCEPT, "i", &accept_cb, this);
     lo_server_add_method(m_server, PSYNTH_OSC_MSG_ALIVE, "", &alive_cb, this);
@@ -186,7 +186,7 @@ int osc_client::_accept_cb(const char* path, const char* types,
 	set_id (m_id);
 
 	get_world()->clear();
-	
+
 	osc_controller::add_methods(m_server);
 	activate();
 
@@ -194,24 +194,24 @@ int osc_client::_accept_cb(const char* path, const char* types,
 	lo_address add = lo_message_get_source(msg);
 	lo_address addcpy = lo_address_new(lo_address_get_hostname(add),
 					   lo_address_get_port(add));
-    
+
 	add_target(addcpy);
 
 	lo_message msg = lo_message_new();
 	broadcast_message (PSYNTH_OSC_MSG_GET_STATE, msg);
 	lo_message_free(msg);
-	
+
 	m_state = CONNECTED;
 	notify_client_accept(this);
     }
-    
+
     return 0;
 }
 
 int osc_client::_alive_cb(const char* path, const char* types,
 			 lo_arg** argv, int argc, lo_message msg)
 {
-    m_last_alive_recv = 0;    
+    m_last_alive_recv = 0;
     return 0;
 }
 

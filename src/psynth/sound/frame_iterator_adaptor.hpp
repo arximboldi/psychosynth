@@ -12,7 +12,7 @@
  *  Copyright (C) 2010 Juan Pedro Bolivar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -30,7 +30,7 @@
 
 /*
  *  Copyright 2005-2007 Adobe Systems Incorporated
- * 
+ *
  *  Use, modification and distribution are subject to the Boost
  *  Software License, Version 1.0. (See accompanying file
  *  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt).
@@ -97,25 +97,25 @@ public:
 
     dereference_iterator_adaptor () {}
 
-    template <typename Iterator1> 
+    template <typename Iterator1>
     dereference_iterator_adaptor (
 	const dereference_iterator_adaptor<Iterator1,DFn>& dit)
 	: parent_type (dit.base())
 	, _deref_fn (dit._deref_fn)
     {}
-    
+
     dereference_iterator_adaptor (Iterator it, DFn deref_fn = DFn())
 	: parent_type (it)
 	, _deref_fn (deref_fn)
     {}
-    
-    template <typename Iterator1, typename DFn1> 
+
+    template <typename Iterator1, typename DFn1>
     dereference_iterator_adaptor (
 	const dereference_iterator_adaptor<Iterator1,DFn1>& it)
 	: parent_type (it.base())
 	, _deref_fn (it._deref_fn)
     {}
-    
+
     /**
        For some reason operator[] provided by iterator_facade returns
        a custom class that is convertible to reference We require our
@@ -130,13 +130,13 @@ public:
     */
     bool operator> (const dereference_iterator_adaptor& p) const
     { return this->base_reference() > p.base_reference(); }
-    
+
     bool operator< (const dereference_iterator_adaptor& p) const
     { return this->base_reference() < p.base_reference(); }
-    
+
     bool operator>= (const dereference_iterator_adaptor& p) const
     { return this->base_reference() >= p.base_reference(); }
-    
+
     bool operator<= (const dereference_iterator_adaptor& p) const
     { return this->base_reference() <= p.base_reference(); }
 
@@ -152,7 +152,7 @@ public:
     const DFn& deref_fn () const { return _deref_fn; }
 
 private:
-    template <typename Iterator1, typename DFn1> 
+    template <typename Iterator1, typename DFn1>
     friend class dereference_iterator_adaptor;
     friend class boost::iterator_core_access;
 
@@ -160,14 +160,14 @@ private:
     { return _deref_fn(*(this->base_reference())); }
 };
 
-template <typename I, typename DFn> 
+template <typename I, typename DFn>
 struct const_iterator_type<dereference_iterator_adaptor<I,DFn> >
-{ 
+{
     typedef dereference_iterator_adaptor<
-	typename const_iterator_type<I>::type,typename DFn::const_type> type; 
+	typename const_iterator_type<I>::type,typename DFn::const_type> type;
 };
 
-template <typename I, typename DFn> 
+template <typename I, typename DFn>
 struct iterator_is_mutable<dereference_iterator_adaptor<I, DFn> > :
 	public boost::mpl::bool_<DFn::is_mutable> {};
 
@@ -224,45 +224,45 @@ struct byte_to_memunit<dereference_iterator_adaptor<Iterator,DFn> > :
     public byte_to_memunit<Iterator> {};
 
 template <typename Iterator, typename DFn>
-inline typename std::iterator_traits<Iterator>::difference_type 
+inline typename std::iterator_traits<Iterator>::difference_type
 memunit_step(const dereference_iterator_adaptor<Iterator, DFn>& p)
-{ 
+{
     return memunit_step (p.base());
 }
 
 template <typename Iterator, typename DFn>
-inline typename std::iterator_traits<Iterator>::difference_type 
-memunit_distance (const dereference_iterator_adaptor<Iterator,DFn>& p1, 
+inline typename std::iterator_traits<Iterator>::difference_type
+memunit_distance (const dereference_iterator_adaptor<Iterator,DFn>& p1,
 		  const dereference_iterator_adaptor<Iterator,DFn>& p2)
-{ 
-    return memunit_distance (p1.base(), p2.base()); 
+{
+    return memunit_distance (p1.base(), p2.base());
 }
 
 template <typename Iterator, typename DFn>
 inline void memunit_advance(
-    dereference_iterator_adaptor<Iterator,DFn>& p, 
+    dereference_iterator_adaptor<Iterator,DFn>& p,
     typename std::iterator_traits<Iterator>::difference_type diff)
-{ 
+{
     memunit_advance (p.base(), diff);
 }
 
 template <typename Iterator, typename DFn>
-inline dereference_iterator_adaptor<Iterator,DFn> 
+inline dereference_iterator_adaptor<Iterator,DFn>
 memunit_advanced (
-    const dereference_iterator_adaptor<Iterator,DFn>& p, 
+    const dereference_iterator_adaptor<Iterator,DFn>& p,
     typename std::iterator_traits<Iterator>::difference_type diff)
-{ 
+{
     return dereference_iterator_adaptor<Iterator,DFn> (
-	memunit_advanced (p.base(), diff), p.deref_fn ()); 
+	memunit_advanced (p.base(), diff), p.deref_fn ());
 }
 
-template <typename Iterator, typename DFn> inline 
+template <typename Iterator, typename DFn> inline
 typename std::iterator_traits<
-    dereference_iterator_adaptor<Iterator,DFn> >::reference 
+    dereference_iterator_adaptor<Iterator,DFn> >::reference
 memunit_advanced_ref (
-    const dereference_iterator_adaptor<Iterator,DFn>& p, 
+    const dereference_iterator_adaptor<Iterator,DFn>& p,
     typename std::iterator_traits<Iterator>::difference_type diff)
-{ 
+{
     return * memunit_advanced (p, diff);
 }
 
@@ -283,7 +283,7 @@ struct dynamic_step_type<dereference_iterator_adaptor<Iterator,DFn> >
 /**
    \brief Returns the type (and creates an instance) of an iterator
    that invokes the given dereference adaptor upon dereferencing
-   
+
    \ingroup FrameIteratorModelDerefPtr
 */
 template <typename Iterator, typename Deref>
@@ -315,9 +315,9 @@ struct iterator_add_deref<
     static type make (
 	const dereference_iterator_adaptor<Iterator, PrevDeref>& it,
 	const Deref& d)
-    { 
+    {
         return type (it.base(),
-		     deref_compose<Deref, PrevDeref>(d, it.deref_fn ())); 
+		     deref_compose<Deref, PrevDeref>(d, it.deref_fn ()));
     }
 };
 

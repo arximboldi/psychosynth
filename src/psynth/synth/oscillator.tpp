@@ -13,7 +13,7 @@
  *  Copyright (C) 2011 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -61,13 +61,13 @@ template <class Range1>
 void oscillator<G>::update (const Range1& out_buf)
 {
     typedef typename Range1::value_type frame_type;
-    
+
     generate_frames (out_buf, [&] () -> frame_type {
             frame_type ret { this->_gen (this->_x) * this->_ampl };
             this->_x += this->_speed;
             return ret;
         });
-    
+
     _x = base::phase (_x);
 }
 
@@ -77,7 +77,7 @@ void oscillator<G>::update_fm (const Range1& out_buf, const Range2& mod_buf)
 {
     typedef typename Range2::value_type modval;
     typedef typename Range1::value_type outval;
-    
+
     transform_frames (mod_buf, out_buf, [&] (modval m) -> outval {
             auto ret = this->_gen (this->_x) * this->_ampl;
             this->_x += (this->_freq + this->_freq * (sound::bits32sf) (m))
@@ -93,7 +93,7 @@ void oscillator<G>::update_pm (const Range1& out_buf, const Range2& mod_buf)
 {
     typedef typename Range2::value_type modval;
     typedef typename Range1::value_type outval;
-    
+
     transform_frames (mod_buf, out_buf, [&] (modval m) -> outval {
             auto ret = this->_gen (this->_x + (sound::bits32sf) m) * this->_ampl;
             this->_x += this->_speed;
@@ -108,7 +108,7 @@ void oscillator<G>::update_am (const Range1& out_buf, const Range2& mod_buf)
 {
     typedef typename Range2::value_type modval;
     typedef typename Range1::value_type outval;
-    
+
     transform_frames (mod_buf, out_buf, [&] (modval m) -> outval {
             auto ret = this->_gen (this->_x) * this->_ampl * (sound::bits32sf) m;
             this->_x += this->_speed;
@@ -121,4 +121,3 @@ void oscillator<G>::update_am (const Range1& out_buf, const Range2& mod_buf)
 } /* namespace psynth */
 
 #endif /* PSYNTH_SYNTH_OSCILLATOR_TPP_ */
-

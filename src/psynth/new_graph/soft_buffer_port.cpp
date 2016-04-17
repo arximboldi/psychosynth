@@ -12,7 +12,7 @@
  *  Copyright (C) 2011 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -57,26 +57,26 @@ void soft_buffer_in_port<B>::rt_process (rt_process_context& ctx)
     if (_requested)
         _envelope.release ();
     _envelope.update (); // Hack, skips one frame
-    
+
     if (_requested && (!this->rt_connected () ||
                        _envelope.finished ()))
     {
         this->_rt_connect (_request_source);
-        if (_request_source) 
+        if (_request_source)
             _envelope.press ();
         _requested = false;
     }
 
-    base_type::rt_process (ctx);    
+    base_type::rt_process (ctx);
     if (this->rt_in_available ())
     {
         _envelope.update (range (_local_buffer));
-        
+
         synth::blend (const_range (base_type::rt_get_in ()),
                       range (_local_buffer),
                       _stable_value,
                       range (_local_buffer));
-        
+
     }
     else
     {

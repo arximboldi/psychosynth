@@ -12,7 +12,7 @@
  *  Copyright (C) 2011 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -73,13 +73,13 @@ void mixer<B>::rt_do_process (rt_process_context& ctx)
 {
     typedef typename in_port_type::port_type::value_type frame_type;
     typedef typename sound::sample_type<frame_type>::type sample_type;
-            
+
     int num_mixed = 0;
 
     auto out  = _out_output.rt_out_range ();
     float gain = _ctl_gain.rt_get ();
 
-    sound::fill_frames (out, frame_type (0.0f));    
+    sound::fill_frames (out, frame_type (0.0f));
     for (auto& in : _in_inputs)
     {
         if (in->rt_in_available ())
@@ -88,7 +88,7 @@ void mixer<B>::rt_do_process (rt_process_context& ctx)
             ++ num_mixed;
         }
     }
-        
+
     if (num_mixed == 0)
     {
         auto zero = sound::sample_traits<sample_type>::zero_value ();

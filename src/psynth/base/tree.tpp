@@ -10,7 +10,7 @@
 
 /*
  *  Copyright (C) 2009 Juan Pedro Bolívar Puente
- *  
+ *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -61,17 +61,17 @@ bool tree_node<N, K, T, P>::attach (const K& name, node_ptr node)
 template <class N, class K, class T, class P>
 typename tree_node<N, K, T, P>::node_ptr
 tree_node<N, K, T, P>::detach (iterator iter)
-{   
+{
     if (iter == end ())
 	throw tree_node_error ("Invalid iterator.");
 
     decltype (_childs.begin ()) iter_map = iter;
-    node_ptr node = std::move (iter_map->second);  
+    node_ptr node = std::move (iter_map->second);
     _childs.erase (iter_map);
 
     on_remove_child (*node);
     node->uninit ();
-      
+
     return node;
 }
 
@@ -80,7 +80,7 @@ typename tree_node <N, K, T, P>::iterator
 tree_node <N, K, T, P>::remove_child (iterator iter)
 {
     iterator next = std::next (iter);
-    
+
     on_remove_child (*iter);
     _childs.erase (iter);
 
@@ -91,7 +91,7 @@ template <class N, class K, class T, class P>
 void tree_node <N, K, T, P>::clear_childs ()
 {
     tree_lock lock (this);
-    
+
     iterator iter = begin ();
     while (iter != end ())
 	iter = remove_child (iter);
@@ -101,7 +101,7 @@ template <class N, class K, class T, class P>
 K tree_node <N, K, T, P>::path_name () const
 {
     tree_lock lock (this);
-    
+
     K prefix;
     path_name (prefix);
     return prefix;
@@ -111,16 +111,16 @@ template <class N, class K, class T, class P>
 N& tree_node <N, K, T, P>::child (const K& name)
 {
     tree_lock lock (this);
-    
-    iterator it = _childs.find (name); 
-    
+
+    iterator it = _childs.find (name);
+
     if (it == _childs.end ()) {
 	it = _childs.insert (make_pair (name, std::unique_ptr<N> (new N ()))).first;
-	
+
 	it->init (name, dynamic_cast<N*>(this));
 	on_new_child (*it);
     }
-	
+
     return *it;
 }
 
@@ -135,11 +135,11 @@ template <class N, class K, class T, class P>
 const N& tree_node <N, K, T, P>::existing_child (const K& name) const
 {
     tree_lock lock (this);
-    
+
     const_iterator it = _childs.find (name);
     if (it == end ())
 	throw tree_node_error ("Can't find child node.");
-	
+
     return *it;
 }
 
@@ -169,7 +169,7 @@ template <class N, class K, class T, class P>
 void tree_node <N, K, T, P>::path_name (K& prefix) const
 {
     tree_lock lock (this);
-    
+
     if (_parent)
     {
 	if (_parent->_parent) {
@@ -186,11 +186,11 @@ N& tree_node <N, K, T, P>::path (typename K::const_iterator begin,
 {
     typename K::const_iterator base_end = end;
     typename K::const_iterator rest_begin;
-    
+
     find_base (begin, base_end);
     rest_begin = base_end;
     rest_begin ++;
-    
+
     return base_end == end ?
 	child (K (begin, base_end)) :
 	child (K (begin, base_end)).path (rest_begin, end);
@@ -203,11 +203,11 @@ existing_path (typename K::const_iterator begin,
 {
     typename K::const_iterator base_end = end;
     typename K::const_iterator rest_begin;
-    
+
     find_base (begin, base_end);
     rest_begin = base_end;
     rest_begin ++;
-    
+
     return base_end == end ?
 	existing_child (K (begin, base_end)) :
 	existing_child (K (begin, base_end))
@@ -218,14 +218,14 @@ template <class N, class K, class T, class P>
 const N& tree_node <N, K, T, P>::
 existing_path (typename K::const_iterator begin,
 		   typename K::const_iterator end) const
-{   
+{
     typename K::const_iterator base_end = end;
     typename K::const_iterator rest_begin;
-    
+
     find_base (begin, base_end);
     rest_begin = base_end;
     rest_begin ++;
-    
+
     return base_end == end ?
 	existing_child (K (begin, base_end)) :
 	existing_child (K (begin, base_end))
@@ -236,7 +236,7 @@ template <class N, class K, class T, class P>
 template <typename InputIterator>
 void tree_node <N, K, T, P>::find_base (InputIterator& base_b,
 				     InputIterator& base_e)
-{   
+{
     InputIterator end = base_e;
     base_e = base_b;
     while (base_e != end && *base_e != T::separator)

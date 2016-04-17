@@ -32,7 +32,7 @@ class gui_log_sink : public psynth::base::log_sink
     std::string m_buffer;
 
     void dump (psynth::base::log& l, int level, const std::string& msg);
-    
+
 public:
     gui_log_sink (CEGUI::Window* win = NULL)
 	: m_window (win) {}

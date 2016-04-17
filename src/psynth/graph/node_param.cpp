@@ -111,10 +111,10 @@ void node_param::configure (int id, std::string name,
     m_id = id;
     m_name = name;
     m_dest = dest;
-    
+
     if (type != m_type) {
 	clear();
-		
+
 	m_type = type;
 
 	switch(m_type) {

@@ -12,7 +12,7 @@
  *  Copyright (C) 2011 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -73,22 +73,22 @@ std::size_t buffered_input_impl<Ir, Op>::take (const Range& data)
     std::size_t read        = 0;
     std::size_t old_read    = 1; // Do not get into an infinite loop
                                  // when the device refuses to write.
-    
+
     while (old_read != read && read < total)
     {
-        const std::size_t to_read = std::min (block_size, total - read); 
+        const std::size_t to_read = std::min (block_size, total - read);
         auto src = sub_range (data, read, to_read);
         auto dst = sub_range (sound::range (_buffer), 0, to_read);
         old_read = read;
         read += _input_ptr->take (dst);
         copy_and_convert_frames (dst, src);
     }
-    
+
     return read;
 }
 
 template <class Ir, class Op>
-void buffered_async_input_impl<Ir, Op>::fit_buffer ()    
+void buffered_async_input_impl<Ir, Op>::fit_buffer ()
 {
     this->_input_ptr->check_idle ();
     std::size_t new_size = this->_input_ptr->get_buffer_size ();
@@ -102,4 +102,3 @@ void buffered_async_input_impl<Ir, Op>::fit_buffer ()
 } /* namespace psynth */
 
 #endif /* PSYNTH_IO_BUFFERED_INPUT_TPP_ */
-

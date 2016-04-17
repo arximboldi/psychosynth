@@ -12,7 +12,7 @@
  *  Copyright (C) 2010 Juan Pedro Bolivar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -30,7 +30,7 @@
 
 /*
  *  Copyright 2005-2007 Adobe Systems Incorporated
- * 
+ *
  *  Use, modification and distribution are subject to the Boost
  *  Software License, Version 1.0. (See accompanying file
  *  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt).
@@ -76,7 +76,7 @@ struct _select_subvector {
 private:
     typedef typename front<VecOfVecs>::type cur_vec;
     static const std::size_t cur_base = size<cur_vec>::value;
-    typedef typename pop_front<VecOfVecs>::type  next_vec_of_vecs; 
+    typedef typename pop_front<VecOfVecs>::type  next_vec_of_vecs;
     typedef typename _select_subvector<next_vec_of_vecs,  N/cur_base, B_SIZE-1>::type
     next_subvector;
 public:
@@ -84,12 +84,12 @@ public:
     next_subvector,
     typename at_c<cur_vec, N%cur_base>::type >::type type;
 };
- 
+
 template <typename VecOfVecs, std::size_t N>
 struct _select_subvector<VecOfVecs, N, 0> {
     typedef vector<>::type type;
 };
- 
+
 template <typename VecOfVecs, std::size_t N>
 struct select_subvector_c {
     typedef typename _select_subvector<
@@ -104,7 +104,7 @@ struct select_subvector_c {
  *
  * \ingroup CrossVector
  *
- * INPUT: 
+ * INPUT:
  *  VecOfVecs - a vector of vector types. For example [ [A1,A2,A3],
  *  [B1,B2], [C1,C2,C3,C4] ]
  *
@@ -122,7 +122,7 @@ struct select_subvector_c {
  *                TypeGen[A3,B1,C2], ... ]
  *
  * Models an immutable MPL Random Access Sequence
- * Traversal, random-access, etc, is defined, but mutable operations, 
+ * Traversal, random-access, etc, is defined, but mutable operations,
  * such as push_back and pop_front are not supported
  *
  */
@@ -305,13 +305,13 @@ template <typename VecOfVecs, typename TypeGen, typename OPP>
 struct transform<cross_vector<VecOfVecs,TypeGen>, OPP > {
     typedef typename lambda<OPP>::type Op;
     struct adapter {
-        template <typename Elements> 
+        template <typename Elements>
         struct apply {
             typedef typename TypeGen::template apply<Elements>::type orig_t;
             typedef typename Op::template apply<orig_t>::type type;
         };
     };
-    typedef cross_vector<VecOfVecs, adapter > type; 
+    typedef cross_vector<VecOfVecs, adapter > type;
 };
 
 } /* namespace mpl */
@@ -376,7 +376,7 @@ public:
     typedef typename push_front<rest, T>::type type;
 };
 
-template <typename SFirst> 
+template <typename SFirst>
 struct copy_to_vector_impl<SFirst,1>
 {
     typedef vector<typename deref<SFirst>::type> type;
@@ -413,7 +413,7 @@ namespace sound
  * the operation on the given type
  */
 
-/** 
+/**
  * \brief Unary reduce.
  *
  * Given a set of types and an operation, reduces each type in the set
@@ -449,7 +449,7 @@ struct unary_reduce : public unary_reduce_impl<Types,Op>
         typedef typename boost::mpl::mapping_vector<reduced_t, unique_t> indices_t;
         return gil::at_c<indices_t, unsigned short>(index);
     }
-    
+
     template <typename Bits> PSYNTH_FORCEINLINE
     static typename Op::result_type applyc (
 	const Bits& bits, std::size_t index, Op op)
@@ -537,7 +537,7 @@ struct binary_reduce_impl
 	boost::mpl::vector2<vec1_types, vec2_types>, pair_generator> BIN_TYPES;
 
     typedef unary_reduce<BIN_TYPES,Op> bin_reduced_t;
-        
+
     static unsigned short inline map_index (std::size_t index1,
 					    std::size_t index2)
     {
@@ -549,7 +549,7 @@ struct binary_reduce_impl
 
 public:
     typedef typename bin_reduced_t::unique_t unique_t;
-    
+
     template <typename Bits1, typename Bits2>
     static typename Op::result_type inline apply (
 	const Bits1& bits1, std::size_t index1,
@@ -587,7 +587,7 @@ struct binary_reduce
     typedef unary_reduce<Types2,Op> unary2_t;
 
     static const std::size_t CROSS_SIZE =
-	boost::mpl::size<typename unary1_t::unique_t>::value * 
+	boost::mpl::size<typename unary1_t::unique_t>::value *
 	boost::mpl::size<typename unary2_t::unique_t>::value;
 
     typedef detail::binary_reduce_impl<
@@ -622,7 +622,7 @@ template <typename Types1, typename Types2, typename BinaryOp> PSYNTH_FORCEINLIN
 typename BinaryOp::result_type apply_operation (const variant<Types1>& arg1,
 						const variant<Types2>& arg2,
 						BinaryOp op)
-{    
+{
     return binary_reduce<Types1, Types2, BinaryOp>::template apply (
 	arg1._bits, arg1._index,
 	arg2._bits, arg2._index, op);
@@ -679,10 +679,10 @@ struct reduce_range_basic
 };
 
 template <typename Op, typename Loc>
-struct reduce<Op, buffer_range<Loc> > 
+struct reduce<Op, buffer_range<Loc> >
     : public reduce_range_basic<Op, buffer_range<Loc>,
 			       range_is_basic<buffer_range<Loc> >::value> {};
- 
+
 /**
  *
  * Unary reduce_buffer operation. Splits into basic and non-basic buffers.
@@ -716,7 +716,7 @@ struct reduce_ranges_basic
 };
 
 template <typename Op, typename L1, typename L2>
-struct reduce<Op, std::pair<const buffer_range<L1>*, const buffer_range<L2>*> > 
+struct reduce<Op, std::pair<const buffer_range<L1>*, const buffer_range<L2>*> >
     : public reduce_ranges_basic<Op,
 				buffer_range<L1>,
 				buffer_range<L2>,
@@ -739,7 +739,7 @@ struct reduce_channel_space {
 };
 
 /*
-  TODO: 
+  TODO:
   template <> struct reduce_channel_space<lab_t> { typedef rgb_t type; };
   template <> struct reduce_channel_space<hsb_t> { typedef rgb_t type; };
   template <> struct reduce_channel_space<cmyk_t> { typedef rgba_t type; };
@@ -750,11 +750,11 @@ struct reduce_channel_space {
    Channel space binary reduce operation. Given a source and
    destination channel spaces, returns a reduced source and
    destination channel spaces that have the same mapping of samples
-  
+
    Precondition: The two channel spaces must be compatible (i.e. must
    have the same set of samples)
-  
-    template <typename Vec, int Basis, int VecSize> 
+
+    template <typename Vec, int Basis, int VecSize>
     struct type_vec_to_integer_impl {
         typedef typename boost::mpl::back<Vec>::type     last;
         typedef typename boost::mpl::pop_back<Vec>::type rest;
@@ -763,7 +763,7 @@ struct reduce_channel_space {
 	    Basis + last::value;
     };
 
-    template <typename Vec, int Basis> 
+    template <typename Vec, int Basis>
     struct type_vec_to_integer_impl<Vec,Basis,0> {
         static const int value=0;
     };
@@ -777,7 +777,7 @@ struct reduce_channel_space {
     // Given two channel spaces and the mapping of the samples between
     // them, returns the reduced pair of channel spaces The default
     // version performs no reduction
-    
+
     template <typename SrcChannelSpace, typename DstChannelSpace, int Mapping>
     struct reduce_channel_spaces_impl {
         typedef SrcChannelSpace first_t;
@@ -850,7 +850,7 @@ struct reduce_channel_space {
 	    src_order_t, type_to_index<
 	         dst_order_t,boost::mpl::_1> >::type mapping;
         static const int mapping_val = type_vec_to_integer<mapping>::value;
-        
+
         typedef typename reduce_channel_spaces_impl<
 	     SrcChannelSpace,DstChannelSpace,mapping_val>::first_t  _first_t;
         typedef typename reduce_channel_spaces_impl<
@@ -909,12 +909,12 @@ struct copy_frames_fn;
 
 // Incompatible ranges cannot be used in copy_frames - will throw
 // std::bad_cast
-template <typename V1, typename V2, bool Compatible> 
+template <typename V1, typename V2, bool Compatible>
 struct reduce_copy_pixop_compat
 {
     typedef error_type type;
 };
-    
+
 // For compatible basic ranges, reduce their channel spaces based on
 // their sample mapping.  Make the source immutable and the
 // destination mutable (they should already be that way)
@@ -931,14 +931,14 @@ struct reduce_copy_pixop_compat<V1, V2, true>
 
      typedef typename derived_range_type<
 	 V1, boost::use_default, L1,
-         boost::use_default, 
+         boost::use_default,
 	 boost::use_default, boost::mpl::false_>::type DV1;
 
      typedef typename derived_range_type<
 	 V2, boost::use_default, L2,
-         boost::use_default, 
+         boost::use_default,
 	 boost::use_default, boost::mpl::true_ >::type DV2;
-        
+
      typedef std::pair<const DV1*, const DV2*> type;
 };
 
@@ -993,37 +993,37 @@ struct reduce_buffer_basic<dynamic_type_get_dimensions, Img, true>
  *      Reduce for get_num_samples (only channel space matters)
  *
  */
-    
+
 struct dynamic_type_get_num_samples;
 template <typename Range>
 struct reduce_range_basic<dynamic_type_get_num_samples,Range,true>
-{ 
+{
     typedef typename Range::channel_space::base Cs;
 
     typedef typename range_type<
-	bits8, typename reduce_channel_space<Cs>::type>::type type; 
+	bits8, typename reduce_channel_space<Cs>::type>::type type;
 };
 
 template <typename Img>
 struct reduce_buffer_basic<dynamic_type_get_num_samples, Img, true>
-{ 
+{
     typedef typename Img::channel_space_t::base Cs;
     typedef typename buffer_type<
-	bits8, typename reduce_channel_space<Cs>::type>::type type; 
+	bits8, typename reduce_channel_space<Cs>::type>::type type;
 };
 
 /*
  *
  *      Reduce for resample_frames (same as copy_frames)
  *
- */    
+ */
 template <typename Sampler, typename MapFn> struct resample_frames_fn;
 
-template <typename S, typename M, typename V, bool IsBasic> 
+template <typename S, typename M, typename V, bool IsBasic>
 struct reduce_range_basic<resample_frames_fn<S,M>, V, IsBasic> :
     public reduce_range_basic<copy_frames_fn, V, IsBasic> {};
 
-template <typename S, typename M, typename V1, typename V2, bool IsBasic> 
+template <typename S, typename M, typename V1, typename V2, bool IsBasic>
 struct reduce_ranges_basic<resample_frames_fn<S,M>, V1, V2, IsBasic>
     : public reduce_ranges_basic<copy_frames_fn, V1, V2, IsBasic> {};
 
@@ -1035,12 +1035,12 @@ struct reduce_ranges_basic<resample_frames_fn<S,M>, V1, V2, IsBasic>
  *      and have the same mapping, planarity and stepness)
  *
  */
-    
+
 template <typename CC> class copy_and_convert_frames_fn;
 
 // the only thing for 1D reduce is making them all mutable...
-template <typename CC, typename Range, bool IsBasic> 
-struct reduce_range_basic<copy_and_convert_frames_fn<CC>, Range, IsBasic> 
+template <typename CC, typename Range, bool IsBasic>
+struct reduce_range_basic<copy_and_convert_frames_fn<CC>, Range, IsBasic>
     : public derived_range_type<Range, boost::use_default, boost::use_default,
 			       boost::use_default, boost::use_default, boost::mpl::true_>
 {
@@ -1050,7 +1050,7 @@ struct reduce_range_basic<copy_and_convert_frames_fn<CC>, Range, IsBasic>
 // (i.e. the same frames) then copy_and_convert is just copy.  In this
 // case, reduce their common channel space. In general make the first
 // immutable and the second mutable
-template <typename CC, typename V1, typename V2, bool AreBasic> 
+template <typename CC, typename V1, typename V2, bool AreBasic>
 struct reduce_ranges_basic<copy_and_convert_frames_fn<CC>, V1, V2, AreBasic>
 {
     typedef boost::is_same<typename V1::frame_type, typename V2::frame_type> Same;
@@ -1060,7 +1060,7 @@ struct reduce_ranges_basic<copy_and_convert_frames_fn<CC>, V1, V2, AreBasic>
 	Same, typename CsR::type, typename V1::channel_space>::type Cs1;
     typedef typename boost::mpl::if_<
 	Same, typename CsR::type, typename V2::channel_space>::type Cs2;
-    
+
     typedef typename derived_range_type<
 	V1, boost::use_default, layout<Cs1, typename V1::sample_mapping>,
 	boost::use_default, boost::use_default, boost::mpl::false_>::type DV1;
@@ -1068,7 +1068,7 @@ struct reduce_ranges_basic<copy_and_convert_frames_fn<CC>, V1, V2, AreBasic>
     typedef typename derived_range_type<
 	V2, boost::use_default, layout<Cs2, typename V2::sample_mapping_t>,
 	boost::use_default, boost::use_default, boost::mpl::true_ >::type DV2;
-    
+
     typedef std::pair<const DV1*, const DV2*> type;
 };
 
@@ -1082,7 +1082,7 @@ struct reduce_ranges_basic<copy_and_convert_frames_fn<CC>, V1, V2, AreBasic>
 //fill_converted_frames_fn
 //bind(gil::detail::copy_frames_fn(), _1, dst)
 //bind(gil::detail::copy_frames_fn(), src,_1)
-    
+
 //bind(detail::copy_and_convert_frames_fn(), _1, dst)
 //bind(detail::copy_and_convert_frames_fn(), src, _1)
 //gil::detail::fill_frames_fn<Value>(val)

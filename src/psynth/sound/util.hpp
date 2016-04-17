@@ -14,7 +14,7 @@
  *  Copyright (C) 2010 Juan Pedro Bolivar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -32,7 +32,7 @@
 
 /*
  *  Copyright 2005-2007 Adobe Systems Incorporated
- * 
+ *
  *  Use, modification and distribution are subject to the Boost
  *  Software License, Version 1.0. (See accompanying file
  *  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt).
@@ -83,14 +83,14 @@ inline std::ptrdiff_t iceil(double x)
  *
  */
 
-template <typename T> 
+template <typename T>
 inline T align (T val, std::size_t alignment)
-{ 
-    return val + (alignment - val % alignment) % alignment; 
+{
+    return val + (alignment - val % alignment) % alignment;
 }
 
 /**
-   \brief Helper base class for pixel dereference adaptors. 
+   \brief Helper base class for pixel dereference adaptors.
    \ingroup PixelDereferenceAdaptorModel
 */
 template <typename ConstT, typename Value, typename Reference,
@@ -109,7 +109,7 @@ struct deref_base : public std::unary_function<ArgType, ResultType>
    \brief Composes two dereference function objects. Similar to
    std::unary_compose but needs to pull some typedefs from the
    component types.  Models: PixelDereferenceAdaptorConcept
-   
+
    \ingroup PixelDereferenceAdaptorModel
 */
 template <typename D1, typename D2>
@@ -118,7 +118,7 @@ class deref_compose : public deref_base<
 		  typename D2::const_type>,
     typename D1::value_type,
     typename D1::reference,
-    typename D1::const_reference, 
+    typename D1::const_reference,
     typename D2::argument_type,
     typename D1::result_type,
     D1::is_mutable && D2::is_mutable>
@@ -207,7 +207,7 @@ copy_n (InputIter first, Size count, OutputIter result)
 }
 
 /** \brief identity taken from SGI STL. */
-template <typename T> 
+template <typename T>
 struct identity : public std::unary_function<T,T> {
     const T& operator()(const T& val) const { return val; }
 };
@@ -242,9 +242,9 @@ struct dec : public std::unary_function<T,T>
    the type is not present)
 */
 template <typename Types, typename T>
-struct type_to_index 
+struct type_to_index
     : public boost::mpl::distance<
-    typename boost::mpl::begin<Types>::type, 
+    typename boost::mpl::begin<Types>::type,
     typename boost::mpl::find<Types,T>::type>::type {};
 
 } /* namespace detail */

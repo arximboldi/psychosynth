@@ -38,7 +38,7 @@ class file_manager_director
     void on_conf_nudge (base::conf_node& node);
     void register_config ();
     void unregister_config ();
-    
+
 public:
     void start (base::conf_node& conf,
 	        const boost::filesystem::path& home_path);

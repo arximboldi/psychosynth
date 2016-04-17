@@ -12,7 +12,7 @@
  *  Copyright (C) 2011 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -170,7 +170,7 @@ BOOST_AUTO_TEST_CASE(test_in_control_non_fundamental_attach)
     p.start ();
     p.rt_request_process ();
     ::usleep (1 << 10);
-    
+
     ctl->in.set (ivec2 (1,2));
 
     p.rt_request_process ();
@@ -225,4 +225,3 @@ BOOST_AUTO_TEST_CASE(test_out_control_non_fundamental_attach)
 }
 
 BOOST_AUTO_TEST_SUITE_END ();
-

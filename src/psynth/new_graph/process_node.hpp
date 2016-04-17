@@ -12,7 +12,7 @@
  *  Copyright (C) 2011 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -43,7 +43,7 @@ class process_node : public virtual node
 public:
     virtual void start () = 0;
     virtual void stop () = 0;
-    
+
 protected:
     void rt_request_process ();
 };
@@ -52,4 +52,3 @@ protected:
 } /* namespace psynth */
 
 #endif /* PSYNTH_GRAPH_PROCESS_NODE_HPP_ */
-

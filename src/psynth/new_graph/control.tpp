@@ -12,7 +12,7 @@
  *  Copyright (C) 2011 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -83,7 +83,7 @@ void in_control_base::set (const T& val)
     boost::polymorphic_downcast<
         typed_in_control_base<T>*>(this)->set (val);
 }
-    
+
 template <typename T>
 void out_control_base::rt_set (const T& val, rt_process_context& ctx)
 {

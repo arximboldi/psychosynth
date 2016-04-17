@@ -249,4 +249,3 @@ void node_double_sampler::on_info_change ()
 
 } /* namespace graph */
 } /* namespace psynth */
-

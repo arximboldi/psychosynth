@@ -12,7 +12,7 @@
  *  Copyright (C) 2011 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -72,7 +72,7 @@ void port_name_control<Base>::set (const std::string& name)
         auto& patch = node.patch ();
         auto& port  = node.patch_port ();
         auto old    = port.name ();
-            
+
         patch.unregister_component (port); // This must not fail
         auto guard = base::make_guard ([&] {
                 port._set_name (old);
@@ -87,7 +87,7 @@ void port_name_control<Base>::set (const std::string& name)
         auto& port = node.patch_port ();
         port._set_name (name);
     }
-    
+
     base_type::set (name);
 }
 

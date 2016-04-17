@@ -48,7 +48,7 @@ enum osc_server_error {
 
 class osc_server_listener
 {
-    
+
 public:
     virtual ~osc_server_listener() {}
     virtual bool handle_server_start_listening (osc_server* server) = 0;
@@ -68,7 +68,7 @@ protected:
     void notify_server_client_disconnect (osc_server* server, int client_id,
 					  osc_server_client_error cause);
     void notify_server_client_connect (osc_server* server, int client_id);
-    
+
 public:
     void add_listener (osc_server_listener* l) {
 	m_list.push_back(l);
@@ -95,7 +95,7 @@ private:
 	int id;
 	int last_alive_recv;
 	int last_alive_sent;
-	
+
 	slot(int id = 0) :
 	    id(id), last_alive_recv(0), last_alive_sent(0) {};
     };
@@ -106,23 +106,23 @@ private:
 	}
     };
 
-    typedef std::map<lo_address, slot, lo_address_lt_func> slot_map; 
+    typedef std::map<lo_address, slot, lo_address_lt_func> slot_map;
     slot_map m_slots;
-    
+
     lo_server m_server;
     bool m_listening;
     int m_nextid;
     state m_state;
-    
+
     LO_HANDLER (osc_server, alive);
     LO_HANDLER (osc_server, connect);
     LO_HANDLER (osc_server, get_state);
     LO_HANDLER (osc_server, disconnect);
 
     void add_methods ();
-    
+
 public:
-    
+
     osc_server();
     ~osc_server();
 
@@ -133,7 +133,7 @@ public:
     state get_state () {
 	return m_state;
     }
-    
+
     void listen (const char* port);
     void stop ();
     void close ();
@@ -146,4 +146,3 @@ public:
 } /* namespace psynth */
 
 #endif /* PSYNTH_OSCSERVER_H */
-

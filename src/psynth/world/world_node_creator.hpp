@@ -49,11 +49,11 @@ class world_node_creator
     class param_maker : public param_maker_base
     {
 	T m_val;
-	
+
     public:
 	param_maker (const T& val) :
 	    m_val(val) {}
-	    
+
 	void apply (world_node & obj, const std::string& par) {
 	    obj.set_param (par, m_val);
 	}
@@ -61,7 +61,7 @@ class world_node_creator
 	void set (const T& val) {
 	    m_val = val;
 	}
-	
+
 	param_maker_base* clone () const {
 	    return new param_maker <T> (m_val);
 	}
@@ -75,14 +75,14 @@ class world_node_creator
     void destroy ();
     void copy (const world_node_creator& obj);
     param_maker_base* find (const std::string& name);
-    
+
 public:
     world_node_creator () {}
 
     world_node_creator (const world_node_creator& obj) {
 	copy (obj);
     }
-    
+
     ~world_node_creator () {
 	destroy ();
     };
@@ -94,13 +94,13 @@ public:
 	}
 	return *this;
     }
-    
+
     world_node create (world& table);
 
     void set_name (const std::string& name) {
 	m_name = name;
     }
-    
+
     template<class T>
     void add_param (const std::string& name, const T& value) {
 	m_param.push_back (std::make_pair (std::string(name),

@@ -12,7 +12,7 @@
  *  Copyright (C) 2011 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -50,7 +50,7 @@ public:
     osc_passive (const char* port);
     ~osc_passive ();
     int receive (int time_out = 0);
-    
+
 private:
     lo_server _server;
 };
@@ -59,4 +59,3 @@ private:
 } /* namespace psynth */
 
 #endif /* PSYNTH_NET_OSC_PASSIVE_CLIENT_HPP_ */
-

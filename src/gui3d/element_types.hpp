@@ -31,7 +31,7 @@ enum element_type
     ELEM_OSC_TRIANGLE,
     ELEM_OSC_MOOGSAW,
     ELEM_OSC_EXP,
-    
+
     ELEM_LFO_SINE,
     ELEM_LFO_SQUARE,
     ELEM_LFO_SAWTOOTH,

@@ -40,7 +40,7 @@ struct audio_info
     size_t sample_rate;   /**< Sampling rate of the stream. */
     size_t block_size;    /**< Size of processing buffers. */
     size_t num_channels;  /**< Number of channels of the audio stream. */
-    
+
     audio_info (const audio_info& i) :
 	sample_rate(i.sample_rate), block_size(i.block_size), num_channels(i.num_channels) {}
 
@@ -65,4 +65,3 @@ struct audio_info
 } /* namespace psynth */
 
 #endif /* PSYNTH_AUDIOINFO_H */
-

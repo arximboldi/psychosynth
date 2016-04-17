@@ -40,17 +40,17 @@ class output_director_oss : public output_director
 	if (m_output)
 	    stop();
     }
-    
+
     void on_device_change (base::conf_node& conf)
     {
-#if PSYNTH_ON_DEVICE_CHANGE_LISTENER 
+#if PSYNTH_ON_DEVICE_CHANGE_LISTENER
         auto old_state = m_output->state ();
         build_output (*conf.parent ());
         if (old_state == io::async_state::running)
             m_output->start ();
 #endif
     }
-    
+
     virtual graph::audio_async_output_ptr
     do_start (base::conf_node& conf)
     {
@@ -93,7 +93,7 @@ public:
     {
 	return PSYNTH_DEFAULT_OSS_NAME;
     }
-    
+
     virtual output_director* create_output_director()
     {
 	return new output_director_oss;

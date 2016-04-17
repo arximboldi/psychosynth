@@ -90,4 +90,3 @@ PSYNTH_DECLARE_NODE_FACTORY (node_delay, "delay");
 } /* namespace psynth */
 
 #endif /* PSYNTH_OBJECTDELAY_H */
-

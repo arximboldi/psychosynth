@@ -12,7 +12,7 @@
  *  Copyright (C) 2011 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -76,7 +76,7 @@ struct oss_support
         typename sound::sample_type<Range>::type >::type format;
     typedef typename sound::is_planar<Range>::type is_planar;
     typedef typename sound::num_samples<Range>::type channels;
-    
+
     typedef typename mpl::and_<mpl::not_<
                                    mpl::equal_to<mpl::int_<PSYNTH_OSS_UNDEF>,
                                                  format> >,
@@ -110,4 +110,3 @@ std::size_t oss_output<Range>::put (const const_range& data)
 } /* namespace psynth */
 
 #endif /* PSYNTH_IO_OSS_OUTPUT_TPP_ */
-

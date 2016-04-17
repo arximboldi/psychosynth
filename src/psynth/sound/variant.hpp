@@ -15,7 +15,7 @@
  *  Copyright (C) 2010 Juan Pedro Bolivar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -33,7 +33,7 @@
 
 /*
  *  Copyright 2005-2007 Adobe Systems Incorporated
- * 
+ *
  *  Use, modification and distribution are subject to the Boost
  *  Software License, Version 1.0. (See accompanying file
  *  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt).
@@ -64,7 +64,7 @@ namespace sound
 {
 
 namespace detail
-{ 
+{
 
 template <typename Types, typename T>
 struct type_to_index;
@@ -90,7 +90,7 @@ struct copy_construct_in_place_fn;
 /**
    \brief Represents a concrete instance of a run-time specified type
    from a set of types
-   
+
    \class variant
    \ingroup Variant
 
@@ -151,7 +151,7 @@ class variant
 		      boost::mpl::sizeof_<boost::mpl::_2> > >::type::value;
 
     static const std::size_t NUM_TYPES = boost::mpl::size<Types>::value;
-    
+
 public:
     typedef Types                            types_t;
 
@@ -164,7 +164,7 @@ public:
     {
 	new (&_bits) typename boost::mpl::at_c<Types, 0>::type ();
     }
-    
+
     virtual ~variant ()
     {
 	apply_operation (*this, detail::destructor_op());
@@ -193,7 +193,7 @@ public:
 	swap (*this,tmp);
 	return *this;
     }
-    
+
     variant& operator= (const variant& v)
     {
 	variant tmp (v);
@@ -206,7 +206,7 @@ public:
     {
 	apply_operation (v, detail::copy_construct_in_place_fn<base_t> (_bits));
     }
-    
+
     template <typename T>
     void move_in (T& obj)
     {
@@ -231,7 +231,7 @@ public:
 	    throw std::bad_cast();
 	return *psynth_reinterpret_cast_c<const T*> (&_bits);
     }
-    
+
     template <typename T>
     T& do_dynamic_cast ()
     {
@@ -302,7 +302,7 @@ struct equal_to_fn
 {
     const Bits& _dst;
     equal_to_fn(const Bits& dst) : _dst(dst) {}
-        
+
     typedef bool result_type;
     template <typename T> result_type operator()(const T& x) const
     {
@@ -317,27 +317,27 @@ struct equal_to_fn
  * variant. obj will contain default-constructed instance after the
  * call
  */
-template <typename Types> 
+template <typename Types>
 template <typename T>
 variant<Types>::variant (T& obj, bool do_swap)
 {
-    _index = type_id<T> (); 
+    _index = type_id<T> ();
     if (_index == NUM_TYPES)
-	throw std::bad_cast (); 
+	throw std::bad_cast ();
 
     if (do_swap)
     {
         new (&_bits) T();    // default construct
         swap (obj, *psynth_reinterpret_cast<T*> (&_bits));
     }
-    else 
+    else
         detail::copy_construct_in_place (const_cast<const T&>(obj), _bits);
 }
 
-template <typename Types> 
+template <typename Types>
 void swap (variant<Types>& x, variant<Types>& y)
 {
-    std::swap (x._bits,  y._bits); 
+    std::swap (x._bits,  y._bits);
     std::swap (x._index, y._index);
 }
 

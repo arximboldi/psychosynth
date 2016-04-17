@@ -12,7 +12,7 @@
  *  Copyright (C) 2011 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -48,7 +48,7 @@ class oss_raw_output : public thread_async,
 {
 public:
     typedef thread_async::callback_type callback_type;
-    
+
     /**
      * We do not check that sample_size and format match.
      */
@@ -60,7 +60,7 @@ public:
                     int         rate,
                     int         channels,
                     callback_type cb = callback_type ());
-    
+
     ~oss_raw_output ();
 
     std::size_t put_i (const void*        data, std::size_t frames);
@@ -68,7 +68,7 @@ public:
 
     std::size_t buffer_size () const
     { return _buffer_size; }
-    
+
 private:
     void iterate ();
 
@@ -81,4 +81,3 @@ private:
 } /* namespace psynth */
 
 #endif /* PSYNTH_IO_OSS_RAW_OUTPUT_H_ */
-

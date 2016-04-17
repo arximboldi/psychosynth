@@ -12,7 +12,7 @@
  *  Copyright (C) 2011 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -53,10 +53,10 @@ class oss_output : public oss_raw_output,
                    public async_output<Range>
 {
     typedef async_output<Range> base_type;
-    
+
 public:
     static_assert (oss_support<Range>::is_supported::value,
-                   "Range output format not supported by OSS.");    
+                   "Range output format not supported by OSS.");
 
     typedef typename base_type::range range;
     typedef typename base_type::const_range const_range;
@@ -78,4 +78,3 @@ public:
 #include <psynth/io/oss_output.tpp>
 
 #endif /* PSYNTH_IO_OSS_OUTPUT_H_ */
-

@@ -32,7 +32,7 @@ namespace psynth
 class filter_values
 {
     friend class filter;
-    
+
 public:
     enum type {
 	LOWPASS,
@@ -51,7 +51,7 @@ private:
     float m_freq;
     float m_res;
     float m_srate;
-    
+
 public:
     filter_values (type type = LOWPASS,
 		   float freq = 220.0f,
@@ -59,11 +59,11 @@ public:
 		   float srate = 44100.0f) {
 	calculate (type, freq, res, srate);
     }
-    
+
     void calculate (type type, float freq, float res, float srate);
     void calculate (float freq);
     void calculate ();
-    
+
     type get_type () {
 	return m_type;
     };
@@ -85,7 +85,7 @@ class filter
       in/out history
     */
     sample m_ou1, m_ou2, m_in1, m_in2;
-    
+
     /*
       in/out history for moog-filter
     */
@@ -140,17 +140,17 @@ public:
 	    if (f.m_local_coef) {
 		m_coef = new filter_values;
 		*m_coef = *f.m_coef;
-	    }	    
+	    }
 	}
 
 	return *this;
     }
-    
+
     ~filter() {
 	if (m_local_coef)
 	    delete m_coef;
     }
-    
+
     filter_values* get_values () {
 	return m_coef;
     }
@@ -158,7 +158,7 @@ public:
     /*void set_values (filter_values* coef) {
 	m_coef = coef;
 	}*/
-    
+
     sample update (sample x);
 };
 

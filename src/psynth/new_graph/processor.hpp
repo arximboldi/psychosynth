@@ -5,14 +5,14 @@
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
  *  @date        Thu Jun  9 21:30:51 2011
  *
- *  @brief 
+ *  @brief
  */
 
 /*
  *  Copyright (C) 2011 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -82,7 +82,7 @@ async_triple_buffer;
 
 class basic_process_context : private boost::noncopyable
 {
-public:    
+public:
     std::size_t block_size () const
     { return _block_size; }
 
@@ -94,13 +94,13 @@ protected:
     basic_process_context (std::size_t block_size,
                            std::size_t frame_rate,
                            std::size_t queue_size);
-    
+
     rt_triple_buffer    _rt_buffers;
     async_triple_buffer _async_buffers;
-    
+
     std::size_t _block_size;
     std::size_t _frame_rate;
-    
+
     // FIXME: Factor the related functions a bit
     std::thread             _async_thread;
     std::condition_variable _async_cond;
@@ -139,13 +139,13 @@ public:
 
 protected:
     friend class processor;
-    
+
     rt_process_context (std::size_t block_size,
                            std::size_t frame_rate,
                            std::size_t queue_size)
         : basic_process_context (block_size, frame_rate, queue_size)
     {}
-    
+
     node_ptr        _curr_node;
     node_ptr        _request_node;
     out_port_base*  _request_output;
@@ -153,7 +153,7 @@ protected:
 
 class async_process_context : public virtual basic_process_context
 {
-public:    
+public:
     template <class Event, typename... Args>
     bool push_rt_event (Args&&... args);
 
@@ -185,7 +185,7 @@ protected:
                            std::size_t frame_rate,
                            std::size_t queue_size)
         : basic_process_context (block_size, frame_rate, queue_size) {}
-    
+
 };
 
 class user_process_context : public virtual basic_process_context
@@ -231,7 +231,7 @@ class full_process_context : public rt_process_context
 // private:
 public: // Eases unit testing!
     friend class processor;
-    
+
     full_process_context (std::size_t block_size = 1 << 6,
                           std::size_t frame_rate = 44100,
                           std::size_t queue_size = 1 << 10)
@@ -252,7 +252,7 @@ public:
                std::size_t queue_size = default_queue_size);
 
     ~processor ();
-    
+
     void start ();
     void stop ();
 
@@ -261,13 +261,13 @@ public:
 
     user_process_context& context ()
     { return _ctx; }
-    
+
     const user_process_context& context () const
     { return _ctx; }
-    
+
     void set_block_size (std::size_t new_size);
     void set_frame_rate (std::size_t new_frame_rate);
-    
+
     void rt_request_process (std::ptrdiff_t iterations);
     void rt_request_process ();
 
@@ -281,11 +281,11 @@ public:
     /** To be called by patches */
     void notify_remove_node (node_ptr node)
     { _explore_node_remove (node); }
-    
+
 private:
     void _explore_node_add (node_ptr node);
     void _explore_node_remove (node_ptr node);
-    
+
     void _async_loop ();
     void _rt_process_once ();
 
@@ -293,14 +293,14 @@ private:
     typedef std::list<process_node_ptr> process_node_list;
 
     core::patch_ptr         _root;
-    
+
     process_node_list       _procs; // Not readed from rt-threads.
     sink_node_list          _sinks; // Readed from rt-threads.
-    
+
     full_process_context    _ctx;
 
     std::mutex              _rt_mutex;
-    
+
     std::atomic<bool>       _is_running;
 };
 

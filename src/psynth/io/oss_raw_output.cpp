@@ -12,7 +12,7 @@
  *  Copyright (C) 2011 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -65,7 +65,7 @@ oss_raw_output::oss_raw_output (const char* device,
     , _frame_size (sample_size * channels)
     , _buffer_size (buffer_size)
 {
-    
+
 #define PSYNTH_OSS_CHECK(fun, except)                                   \
     do {                                                                \
         int err = fun;                                                  \
@@ -98,7 +98,7 @@ oss_raw_output::oss_raw_output (const char* device,
                    << "Planar audio data is not supported.";
         throw oss_param_error ();
     }
-    
+
     _handle = ::open (device, O_WRONLY, 0);
     PSYNTH_OSS_CHECK (_handle, oss_open_error);
 
@@ -112,7 +112,7 @@ oss_raw_output::oss_raw_output (const char* device,
                       oss_param_error);
     PSYNTH_OSS_CHECK (::ioctl (_handle, SNDCTL_DSP_SPEED,       &rate),
                       oss_param_error);
-    
+
     grd_handle.dismiss ();
 }
 

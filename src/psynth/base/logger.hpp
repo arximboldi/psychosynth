@@ -13,7 +13,7 @@
  *  Copyright (C) 2007, 2008, 2009 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -62,20 +62,20 @@ public:
     inline log_stream_adapter (log& l);
     inline log_stream_adapter (const log_stream_adapter&);
     inline log_stream_adapter (log_stream_adapter&&);
-    
+
     /** Destructor. */
     inline ~log_stream_adapter ();
 
     /** Sets the level. */
     void set_level (int level)
-    { _level = level; } 
+    { _level = level; }
 
     /** Gests current level. */
     int level () const { return _level; }
 
     /** Gests current message. */
     const std::string message () const { return _str.str (); }
-    
+
     /** Sends the message. */
     inline void flush ();
 
@@ -133,7 +133,7 @@ public:
     {
 	return *_stream;
     }
-    
+
 private:
     log_stream_adapter* _stream;
 };
@@ -152,7 +152,7 @@ log_stream_adapter_wrapper operator<< (log_stream_adapter_wrapper s, T p)
 class log_sink
 {
 public:
-    
+
     /**
      * Deliver a message to the user.
      * @param log The log node that originated the message.
@@ -217,7 +217,7 @@ public:
     log ()
 	: _stream (*this)
     {}
-    
+
     /** Destructor. */
     ~log ();
 
@@ -226,7 +226,7 @@ public:
      * @param d The sink that we want to dump this log's messages.
      */
     void add_sink (log_sink_ptr d);
-        
+
     /**
      * Dettachs a sink from this node.
      * @param d The sink we don't want to dump massages of this log anymore.
@@ -264,7 +264,7 @@ public:
     {
 	return log_stream_adapter_wrapper (_stream);
     }
-    
+
 private:
     /**
      * Log a message into this node which has been propagated from
@@ -284,7 +284,7 @@ private:
  * Root singleton @c Log to log global messages.
  */
 struct logger : public singleton_holder<log> {};
-    
+
 /**
  * Simple log sink that logs messages to @c cout and @c cerr.
  *
@@ -341,7 +341,7 @@ public:
     log_stream_sink (std::ostream& os)
 	: _output (&os)
     {}
-    
+
     /**
      * Dums a message to a stream.
      * @param log The log that originated the message.
@@ -366,7 +366,7 @@ protected:
     {
 	_output = &os;
     }
-    
+
 private:
     std::ostream* _output;
 };

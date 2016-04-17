@@ -7,14 +7,14 @@
  *
  *  Frame class and related utilities.
  *
- *  @todo Reimplement with C++0x variadic templates? 
+ *  @todo Reimplement with C++0x variadic templates?
  */
 
 /*
  *  Copyright (C) 2010 Juan Pedro Bolivar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -32,7 +32,7 @@
 
 /*
  *  Copyright 2005-2007 Adobe Systems Incorporated
- * 
+ *
  *  Use, modification and distribution are subject to the Boost
  *  Software License, Version 1.0. (See accompanying file
  *  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt).
@@ -99,19 +99,19 @@ namespace detail
 {
 
 template <typename DstLayout, typename SrcLayout, int K>
-struct mapping_transform 
-    : public boost::mpl::at<typename SrcLayout::sample_mapping, 
+struct mapping_transform
+    : public boost::mpl::at<typename SrcLayout::sample_mapping,
                      typename detail::type_to_index<
 			 typename DstLayout::sample_mapping,
 			 boost::mpl::integral_c<int, K> >::type
                            >::type {};
 
 /**
-   \defgroup ChannelBaseModelHomogeneous detail::homogeneous_channel_base 
+   \defgroup ChannelBaseModelHomogeneous detail::homogeneous_channel_base
    \ingroup ChannelBaseModel
    \brief A homogeneous channel base holding one channel element. Models
    HomogeneousChannelBaseConcept or HomogeneousChannelBaseValueConcept
-   
+
    If the element type models Regular, this class models
    HomogeneousChannelBaseValueConcept.
 */
@@ -119,7 +119,7 @@ struct mapping_transform
 /**
    \brief A homogeneous channel base holding one channel element. Models
    HomogeneousChannelBaseConcept or HomogeneousChannelBaseValueConcept
-   
+
    \ingroup ChannelBaseModelHomogeneous
 */
 template <typename Element, typename Layout>
@@ -138,7 +138,7 @@ public:
 
     homogeneous_channel_base () {}
     homogeneous_channel_base (Element v) : _v0(v) {}
- 
+
     // grayscale frame values are convertible to sample type
     operator Element () const { return _v0; }
 
@@ -152,7 +152,7 @@ public:
    \brief A homogeneous channel base holding two channel
    elements. Models HomogeneousChannelBaseConcept or
    HomogeneousChannelBaseValueConcept
-   
+
    \ingroup ChannelBaseModelHomogeneous
 */
 template <typename Element, typename Layout>
@@ -200,14 +200,14 @@ public:
     }
 
     template <typename Ref> Ref deref () const
-    { 
-        return Ref (*semantic_at_c<0>(*this), 
+    {
+        return Ref (*semantic_at_c<0>(*this),
 		    *semantic_at_c<1>(*this));
     }
 
     // Support for planar_frame_reference offset constructor
     template <typename Ptr>
-    homogeneous_channel_base(const Ptr& ptr, std::ptrdiff_t diff) 
+    homogeneous_channel_base(const Ptr& ptr, std::ptrdiff_t diff)
         : _v0 (*memunit_advanced (semantic_at_c<0>(ptr), diff)),
           _v1 (*memunit_advanced (semantic_at_c<1>(ptr), diff)) {}
 
@@ -223,7 +223,7 @@ public:
    \brief A homogeneous channel base holding three channel
    elements. Models HomogeneousChannelBaseConcept or
    HomogeneousChannelBaseValueConcept
-   
+
    \ingroup ChannelBaseModelHomogeneous
 */
 template <typename Element, typename Layout>
@@ -269,28 +269,28 @@ public:
 
     // Support for l-value reference proxy copy construction
     template <typename E2, typename L2>
-    homogeneous_channel_base(      homogeneous_channel_base<E2,L2,3>& c) 
+    homogeneous_channel_base(      homogeneous_channel_base<E2,L2,3>& c)
 	: _v0(sound::at_c<mapping_transform<Layout,L2,0>::value>(c))
 	, _v1(sound::at_c<mapping_transform<Layout,L2,1>::value>(c))
 	, _v2(sound::at_c<mapping_transform<Layout,L2,2>::value>(c)) {}
 
     // Support for planar_frame_iterator construction and dereferencing
     template <typename P> homogeneous_channel_base(P* p,bool)
-	: _v0(&semantic_at_c<0>(*p)) 
-        , _v1(&semantic_at_c<1>(*p)) 
+	: _v0(&semantic_at_c<0>(*p))
+        , _v1(&semantic_at_c<1>(*p))
         , _v2(&semantic_at_c<2>(*p)) {}
-    
+
     template <typename Ref>
     Ref deref() const
-    { 
-        return Ref(*semantic_at_c<0>(*this), 
-                   *semantic_at_c<1>(*this), 
+    {
+        return Ref(*semantic_at_c<0>(*this),
+                   *semantic_at_c<1>(*this),
                    *semantic_at_c<2>(*this));
     }
 
     // Support for planar_frame_reference offset constructor
     template <typename Ptr>
-    homogeneous_channel_base (const Ptr& ptr, std::ptrdiff_t diff) 
+    homogeneous_channel_base (const Ptr& ptr, std::ptrdiff_t diff)
         : _v0(*memunit_advanced(semantic_at_c<0>(ptr), diff))
 	, _v1(*memunit_advanced(semantic_at_c<1>(ptr), diff))
 	, _v2(*memunit_advanced(semantic_at_c<2>(ptr), diff)) {}
@@ -310,7 +310,7 @@ public:
    \brief A homogeneous channel base holding four channel
    elements. Models HomogeneousChannelBaseConcept or
    HomogeneousChannelBaseValueConcept
-   
+
    \ingroup ChannelBaseModelHomogeneous
 */
 template <typename Element, typename Layout>
@@ -350,44 +350,44 @@ public:
 
     explicit homogeneous_channel_base (Element v)
 	: _v0(v), _v1(v), _v2(v), _v3(v) {}
-    
+
     homogeneous_channel_base (Element v0, Element v1, Element v2, Element v3)
 	: _v0(v0), _v1(v1), _v2(v2), _v3 (v3) {}
 
     template <typename E2, typename L2>
     homogeneous_channel_base (const homogeneous_channel_base<E2,L2,4>& c)
-	: _v0(sound::at_c<mapping_transform<Layout,L2,0>::value>(c)) 
-        , _v1(sound::at_c<mapping_transform<Layout,L2,1>::value>(c)) 
+	: _v0(sound::at_c<mapping_transform<Layout,L2,0>::value>(c))
+        , _v1(sound::at_c<mapping_transform<Layout,L2,1>::value>(c))
         , _v2(sound::at_c<mapping_transform<Layout,L2,2>::value>(c))
         , _v3(sound::at_c<mapping_transform<Layout,L2,3>::value>(c)) {}
 
     // Support for l-value reference proxy copy construction
     template <typename E2, typename L2>
     homogeneous_channel_base (homogeneous_channel_base<E2,L2,4>& c)
-	: _v0(sound::at_c<mapping_transform<Layout,L2,0>::value>(c)) 
-        , _v1(sound::at_c<mapping_transform<Layout,L2,1>::value>(c)) 
+	: _v0(sound::at_c<mapping_transform<Layout,L2,0>::value>(c))
+        , _v1(sound::at_c<mapping_transform<Layout,L2,1>::value>(c))
         , _v2(sound::at_c<mapping_transform<Layout,L2,2>::value>(c))
         , _v3(sound::at_c<mapping_transform<Layout,L2,3>::value>(c)) {}
 
     // Support for planar_frame_iterator construction and dereferencing
     template <typename P> homogeneous_channel_base(P* p,bool)
-	: _v0(&semantic_at_c<0>(*p)) 
-        , _v1(&semantic_at_c<1>(*p)) 
-        , _v2(&semantic_at_c<2>(*p)) 
+	: _v0(&semantic_at_c<0>(*p))
+        , _v1(&semantic_at_c<1>(*p))
+        , _v2(&semantic_at_c<2>(*p))
         , _v3(&semantic_at_c<3>(*p)) {}
 
     template <typename Ref>
     Ref deref () const
-    { 
-        return Ref (*semantic_at_c<0>(*this), 
-		    *semantic_at_c<1>(*this), 
-		    *semantic_at_c<2>(*this), 
+    {
+        return Ref (*semantic_at_c<0>(*this),
+		    *semantic_at_c<1>(*this),
+		    *semantic_at_c<2>(*this),
 		    *semantic_at_c<3>(*this));
     }
 
     // Support for planar_frame_reference offset constructor
     template <typename Ptr>
-    homogeneous_channel_base (const Ptr& ptr, std::ptrdiff_t diff) 
+    homogeneous_channel_base (const Ptr& ptr, std::ptrdiff_t diff)
         : _v0(*memunit_advanced(semantic_at_c<0>(ptr),diff))
 	, _v1(*memunit_advanced(semantic_at_c<1>(ptr),diff))
 	, _v2(*memunit_advanced(semantic_at_c<2>(ptr),diff))
@@ -409,7 +409,7 @@ public:
    \brief A homogeneous channel base holding five channel
    elements. Models HomogeneousChannelBaseConcept or
    HomogeneousChannelBaseValueConcept
-   
+
    \ingroup ChannelBaseModelHomogeneous
 */
 template <typename Element, typename Layout>
@@ -462,7 +462,7 @@ public:
 
     template <typename E2, typename L2>
     homogeneous_channel_base (const homogeneous_channel_base<E2,L2,5>& c)
-        : _v0(sound::at_c<mapping_transform<Layout,L2,0>::value>(c)) 
+        : _v0(sound::at_c<mapping_transform<Layout,L2,0>::value>(c))
         , _v1(sound::at_c<mapping_transform<Layout,L2,1>::value>(c))
         , _v2(sound::at_c<mapping_transform<Layout,L2,2>::value>(c))
         , _v3(sound::at_c<mapping_transform<Layout,L2,3>::value>(c))
@@ -471,32 +471,32 @@ public:
     // Support for l-value reference proxy copy construction
     template <typename E2, typename L2>
     homogeneous_channel_base (homogeneous_channel_base<E2,L2,5>& c)
-        : _v0(sound::at_c<mapping_transform<Layout,L2,0>::value>(c)) 
+        : _v0(sound::at_c<mapping_transform<Layout,L2,0>::value>(c))
         , _v1(sound::at_c<mapping_transform<Layout,L2,1>::value>(c))
         , _v2(sound::at_c<mapping_transform<Layout,L2,2>::value>(c))
         , _v3(sound::at_c<mapping_transform<Layout,L2,3>::value>(c))
         , _v4(sound::at_c<mapping_transform<Layout,L2,4>::value>(c)) {}
-	
+
     // Support for planar_frame_iterator construction and dereferencing
     template <typename P> homogeneous_channel_base(P* p,bool)
-	: _v0(&semantic_at_c<0>(*p)) 
-        , _v1(&semantic_at_c<1>(*p)) 
-        , _v2(&semantic_at_c<2>(*p)) 
+	: _v0(&semantic_at_c<0>(*p))
+        , _v1(&semantic_at_c<1>(*p))
+        , _v2(&semantic_at_c<2>(*p))
         , _v3(&semantic_at_c<3>(*p))
         , _v4(&semantic_at_c<4>(*p)) {}
 
     template <typename Ref> Ref deref() const
-    { 
-        return Ref (*semantic_at_c<0>(*this), 
-		    *semantic_at_c<1>(*this), 
-		    *semantic_at_c<2>(*this), 
+    {
+        return Ref (*semantic_at_c<0>(*this),
+		    *semantic_at_c<1>(*this),
+		    *semantic_at_c<2>(*this),
 		    *semantic_at_c<3>(*this),
 		    *semantic_at_c<4>(*this));
     }
 
     // Support for planar_frame_reference offset constructor
     template <typename Ptr>
-    homogeneous_channel_base (const Ptr& ptr, std::ptrdiff_t diff) 
+    homogeneous_channel_base (const Ptr& ptr, std::ptrdiff_t diff)
         : _v0(*memunit_advanced(semantic_at_c<0>(ptr),diff))
 	, _v1(*memunit_advanced(semantic_at_c<1>(ptr),diff))
 	, _v2(*memunit_advanced(semantic_at_c<2>(ptr),diff))
@@ -547,7 +547,7 @@ dynamic_at_c (homogeneous_channel_base<Element,Layout,K>& cb, std::size_t i)
 
 template <typename Element, typename Layout, int K>
 typename element_const_reference_type<
-    homogeneous_channel_base<Element,Layout,K> >::type 
+    homogeneous_channel_base<Element,Layout,K> >::type
 dynamic_at_c (const homogeneous_channel_base<Element,Layout,K>& cb,
 	      std::size_t i)
 {
@@ -557,7 +557,7 @@ dynamic_at_c (const homogeneous_channel_base<Element,Layout,K>& cb,
 
 template <typename Element, typename Layout, int K>
 typename element_reference_type<
-    homogeneous_channel_base<Element&,Layout,K> >::type       
+    homogeneous_channel_base<Element&,Layout,K> >::type
 dynamic_at_c(const homogeneous_channel_base<Element&,Layout,K>& cb,
 	     std::size_t i)
 {
@@ -567,7 +567,7 @@ dynamic_at_c(const homogeneous_channel_base<Element&,Layout,K>& cb,
 
 template <typename Element, typename Layout, int K>
 typename element_const_reference_type<
-    homogeneous_channel_base<const Element&,Layout,K> >::type 
+    homogeneous_channel_base<const Element&,Layout,K> >::type
 dynamic_at_c (const homogeneous_channel_base<const Element&,Layout,K>& cb,
 	      std::size_t i)
 {
@@ -577,18 +577,18 @@ dynamic_at_c (const homogeneous_channel_base<const Element&,Layout,K>& cb,
 
 } /* namespace detail */
 
-template <typename Element, typename Layout, int K1, int K>  
+template <typename Element, typename Layout, int K1, int K>
 struct kth_element_type<detail::homogeneous_channel_base<Element,Layout,K1>, K>
 {
     typedef Element type;
 };
 
-template <typename Element, typename Layout, int K1, int K> 
+template <typename Element, typename Layout, int K1, int K>
 struct kth_element_reference_type<
     detail::homogeneous_channel_base<Element,Layout,K1>, K> :
     public boost::add_reference<Element> {};
 
-template <typename Element, typename Layout, int K1, int K> 
+template <typename Element, typename Layout, int K1, int K>
 struct kth_element_const_reference_type<
     detail::homogeneous_channel_base<Element,Layout,K1>, K> :
     public boost::add_reference<typename boost::add_const<Element>::type> {};
@@ -631,7 +631,7 @@ namespace detail
 template <typename E, typename L, int N> inline
 void swap (detail::homogeneous_channel_base<E,L,N>& x,
 	   detail::homogeneous_channel_base<E,L,N>& y)
-{ 
+{
     static_for_each (x, y, detail::swap_fn ());
 }
 

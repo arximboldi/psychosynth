@@ -18,7 +18,7 @@
  *  Copyright (C) 2010 Juan Pedro Bolivar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -36,7 +36,7 @@
 
 /*
  *  Copyright 2005-2007 Adobe Systems Incorporated
- * 
+ *
  *  Use, modification and distribution are subject to the Boost
  *  Software License, Version 1.0. (See accompanying file
  *  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt).
@@ -52,7 +52,7 @@
 #include <boost/mpl/next.hpp>
 #include <boost/mpl/deref.hpp>
 #include <boost/mpl/size.hpp>
-#include <boost/preprocessor/repeat.hpp> 
+#include <boost/preprocessor/repeat.hpp>
 
 namespace psynth
 {
@@ -202,7 +202,7 @@ PSYNTH_GENERATE_APPLY_FWD_OPS(10)
 } /* namespace detail */
 
 // unary application
-template <typename Types, typename Bits, typename Op> 
+template <typename Types, typename Bits, typename Op>
 typename Op::result_type PSYNTH_FORCEINLINE
 apply_operation_basec (const Bits& bits, std::size_t index, Op op)
 {
@@ -212,7 +212,7 @@ apply_operation_basec (const Bits& bits, std::size_t index, Op op)
 }
 
 // unary application
-template <typename Types, typename Bits, typename Op> 
+template <typename Types, typename Bits, typename Op>
 typename Op::result_type PSYNTH_FORCEINLINE
 apply_operation_base (Bits& bits, std::size_t index, Op op)
 {
@@ -229,12 +229,12 @@ struct reduce_bind1
 {
     const T2& _t2;
     Op&       _op;
-    
+
     typedef typename Op::result_type result_type;
-    
+
     reduce_bind1(const T2& t2, Op& op)
 	: _t2(t2), _op(op) {}
-    
+
     template <typename T1> PSYNTH_FORCEINLINE
     result_type operator () (const T1& t1)
     { return _op(t1, _t2); }
@@ -257,7 +257,7 @@ struct reduce_bind2
 
     template <typename T2> PSYNTH_FORCEINLINE
     result_type operator () (const T2& t2)
-    { 
+    {
 	return apply_operation_basec<Types1> (
 	    _bits1, _index1, reduce_bind1<T2,Op> (t2, _op));
     }

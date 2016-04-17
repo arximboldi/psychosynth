@@ -12,7 +12,7 @@
  *  Copyright (C) 2011 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -43,14 +43,14 @@ typedef base::dynamic_functor<void, rt_process_context&> rt_event;
 typedef base::dynamic_functor<void, async_process_context&> async_event;
 
 /**
- *  @todo Change when inheriting constructors or template aliases are added. 
+ *  @todo Change when inheriting constructors or template aliases are added.
  */
 template <typename Fn>
 struct fn_rt_event : public base::fn_dynamic_functor <
     Fn, void, rt_process_context&>
 {
     typedef base::fn_dynamic_functor <Fn, void, rt_process_context&> base;
-    
+
     fn_rt_event (const Fn& f)
         : base (f) {}
     fn_rt_event (Fn&& f)
@@ -62,7 +62,7 @@ struct fn_async_event : base::fn_dynamic_functor <
     Fn, void, async_process_context&>
 {
     typedef base::fn_dynamic_functor <Fn, void, async_process_context&> base;
-    
+
     fn_async_event (const Fn& f)
         : base (f) {}
     fn_async_event (Fn&& f)

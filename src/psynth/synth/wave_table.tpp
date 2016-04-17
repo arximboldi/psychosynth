@@ -12,7 +12,7 @@
  *  Copyright (C) 2011 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -46,10 +46,10 @@ typename wave_table<B>::frame_type wave_table<B>::get (float x) const
     float  findex = (rng.size () - 1) * base::phase(x);
     size_t index  = findex;
     float  alpha  = findex - index;
-	
+
     frame_type out = rng [index];
     out += alpha * (rng [index + 1 >= rng.size () ? 0 : index + 1] - out);
-    
+
     return out;
 }
 
@@ -69,4 +69,3 @@ void wave_table<B>::fill (Func func)
 } /* namespace psynth */
 
 #endif /* PSYNTH_SYNTH_WAVE_TABLE_TPP_ */
-

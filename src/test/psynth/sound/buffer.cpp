@@ -14,7 +14,7 @@
  *  Copyright (C) 2010 Juan Pedro Bolivar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -32,7 +32,7 @@
 
 /*
  *  Copyright 2005-2007 Adobe Systems Incorporated
- * 
+ *
  *  Use, modification and distribution are subject to the Boost
  *  Software License, Version 1.0. (See accompanying file
  *  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt).
@@ -133,7 +133,7 @@ struct my_channel_converter
 {
     template <typename SrcP,typename DstP>
     void operator () (const SrcP& src,DstP& dst) const
-    { 
+    {
         typedef typename channel_space_type<SrcP>::type src_cs_t;
         typedef typename channel_space_type<DstP>::type dst_cs_t;
         my_channel_converter_impl<src_cs_t, dst_cs_t>()(src, dst);
@@ -142,7 +142,7 @@ struct my_channel_converter
 
 /*
  *
- *   NOTE: Remove mandelbrot generator. 
+ *   NOTE: Remove mandelbrot generator.
  *
  */
 
@@ -180,11 +180,11 @@ public:
     virtual ~buffer_test () {}
 
     void run();
-    
+
 protected:
     virtual void check_range_impl (const stereo32sfc_range& range,
 				  const string name) = 0;
-    
+
     template <typename Range>
     void check_range (const Range& buf_range, const string name)
     {
@@ -231,7 +231,7 @@ void buffer_test::basic_test (const string prefix)
 
     // fill it with "left on"
     stereo32sf_frame left32 (1.0f, 0), right32 (0, -1);
-    
+
     typename Range::value_type left, right, zero (0);
     channel_convert (left32, left);
     default_channel_converter () (left32,left);
@@ -239,9 +239,9 @@ void buffer_test::basic_test (const string prefix)
 	stereo32sf_ref, typename Buf::range::value_type> () (left32);
 
     channel_convert (right32, right);
-    
+
     fill (buf_range.begin (), buf_range.end (), left);
-    
+
     channel_convert (left32, buf_range [0]);
 
     // pointer to frame in the middle
@@ -251,7 +251,7 @@ void buffer_test::basic_test (const string prefix)
     typename Range::iterator  ptr2 = &rt2;
     BOOST_CHECK_EQUAL (ptr, ptr2);
     BOOST_CHECK_EQUAL (buf_range.at (0) + 10, 10 + buf_range.at (0));
-    
+
     // draw 'right' dots with step of 3
     auto it = buf_range.at (buf_range.size () - 1);
     while (it >= buf_range.at (0)) {
@@ -279,7 +279,7 @@ void buffer_test::histogram_test (const Range& buf_range, const string prefix)
     //  get_hist (cropped, histogram.begin ());
     unsigned char histogram [256];
     fill (histogram, histogram + 256, 0);
-    
+
     get_hist (buf_range, histogram);
     mono8c_range hist_range =
 	interleaved_range (256, (const mono8_frame*) histogram);
@@ -300,7 +300,7 @@ void buffer_test::range_transformations_test (const Range& buf_range,
     check_range(channel_converted_range<mono8_frame>(
 		   buf_range, my_channel_converter ()), prefix + "my_mono8");
     check_range (flipped_range (buf_range), prefix + "flipped_ud");
-    check_range (sub_sampled_range (buf_range, 2), prefix + "subsampled");   
+    check_range (sub_sampled_range (buf_range, 2), prefix + "subsampled");
     check_range (kth_sample_range<0>(buf_range), prefix + "0th_k_sample");
     homogeneous_range_transformations_test (
 	buf_range, prefix, range_is_homogeneous<Range>());
@@ -317,7 +317,7 @@ void buffer_test::virtual_range_test ()
 {
     // TODO: Design a new test that does not require fucking
     // mandelbrot :D
-    
+
 #if 0
     typedef mandelbrot_fn<stereo32sf_frame_t> deref_t;
     typedef deref_t::point_t            point_t;
@@ -351,18 +351,18 @@ void buffer_test::packed_buffer_test ()
 {
     typedef bit_aligned_buffer2_type<1,3, stereo_layout>::type stereo13_buffer;
     typedef stereo13_buffer::value_type stereo13_frame;
-        
+
     stereo13_buffer stereo13_buf (10);
 
     stereo13_frame fill_val (1, 3);
     fill_frames (range (stereo13_buf), fill_val);
-    
+
     stereo13_buffer stereo13a_buf (10, 1);
     copy_frames(const_range(stereo13_buf), range(stereo13a_buf));
-    
+
     stereo13_buffer stereo13b_buf (10, 4);
     copy_frames(const_range (stereo13_buf), range(stereo13b_buf));
-    
+
     BOOST_CHECK (stereo13_buf == stereo13a_buf);
     BOOST_CHECK (stereo13a_buf == stereo13b_buf);
 }
@@ -377,18 +377,18 @@ void buffer_test::dynamic_buffer_test ()
 	    stereo16_buffer,
 	    stereo32sf_planar_buffer> >
 	test_buffer;
-    
+
     stereo32sf_planar_buffer buf (sample_range.size ());
     copy_frames (sample_range, range (buf));
-    
+
     test_buffer any_buf = test_buffer (buf);
-    
+
     check_range (range (any_buf), "dynamic_");
     check_range (flipped_range (range (any_buf)), "dynamic_fliplr");
-        
+
     test_buffer::range sub_buffer = sub_range (
 	range (any_buf), 128, 256);
-    
+
     check_range (sub_buffer, "dynamic_subbuffer");
     check_range (sub_sampled_range (range (any_buf), 2),
 		"dynamic_subbuffer_subsampled180rot");
@@ -398,11 +398,11 @@ template <typename Buf>
 void buffer_test::buffer_all_test (const string prefix)
 {
     basic_test<Buf> (prefix + "basic_");
-    
+
     Buf buf;
     buf.recreate (sample_range.size ());
     copy_and_convert_frames (sample_range, range (buf));
-    
+
     range_transformations_test (range (buf), prefix + "ranges_");
     histogram_test (const_range (buf),prefix + "histogram_");
 }
@@ -410,12 +410,12 @@ void buffer_test::buffer_all_test (const string prefix)
 void buffer_test::run ()
 {
     initialize ();
-    
+
     buffer_all_test<rlstereo8_buffer> ("bgr8_");
     buffer_all_test<stereo32sf_buffer> ("stereo32sf_");
     buffer_all_test<stereo32sf_planar_buffer> ("planarstereo32sf_");
     buffer_all_test<mono8_buffer> ("gray8_");
-    
+
     typedef const bit_aligned_frame_reference <
 	boost::uint8_t,
 	mpl::vector2_c<int,1,2>,
@@ -464,7 +464,7 @@ class checksum_buffer_test : public checksum_buffer_mgr
 public:
     checksum_buffer_test (const char* filename)
 	: _filename(filename) {}
-    
+
 private:
     const char* _filename;
     virtual void initialize();
@@ -475,7 +475,7 @@ private:
 // buffer
 void checksum_buffer_test::initialize ()
 {
-    string crc_name; 
+    string crc_name;
     boost::crc_32_type::value_type crc_result;
     fstream checksum_ref (_filename, ios::in);
     while (true) {
@@ -596,7 +596,7 @@ BOOST_AUTO_TEST_CASE (test_buffer_static_checks)
     BOOST_STATIC_ASSERT(range_is_step_in_x<stereo32sf_planar_step_range>::value);
     BOOST_STATIC_ASSERT(!range_is_step_in_x<stereo32sf_planar_range>::value);
 #endif
-    
+
     BOOST_STATIC_ASSERT(!is_planar<stereo32sf_step_range>::value);
     BOOST_STATIC_ASSERT(is_planar<stereo32sf_planar_step_range>::value);
     BOOST_STATIC_ASSERT(is_planar<stereo32sf_planar_range>::value);
@@ -621,7 +621,7 @@ BOOST_AUTO_TEST_CASE (test_buffer_static_checks)
 					  use_default,
 					  mpl::false_>::type,
 			stereo32sfc_step_range>::value));
-    
+
     // test range get raw data (mostly compile-time test)
     {
 	stereo8_buffer buf (128);

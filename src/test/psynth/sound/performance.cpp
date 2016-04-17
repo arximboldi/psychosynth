@@ -29,7 +29,7 @@
  *  Copyright (C) 2010 Juan Pedro Bolivar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -47,7 +47,7 @@
 
 /*
  *  Copyright 2005-2007 Adobe Systems Incorporated
- * 
+ *
  *  Use, modification and distribution are subject to the Boost
  *  Software License, Version 1.0. (See accompanying file
  *  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt).
@@ -162,7 +162,7 @@ struct fill_nonpsynth<STEREO_RANGE(T1), frame<T2,rlstereo_layout> >
     fill_nonpsynth (const Range& v_in, const P& p_in)
 	: _v(v_in)
 	, _p(p_in) {}
-    
+
     void operator()() const
     {
         T1* first = (T1*)_v.begin ();
@@ -183,7 +183,7 @@ struct fill_nonpsynth<STEREO_PLANAR_RANGE(T1), frame<T2,stereo_layout> >
     typedef frame<T2,stereo_layout> P;
     Range _v;
     P _p;
-    
+
     fill_nonpsynth (const Range& v_in, const P& p_in)
 	: _v(v_in)
 	, _p(p_in) {}
@@ -206,7 +206,7 @@ struct fill_nonpsynth<STEREO_PLANAR_RANGE(T1), frame<T2,rlstereo_layout> >
     typedef frame<T2, rlstereo_layout> P;
     Range _v;
     P _p;
-    
+
     fill_nonpsynth (const Range& v_in, const P& p_in)
 	: _v(v_in), _p(p_in) {}
 
@@ -229,7 +229,7 @@ void test_fill (std::size_t trials)
 
     fill_range_max (range (bufp));
     fill_range_max (range (bufn));
-    
+
     BOOST_TEST_MESSAGE (
 	"psynth: " << measure_time (
 	    fill_psynth<Range,P> (range (bufp), P(0)), trials));
@@ -237,7 +237,7 @@ void test_fill (std::size_t trials)
     BOOST_TEST_MESSAGE (
 	"non-psynth: "<< measure_time (
 	    fill_nonpsynth<Range,P> (range (bufn), P(0)), trials));
-    
+
     BOOST_CHECK (range (bufp) [0] == P(0));
     BOOST_CHECK (equal_frames (range (bufp), range (bufn)));
 };
@@ -250,7 +250,7 @@ struct stereo_fr_t
     {
         p = frame<T,stereo_layout> {0, 1};
     }
-    
+
     PSYNTH_FORCEINLINE
     void operator () (const planar_frame_reference<T&, stereo_space>& p) const
     {
@@ -332,11 +332,11 @@ void test_for_each (std::size_t trials)
 
     fill_range_max (range (bufp));
     fill_range_max (range (bufn));
-    
+
     BOOST_TEST_MESSAGE (
 	"psynth: " << measure_time (
 	    for_each_psynth<Range, F> (range (bufp), F ()), trials));
-    
+
     BOOST_TEST_MESSAGE (
 	"non-psynth: " << measure_time (
 	    for_each_nonpsynth<Range, F> (range (bufn), F ()), trials));
@@ -392,13 +392,13 @@ struct copy_nonpsynth<STEREO_RANGE(T1), RLSTEREO_RANGE(T2)>
     copy_nonpsynth (const Range1& v1_in, const Range2& v2_in)
 	: _v1 (v1_in)
 	, _v2 (v2_in) {}
-    
+
     void operator() () const
     {
         T1* first1 = (T1*)_v1.begin ();
         T1* last1  = first1 + _v1.size() * 2;
         T2* first2 = (T2*)_v2.begin ();
-	
+
         while (first1!=last1)
 	{
             first2 [1] = first1 [0];
@@ -424,7 +424,7 @@ struct copy_nonpsynth<STEREO_PLANAR_RANGE(T1),STEREO_PLANAR_RANGE(T2)>
         std::size_t size=_v1.size();
         T1* first10 = (T1*) psynth::sound::at_c<0>(_v1.begin ());
         T1* first11 = (T1*) psynth::sound::at_c<1>(_v1.begin ());
-        
+
 	T2* first20 = (T2*) psynth::sound::at_c<0>(_v2.begin ());
         T2* first21 = (T2*) psynth::sound::at_c<1>(_v2.begin ());
 
@@ -450,7 +450,7 @@ struct copy_nonpsynth<STEREO_RANGE(T1),STEREO_PLANAR_RANGE(T2)>
         T1* last   = first + _v1.size() * 2;
         T2* first0 = (T2*) psynth::sound::at_c<0> (_v2.begin ());
         T2* first1 = (T2*) psynth::sound::at_c<1> (_v2.begin ());
-	
+
 	while (first != last)
 	{
             *first0++ = first[0];
@@ -497,7 +497,7 @@ void test_copy (std::size_t trials)
 
     fill_range_max (range (bufp1));
     fill_range_max (range (bufn1));
-    
+
     BOOST_TEST_MESSAGE (
 	"psynth: " << measure_time (
 	    copy_psynth<Range1,Range2> (range(bufp1), range (bufp2)), trials));
@@ -575,7 +575,7 @@ struct transform_nonpsynth<STEREO_PLANAR_RANGE(T1),STEREO_PLANAR_RANGE(T2),F>
     Range1 _v1;
     Range2 _v2;
     F _f;
-    
+
     transform_nonpsynth (const Range1& v1_in, const Range2& v2_in, const F& f_in)
 	: _v1(v1_in), _v2(v2_in), _f(f_in) {}
 
@@ -659,7 +659,7 @@ void test_transform (std::size_t trials)
     fill_range_max (range (bufp2));
     fill_range_max (range (bufn1));
     fill_range_max (range (bufn2));
-    
+
     BOOST_TEST_MESSAGE (
 	"psynth: " << measure_time (
 	    transform_psynth<Range1, Range2, F>(
@@ -681,7 +681,7 @@ BOOST_AUTO_TEST_CASE (test_fill_frames_performance)
     BOOST_TEST_MESSAGE (
 	"Test fill_frames() on stereo8_buffer with stereo8_frame");
     test_fill<stereo8_range, stereo8_frame>(num_trials);
-    
+
     BOOST_TEST_MESSAGE (
 	"Test fill_frames() on stereo8_planar_buffer with stereo8_frame");
     test_fill<stereo8_planar_range, stereo8_frame>(num_trials);
@@ -689,7 +689,7 @@ BOOST_AUTO_TEST_CASE (test_fill_frames_performance)
     BOOST_TEST_MESSAGE (
 	"Test fill_frames() on stereo8_buffer with rlstereo8_frame");
     test_fill<stereo8_range, rlstereo8_frame>(num_trials);
-    
+
     BOOST_TEST_MESSAGE (
 	"Test fill_frames() on stereo8_planar_buffer with rlstereo8_frame");
     test_fill<stereo8_planar_range, rlstereo8_frame>(num_trials);
@@ -709,20 +709,20 @@ BOOST_AUTO_TEST_CASE (test_copy_frames_performance)
     BOOST_TEST_MESSAGE (
 	"Test copy_frames() between stereo8_buffer and stereo8_buffer");
     test_copy<stereo8_range,stereo8_range>(num_trials);
-    
+
     BOOST_TEST_MESSAGE (
 	"Test copy_frames() between stereo8_buffer and rlstereo8_buffer");
     test_copy<stereo8_range,rlstereo8_range>(num_trials);
-    
+
     BOOST_TEST_MESSAGE (
 	"Test copy_frames() between stereo8_planar_buffer and "
 	"stereo8_planar_buffer");
     test_copy<stereo8_planar_range,stereo8_planar_range>(num_trials);
-    
+
     BOOST_TEST_MESSAGE (
 	"Test copy_frames() between stereo8_buffer and stereo8_planar_buffer");
     test_copy<stereo8_range,stereo8_planar_range>(num_trials);
-    
+
     BOOST_TEST_MESSAGE (
 	"Test copy_frames() between stereo8_planar_buffer and stereo8_buffer");
     test_copy<stereo8_planar_range,stereo8_range>(num_trials);
@@ -736,7 +736,7 @@ BOOST_AUTO_TEST_CASE (test_transform_frames_performance)
 	stereo8_range,
 	stereo8_range,
 	rlstereo_to_stereo<bits8,frame<bits8,stereo_layout> > >(num_trials);
-    
+
     BOOST_TEST_MESSAGE (
 	"Test transform_frames() between stereo8_planar_buffer and "
 	"stereo8_planar_buffer");
@@ -745,7 +745,7 @@ BOOST_AUTO_TEST_CASE (test_transform_frames_performance)
 	stereo8_planar_range,
 	rlstereo_to_stereo<
 	    bits8, planar_frame_reference<bits8,stereo_space> > >(num_trials);
-    
+
     BOOST_TEST_MESSAGE (
 	"Test transform_frames() between stereo8_buffer and "
 	"stereo8_planar_buffer");
@@ -753,7 +753,7 @@ BOOST_AUTO_TEST_CASE (test_transform_frames_performance)
 	stereo8_range,
 	stereo8_planar_range,
 	rlstereo_to_stereo<bits8,frame<bits8,stereo_layout> > >(num_trials);
-    
+
     BOOST_TEST_MESSAGE (
 	"Test transform_frames() between stereo8_planar_buffer and "
 	"stereo8_buffer");
@@ -761,7 +761,7 @@ BOOST_AUTO_TEST_CASE (test_transform_frames_performance)
 	stereo8_planar_range,
 	stereo8_range,
 	rlstereo_to_stereo<
-	    bits8,planar_frame_reference<bits8,stereo_space> > >(num_trials);   
+	    bits8,planar_frame_reference<bits8,stereo_space> > >(num_trials);
 }
 
 BOOST_AUTO_TEST_SUITE_END ();

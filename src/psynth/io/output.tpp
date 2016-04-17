@@ -12,7 +12,7 @@
  *  Copyright (C) 2011 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -79,7 +79,7 @@ std::size_t put_on_raw (RawOutput& out, const Range& data)
     std::size_t written     = 0;
     std::size_t old_written = 1; // Do not get into an infinite loop
                                  // when the device refuses to write.
-    
+
     while (old_written != written && written < total)
     {
         auto block = sub_range (
@@ -88,7 +88,7 @@ std::size_t put_on_raw (RawOutput& out, const Range& data)
         written += detail::put_on_raw_fn<sound::is_planar<Range>::value> () (
             out, block);
     }
-    
+
     return written;
 }
 

@@ -12,7 +12,7 @@
  *  Copyright (C) 2011 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -47,7 +47,7 @@ struct counting_node : public node
     void rt_on_context_update (rt_process_context& ctx)
     { ++init; }
     void rt_do_process (rt_process_context& ctx)
-    { ++count; }    
+    { ++count; }
 };
 
 struct counting_sink : public sink_node
@@ -58,7 +58,7 @@ struct counting_sink : public sink_node
     void rt_on_context_update (rt_process_context& ctx)
     { ++init; }
     void rt_do_process (rt_process_context& ctx)
-    { ++count; }    
+    { ++count; }
 };
 
 BOOST_AUTO_TEST_SUITE(graph_processor_test_suite);
@@ -73,7 +73,7 @@ BOOST_AUTO_TEST_CASE(test_processor)
 BOOST_AUTO_TEST_CASE(test_processor_not_sink)
 {
     processor p;
-    
+
     std::shared_ptr<counting_node> n = std::make_shared<counting_node> ();
     BOOST_CHECK_THROW (n->check_attached_to_patch (),
                        node_attachment_error);
@@ -84,14 +84,14 @@ BOOST_AUTO_TEST_CASE(test_processor_not_sink)
     BOOST_CHECK_NO_THROW (n->check_attached_to_patch ());
     BOOST_CHECK_NO_THROW (n->check_attached_to_process ());
     p.rt_request_process ();
-    
+
     BOOST_CHECK_EQUAL (n->count, 0);
 }
 
 BOOST_AUTO_TEST_CASE(test_processor_sink)
 {
     processor p;
-    
+
     std::shared_ptr<counting_sink> n = std::make_shared<counting_sink> ();
     BOOST_CHECK_THROW (n->check_attached_to_patch (),
                        node_attachment_error);
@@ -111,7 +111,7 @@ BOOST_AUTO_TEST_CASE(test_processor_sink)
 BOOST_AUTO_TEST_CASE(test_processor_init)
 {
     processor p;
-    
+
     std::shared_ptr<counting_sink> n = std::make_shared<counting_sink> ();
     BOOST_CHECK_EQUAL (n->init, 0);
     p.root ()->add (n);
@@ -135,7 +135,7 @@ BOOST_AUTO_TEST_CASE(test_processor_rt_event_two)
 {
     processor p;
     int var = 0;
-    
+
     p.context ().push_rt_event (
         make_rt_event ([&] (rt_process_context&) {
                 var++;
@@ -151,7 +151,7 @@ BOOST_AUTO_TEST_CASE(test_processor_rt_event_two)
         p.rt_request_process ();
         ::usleep (1 << 10);
     }
-    
+
     BOOST_CHECK_EQUAL (var, 4);
 }
 
@@ -172,7 +172,7 @@ BOOST_AUTO_TEST_CASE(test_processor_async_event_two)
 {
     processor p;
     int var = 0;
-    
+
     p.context ().push_async_event (
         make_async_event ([&] (async_process_context&) {
                 var++;
@@ -194,13 +194,13 @@ BOOST_AUTO_TEST_CASE(test_processor_async_event_two)
 BOOST_AUTO_TEST_CASE (test_processor_errors)
 {
     processor p;
-    
+
     BOOST_CHECK_THROW (
         p.stop (), processor_not_running_error);
     p.start ();
     BOOST_CHECK_THROW (
         p.start (), processor_not_idle_error);
-    
+
     // Should stop on destroy
 }
 

@@ -12,7 +12,7 @@
  *  Copyright (C) 2011 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -50,7 +50,7 @@ class jack_raw_output : public detail::async_base_impl,
 {
 public:
     typedef detail::async_base_impl::callback_type callback_type;
-    
+
     jack_raw_output (const char* client,
                      const char* server,
                      int         rate,
@@ -61,16 +61,16 @@ public:
 
     void start ();
     void stop ();
-    
+
     std::size_t put_i (const void*        data, std::size_t frames);
     std::size_t put_n (const void* const* data, std::size_t frames);
 
     std::size_t buffer_size () const
     { return _buffer_size; }
-    
+
 private:
     void connect_ports ();
-    
+
     void _on_process (jack_nframes_t frames)
     { process (frames); }
 
@@ -78,14 +78,14 @@ private:
 
     void _on_buffer_size (jack_nframes_t newsize)
     { _buffer_size = newsize; }
-    
+
     void _on_shutdown () { /* TODO */ }
-    
+
     static int _process_cb (jack_nframes_t nframes, void* jack_client);
     static int _sample_rate_cb (jack_nframes_t newrate, void* jack_client);
     static int _buffer_size_cb (jack_nframes_t newsize, void* jack_client);
     static void _shutdown_cb (void* jack_client);
-    
+
     std::vector<jack_port_t*> _out_ports;
     jack_client_t*            _client;
     int                       _actual_rate;
@@ -96,4 +96,3 @@ private:
 } /* namespace psynth */
 
 #endif /* PSYNTH_IO_JACK_RAW_OUTPUT_H_ */
-

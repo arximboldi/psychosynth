@@ -44,15 +44,15 @@ dnl ======================================================================
 dnl CXX=gfilt
 CXXFLAGS="${CXXFLAGS} -std=c++0x -Wno-unused-local-typedefs"
 
-AC_ARG_ENABLE([gprof], 
+AC_ARG_ENABLE([gprof],
 		[AC_HELP_STRING([--enable-gprof],
 	        [enable gprof [default=disabled] ])],
 		[CXXFLAGS="${CXXFLAGS} -pg"], [])
 
-AC_ARG_ENABLE([debug], 
+AC_ARG_ENABLE([debug],
 		[AC_HELP_STRING([--enable-debug],
 	        [enable debug [default=disabled] ])],
-		[CXXFLAGS="${CXXFLAGS} -g3 -O0"], 
+		[CXXFLAGS="${CXXFLAGS} -g3 -O0"],
 		[CXXFLAGS="${CXXFLAGS} -DNDEBUG"])
 
 AC_ARG_ENABLE([local-data],
@@ -172,7 +172,7 @@ AC_ARG_ENABLE([soundtouch],
 
 if test "x${soundtouch}" != xno ; then
     PKG_CHECK_MODULES(SOUNDTOUCH, [ soundtouch ],
-    
+
     [
             HAVE_SOUNDTOUCH=yes
             AC_DEFINE([HAVE_SOUNDTOUCH], 1, [Have Soundtouch?])
@@ -203,7 +203,7 @@ dnl        ])
 dnl else
 dnl    HAVE_SAMPLERATE=disabled
 dnl fi
- 
+
 dnl  OGG Vorbis
 dnl ----------------------------------------------------------------------
 
@@ -294,7 +294,7 @@ AC_ARG_ENABLE([psynth3d],
 
 if test "x${psynth3d}" != xno ; then
    BUILD_PSYNTH3D=yes
-   
+
    dnl Check OGRE
    PKG_CHECK_MODULES(OGRE, [OGRE >= 1.6], HAVE_OGRE=yes, BUILD_PSYNTH3D=no)
    OGRE_PLUGIN_DIR=`pkg-config --variable=plugindir OGRE`
@@ -438,12 +438,12 @@ AC_MSG_RESULT([
 else
 AC_MSG_RESULT([
 **************************************************************
- 
+
    Psychosynth $VERSION:  Automatic configuration OK.
- 
- 
+
+
     Configuration summary:
- 
+
        3D client (psynth3d) ..... $BUILD_PSYNTH3D])
 if test "x$psynth3d" != xno; then
 if test "x$HAVE_OGRE" != xyes; then
@@ -508,9 +508,9 @@ if test "x$HAVE_BOOST_TEST" != xyes; then
 AC_MSG_RESULT([           > No Boost.UTF >= 1.42]);
 fi
 
-AC_MSG_RESULT([  
+AC_MSG_RESULT([
     Installation directories:
-  
+
        Program: ................. $PACKAGE_BIN_DIR
        Library: ................. $PACKAGE_LIB_DIR
        Includes: ................ $PACKAGE_INCLUDE_DIR
@@ -519,12 +519,11 @@ AC_MSG_RESULT([
        Prefix: .................. $prefix
        Exec. prefix: ............ $exec_prefix
 
-     
+
     Type 'make' to compile.
     Then type 'make install' to install.
-    
+
     Have fun!
 ])
 
 fi
-

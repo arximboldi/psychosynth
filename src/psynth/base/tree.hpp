@@ -11,7 +11,7 @@
 
 /*
  *  Copyright (C) 2008, 2009 Juan Pedro Bolívar Puente
- *  
+ *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -99,13 +99,13 @@ template <class Node,
 	  class Traits = tree_node_traits<Key>,
 	  class ThreadingPolicy = PSYNTH_DEFAULT_THREADING <Node> >
 class tree_node
-{   
+{
 public:
     /**
      * Pointer to the node type.
      */
     typedef std::unique_ptr<Node> node_ptr;
-    
+
     /**
      * Iterator to check the childs of this node.
      */
@@ -121,7 +121,7 @@ public:
      * Traits being used in this instanciation.
      */
     typedef Traits traits;
-    
+
     /** Constuctor. */
     tree_node () :
 	_parent(NULL), _isinit(false)
@@ -148,7 +148,7 @@ public:
     {
 	return _childs.begin ();
     }
-    
+
     /**
      * Returns an iterator to the end of this node childs.
      * @note Using iterators is not thread safe with any threading model.
@@ -166,7 +166,7 @@ public:
     {
 	return _childs.end ();
     }
-    
+
     /**
      * Returns a pointer to the parent of this node or @c null if this is a root
      * node.
@@ -186,7 +186,7 @@ public:
 	tree_lock lock (this);
 	return _parent;
     }
-    
+
     /**
      * Returns the name of this node.
      */
@@ -195,7 +195,7 @@ public:
 	tree_lock lock (this);
 	return _name;
     }
-   
+
     /**
      * Returns an iterator to a child given by its key or end () otherwise.
      * @param name The key name of the child.
@@ -205,7 +205,7 @@ public:
 	tree_lock lock (this);
 	return _childs.find (name);
     }
- 
+
     /**
      * Returns an iterator to a child given by its key or end () otherwise.
      * @param name The key name of the child.
@@ -221,7 +221,7 @@ public:
      * of freeing the node memory. If the key does not refer to a node
      * it throws an exception.
      *
-     * @return A pointer to the detached node. 
+     * @return A pointer to the detached node.
      */
     node_ptr detach (const Key& name)
     {
@@ -247,7 +247,7 @@ public:
      * @return true If the node was successfully attached and false otherwise.
      */
     bool attach (const Key& name, node_ptr node);
-    
+
     /**
      * Detaches a node from the tree. Once detached you are responsible
      * of freeing the node memory. If the iterator points to end ()
@@ -257,12 +257,12 @@ public:
      * @note This version of detach is not thread-safe.
      */
     node_ptr detach (iterator iter);
-    
+
     /**
      * Returns the path of this node from the root to the node.
      */
     Key path_name () const;
-    
+
     /**
      * Deletes a child of this node.
      * @return An iterator to the next child.
@@ -274,7 +274,7 @@ public:
      * Removes all childs.
      */
     void clear_childs ();
-    
+
     /**
      * Returns a reference to the child of this node mathing a name. The child
      * is created if it does not exist yet.
@@ -296,13 +296,13 @@ public:
      * @param name The name of the child.
      */
     const Node& existing_child (const Key& name) const;
-    
+
     /**
      * Returns a reference to the child matching a path. All nodes
      * in the path are created if they do not exist.
      */
     Node& path (const Key& name);
-    
+
     /**
      * Returns a reference to the child matching a path, an
      * exception is thrown if the path does not exist.
@@ -317,12 +317,12 @@ public:
      */
     const Node& existing_path (const Key& name) const;
 
-protected:    
+protected:
     virtual void on_new_child (Node& node) {}
     virtual void on_remove_child (Node& node) {}
     virtual void on_init () {}
     virtual void on_uninit () {}
-    
+
 private:
     typedef std::map<Key, std::unique_ptr<Node>> child_map;
 
@@ -344,7 +344,7 @@ private:
 
     Node& path (typename Key::const_iterator begin,
 		    typename Key::const_iterator end);
-    
+
     void path_name (Key& prefix) const;
 
     bool is_init() const

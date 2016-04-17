@@ -12,7 +12,7 @@
  *  Copyright (C) 2007 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -46,7 +46,7 @@ class timer
 public:
     typedef int tick_type;
     typedef size_t frame_type;
-    
+
     /** Constructor. */
     timer ();
 
@@ -87,7 +87,7 @@ public:
     {
 	return m_time_count;
     }
-    
+
     /**
      * Returns the milliseconds elapsed between the last two @c update() calls.
      */
@@ -107,17 +107,17 @@ public:
 private:
     timeval m_clock_now;
     timeval m_clock_start;
-    
+
     frame_type m_frame_count;
     frame_type m_total_frame_count;
-    
+
     tick_type m_time_count;
     tick_type m_delta;
     tick_type m_last_time;
-    
+
     int    m_fps;
     double m_rate;
-    
+
     void update_ticks ();
 };
 

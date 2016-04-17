@@ -12,7 +12,7 @@
  *  Copyright (C) 2011 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -74,7 +74,7 @@ void thread_async::_request_rt ()
     sched_param p;
     p.sched_priority = 1;
     auto ret = pthread_setschedparam (hdl, SCHED_FIFO, &p);
-    
+
 #ifndef PSYNTH_NO_LOG_RT_REQUEST
     if (ret)
         PSYNTH_LOG << base::log::warning

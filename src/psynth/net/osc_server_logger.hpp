@@ -36,7 +36,7 @@ public:
 	base::logger::self () ("oscserver", base::log::info, "Server listening.");
 	return false;
     }
-    
+
     virtual bool handle_server_stop_listening (osc_server* server,
 					       osc_server_error err)
     {
@@ -44,7 +44,7 @@ public:
 	case SE_NONE:
 	    base::logger::self () ("oscserver", base::log::info, "Server no longer listening.");
 	    break;
-	    
+
 	case SE_PORT_BINDING:
 	    base::logger::self () ("oscserver", base::log::info, "Could not bind port.");
 	    break;
@@ -55,13 +55,13 @@ public:
 
 	return false;
     }
-    
+
     virtual bool handle_server_client_connect(osc_server* server, int client_id)
     {
 	base::logger::self () ("oscserver", base::log::info, "Client connected.");
 	return false;
     }
-    
+
     virtual bool handle_server_client_disconnect(osc_server* server,
 						 int client_id,
 						 osc_server_client_error cause)
@@ -74,11 +74,11 @@ public:
 	case SCE_CLIENT_TIMEOUT:
 	    base::logger::self () ("oscserver", base::log::info, "Client timeout.");
 	    break;
-	    
+
 	default:
 	    break;
 	}
-	
+
 	return false;
     }
 };

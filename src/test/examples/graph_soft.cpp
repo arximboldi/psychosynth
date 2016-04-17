@@ -12,7 +12,7 @@
  *  Copyright (C) 2011 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -58,7 +58,7 @@ graph::node_ptr make_file_output (const char* fname)
 graph::node_ptr make_output_patch ()
 {
     auto& factory = graph::node_factory::self ();
-    
+
     auto patch = graph::core::new_patch ();
 
     auto out1 = patch->add (make_file_output ("graph-soft-1.wav"));
@@ -67,34 +67,34 @@ graph::node_ptr make_output_patch ()
 
     auto mixer = patch->add (factory.create ("audio_mixer"));
     mixer->param ("gain").set (1.0f);
-    
+
     auto in0 = patch->add (factory.create ("audio_patch_soft_in_port"));
     in0->param ("port-name").str ("input-0");
     auto in1 = patch->add (factory.create ("audio_patch_soft_in_port"));
     in1->param ("port-name").str ("input-1");
-        
+
     graph::connect (mixer, "output", out2, "input");
     graph::connect (in0, "output", out1, "input");
     graph::connect (in1, "output", out3, "input");
-    
+
     graph::connect (in0, "output", mixer, "input-0");
     graph::connect (in1, "output", mixer, "input-1");
 
 
     return patch;
 }
-    
+
 int main ()
 {
     base::logger::self ().add_sink (base::new_log_std_sink ());
     auto& factory = graph::node_factory::self ();
-    
+
     graph::processor p;
     auto root     = p.root ();
     auto out = root->add (make_output_patch ());
     auto osc = root->add (factory.create ("audio_sine_oscillator"));
     osc->param ("frequency").set (880.0f);
-    
+
     graph::connect (osc, "output", out, "input-0");
 
     p.rt_request_process (16);

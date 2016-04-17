@@ -30,14 +30,14 @@ class input_manager: public OIS::MouseListener, public OIS::KeyListener
 {
     typedef std::list<OIS::MouseListener*>::reverse_iterator mouse_reverse_iterator;
     typedef std::list<OIS::KeyListener*>::reverse_iterator key_reverse_iterator;
-	
+
     std::list<OIS::MouseListener*> m_mlist;
     std::list<OIS::KeyListener*> m_klist;
-	
+
     OIS::InputManager* m_inputmgr;
     OIS::Keyboard* m_keyboard;
     OIS::Mouse* m_mouse;
-	
+
     int m_width;
     int m_height;
 
@@ -50,17 +50,17 @@ public:
 	m_mlist.push_back (listener);
 	return true; /* TODO */
     }
-	
+
     bool add_key_listener (OIS::KeyListener* listener) {
 	m_klist.push_back (listener);
 	return true;
     }
-	
+
     bool remove_mouse_listener (OIS::MouseListener* listener) {
 	m_mlist.remove (listener);
 	return true;
     }
-	
+
     bool remove_keyboard_listener (OIS::KeyListener* listener) {
 	m_klist.remove(listener);
 	return true;

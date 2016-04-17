@@ -12,7 +12,7 @@
  *  Copyright (C) 2011 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -53,7 +53,7 @@ class patch : public node
 {
 public:
     typedef std::list<graph::node_ptr> child_list;
-    
+
     typedef boost::intrusive::list<
         node,
         boost::intrusive::member_hook<
@@ -83,21 +83,21 @@ public:
     void rt_process (rt_process_context& ctx);
     void rt_context_update (rt_process_context& ctx);
     void rt_advance ();
-    
+
     node_ptr add (node_ptr child);
     void remove (node_ptr child);
-    
+
     child_range childs ()
     { return boost::make_iterator_range (_childs); }
     child_const_range cchilds () const
     { return boost::make_iterator_range (_childs); }
 
-    
+
     rt_child_range rt_childs ()
     { return boost::make_iterator_range (_rt_childs); }
     rt_child_const_range rt_cchilds () const
     { return boost::make_iterator_range (_rt_childs); }
-    
+
 protected:
     child_list _childs;
     rt_child_list _rt_childs;

@@ -12,7 +12,7 @@
  *  Copyright (C) 2011 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -67,23 +67,23 @@ public:
     virtual base::type_value type () const = 0;
     virtual const port_meta& meta () const = 0;
     virtual void rt_context_update (rt_process_context&) {}
-    
+
     std::string name ()
     { return _name; }
-    
+
     node& owner ()
     { return *_owner; }
     const node& owner () const
     { return *_owner; }
-    
+
     void _set_owner (node* new_owner = 0);
     void _set_name (std::string new_name);
     bool _has_owner () const
     { return _owner != 0; }
-    
+
 protected:
     port_base (std::string name, node* owner);
-        
+
 private:
     std::string _name;
     node* _owner;
@@ -99,13 +99,13 @@ out_port_referee_hook;
 void check_port_compatibility (in_port_base& in, out_port_base& out);
 
 class in_port_base : public port_base
-{   
+{
 public:
     out_port_referee_hook _out_port_referee_hook;
-    
+
     virtual void connect (out_port_base& port);
     virtual void disconnect ();
-    
+
     bool connected () const
     { return _source_port != 0; }
     bool rt_connected () const
@@ -122,7 +122,7 @@ public:
 
     virtual bool rt_in_available () const;
     virtual void rt_process (rt_process_context& rt);
-    
+
 protected:
     in_port_base (std::string name, graph::node* owner);
 
@@ -164,31 +164,31 @@ public:
     const_reference_range;
 
     void disconnect ();
-    
+
     bool connected ()
     { return !_refs.empty (); }
-    
+
     bool rt_connected ()
     { return !_rt_refs.empty (); }
     // FIXME: Add concurrent access to refs policy
 
     virtual bool rt_out_available () const
     { return true; }
-    
+
     reference_range references ()
     { return reference_range (_refs.begin (), _refs.end ()); }
     const_reference_range references () const
     { return const_reference_range (_refs.begin (), _refs.end ()); }
-    
+
 protected:
     out_port_base (std::string name, node* owner);
-    
+
 private:
     void _add_reference (in_port_base*);
     void _del_reference (in_port_base*);
-    
+
     friend class detail::out_port_access;
-    
+
     reference_list    _refs;
     rt_reference_list _rt_refs;
 };
@@ -212,7 +212,7 @@ class typed_out_port_base : public out_port_base
 {
 public:
     typedef T port_type;
-    
+
     virtual T& rt_get_out () = 0;
     virtual const T& rt_get_out () const = 0;
 
@@ -245,20 +245,20 @@ class out_port : public typed_out_port_base<T>
 {
 public:
     typedef T port_type;
-    
+
     out_port (std::string name, node* owner, const T& value = T())
         : typed_out_port_base<T> (name, owner)
         , _data (value){}
-    
+
     T& rt_get_out ()
     { return _data; }
-    
+
     const T& rt_get_out () const
     { return _data; }
-    
-    const port_meta& meta () const 
+
+    const port_meta& meta () const
     { return default_port_meta; }  // FIXME !!!
-    
+
 private:
     T _data;
 };
@@ -269,8 +269,8 @@ class in_port : public typed_in_port_base<T>
 public:
     in_port (std::string name, node* owner)
         : typed_in_port_base<T> (name, owner) {}
-    
-    const port_meta& meta () const 
+
+    const port_meta& meta () const
     { return default_port_meta; } // FIXME !!!
 
     const T& rt_get_in () const
@@ -279,7 +279,7 @@ public:
         return static_cast<const out_port<T>&> (
             this->rt_source ()).rt_get_out ();
     }
-    
+
 private:
 };
 
@@ -295,24 +295,24 @@ class forward_port_impl
 {
 public:
     typedef typename InPort::port_type port_type;
-    
+
     static_assert (
         std::is_same<typename InPort::port_type,
                      typename OutPort::port_type>::value,
         "Can not forward different types");
-    
+
     void rt_context_update (rt_process_context& ctx)
     {
         InPort::rt_context_update (ctx);
         OutPort::rt_context_update (ctx);
     }
-    
+
     base::type_value type () const
     { return typeid (port_type); }
 
-    const port_meta& meta () const 
+    const port_meta& meta () const
     { return default_port_meta; } // FIXME !!!
-    
+
     const port_type& rt_get_out () const
     {
         if (InPort::rt_connected ())

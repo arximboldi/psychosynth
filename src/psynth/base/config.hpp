@@ -94,10 +94,10 @@ class conf_subject : public subject_base <conf_listener>
 public:
     typedef boost::signals2::signal <void (conf_node&)> signal;
     //typedef psynth::base::signal <void, conf_node&> signal;
-    
+
     /** Event emitted whenever the node value is changed. */
     signal on_change;
-    
+
     /**
      * Generic event to notify changes on the node subchilds.
      * It should be emitted by the user with the nudge () method.
@@ -206,7 +206,7 @@ public:
     {
 	on_nudge (*this);
     }
-    
+
     /**
      * Sets the value of the node. The node type is set to @a T, unless
      * @a T is not a valid type in which case nothing happends.
@@ -227,7 +227,7 @@ public:
      */
     template<class T>
     void set (const T& val, bool overwrite);
-    
+
     /**
      * Sets the value of the node if no previous value has been give to
      * the node. The node type is set to @a T, unless @a T is not a valid type
@@ -236,7 +236,7 @@ public:
      */
     template<class T>
     void def (const T& val);
-    
+
     /**
      * Gets the value of the node. Make sure that @a T matches the node type.
      * @param data Somewhere to store the node value.
@@ -249,7 +249,7 @@ public:
      */
     template<class T>
     T get () const;
-    
+
     /**
      * Permanently stores this node hierarchy using the attached backend.
      */
@@ -265,7 +265,7 @@ public:
      * set values with their old value.
      */
     void def_load ();
-    
+
     /**
      * Attaches a backend to the node. If another backend has already been
      * attached it is datached.
@@ -277,7 +277,7 @@ public:
      * Dataches the currently attached backend to the node.
      */
     void unset_backend ();
-    
+
 private:
     boost::any       _element;
     conf_backend_ptr _backend;
@@ -304,7 +304,7 @@ template<class T>
 void conf_node::get (T& data) const
 {
     lock lock (this);
-    
+
     try {
 	data = boost::any_cast<T> (_element);
     } catch (boost::bad_any_cast&) {
@@ -317,7 +317,7 @@ T conf_node::get () const
 {
     lock lock (this);
     T ret;
-    
+
     try {
 	ret = boost::any_cast<T> (_element);
     } catch (boost::bad_any_cast&) {
@@ -332,7 +332,7 @@ template<class T>
 void conf_node::def (const T& val)
 {
     lock lock (this);
-    
+
     if (_element.empty ()) {
 	_element = val;
 	on_change (*this);
@@ -343,7 +343,7 @@ template<class T>
 void conf_node::set (const T& val, bool overwrite)
 {
     lock lock (this);
-    
+
     if (overwrite || _element.empty ()) {
 	_element = val;
 	on_change (*this);

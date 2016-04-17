@@ -12,7 +12,7 @@
  *  Copyright (C) 2011 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -94,7 +94,7 @@ struct do_test_buffered_input
 
         typedef R1 src_range;
         typedef R2 dst_range;
-        
+
         typedef typename sound::buffer_from_range<src_range>::type
             src_buffer_type;
 
@@ -102,17 +102,17 @@ struct do_test_buffered_input
 
         const typename dst_range::value_type zero (
             sound::sample_traits<
-                typename sound::sample_type <dst_range>::type>::zero_value ()); 
+                typename sound::sample_type <dst_range>::type>::zero_value ());
         typename src_range::value_type src_zero;
         sound::channel_convert (zero, src_zero);
-        
+
         src_buffer_type buf (buffer_size);
         src_buffer_type test_buf (buffer_size, src_zero, 0);
-        
+
         io::buffered_input<src_range, io::dummy_input<dst_range> > out;
         out.take (range (buf));
         BOOST_CHECK(equal_frames (range (buf), range (test_buf)));
-        
+
         auto aout = io::make_buffered_input<src_range> (&out.input ());
         aout.take (range (buf));
         BOOST_CHECK(equal_frames (range (buf), range (test_buf)));
@@ -132,7 +132,7 @@ struct do_test_buffered_input<R, R>
 BOOST_AUTO_TEST_CASE_TEMPLATE (buffered_input_test, RangePair,
                                input_test_types_product)
 {
-    
+
     typedef typename RangePair::first  src_range;
     typedef typename RangePair::second dst_range;
 
@@ -149,7 +149,7 @@ struct do_test_async_buffered_input
 
         typedef R1 src_range;
         typedef R2 dst_range;
-        
+
         typedef typename sound::buffer_from_range<src_range>::type
             src_buffer_type;
 
@@ -157,19 +157,19 @@ struct do_test_async_buffered_input
 
         const typename dst_range::value_type zero (
             sound::sample_traits<
-                typename sound::sample_type <dst_range>::type>::zero_value ()); 
+                typename sound::sample_type <dst_range>::type>::zero_value ());
         typename src_range::value_type src_zero;
         sound::channel_convert (zero, src_zero);
-        
+
         src_buffer_type buf (buffer_size);
         src_buffer_type test_buf (buffer_size, src_zero, 0);
-        
+
         io::buffered_async_input<
             src_range,
             io::dummy_async_input<dst_range> > out (buffer_size);
         out.take (range (buf));
         BOOST_CHECK(equal_frames (range (buf), range (test_buf)));
-        
+
         auto aout = io::make_buffered_input<src_range> (&out.input ());
         aout.take (range (buf));
         BOOST_CHECK(equal_frames (range (buf), range (test_buf)));
@@ -189,7 +189,7 @@ struct do_test_async_buffered_input<R, R>
 BOOST_AUTO_TEST_CASE_TEMPLATE (buffered_async_input_test, RangePair,
                                input_test_types_product)
 {
-    
+
     typedef typename RangePair::first  src_range;
     typedef typename RangePair::second dst_range;
 
@@ -203,20 +203,20 @@ typedef mpl::filter_view<input_test_types,
 file_test_types;
 
 BOOST_AUTO_TEST_CASE_TEMPLATE (file_input_test, Range, file_test_types)
-{    
+{
     using namespace psynth;
     namespace fs = boost::filesystem;
-    
+
     typedef typename sound::buffer_from_range<Range>::type buffer_type;
 
     const std::string filename    = std::tmpnam (0);
     const std::size_t sample_rate = 44100;
     const std::size_t buffer_size = 1024;
-    
+
     buffer_type out_buf (buffer_size);
     buffer_type in_buf (buffer_size);
     fill_frames (range (out_buf), typename Range::value_type (0));
-    
+
     for (int fmt = 0; fmt < (int) io::file_fmt::num_formats; ++fmt)
         // Exclude loosy formats.
         // if ((io::file_fmt) fmt != io::file_fmt::ogg)
@@ -255,29 +255,29 @@ BOOST_AUTO_TEST_CASE_TEMPLATE (caching_file_input_test, RangePair,
 
     typedef typename RangePair::first  src_range;
     typedef typename RangePair::second dst_range;
-    
+
     typedef typename sound::buffer_from_range<src_range>::type src_buffer_type;
 
     const typename dst_range::value_type zero (
         sound::sample_traits<
-            typename sound::sample_type <dst_range>::type>::zero_value ()); 
+            typename sound::sample_type <dst_range>::type>::zero_value ());
 
     typename src_range::value_type src_zero;
     sound::channel_convert (zero, src_zero);
-    
+
     typename src_range::value_type src_one (
         sound::sample_traits<
             typename sound::sample_type <src_range>::type>::max_value ());
 
     io::dummy_file_input<dst_range> fin;
     io::caching_file_input_adapter<src_range, decltype (&fin)> cfin (&fin);
-    
+
     const std::size_t buffer_size = cfin.default_chunk_size;
     src_buffer_type buf (buffer_size, src_zero, 0);
     src_buffer_type test_buf (buffer_size, src_zero, 0);
 
     const int num_loops = 1;
-    
+
     cfin.start ();
     for (int i = 0; i < num_loops; ++i)
         cfin.take (sound::range (buf));
@@ -289,4 +289,3 @@ BOOST_AUTO_TEST_CASE_TEMPLATE (caching_file_input_test, RangePair,
 #endif /* PSYNTH_HAVE_PCM */
 
 BOOST_AUTO_TEST_SUITE_END ();
-

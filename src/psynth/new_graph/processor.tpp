@@ -12,7 +12,7 @@
  *  Copyright (C) 2011 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -50,7 +50,7 @@ bool user_process_context::push_rt_event (Args&&... args)
 {
     auto g = _rt_buffers.back_policy ().guard ();
     return _rt_buffers.back ().push_back<Event> (
-        std::forward<Args> (args) ...);   
+        std::forward<Args> (args) ...);
 }
 
 template <class Event, typename... Args>

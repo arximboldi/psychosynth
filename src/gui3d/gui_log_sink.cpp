@@ -32,4 +32,3 @@ void gui_log_sink::dump (psynth::base::log& l, int level, const string& msg)
     if (m_window)
 	m_window->setText (m_buffer);
 }
-

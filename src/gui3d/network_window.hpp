@@ -36,7 +36,7 @@ class client_tab : public psynth::osc_client_listener,
 		   public std::enable_shared_from_this<client_tab>
 {
     psynth::osc_client_logger m_logger;
-    
+
     psynth::osc_client* m_client;
     bool m_connected;
 
@@ -48,7 +48,7 @@ class client_tab : public psynth::osc_client_listener,
     CEGUI::Editbox* m_host;
 
     std::shared_ptr<gui_log_sink> m_logsink;
-    
+
     bool handle_client_accept (psynth::osc_client* client) { return false; }
     bool handle_client_connect (psynth::osc_client* client);
     bool handle_client_disconnect (psynth::osc_client* client,
@@ -59,8 +59,8 @@ class client_tab : public psynth::osc_client_listener,
 public:
     client_tab(psynth::world* world);
     ~client_tab();
-    
-    CEGUI::Window* create_window ();    
+
+    CEGUI::Window* create_window ();
     bool on_button_click (const CEGUI::EventArgs &e);
 
     void external_dependant (CEGUI::Window* win) {
@@ -83,7 +83,7 @@ class server_tab : public psynth::osc_server_listener,
     CEGUI::Spinner* m_lport;
 
     std::shared_ptr<gui_log_sink> m_logsink;
-    
+
     bool handle_server_start_listening(psynth::osc_server* server);
     bool handle_server_stop_listening(psynth::osc_server* server,
 				   psynth::osc_server_error err);
@@ -96,14 +96,14 @@ class server_tab : public psynth::osc_server_listener,
 				   int client_id) { return false; };
 
     void set_listening (bool listening);
-    
+
 public:
     server_tab (psynth::world* world);
     ~server_tab ();
     CEGUI::Window* create_window ();
 
     void update (int ticks);
-    
+
     bool on_button_click (const CEGUI::EventArgs &e);
 
     void external_dependant (CEGUI::Window* win) {
@@ -117,18 +117,18 @@ class passive_tab : public std::enable_shared_from_this<passive_tab>
     psynth::world* m_world;
     psynth::net::osc_passive* m_passive;
     bool m_listening;
-    
+
     CEGUI::Window* m_button;
     CEGUI::Spinner* m_lport;
     std::shared_ptr<gui_log_sink> m_logsink;
-    
+
 public:
     void update (int ticks);
-    
+
     passive_tab (psynth::world* world);
     ~passive_tab ();
     CEGUI::Window* create_window ();
-    
+
     bool on_button_click (const CEGUI::EventArgs &e);
 };
 
@@ -138,9 +138,9 @@ class network_window : public toggable_window
     std::shared_ptr<client_tab>  m_client_tab;
     std::shared_ptr<server_tab>  m_server_tab;
     std::shared_ptr<passive_tab> m_passive_tab;
-    
+
     virtual CEGUI::FrameWindow* create_window ();
-    
+
 public:
 
     network_window (psynth::world* world);

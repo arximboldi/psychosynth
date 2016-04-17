@@ -12,7 +12,7 @@
  *  Copyright (C) 2008, 2011 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -27,7 +27,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
- 
+
 #ifndef PSYNTH_SCALERST_H
 #define PSYNTH_SCALERST_H
 
@@ -50,16 +50,16 @@ class scaler_support;
  */
 template <class Range>
 class scaler
-{    
+{
 public:
     static_assert (std::is_same<soundtouch::SAMPLETYPE, float>::value,
                    "Soundtouch SAMPLETYPE must be flaot.");
-    
+
     static_assert (scaler_support<Range>::is_supported::value,
                    "Soundtouch supports only interleaved bits32sf ranges.");
 
     typedef Range range;
-    
+
     /** Constructor. */
     scaler (std::size_t frame_rate)
     {
@@ -141,7 +141,7 @@ public:
     std::size_t receive (const Range& data)
     { return _st.receiveSamples (
             (soundtouch::SAMPLETYPE*) &data[0][0], data.size ()); }
-    
+
     /**
      * Push some data for scaling.
      * @param data The buffer with the data to scale in interleaved format.

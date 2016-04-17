@@ -129,4 +129,3 @@ void node_echo::do_update (const node0* caller,
 
 } /* namespace graph */
 } /* namespace psynth */
-

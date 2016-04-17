@@ -12,7 +12,7 @@
  *  Copyright (C) 2011 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -54,7 +54,7 @@ class output
 public:
     typedef Range range;
     typedef typename Range::const_type const_range;
-    
+
     /**
      * Write a bunch of data into the device.
      */
@@ -70,7 +70,7 @@ class dummy_output : public output<Range>
 public:
     typedef Range range;
     typedef typename Range::const_type const_range;
-        
+
     virtual std::size_t put (const const_range& data)
     {
         detail::dummy_output_put_impl ();
@@ -99,14 +99,14 @@ class dummy_async_output : public detail::async_base_impl
 public:
     typedef Range range;
     typedef typename Range::const_type const_range;
-    
+
     dummy_async_output (std::size_t buffer_size)
         : _buffer_size (buffer_size)
     {}
-    
+
     std::size_t buffer_size () const
     { return _buffer_size; }
-    
+
     virtual std::size_t put (const range& data)
     {
         detail::dummy_output_put_impl ();
@@ -126,7 +126,7 @@ public:
         this->set_state (async_state::idle);
         detail::dummy_output_stop_impl ();
     }
-    
+
 private:
     std::size_t _buffer_size;
 };
@@ -142,4 +142,3 @@ std::size_t put_on_raw (RawOutput& out, const Range& data);
 } /* namespace psynth */
 
 #endif /* PSYNTH_IO_OUTPUT_H */
-

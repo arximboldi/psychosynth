@@ -19,7 +19,7 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
  *                                                                         *
  ***************************************************************************/
- 
+
 #ifndef PSYNTH_THREAD_H
 #define PSYNTH_THREAD_H
 
@@ -69,17 +69,17 @@ typedef FastDelegate0<void> thread_delegate;
  */
 class thread
 {
-private:    
+private:
     pthread_t m_thread;
     thread_delegate m_delegate;
 
     static void* process(void* obj) {
 	thread* the_this = reinterpret_cast<thread*>(obj);
 	the_this->m_delegate();
-	
+
 	return NULL;
     };
-    
+
 public:
     /**
      * Contructor that attaches a runnable object to the Thread.

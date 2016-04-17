@@ -44,7 +44,7 @@ public:
 class camera_controller_default : public camera_controller
 {
     friend class camera_move;
-	
+
     camera_move* m_move;
     bool m_mouseleft;
     bool m_mouseright;
@@ -57,17 +57,17 @@ class camera_controller_default : public camera_controller
     Ogre::Radian m_yangle;
     Ogre::Real m_dist;
     Ogre::Real m_zxdist;
-	
+
     void recalculate ();
     bool get_table_intersection (Ogre::Vector3& dest);
 
 public:
     camera_controller_default (Ogre::Camera* camera);
-	
+
     virtual bool mouseMoved(const OIS::MouseEvent& e);
     virtual bool mousePressed(const OIS::MouseEvent &e, OIS::MouseButtonID id);
     virtual bool mouseReleased(const OIS::MouseEvent &e, OIS::MouseButtonID id);
-    
+
     virtual bool keyPressed(const OIS::KeyEvent &e);
     virtual bool keyReleased(const OIS::KeyEvent &e);
 };

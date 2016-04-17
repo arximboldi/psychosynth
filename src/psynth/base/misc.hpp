@@ -13,7 +13,7 @@
  *  Copyright (C) 2007, 2009 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -75,7 +75,7 @@ inline T phase (T x)
 template <class T>
 inline T linear_interp (T val, T next, T delta)
 {
-    return val + delta * (next - val); 
+    return val + delta * (next - val);
 }
 
 /**
@@ -94,7 +94,7 @@ char* itoa (int val, int base);
  * function and so new calls invalidates old returned value and it is not
  * thread safe.
  * @param f The value to convert to string.
- * @param sigfigs The number of significant 
+ * @param sigfigs The number of significant
  */
 char* ftoa (double f, double sigfigs);
 

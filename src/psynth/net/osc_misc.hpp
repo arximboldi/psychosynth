@@ -74,7 +74,7 @@ inline int lo_generic_handler(const char *path, const char *types, lo_arg **argv
 	lo_arg_pp((lo_type)types[i], argv[i]);
 	printf("\n");
     }
-    
+
     printf("\n");
     fflush(stdout);
 

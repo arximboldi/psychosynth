@@ -12,7 +12,7 @@
  *  Copyright (C) 2011 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -80,7 +80,7 @@ SNDFILE* file_open_impl (const char* fname, int mode, SF_INFO* info)
     int orig_channels = info->channels;
     SNDFILE* file = sf_open (fname, mode, info);
     auto file_grd = base::make_guard ([&] { sf_close (file); });
-    
+
     if (file == 0)
     {
         PSYNTH_LOG << base::log::warning
@@ -92,7 +92,7 @@ SNDFILE* file_open_impl (const char* fname, int mode, SF_INFO* info)
     if (orig_channels != info->channels)
         throw file_open_error ("Number of channels expected mismatch.");
 
-    file_grd.dismiss ();    
+    file_grd.dismiss ();
     return file;
 }
 
@@ -108,7 +108,7 @@ std::size_t file_seek_impl (SNDFILE* file, std::ptrdiff_t offset, seek_dir dir)
                    << sf_strerror (file);
         throw file_seek_error ();
     }
-    
+
     return res;
 }
 

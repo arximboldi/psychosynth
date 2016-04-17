@@ -19,7 +19,7 @@
  *  Copyright (C) 2010 Juan Pedro Bolivar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -65,7 +65,7 @@ enum class ring_buffer_error
      *  previously read.
      */
     underrun,
-	
+
     /**
      *  An overrun has ocurred. This means that the reader has read
      *  more data that the one actually in the buffer.
@@ -92,13 +92,13 @@ public:
     unsafe_ring_position& operator= (const unsafe_ring_position& p) = default;
 
     explicit unsafe_ring_position (size_type p) : _pos (p) {}
-    
+
     size_type offset () const
     { return _pos; }
 
     bool operator== (const unsafe_ring_position& p) const
     { return  _pos == p._pos; }
-    
+
     // TODO: Make private
     void _add (difference_type n) {}
 
@@ -113,23 +113,23 @@ class ring_position : public unsafe_ring_position<Ring>
 public:
     typedef typename parent_type::size_type size_type;
     typedef typename parent_type::difference_type difference_type;
-    
+
     ring_position () = default;
     ring_position (const ring_position& r) = default;
     ring_position& operator= (const ring_position& p) = default;
-    
+
     explicit ring_position (size_type p, size_type c)
 	: parent_type (p), _count (c) {}
-    
+
     difference_type count () const { return _count; }
 
     bool operator== (const ring_position& p) const
     { return parent_type::operator== (p) && _count == p._count; }
-    
+
     // TODO: Make private
     void _add (difference_type n)
     { _count += n; }
-    
+
     difference_type _count;
 };
 
@@ -150,7 +150,7 @@ public:
     typedef Ring     ring_type;
 
     ring_iterator () {}
-    
+
     ring_iterator (const Position& pos, const ring_type* ring)
 	: _position (pos)
 	, _ring (ring)
@@ -173,7 +173,7 @@ public:
 	_ring = it._ring;
 	return *this;
     }
-    
+
     template <typename RingIterator>
     ring_iterator& operator= (const RingIterator& it)
     {
@@ -181,10 +181,10 @@ public:
 	_ring = it._ring;
 	return *this;
     }
-    
+
     const position_type& position ()
     { return _position; }
-    
+
 private:
     void increment ()
     { _ring->increment (_position); }
@@ -207,7 +207,7 @@ private:
     bool equal (const RingIterator& it) const
     { return _position == it._position && _ring == it._ring; };
     // TODO: Remove comparison of _ring?
-    
+
     friend class boost::iterator_core_access;
     position_type      _position;
     const ring_type*   _ring;
@@ -223,13 +223,13 @@ class ring_buffer_range_base
 {
 public:
     typedef Range range;
-    
+
     typedef typename Range::size_type       size_type;
     typedef typename Range::difference_type difference_type;
-    
+
     typedef detail::unsafe_ring_position<ring_buffer_range_base> unsafe_position;
     typedef detail::ring_position<ring_buffer_range_base>        position;
-    
+
     /**
      * Constructor.
      * @param size The size of the buffer, defaults to zero.
@@ -254,12 +254,12 @@ public:
 	, _writepos (0, 0)
 	, _range (range)
     {}
-    
-#if 0    
+
+#if 0
     // FIXME: This kind of constructor in this and related classes
     // produced anoying behaviour because the derived class does not
     // get casted and passes up through this constructor.
-    
+
     template<class Range2>
     explicit ring_buffer_range_base (Range2& range)
 	: _backwards (false)
@@ -267,7 +267,7 @@ public:
 	, _writepos (0, 0)
 	, _range (range)
     {}
-    
+
     template<class Range2>
     explicit ring_buffer_range_base (const Range2& range)
 	: _backwards (false)
@@ -276,7 +276,7 @@ public:
 	, _range (range)
     {}
 #endif
-    
+
     /** Copy constructor. */
     template <class Range2>
     ring_buffer_range_base (const ring_buffer_range_base<Range2>& range)
@@ -285,7 +285,7 @@ public:
 	, _writepos (range._writepos)
 	, _range (range._range)
     {}
-    
+
     /** Assignment operator. */
     ring_buffer_range_base& operator= (const ring_buffer_range_base& range)
     {
@@ -328,7 +328,7 @@ public:
      */
     position end_pos () const
     { return _writepos; };
-    
+
     /**
      * Returns the number of available data from a read pointer.
      * @param r The read pointer to test for available data.
@@ -346,14 +346,14 @@ public:
 	    _writepos._pos - r._pos :
 	    _writepos._pos + size () - r._pos;
     }
-    
+
     /**
      * Returns the number of available data from a read pointer.
      * @param r The read pointer to test for available data.
      */
     size_type available () const
     { return _writepos._count > size () ? size () : _writepos._count; }
-    
+
     /**
      * Checks a iterator for error states.
      */
@@ -369,11 +369,11 @@ public:
     template <class Position>
     typename buffer_range_type<Range>::type
     sub_buffer_one (const Position& p, size_type slice) const;
-    
+
     template <class Position>
     typename buffer_range_type<Range>::type
     sub_buffer_two (const Position& p, size_type slice) const;
-    
+
     /**
      * Fills a sample_buffer with data from the ring buffer.
      * @param r The reader posize_ter.
@@ -414,7 +414,7 @@ public:
     template<class Position, class Range2, class CC = default_channel_converter>
     size_type read_and_convert (Position& r, const Range2& range,
 				size_type samples, CC cc = CC ()) const;
-    
+
     /**
      * Write all the data in a sample_buffer to the ring buffer.
      * @param buf The buffer to write.
@@ -432,7 +432,7 @@ public:
      */
     template <class Range2>
     void write (const Range2& range, size_type samples);
-    
+
     /**
      * Write all the data in a sample_buffer to the ring buffer.
      * @param buf The buffer to write.
@@ -465,7 +465,7 @@ public:
      */
     bool is_backwards () const
     { return _backwards; }
-    
+
     /**
      * Changes the reading direction of the current pointer write pointer.
      * If you are using this buffer as an intermediate buffer from another
@@ -486,7 +486,7 @@ public:
 	if (_writepos._count < size ())
 	    std::swap (_startpos, _writepos._pos);
     }
-    
+
     /**
      * Advances the write pointer of the buffer a given number of elements.
      * @param n The number of elements to advance.
@@ -495,7 +495,7 @@ public:
     {
 	advance (_writepos, n);
     }
-    
+
     /**
      * Advances a read pointer a given number of elements.
      * @param r The iterator to advance.
@@ -514,16 +514,16 @@ public:
         r._pos = new_pos;
         r._add (n * (is_backwards () ? -1 : 1));
     }
-    
+
     difference_type distance (const unsafe_position& ra,
                               const unsafe_position& rb) const
     {
         assert (false); // TODO
     }
-        
+
     difference_type distance (const position& ra, const position& rb) const
     { return rb.count () - ra.count (); }
-    
+
     template <typename Position>
     void increment (Position& r) const
     {
@@ -546,7 +546,7 @@ public:
     {
 	return _writepos.count ();
     }
-    
+
     /**
      * Returns a new iterator in the same position but with the read count
      * calculated from the read position to the write position.
@@ -567,7 +567,7 @@ public:
 					    r._pos - _writepos._pos :
 					    size () - _writepos._pos + r._pos));
     }
-    
+
 public:
     bool          _backwards;  /**< @c true if we are reading and
 			          writting the ringbuffer backwards. */
@@ -586,7 +586,7 @@ public:
     typedef typename parent_type::range::value_type         value_type;
     typedef typename parent_type::range::reference          reference;
     typedef typename parent_type::range::difference_type    difference_type;
-    
+
     typedef detail::ring_iterator<typename parent_type::unsafe_position,
 				  ring_buffer_range>
     unsafe_iterator;
@@ -601,23 +601,23 @@ public:
     explicit ring_buffer_range (const Range& range)
         : parent_type (range)
     {}
-    
+
 #if 0
     template<class Range2>
     explicit ring_buffer_range (Range2& range)
 	: parent_type (range) {}
-    
+
     template<class Range2>
     explicit ring_buffer_range (const Range2& range)
 	: parent_type (range) {}
 
-    
+
     /** Copy constructor. */
     template <class Range2>
     ring_buffer_range (const ring_buffer_range<Range2>& range)
 	: parent_type ((const ring_buffer_range_base<Range2>&) range) {}
 #endif
-    
+
     unsafe_iterator begin_unsafe () const
     { return unsafe_iterator (this->begin_unsafe_pos (), this); }
 
@@ -635,10 +635,10 @@ public:
      */
     reference operator [] (difference_type i) const
     { return this->_range [i]; } // potential performance problem!
-    
+
     iterator at (difference_type i) const
     { return begin () + i; }
-    
+
     unsafe_iterator unsafe_at (difference_type i) const
     { return begin_unsafe () + i; }
 };
@@ -650,29 +650,29 @@ struct const_ring_buffer_range :
 /*
  *
  *  @todo FrameBasedConcept
- *  
+ *
  */
 
 template <typename Range>
 struct sample_type<ring_buffer_range<Range> > :
-    public sample_type<Range> {}; 
+    public sample_type<Range> {};
 
 template <typename Range>
 struct channel_space_type<ring_buffer_range<Range> > :
-    public channel_space_type<Range> {}; 
+    public channel_space_type<Range> {};
 
 template <typename Range>
 struct sample_mapping_type<ring_buffer_range<Range> > :
-    public sample_mapping_type<Range> {}; 
+    public sample_mapping_type<Range> {};
 
 template <typename Range>
 struct is_planar<ring_buffer_range<Range> > :
-    public is_planar<Range> {}; 
+    public is_planar<Range> {};
 
 /*
  *
  *  @todo DynamicStepTypeConcept
- *  
+ *
  */
 
 
@@ -682,4 +682,3 @@ struct is_planar<ring_buffer_range<Range> > :
 #include <psynth/sound/ring_buffer_range.tpp>
 
 #endif /* PSYNTH_SOUND_RING_BUFFER_RANGE_H_ */
-

@@ -12,7 +12,7 @@
  *  Copyright (C) 2011 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -55,20 +55,20 @@ class async_base
 {
 public:
     typedef std::function<void (std::size_t)> callback_type;
-    
+
     virtual ~async_base () {}
-    
+
     virtual void start () = 0;
     virtual void stop () = 0;
     virtual async_state state () const = 0;
     virtual void set_callback (callback_type cb) = 0;
-    
+
     void soft_start ()
     {
         if (state () == async_state::idle)
             start ();
     }
-    
+
     void soft_stop ()
     {
         if (state () == async_state::running)
@@ -106,25 +106,25 @@ public:
         , _callback (cb)
     {
     }
-    
+
     virtual ~async_base_impl () {}
-    
+
     async_state state () const
     { return (async_state) (int) _state; }
-    
+
     void set_callback (callback_type cb)
     {
         check_idle ();
         _callback = cb;
     }
-    
+
 protected:
     void set_state (async_state state)
     { _state = (int) state; }
 
     void process (std::size_t nframes)
     { _callback (nframes); }
-    
+
 private:
     std::atomic<int> _state; // FIXME: Why does GCC does not support
                              // this with an enum?

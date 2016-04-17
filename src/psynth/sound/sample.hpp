@@ -12,7 +12,7 @@
  *  Copyright (C) 2010 Juan Pedro Bolivar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -30,7 +30,7 @@
 
 /*
  *  Copyright 2005-2007 Adobe Systems Incorporated
- * 
+ *
  *  Use, modification and distribution are subject to the Boost
  *  Software License, Version 1.0. (See accompanying file
  *  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt).
@@ -53,7 +53,7 @@ namespace sound
 
 /**
   sample_traits
-  
+
   \ingroup SampleModel
   \class sample_traits
   \brief defines properties of samples, such as their range and
@@ -71,7 +71,7 @@ namespace detail
 template <typename T, bool is_class> struct sample_traits_impl;
 
 /* sample traits for custom class */
-template <typename T> 
+template <typename T>
 struct sample_traits_impl<T, true>
 {
     typedef typename T::value_type      value_type;
@@ -87,7 +87,7 @@ struct sample_traits_impl<T, true>
 
 /* sample traits implementation for built-in integral or floating
    point sample type */
-template <typename T> 
+template <typename T>
 struct sample_traits_impl<T, false>
 {
     typedef T           value_type;
@@ -103,7 +103,7 @@ struct sample_traits_impl<T, false>
 
 /* sample traits implementation for constant built-in scalar or
    floating point type */
-template <typename T> 
+template <typename T>
 struct sample_traits_impl<const T, false> :
 	public sample_traits_impl<T, false>
 {
@@ -126,7 +126,7 @@ struct sample_traits {
     typedef ... pointer;
     typedef ... const_reference;
     typedef ... const_pointer;
-    
+
     static const bool is_mutable;
     static value_type min_value();
     static value_type max_value();
@@ -198,7 +198,7 @@ struct scoped_sample_value
     typedef value_type*            pointer;
     typedef const value_type&      const_reference;
     typedef const value_type*      const_pointer;
-    
+
     BOOST_STATIC_CONSTANT(bool, is_mutable =
 			  sample_traits<BaseSampleValue>::is_mutable);
 
@@ -221,7 +221,7 @@ struct scoped_sample_value
 	this->operator++ ();
 	return tmp;
     }
-    
+
     scoped_sample_value operator--(int)
     {
 	scoped_sample_value tmp = *this;
@@ -282,14 +282,14 @@ namespace detail
 template <int NumBits>
 struct min_fast_uint :
 	public boost::mpl::if_c<
-    (NumBits<=8), 
-	uint_least8_t, 
+    (NumBits<=8),
+	uint_least8_t,
 	typename boost::mpl::if_c<
-	(NumBits<=16), 
-	    uint_least16_t, 
+	(NumBits<=16),
+	    uint_least16_t,
 	    typename boost::mpl::if_c<
-	    (NumBits<=32), 
-		uint_least32_t, 
+	    (NumBits<=32),
+		uint_least32_t,
 		uintmax_t
 		>::type
 	    >::type
@@ -301,12 +301,12 @@ struct min_fast_uint :
    \ingroup SampleModel
    \brief Represents the value of an unsigned integral sample
    operating over a bit range. Models: SampleValueConcept
-   
+
    Example:
    \code
    // A 4-bit unsigned integral sample.
    typedef packed_sample_value<4> bits4;
-   
+
    assert(sample_traits<bits4>::min_value()==0);
    assert(sample_traits<bits4>::max_value()==15);
    assert(sizeof(bits4)==1);
@@ -342,7 +342,7 @@ public:
     packed_sample_value (const packed_sample_value& v) : _value (v._value) {}
     template <typename Scalar>
     packed_sample_value (Scalar v) : _value (integer_t (v) % num_values) {}
-    // suppress GCC implicit conversion warnings in sample regression file 
+    // suppress GCC implicit conversion warnings in sample regression file
 
     operator integer_t () const { return _value; }
 
@@ -387,7 +387,7 @@ public:
     {
 	return sample_traits<value_type>::min_value();
     }
-    
+
     static value_type max_value ()
     {
 	return sample_traits<value_type>::max_value();
@@ -416,7 +416,7 @@ public:
 	this->operator++();
 	return tmp;
     }
-    
+
     Derived operator--(int) const
     {
 	Derived tmp=derived();
@@ -446,7 +446,7 @@ protected:
     {
 	return *static_cast<const bitfield_t*> (_data_ptr);
     }
-    
+
     void set_data(const bitfield_t& val) const
     {
 	*static_cast<bitfield_t*> (_data_ptr) = val;
@@ -460,7 +460,7 @@ protected:
 	    psynth_reinterpret_cast<unsigned char*>(&ret));
         return ret;
     }
-    
+
     void set_data(const bitfield_t& val) const
     {
         static_copy_bytes<sizeof(bitfield_t)> ()(
@@ -475,9 +475,9 @@ private:
 	// TODO: can this be done faster??
         const integer_t num_values = max_val+1;
         this->derived ().set_unsafe (
-	    ((value % num_values) + num_values) % num_values); 
+	    ((value % num_values) + num_values) % num_values);
     }
-    
+
     integer_t get () const { return derived ().get (); }
 
     const Derived& derived() const
@@ -494,7 +494,7 @@ private:
    \brief Represents a reference proxy to a sample operating over a
    bit range whose offset is fixed at compile time. Models
    SampleConcept
-   
+
    Example:
    \code
    // Reference to a 2-bit sample starting at bit 1 (i.e. the second bit)
@@ -580,7 +580,7 @@ public:
    at compile time. Models SampleConcept
 */
 template <typename BitField, int FirstBit, int NumBits>
-class packed_sample_reference<BitField, FirstBit, NumBits, true> 
+class packed_sample_reference<BitField, FirstBit, NumBits, true>
    : public detail::packed_sample_reference_base<
     packed_sample_reference<BitField, FirstBit, NumBits, true>,
     BitField, NumBits, true>
@@ -612,13 +612,13 @@ public:
 	set_unsafe (value);
 	return *this;
     }
-    
+
     const packed_sample_reference& operator= (const mutable_reference& ref) const
     {
 	set_from_reference (ref.get_data ());
 	return *this;
     }
-    
+
     const packed_sample_reference& operator= (const const_reference&   ref) const
     {
 	set_from_reference (ref.get_data ());
@@ -640,15 +640,15 @@ public:
     {
 	return integer_t((this->get_data()&sample_mask) >> FirstBit);
     }
-    
+
     void set_unsafe (integer_t value) const
     {
 	this->set_data ((this->get_data() & ~sample_mask) |
 			(( static_cast< BitField >( value )<<FirstBit)));
     }
-    
+
 private:
-    
+
     void set_from_reference (const BitField& other_bits) const
     {
 	this->set_data((this->get_data() & ~sample_mask) |
@@ -665,8 +665,8 @@ namespace std
 /*
   We are forced to define swap inside std namespace because on some
   platforms (Visual Studio 8) STL calls swap qualified.
-  
-  swap with 'left bias': 
+
+  swap with 'left bias':
   - swap between proxy and anything
   - swap between value type and proxy
   - swap between proxy and proxy
@@ -678,10 +678,10 @@ namespace std
 */
 template <typename BF, int FB, int NB, bool M, typename R> inline
 void swap(const psynth::sound::packed_sample_reference<BF,FB,NB,M> x, R& y)
-{ 
+{
     psynth::sound::swap_proxy<
 	typename psynth::sound::packed_sample_reference<BF,FB,NB,M>::value_type>(
-	    x, y); 
+	    x, y);
 }
 
 
@@ -693,10 +693,10 @@ template <typename BF, int FB, int NB, bool M> inline
 void swap(
     typename psynth::sound::packed_sample_reference<BF,FB,NB,M>::value_type& x,
     const psynth::sound::packed_sample_reference<BF,FB,NB,M> y)
-{ 
+{
     psynth::sound::swap_proxy<
 	typename psynth::sound::packed_sample_reference<BF,FB,NB,M>::value_type>(
-	    x, y); 
+	    x, y);
 }
 
 
@@ -708,10 +708,10 @@ template <typename BF, int FB, int NB, bool M> inline
 void swap (
     const psynth::sound::packed_sample_reference<BF,FB,NB,M> x,
     const psynth::sound::packed_sample_reference<BF,FB,NB,M> y)
-{ 
+{
     psynth::sound::swap_proxy<
 	typename psynth::sound::packed_sample_reference<BF,FB,NB,M>::value_type>(
-	    x, y); 
+	    x, y);
 }
 
 } /* namespace std */
@@ -724,7 +724,7 @@ namespace sound
 /**
    \defgroup PackedSampleDynamicReferenceModel
    packed_dynamic_sample_reference
-   
+
    \ingroup SampleModel
    \brief Represents a reference proxy to a sample operating over a
    bit range whose offset is specified at run time. Models
@@ -732,7 +732,7 @@ namespace sound
 
    Example:
    \code
-   
+
    // Reference to a 2-bit sample whose offset is specified at
    // construction time
 
@@ -749,13 +749,13 @@ namespace sound
 /**
    \brief Models a constant subbyte sample reference whose bit offset
    is a runtime parameter. Models SampleConcept
-   
+
    Same as packed_sample_reference, except that the offset is a
    runtime parameter
-   
+
  \ingroup PackedSampleDynamicReferenceModel
 */
-template <typename BitField, int NumBits> 
+template <typename BitField, int NumBits>
 class packed_dynamic_sample_reference<BitField,NumBits,false>
    : public detail::packed_sample_reference_base<
     packed_dynamic_sample_reference<BitField, NumBits, false>,
@@ -781,11 +781,11 @@ public:
     packed_dynamic_sample_reference (const void* data_ptr, unsigned first_bit)
 	: parent_t(data_ptr)
 	, _first_bit(first_bit) {}
-    
+
     packed_dynamic_sample_reference (const const_reference& ref)
 	: parent_t (ref._data_ptr)
 	, _first_bit(ref._first_bit) {}
-    
+
     packed_dynamic_sample_reference (const mutable_reference& ref)
 	: parent_t (ref._data_ptr)
 	, _first_bit (ref._first_bit) {}
@@ -793,7 +793,7 @@ public:
     unsigned first_bit () const { return _first_bit; }
 
     integer_t get () const
-    { 
+    {
         const BitField sample_mask = parent_t::max_val << _first_bit;
         return (static_cast<integer_t>(this->get_data () & sample_mask ) >>
 		_first_bit);
@@ -803,13 +803,13 @@ public:
 /**
    \brief Models a mutable subbyte sample reference whose bit offset
    is a runtime parameter. Models SampleConcept
-   
+
    Same as packed_sample_reference, except that the offset is a
    runtime parameter
-   
+
    \ingroup PackedSampleDynamicReferenceModel
 */
-template <typename BitField, int NumBits> 
+template <typename BitField, int NumBits>
 class packed_dynamic_sample_reference<BitField, NumBits, true>
    : public detail::packed_sample_reference_base<
     packed_dynamic_sample_reference<BitField, NumBits, true>,
@@ -818,7 +818,7 @@ class packed_dynamic_sample_reference<BitField, NumBits, true>
     typedef detail::packed_sample_reference_base<
 	packed_dynamic_sample_reference<BitField, NumBits, true>,
 	BitField, NumBits, true> parent_t;
-    
+
     friend class packed_dynamic_sample_reference<BitField, NumBits, false>;
 
     unsigned _first_bit;
@@ -826,7 +826,7 @@ class packed_dynamic_sample_reference<BitField, NumBits, true>
 public:
     typedef const packed_dynamic_sample_reference<BitField,NumBits, false>
     const_reference;
-    
+
     typedef const packed_dynamic_sample_reference<BitField,NumBits, true>
     mutable_reference;
 
@@ -835,7 +835,7 @@ public:
     packed_dynamic_sample_reference (void* data_ptr, unsigned first_bit)
 	: parent_t (data_ptr)
 	, _first_bit (first_bit) {}
-    
+
     packed_dynamic_sample_reference (const packed_dynamic_sample_reference& ref)
 	: parent_t(ref._data_ptr)
 	, _first_bit (ref._first_bit) {}
@@ -847,14 +847,14 @@ public:
 	set_unsafe (value);
 	return *this;
     }
-    
+
     const packed_dynamic_sample_reference&
     operator= (const mutable_reference& ref) const
     {
 	set_unsafe (ref.get());
 	return *this;
     }
-    
+
     const packed_dynamic_sample_reference&
     operator= (const const_reference& ref) const
     {
@@ -865,7 +865,7 @@ public:
     template <typename BitField1, int FirstBit1, bool Mutable1>
     const packed_dynamic_sample_reference& operator= (
 	const packed_sample_reference<BitField1, FirstBit1,
-				      NumBits, Mutable1>& ref) const 
+				      NumBits, Mutable1>& ref) const
     {
 	set_unsafe (ref.get());
 	return *this;
@@ -874,16 +874,16 @@ public:
     unsigned first_bit () const { return _first_bit; }
 
     integer_t get() const
-    { 
+    {
         const BitField sample_mask = parent_t::max_val<<_first_bit;
         return (static_cast<integer_t>(this->get_data() & sample_mask ) >>
 		_first_bit);
     }
-    
+
     void set_unsafe(integer_t value) const
-    { 
+    {
         const BitField sample_mask = parent_t::max_val << _first_bit;
-        this->set_data ((this->get_data() & ~sample_mask) | value << _first_bit); 
+        this->set_data ((this->get_data() & ~sample_mask) | value << _first_bit);
     }
 };
 
@@ -896,8 +896,8 @@ namespace std
 /*
   We are forced to define swap inside std namespace because on some
   platforms (Visual Studio 8) STL calls swap qualified.
-  
-  swap with 'left bias': 
+
+  swap with 'left bias':
   - swap between proxy and anything
   - swap between value type and proxy
   - swap between proxy and proxy
@@ -909,10 +909,10 @@ namespace std
 */
 template <typename BF, int NB, bool M, typename R> inline
 void swap(const psynth::sound::packed_dynamic_sample_reference<BF,NB,M> x, R& y)
-{ 
+{
     psynth::sound::swap_proxy<
 	typename psynth::sound::packed_dynamic_sample_reference<
-	    BF,NB,M>::value_type> (x, y); 
+	    BF,NB,M>::value_type> (x, y);
 }
 
 
@@ -923,10 +923,10 @@ void swap(const psynth::sound::packed_dynamic_sample_reference<BF,NB,M> x, R& y)
 template <typename BF, int NB, bool M> inline
 void swap (typename psynth::sound::packed_dynamic_sample_reference<BF,NB,M>::value_type& x,
 	   const psynth::sound::packed_dynamic_sample_reference<BF,NB,M> y)
-{ 
+{
     psynth::sound::swap_proxy<
 	typename psynth::sound::packed_dynamic_sample_reference<
-	    BF, NB, M>::value_type> (x,y); 
+	    BF, NB, M>::value_type> (x,y);
 }
 
 /**
@@ -936,9 +936,9 @@ void swap (typename psynth::sound::packed_dynamic_sample_reference<BF,NB,M>::val
 template <typename BF, int NB, bool M> inline
 void swap(const psynth::sound::packed_dynamic_sample_reference<BF,NB,M> x,
 	  const psynth::sound::packed_dynamic_sample_reference<BF,NB,M> y)
-{ 
+{
     psynth::sound::swap_proxy<
-	typename psynth::sound::packed_dynamic_sample_reference<BF,NB,M>::value_type> (x,y); 
+	typename psynth::sound::packed_dynamic_sample_reference<BF,NB,M>::value_type> (x,y);
 }
 
 } /* namespace std */
@@ -1049,7 +1049,7 @@ struct is_integral<psynth::sound::packed_dynamic_sample_reference<
 	public boost::mpl::true_ {};
 
 template <typename BaseSampleValue,
-	  typename MinVal, typename MaxVal, typename ZeroVal> 
+	  typename MinVal, typename MaxVal, typename ZeroVal>
 struct is_integral<psynth::sound::scoped_sample_value<
 		       BaseSampleValue, MinVal, MaxVal, ZeroVal> > :
 	public is_integral<BaseSampleValue> {};
@@ -1074,13 +1074,13 @@ struct is_integral<psynth::sound::packed_dynamic_sample_reference<
 	public std::true_type {};
 
 template <typename BaseSampleValue,
-	  typename MinVal, typename MaxVal, typename ZeroVal> 
+	  typename MinVal, typename MaxVal, typename ZeroVal>
 struct is_integral<psynth::sound::scoped_sample_value<
 		       BaseSampleValue, MinVal, MaxVal, ZeroVal> > :
 	public is_integral<BaseSampleValue> {};
 
 template <typename BaseSampleValue,
-	  typename MinVal, typename MaxVal, typename ZeroVal> 
+	  typename MinVal, typename MaxVal, typename ZeroVal>
 struct is_floating_point<psynth::sound::scoped_sample_value<
                              BaseSampleValue, MinVal, MaxVal, ZeroVal> > :
 	public is_floating_point<BaseSampleValue> {};

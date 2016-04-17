@@ -12,7 +12,7 @@
  *  Copyright (C) 2011 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -57,7 +57,7 @@ async_output::async_output (device_ptr out)
     , _buffer (out ? out->buffer_size () * default_buffer_factor : 0)
 {
     using namespace std::placeholders;
-    
+
     if (out)
     {
         out->check_idle ();
@@ -83,7 +83,7 @@ void async_output::stop ()
 void async_output::set_output (device_ptr out)
 {
     bool started = false;
-    
+
     if (_output)
     {
         started = _output->state () != io::async_state::idle;

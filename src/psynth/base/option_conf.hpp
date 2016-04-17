@@ -12,7 +12,7 @@
  *  Copyright (C) 2007, 2009 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -51,7 +51,7 @@ template <class T>
 class option_conf : public option
 {
     conf_node& m_node;
-    
+
 public:
     /**
      * Constructor.
@@ -70,7 +70,7 @@ public:
 	std::istringstream str(arg);
 	str >> val;
 	m_node.set(val);
-	
+
 	return true;
     }
 };
@@ -82,7 +82,7 @@ template <>
 class option_conf<std::string> : public option
 {
     conf_node& m_node;
-    
+
 public:
     /**
      * Constructor.

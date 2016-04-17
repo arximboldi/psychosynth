@@ -27,7 +27,7 @@
  *  Copyright (C) 2009 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -100,7 +100,7 @@ struct try_lock_guard
 
     void unlock ()
     { _mutex.unlock (); }
-    
+
 private:
     Mutex _mutex;
 };
@@ -113,7 +113,7 @@ template <class Mutex = std::mutex>
 struct lock_guard : public try_lock_guard<Mutex>
 {
     typedef std::unique_lock<Mutex> guard_type;
-    
+
     guard_type default_guard ()
     { return guard_type (_mutex); }
 
@@ -130,9 +130,9 @@ struct no_lock_guard
 {
     struct guard_type
     {
-        bool owns_lock () { return true; }        
+        bool owns_lock () { return true; }
     };
-    
+
     guard_type default_guard () { return {}; }
     template <typename... Args>
     guard_type guard (Args...) { assert (false); return {}; }
@@ -154,7 +154,7 @@ public:
 	explicit lock (const no_threading& host) {}
 	explicit lock (const no_threading* host) {}
     };
-	
+
 private:
 };
 
@@ -179,14 +179,14 @@ public:
 	lock (const object_lockable* host)
 	    : _host (*host)
 	{ _host._mutex.lock (); }
-	
+
 	~lock ()
 	{ _host._mutex.unlock (); }
 
     private:
 	const object_lockable& _host;
     };
-    
+
 private:
     mutable Mutex _mutex;
 };
@@ -206,11 +206,11 @@ public:
 
 	lock (const class_lockable* host)
 	{ s_init._mutex.lock (); }
-	
+
 	~lock ()
 	{ s_init._mutex.unlock (); }
     };
-	
+
 private:
     struct initializer
     {

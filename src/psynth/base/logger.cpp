@@ -13,7 +13,7 @@
  *  Copyright (C) 2007, 2008, 2009 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -47,13 +47,13 @@ log::~log()
 {
 }
 
-void log::add_sink (log_sink_ptr d)    
+void log::add_sink (log_sink_ptr d)
 {
     lock lock (this);
     _dumpers.push_back (d);
 }
 
-void log::del_sink (log_sink_ptr d)    
+void log::del_sink (log_sink_ptr d)
 {
     lock lock (this);
 
@@ -78,4 +78,3 @@ void log::operator () (log& l, int level, const string& msg)
 
 } /* namespace base */
 } /* namespace psynth */
-

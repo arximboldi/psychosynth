@@ -12,7 +12,7 @@
  *  Copyright (C) 2010 Juan Pedro Bolivar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -30,7 +30,7 @@
 
 /*
  *  Copyright 2005-2007 Adobe Systems Incorporated
- * 
+ *
  *  Use, modification and distribution are subject to the Boost
  *  Software License, Version 1.0. (See accompanying file
  *  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt).
@@ -65,11 +65,11 @@ namespace sound
    \brief An iterator over non-byte-aligned frames. Models
    FrameIteratorConcept, FrameBasedConcept,
    MemoryBasedIteratorConcept, HasDynamicXStepTypeConcept
-   
+
    An iterator over frames that correspond to non-byte-aligned bit
    ranges. Examples of such frames are single bit grayscale frame, or
    a 6-bit RGB 222 frame.
-   
+
    \ingroup FrameIteratorNonAlignedFrameIterator FrameBasedModel
 */
 template <typename NonAlignedFrameReference>
@@ -99,7 +99,7 @@ public:
     typedef typename parent_type::reference         reference;
 
     bit_aligned_frame_iterator () {}
-    
+
     bit_aligned_frame_iterator (const bit_aligned_frame_iterator& p)
 	: _bit_range (p._bit_range) {}
 
@@ -116,7 +116,7 @@ public:
     bit_aligned_frame_iterator (reference* ref)
 	: _bit_range (ref->bit_range ())
     {}
-    
+
     explicit bit_aligned_frame_iterator (
 	typename bit_range_type::byte_type* data, int bit_offset = 0)
 	: _bit_range(data,bit_offset)
@@ -125,7 +125,7 @@ public:
     /**
        For some reason operator[] provided by iterator_adaptor returns
        a custom class that is convertible to reference
-       
+
        We require our own reference because it is registered in
        iterator_traits
     */
@@ -137,7 +137,7 @@ public:
     }
 
     reference operator-> () const { return **this; }
-    
+
     const bit_range_type& bit_range () const { return _bit_range; }
           bit_range_type& bit_range ()       { return _bit_range; }
 
@@ -148,7 +148,7 @@ private:
     friend class boost::iterator_core_access;
     reference dereference () const
     { return NonAlignedFrameReference(_bit_range); }
-    
+
     void increment ()
     { ++_bit_range; }
 
@@ -160,24 +160,24 @@ private:
 
     difference_type distance_to (const bit_aligned_frame_iterator& it) const
     { return _bit_range.bit_distance_to(it._bit_range) / bit_size; }
-    
+
     bool equal (const bit_aligned_frame_iterator& it) const
     { return _bit_range == it._bit_range; }
 };
 
-template <typename NonAlignedFrameReference> 
+template <typename NonAlignedFrameReference>
 struct const_iterator_type<bit_aligned_frame_iterator<NonAlignedFrameReference> >
-{ 
+{
     typedef bit_aligned_frame_iterator<
-	typename NonAlignedFrameReference::const_reference> type; 
+	typename NonAlignedFrameReference::const_reference> type;
 };
 
-template <typename NonAlignedFrameReference> 
+template <typename NonAlignedFrameReference>
 struct iterator_is_mutable<
     bit_aligned_frame_iterator<NonAlignedFrameReference> > :
 	public boost::mpl::bool_<NonAlignedFrameReference::is_mutable> {};
 
-template <typename NonAlignedFrameReference> 
+template <typename NonAlignedFrameReference>
 struct is_iterator_adaptor<
     bit_aligned_frame_iterator<NonAlignedFrameReference> > :
 	public boost::mpl::false_ {};
@@ -216,27 +216,27 @@ struct byte_to_memunit<bit_aligned_frame_iterator<NonAlignedFrameReference> > :
 template <typename NonAlignedFrameReference>
 inline std::ptrdiff_t memunit_step (
     const bit_aligned_frame_iterator<NonAlignedFrameReference>&)
-{ 
-    return NonAlignedFrameReference::bit_size; 
+{
+    return NonAlignedFrameReference::bit_size;
 }
 
 template <typename NonAlignedFrameReference>
 inline std::ptrdiff_t memunit_distance (
     const bit_aligned_frame_iterator<NonAlignedFrameReference>& p1,
     const bit_aligned_frame_iterator<NonAlignedFrameReference>& p2)
-{ 
+{
     return
 	(p2.bit_range().current_byte() -
 	 p1.bit_range().current_byte()) * 8 +
 	p2.bit_range().bit_offset() -
-	p1.bit_range().bit_offset(); 
+	p1.bit_range().bit_offset();
 }
 
 template <typename NonAlignedFrameReference>
 inline void memunit_advance (
     bit_aligned_frame_iterator<NonAlignedFrameReference>& p,
     std::ptrdiff_t diff)
-{ 
+{
     p.bit_range().bit_advance(diff);
 }
 
@@ -312,7 +312,7 @@ namespace std
   It is important to provide an overload of uninitialized_copy for
   bit_aligned_frame_iterator. The default STL implementation calls
   placement new, which is not defined for bit_aligned_frame_iterator.
-*/ 
+*/
 template <typename NonAlignedFrameReference>
 psynth::sound::bit_aligned_frame_iterator<NonAlignedFrameReference>
 uninitialized_copy (

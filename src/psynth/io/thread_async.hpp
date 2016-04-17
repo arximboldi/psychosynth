@@ -12,7 +12,7 @@
  *  Copyright (C) 2011 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -43,14 +43,14 @@ class thread_async : public detail::async_base_impl
 {
 public:
     typedef detail::async_base_impl::callback_type callback_type;
-    
+
     thread_async (callback_type cb, bool realtime = false)
         : detail::async_base_impl (cb)
         , _realtime (realtime)
     {}
-    
+
     ~thread_async () { soft_stop (); }
-    
+
     void start ();
     void stop ();
 
@@ -58,7 +58,7 @@ protected:
     virtual void run ();
     virtual void iterate () {}
     virtual void prepare () {}
-    
+
 private:
     void _request_rt ();
 

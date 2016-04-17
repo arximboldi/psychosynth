@@ -60,7 +60,7 @@ class osc_controller : public world_listener,
 	world->delete_world_listener (this);
 	world->delete_world_node_listener (this);
     }
-    
+
 public:
     osc_controller (bool broadcast = false,
                     bool restricted = true);
@@ -102,7 +102,7 @@ public:
     }
 
     void add_methods (lo_server s);
-    
+
     void handle_add_node (world_node& obj);
     void handle_delete_node (world_node& obj);
     void handle_activate_node (world_node& obj);

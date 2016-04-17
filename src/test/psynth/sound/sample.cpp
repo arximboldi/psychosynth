@@ -12,7 +12,7 @@
  *  Copyright (C) 2010 Juan Pedro Bolivar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -30,7 +30,7 @@
 
 /*
  *  Copyright 2005-2007 Adobe Systems Incorporated
- * 
+ *
  *  Use, modification and distribution are subject to the Boost
  *  Software License, Version 1.0. (See accompanying file
  *  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt).
@@ -107,7 +107,7 @@ struct do_test : public SampleTestCore
 
 	this->_min_v = 1;    // assignable to scalar
 	this->_min_v = mv;   // and to value type
-	
+
 	// test swap
 	sample_value_t v1 = this->_min_v;
 	sample_value_t v2 = this->_max_v;
@@ -141,7 +141,7 @@ struct do_test : public SampleTestCore
 	BOOST_CHECK_EQUAL (this->_min_v, 1);
 	// comparable to integral
 	#endif
-	
+
         test_mutable (boost::mpl::bool_<sample_traits<sample_t>::is_mutable>());
     }
 
@@ -299,13 +299,13 @@ protected:
 
 template <typename SampleValue>
 void do_test_sample_value()
-{ 
+{
     do_test<value_core<SampleValue> >().test_all();
 }
 
 template <typename SampleRef>
 void do_test_sample_reference()
-{ 
+{
     do_test<reference_core<SampleRef> >().test_all();
 }
 
@@ -374,7 +374,7 @@ struct sample_archetype
     sample_archetype& operator--() { return *this; }
     sample_archetype  operator++(int) { return *this; }
     sample_archetype  operator--(int) { return *this; }
-    
+
     template <typename Scalar>
     sample_archetype operator+=(Scalar) { return *this; }
     template <typename Scalar>
@@ -421,7 +421,7 @@ typedef mpl::vector<
     packed_sample_reference<boost::uint16_t, 11, 5, true>
     >
 packed_sample_types;
-    
+
 BOOST_AUTO_TEST_CASE_TEMPLATE (test_packed_sample_reference,
                                PackedSampleRef,
                                packed_sample_types)
@@ -505,7 +505,7 @@ BOOST_AUTO_TEST_CASE (test_sample_archetype)
 BOOST_AUTO_TEST_SUITE_END ()
 
 /*
- *  TODO: 
+ *  TODO:
  *  - provide algorithm performance overloads for scoped sample and
  *    packed samples
  *  - Update concepts and documentation

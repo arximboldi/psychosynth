@@ -15,7 +15,7 @@
  *  Copyright (C) 2011 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -77,7 +77,7 @@ struct file_support
 {
     typedef typename detail::file_format<
         typename sound::sample_type<Range>::type>::type format;
-    
+
     typedef typename mpl::and_<
         mpl::not_<mpl::equal_to<format, mpl::int_<SF_FORMAT_ENDMASK> > >,
         mpl::not_<typename sound::is_planar<Range>::type> >

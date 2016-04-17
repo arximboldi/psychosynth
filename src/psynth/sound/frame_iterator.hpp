@@ -12,7 +12,7 @@
  *  Copyright (C) 2010 Juan Pedro Bolivar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -30,7 +30,7 @@
 
 /*
  *  Copyright 2005-2007 Adobe Systems Incorporated
- * 
+ *
  *  Use, modification and distribution are subject to the Boost
  *  Software License, Version 1.0. (See accompanying file
  *  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt).
@@ -62,7 +62,7 @@ template <typename Iterator> struct dynamic_step_type;
 /**
    \brief metafunction predicate determining whether the given
    iterator is a plain one or an adaptor over another iterator.
-   
+
    Examples of adaptors are the step iterator and the dereference
    iterator adaptor.
 */
@@ -110,7 +110,7 @@ struct const_iterator_type<const T*>
 /**
    \brief Metafunction predicate returning whether the given iterator
    allows for changing its values
-   
+
    \ingroup GILIsMutable
 */
 template <typename It>
@@ -212,14 +212,14 @@ inline std::ptrdiff_t memunit_step (const P*)
 
 template <typename P>
 inline std::ptrdiff_t memunit_distance (const P* p1, const P* p2)
-{ 
+{
     return (psynth_reinterpret_cast_c<const unsigned char*> (p2) -
-	    psynth_reinterpret_cast_c<const unsigned char*> (p1)); 
+	    psynth_reinterpret_cast_c<const unsigned char*> (p1));
 }
 
 template <typename P>
 inline void memunit_advance (P* &p, std::ptrdiff_t diff)
-{ 
+{
     p = (P*) ((unsigned char*)(p) + diff);
 }
 

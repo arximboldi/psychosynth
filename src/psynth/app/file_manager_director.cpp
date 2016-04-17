@@ -11,7 +11,7 @@
 
 /*
  *  Copyright (C) 2008, 2009 Juan Pedro Bolívar Puente
- *  
+ *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -45,9 +45,9 @@ void file_manager_director::on_conf_nudge (base::conf_node& node)
 	base::file_manager::self ()
 	.child ("psychosynth")
 	.child (node.name());
-    
+
     string val;
-    
+
     mgr.clear();
     for (base::conf_node::iterator it = node.begin(); it != node.end(); ++it) {
 	it->get (val);
@@ -57,7 +57,7 @@ void file_manager_director::on_conf_nudge (base::conf_node& node)
 
 void file_manager_director::register_config ()
 {
-    m_on_conf_nudge_slot = 
+    m_on_conf_nudge_slot =
 	m_conf->child ("samples").on_nudge.connect
 	(boost::bind (&file_manager_director::on_conf_nudge, this, _1));
     m_conf->child ("samples").nudge ();
@@ -73,7 +73,7 @@ void file_manager_director::start (base::conf_node& conf,
 {
     m_conf = &conf;
     m_home_path = home_path;
-    
+
     register_config ();
     defaults();
 }

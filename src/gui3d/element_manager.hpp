@@ -44,7 +44,7 @@ class element_manager : public OIS::MouseListener,
     typedef std::map<int, element*> elem_map; /* TODO: turn back into a list? */
     typedef elem_list::iterator elem_iter;
     typedef elem_map::iterator elem_map_iter;
-    
+
     psynth::world* m_world;
     psynth::world_node m_adding;
     elem_list m_clear_elems;
@@ -55,22 +55,22 @@ class element_manager : public OIS::MouseListener,
     int m_must_own;
     int m_modifier_1;
     int m_modifier_2;
-    
+
     Ogre::Camera* m_camera;
     Ogre::SceneManager* m_scene;
     Ogre::RaySceneQuery* m_rayquery;
 
-    
+
     bool get_world_pointer (Ogre::Vector2& res);
     element* create_element (psynth::world_node& obj);
-    
+
 public:
     element_manager (psynth::world* world,
 		    Ogre::SceneManager* scene,
 		    Ogre::Camera* camera);
-    
+
     ~element_manager ();
-    
+
     void update ();
 
     /*
@@ -78,11 +78,11 @@ public:
     */
 
     void add_element (psynth::world_node_creator& obj);
-    
+
     bool mouseMoved(const OIS::MouseEvent& e);
     bool mousePressed(const OIS::MouseEvent &e, OIS::MouseButtonID id);
     bool mouseReleased(const OIS::MouseEvent &e, OIS::MouseButtonID id);
-    
+
     bool keyPressed(const OIS::KeyEvent &e);
     bool keyReleased(const OIS::KeyEvent &e);
 

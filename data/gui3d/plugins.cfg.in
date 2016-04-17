@@ -2,4 +2,3 @@
 
 PluginFolder = @OGRE_PLUGIN_DIR@
 Plugin = RenderSystem_GL
-

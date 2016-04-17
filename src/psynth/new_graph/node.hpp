@@ -12,7 +12,7 @@
  *  Copyright (C) 2011 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -86,36 +86,36 @@ public:
         base::map_iterator<state_map::key_type,
                            state_map::mapped_type> >
     state_iterator;
-    
+
     typedef boost::iterator_range<input_iterator> input_range;
     typedef boost::iterator_range<output_iterator> output_range;
     typedef boost::iterator_range<param_iterator> param_range;
     typedef boost::iterator_range<state_iterator> state_range;
-    
+
     patch_child_hook _patch_child_hook;
-    
+
     node ();
-    
+
     virtual void rt_process (rt_process_context& ctx);
     virtual void rt_context_update (rt_process_context& ctx);
     virtual void rt_advance ();
-    
+
     in_port_base& in (const std::string& name);
     const in_port_base& in (const std::string& name) const;
     input_range inputs ();
-    
+
     out_port_base& out (const std::string& name);
     const out_port_base& out (const std::string& name) const;
     output_range outputs ();
-        
+
     in_control_base& param (const std::string& name);
     const in_control_base& param (const std::string& name) const;
     param_range params ();
-    
+
     out_control_base& state (const std::string& name);
     const out_control_base& state (const std::string& name) const;
     state_range states ();
-        
+
     void register_component (in_port_base& in);
     void register_component (out_port_base& out);
     void register_component (in_control_base& param);
@@ -123,7 +123,7 @@ public:
 
     void unregister_component (in_port_base& in);
     void unregister_component (out_port_base& out);
-    
+
     void attach_to_process (processor& p);
     void detach_from_process ();
 
@@ -135,19 +135,19 @@ public:
         check_attached_to_process ();
         return *_process;
     }
-    
+
     const processor& process () const
     {
         check_attached_to_process ();
         return *_process;
     }
-    
+
     core::patch& patch ()
     {
         check_attached_to_patch ();
         return *_patch;
     }
-    
+
     const core::patch& patch () const
     {
         check_attached_to_patch ();
@@ -158,13 +158,13 @@ public:
     { return _process != 0; }
     bool is_attached_to_patch () const
     { return _patch != 0; }
-    
+
     void check_attached_to_process (bool attached = true) const
     {
         if (is_attached_to_process () != attached)
             throw node_attachment_error ();
     }
-    
+
     void check_attached_to_patch (bool attached = true) const
     {
         if (is_attached_to_patch () != attached)
@@ -173,15 +173,15 @@ public:
 
     template <class Fn>
     void execute_rt (const Fn& fn);
-    
+
 private:
-    
+
     virtual void rt_on_context_update (rt_process_context& ctx) {}
     virtual void rt_do_process (rt_process_context& ctx) {}
-    
+
     core::patch* _patch;
     processor*   _process;
-    
+
     in_map    _inputs;
     out_map   _outputs;
     param_map _params;
@@ -209,7 +209,7 @@ void node::execute_rt (const Fn& fn)
 {
     if (is_attached_to_process () &&
         process ().is_running ())
-    {    
+    {
         auto& ctx = process ().context ();
         ctx.push_rt_event (make_rt_event ([fn] (rt_process_context&) {
                     fn ();

@@ -12,7 +12,7 @@
  *  Copyright (C) 2010 Juan Pedro Bolivar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -30,7 +30,7 @@
 
 /*
  *  Copyright 2005-2007 Adobe Systems Incorporated
- * 
+ *
  *  Use, modification and distribution are subject to the Boost
  *  Software License, Version 1.0. (See accompanying file
  *  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt).
@@ -77,7 +77,7 @@ namespace sound
 /**
    \brief Returns an MPL integral type specifying the number of
    elements in a channel base
-   
+
    \ingroup ChannelBaseAlgorithmSize
 */
 template <typename ChannelBase>
@@ -95,11 +95,11 @@ struct size : public boost::mpl::size<
    \defgroup ChannelBaseAlgorithmSemanticAtC
    kth_semantic_element_type, kth_semantic_element_reference_type,
    kth_semantic_element_const_reference_type, semantic_at_c
-   
+
    \ingroup ChannelBaseAlgorithm
    \brief Support for accessing the elements of a channel base by
    semantic index
-   
+
    The semantic index of an element is the index of its channel in the
    channel space. Semantic indexing allows for proper pairing of
    elements of channel bases independent on their layout. For example,
@@ -116,7 +116,7 @@ struct size : public boost::mpl::size<
     typedef packed_frame_type<uint16_t,
     boost::mpl::vector3_c<unsigned,4,3,2>, bgr_layout>::type
     bgr432_frame_t;
-    
+
 
     // A reference to its red sample. Although the red sample is the
     // third, its semantic index is 0 in the RGB channel space
@@ -128,7 +128,7 @@ struct size : public boost::mpl::size<
 
     // Set the red sample to 100%
     red_sample_reference_t red_sample = semantic_at_c<0>(red_frame);
-    red_sample = sample_traits<red_sample_reference_t>::max_value();       
+    red_sample = sample_traits<red_sample_reference_t>::max_value();
     \endcode
 */
 
@@ -172,7 +172,7 @@ struct kth_semantic_element_reference_type
 /**
   \brief Specifies the return type of the constant
   semantic_at_c<K>(channel_base);
-  
+
   \ingroup ChannelBaseAlgorithmSemanticAtC
 */
 template <typename ChannelBase, int K>
@@ -201,7 +201,7 @@ typename boost::disable_if<
     boost::is_const<ChannelBase>,
     typename kth_semantic_element_reference_type<ChannelBase,K>::type>::type
 semantic_at_c (ChannelBase& p)
-{ 
+{
     return kth_semantic_element_reference_type<ChannelBase, K>::get (p);
 }
 
@@ -213,8 +213,8 @@ semantic_at_c (ChannelBase& p)
 template <int K, typename ChannelBase> inline
 typename kth_semantic_element_const_reference_type<ChannelBase,K>::type
 semantic_at_c (const ChannelBase& p)
-{ 
-    return kth_semantic_element_const_reference_type<ChannelBase,K>::get (p); 
+{
+    return kth_semantic_element_const_reference_type<ChannelBase,K>::get (p);
 }
 
 
@@ -228,7 +228,7 @@ semantic_at_c (const ChannelBase& p)
    \defgroup ChannelBaseAlgorithmChannel channel_element_type,
    channel_element_reference_type,
    channel_element_const_reference_type, get_channel, contains_channel
-   
+
    \ingroup ChannelBaseAlgorithm
    \brief Support for accessing the elements of a channel base by
    channel name
@@ -243,7 +243,7 @@ semantic_at_c (const ChannelBase& p)
        BOOST_STATIC_ASSERT((contains_channel<Frame, red_t>::value));
 
        typedef typename channel_element_type<Frame, red_t>::type red_sample_t;
-       get_channel(frame, red_t()) = sample_traits<red_sample_t>::max_value(); 
+       get_channel(frame, red_t()) = sample_traits<red_sample_t>::max_value();
    }
    \endcode
 */
@@ -251,7 +251,7 @@ semantic_at_c (const ChannelBase& p)
 /**
    \brief A predicate metafunction determining whether a given channel
    base contains a given channel
-   
+
    \ingroup ChannelBaseAlgorithmChannel
 */
 template <typename ChannelBase, typename Channel>
@@ -276,7 +276,7 @@ struct channel_element_type : public kth_semantic_element_type<
 /**
    \brief Specifies the return type of the mutable element accessor by
    channel name, get_channel(channel_base, Channel());
-   
+
    \ingroup ChannelBaseAlgorithmChannel
 */
 template <typename ChannelBase, typename Channel>
@@ -287,7 +287,7 @@ struct channel_element_reference_type :
 /**
    \brief Specifies the return type of the constant element accessor
    by channel name, get_channel(channel_base, Channel());
-   
+
    \ingroup ChannelBaseAlgorithmChannel
 */
 template <typename ChannelBase, typename Channel>
@@ -300,7 +300,7 @@ struct channel_element_const_reference_type :
    channel name
    \ingroup ChannelBaseAlgorithmChannel
 */
-template <typename ChannelBase, typename Channel> 
+template <typename ChannelBase, typename Channel>
 typename channel_element_reference_type<ChannelBase,Channel>::type
 get_channel (ChannelBase& cb, Channel = Channel())
 {
@@ -311,7 +311,7 @@ get_channel (ChannelBase& cb, Channel = Channel())
    \brief Constant accessor to the element associated with a given channel name
    \ingroup ChannelBaseAlgorithmChannel
 */
-template <typename ChannelBase, typename Channel> 
+template <typename ChannelBase, typename Channel>
 typename channel_element_const_reference_type<ChannelBase,Channel>::type
 get_channel (const ChannelBase& cb, Channel=Channel())
 {
@@ -330,7 +330,7 @@ get_channel (const ChannelBase& cb, Channel=Channel())
 /**
    \defgroup ChannelBaseAlgorithmHomogeneous element_type,
    element_reference_type, element_const_reference_type
-   
+
    \ingroup ChannelBaseAlgorithm
    \brief Types for homogeneous channel bases
 
@@ -351,7 +351,7 @@ struct element_type : public kth_element_type<ChannelBase, 0> {};
 /**
    \brief Specifies the return type of the mutable element accessor
    sound::at_c of a homogeneous channel base
-   
+
    \ingroup ChannelBaseAlgorithmHomogeneous
 */
 template <typename ChannelBase>
@@ -361,7 +361,7 @@ struct element_reference_type :
 /**
    \brief Specifies the return type of the constant element accessor
    sound::at_c of a homogeneous channel base
-   
+
    \ingroup ChannelBaseAlgorithmHomogeneous
 */
 template <typename ChannelBase>
@@ -379,11 +379,11 @@ struct element_recursion
     // static_equal
     template <typename P1,typename P2>
     static bool static_equal (const P1& p1, const P2& p2)
-    { 
+    {
         return element_recursion<N-1>::static_equal(p1,p2) &&
-               semantic_at_c<N-1>(p1) == semantic_at_c<N-1>(p2); 
+               semantic_at_c<N-1>(p1) == semantic_at_c<N-1>(p2);
     }
-    
+
     //static_copy
     template <typename P1,typename P2>
     static void static_copy(const P1& p1, P2& p2)
@@ -391,7 +391,7 @@ struct element_recursion
         element_recursion<N-1>::static_copy(p1,p2);
         semantic_at_c<N-1>(p2) = semantic_at_c<N-1>(p1);
     }
-    
+
     //static_fill
     template <typename P,typename T2>
     static void static_fill(P& p, T2 v)
@@ -399,42 +399,42 @@ struct element_recursion
         element_recursion<N-1>::static_fill (p,v);
         semantic_at_c<N-1>(p) = v;
     }
-    
+
     //static_generate
-    template <typename Dst,typename Op> 
+    template <typename Dst,typename Op>
     static void static_generate (Dst& dst, Op op)
     {
         element_recursion<N-1>::static_generate (dst, op);
         semantic_at_c<N-1>(dst) = op();
     }
-    
+
     //static_for_each with one source
-    template <typename P1,typename Op> 
+    template <typename P1,typename Op>
     static Op static_for_each (P1& p1, Op op)
     {
         Op op2 (element_recursion<N-1>::static_for_each (p1,op));
         op2 (semantic_at_c<N-1> (p1));
         return op2;
     }
-    
-    template <typename P1,typename Op> 
+
+    template <typename P1,typename Op>
     static Op static_for_each (const P1& p1, Op op)
     {
         Op op2 (element_recursion<N-1>::static_for_each (p1,op));
         op2 (semantic_at_c<N-1> (p1));
         return op2;
     }
-    
+
     //static_for_each with two sources
-    template <typename P1,typename P2,typename Op> 
+    template <typename P1,typename P2,typename Op>
     static Op static_for_each (P1& p1, P2& p2, Op op)
     {
         Op op2(element_recursion<N-1>::static_for_each (p1, p2, op));
         op2(semantic_at_c<N-1>(p1), semantic_at_c<N-1>(p2));
         return op2;
     }
-    
-    template <typename P1,typename P2,typename Op> 
+
+    template <typename P1,typename P2,typename Op>
     static Op static_for_each(P1& p1, const P2& p2, Op op)
     {
         Op op2(element_recursion<N-1>::static_for_each(p1,p2,op));
@@ -442,7 +442,7 @@ struct element_recursion
         return op2;
     }
 
-    template <typename P1,typename P2,typename Op> 
+    template <typename P1,typename P2,typename Op>
     static Op static_for_each(const P1& p1, P2& p2, Op op)
     {
         Op op2(element_recursion<N-1>::static_for_each(p1,p2,op));
@@ -450,7 +450,7 @@ struct element_recursion
         return op2;
     }
 
-    template <typename P1,typename P2,typename Op> 
+    template <typename P1,typename P2,typename Op>
     static Op static_for_each(const P1& p1, const P2& p2, Op op)
     {
         Op op2(element_recursion<N-1>::static_for_each(p1,p2,op));
@@ -468,7 +468,7 @@ struct element_recursion
 	    semantic_at_c<N-1>(p3));
         return op2;
     }
-    
+
     template <typename P1,typename P2,typename P3,typename Op>
     static Op static_for_each (P1& p1, P2& p2, const P3& p3, Op op)
     {
@@ -478,7 +478,7 @@ struct element_recursion
 	     semantic_at_c<N-1>(p3));
         return op2;
     }
-    
+
     template <typename P1,typename P2,typename P3,typename Op>
     static Op static_for_each (P1& p1, const P2& p2, P3& p3, Op op)
     {
@@ -488,7 +488,7 @@ struct element_recursion
 	     semantic_at_c<N-1>(p3));
         return op2;
     }
-    
+
     template <typename P1,typename P2,typename P3,typename Op>
     static Op static_for_each (P1& p1, const P2& p2, const P3& p3, Op op)
     {
@@ -498,7 +498,7 @@ struct element_recursion
 	     semantic_at_c<N-1>(p3));
         return op2;
     }
-    
+
     template <typename P1,typename P2,typename P3,typename Op>
     static Op static_for_each (const P1& p1, P2& p2, P3& p3, Op op)
     {
@@ -508,7 +508,7 @@ struct element_recursion
 	     semantic_at_c<N-1>(p3));
         return op2;
     }
-    
+
     template <typename P1,typename P2,typename P3,typename Op>
     static Op static_for_each (const P1& p1, P2& p2, const P3& p3, Op op)
     {
@@ -518,7 +518,7 @@ struct element_recursion
 	     semantic_at_c<N-1>(p3));
         return op2;
     }
-    
+
     template <typename P1,typename P2,typename P3,typename Op>
     static Op static_for_each (const P1& p1, const P2& p2, P3& p3, Op op)
     {
@@ -528,7 +528,7 @@ struct element_recursion
 	     semantic_at_c<N-1>(p3));
         return op2;
     }
-    
+
     template <typename P1,typename P2,typename P3,typename Op>
     static Op static_for_each (const P1& p1, const P2& p2, const P3& p3, Op op)
     {
@@ -538,24 +538,24 @@ struct element_recursion
 	     semantic_at_c<N-1>(p3));
         return op2;
     }
-    
+
     //static_transform with one source
-    template <typename P1,typename Dst,typename Op> 
+    template <typename P1,typename Dst,typename Op>
     static Op static_transform (P1& src, Dst& dst, Op op)
     {
         Op op2 (element_recursion<N-1>::static_transform (src,dst,op));
         semantic_at_c<N-1> (dst) = op2 (semantic_at_c<N-1> (src));
         return op2;
     }
-    
-    template <typename P1,typename Dst,typename Op> 
+
+    template <typename P1,typename Dst,typename Op>
     static Op static_transform (const P1& src, Dst& dst, Op op)
     {
         Op op2(element_recursion<N-1>::static_transform(src,dst,op));
         semantic_at_c<N-1>(dst)=op2(semantic_at_c<N-1>(src));
         return op2;
     }
-    
+
     //static_transform with two sources
     template <typename P1,typename P2,typename Dst,typename Op>
     static Op static_transform (P1& src1, P2& src2, Dst& dst, Op op)
@@ -565,7 +565,7 @@ struct element_recursion
 				       semantic_at_c<N-1>(src2));
         return op2;
     }
-    
+
     template <typename P1,typename P2,typename Dst,typename Op>
     static Op static_transform (P1& src1, const P2& src2, Dst& dst, Op op) {
         Op op2(element_recursion<N-1>::static_transform(src1,src2,dst,op));
@@ -573,7 +573,7 @@ struct element_recursion
 				       semantic_at_c<N-1>(src2));
         return op2;
     }
-    
+
     template <typename P1,typename P2,typename Dst,typename Op>
     static Op static_transform (const P1& src1, P2& src2, Dst& dst, Op op)
     {
@@ -582,7 +582,7 @@ struct element_recursion
 				       semantic_at_c<N-1>(src2));
         return op2;
     }
-    
+
     template <typename P1,typename P2,typename Dst,typename Op>
     static Op static_transform (const P1& src1, const P2& src2, Dst& dst, Op op)
     {
@@ -645,24 +645,24 @@ struct min_max_recur
     {
         return mutable_max(min_max_recur<N-1>::max_(p), semantic_at_c<N-1>(p));
     }
-    
+
     template <typename P>
     static typename element_reference_type<P>::type       max_ (P& p)
     {
         return mutable_max(min_max_recur<N-1>::max_(p), semantic_at_c<N-1>(p));
     }
-    
+
     template <typename P>
     static typename element_const_reference_type<P>::type min_ (const P& p)
     {
         return mutable_min(min_max_recur<N-1>::min_(p), semantic_at_c<N-1>(p));
     }
-    
+
     template <typename P>
     static typename element_reference_type<P>::type       min_ (P& p)
     {
         return mutable_min(min_max_recur<N-1>::min_(p), semantic_at_c<N-1>(p));
-    }    
+    }
 };
 
 // termination condition of the compile-time recursion for min/max
@@ -726,7 +726,7 @@ typename element_reference_type<P>::type       static_min (P& p)
 /** \} */
 
 /**
-   \defgroup ChannelBaseAlgorithmEqual static_equal 
+   \defgroup ChannelBaseAlgorithmEqual static_equal
    \ingroup ChannelBaseAlgorithm
    \brief Equivalent to std::equal. Pairs the elements semantically
 
@@ -735,7 +735,7 @@ typename element_reference_type<P>::type       static_min (P& p)
    rgb8_frame_t rgb_red(255,0,0);
    bgr8_frame_t bgr_red(0,0,255);
    assert(rgb_red[0]==255 && bgr_red[0]==0);
-   
+
    assert(static_equal(rgb_red,bgr_red));
    assert(rgb_red==bgr_red);  // operator== invokes static_equal
    \endcode
@@ -750,16 +750,16 @@ bool static_equal (const P1& p1, const P2& p2)
 /** \} */
 
 /**
-   \defgroup ChannelBaseAlgorithmCopy static_copy 
+   \defgroup ChannelBaseAlgorithmCopy static_copy
    \ingroup ChannelBaseAlgorithm
    \brief Equivalent to std::copy. Pairs the elements semantically
-   
+
    Example:
    \code
    rgb8_frame_t rgb_red(255,0,0);
    bgr8_frame_t bgr_red;
    static_copy(rgb_red, bgr_red);  // same as bgr_red = rgb_red
-   
+
    assert(rgb_red[0] == 255 && bgr_red[0] == 0);
    assert(rgb_red == bgr_red);
    \endcode
@@ -774,10 +774,10 @@ void static_copy(const Src& src, Dst& dst)
 /** \} */
 
 /**
-   \defgroup ChannelBaseAlgorithmFill static_fill 
+   \defgroup ChannelBaseAlgorithmFill static_fill
    \ingroup ChannelBaseAlgorithm
    \brief Equivalent to std::fill.
-   
+
    Example:
    \code
    rgb8_frame_t p;
@@ -793,13 +793,13 @@ void static_fill (P& p, const V& v)
 /** \} */
 
 /**
-   \defgroup ChannelBaseAlgorithmGenerate static_generate 
+   \defgroup ChannelBaseAlgorithmGenerate static_generate
    \ingroup ChannelBaseAlgorithm
    \brief Equivalent to std::generate.
-   
+
    Example: Set each sample of a frame to its semantic index. The
    samples must be assignable from an integer.
-   
+
    \code
    struct consecutive_fn {
      int& _current;
@@ -821,14 +821,14 @@ PSYNTH_FORCEINLINE void static_generate(P1& dst,Op op)
 /** \} */
 
 /**
-   \defgroup ChannelBaseAlgorithmTransform static_transform 
+   \defgroup ChannelBaseAlgorithmTransform static_transform
    \ingroup ChannelBaseAlgorithm
    \brief Equivalent to std::transform. Pairs the elements
    semanticall
 
    Example: Write a generic function that adds two frames into a
    homogeneous result frame.
-   
+
    \code
    template <typename Result>
    struct my_plus {
@@ -904,15 +904,15 @@ Op static_transform (const P2& p2, const P3& p3, Dst& dst, Op op)
 /** \} */
 
 /**
-   \defgroup ChannelBaseAlgorithmForEach static_for_each 
+   \defgroup ChannelBaseAlgorithmForEach static_for_each
    \ingroup ChannelBaseAlgorithm
    \brief Equivalent to std::for_each. Pairs the elements semantically
-   
+
    Example: Use static_for_each to increment a planar frame iterator
    \code
-   struct increment { 
-      template <typename Incrementable> 
-      void operator()(Incrementable& x) const { ++x; } 
+   struct increment {
+      template <typename Incrementable>
+      void operator()(Incrementable& x) const { ++x; }
    };
 
    template <typename ChannelBase>

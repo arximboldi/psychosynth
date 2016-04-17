@@ -12,7 +12,7 @@
  *  Copyright (C) 2011 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -66,7 +66,7 @@ class hetero_iterator : public boost::iterator_facade <
     boost::bidirectional_traversal_tag>
 {
     typedef hetero_header<Base> header;
-    
+
 public:
     explicit hetero_iterator (header* curr)
         : _curr (curr) {}
@@ -77,7 +77,7 @@ public:
 
 private:
     friend class boost::iterator_core_access;
-    
+
     Base& dereference () const
     { return *_curr->access; }
 
@@ -86,10 +86,10 @@ private:
 
     void increment ()
     { _curr = _curr->next; }
-    
+
     void decrement ()
     { _curr = _curr->prev; }
-                
+
     header* _curr;
 };
 
@@ -125,7 +125,7 @@ public:
     typedef typename iterator::reference reference;
     typedef typename iterator::difference_type difference_type;
     typedef typename const_iterator::reference const_reference;
-    
+
     explicit hetero_deque (std::size_t size = 0);
     hetero_deque (hetero_deque&&);
     hetero_deque& operator= (hetero_deque&&);
@@ -134,7 +134,7 @@ public:
     hetero_deque& operator= (const hetero_deque&);
 #endif
     ~hetero_deque ();
-    
+
     Base& back ();
     const Base& back () const;
     template <class Concrete, typename ...Args>
@@ -164,7 +164,7 @@ public:
     bool pop_front ();
 
     void clear ();
-    
+
     void swap (hetero_deque& other);
 
     bool empty () const
@@ -180,7 +180,7 @@ public:
     { return reverse_iterator (_front); }
     const_reverse_iterator rbegin () const
     { return const_reverse_iterator (_front); }
-    
+
     iterator end ()
     { return iterator (_back->next ? _back->next : _back); }
     const_iterator end () const
@@ -191,20 +191,20 @@ public:
     { return reverse_iterator (_back->next ? _back->next : _back); }
     const_reverse_iterator rend () const
     { return const_reverse_iterator (_back->next ? _back->next : _back); }
-    
+
 private:
     typedef detail::hetero_header<Base> header;
     static_assert (std::is_pod<header>::value,
                    "hetero_header must be a POD");
-    
+
     template <class Concrete, typename ...Args>
     void construct (header* data, Args&&... args);
-    
+
     const Base& access (const header* data) const;
     Base& access (header* data) const;
-        
+
     typedef std::vector<char> memory_t;
-    
+
     memory_t    _memory;
     header*     _front;
     header*     _back;
@@ -228,4 +228,3 @@ void swap (psynth::base::hetero_deque<B>& a,
 #include <psynth/base/hetero_deque.tpp>
 
 #endif /* PSYNTH_BASE_HETERO_DEQUE_HPP_ */
-

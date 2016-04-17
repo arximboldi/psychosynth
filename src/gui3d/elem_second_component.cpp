@@ -94,9 +94,9 @@ bool elem_second_component::handle_pointer_move (Ogre::Vector2 pos)
 
 	if (new_angle < -Math::PI/2)
 	    new_angle = Math::PI;
-	
+
 	float new_val = new_angle/Math::PI * (m_max_val - m_min_val) + m_min_val;
-	
+
 	if (new_val < m_min_val)
 	    new_val = m_min_val;
 	if (new_val > m_max_val)
@@ -118,7 +118,7 @@ bool elem_second_component::handle_pointer_click (Ogre::Vector2 pos, OIS::MouseB
 	m_changing = true;
 	return true;
     }
-	
+
     return false;
 }
 

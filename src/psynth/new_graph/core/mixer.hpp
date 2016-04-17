@@ -12,7 +12,7 @@
  *  Copyright (C) 2011 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -47,7 +47,7 @@ class mixer : public node
 {
 public:
     mixer ();
-    
+
 protected:
     void rt_do_process (rt_process_context& ctx);
 
@@ -57,7 +57,7 @@ protected:
     typedef std::vector <in_port_ptr> in_port_vector;
 
     soft_sample_in_port _in_modulator;
-    in_port_vector _in_inputs; 
+    in_port_vector _in_inputs;
     out_port_type _out_output;
 
     in_control<float> _ctl_gain;
@@ -72,4 +72,3 @@ typedef mixer<sample_buffer> sample_mixer;
 } /* namespace psynth */
 
 #endif /* PSYNTH_GRAPH_CORE_MIXER_HPP_ */
-

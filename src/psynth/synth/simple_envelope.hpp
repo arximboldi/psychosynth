@@ -14,7 +14,7 @@
  *  Copyright (C) 2011 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -59,7 +59,7 @@ public:
 	, _curr_dt (0.0f)
 	, _val (0.0f)
 	{}
-    
+
     simple_envelope (float rise_dt, float fall_dt)
 	: _rise_dt (rise_dt)
 	, _fall_dt (fall_dt)
@@ -75,7 +75,7 @@ public:
 
     void set (sample_type value)
     { _val = value; }
-    
+
     value_type update ()
     {
         const sample_type one  =
@@ -83,7 +83,7 @@ public:
         const sample_type zero =
             sound::sample_traits<sample_type>::zero_value ();
         sample_type val = _val;
-        
+
 	_val = _val + _curr_dt;
 	if (_val > one)
             _val = one;
@@ -99,7 +99,7 @@ public:
         const sample_type zero =
             sound::sample_traits<sample_type>::zero_value ();
         sample_type val = _val;
-        
+
 	_val = _val + _curr_dt * sample;
 	if (_val > one)
             _val = one;
@@ -132,7 +132,7 @@ public:
 
     bool finished ()
     { return _val <= 0.0f; }
-    
+
 private:
     float       _rise_dt;
     float       _fall_dt;

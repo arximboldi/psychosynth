@@ -12,7 +12,7 @@
  *  Copyright (C) 2008 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -42,7 +42,7 @@ namespace base
 {
 
 bf::path file_finder::find_in (const bf::path& dir_path, const bf::path& file) const
-{    
+{
     if (!bf::exists (dir_path))
 	return bf::path ();
 
@@ -56,19 +56,19 @@ bf::path file_finder::find_in (const bf::path& dir_path, const bf::path& file) c
 }
 
 void file_finder::cache_path (const bf::path& dir_path)
-{    
+{
     if (!bf::exists (dir_path))
 	return;
 
     bf::directory_iterator end_itr;
     for (bf::directory_iterator itr (dir_path); itr != end_itr; ++itr)
-	m_cache.insert (make_pair (itr->path().leaf(), itr->path ()));    
+	m_cache.insert (make_pair (itr->path().leaf(), itr->path ()));
 }
 
 void file_finder::uncache_path (const bf::path& path)
 {
     path_map::iterator iter;
-    
+
     for (iter = m_cache.begin(); iter != m_cache.end();)
 	if (path == iter->second)
 	    m_cache.erase (iter++);
@@ -133,10 +133,9 @@ bf::path file_finder::find (const bf::path& file) const
 	if (iter != m_cache.end ())
 	    return iter->second;
     }
-    
+
     return bf::path ();
 }
 
 } /* namespace base */
 } /* namespace psynth */
-

@@ -31,7 +31,7 @@ namespace psynth
 class scaler_src : public scaler
 {
 public:
-    
+
 };
 
 } /* namespace psynth */

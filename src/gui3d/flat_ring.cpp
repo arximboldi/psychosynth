@@ -78,4 +78,3 @@ void flat_ring::update()
     build();
     end();
 }
-

@@ -12,7 +12,7 @@
  *  Copyright (C) 2007 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -57,7 +57,7 @@ timer::timer (int fpsrate)
 timer::~timer ()
 {
 }
-	
+
 void timer::force_fps (int fpsrate)
 {
     m_fps = fpsrate;
@@ -65,7 +65,7 @@ void timer::force_fps (int fpsrate)
 	m_rate = 1000.0 / double (m_fps);
     m_frame_count = 0;
 }
-	
+
 void timer::reset ()
 {
     m_total_frame_count = 0;
@@ -75,7 +75,7 @@ void timer::reset ()
 
     m_last_time = 0;
     m_frame_count = 0;
-     
+
     gettimeofday (&m_clock_start, NULL);
 }
 

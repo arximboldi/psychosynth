@@ -11,7 +11,7 @@
 
 /*
  *  Copyright (C) 2009 Juan Pedro Bolívar Puente
- *  
+ *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -76,9 +76,9 @@ template <typename A>
 struct equal_id
 {
     const A& elem;
-    
+
     equal_id (const A& e) : elem (e) {}
-    
+
     bool operator () (const A& b) const
     {
         return &elem == &b;

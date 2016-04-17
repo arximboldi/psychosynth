@@ -41,7 +41,7 @@ struct sub_range_fn
     sub_range_fn (std::ptrdiff_t start, std::ptrdiff_t size)
 	: _start (start)
 	, _size (size) {}
-    
+
     template <typename Range>
     result_type operator () (const Range& src) const
     {
@@ -57,7 +57,7 @@ struct sub_sampled_range_fn
     typedef Result result_type;
     sub_sampled_range_fn (std::ptrdiff_t step)
 	: _step (step) {}
-    
+
     template <typename Range>
     result_type operator () (const Range& src) const
     {
@@ -74,7 +74,7 @@ struct nth_sample_range_fn
 
     nth_sample_range_fn(int n)
 	: _n (n) {}
-    
+
     template <typename Range>
     result_type operator () (const Range& src) const
     {
@@ -125,11 +125,11 @@ template <typename RangeTypes> inline
 // Models MPL Random Access Container of models of BufferRangeConcept
 typename dynamic_step_type<dynamic_buffer_range<RangeTypes> >::type
 flipped_range (const dynamic_buffer_range<RangeTypes>& src)
-{ 
+{
     return apply_operation (
 	src, detail::flipped_fn<
 	    typename dynamic_step_type<
-		dynamic_buffer_range<RangeTypes> >::type>()); 
+		dynamic_buffer_range<RangeTypes> >::type>());
 }
 
 /** \ingroup BufferRangeTransformationsSubbuffer */
@@ -140,7 +140,7 @@ sub_range (const dynamic_buffer_range<RangeTypes>& src,
            size_t start, size_t size)
 {
     return apply_operation (src, detail::sub_range_fn<
-				dynamic_buffer_range<RangeTypes> >(start, size)); 
+				dynamic_buffer_range<RangeTypes> >(start, size));
 }
 
 /** \ingroup BufferRangeTransformationsSub_Sampled */
@@ -149,11 +149,11 @@ template <typename RangeTypes> inline
 typename dynamic_step_type<dynamic_buffer_range<RangeTypes> >::type
 sub_sampled_range (const dynamic_buffer_range<RangeTypes>& src,
 		   std::ptrdiff_t step)
-{ 
+{
     return apply_operation (
 	src, detail::sub_sampled_range_fn<
 	    typename dynamic_step_type<
-		dynamic_buffer_range<RangeTypes> >::type> (step)); 
+		dynamic_buffer_range<RangeTypes> >::type> (step));
 }
 
 namespace detail
@@ -188,11 +188,11 @@ template <typename RangeTypes> inline
 // Models MPL Random Access Container of models of BufferRangeConcept
 typename nth_sample_range_type<dynamic_buffer_range<RangeTypes> >::type
 nth_sample_range (const dynamic_buffer_range<RangeTypes>& src, int n)
-{ 
+{
     return apply_operation (
 	src, detail::nth_sample_range_fn<
         typename nth_sample_range_type<
-        dynamic_buffer_range<RangeTypes> >::type>(n)); 
+        dynamic_buffer_range<RangeTypes> >::type>(n));
 }
 
 namespace detail
@@ -230,11 +230,11 @@ template <typename DstP, typename RangeTypes, typename CC> inline
 typename channel_converted_range_type<
     dynamic_buffer_range<RangeTypes>, DstP, CC>::type
 channel_converted_range (const dynamic_buffer_range<RangeTypes>& src,CC cc)
-{ 
+{
     return apply_operation (
 	src, detail::channel_converted_range_fn<
         DstP,typename channel_converted_range_type<
-        dynamic_buffer_range<RangeTypes>, DstP, CC>::type >()); 
+        dynamic_buffer_range<RangeTypes>, DstP, CC>::type >());
 }
 
 /**
@@ -260,11 +260,11 @@ template <typename DstP, typename RangeTypes> inline
 // Models MPL Random Access Container of models of BufferRangeConcept
 typename channel_converted_range_type<dynamic_buffer_range<RangeTypes>, DstP>::type
 channel_converted_range (const dynamic_buffer_range<RangeTypes>& src)
-{ 
+{
     return apply_operation (
 	src, detail::channel_converted_range_fn <
         DstP,typename channel_converted_range_type<
-        dynamic_buffer_range<RangeTypes>, DstP>::type >()); 
+        dynamic_buffer_range<RangeTypes>, DstP>::type >());
 }
 
 /**
@@ -281,11 +281,11 @@ template <typename DstP, typename RangeTypes, typename CC> inline
 typename channel_converted_range_type<
     dynamic_buffer_range<RangeTypes>, DstP, CC>::type
 dynamic_channel_converted_range (const dynamic_buffer_range<RangeTypes>& src, CC cc)
-{ 
+{
     return apply_operation (
 	src, detail::channel_converted_range_fn<
         DstP,typename channel_converted_range_type<
-        dynamic_buffer_range<RangeTypes>, DstP, CC>::type >()); 
+        dynamic_buffer_range<RangeTypes>, DstP, CC>::type >());
 }
 
 /**
@@ -301,11 +301,11 @@ template <typename DstP, typename RangeTypes> inline
 // Models MPL Random Access Container of models of BufferRangeConcept
 typename channel_converted_range_type<dynamic_buffer_range<RangeTypes>, DstP>::type
 dynamic_channel_converted_range (const dynamic_buffer_range<RangeTypes>& src)
-{ 
+{
     return apply_operation (
 	src, detail::channel_converted_range_fn<
         DstP, typename channel_converted_range_type<
-        dynamic_buffer_range<RangeTypes>, DstP>::type >()); 
+        dynamic_buffer_range<RangeTypes>, DstP>::type >());
 }
 
 /** \} */

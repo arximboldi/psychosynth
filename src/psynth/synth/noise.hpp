@@ -9,7 +9,7 @@
 
 /*
  *  Copyright (C) 2012 Juan Pedro Bolívar Puente
- *  
+ *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -50,10 +50,10 @@ class white_noise_distribution
         std::uniform_int_distribution<SampleType>,
         std::uniform_real_distribution<SampleType>>::type
         uniform_distribution_type;
-    
+
 public:
     typedef SampleType result_type;
-    
+
     white_noise_distribution()
         : _uniform(sound::sample_traits<SampleType>::min_value (),
                    sound::sample_traits<SampleType>::max_value ())
@@ -64,7 +64,7 @@ public:
     template <typename Engine>
     SampleType operator() (Engine& engine)
     { return _uniform (engine); }
-    
+
 private:
     uniform_distribution_type _uniform;
 };
@@ -77,10 +77,10 @@ public:
     pink_noise_distribution();
     pink_noise_distribution(const pink_noise_distribution&) = default;
     pink_noise_distribution& operator=(const pink_noise_distribution&) = default;
-    
+
     template <typename GenEngine>
     SampleType operator()(GenEngine& gen);
-    
+
 private:
     SampleType _b0, _b1, _b2, _b3, _b4, _b5, _b6;
 };
@@ -99,29 +99,29 @@ public:
 
     noise(const noise&) = default;
     noise& operator=(const noise&) = default;
-    
+
     template <class Range>
     void update (const Range& out_buf);
 
     void distribution(const Distribution& d)
     { _distribution = d; };
-    
+
     const Distribution& distribution() const
     { return _distribution; }
-    
+
     Distribution& distribution()
     { return _distribution; }
 
-    
+
     void generator(const Generator& d)
     { _generator = d; };
-    
+
     const Generator& generator() const
     { return _generator; }
-    
+
     Generator& generator()
     { return _generator; }
-    
+
 private:
     Distribution _distribution;
     Generator    _generator;

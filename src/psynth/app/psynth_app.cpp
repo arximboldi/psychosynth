@@ -71,7 +71,7 @@ bool psynth_app::parse_args (int argc, const char* argv[])
     base::conf_node& conf = base::config::self ().child ("psychosynth");
     bool show_help = false;
     bool show_version = false;
-    
+
     ap.add('h', "help", &show_help);
     ap.add('v', "version", &show_version);
     ap.add('s', "sample-rate", new base::option_conf<int>(conf.child ("sample_rate")));
@@ -142,20 +142,20 @@ void psynth_app::setup_synth()
     m_director.start (base::config::self  ().child ("psychosynth"),
 		      get_config_path ());
 }
-    
+
 void psynth_app::close_synth ()
 {
     m_director.stop();
 }
 
 int psynth_app::run (int argc, const char* argv[])
-{   
+{
     int ret_val = 0;
 
     try {
 	base::conf_node& conf = base::config::self ().child ("psychosynth");
 	base::logger::self ().add_sink (base::new_log_std_sink ());
-	
+
 	if (!parse_args (argc, argv))
 	    return ERR_GENERIC;
 
@@ -171,7 +171,7 @@ int psynth_app::run (int argc, const char* argv[])
 	} catch (psynth::base::exception& error) {
 	    error.log ();
 	}
-    
+
 #ifdef PSYNTH_HAVE_ALSA
 	m_director.attach_output_director_factory (new output_director_alsa_factory);
 #endif
@@ -181,7 +181,7 @@ int psynth_app::run (int argc, const char* argv[])
 #ifdef PSYNTH_HAVE_JACK
 	m_director.attach_output_director_factory (new output_director_jack_factory);
 #endif
-	
+
 	ret_val = execute();
 
 	try {
@@ -194,7 +194,7 @@ int psynth_app::run (int argc, const char* argv[])
 	error.log ();
 	ret_val = -1;
     }
-    
+
     return ret_val;
 }
 

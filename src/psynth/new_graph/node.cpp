@@ -12,7 +12,7 @@
  *  Copyright (C) 2011 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -196,7 +196,7 @@ void node::register_component (out_control_base& state)
     if (it != _states.end ())
         PSYNTH_THROW (node_component_error)
             << "Duplicate state control name: " << name;
-    _states.insert (it, std::make_pair (name, &state));    
+    _states.insert (it, std::make_pair (name, &state));
 }
 
 void node::unregister_component (in_port_base& in)

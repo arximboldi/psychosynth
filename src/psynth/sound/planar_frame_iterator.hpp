@@ -12,7 +12,7 @@
  *  Copyright (C) 2010 Juan Pedro Bolivar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -30,7 +30,7 @@
 
 /*
  *  Copyright 2005-2007 Adobe Systems Incorporated
- * 
+ *
  *  Use, modification and distribution are subject to the Boost
  *  Software License, Version 1.0. (See accompanying file
  *  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt).
@@ -56,15 +56,15 @@ namespace sound
   forward declaration (as this file is included in
   planar_frame_reference.hpp)
 */
-template <typename SampleReference, typename ChannelSpace> 
+template <typename SampleReference, typename ChannelSpace>
 struct planar_frame_reference;
 
 /**
-   \defgroup ChannelBaseModelPlanarPtr planar_frame_iterator 
+   \defgroup ChannelBaseModelPlanarPtr planar_frame_iterator
    \ingroup ChannelBaseModel
    \brief A homogeneous channel base whose element is a sample
    iterator. Models HomogeneousChannelBaseValueConcept
-   
+
    This class is used as an iterator to a planar frame.
 */
 
@@ -81,11 +81,11 @@ struct planar_frame_reference;
    HomogeneousChannelBaseConcept, FrameIteratorConcept,
    HomogeneousFrameBasedConcept, MemoryBasedIteratorConcept,
    HasDynamicXStepTypeConcept
-   
+
    Planar frames have sample data that is not consecutive in memory.
    To abstract this we use classes to represent references and
    pointers to planar frames.
-   
+
    \ingroup FrameIteratorModelPlanarPtr ChannelBaseModelPlanarPtr
    FrameBasedModel
 */
@@ -131,14 +131,14 @@ public:
     typedef typename parent_type::reference          reference;
     typedef typename parent_type::difference_type    difference_type;
 
-    planar_frame_iterator () : channel_base_parent_type (0) {} 
+    planar_frame_iterator () : channel_base_parent_type (0) {}
     planar_frame_iterator (bool) {}
     // constructor that does not fill with zero (for performance)
 
     planar_frame_iterator (const SamplePtr& v0,
 			   const SamplePtr& v1)
 	: channel_base_parent_type (v0, v1) {}
-    
+
     planar_frame_iterator (const SamplePtr& v0,
 			   const SamplePtr& v1,
 			   const SamplePtr& v2)
@@ -149,7 +149,7 @@ public:
 			   const SamplePtr& v2,
 			   const SamplePtr& v3)
 	: channel_base_parent_type (v0, v1, v2, v3) {}
-    
+
     planar_frame_iterator (const SamplePtr& v0,
 			   const SamplePtr& v1,
 			   const SamplePtr& v2,
@@ -157,7 +157,7 @@ public:
 			   const SamplePtr& v4)
 	: channel_base_parent_type (v0, v1, v2, v3, v4) {}
 
-    template <typename IC1, typename C1> 
+    template <typename IC1, typename C1>
     planar_frame_iterator (const planar_frame_iterator<IC1,C1>& ptr)
 	: channel_base_parent_type (ptr) {}
 
@@ -168,7 +168,7 @@ public:
        constructs like pointer = &value or pointer = &reference Since
        we should not override operator& that's the best we can do.
     */
-    template <typename P> 
+    template <typename P>
     planar_frame_iterator (P* pix)
 	: channel_base_parent_type (pix, true)
     {
@@ -180,8 +180,8 @@ public:
 	template <typename T>
 	T* operator () (T& t) { return &t; }
     };
-    
-    template <typename P> 
+
+    template <typename P>
     planar_frame_iterator& operator= (P* pix)
     {
 	/*
@@ -189,9 +189,9 @@ public:
 	  It seems that the following statements are optimized away by
 	  GCC in some strange cases...
 	 */
-	boost::function_requires<FramesCompatibleConcept<P, value_type> >();	
+	boost::function_requires<FramesCompatibleConcept<P, value_type> >();
 	static_transform (*pix, *this, address_of ());
-		
+
 	/*
 	  TODO:
 	  Performance compare to this:
@@ -208,7 +208,7 @@ public:
     /**
        For some reason operator[] provided by iterator_facade returns
        a custom class that is convertible to reference.
-       
+
        We require our own reference because it is registered in
        iterator_traits.
     */
@@ -227,12 +227,12 @@ public:
     {
 	return sound::at_c<0>(*this) < sound::at_c<0>(ptr);
     }
-    
+
     bool operator!= (const planar_frame_iterator& ptr) const
     {
 	return sound::at_c<0>(*this) != sound::at_c<0>(ptr);
     }
-    
+
 private:
     friend class boost::iterator_core_access;
 
@@ -240,19 +240,19 @@ private:
     {
 	static_transform (*this, *this, detail::inc<SamplePtr>());
     }
-    
+
     void decrement ()
     {
 	static_transform (*this, *this, detail::dec<SamplePtr>());
     }
-    
+
     void advance (ptrdiff_t d)
     {
 	static_transform (
 	    *this, *this,
 	    std::bind2nd (detail::plus_asymmetric<SamplePtr, ptrdiff_t>(), d));
     }
-    
+
     reference dereference () const
     {
 	return this->template deref<reference> ();
@@ -262,7 +262,7 @@ private:
     {
 	return sound::at_c<0>(it) - sound::at_c<0>(*this);
     }
-    
+
     bool equal (const planar_frame_iterator& it) const
     {
 	return sound::at_c<0>(*this) == sound::at_c<0>(it);
@@ -279,23 +279,23 @@ struct sample_iterator_is_mutable<const T*> : public boost::mpl::false_ {};
 
 } /* namespace detail */
 
-template <typename IC, typename C> 
+template <typename IC, typename C>
 struct const_iterator_type<planar_frame_iterator<IC,C> >
-{ 
+{
 private:
     typedef typename std::iterator_traits<IC>::value_type sample_type;
 
 public:
     typedef
     planar_frame_iterator<typename sample_traits<sample_type>::const_pointer,
-			  C> type; 
+			  C> type;
 };
 
 /**
    The default implementation when the iterator is a C pointer is to
    use the standard constness semantics
 */
-template <typename IC, typename C> 
+template <typename IC, typename C>
 struct iterator_is_mutable<planar_frame_iterator<IC,C> > :
 	public detail::sample_iterator_is_mutable<IC> {};
 
@@ -305,17 +305,17 @@ struct iterator_is_mutable<planar_frame_iterator<IC,C> > :
  *
  */
 
-template <typename IC, typename C, int K>  
+template <typename IC, typename C, int K>
 struct kth_element_type<planar_frame_iterator<IC, C>, K>
 {
     typedef IC type;
 };
 
-template <typename IC, typename C, int K>  
+template <typename IC, typename C, int K>
 struct kth_element_reference_type<planar_frame_iterator<IC,C>, K> :
     public boost::add_reference<IC> {};
 
-template <typename IC, typename C, int K>  
+template <typename IC, typename C, int K>
 struct kth_element_const_reference_type<planar_frame_iterator<IC, C>, K> :
     public boost::add_reference<typename boost::add_const<IC>::type> {};
 
@@ -362,8 +362,8 @@ inline std::ptrdiff_t memunit_step (const planar_frame_iterator<IC,C>&)
 template <typename IC, typename C>
 inline std::ptrdiff_t memunit_distance (const planar_frame_iterator<IC,C>& p1,
 					const planar_frame_iterator<IC,C>& p2)
-{ 
-    return memunit_distance (sound::at_c<0>(p1), sound::at_c<0>(p2)); 
+{
+    return memunit_distance (sound::at_c<0>(p1), sound::at_c<0>(p2));
 }
 
 template <typename IC>
@@ -380,7 +380,7 @@ struct memunit_advance_fn
 template <typename IC, typename C>
 inline void memunit_advance (planar_frame_iterator<IC, C>& p,
 			     std::ptrdiff_t diff)
-{ 
+{
     static_transform (p, p, memunit_advance_fn<IC> (diff));
 }
 
@@ -395,7 +395,7 @@ inline planar_frame_iterator<IC,C> memunit_advanced (
 
 template <typename SamplePtr, typename ChannelSpace> inline
 planar_frame_reference<typename std::iterator_traits<SamplePtr>::reference,
-		       ChannelSpace> 
+		       ChannelSpace>
 memunit_advanced_ref (const planar_frame_iterator<SamplePtr, ChannelSpace>& ptr,
 		      std::ptrdiff_t diff)
 {

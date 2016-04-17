@@ -33,5 +33,5 @@ void task_manager::update (int ms)
 	    if (!(*i)->m_is_paused)
 		(*i)->update(ms);
 	    i++;
-	}    
+	}
 }

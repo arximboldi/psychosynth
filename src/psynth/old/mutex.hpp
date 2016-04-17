@@ -43,10 +43,10 @@ namespace psynth
 class mutex
 {
     friend class condition;
-    
+
     pthread_mutex_t m_mutex;
     pthread_mutexattr_t attr;
-    
+
     void init (int type) {
 	pthread_mutexattr_init(&attr);
 	pthread_mutexattr_settype(&attr, type);
@@ -57,7 +57,7 @@ class mutex
 	pthread_mutexattr_destroy(&attr);
 	pthread_mutex_destroy(&m_mutex);
     }
-    
+
 public:
 
     /**
@@ -86,7 +86,7 @@ public:
     ~mutex () {
 	destroy();
     }
-    
+
     /**
      * Rebuilds the mutex.
      * @param type New mutex type.
@@ -136,14 +136,14 @@ public:
 
 /**
  * A lock that implements mutual exclusion for writers but allows multiple
- * readers. 
+ * readers.
  * @see Mutex
  */
 class rwlock
 {
     pthread_rwlock_t m_rwlock;
     // pthread_rwlockattr_t attr;
-    
+
     void init (int type) {
 	/*
 	pthread_rwlockattr_init(&attr);
@@ -158,7 +158,7 @@ class rwlock
 	*/
 	pthread_rwlock_destroy(&m_rwlock);
     }
-    
+
 public:
     enum type {
 	DEFAULT
@@ -232,7 +232,7 @@ public:
 	    return false;
 	return true;
     }
-    
+
     bool timed_write_lock(const timespec& delay) const {
 	if (pthread_rwlock_timedwrlock_np((pthread_rwlock_t*)&m_rwlock, &delay) == EBUSY)
 	    return false;

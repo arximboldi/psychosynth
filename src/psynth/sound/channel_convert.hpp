@@ -12,7 +12,7 @@
  *  Copyright (C) 2010 Juan Pedro Bolivar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -30,7 +30,7 @@
 
 /*
  *  Copyright 2005-2007 Adobe Systems Incorporated
- * 
+ *
  *  Use, modification and distribution are subject to the Boost
  *  Software License, Version 1.0. (See accompanying file
  *  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt).
@@ -71,7 +71,7 @@ struct sample_type;
  */
 
 /**
-   \ingroup ChannelConvert 
+   \ingroup ChannelConvert
    \brief Channel Convertion function object. To be specialized for
    every src/dst channel space
 */
@@ -123,7 +123,7 @@ struct default_channel_converter_impl<stereo_space, mono_space>
     template <typename P1, typename P2>
     void operator() (const P1& src, P2& dst) const
     {
-        get_channel (dst, mono_channel ()) = 
+        get_channel (dst, mono_channel ()) =
 	    sample_convert<typename channel_element_type<P2, mono_channel>::type>(
                 get_channel (src, left_channel ()) / 2 +
 		get_channel (src, right_channel ()) / 2
@@ -144,7 +144,7 @@ struct default_channel_converter
 {
     template <typename SrcP, typename DstP>
     void operator () (const SrcP& src,DstP& dst) const
-    { 
+    {
         typedef typename channel_space_type<SrcP>::type SrcChannelSpace;
         typedef typename channel_space_type<DstP>::type DstChannelSpace;
         default_channel_converter_impl<SrcChannelSpace, DstChannelSpace>()(
@@ -156,7 +156,7 @@ struct default_channel_converter
    \ingroup FrameAlgorithm
    \brief helper function for converting one frame to another using
    GIL default channel-converters
-   
+
      where ScrP models HomogeneousFrameConcept
            DstP models HomogeneousFrameValueConcept
 */

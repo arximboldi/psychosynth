@@ -39,7 +39,7 @@ class window_list : public OIS::KeyListener
     class button
     {
 	friend class window_list;
-		
+
 	toggable_window *m_toggable;
 	CEGUI::Window *m_window;
 	CEGUI::Window *m_tooltip;
@@ -50,33 +50,33 @@ class window_list : public OIS::KeyListener
 		const std::string& tooltip,
 		toggable_window* window,
 		OIS::KeyCode key, int i);
-		
+
 	~button () {
 	    delete m_toggable;
 	}
-		
+
 	bool on_click (const CEGUI::EventArgs &e);
 	bool on_leave (const CEGUI::EventArgs &e);
 	bool on_enter (const CEGUI::EventArgs &e);
     };
-	
+
     std::list<button*> m_lwind;
     int m_nwind;
 
 public:
     window_list ()
 	: m_nwind(0) {}
-	
+
     ~window_list ();
-	
+
     void add_window (std::string but_imageset, std::string but_layout,
 		     std::string tooltip,
 		     toggable_window* window, OIS::KeyCode key);
-	
+
     bool keyPressed (const OIS::KeyEvent &arg);
     bool keyReleased (const OIS::KeyEvent &arg) {
 	return false;
-    };	
+    };
 };
 
 #endif /* WINDOWLIST_H */

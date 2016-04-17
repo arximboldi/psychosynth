@@ -17,7 +17,7 @@
  *  Copyright (C) 2010 Juan Pedro Bolivar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -35,7 +35,7 @@
 
 /*
  *  Copyright 2005-2007 Adobe Systems Incorporated
- * 
+ *
  *  Use, modification and distribution are subject to the Boost
  *  Software License, Version 1.0. (See accompanying file
  *  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt).
@@ -152,7 +152,7 @@ planar_range_get_raw_data(const HomogeneousRange& range, int plane_index)
 
    \ingroup BufferRangeTransformationsChannelConvert FrameDereferenceAdaptorModel
    \brief Function object that given a source frame, returns it converted to a given channel space and sample depth. Models: FrameDereferenceAdaptorConcept
-   
+
    Useful in constructing a channel converted range over a given buffer range
 */
 
@@ -173,7 +173,7 @@ public:
         _cc (srcP, dstP);
         return dstP;
     }
-    
+
 private:
     CC _cc; // channel-converter
 };
@@ -190,7 +190,7 @@ private:
     typedef channel_convert_deref_fn<
     typename SrcRange::const_type::reference,DstP,CC> deref_t;
     typedef typename SrcRange::template add_deref<deref_t> add_ref_t;
-    
+
 public:
     typedef typename add_ref_t::type type;
     static type make (const SrcRange& sv,CC cc)
@@ -215,7 +215,7 @@ struct channel_converted_range_type_impl<SrcRange,CC,DstP,DstP>
 /**
    \brief Returns the type of a range that does channel conversion upon
    dereferencing its frames
-   
+
    \ingroup BufferRangeTransformationsChannelConvert
 */
 template <typename SrcRange, typename DstP, typename CC=default_channel_converter>
@@ -262,7 +262,7 @@ channel_converted_range (const Range& src)
 
    \ingroup BufferRangeTransformationsFlipLR
 */
-template <typename Range> 
+template <typename Range>
 inline typename dynamic_step_type<Range>::type flipped_range (const Range& src)
 {
     typedef typename dynamic_step_type<Range>::type RRange;
@@ -290,7 +290,7 @@ sub_range (const Range& src, size_t start, size_t size)
    \brief range of an axis-aligned rectangular area within an buffer_range
 
    \ingroup BufferRangeTransformationsSubbuffer
-   
+
    @todo This is an overload for buffer to avoid the container vs
    range constness problem. Maybe we should step back in front of this
    constness nightmare?
@@ -317,7 +317,7 @@ sub_range (buffer<F,P,A>& src, size_t start, size_t size)
    \brief range of an axis-aligned rectangular area within an buffer_range
 
    \ingroup BufferRangeTransformationsSubbuffer
-   
+
    @todo This is a non-const version. Non const versions of
    range factories are needed because buffers are now ranges. Keep
    working on this.
@@ -345,7 +345,7 @@ sub_range (Range& src,
 
    \ingroup BufferRangeTransformationsSub_Sampled
 */
-template <typename Range> 
+template <typename Range>
 inline typename dynamic_step_type<Range>::type
 sub_sampled_range (const Range& src, typename Range::size_type step)
 {
@@ -384,7 +384,7 @@ struct nth_sample_range_basic_impl<Range, false>
     {
 	typedef typename type::iterator iterator;
 	typedef typename iterator_adaptor_get_base <iterator>::type iterator_base;
-	
+
 	return type (src.size (),
 		     iterator (iterator_base (& (src [0] [n])),
 			       src.frame_size ()));
@@ -439,7 +439,7 @@ public:
    \brief Function object that returns a grayscale reference of the
    N-th sample of a given reference. Models:
    FrameDereferenceAdaptorConcept.
-   
+
    \ingroup FrameDereferenceAdaptorModel
 
    If the input is a frame value or constant reference, the function
@@ -465,7 +465,7 @@ private:
 	sample_t, mono_layout, false, is_mutable>::type ref_t;
 
     int _n;        // the sample to use
-    
+
 public:
     typedef nth_sample_deref_fn<const_ref_t>       const_type;
     typedef typename frame_value_type<
@@ -485,8 +485,8 @@ public:
     nth_sample_deref_fn (const nth_sample_deref_fn<P>& d)
 	: _n(d._n) {}
 
-    result_type operator () (argument_type src_f) const { 
-	return result_type (src_f[_n]); 
+    result_type operator () (argument_type src_f) const {
+	return result_type (src_f[_n]);
     }
 };
 
@@ -496,7 +496,7 @@ struct nth_sample_range_impl<Range,false>
 private:
     typedef nth_sample_deref_fn<typename Range::reference> deref_t;
     typedef typename Range::template add_deref<deref_t>    AD;
-    
+
 public:
     typedef typename AD::type type;
     static type make(const Range& src, int n)
@@ -511,7 +511,7 @@ public:
    \brief Given a source buffer range type Range, returns the type of an
    buffer range over a single sample of Range
    \ingroup BufferRangeTransformationsNthSample
-   
+
    If the samples in the source range are adjacent in memory (such as
    planar non-step range or single-sample range) then the return range is
    a single-sample non-step range.  If the samples are non-adjacent
@@ -633,7 +633,7 @@ public:
    \brief Function object that returns a grayscale reference of the
    K-th sample (specified as a template parameter) of a given
    reference. Models: FrameDereferenceAdaptorConcept.
-   
+
    \ingroup FrameDereferenceAdaptorModel
 
    If the input is a frame value or constant reference, the function
@@ -667,13 +667,13 @@ public:
     typedef typename boost::mpl::if_c<
         is_mutable, ref_t, value_type>::type  reference;
     typedef reference                             result_type;
-    
+
     kth_sample_deref_fn () {}
     template <typename P>
     kth_sample_deref_fn (const kth_sample_deref_fn<K, P>&) {}
-    
+
     result_type operator () (argument_type srcframe) const
-    { 
+    {
 	return result_type (sound::at_c<K>(srcframe));
     }
 };
@@ -695,9 +695,9 @@ public:
 /**
    \brief Given a source buffer range type Range, returns the type of an
    buffer range over a given sample of Range.
-   
+
    \ingroup BufferRangeTransformationsKthSample
-   
+
    If the samples in the source range are adjacent in memory (such as
    planar non-step range or single-sample range) then the return range is
    a single-sample non-step range.  If the samples are non-adjacent

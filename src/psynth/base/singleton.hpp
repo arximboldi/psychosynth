@@ -16,7 +16,7 @@
 
 /*
  *  Copyright (C) 2007, 2009 Juan Pedro Bolívar Puente
- *  
+ *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -73,26 +73,26 @@ class singleton_holder : private boost::noncopyable
 {
 public:
     typedef T type;
-    
+
     /**
      * Access the singleton only instance.
      * @return The singleton instance.
      */
     static T& self ();
-    
+
 private:
     /** Hidden constructor. */
     singleton_holder () = delete;
     /** Hidden destructor. */
     ~singleton_holder () {};
-    
+
     /** The single instance pointer type. */
     typedef typename ThreadingPolicy<T*>::volatile_type instance_type;
     /** The single instance pointer. */
     static instance_type m_instance;
     /** Did we kill the singleton already? */
     static bool m_destroyed;
-    
+
     /** The destroy handler */
     static void destroy_singleton ();
 };
@@ -108,7 +108,7 @@ struct create_with_new
     {
 	return new T;
     }
-    
+
     static void destroy (T* var)
     {
 	delete var;
@@ -293,7 +293,7 @@ public:
 	m_destroyed = true;
 #endif
     }
-        
+
 private:
 #ifndef PSYNTH_ATEXIT_FIXED
     static bool m_destroyed;

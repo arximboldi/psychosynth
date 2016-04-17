@@ -12,7 +12,7 @@
  *  Copyright (C) 2011 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -79,13 +79,13 @@ jack_raw_output::jack_raw_output (const char* client,
 {
     jack_set_error_function (log_jack_error);
     jack_set_info_function (log_jack_info);
-    
-    jack_options_t options = !server ? JackNullOption : JackServerName; 
+
+    jack_options_t options = !server ? JackNullOption : JackServerName;
     _client = jack_client_open (client, options, 0, server);
     if (!_client) throw jack_open_error ();
 
     auto grd_client = base::make_guard ([&] { jack_client_close (_client); });
-    
+
     PSYNTH_JACK_CHECK (jack_set_process_callback (
                            _client, &jack_raw_output::_process_cb, this),
                        jack_param_error);
@@ -94,7 +94,7 @@ jack_raw_output::jack_raw_output (const char* client,
                        jack_param_error);
 
     jack_on_shutdown (_client, &jack_raw_output::_shutdown_cb, this);
-	
+
     _actual_rate = jack_get_sample_rate (_client);
     if (_actual_rate != rate)
         PSYNTH_LOG
@@ -106,20 +106,20 @@ jack_raw_output::jack_raw_output (const char* client,
     _buffer_size = jack_get_buffer_size (_client);
     PSYNTH_LOG << base::log::info
                << "Jackd buffer size is: " << _buffer_size;
-    
+
     for (size_t i = 0; i < _out_ports.size(); ++i)
     {
         std::string port_name = std::string ("out_") +
             boost::lexical_cast<std::string> (i);
-        
+
         _out_ports [i] = jack_port_register (
             _client, port_name.c_str (), JACK_DEFAULT_AUDIO_TYPE,
             JackPortIsOutput, 0);
-        
+
         if (_out_ports [i] == 0)
             throw jack_param_error ();
     }
-    
+
     grd_client.dismiss ();
 }
 
@@ -139,7 +139,7 @@ std::size_t jack_raw_output::put_i (const void* data, std::size_t frames)
 std::size_t jack_raw_output::put_n (const void* const* data, std::size_t frames)
 {
     assert (state () == async_state::running); // Non-asynchronous IO only
-    
+
     for (size_t i = 0; i < _out_ports.size(); ++i)
     {
 	const auto out   = jack_port_get_buffer (_out_ports [i], frames);
@@ -159,7 +159,7 @@ void jack_raw_output::start ()
     auto grd_activate = base::make_guard ([&] { jack_deactivate (_client); });
 
     connect_ports ();
-    
+
     grd_activate.dismiss ();
     set_state (async_state::running);
 }

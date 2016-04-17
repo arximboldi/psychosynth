@@ -24,4 +24,3 @@
 #include "world/patcher.hpp"
 
 using namespace std;
-

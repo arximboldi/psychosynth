@@ -44,7 +44,7 @@ class osc_client_listener
 {
 public:
     virtual ~osc_client_listener() {}
-    
+
     virtual bool handle_client_connect(osc_client* client) = 0;
     virtual bool handle_client_disconnect(osc_client* client, osc_client_error err) = 0;
     virtual bool handle_client_accept(osc_client* client) = 0;
@@ -58,12 +58,12 @@ protected:
     void notify_client_connect(osc_client* param);
     void notify_client_disconnect(osc_client* param, osc_client_error err);
     void notify_client_accept(osc_client* param);
-    
+
 public:
     void add_listener(osc_client_listener* l) {
 	m_list.push_back(l);
     };
-    
+
     void delete_listener(osc_client_listener* l) {
 	m_list.remove(l);
     };
@@ -88,23 +88,23 @@ private:
     int m_last_alive_recv;
     int m_last_alive_sent;
     int m_count_next;
-    
+
     LO_HANDLER(osc_client, alive);
     LO_HANDLER(osc_client, drop);
     LO_HANDLER(osc_client, accept);
 
     void add_methods();
     void close();
-    
+
 public:
-    
+
     osc_client();
     ~osc_client();
 
     state get_state() const {
 	return m_state;
     }
-    
+
     void connect(lo_address target, const char* src_port);
     void disconnect();
 

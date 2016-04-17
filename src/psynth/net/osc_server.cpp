@@ -83,7 +83,7 @@ void osc_server::add_methods ()
     /*
       lo_server_add_method(m_server, NULL, NULL, &lo_generic_handler, NULL);
     */
-    
+
     lo_server_add_method(m_server, PSYNTH_OSC_MSG_ALIVE, "", &alive_cb, this);
     lo_server_add_method(m_server, PSYNTH_OSC_MSG_CONNECT, "", &connect_cb, this);
     lo_server_add_method(m_server, PSYNTH_OSC_MSG_GET_STATE, "", &get_state_cb, this);
@@ -96,7 +96,7 @@ void osc_server::listen(const char* port)
 	notify_server_start_listening (this);
 
 	m_server = lo_server_new_with_proto(port, LO_UDP, NULL);
-	
+
 	if (!m_server) {
 	    notify_server_stop_listening (this, SE_PORT_BINDING);
 	    return;
@@ -110,7 +110,7 @@ void osc_server::listen(const char* port)
 	set_sender (m_server);
 
 	activate();
-	
+
 	m_state = LISTENING;
     }
 }
@@ -138,7 +138,7 @@ void osc_server::close()
 int osc_server::receive(int time_out)
 {
     int n_recv = 0;
-    
+
     if (m_state != IDLE) {
 	if (time_out >= 0)
 	    n_recv = lo_server_recv_noblock(m_server, time_out);
@@ -150,7 +150,7 @@ int osc_server::receive(int time_out)
 }
 
 int osc_server::update(int msec)
-{    
+{
     if (m_state != IDLE) {
 	for (slot_map::iterator it = m_slots.begin();
 	     it != m_slots.end();) {
@@ -159,15 +159,15 @@ int osc_server::update(int msec)
 
 	    cl.last_alive_recv += msec;
 	    cl.last_alive_sent += msec;
-	
+
 	    if (cl.last_alive_recv > MAX_ALIVE_DELAY) {
 		lo_message msg = lo_message_new();
 		lo_send_message_from(it->first, m_server,
 				     PSYNTH_OSC_MSG_DROP, msg);
 		lo_message_free(msg);
-	       
+
 		notify_server_client_disconnect(this, cl.id, SCE_CLIENT_TIMEOUT);
-		
+
 		m_slots.erase(it++);
 		delete_target(addr);
 	    } else {
@@ -176,14 +176,14 @@ int osc_server::update(int msec)
 		    lo_send_message_from(it->first, m_server,
 					 PSYNTH_OSC_MSG_ALIVE, msg);
 		    lo_message_free(msg);
-		
+
 		    cl.last_alive_sent = 0;
 		}
 		++it;
 	    }
 	}
     }
-    
+
     return m_state;
 }
 
@@ -195,7 +195,7 @@ int osc_server::_alive_cb(const char* path, const char* types,
     iter = m_slots.find(lo_message_get_source(msg));
     if (iter != m_slots.end())
 	iter->second.last_alive_recv = 0;
-    
+
     return 0;
 }
 
@@ -204,13 +204,13 @@ int osc_server::_connect_cb(const char* path, const char* types,
 {
     lo_address add = lo_message_get_source(msg);
     int id;
-    
+
     if (!is_target(add)) {
 	id = m_nextid++;
-	
+
 	lo_address addcpy = lo_address_new(lo_address_get_hostname(add),
 					   lo_address_get_port(add));
-	
+
 	add_target(addcpy);
 	m_slots[addcpy] = slot (id);
     } else {
@@ -218,11 +218,11 @@ int osc_server::_connect_cb(const char* path, const char* types,
 	m_slots[add].last_alive_recv = 0;
 	m_slots[add].last_alive_sent = 0;
     }
-    
+
     lo_message resp = lo_message_new();
     lo_message_add_int32(resp, id);
     lo_send_message_from(add, m_server, PSYNTH_OSC_MSG_ACCEPT, resp);
-    
+
     return 0;
 }
 
@@ -233,23 +233,23 @@ int osc_server::_get_state_cb(const char* path, const char* types,
     if (is_target(add)) {
 	/* TODO */
     }
-    
+
     return 0;
 }
 
 int osc_server::_disconnect_cb(const char* path, const char* types,
 			      lo_arg** argv, int argc, lo_message msg)
 {
-    
+
     lo_address add = lo_message_get_source(msg);
 
     if (is_target(add)) {
 	notify_server_client_disconnect(this, m_slots[add].id, SCE_NONE);
-	
+
 	m_slots.erase(add);
 	delete_target(add);
     }
-    
+
     return 0;
 }
 

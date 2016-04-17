@@ -15,7 +15,7 @@
  *  Copyright (C) 2010 Juan Pedro Bolivar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -64,7 +64,7 @@ ring_buffer_range_base<R>::sub_buffer_two (const Position& p,
 					   size_type slice) const
 {
     assert (slice <= available (p));
-    
+
     if (p._pos + slice > size ())
 	return sub_range (_range, 0, p._pos + slice - size ());
     else
@@ -82,7 +82,7 @@ ring_buffer_range_base<R>::read (Position& r,
 
     if (is_backwards ())
         advance (r, -slice);
-    
+
     if (r._pos + slice > size ())
     {
 	const size_type slice_one = size () - r._pos;
@@ -98,7 +98,7 @@ ring_buffer_range_base<R>::read (Position& r,
 
     if (!is_backwards ())
         advance (r, slice);
-    
+
     return slice;
 }
 
@@ -109,12 +109,12 @@ ring_buffer_range_base<R>::read_and_convert (Position& r,
 					     const Range& buf,
 					     size_type samples,
 					     CC cc) const
-{    
+{
     const size_type slice = std::min (available (r), samples);
 
     if (is_backwards ())
         advance (r, -slice);
-    
+
     if (r._pos + slice > size ())
     {
 	const size_type slice_one = size () - r._pos;
@@ -133,7 +133,7 @@ ring_buffer_range_base<R>::read_and_convert (Position& r,
 
     if (!is_backwards ())
         advance (r, slice);
-    
+
     return slice;
 }
 
@@ -145,7 +145,7 @@ void ring_buffer_range_base<R>::write (const Range& buf, size_type nwrite)
     // first samples 'offset'.
     size_type offset = 0;
     size_type slice  = nwrite;
-    
+
     if (slice > size ()) {
 	offset = slice - size ();
 	slice = size ();
@@ -153,7 +153,7 @@ void ring_buffer_range_base<R>::write (const Range& buf, size_type nwrite)
 
     if (is_backwards ())
         advance (-slice);
-    
+
     if (_writepos._pos + slice > size ())
     {
 	const size_type slice_one = size () - _writepos._pos;
@@ -162,7 +162,7 @@ void ring_buffer_range_base<R>::write (const Range& buf, size_type nwrite)
 		     sub_range (_range, _writepos._pos, slice_one));
 	copy_frames (sub_range (buf, offset + slice_one, slice_two),
 		     sub_range (_range, 0, slice_two));
-    } else 
+    } else
 	copy_frames (sub_range (buf, 0, slice),
 		     sub_range (_range, _writepos._pos, slice));
 
@@ -187,7 +187,7 @@ void ring_buffer_range_base<R>::write_and_convert (const Range& buf,
 
     if (is_backwards ())
         advance (-nwrite);
-    
+
     if (_writepos._pos + slice > size ())
     {
 	const size_type slice_one = size () - _writepos._pos;
@@ -200,7 +200,7 @@ void ring_buffer_range_base<R>::write_and_convert (const Range& buf,
 	    sub_range (buf, offset + slice_one, slice_two),
 	    sub_range (_range, 0, slice_two),
 	    cc);
-    } else 
+    } else
 	copy_and_convert_frames (
 	    sub_range (buf, 0, slice),
 	    sub_range (_range, _writepos._pos, slice),

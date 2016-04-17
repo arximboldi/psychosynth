@@ -41,7 +41,7 @@ void filter_values::calculate (float freq)
 }
 
 void filter_values::calculate (type type, float freq, float res, float srate)
-{    
+{
     /* Adapt the values to avoid strange noise */
     freq = tMax(freq, 0.01f);
     res = tMax(res, 0.01f);
@@ -55,7 +55,7 @@ void filter_values::calculate (type type, float freq, float res, float srate)
 }
 
 void filter_values::calculate ()
-{   
+{
     if(m_type == MOOG) {
 	// [0, 0.5]
 	const float f = m_freq / m_srate;
@@ -157,7 +157,7 @@ sample filter::update (sample _in0)
 
 	break;
     }
-	
+
     default:
 	// filter
 	out = m_b0a0 * _in0 +
@@ -165,7 +165,7 @@ sample filter::update (sample _in0)
 	    m_b2a0 * m_in2 -
 	    m_a1a0 * m_ou1 -
 	    m_a2a0 * m_ou2;
-   
+
 	// push in/out buffers
 	m_in2 = m_in1;
 	m_in1 = _in0;

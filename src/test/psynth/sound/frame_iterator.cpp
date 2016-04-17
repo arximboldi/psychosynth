@@ -12,7 +12,7 @@
  *  Copyright (C) 2010 Juan Pedro Bolivar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -30,7 +30,7 @@
 
 /*
  *  Copyright 2005-2007 Adobe Systems Incorporated
- * 
+ *
  *  Use, modification and distribution are subject to the Boost
  *  Software License, Version 1.0. (See accompanying file
  *  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt).
@@ -84,11 +84,11 @@ BOOST_AUTO_TEST_CASE (test_frame_iterator)
     // TEST dynamic_step
     BOOST_STATIC_ASSERT(
 	(boost::is_same <quad16_step_ptr,
-			 dynamic_step_type<quad16_step_ptr>::type>::value)); 
+			 dynamic_step_type<quad16_step_ptr>::type>::value));
 
     BOOST_STATIC_ASSERT(
 	(boost::is_same <quad16_planar_step_ptr,
-			 dynamic_step_type<quad16_planar_ptr>::type>::value)); 
+			 dynamic_step_type<quad16_planar_ptr>::type>::value));
 
     BOOST_STATIC_ASSERT(
 	(boost::is_same<
@@ -122,7 +122,7 @@ BOOST_AUTO_TEST_CASE (test_frame_iterator)
 
     typedef dereference_iterator_adaptor<stereo8_step_ptr, ccv_stereo_g_fn>
 	stereo2mono_step_ptr1;
-    
+
     BOOST_STATIC_ASSERT (iterator_is_step <stereo2mono_step_ptr1>::value);
     BOOST_STATIC_ASSERT (
 	(boost::is_same <
@@ -151,12 +151,12 @@ BOOST_AUTO_TEST_CASE (test_frame_iterator)
 
     // RLSTEREO23 frame value. It is a packed_frame of size 1
     // byte. (The last bit is unused)
-    typedef std::iterator_traits<rlstereo23_ptr>::value_type rlstereo23_frame; 
+    typedef std::iterator_traits<rlstereo23_ptr>::value_type rlstereo23_frame;
     BOOST_STATIC_ASSERT((sizeof (rlstereo23_frame) == 1));
 
     rlstereo23_frame left (0, 3); // = 0RRGGGBB, = 01100000
     // a buffer of 7 bytes fits exactly 8 RLSTEREO23 frames.
-    unsigned char pix_buffer [7];    
+    unsigned char pix_buffer [7];
     std::fill (pix_buffer, pix_buffer + 7, 0);
     rlstereo23_ptr pix_it (&pix_buffer [0], 0);
     // start at bit 0 of the first frame
@@ -210,7 +210,7 @@ BOOST_AUTO_TEST_CASE (test_frame_iterator_old)
     step_it++;
     stereo8_step_ptr step_it2 = step_it + 10;
     step_it2 = step_it;
-    
+
     stereo8_step_ptr step_it3(&stereo8,5);
 
     stereo8_frame& ref1=step_it3[5];
@@ -249,7 +249,7 @@ BOOST_AUTO_TEST_CASE (test_frame_iterator_old)
 
     stereo8_step_ptr step_it5;
     BOOST_CHECK (step_it4 != step_it5);
-    
+
     make_step_iterator(stereo8_ptr(),3);
     make_step_iterator(stereo8_planar_ptr(),3);
     make_step_iterator(stereo8_planar_step_ptr(),3);
@@ -270,8 +270,8 @@ BOOST_AUTO_TEST_CASE (test_frame_iterator_old)
     //
     // values, references, pointers
     // channel spaces (stereo,quad,mono)
-    // sample ordering (rlstereo vs stereo) 
-    // planar vs interleaved    
+    // sample ordering (rlstereo vs stereo)
+    // planar vs interleaved
 
     // Frame POINTERS
     //  typedef const iterator_traits<stereo8_ptr>::pointer  stereo8_const_ptr;
@@ -295,7 +295,7 @@ BOOST_AUTO_TEST_CASE (test_frame_iterator_old)
 
     stereo8c_planar_ptr r8c = &stereo8;
     r8c = &stereo8;
-    
+
     //  stereo8_const_planar_ptr = &stereo16p;
     //  error: incompatible bit depth
 

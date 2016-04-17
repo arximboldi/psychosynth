@@ -34,24 +34,24 @@ class ObjectRadar : public Object
     float m_param_speed;
     float m_param_angle;
     float m_angle;
-    
+
     void doUpdate(const Object* caller, int caller_port_type, int caller_port);
     void doAdvance();
-    
+
 public:
     enum {
       N_IN_A_SOCKETS
     };
-	
+
     enum InControlSocketID {
 	IN_C_SPEED,
 	N_IN_C_SOCKETS
     };
-	
+
     enum OutAudioSocketID {
 	N_OUT_A_SOCKETS
     };
-	
+
     enum OutControlSocketID {
 	OUT_C_TRIGGER,
 	N_OUT_C_SOCKETS
@@ -62,7 +62,7 @@ public:
 	PARAM_ANGLE,
 	N_PARAM
     };
-    
+
     ObjectRadar(const AudioInfo& info);
 };
 

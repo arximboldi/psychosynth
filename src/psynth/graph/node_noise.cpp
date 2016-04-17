@@ -152,4 +152,3 @@ sample node_noise::update_white()
 
 } /* namespace graph */
 } /* namespace psynth */
-

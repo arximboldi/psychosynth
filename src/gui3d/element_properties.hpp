@@ -38,11 +38,11 @@ class elem_gui_param
     element_properties* m_parent;
     int m_param;
     bool changed;
-    
+
 public:
     elem_gui_param (int param) :
 	m_param(param) {};
-    
+
     virtual ~elem_gui_param () {};
 
     virtual void create_gui () = 0;
@@ -53,7 +53,7 @@ public:
 	m_parent = parent;
 	create_gui ();
     }
-    
+
     int get_param () {
 	return m_param;
     }
@@ -75,7 +75,7 @@ class elem_gui_param_float : public elem_gui_param
     float m_max_val;
     std::string m_name;
     int m_skip;
-    
+
 public:
     elem_gui_param_float (int param, float min_val, float max_val,
 			  const std::string& name);
@@ -93,7 +93,7 @@ class elem_gui_param_int : public elem_gui_param
     int m_max_val;
     std::string m_name;
     int m_skip;
-    
+
 public:
     elem_gui_param_int (int param, int min_val, int max_val,
 			const std::string& name);
@@ -108,11 +108,11 @@ class elem_gui_param_multi : public elem_gui_param
     CEGUI::Window*  m_label;
     CEGUI::Combobox* m_selector;
     const char** m_op_names;
-    
+
     int m_nval;
     std::string m_name;
     int m_skip;
-    
+
 public:
     elem_gui_param_multi (int param,
 			  int nval, const char** names,
@@ -128,10 +128,10 @@ class element_properties : public toggable_window,
 {
     std::map<int, elem_gui_param*> m_params;
     psynth::world_node m_obj;
-    
+
     CEGUI::Window* m_container;
     float m_y_offset;
-    
+
     CEGUI::FrameWindow* create_window ();
 
 public:
@@ -147,10 +147,10 @@ public:
 
     void add_parameter (elem_gui_param* e);
     void handle_set_param_node (psynth::world_node& ob, int param_id);
-    
+
     void handle_activate_node (psynth::world_node& obj) {};
     void handle_deactivate_node (psynth::world_node& obj) {};
-    
+
     psynth::world_node& get_node () {
 	return m_obj;
     }

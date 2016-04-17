@@ -66,10 +66,10 @@ void elem_toggler_component::create_toggles ()
     obj.get_param(m_param_num, num_toggles);
     m_toggles.resize(num_toggles);
 
-    angle_width = (360.0 / num_toggles) - TOGGLE_GAP; 
+    angle_width = (360.0 / num_toggles) - TOGGLE_GAP;
     for (int i = 0; i < num_toggles; ++i) {
 	obj.get_param (m_param_first + i, tog.second);
-	
+
 	curr_angle = (360.0 / num_toggles) * i;
 	tog.first = new flat_ring (string("TOG") +
 				   itoa(i, 10) +
@@ -118,7 +118,7 @@ bool elem_toggler_component::handle_pointer_click (Ogre::Vector2 pos, OIS::Mouse
 	pos -= abs_pos;
 	pos = yaw_vector2 (pos, orig_angle.getYaw().valueRadians() - Math::PI/2);
 	float new_angle = Math::PI - Math::ATan2(pos.x, pos.y).valueRadians();
-		
+
 	int index = new_angle / ((2.0 * Math::PI) / m_toggles.size());
 
 	m_toggles[index].second = !m_toggles[index].second;
@@ -141,7 +141,7 @@ void elem_toggler_component::handle_param_change (world_node& obj, int param_id)
     } else if (param_id >= (int) m_param_first &&
 	       param_id <= m_param_first + (int) m_toggles.size()) {
 	int index = param_id - m_param_first;
-	
+
 	obj.get_param(param_id, m_toggles[index].second);
 	if (m_step == index)
 	    update_current_step_colour (index);
@@ -178,4 +178,3 @@ void elem_toggler_component::update_current_step_colour (int step)
 				       COLOUR_CURRENT_PASSIVE);
     m_toggles[step].first->update();
 }
-

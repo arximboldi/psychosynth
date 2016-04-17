@@ -24,7 +24,7 @@
 #define PSYNTH_WATCH_VIEWER_H
 
 #include <mutex>
-#include <iostream> // FIXME 
+#include <iostream> // FIXME
 #include <psynth/graph/watch.hpp>
 #include <psynth/sound/buffer.hpp>
 #include <psynth/sound/ring_buffer.hpp>
@@ -45,7 +45,7 @@ protected:
     float m_secs;
     bool m_updated;
     std::mutex m_mutex;
-    
+
 public:
     watch_viewer (std::size_t points, std::size_t secs) :
 	m_ring(points),
@@ -59,7 +59,7 @@ public:
             //fill_frames (range (m_ring),
             //           typename BufferType::range::value_type (0));
 	}
-    
+
     virtual void set_info (const audio_info& info) {
 	m_factor = (float) info.sample_rate / ((float) m_points / m_secs);
         //m_ring.zero();
@@ -94,10 +94,10 @@ class watch_view_audio : public watch_viewer<audio_buffer, audio_ring_buffer>
 {
 public:
     typedef watch_viewer<audio_buffer, audio_ring_buffer> base;
-    
+
     watch_view_audio (std::size_t points, std::size_t secs) :
 	base (points, secs) {}
-    
+
     virtual void set_info (const audio_info& newinfo)
     {
 	audio_info info = newinfo;

@@ -12,7 +12,7 @@
  *  Copyright (C) 2011 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -53,14 +53,14 @@ class alsa_output : public async_output<Range>,
                     public alsa_raw_output
 {
     typedef async_output<Range> base_type;
-    
+
 public:
     static_assert (alsa_support<Range>::is_supported::value,
                    "Range output format not supported by ALSA.");
-    
+
     typedef typename base_type::range range;
     typedef typename base_type::const_range const_range;
-    
+
     alsa_output (const std::string& device,
                  std::size_t        nperiods,
                  std::size_t        period_size,

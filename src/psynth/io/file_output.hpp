@@ -12,7 +12,7 @@
  *  Copyright (C) 2011 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -48,10 +48,10 @@ class file_output : public file_output_base<Range>
 public:
     typedef typename base::range range;
     typedef typename base::const_range const_range;
-    
+
     static_assert (file_support<Range>::is_supported::value,
                    "Audio file format not supported.");
-    
+
     file_output (const std::string& fname,
                  file_fmt           format,
                  std::size_t        rate);
@@ -61,7 +61,7 @@ public:
     std::size_t put (const const_range& data);
 
     std::size_t seek (std::ptrdiff_t offset, seek_dir dir);
-    
+
 private:
     SNDFILE* _file;
     SF_INFO  _info;
@@ -73,4 +73,3 @@ private:
 #include <psynth/io/file_output.tpp>
 
 #endif /* PSYNTH_IO_FILE_OUTPUT_H_ */
-

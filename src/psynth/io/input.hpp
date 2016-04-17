@@ -12,7 +12,7 @@
  *  Copyright (C) 2011 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -48,7 +48,7 @@ const std::size_t default_input_buffer_size = 1024;
  *
  * @todo All the IO interface (actually the output class and derivates
  * too) assume that buffers do not model ranges. This is why we can
- * safely assume a <i>const Range&</i> in this interface. 
+ * safely assume a <i>const Range&</i> in this interface.
  */
 template <class Range>
 class input
@@ -67,7 +67,7 @@ class dummy_input : public input<Range>
 {
 public:
     typedef Range range;
-    
+
     virtual std::size_t take (const range& data)
     {
         detail::dummy_input_take_impl ();
@@ -103,10 +103,10 @@ public:
     dummy_async_input (std::size_t buffer_size)
         : _buffer_size (buffer_size)
     {}
-    
+
     std::size_t buffer_size () const
     { return _buffer_size; }
-    
+
     virtual std::size_t take (const range& data)
     {
         detail::dummy_input_take_impl ();
@@ -131,7 +131,7 @@ public:
         this->set_state (async_state::idle);
         detail::dummy_input_stop_impl ();
     }
-    
+
 private:
     std::size_t _buffer_size;
 };
@@ -141,4 +141,3 @@ private:
 } /* namespace psynth */
 
 #endif /* PSYNTH_IO_INPUT_H_ */
-

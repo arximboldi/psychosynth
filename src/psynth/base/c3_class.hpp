@@ -22,7 +22,7 @@
  *  Copyright (C) 2010 Juan Pedro Bolivar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -77,7 +77,7 @@ struct do_merge_lists
         template<class L>
         struct tail_p : public mpl::contains<
             typename safe_pop_front<L>::type, cls> {};
-        
+
         typedef typename mpl::if_<
             mpl::not_<any_p<RemainingInputs, mpl::quote1<tail_p> > >,
             cls, mpl::false_>::type type;
@@ -93,7 +93,7 @@ struct do_merge_lists
     struct candidate_at_head_p :
         public mpl::not_<boost::is_same<typename candidate_at_head<L>::type,
                                         mpl::false_> > {};
-    
+
     typedef typename mpl::find_if<
         RemainingInputs,
         mpl::quote1<candidate_at_head_p> >::type next_iter;
@@ -108,16 +108,16 @@ struct do_merge_lists
                          (ReversedPartialResult, RemainingInputs));
 
     typedef typename mpl::front<typename mpl::deref<next_iter>::type>::type next;
-    
+
     //BOOST_MPL_ASSERT_MSG(false, PSYNTH_SHOW_NEXT, (next));
-    
+
     template<class L>
     struct remove_next :
         public mpl::eval_if<
         typename boost::is_same<typename safe_front<L>::type, next>::type,
         mpl::pop_front<L>,
         mpl::identity<L> > {};
-    
+
     typedef typename merge_lists<
         typename mpl::push_front<ReversedPartialResult, next>::type,
         typename mpl::transform<RemainingInputs,
@@ -142,7 +142,7 @@ template<class ClsDef>
 struct all_superclasses
 {
     typedef typename direct_superclasses<ClsDef>::type superclasses;
-    
+
     typedef typename detail::merge_lists<
         mpl::list<ClsDef>,
         typename concat<
@@ -166,7 +166,7 @@ struct c3_inheriter<ClsDefList, false> :
                      typename mpl::pop_front<ClsDefList>::type >::type::value
                  > >
 {
-    typedef typename mpl::front<ClsDefList>::type c3_type;    
+    typedef typename mpl::front<ClsDefList>::type c3_type;
 };
 
 template<class ClsDefList>
@@ -180,7 +180,7 @@ struct c3_inheriter<ClsDefList, true> :
 
 template<class ClsDef>
 struct generate_c3_hierarchy
-{    
+{
     typedef typename all_superclasses<ClsDef>::type classes;
 
     //BOOST_MPL_ASSERT_MSG(false, PSYNTH_SHOW_CLASSES, (classes));

@@ -38,22 +38,22 @@ class elem_component
 {
     element* m_parent;
     Ogre::SceneNode* m_node;
-    
-public:    
+
+public:
     virtual ~elem_component() {};
     virtual void init() = 0;
-    
+
     virtual void handle_param_change (psynth::world_node& obj, int id) = 0;
     virtual bool handle_pointer_move (Ogre::Vector2 pos) = 0;
     virtual bool handle_pointer_click (Ogre::Vector2 pos, OIS::MouseButtonID id) = 0;
     virtual bool handle_pointer_release (Ogre::Vector2 pos, OIS::MouseButtonID id) = 0;
-    
+
     void set_scene_node (Ogre::SceneNode* node) {
 	m_node = node;
     }
 
     inline void update_visibility ();
-    
+
     Ogre::SceneNode* get_scene_node() {
 	return m_node;
     }
@@ -61,7 +61,7 @@ public:
     void set_parent (element* parent) {
 	m_parent = parent;
     }
-    
+
     element* get_parent () {
 	return m_parent;
     };
@@ -76,10 +76,10 @@ class element : public psynth::world_node_listener
       std::list<Connection*> m_src_con;
       std::list<Connection*> m_dest_con;
     */
-    
+
     psynth::world_node m_obj;
     psynth::world_node m_target;
-    
+
     Ogre::ColourValue   m_col_ghost;
     Ogre::ColourValue   m_col_selected;
     Ogre::ColourValue   m_col_normal;
@@ -87,7 +87,7 @@ class element : public psynth::world_node_listener
     Ogre::SceneNode*    m_node;
 
     flat_ring*          m_base;
-    
+
     Ogre::Vector3 m_aimpoint;
     Ogre::Vector2 m_click_diff;
     Ogre::Vector2 m_pos;
@@ -99,7 +99,7 @@ class element : public psynth::world_node_listener
 
     int m_modifier_1;
     int m_modifier_2;
-    
+
     element_properties m_gui_prop;
 
     void node_moved (psynth::world_node& pos,
@@ -108,9 +108,9 @@ class element : public psynth::world_node_listener
 public:
     static constexpr Ogre::Real RADIOUS = 1.0f;
     static constexpr Ogre::Real Z_POS = 0.001f;
-    
+
     element (psynth::world_node& obj, Ogre::SceneManager* scene);
-    
+
     virtual ~element();
 
     void add_component (elem_component* comp);
@@ -128,22 +128,22 @@ public:
     void set_second_modifier (int val) {
 	m_modifier_2 = val;
     }
-    
+
     bool pointer_clicked (const Ogre::Vector2& pos, OIS::MouseButtonID id);
     bool pointer_released (const Ogre::Vector2& pos, OIS::MouseButtonID id);
     bool pointer_moved (const Ogre::Vector2& pos);
     bool key_pressed (const OIS::KeyEvent& e);
     bool key_released (const OIS::KeyEvent& e);
-    
+
     void handle_activate_node (psynth::world_node& obj);
     void handle_deactivate_node (psynth::world_node& obj);
     void handle_set_param_node (psynth::world_node& ob,
 				int param_id);
-    
+
     bool is_ghost () const {
 	return m_ghost;
     };
-	
+
     bool is_selected () const {
 	return m_selected;
     };
@@ -151,7 +151,7 @@ public:
     bool is_owned () const {
 	return m_owned;
     };
-    
+
     Ogre::Vector2 get_position () {
 	return m_pos;
     }
@@ -159,7 +159,7 @@ public:
     void set_owned (bool owned) {
 	m_owned = owned;
     }
-    
+
     Ogre::SceneManager* get_scene () {
 	return m_scene;
     }

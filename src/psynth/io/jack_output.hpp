@@ -12,7 +12,7 @@
  *  Copyright (C) 2011 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -53,14 +53,14 @@ class jack_output : public async_output<Range>,
                     public jack_raw_output
 {
     typedef async_output<Range> base_type;
-    
+
 public:
     static_assert (jack_support<Range>::is_supported::value,
                    "Range output format not supported by JACK.");
 
     typedef typename base_type::range range;
     typedef typename base_type::const_range const_range;
-    
+
     jack_output (const std::string& client,
                  const std::string& server,
                  std::size_t        rate,
@@ -82,4 +82,3 @@ public:
 #include <psynth/io/jack_output.tpp>
 
 #endif /* PSYNTH_IO_JACK_OUTPUT_H_ */
-

@@ -12,7 +12,7 @@
  *  Copyright (C) 2007, 2009 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -104,7 +104,7 @@ struct atof_func
     {
 	char* end = 0;
 	float res = strtof (str, &end);
-	
+
 	if (end <= str)
 	    throw parse_error ();
 	return res;
@@ -282,7 +282,7 @@ public:
 	} catch (...) {
 	    throw parse_error ();
 	}
-	
+
 	return true;
     }
 };
@@ -379,7 +379,7 @@ public:
      * @see Option
      */
     void add (unsigned char flag, const char* str, option* op);
-    
+
     /**
      * Parse the command line arguments using the defined options. Any
      * arguments that had no option associated are added to the free
@@ -449,14 +449,14 @@ private:
     option_map;
 
     static const unsigned char null_flag = '\0';
-    
+
     option_list              _short [256];
     option_map               _long;
     unique_option_list       _all;
     std::list <const char *> _free;
 
     const char** parse_short (const char** argv, const char** argv_end);
-    const char** parse_long (const char** argv, const char** argv_end);    
+    const char** parse_long (const char** argv, const char** argv_end);
 };
 
 } /* namespace base */

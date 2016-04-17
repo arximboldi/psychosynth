@@ -10,7 +10,7 @@
 
 /*
  *  Copyright (C) 2008, 2009 Juan Pedro Bolívar Puente
- *  
+ *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -63,9 +63,9 @@ void default_selector_populator::on_samples_conf_nudge (psynth::base::conf_node&
 void default_selector_populator::populate_samples (selector_window::category* cat)
 {
     world_node_creator creat;
-    
+
     creat.set_name ("sampler");
-    
+
     base::file_mgr_node::path_list files;
     list<string> valid_ext;
 
@@ -74,16 +74,16 @@ void default_selector_populator::populate_samples (selector_window::category* ca
     valid_ext.push_back (".wav");
     valid_ext.push_back (".aiff");
 #endif
-#ifdef PSYNTH_HAVE_OGG    
+#ifdef PSYNTH_HAVE_OGG
     valid_ext.push_back (".ogg");
 #endif
-    
+
     base::file_manager::self  ()
 	.path ("psychosynth.samples")
 	.find_if (make_has_extension (valid_ext.begin(), valid_ext.end()), files);
 
     files.sort ();
-    
+
     for (file_mgr_node::path_list::iterator it = files.begin();
 	 it != files.end (); ++it)
     {
@@ -99,7 +99,7 @@ void default_selector_populator::populate(selector_window* sel)
 	.path ("psychosynth.file_manager.samples").on_nudge.connect
 	(boost::bind (&default_selector_populator::on_samples_conf_nudge,
                       this, _1));
-    
+
     selector_window::category* cat = NULL;
     world_node_creator creat;
 
@@ -107,7 +107,7 @@ void default_selector_populator::populate(selector_window* sel)
     creat.set_name ("oscillator");
     creat.set_param ("frequency", (float) 110.0f);
     creat.set_param ("amplitude", (float) 0.3f);
-    
+
     creat.set_param ("wave", (int) graph::node_oscillator::OSC_SINE);
     cat->add_button ("Sine", creat);
     creat.set_param ("wave", (int) graph::node_oscillator::OSC_SQUARE);
@@ -127,13 +127,13 @@ void default_selector_populator::populate(selector_window* sel)
     cat->add_button ("Pink Noise", creat);
     creat.set_param ("type", (int) graph::node_noise::NOISE_WHITE);
     cat->add_button ("White Noise", creat);
-    
+
     creat.clear();
     cat = sel->add_category ("Control");
     creat.set_name ("lfo");
     creat.set_param ("frequency", 1.0f);
     creat.set_param ("amplitude", 0.7f);
-    
+
     creat.set_param ("wave", (int) graph::node_oscillator::OSC_SINE);
     cat->add_button ("Sine", creat);
     creat.set_param ("wave", (int) graph::node_oscillator::OSC_SQUARE);
@@ -153,12 +153,12 @@ void default_selector_populator::populate(selector_window* sel)
     cat->add_button ("Pink Noise", creat);
     creat.set_param ("type", (int) graph::node_noise::NOISE_WHITE);
     cat->add_button ("White Noise", creat);
-    
+
     creat.clear();
     cat = sel->add_category ("Filter");
     creat.set_name ("filter");
     creat.set_param ("resonance", (float) 0.8f);
-	
+
     creat.set_param ("type", (int) graph::node_filter::FILTER_LOWPASS);
     cat->add_button ("Low-pass", creat);
     creat.set_param ("type", (int) graph::node_filter::FILTER_HIGHPASS);
@@ -179,7 +179,7 @@ void default_selector_populator::populate(selector_window* sel)
 
     creat.set_name ("delay");
     cat->add_button ("Delay", creat);
-    
+
     creat.clear();
     cat = sel->add_category ("Mixers");
     creat.set_name ("audio_mixer");
@@ -207,12 +207,12 @@ void default_selector_populator::populate(selector_window* sel)
     cat->add_button ("Step FW Saw", creat);
     creat.set_param ("shape", (int) graph::node_step_seq::SHAPE_BWSAWTOOTH);
     cat->add_button ("Step BW Saw", creat);
-    
+
     cat = sel->add_category ("Samples");
     /* FIXME: populate_samples (cat); */
     config::self ().path ("psychosynth.file_manager.samples").nudge ();
     //config::self ().path ("psychosynth.file_manager.samples").nudge ();
-    
+
     creat.clear ();
     cat = sel->add_category ("Bi-Samples");
     creat.set_name ("double_sampler");

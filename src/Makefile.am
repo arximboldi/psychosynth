@@ -76,7 +76,7 @@ psynth3d_CXXFLAGS = \
 	$(OGRE_CFLAGS) \
 	$(CEGUI_CFLAGS) \
 	$(CEGUIOGRE_CFLAGS) \
-	$(OIS_CFLAGS) 
+	$(OIS_CFLAGS)
 
 
 # libboost_system is a hack
@@ -142,7 +142,7 @@ psynth3d_SOURCES = \
 	gui3d/flat_ring.hpp\
 	gui3d/connection.hpp\
 	gui3d/ogre_misc.hpp \
-	gui3d/gui_log_sink.hpp 
+	gui3d/gui_log_sink.hpp
 
 if HAVE_LIBXML
 psynth3d_CXXFLAGS += $(LIBXML_CFLAGS)

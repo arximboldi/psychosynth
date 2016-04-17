@@ -12,7 +12,7 @@
  *  Copyright (C) 2011 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -101,7 +101,7 @@ void out_port_base::_add_reference (in_port_base* ref)
 void out_port_base::_del_reference (in_port_base* ref)
 {
     _refs.remove (ref);
-    
+
     if (_has_owner () &&
         owner ().is_attached_to_process () &&
         owner ().process ().is_running ())
@@ -113,7 +113,7 @@ void out_port_base::_del_reference (in_port_base* ref)
                 }));
     }
     else
-        _rt_refs.remove_if (base::make_equal_id (*ref));   
+        _rt_refs.remove_if (base::make_equal_id (*ref));
 }
 
 bool in_port_base::rt_in_available () const
@@ -150,7 +150,7 @@ void in_port_base::_connect (out_port_base* source)
 
     // FIXME: I am using this pattern so much we should consider
     // abstracting it as a method of node.
-    
+
     if (_has_owner () &&  // always true here
         owner ().is_attached_to_process () &&
         owner ().process ().is_running ())
@@ -190,11 +190,10 @@ void out_port_base::disconnect ()
 {
     // Do not use a for loop, disconnect removes the element
     // invalidating iterators.
-    
+
     while (!_refs.empty ())
         _refs.front ()->disconnect ();
 }
 
 } /* namespace graph */
 } /* namespace psynth */
-

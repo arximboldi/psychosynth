@@ -12,7 +12,7 @@
  *  Copyright (C) 2010 Juan Pedro Bolivar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -30,7 +30,7 @@
 
 /*
  *  Copyright 2005-2007 Adobe Systems Incorporated
- * 
+ *
  *  Use, modification and distribution are subject to the Boost
  *  Software License, Version 1.0. (See accompanying file
  *  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt).
@@ -115,7 +115,7 @@ public:
 
     typedef typename std::iterator_traits<Iterator>::difference_type
     difference_type;
-    
+
     typedef buffer_range<typename const_iterator_type<Iterator>::type>
     const_type;
 
@@ -141,7 +141,7 @@ public:
     {}
 
 #ifdef PSYNTH_BUFFER_MODEL_RANGE
-    
+
     /** We need a non const constructor to copy from buffers. */
     template <typename Range>
     buffer_range (Range& bv)
@@ -167,7 +167,7 @@ public:
 	: _size (sz)
 	, _frames (it)
     {}
-    
+
     template <typename Range>
     buffer_range& operator= (const Range& bv)
     {
@@ -175,7 +175,7 @@ public:
 	_size   = bv.size ();
 	return *this;
     }
-    
+
     buffer_range& operator= (const buffer_range& bv)
     {
 	_frames = bv.frames ();
@@ -188,7 +188,7 @@ public:
     {
 	return frames () == v.frames () && size () == v.size();
     }
-    
+
     template <typename Range>
     bool operator!= (const Range& v) const
     {
@@ -207,22 +207,22 @@ public:
     {
 	return _frames;
     }
-    
+
     std::size_t frame_size () const
     {
 	return memunit_step (begin ());
     }
-    
+
     std::size_t num_samples () const
     {
 	return psynth::sound::num_samples<value_type>::value;
     }
-    
+
     iterator begin () const
     {
 	return _frames;
     }
-    
+
     iterator end () const
     {
 	return begin () + (difference_type) size();
@@ -232,12 +232,12 @@ public:
     {
 	return reverse_iterator (end ());
     }
-    
+
     reverse_iterator rend () const
     {
 	return reverse_iterator(begin());
     }
-    
+
     reference operator [] (difference_type i) const
     {
 	return begin() [i];
@@ -248,7 +248,7 @@ public:
 	return begin () + i;
     }
     //\}@
-    
+
 private:
     template <typename L2> friend class buffer_range;
 
@@ -256,11 +256,11 @@ private:
     iterator    _frames;
 };
 
-template <typename I2> 
+template <typename I2>
 inline void swap (buffer_range<I2>& x, buffer_range<I2>& y)
-{ 
+{
     using std::swap;
-    swap (x._size, y._size); 
+    swap (x._size, y._size);
     swap (x._frames, y._frames); // TODO: Extend further
 }
 
@@ -271,16 +271,16 @@ inline void swap (buffer_range<I2>& x, buffer_range<I2>& y)
  */
 
 template <typename I>
-struct sample_type<buffer_range<I> > : public sample_type<I> {}; 
+struct sample_type<buffer_range<I> > : public sample_type<I> {};
 
 template <typename I>
-struct channel_space_type<buffer_range<I> > : public channel_space_type<I> {}; 
+struct channel_space_type<buffer_range<I> > : public channel_space_type<I> {};
 
 template <typename I>
-struct sample_mapping_type<buffer_range<I> > : public sample_mapping_type<I> {}; 
+struct sample_mapping_type<buffer_range<I> > : public sample_mapping_type<I> {};
 
 template <typename I>
-struct is_planar<buffer_range<I> > : public is_planar<I> {}; 
+struct is_planar<buffer_range<I> > : public is_planar<I> {};
 
 /*
  *

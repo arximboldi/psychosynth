@@ -10,7 +10,7 @@
  *  Copyright (C) 2011, 2016 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -105,16 +105,16 @@ struct do_test_buffered_output
 
         typedef R1 src_range;
         typedef R2 dst_range;
-        
+
         typedef typename sound::buffer_from_range<src_range>::type
             src_buffer_type;
 
         const std::size_t tmp_buffer_size = 1024;
         const std::size_t out_buffer_size = 512;
-    
+
         src_buffer_type buf (tmp_buffer_size);
         fill_frames (range (buf), typename src_range::value_type (0));
-    
+
         io::buffered_output<src_range, io::dummy_output<dst_range> > out;
         out.set_buffer_size (out_buffer_size);
         out.put (range (buf));
@@ -150,7 +150,7 @@ struct do_test_buffered_output<R, R>
 BOOST_AUTO_TEST_CASE_TEMPLATE (buffered_output_test, RangePair,
                                output_test_types_product)
 {
-    
+
     typedef typename RangePair::first  src_range;
     typedef typename RangePair::second dst_range;
 
@@ -167,20 +167,20 @@ struct do_test_async_buffered_output
 
         typedef R1 src_range;
         typedef R2 dst_range;
-        
+
         typedef typename sound::buffer_from_range<src_range>::type
             src_buffer_type;
 
         const std::size_t buffer_size = 1024;
-            
+
         src_buffer_type buf (buffer_size);
         fill_frames (range (buf), typename src_range::value_type (0));
-    
+
         io::buffered_async_output<
             src_range,
             io::dummy_async_output<dst_range> > out (buffer_size);
         out.put (range (buf));
-        
+
         BOOST_CHECK(
             equal_frames (
                 sound::channel_converted_range<typename dst_range::value_type> (
@@ -211,7 +211,7 @@ struct do_test_async_buffered_output<R, R>
 BOOST_AUTO_TEST_CASE_TEMPLATE (buffered_async_output_test, RangePair,
                                output_test_types_product)
 {
-    
+
     typedef typename RangePair::first  src_range;
     typedef typename RangePair::second dst_range;
 
@@ -228,17 +228,17 @@ BOOST_AUTO_TEST_CASE_TEMPLATE (alsa_output_test, Range, alsa_test_types)
 {
     using namespace psynth;
     typedef typename sound::buffer_from_range<Range>::type buffer_type;
-    
+
     const std::size_t buffer_size = 1024;
     const std::size_t sample_rate = 44100;
 
     try
     {
         buffer_type buf (buffer_size, 0);
-        
+
         std::size_t nframes       = 0;
         std::size_t async_nframes = 0;
-        
+
         io::alsa_output<Range> device (
             TEST_DEVICE_ALSA, 2, buffer_size/2, sample_rate, [&] (std::size_t)
             { async_nframes = device.put (range (buf)); });
@@ -250,7 +250,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE (alsa_output_test, Range, alsa_test_types)
             // HACK because g++-4.5 does not have this_thread::sleep
             ::usleep (10);
         device.stop ();
-        
+
         BOOST_CHECK_EQUAL (nframes, buffer_size);
         BOOST_CHECK_EQUAL (async_nframes, buffer_size);
     }
@@ -260,7 +260,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE (alsa_output_test, Range, alsa_test_types)
                            "might be caused by the system.");
         err.log ();
     }
-    
+
 }
 
 #endif /* PSYNTH_HAVE_ALSA */
@@ -272,15 +272,15 @@ typedef mpl::filter_view<output_test_types,
 oss_test_types;
 
 BOOST_AUTO_TEST_CASE_TEMPLATE (oss_output_test, Range, oss_test_types)
-{    
+{
     using namespace psynth;
     typedef typename sound::buffer_from_range<Range>::type buffer_type;
-    
+
     const std::size_t buffer_size = 1024;
     const std::size_t sample_rate = 44100;
-    
+
     buffer_type buf (buffer_size, 0);
-        
+
     std::size_t nframes       = 0;
     std::size_t async_nframes = 0;
 
@@ -297,7 +297,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE (oss_output_test, Range, oss_test_types)
             // HACK because g++-4.5 does not have this_thread::sleep
             ::usleep (10);
         device.stop ();
-       
+
         BOOST_CHECK_EQUAL (nframes, buffer_size);
         BOOST_CHECK_EQUAL (async_nframes, buffer_size);
     }
@@ -322,15 +322,15 @@ jack_test_types;
 typedef mpl::vector<> jack_test_types;
 
 BOOST_AUTO_TEST_CASE_TEMPLATE (jack_output_test, Range, jack_test_types)
-{    
+{
     using namespace psynth;
     typedef typename sound::buffer_from_range<Range>::type buffer_type;
-    
+
     const std::size_t buffer_size = 1024;
     const std::size_t sample_rate = 44100;
-    
+
     buffer_type buf (buffer_size, 0);
-    
+
     std::size_t async_nframes = 0;
 
     try
@@ -338,13 +338,13 @@ BOOST_AUTO_TEST_CASE_TEMPLATE (jack_output_test, Range, jack_test_types)
         io::jack_output<Range> device (
             "psynth_test", sample_rate, [&] (std::size_t)
             { async_nframes = device.put (range (buf)); });
-        
+
         device.start ();
         for (std::size_t i = 1000; async_nframes == 0 && i > 0; --i)
             // HACK because g++-4.5 does not have this_thread::sleep
             ::usleep (10);
         device.stop ();
-       
+
         BOOST_CHECK_EQUAL (async_nframes, buffer_size);
     }
     catch (io::jack_error& err)
@@ -364,16 +364,15 @@ typedef mpl::filter_view<output_test_types,
 file_test_types;
 
 BOOST_AUTO_TEST_CASE_TEMPLATE (file_output_test, Range, file_test_types)
-{    
+{
     using namespace psynth;
     namespace fs = boost::filesystem;
-    
-    typedef typename sound::buffer_from_range<Range>::type buffer_type;
 
+    typedef typename sound::buffer_from_range<Range>::type buffer_type;
     const std::string filename    = std::tmpnam (0);
     const std::size_t sample_rate = 44100;
     const std::size_t buffer_size = 1024;
-    
+
     buffer_type buf (buffer_size);
     PSYNTH_ON_BLOCK_EXIT ([&] { fs::remove (fs::path (filename)); });
 
@@ -396,4 +395,3 @@ BOOST_AUTO_TEST_CASE_TEMPLATE (file_output_test, Range, file_test_types)
 #endif /* PSYNTH_HAVE_PCM */
 
 BOOST_AUTO_TEST_SUITE_END ();
-

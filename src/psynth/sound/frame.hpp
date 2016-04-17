@@ -12,7 +12,7 @@
  *  Copyright (C) 2010 Juan Pedro Bolivar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -30,7 +30,7 @@
 
 /*
  *  Copyright 2005-2007 Adobe Systems Incorporated
- * 
+ *
  *  Use, modification and distribution are subject to the Boost
  *  Software License, Version 1.0. (See accompanying file
  *  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt).
@@ -87,7 +87,7 @@ template <typename T> struct is_frame<const T> : public is_frame<T> {};
 */
 template <typename FrameBased>
 struct num_samples :
-	public boost::mpl::size<typename channel_space_type<FrameBased>::type> {}; 
+	public boost::mpl::size<typename channel_space_type<FrameBased>::type> {};
 
 /**
 \addtogroup FrameBasedAlgorithm
@@ -99,19 +99,19 @@ BOOST_STATIC_ASSERT((num_samples<cmyk16_planar_ptr_t>::value==4));
 
 BOOST_STATIC_ASSERT((is_planar<rgb16_planar_image_t>::value));
 BOOST_STATIC_ASSERT((is_same<channel_space_type<rgb8_planar_ref_t>::type, rgb_t>::value));
-BOOST_STATIC_ASSERT((is_same<sample_mapping_type<cmyk8_frame_t>::type, 
+BOOST_STATIC_ASSERT((is_same<sample_mapping_type<cmyk8_frame_t>::type,
                              sample_mapping_type<rgba8_frame_t>::type>::value));
 BOOST_STATIC_ASSERT((is_same<sample_type<bgr8_frame_t>::type, bits8>::value));
 \endcode
 */
 
 /**
-   \defgroup ChannelBaseModelFrame frame 
+   \defgroup ChannelBaseModelFrame frame
    \ingroup ChannelBaseModel
    \brief A homogeneous channel base whose element is a sample
    value. Models HomogeneousChannelBaseValueConcept
 
-   \defgroup FrameModelFrame frame 
+   \defgroup FrameModelFrame frame
    \ingroup FrameModel
    \brief A homogeneous frame value. Models HomogeneousFrameValueConcept
 
@@ -119,7 +119,7 @@ BOOST_STATIC_ASSERT((is_same<sample_type<bgr8_frame_t>::type, bits8>::value));
    \brief Represents a frame value (a container of samples). Models:
    HomogeneousChannelBaseValueConcept, FrameValueConcept,
    HomogeneousFrameBasedConcept
- 
+
    A frame is a set of samples defining the channel at a given point in
    an image. Conceptually, a frame is little more than a channel base
    whose elements model \p SampleConcept. The class \p frame defines
@@ -196,7 +196,7 @@ public:
     frame (const Frame& p,
 	   typename boost::enable_if_c<is_frame<Frame>::value>::type* dummy = 0)
 	: parent_t (p)
-    { 
+    {
         check_compatible<Frame>();
     }
 
@@ -206,12 +206,12 @@ public:
 	assign (p, boost::mpl::bool_<is_frame<P>::value>());
 	return *this;
     }
-    
+
     template <typename P>
     bool operator == (const P& p) const
     {
 	return equal (p, boost::mpl::bool_<is_frame<P>::value>());
-    } 
+    }
 
     template <typename P>
     bool operator != (const P& p) const
@@ -225,7 +225,7 @@ public:
     {
 	return dynamic_at_c (*this, i);
     }
-    
+
     typename sample_traits<sample_t>::const_reference
     operator[](std::size_t i) const
     {
@@ -239,13 +239,13 @@ public:
 	sound::at_c<0>(*this) = chan;
 	return *this;
     }
-    
+
     bool operator== (sample_t chan) const
     {
 	check_mono ();
 	return sound::at_c<0>(*this) == chan;
     }
-    
+
 private:
     template <typename Frame>
     void assign (const Frame& p, boost::mpl::true_)
@@ -253,13 +253,13 @@ private:
 	check_compatible<Frame>();
 	static_copy (p, *this);
     }
-    
+
     template <typename Frame>
     bool equal (const Frame& p, boost::mpl::true_) const
     {
 	check_compatible<Frame>();
 	return static_equal(*this, p);
-    } 
+    }
 
     template <typename Frame>
     void check_compatible() const
@@ -275,14 +275,14 @@ private:
 	BOOST_STATIC_ASSERT(
 	    (boost::is_same<typename Layout::channel_space, mono_space>::value));
     }
-    
+
     template <typename Sample>
     void assign (const Sample& chan, boost::mpl::false_)
     {
 	check_mono ();
 	sound::at_c<0> (*this) = chan;
     }
-    
+
     template <typename Sample>
     bool equal (const Sample& chan, boost::mpl::false_) const
     {
@@ -297,25 +297,25 @@ private:
  *
  */
 
-template <typename SampleValue, typename Layout, int K>  
+template <typename SampleValue, typename Layout, int K>
 struct kth_element_type<frame<SampleValue,Layout>, K>
 {
     typedef SampleValue type;
 };
 
-template <typename SampleValue, typename Layout, int K>  
+template <typename SampleValue, typename Layout, int K>
 struct kth_element_reference_type<frame<SampleValue,Layout>, K>
 {
     typedef typename sample_traits<SampleValue>::reference type;
 };
 
-template <typename SampleValue, typename Layout, int K>  
+template <typename SampleValue, typename Layout, int K>
 struct kth_element_reference_type<const frame<SampleValue,Layout>, K>
 {
     typedef typename sample_traits<SampleValue>::const_reference type;
 };
 
-template <typename SampleValue, typename Layout, int K>  
+template <typename SampleValue, typename Layout, int K>
 struct kth_element_const_reference_type<frame<SampleValue,Layout>, K>
 {
     typedef typename sample_traits<SampleValue>::const_reference type;
@@ -327,7 +327,7 @@ struct kth_element_const_reference_type<frame<SampleValue,Layout>, K>
  *
  */
 
-template <typename SampleValue, typename Layout> 
+template <typename SampleValue, typename Layout>
 struct is_frame<frame<SampleValue,Layout> > : public boost::mpl::true_{};
 
 /*
@@ -340,13 +340,13 @@ template <typename SampleValue, typename Layout>
 struct channel_space_type<frame<SampleValue,Layout> >
 {
     typedef typename Layout::channel_space type;
-}; 
+};
 
 template <typename SampleValue, typename Layout>
 struct sample_mapping_type<frame<SampleValue,Layout> >
 {
     typedef typename Layout::sample_mapping type;
-}; 
+};
 
 template <typename SampleValue, typename Layout>
 struct is_planar<frame<SampleValue,Layout> > :
@@ -356,14 +356,14 @@ template <typename SampleValue, typename Layout>
 struct sample_type<frame<SampleValue,Layout> >
 {
     typedef SampleValue type;
-}; 
+};
 
 } /* namespace sound */
 } /* namespace psynth */
 
 namespace boost
 {
-    template <typename SampleValue, typename Layout> 
+    template <typename SampleValue, typename Layout>
     struct has_trivial_constructor<psynth::sound::frame<SampleValue,Layout> > :
 	public has_trivial_constructor<SampleValue> {};
 }

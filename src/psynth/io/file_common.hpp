@@ -15,7 +15,7 @@
  *  Copyright (C) 2011 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psyhcosynth.
- *   
+ *
  *  Psyhcosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -59,7 +59,7 @@ struct file_is_supported
 
 /**
  * Supported file formats.
- * 
+ *
  * @todo Fill with the rest of sndfile formats.
  * @todo Implement MP3 support. That would require some refactoring.
  */
@@ -97,7 +97,7 @@ class file_input_base : public input<Range>
 {
 public:
     virtual std::size_t frame_rate () const = 0;
-    
+
     virtual std::size_t seek (std::ptrdiff_t offset,
                               seek_dir dir = seek_dir::beg) = 0;
 
@@ -109,17 +109,17 @@ class dummy_file_input : public file_input_base<Range>
 {
 public:
     typedef Range range;
-    
+
     std::size_t frame_rate () const
     { return 44100; }
 
     std::size_t length () const
     { return 0; }
-    
+
     std::size_t seek (std::ptrdiff_t offset,
                       seek_dir dir = seek_dir::beg)
     { return 0; }
-    
+
     virtual std::size_t take (const range& data)
     {
         detail::dummy_input_take_impl ();
@@ -138,4 +138,3 @@ public:
 #include <psynth/io/file_common.tpp>
 
 #endif /* PSYNTH_IO_FILE_COMMON_H_ */
-

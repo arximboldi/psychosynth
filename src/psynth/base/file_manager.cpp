@@ -12,7 +12,7 @@
  *  Copyright (C) 2008, 2009 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -48,13 +48,13 @@ template class PSYNTH_DEFAULT_THREADING <file_mgr_node>;
 bf::path file_mgr_node::find_all (const bf::path& file) const
 {
     lock lock (this);
-    
+
     bf::path res;
 
     res = find (file);
     for (const_iterator it = begin(); res.empty() && it != end(); ++it)
 	res = it->find_all (file);
-    
+
     return res;
 }
 

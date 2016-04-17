@@ -13,7 +13,7 @@
  *  Copyright (C) 2010 Juan Pedro Bolivar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -31,7 +31,7 @@
 
 /*
  *  Copyright 2005-2007 Adobe Systems Incorporated
- * 
+ *
  *  Use, modification and distribution are subject to the Boost
  *  Software License, Version 1.0. (See accompanying file
  *  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt).
@@ -203,7 +203,7 @@ template <typename It>
 struct iterator_is_step_impl<It,true,false> : public boost::mpl::false_{};
 
 // for an iterator adaptor, see if its base is step
-template <typename It> struct iterator_is_step_impl<It,false,false> 
+template <typename It> struct iterator_is_step_impl<It,false,false>
     : public iterator_is_step<typename iterator_adaptor_get_base<It>::type>{};
 
 } /* namespace detail */
@@ -214,9 +214,9 @@ template <typename It> struct iterator_is_step_impl<It,false,false>
    \brief Determines if the given iterator has a step that could be
    set dynamically
 */
-template <typename I> struct iterator_is_step 
+template <typename I> struct iterator_is_step
     : public detail::iterator_is_step_impl<
-    I, 
+    I,
     !is_iterator_adaptor<I>::type::value,
     boost::is_same<I,typename dynamic_step_type<I>::type>::value > {};
 
@@ -227,13 +227,13 @@ template <typename I> struct iterator_is_step
    dynamically.
 */
 template <typename V> struct range_is_step :
-	public iterator_is_step<typename V::iterator> {}; 
+	public iterator_is_step<typename V::iterator> {};
 
 
 /**
    \brief Determines whether the given frame reference is a proxy
    class or a native C++ reference
-   
+
    \ingroup TypeAnalysis
 */
 template <typename FrameReference>
@@ -246,7 +246,7 @@ struct frame_reference_is_proxy
 /**
    \brief Given a model of a frame, determines whether the model
    represents a frame reference (as opposed to frame value)
-   
+
    \ingroup TypeAnalysis
 */
 template <typename Frame>
@@ -266,7 +266,7 @@ struct frame_is_reference :
    \ingroup GILIsMutable
    \brief Determines if the given frame reference is mutable (i.e. its
    samples can be changed)
-   
+
    Note that built-in C++ references obey the const qualifier but
    reference proxy classes do not.
 */
@@ -363,26 +363,26 @@ struct iterator_type_from_frame<Frame,false,false,false>
 
 template <typename Frame>
 struct iterator_type_from_frame<Frame,true,false,true>
-{ 
+{
     typedef planar_frame_iterator<
 	typename sample_traits<typename sample_type<Frame>::type>::pointer,
-	typename channel_space_type<Frame>::type> type; 
+	typename channel_space_type<Frame>::type> type;
 };
 
 template <typename Frame>
 struct iterator_type_from_frame<Frame,true,false,false>
-{ 
+{
     typedef planar_frame_iterator<
 	typename sample_traits<typename sample_type<Frame>::type>::const_pointer,
-	typename channel_space_type<Frame>::type> type; 
+	typename channel_space_type<Frame>::type> type;
 };
 
 template <typename Frame, bool IsPlanar, bool IsMutable>
 struct iterator_type_from_frame<Frame,IsPlanar,true,IsMutable>
-{ 
+{
     typedef memory_based_step_iterator<
 	typename iterator_type_from_frame<
-	    Frame,IsPlanar,false,IsMutable>::type> type; 
+	    Frame,IsPlanar,false,IsMutable>::type> type;
 };
 
 
@@ -424,9 +424,9 @@ struct iterator_type<T,L,true,false,false>
 
 template <typename T, typename L, bool IsPlanar, bool IsMutable>
 struct iterator_type<T,L,IsPlanar,true,IsMutable>
-{ 
+{
     typedef memory_based_step_iterator<
-	typename iterator_type<T,L,IsPlanar,false,IsMutable>::type> type; 
+	typename iterator_type<T,L,IsPlanar,false,IsMutable>::type> type;
 };
 
 
@@ -434,11 +434,11 @@ struct iterator_type<T,L,IsPlanar,true,IsMutable>
    \brief Given a frame iterator defining access to frames along a
    row, returns the types of the corresponding built-in step_iterator,
    xy_locator, buffer_range
-   
+
    \ingroup TypeFactory
    @see boost::gil::type_from_x_iterator
-*/   
-template <typename Iterator> 
+*/
+template <typename Iterator>
 struct type_from_iterator
 {
     typedef memory_based_step_iterator<Iterator>  step_iterator;
@@ -462,7 +462,7 @@ class packed_sample_references_vector_type
     // first_bits_vector will be boost::mpl::vector<int,0,7,14,16>
     typedef typename boost::mpl::accumulate<
 	SampleBitSizesVector,
-	boost::mpl::vector1<boost::mpl::int_<0> >, 
+	boost::mpl::vector1<boost::mpl::int_<0> >,
 	boost::mpl::push_back<boost::mpl::_1, boost::mpl::plus<boost::mpl::back<boost::mpl::_1>, boost::mpl::_2> >
 	>::type first_bits_vector;
 
@@ -479,10 +479,10 @@ public:
    \ingroup TypeFactoryFromElements
    \brief Returns the type of a packed frame given its bitfield type,
    the bit size of its samples and its layout.
-   
+
    A packed frame has samples that cover bit ranges but itself is byte
    aligned. RGB565 frame is an example.
-   
+
    The size of SampleBitSizeVector must equal the number of samples in
    the given layout The sum of bit sizes for all samples must be less
    than or equal to the number of bits in BitField (and cannot exceed
@@ -505,11 +505,11 @@ struct packed_frame_type
 
    \brief Returns the type of an buffer whose samples are not
    byte-aligned.
- 
+
    A packed buffer is an buffer whose frames are byte aligned, such as
    "rgb565". <br> A bit-aligned buffer is an buffer whose frames are
    not byte aligned, such as "rgb222". <br>
- 
+
    The sum of the bit sizes of all samples cannot exceed 64.
 */
 
@@ -615,7 +615,7 @@ private:
 			boost::mpl::plus<boost::mpl::_1,
 					 boost::mpl::_2> >::type::value));
     typedef typename detail::min_fast_uint<
-	bit_size + 7>::type bitfield_t;  
+	bit_size + 7>::type bitfield_t;
     typedef const bit_aligned_frame_reference<
 	bitfield_t, SampleBitSizeVector, Layout, true> bit_alignedref_t;
 
@@ -687,41 +687,41 @@ struct bit_aligned_buffer5_type :
    \brief Returns the type of a homogeneous frame given the sample
    type and layout
 */
-template <typename Sample, typename Layout> 
+template <typename Sample, typename Layout>
 struct frame_value_type
 {
     typedef frame<Sample,Layout> type;
-    // by default use gil::frame. Specializations are provided for 
+    // by default use gil::frame. Specializations are provided for
 };
 
 // Specializations for packed samples
-template <typename BitField, int NumBits, bool IsMutable, typename Layout> 
+template <typename BitField, int NumBits, bool IsMutable, typename Layout>
 struct frame_value_type<packed_dynamic_sample_reference<
 			    BitField,NumBits,IsMutable>,Layout> :
     public packed_frame_type<BitField,
 			     boost::mpl::vector1_c<unsigned,NumBits>, Layout> {};
 
-template <typename BitField, int NumBits, bool IsMutable, typename Layout> 
+template <typename BitField, int NumBits, bool IsMutable, typename Layout>
 struct frame_value_type<const packed_dynamic_sample_reference<
 			    BitField,NumBits,IsMutable>,Layout> :
     public packed_frame_type<BitField,
 			     boost::mpl::vector1_c<unsigned,NumBits>, Layout> {};
 
 template <typename BitField, int FirstBit, int NumBits, bool IsMutable,
-	  typename Layout> 
+	  typename Layout>
 struct frame_value_type<packed_sample_reference<
 			    BitField,FirstBit,NumBits,IsMutable>,Layout> :
     public packed_frame_type<BitField,
 			     boost::mpl::vector1_c<unsigned,NumBits>, Layout> {};
 
 template <typename BitField, int FirstBit, int NumBits, bool IsMutable,
-	  typename Layout> 
+	  typename Layout>
 struct frame_value_type<const packed_sample_reference<
 			    BitField,FirstBit,NumBits,IsMutable>,Layout> :
     public packed_frame_type<BitField,
 			     boost::mpl::vector1_c<unsigned,NumBits>, Layout> {};
 
-template <int NumBits, typename Layout> 
+template <int NumBits, typename Layout>
 struct frame_value_type<packed_sample_value<NumBits>,Layout> :
     public packed_frame_type<typename detail::min_fast_uint<NumBits>::type,
 			     boost::mpl::vector1_c<unsigned,NumBits>, Layout> {};
@@ -734,7 +734,7 @@ struct frame_value_type<packed_sample_value<NumBits>,Layout> :
    a step horizontally
 */
 template <typename T, typename L, bool IsPlanar=false,
-	  bool IsStepX=false, bool IsMutable=true> 
+	  bool IsStepX=false, bool IsMutable=true>
 struct range_type
 {
     typedef typename type_from_iterator<
@@ -748,7 +748,7 @@ struct range_type
    type, layout, and whether it operates on planar data
 */
 template <typename T, typename L, bool IsPlanar=false,
-	  typename Alloc=std::allocator<unsigned char> > 
+	  typename Alloc=std::allocator<unsigned char> >
 struct buffer_type
 {
     typedef buffer<frame<T,L>, IsPlanar, Alloc> type;
@@ -760,7 +760,7 @@ struct buffer_type
    operates on planar data and whether it has a step horizontally
 */
 template <typename Frame, bool IsPlanar=false, bool IsStepX=false,
-	  bool IsMutable=true> 
+	  bool IsMutable=true>
 struct range_type_from_frame
 {
     typedef typename type_from_iterator<
@@ -772,7 +772,7 @@ struct range_type_from_frame
 /**
    \brief Constructs a frame reference type from a source frame
    reference type by changing some of the properties.
-   
+
    \ingroup TypeFactoryDerived
    Use use_default for the properties of the source range that you want
    to keep
@@ -789,9 +789,9 @@ class derived_frame_reference_type
     typedef typename  boost::mpl::if_<boost::is_same<T, boost::use_default>,
 			       typename sample_type<frame_t>::type,
 			       T>::type sample_type;
-    
+
     typedef typename  boost::mpl::if_<
-	boost::is_same<L, boost::use_default>, 
+	boost::is_same<L, boost::use_default>,
 	layout<typename channel_space_type<frame_t>::type,
 	       typename sample_mapping_type<frame_t>::type>, L>::type layout_type;
 
@@ -814,7 +814,7 @@ public:
 /**
    \brief Constructs a frame iterator type from a source frame
    iterator type by changing some of the properties.
-   
+
    \ingroup TypeFactoryDerived
    Use boost::use_default for the properties of the source range that you want
    to keep
@@ -832,7 +832,7 @@ class derived_iterator_type
 	typename sample_type<Iterator>::type, T >::type sample_t;
 
     typedef typename  boost::mpl::if_<
-	boost::is_same<L,boost::use_default>, 
+	boost::is_same<L,boost::use_default>,
 	layout<typename channel_space_type<Iterator>::type,
 	       typename sample_mapping_type<Iterator>::type>, L>::type layout_t;
 
@@ -850,7 +850,7 @@ class derived_iterator_type
 	boost::is_same<IsStep, boost::use_default>,
 	iterator_is_step<Iterator>,
 	IsStep>::type::value;
-    
+
 public:
     typedef typename iterator_type<
     sample_t, layout_t, planar, step, mut>::type type;
@@ -860,7 +860,7 @@ public:
 /**
    \brief Constructs an buffer range type from a source range type by
    changing some of the properties.
-   
+
    \ingroup TypeFactoryDerived
    Use boost::use_default for the properties of the source range that you want
    to keep
@@ -879,7 +879,7 @@ class derived_range_type
 	T>::type sample_t;
 
     typedef typename  boost::mpl::if_<
-	boost::is_same<L,boost::use_default>, 
+	boost::is_same<L,boost::use_default>,
 	layout<typename channel_space_type<Range>::type,
 	       typename sample_mapping_type<Range>::type>,
 	L>::type layout_t;
@@ -893,7 +893,7 @@ class derived_range_type
 	boost::is_same<IsPlanar,boost::use_default>,
 	is_planar<Range>,
 	IsPlanar>::type::value;
-    
+
     static const bool step   = boost::mpl::if_<
 	boost::is_same<StepX ,boost::use_default>,
 	range_is_step<Range>, StepX>::type::value;
@@ -906,7 +906,7 @@ public:
 /**
    \brief Constructs a homogeneous buffer type from a source buffer
    type by changing some of the properties.
-   
+
    \ingroup TypeFactoryDerived
    Use boost::use_default for the properties of the source buffer that you
    want to keep
@@ -922,7 +922,7 @@ class derived_buffer_type
 	T >::type sample_t;
 
     typedef typename  boost::mpl::if_<
-	boost::is_same<L,boost::use_default>, 
+	boost::is_same<L,boost::use_default>,
 	layout<typename channel_space_type<Buffer>::type,
 	       typename sample_mapping_type<Buffer>::type>,
 	L>::type layout_t;

@@ -17,7 +17,7 @@
  *  Copyright (C) 2010 Juan Pedro Bolivar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -35,7 +35,7 @@
 
 /*
  *  Copyright 2005-2007 Adobe Systems Incorporated
- * 
+ *
  *  Use, modification and distribution are subject to the Boost
  *  Software License, Version 1.0. (See accompanying file
  *  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt).
@@ -201,16 +201,16 @@ struct SampleMappingConcept
    which each primary channel is used in the mixture.
 */
 
-/**         
+/**
    For example, in the stereo channel space, using 8-bit unsigned
    samples, the "left channel" is defined as [255 0 ], which means
    maximum of left, and no right.
-    
+
    Built-in scalar types, such as \p int and \p float, are valid Psynth
    samples. In more complex scenarios, samples may be represented as
    bit ranges or even individual bits.  In such cases special classes are
    needed to represent the value and reference to a sample.
-    
+
    Samples have a traits class, \p sample_traits, which defines
    their associated types as well as their operating ranges.
 
@@ -239,8 +239,8 @@ template <typename T>
 struct SampleConcept
 {
     void constraints() {
-        base::psynth_function_requires< boost::EqualityComparableConcept<T> >(); 
-        
+        base::psynth_function_requires< boost::EqualityComparableConcept<T> >();
+
         typedef typename sample_traits<T>::value_type v;
         typedef typename sample_traits<T>::reference r;
         typedef typename sample_traits<T>::pointer p;
@@ -293,12 +293,12 @@ struct MutableSampleConcept
 };
 
 /**
-   \brief A sample that supports default construction. 
+   \brief A sample that supports default construction.
    \ingroup SampleConcept
 */
 /**
 \code
-concept SampleValueConcept<SampleConcept T> : Regular<T> {}; 
+concept SampleValueConcept<SampleConcept T> : Regular<T> {};
 \endcode
 */
 template <typename T>
@@ -326,7 +326,7 @@ BOOST_STATIC_ASSERT((samples_are_compatible<bits8, const bits8&>::value));
 \endcode
 */
 template <typename T1, typename T2>  // Models Psynth Frame
-struct samples_are_compatible 
+struct samples_are_compatible
     : public boost::is_same<typename sample_traits<T1>::value_type,
 			    typename sample_traits<T2>::value_type> {};
 
@@ -393,7 +393,7 @@ struct SampleConvertibleConcept
    \brief A channel base is a container of channel elements (such as
    samples, sample references or sample pointers)
 */
-/** 
+/**
     The most common use of channel base is in the implementation of a
     frame, in which case the channel elements are sample values. The
     channel base concept, however, can be used in other scenarios. For
@@ -423,24 +423,24 @@ concept ChannelBaseConcept<typename T> :
       CopyConstructible<T>, EqualityComparable<T>
 {
     // a Psynth layout (the channel space and element permutation)
-    typename layout_t;     
-        
+    typename layout_t;
+
     // The type of K-th element
     template <int K> struct kth_element_type;
     where Metafunction<kth_element_type>;
-    
+
     // The result of at_c
     template <int K> struct kth_element_const_reference_type;
-    where Metafunction<kth_element_const_reference_type>;        
-    
+    where Metafunction<kth_element_const_reference_type>;
+
     template <int K> kth_element_const_reference_type<T,K>::type at_c(T);
 
     // Copy-constructible and equality comparable with other compatible channel bases
-    template <ChannelBaseConcept T2> where { ChannelBasesCompatibleConcept<T,T2> } 
+    template <ChannelBaseConcept T2> where { ChannelBasesCompatibleConcept<T,T2> }
         T::T(T2);
-    template <ChannelBaseConcept T2> where { ChannelBasesCompatibleConcept<T,T2> } 
+    template <ChannelBaseConcept T2> where { ChannelBasesCompatibleConcept<T,T2> }
         bool operator==(const T&, const T2&);
-    template <ChannelBaseConcept T2> where { ChannelBasesCompatibleConcept<T,T2> } 
+    template <ChannelBaseConcept T2> where { ChannelBasesCompatibleConcept<T,T2> }
         bool operator!=(const T&, const T2&);
 
 };
@@ -462,9 +462,9 @@ struct ChannelBaseConcept
 
         static const std::size_t num_elements = size<ChannelBase>::value;
 
-        typedef typename kth_element_type<ChannelBase,num_elements-1>::type TN; 
+        typedef typename kth_element_type<ChannelBase,num_elements-1>::type TN;
         typedef typename kth_element_const_reference_type<
-	    ChannelBase, num_elements-1>::type CR; 
+	    ChannelBase, num_elements-1>::type CR;
 
 #if !defined(_MSC_VER) || _MSC_VER > 1310
         CR cr = at_c<num_elements-1>(cb);
@@ -486,7 +486,7 @@ struct ChannelBaseConcept
    \ingroup ChannelBaseConcept
    \brief Channel base which allows for modifying its elements
 */
-/** 
+/**
 
 \code
 concept MutableChannelBaseConcept<ChannelBaseConcept T> :
@@ -496,8 +496,8 @@ concept MutableChannelBaseConcept<ChannelBaseConcept T> :
 
     template <int K>
     kth_element_reference_type<kth_element_type<T,K>::type>::type at_c(T);
-    
-    template <ChannelBaseConcept T2> where { ChannelBasesCompatibleConcept<T,T2> } 
+
+    template <ChannelBaseConcept T2> where { ChannelBasesCompatibleConcept<T,T2> }
         T& operator=(T&, const T2&);
 };
 \endcode
@@ -510,7 +510,7 @@ struct MutableChannelBaseConcept
         base::psynth_function_requires< base::Assignable<ChannelBase> >();
         base::psynth_function_requires< base::Swappable<ChannelBase> >();
 
-        typedef typename kth_element_reference_type<ChannelBase, 0>::type CR; 
+        typedef typename kth_element_reference_type<ChannelBase, 0>::type CR;
 
 #if !defined(_MSC_VER) || _MSC_VER > 1310
         CR r=at_c<0>(cb);
@@ -526,7 +526,7 @@ struct MutableChannelBaseConcept
    \brief Channel base that also has a default-constructor. Refines
    Regular
 */
-/** 
+/**
 \code
 concept ChannelBaseValueConcept<typename T> :
     MutableChannelBaseConcept<T>, Regular<T> {
@@ -546,12 +546,12 @@ struct ChannelBaseValueConcept
    \ingroup ChannelBaseConcept
    \brief Channel base whose elements all have the same type.
 */
-/** 
+/**
 \code
 concept HomogeneousChannelBaseConcept<ChannelBaseConcept CB> {
     // For all K in [0 ... size<C1>::value-1):
     //     where SameType<kth_element_type<CB,K>::type,
-                             kth_element_type<CB,K+1>::type>;    
+                             kth_element_type<CB,K+1>::type>;
     kth_element_const_reference_type<CB,0>::type dynamic_at_c(
            const CB&, std::size_t n) const;
 };
@@ -565,13 +565,13 @@ struct HomogeneousChannelBaseConcept
 
         static const std::size_t num_elements = size<ChannelBase>::value;
 
-        typedef typename kth_element_type<ChannelBase,0>::type T0; 
-        typedef typename kth_element_type<ChannelBase,num_elements-1>::type TN; 
+        typedef typename kth_element_type<ChannelBase,0>::type T0;
+        typedef typename kth_element_type<ChannelBase,num_elements-1>::type TN;
 
         BOOST_STATIC_ASSERT((boost::is_same<T0,TN>::value));
 	// better than nothing
         typedef typename kth_element_const_reference_type<
-	    ChannelBase,0>::type CRef0; 
+	    ChannelBase,0>::type CRef0;
         CRef0 e0=dynamic_at_c(cb,0);
     }
     ChannelBase cb;
@@ -582,7 +582,7 @@ struct HomogeneousChannelBaseConcept
    \brief Homogeneous channel base that allows for modifying its
    elements
 */
-/** 
+/**
 
 \code
 concept MutableHomogeneousChannelBaseConcept<ChannelBaseConcept CB> :
@@ -610,7 +610,7 @@ struct MutableHomogeneousChannelBaseConcept
    \brief Homogeneous channel base that also has a default
    constructor. Refines base::Regular.
 */
-/** 
+/**
 
 \code
 concept HomogeneousChannelBaseValueConcept<typename T> :
@@ -635,7 +635,7 @@ struct HomogeneousChannelBaseValueConcept
    \brief Two channel bases are compatible if they have the same channel
    space and their elements are compatible, semantic-pairwise.
 */
-/** 
+/**
 
 \code
 concept ChannelBasesCompatibleConcept<ChannelBaseConcept C1, ChannelBaseConcept C2> {
@@ -653,7 +653,7 @@ struct ChannelBasesCompatibleConcept
 {
     void constraints() {
         BOOST_STATIC_ASSERT(
-	    (boost::is_same<typename ChannelBase1::layout_type::channel_space, 
+	    (boost::is_same<typename ChannelBase1::layout_type::channel_space,
 	     typename ChannelBase2::layout_type::channel_space>::value));
 //        typedef typename kth_semantic_element_type<ChannelBase1,0>::type e1;
 //        typedef typename kth_semantic_element_type<ChannelBase2,0>::type e2;
@@ -671,17 +671,17 @@ struct ChannelBasesCompatibleConcept
 /**
    \brief Concept for all frame-based Psynth constructs, such as
    frames, iterators, ranges and buffers whose value type is a frame.
-   
+
    \ingroup FrameBasedConcept
 */
 /**
 \code
 concept FrameBasedConcept<typename T> {
-    typename channel_space_type<T>;     
+    typename channel_space_type<T>;
         where Metafunction<channel_space_type<T> >;
         where ChannelSpaceConcept<channel_space_type<T>::type>;
-    typename sample_mapping_type<T>; 
-        where Metafunction<sample_mapping_type<T> >;  
+    typename sample_mapping_type<T>;
+        where Metafunction<sample_mapping_type<T> >;
         where SampleMappingConcept<sample_mapping_type<T>::type>;
     typename is_planar<T>;
         where Metafunction<is_planar<T> >;
@@ -716,7 +716,7 @@ struct FrameBasedConcept
 /**
 \code
 concept HomogeneousFrameBasedConcept<FrameBasedConcept T> {
-    typename sample_type<T>;         
+    typename sample_type<T>;
         where Metafunction<sample_type<T> >;
         where SampleConcept<sample_type<T>::type>;
 };
@@ -730,7 +730,7 @@ struct HomogeneousFrameBasedConcept
         base::psynth_function_requires<FrameBasedConcept<P> >();
 
 	typedef typename sample_type<P>::type sample;
-        base::psynth_function_requires<SampleConcept<sample> >();        
+        base::psynth_function_requires<SampleConcept<sample> >();
     }
 };
 
@@ -742,23 +742,23 @@ struct HomogeneousFrameBasedConcept
 /**
 \code
 concept FrameConcept<typename F> :
-            ChannelBaseConcept<F>, FrameBasedConcept<F> {    
+            ChannelBaseConcept<F>, FrameBasedConcept<F> {
     where is_frame<F>::type::value==true;
     // where for each K [0..size<F>::value-1]:
     //      SampleConcept<kth_element_type<F,K> >;
-        
+
     typename F::value_type;       where FrameValueConcept<value_type>;
     typename F::reference;        where FrameConcept<reference>;
     typename F::const_reference;  where FrameConcept<const_reference>;
     static const bool F::is_mutable;
 
-    template <FrameConcept F2> where { FrameConcept<F,F2> } 
+    template <FrameConcept F2> where { FrameConcept<F,F2> }
         F::F(F2);
-    template <FrameConcept F2> where { FrameConcept<F,F2> } 
+    template <FrameConcept F2> where { FrameConcept<F,F2> }
         bool operator==(const F&, const F2&);
-    template <FrameConcept F2> where { FrameConcept<F,F2> } 
+    template <FrameConcept F2> where { FrameConcept<F,F2> }
         bool operator!=(const F&, const F2&);
-}; 
+};
 \endcode
 */
 
@@ -816,7 +816,7 @@ struct MutableFrameConcept
 /**
 \code
 concept HomogeneousFrameConcept<FrameConcept P> :
-   HomogeneousChannelBaseConcept<F>, HomogeneousFrameBasedConcept<F> { 
+   HomogeneousChannelBaseConcept<F>, HomogeneousFrameBasedConcept<F> {
      F::template element_const_reference_type<F>::type operator[] (
           P p, std::size_t i) const { return dynamic_at_c(p,i); }
 };
@@ -841,7 +841,7 @@ struct HomogeneousFrameConcept
 /**
 \code
 concept MutableHomogeneousFrameConcept<HomogeneousFrameConcept P> :
-           MutableHomogeneousChannelBaseConcept<F> { 
+           MutableHomogeneousChannelBaseConcept<F> {
     F::template element_reference_type<F>::type operator[](P p,
     std::size_t i) {
      return dynamic_at_c(p,i); }
@@ -867,7 +867,7 @@ struct MutableHomogeneousFrameConcept
 \code
 concept FrameValueConcept<FrameConcept P> : base::Regular<F> {
     where SameType<value_type,F>;
-};    
+};
 \endcode
 */
 template <typename F>
@@ -887,7 +887,7 @@ struct FrameValueConcept
 \code
 concept HomogeneousFrameValueConcept<HomogeneousFrameConcept P> : base::Regular<F> {
     where SameType<value_type,F>;
-}; 
+};
 \endcode
 */
 template <typename F>
@@ -903,14 +903,14 @@ struct HomogeneousFrameValueConcept
 namespace detail
 {
     template <typename F1, typename F2, int K>
-    struct samples_are_pairwise_compatible : public 
+    struct samples_are_pairwise_compatible : public
         boost::mpl::and_<
 	samples_are_pairwise_compatible<F1,F2,K-1>,
 	samples_are_compatible<
 	    typename kth_semantic_element_reference_type<F1,K>::type,
 	    typename kth_semantic_element_reference_type<F2,K>::type> >
     {};
-                                                 
+
     template <typename F1, typename F2>
     struct samples_are_pairwise_compatible<F1, F2, -1> :
 	public boost::mpl::true_ {};
@@ -922,14 +922,14 @@ namespace detail
    Frames are compatible if their samples and channel space types are
    compatible. Compatible frames can be assigned and copy constructed
    from one another.
-   
+
    \ingroup FrameAlgorithm
 */
 template <typename F1, typename F2>  // Models Psynth Frame
-struct frames_are_compatible 
+struct frames_are_compatible
     : public boost::mpl::and_<typename channel_spaces_are_compatible<
-				  typename channel_space_type<F1>::type, 
-				  typename channel_space_type<F2>::type>::type, 
+				  typename channel_space_type<F1>::type,
+				  typename channel_space_type<F2>::type>::type,
 			      detail::samples_are_pairwise_compatible<
 				  F1, F2, num_samples<F1>::value-1> > {};
 
@@ -939,7 +939,7 @@ struct frames_are_compatible
    Frames are compatible if their samples and channel space types are
    compatible. Compatible frames can be assigned and copy constructed
    from one another.
-   
+
    \ingroup FrameConcept
 */
 /**
@@ -1001,7 +1001,7 @@ struct FrameConvertibleConcept
 
    \brief Represents a unary function object that can be invoked upon
    dereferencing a frame iterator.
-   
+
    This can perform an arbitrary computation, such as channel conversion
    or table lookup
 */
@@ -1025,8 +1025,8 @@ template <typename D>
 struct FrameDereferenceAdaptorConcept
 {
     void constraints() {
-        base::psynth_function_requires< boost::UnaryFunctionConcept<D, 
-            typename remove_const_and_reference<typename D::result_type>::type, 
+        base::psynth_function_requires< boost::UnaryFunctionConcept<D,
+            typename remove_const_and_reference<typename D::result_type>::type,
             typename D::argument_type> >();
         base::psynth_function_requires< boost::DefaultConstructibleConcept<D> >();
         base::psynth_function_requires< boost::CopyConstructibleConcept<D> >();
@@ -1073,7 +1073,7 @@ struct FrameDereferenceAdaptorArchetype : public std::unary_function<F, F>
    \brief Concept for iterators, locators and ranges that can define a
    type just like the given iterator/locator/range, except it supports
    runtime specified step along the X navigation
-   
+
    \ingroup FrameIteratorConcept
 */
 /**
@@ -1086,7 +1086,7 @@ concept HasDynamicStepTypeConcept<typename T> {
 */
 template <typename T>
 struct HasDynamicStepTypeConcept
-{   
+{
     void constraints () {
         typedef typename dynamic_step_type<T>::type type;
     }
@@ -1096,7 +1096,7 @@ struct HasDynamicStepTypeConcept
    \defgroup FrameIteratorConceptFrameIterator FrameIteratorConcept
    \ingroup FrameIteratorConcept
    \brief STL iterator over frames
-   
+
    \ingroup FrameIteratorConceptFrameIterator
    \brief An STL random access traversal iterator over a model of
    FrameConcept.
@@ -1117,9 +1117,9 @@ concept FrameIteratorConcept<typename Iterator> :
 boost_concepts::RandomAccessTraversalConcept<Iterator>,
 FrameBasedConcept<Iterator> {
     where FrameValueConcept<value_type>;
-    typename const_iterator_type<It>::type;         
+    typename const_iterator_type<It>::type;
         where FrameIteratorConcept<const_iterator_type<It>::type>;
-    static const bool  iterator_is_mutable<It>::type::value;          
+    static const bool  iterator_is_mutable<It>::type::value;
     static const bool  is_iterator_adaptor<It>::type::value;
 // is it an iterator adaptor
 };
@@ -1127,16 +1127,16 @@ FrameBasedConcept<Iterator> {
 */
 template <typename Iterator>
 struct FrameIteratorConcept
-{   
+{
     void constraints()
     {
         base::psynth_function_requires<
 	    boost_concepts::RandomAccessTraversalConcept<Iterator> >();
         base::psynth_function_requires<FrameBasedConcept<Iterator> >();
-        
+
         typedef typename std::iterator_traits<Iterator>::value_type value_type;
         base::psynth_function_requires<FrameValueConcept<value_type> >();
- 
+
         typedef typename const_iterator_type<Iterator>::type const_t;
         static const bool is_mut = iterator_is_mutable<Iterator>::type::value;
 	boost::ignore_unused_variable_warning (is_mut);
@@ -1148,7 +1148,7 @@ struct FrameIteratorConcept
 
         check_base (typename is_iterator_adaptor<Iterator>::type ());
     }
-    
+
     void check_base(boost::mpl::false_) {}
 
     void check_base(boost::mpl::true_)
@@ -1329,10 +1329,10 @@ struct MutableStepIteratorConcept
  - \p iterator_adaptor_get_base<Iterator>:       Returns the base iterator type
  - \p iterator_adaptor_rebind<Iterator,NewBase>: Replaces the base
                                                  iterator with the new one
-   
+
    The adaptee can be obtained from the iterator via the "base()"
    method.
-   
+
 \code
 concept IteratorAdaptorConcept<boost_concepts::ForwardTraversalConcept Iterator> {
     where SameType<is_iterator_adaptor<Iterator>::type, boost::mpl::true_>;
@@ -1340,8 +1340,8 @@ concept IteratorAdaptorConcept<boost_concepts::ForwardTraversalConcept Iterator>
     typename iterator_adaptor_get_base<Iterator>;
         where Metafunction<iterator_adaptor_get_base<Iterator> >;
         where boost_concepts::ForwardTraversalConcept<iterator_adaptor_get_base<Iterator>::type>;
-    
-    typename another_iterator; 
+
+    typename another_iterator;
     typename iterator_adaptor_rebind<Iterator,another_iterator>::type;
         where boost_concepts::ForwardTraversalConcept<another_iterator>;
         where IteratorAdaptorConcept<iterator_adaptor_rebind<Iterator,another_iterator>::type>;
@@ -1401,7 +1401,7 @@ struct MutableIteratorAdaptorConcept
 
 /**
    @todo Fix this documentation.
-   
+
    \defgroup BufferRangeConcept BufferRangeConcept
    \ingroup BufferRangeConcept
    \brief 1-dimensional range
@@ -1409,13 +1409,13 @@ struct MutableIteratorAdaptorConcept
    \defgroup FrameBufferRangeConcept BufferRangeConcept
    \ingroup BufferRangeConcept
    \brief 1-dimensional range over frame data
-   
+
    \ingroup BufferRangeConcept
    \brief N-dimensional range over immutable values
 */
 
 /**
-   
+
 \code
 concept RandomAccessBufferRangeConcept<base::Regular Range> {
     typename value_type;
@@ -1427,7 +1427,7 @@ concept RandomAccessBufferRangeConcept<base::Regular Range> {
     typename iterator; where RandomAccessTraversalConcept<iterator>;
     // iterator over all values
     typename reverse_iterator;
-    where RandomAccessTraversalConcept<reverse_iterator>; 
+    where RandomAccessTraversalConcept<reverse_iterator>;
     typename size_type;       // the return value of size()
 
     // Defines the type of a range similar to this type, except it
@@ -1438,13 +1438,13 @@ concept RandomAccessBufferRangeConcept<base::Regular Range> {
         where RandomAccessBufferRangeConcept<type>;
         static type make(const Range& v, const Deref& deref);
     };
-    
+
     Range::Range(const iterator&, const size_type&);
-    
+
     // total number of elements
-    size_type        Range::size()       const; 
+    size_type        Range::size()       const;
     reference        operator[](Range, const difference_type&) const;
-    
+
     iterator         Range::begin()      const;
     iterator         Range::end()        const;
     reverse_iterator Range::rbegin()     const;
@@ -1469,7 +1469,7 @@ struct RandomAccessBufferRangeConcept
 	typedef typename Range::iterator         iterator;
         typedef typename Range::reverse_iterator reverse_iterator;
         typedef typename Range::size_type        size_type;
-            
+
 	base::psynth_function_requires<
 	    boost_concepts::RandomAccessTraversalConcept<iterator> >();
         base::psynth_function_requires<
@@ -1486,15 +1486,15 @@ struct RandomAccessBufferRangeConcept
 	// TODO: Should we minimize this interface to match Boost.Range?
         sz = range.size ();  boost::ignore_unused_variable_warning(sz);
         it = range.frames ();
-        
+
         it  = range.begin ();
         it  = range.end ();
         rit = range.rbegin ();
         rit = range.rend ();
 
         reference r1=range[d]; boost::ignore_unused_variable_warning(r1);
-	// 1D access 
-        
+	// 1D access
+
         typedef FrameDereferenceAdaptorArchetype<typename Range::value_type>
 	    deref_t;
         typedef typename Range::template add_deref<deref_t>::type dtype;
@@ -1541,11 +1541,11 @@ struct RandomAccessBufferRangeIsMutableConcept
 	base::psynth_function_requires<
 	    detail::RandomAccessIteratorIsMutableConcept<
 		typename Range::reverse_iterator> >();
-	
+
 	typename Range::difference_type diff;
 	initialize_it(diff); boost::ignore_unused_variable_warning(diff);
 	typename Range::value_type v; initialize_it(v);
-	
+
 	range[diff]=v;
     }
     Range range;
@@ -1554,7 +1554,7 @@ struct RandomAccessBufferRangeIsMutableConcept
 template <typename Range>    // preconditions: Range Models BufferRangeConcept
 struct FrameBufferRangeIsMutableConcept
 {
-    void constraints() {        
+    void constraints() {
 	base::psynth_function_requires<
 	    detail::RandomAccessBufferRangeIsMutableConcept<Range> >();
     }
@@ -1606,7 +1606,7 @@ struct MutableBufferRangeConcept
 
 /**
    \brief Returns whether two ranges are compatible
-   
+
    Ranges are compatible if their frames are compatible. Compatible
    ranges can be assigned and copy constructed from one another.
 */
@@ -1620,7 +1620,7 @@ struct ranges_are_compatible :
    \brief Ranges are compatible if they have the same channel spaces
    and compatible sample values. Constness and layout are not
    important for compatibility
-   
+
    \ingroup BufferRangeConcept
 */
 /**
@@ -1659,11 +1659,11 @@ concept RandomAccessBufferConcept<typename Buf> : base::Regular<Buf> {
 
     Buf::Buf(point_t dims, std::size_t alignment=1);
     Buf::Buf(point_t dims, value_type fill_value, std::size_t alignment);
-    
+
     void Buf::recreate(point_t new_dims, std::size_t alignment=1);
     void Buf::recreate(point_t new_dims, value_type fill_value,
                        std::size_t alignment);
-    
+
     const const_range_t&   const_range(const Buf&);
     const range_t&         range(Buf&);
 };
@@ -1706,7 +1706,7 @@ struct RandomAccessBufferConcept
    FrameValueConcept
 */
 /**
-\code 
+\code
 concept BufferConcept<RandomAccessBufferConcept Buf> {
     where MutableBufferRangeConcept<range_t>;
 };
@@ -1719,7 +1719,7 @@ struct BufferConcept
         base::psynth_function_requires<RandomAccessBufferConcept<Buf> >();
         base::psynth_function_requires<MutableBufferRangeConcept<
 	    typename Buf::range> >();
-	
+
         BOOST_STATIC_ASSERT(num_samples<Buf>::value ==
 			    boost::mpl::size<
 				typename channel_space_type<Buf>::type>::value);

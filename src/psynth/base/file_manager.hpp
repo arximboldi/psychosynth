@@ -12,7 +12,7 @@
  *  Copyright (C) 2008, 2009 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -52,8 +52,8 @@ class file_mgr_node : public file_finder,
 		      public boost::noncopyable
 {
     friend class tree_node <file_mgr_node>;
-    
-public:    
+
+public:
     template <class PathPredicate>
     void find_if_all (PathPredicate pred,
 		      file_finder::path_list& res) const;
@@ -70,7 +70,7 @@ void file_mgr_node::find_if_all (StringPredicate pred,
     const_iterator it;
 
     res = find_if (pred, res);
-    
+
     for (it = begin(); it != end(); ++it)
         it->find_if_all (pred, res);
 }

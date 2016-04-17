@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) Juan Pedro Bolivar Puente 2007, 2008                    *
+ *   Copyright (C) Juan Pedro Bolivar Puente 2007, 2008, 2016              *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -39,17 +39,17 @@ class output_director_jack : public output_director
 	if (m_output)
 	    stop();
     }
-    
+
     void on_server_change (base::conf_node& conf)
     {
-#if PSYNTH_ON_DEVICE_CHANGE_LISTENER 
+#if PSYNTH_ON_DEVICE_CHANGE_LISTENER
         auto old_state = m_output->state ();
         build_output (*conf.parent ());
         if (old_state == io::async_state::running)
             m_output->start ();
 #endif
     }
-    
+
     virtual graph::audio_async_output_ptr
     do_start (base::conf_node& conf)
     {
@@ -71,7 +71,7 @@ class output_director_jack : public output_director
     virtual void do_stop (base::conf_node& conf)
     {
 	m_on_server_change_slot.disconnect ();
-	
+
 	if (m_output)
             m_output.reset ();
     }
@@ -90,7 +90,7 @@ public:
     virtual const char* get_name () {
 	return PSYNTH_DEFAULT_JACK_NAME;
     }
-    
+
     virtual output_director* create_output_director () {
 	return new output_director_jack;
     }

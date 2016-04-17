@@ -20,7 +20,7 @@
  *  Copyright (C) 2011 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -96,7 +96,7 @@ hetero_deque<B>& hetero_deque<B>::operator= (const hetero_deque& other)
         hetero_deque aux (other);
         std::swap (*this, aux);
     }
-    
+
     return *this;
 }
 
@@ -159,7 +159,7 @@ void hetero_deque<B>::construct (header* data, Args&&... args)
 {
     static_assert (std::is_base_of<B, Concrete>::value,
                    "Elements should derived from Base.");
-        
+
     void* obj_data = data + 1;
     Concrete* obj  = new (obj_data) Concrete (std::forward<Args> (args) ...);
     *data = header { obj, reinterpret_cast<header*> (obj + 1), 0 };
@@ -171,7 +171,7 @@ bool hetero_deque<B>::push_back (Args&& ... args)
 {
     std::ptrdiff_t req_size  = 2 * sizeof (header) + sizeof (Concrete);
     header*        old_back  = _back;
-    
+
     if (_back->next) // Non empty deque
     {
         _back = _back->next;
@@ -179,7 +179,7 @@ bool hetero_deque<B>::push_back (Args&& ... args)
         if (_front < _back &&
             req_size > &_memory[0] + _memory.size () - (char*) _back)
             _back   = reinterpret_cast<header*> (&_memory[0]);
-        
+
         if (_back < _front && (char*) _front - (char*) _back < req_size) {
             _back  = old_back;
             return false;
@@ -187,7 +187,7 @@ bool hetero_deque<B>::push_back (Args&& ... args)
     }
     else if (req_size > (std::ptrdiff_t) _memory.size ())
         return false;
-    
+
     auto construct_guard = make_guard ([&] { _back  = old_back; });
     this->construct<Concrete> (_back, std::forward<Args> (args) ...);
     *_back->next = header { 0, 0, _back };
@@ -195,26 +195,26 @@ bool hetero_deque<B>::push_back (Args&& ... args)
         _back->prev = old_back;
         _back->prev->next = _back;
     }
-    
+
     construct_guard.dismiss ();
     return true;
 }
 
 template <class B>
 bool hetero_deque<B>::pop_back ()
-{    
+{
     if (_back->next) // Non empty deque
     {
         _back->access->~B ();
         if (_back->prev) { // More than one element
             _back = _back->prev;
             *_back->next = header { 0, 0, _back };
-        } else 
+        } else
             *_back = header { 0, 0, 0 };
 
         return true;
     }
-    
+
     return false;
 }
 
@@ -224,7 +224,7 @@ bool hetero_deque<B>::push_front (Args&& ... args)
 {
     std::ptrdiff_t req_size  = sizeof (header) + sizeof (Concrete);
     header*        old_front = _front;
-    
+
     if (_front->next) // Non empty deque
     {
         _front = reinterpret_cast<header*> ((char*) _front - req_size);
@@ -240,7 +240,7 @@ bool hetero_deque<B>::push_front (Args&& ... args)
         {
             _front = reinterpret_cast<header*> (
                 &_memory[0] + _memory.size () - req_size);
-            
+
             if (_front < _back->next + 1) {
                 _front = old_front;
                 return false;
@@ -251,12 +251,12 @@ bool hetero_deque<B>::push_front (Args&& ... args)
     {
         return this->push_back<Concrete> (std::forward<Args> (args) ...);
     }
-    
+
     auto construct_guard = make_guard ([&] { _front  = old_front; });
     this->construct<Concrete> (_front, std::forward<Args> (args) ...);
     _front->next = old_front;
     _front->next->prev = _front;
-    
+
     construct_guard.dismiss ();
     return true;
 }
@@ -272,10 +272,10 @@ bool hetero_deque<B>::pop_front ()
             _front->prev = 0;
         } else
             *_front = header { 0, 0, 0 };
-        
+
         return true;
     }
-    
+
     return false;
 }
 
@@ -298,9 +298,8 @@ void hetero_deque<B>::swap (hetero_deque& other)
     std::swap (_back, other._back);
     assert (_front >= (header*) &_memory [0]); // TEST
 }
-    
+
 } /* namespace base */
 } /* namespace psynth */
 
 #endif /* PSYNTH_BASE_HETERO_DEQUE_TPP_ */
-

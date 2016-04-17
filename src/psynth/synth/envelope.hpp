@@ -12,7 +12,7 @@
  *  Copyright (C) 2008, 2011 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -45,7 +45,7 @@ class envelope
 public:
     typedef Range range;
     typedef typename Range::value_type value_type;
-    
+
     /**
      * Updates the envelope for one sample.
      * @return The value of the envelope.
