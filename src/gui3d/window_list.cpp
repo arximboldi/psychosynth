@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) 2007 Juan Pedro Bolivar Puente                          *
+ *   Copyright (C) 2007, 2016 Juan Pedro Bolivar Puente                    *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -31,32 +31,34 @@ window_list::button::button (const std::string& imageset,
     m_toggable(window),
     m_key(key)
 {
-    ImagesetManager::getSingleton().create(imageset);
-	 
-    m_window = WindowManager::getSingleton().loadWindowLayout(layout);
+    ImageManager::getSingleton().loadImageset(imageset);
 
-    m_window->setPosition(UVector2(UDim(0.0, WL_GAP*(i+1) + WL_BUTTON_SIZE*i), 
+    m_window = WindowManager::getSingleton().loadLayoutFromFile(layout);
+
+    m_window->setPosition(UVector2(UDim(0.0, WL_GAP*(i+1) + WL_BUTTON_SIZE*i),
     				   UDim(1.0, -WL_BUTTON_SIZE-WL_GAP)));
     m_window->setWantsMultiClickEvents(false);
     m_window->subscribeEvent(
-	PushButton::EventClicked, 
+	PushButton::EventClicked,
 	Event::Subscriber(&window_list::button::on_click, this));
     m_window->subscribeEvent(
-	PushButton::EventMouseEnters, 
+	PushButton::EventMouseEntersArea,
 	Event::Subscriber(&window_list::button::on_enter, this));
     m_window->subscribeEvent(
-	PushButton::EventMouseLeaves, 
+	PushButton::EventMouseLeavesArea,
 	Event::Subscriber(&window_list::button::on_leave, this));
-	
+
     m_tooltip = WindowManager::getSingleton().createWindow("TaharezLook/StaticText");
     m_tooltip->setPosition(UVector2(UDim(0.0, 6.0), UDim(1.0, -WL_BUTTON_SIZE - WL_GAP - 20)));
-    m_tooltip->setSize(UVector2(UDim(1.0, 0), UDim(0.0, 16)));
+    m_tooltip->setSize(USize(UDim(1.0, 0), UDim(0.0, 16)));
     m_tooltip->setText(tooltip);
     m_tooltip->setVisible(false);
-    
-    Window* root_win = System::getSingleton().getGUISheet();
-    root_win->addChildWindow(m_window);
-    root_win->addChildWindow(m_tooltip);
+
+    Window* root_win = System::getSingleton()
+        .getDefaultGUIContext()
+        .getRootWindow();
+    root_win->addChild(m_window);
+    root_win->addChild(m_tooltip);
 
     m_toggable->set_active (false);
 }
@@ -86,7 +88,7 @@ void window_list::add_window (std::string but_imageset, std::string but_layout,
     m_lwind.push_back(new button(but_imageset, but_layout, tooltip,
 				 window, key, m_nwind++));
 }
-	
+
 bool window_list::keyPressed( const OIS::KeyEvent &arg )
 {
     std::list<button*>::iterator i;

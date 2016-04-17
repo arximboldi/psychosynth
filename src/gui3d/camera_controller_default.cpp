@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) 2007 Juan Pedro Bolivar Puente                          *
+ *   Copyright (C) 2007, 2016 Juan Pedro Bolivar Puente                    *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -35,12 +35,12 @@ camera_move::camera_move (camera_controller_default* ctrl,
     m_ctrl(ctrl),
     m_dest(dest),
     m_duration(duration)
-{	
+{
     const Vector3& src = ctrl->m_camera->getPosition();
     m_speed.x = (dest.x - src.x)/duration;
     m_speed.y = (dest.y - src.y)/duration;
     m_speed.z = (dest.z - src.z)/duration;
-	
+
     if (m_ctrl->m_move) m_ctrl->m_move->finish();
     m_ctrl->m_move = this;
 }
@@ -48,19 +48,19 @@ camera_move::camera_move (camera_controller_default* ctrl,
 void camera_move::update (int ms)
 {
     Ogre::Vector3 pos = m_ctrl->m_camera->getPosition();
-	
+
     m_duration -= ms;
     if (m_duration < 0) {
 	ms += m_duration;
 	m_ctrl->m_move = NULL;
 	finish();
     }
-	
+
     pos.x += m_speed.x * ms;
     pos.y += m_speed.y * ms;
     pos.z += m_speed.z * ms;
     m_ctrl->m_camera->setPosition(pos);
-	
+
     m_ctrl->m_aimpoint.x += m_speed.x * ms;
     m_ctrl->m_aimpoint.y += m_speed.y * ms;
     m_ctrl->m_aimpoint.z += m_speed.z * ms;
@@ -68,7 +68,7 @@ void camera_move::update (int ms)
 
 camera_controller_default::camera_controller_default (Ogre::Camera* camera)
     : camera_controller (camera),
-    m_move(NULL),	
+    m_move(NULL),
     m_mouseleft(false),
     m_mouseright(false),
     m_mousecenter(false),
@@ -89,25 +89,26 @@ camera_controller_default::camera_controller_default (Ogre::Camera* camera)
 void camera_controller_default::recalculate ()
 {
     Vector3 pos = m_camera->getPosition();
-	
+
     m_zxdist = m_dist * Math::Cos(m_yangle);
     pos.x = m_aimpoint.x + m_zxdist * Math::Sin(m_xangle);
     pos.y = m_aimpoint.y + m_dist   * Math::Sin(m_yangle);
     pos.z = m_aimpoint.z + m_zxdist * Math::Cos(m_xangle);
-	
+
     m_camera->setPosition(pos);
     m_camera->lookAt(m_aimpoint);
 }
 
 bool camera_controller_default::get_table_intersection (Ogre::Vector3& dest)
 {
-    CEGUI::Point mousepos = CEGUI::MouseCursor::getSingleton().getPosition();	
+    auto mousepos = CEGUI::System::getSingleton()
+        .getDefaultGUIContext().getMouseCursor().getPosition();
     Ray ray =  Ray(m_camera->getCameraToViewportRay(
 		       mousepos.d_x/m_camera->getViewport()->getActualWidth(),
 		       mousepos.d_y/m_camera->getViewport()->getActualHeight()));
     pair<bool, Ogre::Real>  inter = ray.intersects(Plane(Vector3(0.0,1.0,0.0),
 							 Ogre::Real(0.0)));
-			
+
     if (inter.first) {
 	dest = ray.getPoint(inter.second);
 	return true;
@@ -125,30 +126,30 @@ bool camera_controller_default::mouseMoved (const OIS::MouseEvent& e)
 	    m_aimpoint += m_last_tpos - table_pos;
 	}
     }
-    
-    if (m_mouseright) {		
+
+    if (m_mouseright) {
 	m_xangle += Degree(e.state.X.rel * 0.5);
 	m_yangle += Degree(e.state.Y.rel * 0.5);
-		
+
 	if (m_yangle >= Degree(89.0)) m_yangle = Degree(89.0);
 	else if (m_yangle < Degree(0)) m_yangle = Degree(0);
-		
+
 	m_zxdist = m_dist * cos(m_yangle.valueRadians());
-		
+
 	recalculate();
     }
-	
+
     if (m_mousecenter) {
 	// Real h = (corners[0] - corners[3]).length();
 	Real min_dist = 1;//h/Math::Tan(m_yangle);
 	m_dist += 25.0 * Real(e.state.Y.rel) / m_camera->getViewport()->getActualHeight();
-       
+
 	if (m_dist < min_dist)
 	    m_dist = min_dist;
-	
+
 	recalculate();
     }
-	
+
     if (e.state.Z.rel != 0) {
 	Real min_dist = 1;//h/Math::Tan(m_yangle);
 	m_dist += e.state.Z.rel * 0.01;
@@ -156,7 +157,7 @@ bool camera_controller_default::mouseMoved (const OIS::MouseEvent& e)
 	    m_dist = min_dist;
 	recalculate();
     }
-	
+
     return false;
 }
 
@@ -165,7 +166,7 @@ bool camera_controller_default::mousePressed (const OIS::MouseEvent &e, OIS::Mou
     Vector3 table_pos;
     //const Vector3* corners;
     Real min_dist;
-	
+
     switch(id) {
     case OIS::MB_Left:
 	m_mouseleft = true;
@@ -175,12 +176,12 @@ bool camera_controller_default::mousePressed (const OIS::MouseEvent &e, OIS::Mou
 		global_task_manager::self ().attach (
 		    new camera_move (this, m_camera->getPosition() +
 				     (table_pos - m_aimpoint),
-				     CAMERA_MOVE_DELAY)); 
+				     CAMERA_MOVE_DELAY));
 	    } else {
 		m_moving = true;
 		m_last_tpos = table_pos;
 	    }
-	}		
+	}
 	break;
     case OIS::MB_Right:
 	m_mouseright = true;
@@ -191,7 +192,7 @@ bool camera_controller_default::mousePressed (const OIS::MouseEvent &e, OIS::Mou
     case OIS::MB_Button3:
 	m_dist += 1.0;
 	recalculate();
-	break; 
+	break;
     case OIS::MB_Button4:
 	//corners = m_camera->getWorldSpaceCorners();
 	//h = (corners[1] - corners[2]).length();
@@ -204,7 +205,7 @@ bool camera_controller_default::mousePressed (const OIS::MouseEvent &e, OIS::Mou
     default:
 	break;
     }
-	
+
     return false;
 }
 
@@ -221,13 +222,13 @@ bool camera_controller_default::mouseReleased (const OIS::MouseEvent &e, OIS::Mo
     case OIS::MB_Middle:
 	m_mousecenter = false;
 	break;
-    case OIS::MB_Button3: 
-	break; 
+    case OIS::MB_Button3:
+	break;
     case OIS::MB_Button4:
 	break;
     default: break;
     }
-	
+
     return false;
 }
 
@@ -237,7 +238,7 @@ bool camera_controller_default::keyPressed (const OIS::KeyEvent &e)
 	e.key == OIS::KC_RSHIFT)
 	//m_modifier++;
 	m_modifier = 1;
-    
+
     return false;
 }
 
@@ -247,7 +248,6 @@ bool camera_controller_default::keyReleased (const OIS::KeyEvent &e)
 	e.key == OIS::KC_RSHIFT)
 	//m_modifier--;
 	m_modifier = 0;
-    
+
     return false;
 }
-

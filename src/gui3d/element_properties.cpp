@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) 2007 Juan Pedro Bolivar Puente                          *
+ *   Copyright (C) 2007, 2016 Juan Pedro Bolivar Puente                    *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -47,12 +47,12 @@ void elem_gui_param_multi::create_gui ()
 
     m_label = dynamic_cast<Window*>(wmgr.createWindow("TaharezLook/StaticText"));
     m_label->setPosition(UVector2(UDim(0, 0), UDim(0, 0)));
-    m_label->setSize(UVector2(UDim(0.5, -5), UDim(0, 20)));
+    m_label->setSize(USize(UDim(0.5, -5), UDim(0, 20)));
     m_label->setText(m_name);
 
     m_selector = dynamic_cast<Combobox*>(wmgr.createWindow("TaharezLook/Combobox"));
     m_selector->setPosition(UVector2(UDim(0.5, 0), UDim(0, 0)));
-    m_selector->setSize(UVector2(UDim(0.5, 0), UDim(0, 30 + 18 * (m_nval+1))));
+    m_selector->setSize(USize(UDim(0.5, 0), UDim(0, 30 + 18 * (m_nval+1))));
     m_selector->getDropList()->setClippedByParent(false);
     m_selector->setReadOnly(true);
     m_selector->setWantsMultiClickEvents(false);
@@ -62,17 +62,17 @@ void elem_gui_param_multi::create_gui ()
     }
 
     m_selector->subscribeEvent(
-	Combobox::EventListSelectionAccepted, 
+	Combobox::EventListSelectionAccepted,
 	Event::Subscriber(&elem_gui_param_multi::on_combobox_change, this));
-    
+
     int value;
     get_parent()->get_node().get_param (get_param(), value);
     m_skip++;
     m_selector->setText(m_op_names[value]);
     m_skip--;
-    
-    get_parent_window()->addChildWindow(m_label);
-    get_parent_window()->addChildWindow(m_selector);
+
+    get_parent_window()->addChild(m_label);
+    get_parent_window()->addChild(m_selector);
 }
 
 void elem_gui_param_multi::handle_param_change (world_node& obj, int param)
@@ -90,14 +90,14 @@ bool elem_gui_param_multi::on_combobox_change (const CEGUI::EventArgs &e)
 {
     if (!m_skip) {
 	String new_val = m_selector->getText();
-	
+
 	for (int i = 0; i < m_nval; ++i)
 	    if (new_val == m_op_names[i]) {
 		get_parent()->get_node().set_param (get_param(), i);
 		break;
 	    }
     }
-    
+
     return true;
 }
 
@@ -118,27 +118,27 @@ void elem_gui_param_float::create_gui ()
 
     m_label = dynamic_cast<Window*>(wmgr.createWindow("TaharezLook/StaticText"));
     m_label->setPosition(UVector2(UDim(0, 0), UDim(0, 0)));
-    m_label->setSize(UVector2(UDim(0.5, -5), UDim(0, 20)));
+    m_label->setSize(USize(UDim(0.5, -5), UDim(0, 20)));
     m_label->setText(m_name);
 
     m_spinner = dynamic_cast<Spinner*>(wmgr.createWindow("TaharezLook/Spinner"));
     m_spinner->setPosition(UVector2(UDim(0.5, 0), UDim(0, 0)));
-    m_spinner->setSize(UVector2(UDim(0.5, 0), UDim(0, 20)));
+    m_spinner->setSize(USize(UDim(0.5, 0), UDim(0, 20)));
     m_spinner->setMaximumValue(m_max_val);
     m_spinner->setMinimumValue(m_min_val);
     m_spinner->setTextInputMode(Spinner::FloatingPoint);
     m_spinner->subscribeEvent(
-	Spinner::EventValueChanged, 
+	Spinner::EventValueChanged,
 	Event::Subscriber(&elem_gui_param_float::on_spinner_change, this));
-    
+
     float value;
     get_parent()->get_node().get_param (get_param(), value);
     m_skip++;
     m_spinner->setCurrentValue(value);
     m_skip--;
-    
-    get_parent_window()->addChildWindow(m_label);
-    get_parent_window()->addChildWindow(m_spinner);
+
+    get_parent_window()->addChild(m_label);
+    get_parent_window()->addChild(m_spinner);
 }
 
 void elem_gui_param_float::handle_param_change (world_node& obj, int param)
@@ -157,7 +157,7 @@ bool elem_gui_param_float::on_spinner_change (const CEGUI::EventArgs &e)
 	float new_val = m_spinner->getCurrentValue();
 	get_parent()->get_node().set_param (get_param(), new_val);
     }
-    
+
     return true;
 }
 
@@ -177,27 +177,27 @@ void elem_gui_param_int::create_gui ()
 
     m_label = dynamic_cast<Window*>(wmgr.createWindow("TaharezLook/StaticText"));
     m_label->setPosition(UVector2(UDim(0, 0), UDim(0, 0)));
-    m_label->setSize(UVector2(UDim(0.5, -5), UDim(0, 20)));
+    m_label->setSize(USize(UDim(0.5, -5), UDim(0, 20)));
     m_label->setText(m_name);
 
     m_spinner = dynamic_cast<Spinner*>(wmgr.createWindow("TaharezLook/Spinner"));
     m_spinner->setPosition(UVector2(UDim(0.5, 0), UDim(0, 0)));
-    m_spinner->setSize(UVector2(UDim(0.5, 0), UDim(0, 20)));
+    m_spinner->setSize(USize(UDim(0.5, 0), UDim(0, 20)));
     m_spinner->setMaximumValue(m_max_val);
     m_spinner->setMinimumValue(m_min_val);
     m_spinner->setTextInputMode(Spinner::Integer);
     m_spinner->subscribeEvent(
-	Spinner::EventValueChanged, 
+	Spinner::EventValueChanged,
 	Event::Subscriber(&elem_gui_param_int::on_spinner_change, this));
-    
+
     int value;
     get_parent()->get_node().get_param (get_param(), value);
     m_skip++;
     m_spinner->setCurrentValue(value);
     m_skip--;
-    
-    get_parent_window ()->addChildWindow(m_label);
-    get_parent_window ()->addChildWindow(m_spinner);
+
+    get_parent_window ()->addChild(m_label);
+    get_parent_window ()->addChild(m_spinner);
 }
 
 void elem_gui_param_int::handle_param_change (world_node& obj, int param)
@@ -216,7 +216,7 @@ bool elem_gui_param_int::on_spinner_change (const CEGUI::EventArgs &e)
 	int new_val = m_spinner->getCurrentValue();
 	get_parent()->get_node().set_param (get_param(), new_val);
     }
-    
+
     return true;
 }
 
@@ -232,17 +232,17 @@ FrameWindow* element_properties::create_window ()
 
     FrameWindow* window;
     window = dynamic_cast<FrameWindow*>(wmgr.createWindow("TaharezLook/FrameWindow"));
-    
+
     window->setPosition(UVector2(UDim(0.06, 0), UDim(0.2, 0)));
-    window->setSize(UVector2(UDim(0, 240), UDim(0, 60)));
+    window->setSize(USize(UDim(0, 240), UDim(0, 60)));
     window->setText("Properties");
 
     m_container = dynamic_cast<Window*>(wmgr.createWindow("TaharezLook/ScrollablePane"));
 
     m_container->setPosition(UVector2(UDim(0, 20), UDim(0, 35)));
-    m_container->setSize(UVector2(UDim(1, -30), UDim(1, -40)));
+    m_container->setSize(USize(UDim(1, -30), UDim(1, -40)));
 
-    window->addChildWindow(m_container);
+    window->addChild(m_container);
 
     return window;
 }
@@ -252,15 +252,15 @@ void element_properties::add_parameter (elem_gui_param* e)
     WindowManager& wmgr = WindowManager::getSingleton();
 
     Window *window;
-    window = dynamic_cast<Window*>(wmgr.createWindow("DefaultGUISheet"));
+    window = dynamic_cast<Window*>(wmgr.createWindow("DefaultWindow"));
     window->setPosition(UVector2(UDim(0, 0), UDim(0, m_y_offset)));
-    window->setSize(UVector2(UDim(1, -10), UDim(0, 20)));
+    window->setSize(USize(UDim(1, -10), UDim(0, 20)));
     m_y_offset += 25;
 
     get_window()->setHeight(UDim(0, 40 + m_y_offset + 30));
-    
-    m_container->addChildWindow(window);
-    
+
+    m_container->addChild(window);
+
     e->init(this, window);
     m_params[e->get_param()] = e;
 }

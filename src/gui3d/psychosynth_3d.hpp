@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) 2007 Juan Pedro Bolivar Puente                          *
+ *   Copyright (C) 2007, 2016 Juan Pedro Bolivar Puente                    *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -26,7 +26,7 @@
 #include <OGRE/Ogre.h>
 #include <cstddef> // CEGUI bugfix.
 #include <CEGUI/CEGUI.h>
-#include <CEGUI/RendererModules/Ogre/CEGUIOgreRenderer.h>
+#include <CEGUI/RendererModules/Ogre/Renderer.h>
 
 #include <psynth/version.hpp>
 #include <psynth/base/timer.hpp>
@@ -54,7 +54,7 @@ class psychosynth_3d : public psynth::psynth_app,
 
     void prepare (psynth::base::arg_parser& args);
     int execute ();
-       	
+
     bool frameStarted(const Ogre::FrameEvent& evt);
 
 private:
@@ -64,9 +64,9 @@ private:
     Ogre::SceneManager*  m_scene;
     Ogre::Camera*        m_camera;
     Ogre::Viewport*      m_viewport;
-	
+
     CEGUI::System*       m_gui;
-    
+
     default_selector_populator m_populator;
     input_manager*      m_inputmgr;
     cegui_injecter*     m_guiinput;
@@ -79,11 +79,11 @@ private:
 #ifdef PSYNTH_HAVE_OSC
     network_window*     m_netwindow;
 #endif
-    
+
     bool   m_must_quit;
     size_t m_curr_width;
     size_t m_curr_height;
-    
+
     void setup_settings (psynth::base::conf_node& conf);
     void setup_ogre (psynth::base::conf_node& conf);
     void setup_input ();
@@ -111,4 +111,3 @@ private:
 };
 
 #endif /* PSYCHOSYNTH3D_H */
-

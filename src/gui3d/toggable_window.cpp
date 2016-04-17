@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) 2007 Juan Pedro Bolivar Puente                          *
+ *   Copyright (C) 2007, 2016 Juan Pedro Bolivar Puente                    *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -33,8 +33,10 @@ toggable_window::toggable_window ()
 toggable_window::~toggable_window ()
 {
     if (m_active) {
-	Window* root_win = System::getSingleton().getGUISheet();
-	root_win->removeChildWindow(m_window);
+	Window* root_win = System::getSingleton()
+            .getDefaultGUIContext()
+            .getRootWindow();
+	root_win->removeChild(m_window);
     }
     delete m_window;
 }
@@ -43,7 +45,7 @@ void toggable_window::build_window ()
 {
     m_window = create_window ();
     m_window->subscribeEvent(
-	FrameWindow::EventCloseClicked, 
+	FrameWindow::EventCloseClicked,
 	Event::Subscriber(&toggable_window::on_close, this));
 }
 
@@ -51,14 +53,13 @@ void toggable_window::set_active (bool active)
 {
     if (m_window == NULL)
 	build_window ();
-		
+
     if (active != m_active) {
 	m_active = active;
-	Window* root_win = System::getSingleton().getGUISheet();
-	if (m_active)  root_win->addChildWindow(m_window);
-	if (!m_active) root_win->removeChildWindow(m_window);
+	Window* root_win = System::getSingleton()
+            .getDefaultGUIContext()
+            .getRootWindow();
+        if (m_active)  root_win->addChild(m_window);
+	if (!m_active) root_win->removeChild(m_window);
     }
 }
-
-
-

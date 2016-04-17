@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) Juan Pedro Bolivar Puente 2007                          *
+ *   Copyright (C) Juan Pedro Bolivar Puente 2007, 2016                    *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -42,7 +42,7 @@ client_tab::client_tab (psynth::world* world) :
     m_client->set_world (world);
     m_client->add_listener(this);
     m_client->add_listener(&m_logger);
-    
+
     logger::self ().child ("oscclient").add_sink (m_logsink);
 }
 
@@ -50,7 +50,7 @@ client_tab::~client_tab ()
 {
     m_client->delete_listener(this);
     m_client->delete_listener(&m_logger);
- 
+
     logger::self ().child ("oscclient").del_sink (m_logsink);
     m_logsink->set_window (0);
     delete m_client;
@@ -59,71 +59,71 @@ client_tab::~client_tab ()
 Window* client_tab::create_window ()
 {
     WindowManager& wmgr = WindowManager::getSingleton();
-	
-    Window* root = wmgr.createWindow("DefaultGUISheet");
+
+    Window* root = wmgr.createWindow("DefaultWindow");
     root->setPosition( UVector2(UDim(0, 10), UDim(0, 10)) );
-    root->setSize    ( UVector2(UDim(1, -20),     UDim(1, -20)) );
+    root->setSize    ( USize(UDim(1, -20),     UDim(1, -20)) );
     root->setText("Client");
 
-    m_disable = wmgr.createWindow("DefaultGUISheet");
+    m_disable = wmgr.createWindow("DefaultWindow");
     m_disable->setPosition( UVector2(UDim(0, 0), UDim(0, 1)) );
-    m_disable->setSize    ( UVector2(UDim(1, 0),     UDim(0, 75)) );
+    m_disable->setSize    ( USize(UDim(1, 0),     UDim(0, 75)) );
 
     Window* host_label = wmgr.createWindow("TaharezLook/StaticText");
     host_label->setText("Remote host");
     host_label->setPosition(UVector2(UDim(0, 0), UDim(0, 0)));
-    host_label->setSize    (UVector2(UDim(0.5, 0), UDim(0, 20)));
+    host_label->setSize    (USize(UDim(0.5, 0), UDim(0, 20)));
 
     m_host = dynamic_cast<Editbox*>(wmgr.createWindow("TaharezLook/Editbox"));
     m_host->setPosition(UVector2(UDim(0.5, 0), UDim(0, 0)));
-    m_host->setSize    (UVector2(UDim(0.5, 0), UDim(0, 20)));
+    m_host->setSize    (USize(UDim(0.5, 0), UDim(0, 20)));
     m_host->setText(DEFAULT_HOST);
 
     Window* rport_label = wmgr.createWindow("TaharezLook/StaticText");
     rport_label->setText("Remote port");
     rport_label->setPosition(UVector2(UDim(0, 0), UDim(0, 25)));
-    rport_label->setSize    (UVector2(UDim(0.5, 0), UDim(0, 20)));
+    rport_label->setSize    (USize(UDim(0.5, 0), UDim(0, 20)));
 
     m_rport = dynamic_cast<Spinner*>(wmgr.createWindow("TaharezLook/Spinner"));
     m_rport->setPosition(UVector2(UDim(0.5, 0), UDim(0, 25)));
-    m_rport->setSize    (UVector2(UDim(0.5, 0), UDim(0, 20)));
+    m_rport->setSize    (USize(UDim(0.5, 0), UDim(0, 20)));
     m_rport->setCurrentValue(PSYNTH_DEFAULT_SERVER_PORT);
-    
+
     Window* lport_label = wmgr.createWindow("TaharezLook/StaticText");
     lport_label->setText("Local port");
     lport_label->setPosition(UVector2(UDim(0, 0), UDim(0, 50)));
-    lport_label->setSize    (UVector2(UDim(0.5, 0), UDim(0, 20)));
+    lport_label->setSize    (USize(UDim(0.5, 0), UDim(0, 20)));
 
     m_lport = dynamic_cast<Spinner*>(wmgr.createWindow("TaharezLook/Spinner"));
     m_lport->setPosition(UVector2(UDim(0.5, 0), UDim(0, 50)));
-    m_lport->setSize    (UVector2(UDim(0.5, 0), UDim(0, 20)));
+    m_lport->setSize    (USize(UDim(0.5, 0), UDim(0, 20)));
     m_lport->setCurrentValue(PSYNTH_DEFAULT_CLIENT_PORT);
 
     m_button = wmgr.createWindow("TaharezLook/Button");
     m_button->setText("Connect");
     m_button->setPosition(UVector2(UDim(0, 0), UDim(0, 75)));
-    m_button->setSize    (UVector2(UDim(1, 0), UDim(0, 20)));
+    m_button->setSize    (USize(UDim(1, 0), UDim(0, 20)));
     m_button->setWantsMultiClickEvents(false);
-    m_button->subscribeEvent(PushButton::EventClicked, 
+    m_button->subscribeEvent(PushButton::EventClicked,
 			     Event::Subscriber(&client_tab::on_button_click, this));
 
     MultiLineEditbox* log_viewer = dynamic_cast<MultiLineEditbox*>(wmgr.createWindow("TaharezLook/MultiLineEditbox"));
     log_viewer->setPosition(UVector2(UDim(0, 0), UDim(0, 100)));
-    log_viewer->setSize    (UVector2(UDim(1, 0), UDim(1, -100)));
+    log_viewer->setSize    (USize(UDim(1, 0), UDim(1, -100)));
     log_viewer->setReadOnly(true);
     m_logsink->set_window (log_viewer);
-    
-    m_disable->addChildWindow(host_label);
-    m_disable->addChildWindow(m_host);
-    m_disable->addChildWindow(rport_label);
-    m_disable->addChildWindow(m_rport);
-    m_disable->addChildWindow(lport_label);
-    m_disable->addChildWindow(m_lport);
-    
-    root->addChildWindow(m_disable);
-    root->addChildWindow(m_button);
-    root->addChildWindow(log_viewer);
-    
+
+    m_disable->addChild(host_label);
+    m_disable->addChild(m_host);
+    m_disable->addChild(rport_label);
+    m_disable->addChild(m_rport);
+    m_disable->addChild(lport_label);
+    m_disable->addChild(m_lport);
+
+    root->addChild(m_disable);
+    root->addChild(m_button);
+    root->addChild(log_viewer);
+
     return root;
 }
 
@@ -156,7 +156,7 @@ bool client_tab::on_button_click (const CEGUI::EventArgs &e)
     } else {
 	m_client->disconnect();
     }
-    
+
     return true;
 }
 
@@ -186,7 +186,7 @@ server_tab::server_tab (psynth::world* world) :
     m_server->set_world (world);
     m_server->add_listener(this);
     m_server->add_listener(&m_logger);
- 
+
     logger::self ().child ("oscserver").add_sink (m_logsink);
 }
 
@@ -194,7 +194,7 @@ server_tab::~server_tab ()
 {
     m_server->delete_listener(this);
     m_server->delete_listener(&m_logger);
-    
+
     logger::self ().child ("oscserver").del_sink (m_logsink);
     m_logsink->set_window (0);
     delete m_server;
@@ -203,47 +203,47 @@ server_tab::~server_tab ()
 Window* server_tab::create_window ()
 {
     WindowManager& wmgr = WindowManager::getSingleton();
-	
-    Window* root = wmgr.createWindow("DefaultGUISheet");
+
+    Window* root = wmgr.createWindow("DefaultWindow");
     root->setPosition( UVector2(UDim(0, 10), UDim(0, 10)) );
-    root->setSize    ( UVector2(UDim(1, -20),     UDim(1, -20)) );
+    root->setSize    ( USize(UDim(1, -20),     UDim(1, -20)) );
     root->setText("Server");
 
-    m_disable = wmgr.createWindow("DefaultGUISheet");
+    m_disable = wmgr.createWindow("DefaultWindow");
     m_disable->setPosition( UVector2(UDim(0, 0), UDim(0, 1)) );
-    m_disable->setSize    ( UVector2(UDim(1, 0),     UDim(0, 25)) );
-    
+    m_disable->setSize    ( USize(UDim(1, 0),     UDim(0, 25)) );
+
     Window* lport_label = wmgr.createWindow("TaharezLook/StaticText");
     lport_label->setText("Port");
     lport_label->setPosition(UVector2(UDim(0, 0), UDim(0, 0)));
-    lport_label->setSize    (UVector2(UDim(0.5, 0), UDim(0, 20)));
+    lport_label->setSize    (USize(UDim(0.5, 0), UDim(0, 20)));
 
     m_lport = dynamic_cast<Spinner*>(wmgr.createWindow("TaharezLook/Spinner"));
     m_lport->setPosition(UVector2(UDim(0.5, 0), UDim(0, 0)));
-    m_lport->setSize    (UVector2(UDim(0.5, 0), UDim(0, 20)));
+    m_lport->setSize    (USize(UDim(0.5, 0), UDim(0, 20)));
     m_lport->setCurrentValue(PSYNTH_DEFAULT_SERVER_PORT);
 
     m_button = wmgr.createWindow("TaharezLook/Button");
     m_button->setText("Start");
     m_button->setPosition(UVector2(UDim(0, 0), UDim(0, 25)));
-    m_button->setSize    (UVector2(UDim(1, 0), UDim(0, 20)));
+    m_button->setSize    (USize(UDim(1, 0), UDim(0, 20)));
     m_button->setWantsMultiClickEvents(false);
-    m_button->subscribeEvent(PushButton::EventClicked, 
+    m_button->subscribeEvent(PushButton::EventClicked,
 			     Event::Subscriber(&server_tab::on_button_click, this));
 
     MultiLineEditbox* log_viewer = dynamic_cast<MultiLineEditbox*>(wmgr.createWindow("TaharezLook/MultiLineEditbox"));
     log_viewer->setPosition(UVector2(UDim(0, 0), UDim(0, 50)));
-    log_viewer->setSize    (UVector2(UDim(1, 0), UDim(1, -50)));
+    log_viewer->setSize    (USize(UDim(1, 0), UDim(1, -50)));
     log_viewer->setReadOnly(true);
     m_logsink->set_window (log_viewer);
-    
-    m_disable->addChildWindow(lport_label);
-    m_disable->addChildWindow(m_lport);
-    
-    root->addChildWindow(m_disable);
-    root->addChildWindow(m_button);
-    root->addChildWindow(log_viewer);
-    
+
+    m_disable->addChild(lport_label);
+    m_disable->addChild(m_lport);
+
+    root->addChild(m_disable);
+    root->addChild(m_button);
+    root->addChild(log_viewer);
+
     return root;
 }
 
@@ -312,42 +312,42 @@ passive_tab::~passive_tab ()
 Window* passive_tab::create_window ()
 {
     WindowManager& wmgr = WindowManager::getSingleton();
-	
-    Window* root = wmgr.createWindow("DefaultGUISheet");
+
+    Window* root = wmgr.createWindow("DefaultWindow");
     root->setPosition( UVector2(UDim(0, 10), UDim(0, 10)) );
-    root->setSize    ( UVector2(UDim(1, -20),     UDim(1, -20)) );
+    root->setSize    ( USize(UDim(1, -20),     UDim(1, -20)) );
     root->setText("Passive OSC");
-    
+
     Window* lport_label = wmgr.createWindow("TaharezLook/StaticText");
     lport_label->setText("Port");
     lport_label->setPosition(UVector2(UDim(0, 0), UDim(0, 0)));
-    lport_label->setSize    (UVector2(UDim(0.5, 0), UDim(0, 20)));
+    lport_label->setSize    (USize(UDim(0.5, 0), UDim(0, 20)));
 
     m_lport = dynamic_cast<Spinner*>(wmgr.createWindow("TaharezLook/Spinner"));
     m_lport->setPosition(UVector2(UDim(0.5, 0), UDim(0, 0)));
-    m_lport->setSize    (UVector2(UDim(0.5, 0), UDim(0, 20)));
+    m_lport->setSize    (USize(UDim(0.5, 0), UDim(0, 20)));
     m_lport->setCurrentValue(PSYNTH_DEFAULT_PASSIVE_PORT);
 
     m_button = wmgr.createWindow("TaharezLook/Button");
     m_button->setText("Start");
     m_button->setPosition(UVector2(UDim(0, 0), UDim(0, 25)));
-    m_button->setSize    (UVector2(UDim(1, 0), UDim(0, 20)));
+    m_button->setSize    (USize(UDim(1, 0), UDim(0, 20)));
     m_button->setWantsMultiClickEvents(false);
-    m_button->subscribeEvent(PushButton::EventClicked, 
+    m_button->subscribeEvent(PushButton::EventClicked,
 			     Event::Subscriber(&passive_tab::on_button_click, this));
 
     MultiLineEditbox* log_viewer = dynamic_cast<MultiLineEditbox*>(wmgr.createWindow("TaharezLook/MultiLineEditbox"));
     log_viewer->setPosition(UVector2(UDim(0, 0), UDim(0, 50)));
-    log_viewer->setSize    (UVector2(UDim(1, 0), UDim(1, -50)));
+    log_viewer->setSize    (USize(UDim(1, 0), UDim(1, -50)));
     log_viewer->setReadOnly(true);
     m_logsink->set_window (log_viewer);
-    
-    root->addChildWindow(lport_label);
-    root->addChildWindow(m_lport);
-    
-    root->addChildWindow(m_button);
-    root->addChildWindow(log_viewer);
-    
+
+    root->addChild(lport_label);
+    root->addChild(m_lport);
+
+    root->addChild(m_button);
+    root->addChild(log_viewer);
+
     return root;
 }
 
@@ -400,29 +400,29 @@ void network_window::update (int ticks)
 FrameWindow* network_window::create_window ()
 {
     WindowManager& wmgr = WindowManager::getSingleton();
-	
+
     FrameWindow* window = dynamic_cast<FrameWindow*>
 	(wmgr.createWindow("TaharezLook/FrameWindow", "network_window"));
-	
+
     window->setPosition(UVector2(UDim(0.5, -NW_WIDTH/2), UDim(0.5, -NW_HEIGHT/2)));
-    window->setSize    (UVector2(UDim(0, NW_WIDTH),UDim(0, NW_HEIGHT)));
+    window->setSize    (USize(UDim(0, NW_WIDTH),UDim(0, NW_HEIGHT)));
     window->setText("Network");
-    
+
     Window* container = wmgr.createWindow("TaharezLook/TabControl", "network_mode_tab");
     container->setPosition( UVector2(UDim(0, 10), UDim(0, 30)) );
-    container->setSize    ( UVector2(UDim(1, -20),     UDim(1, -40)) );
+    container->setSize    ( USize(UDim(1, -20),     UDim(1, -40)) );
 
     Window* client_win = m_client_tab->create_window ();
     Window* server_win = m_server_tab->create_window ();
     Window* passive_win = m_passive_tab->create_window ();
-    
+
     m_server_tab->external_dependant (client_win);
     m_client_tab->external_dependant (server_win);
-    
-    window->addChildWindow(container);
-    container->addChildWindow(client_win);
-    container->addChildWindow(server_win);
-    container->addChildWindow(passive_win);
-    
+
+    window->addChild(container);
+    container->addChild(client_win);
+    container->addChild(server_win);
+    container->addChild(passive_win);
+
     return window;
 }

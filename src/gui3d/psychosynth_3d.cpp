@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) Juan Pedro Bolivar Puente 2007                          *
+ *   Copyright (C) Juan Pedro Bolivar Puente 2007, 2016                    *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -106,7 +106,7 @@ void psychosynth_3d::print_version ()
 void psychosynth_3d::prepare (arg_parser& arg_parser)
 {
     conf_node& conf = config::self ().child ("psynth3d");
-    
+
     arg_parser.add ('W', "width",
 		    new option_conf<int>(conf.child ("screen_width")));
     arg_parser.add ('H', "height",
@@ -122,10 +122,10 @@ void psychosynth_3d::prepare (arg_parser& arg_parser)
 int psychosynth_3d::execute()
 {
     logger::self () ("gui", log::info, "Loading settings.");
-     
+
     conf_node& conf = config::self ().child ("psynth3d");
     setup_settings (conf);
-    
+
     logger::self () ("gui", log::info, "Initializing Ogre.");
     setup_ogre (conf);
     logger::self () ("gui", log::info, "Initializing OIS.");
@@ -142,7 +142,7 @@ int psychosynth_3d::execute()
     setup_gui ();
     logger::self () ("gui", log::info, "Initializing GUI elements.");
     setup_menus ();
-		
+
     m_ogre->startRendering();
 
     logger::self () ("gui", log::info, "Closing GUI elements.");
@@ -170,7 +170,7 @@ int psychosynth_3d::execute()
     } catch (std::exception& error) {
 	logger::self () ("gui", log::error, error.what ());
     }
-    
+
     return 0;
 }
 
@@ -181,18 +181,19 @@ bool psychosynth_3d::frameStarted (const Ogre::FrameEvent& evt)
 	m_curr_width  != m_window->getWidth ()) {
 	m_curr_height = m_window->getHeight ();
 	m_curr_width  = m_window->getWidth ();
-	
+
 	m_camera->setAspectRatio (Ogre::Real (m_window->getWidth())
 				  / m_window->getHeight());
 
-	CEGUI::Size size = CEGUI::Size(static_cast<float> (m_curr_width),
-				       static_cast<float> (m_curr_height));	
-	dynamic_cast<CEGUI::OgreRenderer*> (m_gui->getRenderer())->setDisplaySize (size);
-	CEGUI::ImagesetManager::getSingleton().notifyDisplaySizeChanged(size);
+        auto size = CEGUI::Sizef(static_cast<float> (m_curr_width),
+                                 static_cast<float> (m_curr_height));
+	auto renderer = dynamic_cast<CEGUI::OgreRenderer*> (m_gui->getRenderer());
+	renderer->setDisplaySize (size);
+        CEGUI::ImageManager::getSingleton().notifyDisplaySizeChanged(size);
 	CEGUI::FontManager::getSingleton().notifyDisplaySizeChanged(size);
-        CEGUI::System::getSingleton().notifyDisplaySizeChanged(size);	
+        CEGUI::System::getSingleton().notifyDisplaySizeChanged(size);
     }
-    
+
     m_timer.update ();
     m_inputmgr->capture ();
     m_taskmgr->update (m_timer.delta_ticks ());
@@ -205,7 +206,7 @@ bool psychosynth_3d::frameStarted (const Ogre::FrameEvent& evt)
 
     if (m_window->isClosed ())
 	m_must_quit = true;
-    
+
     return !m_must_quit;
 }
 
@@ -224,18 +225,18 @@ void psychosynth_3d::setup_settings (conf_node& conf)
     } catch (std::exception& error) {
 	logger::self () ("gui", log::error, error.what ());
     }
-    
+
     conf.child ("screen_width").def (DEFAULT_SCREEN_WIDTH);
     conf.child ("screen_height").def (DEFAULT_SCREEN_HEIGHT);
     conf.child ("fullscreen").def (DEFAULT_FULLSCREEN);
     conf.child ("fps").def (DEFAULT_FPS);
-	
+
     /* Is it dangerous to have this set before the gui is initialized? */
     conf.on_nudge.connect
 	(boost::bind (&psychosynth_3d::on_config_change, this, _1));
     conf.child ("fps").on_change.connect
 	(boost::bind (&psychosynth_3d::on_fps_change, this, _1));
-    
+
 }
 
 void psychosynth_3d::setup_ogre (conf_node& conf)
@@ -249,14 +250,14 @@ void psychosynth_3d::setup_ogre (conf_node& conf)
     conf.child ("screen_height").get (screen_height);
     conf.child ("fullscreen").get (fullscreen);
     conf.child ("fps").get (fps);
-    
+
     (new LogManager)->createLog
 	((get_config_path() / "gui3d/psynth3d_Ogre.log").string (),
 	 false, false, false);
-    
+
     m_ogre = new Root ((get_data_path() / "gui3d/plugins.cfg").string (),
 		       (get_data_path() / "gui3d/ogre.cfg").string ());
-        
+
     ResourceGroupManager& res_mgr = ResourceGroupManager::getSingleton();
     res_mgr.addResourceLocation (get_data_path ().string (),
 				 "FileSystem", "General");
@@ -283,9 +284,9 @@ void psychosynth_3d::setup_ogre (conf_node& conf)
 					  fullscreen);
     m_curr_height = m_window->getHeight ();
     m_curr_width  = m_window->getWidth ();
-	
+
     m_ogre->addFrameListener(this);
-	
+
     m_scene = m_ogre->createSceneManager(Ogre::ST_GENERIC, "main");
 
     m_timer.force_fps(fps);
@@ -295,57 +296,58 @@ void psychosynth_3d::setup_input ()
 {
     int fullscreen; /* I prefer not using the singleton here. */
     config::self ().path("psynth3d.fullscreen").get(fullscreen);
-    
+
     OIS::ParamList pl;
     size_t window_hnd = 0;
 
     m_window->getCustomAttribute("WINDOW", &window_hnd);
-    
+
     pl.insert(std::make_pair(std::string("WINDOW"), std::string(itoa(window_hnd, 10))));
 
-#if defined OIS_WIN32_PLATFORM 
-    pl.insert(std::make_pair(std::string("w32_mouse"), std::string("DISCL_FOREGROUND" ))); 
-    pl.insert(std::make_pair(std::string("w32_mouse"), std::string("DISCL_NONEXCLUSIVE"))); 
-    pl.insert(std::make_pair(std::string("w32_keyboard"), std::string("DISCL_FOREGROUND"))); 
-    pl.insert(std::make_pair(std::string("w32_keyboard"), std::string("DISCL_NONEXCLUSIVE"))); 
+#if defined OIS_WIN32_PLATFORM
+    pl.insert(std::make_pair(std::string("w32_mouse"), std::string("DISCL_FOREGROUND" )));
+    pl.insert(std::make_pair(std::string("w32_mouse"), std::string("DISCL_NONEXCLUSIVE")));
+    pl.insert(std::make_pair(std::string("w32_keyboard"), std::string("DISCL_FOREGROUND")));
+    pl.insert(std::make_pair(std::string("w32_keyboard"), std::string("DISCL_NONEXCLUSIVE")));
 #elif defined OIS_LINUX_PLATFORM
-    pl.insert(std::make_pair(std::string("x11_mouse_grab"), std::string("false"))); 
-    pl.insert(std::make_pair(std::string("x11_mouse_hide"), std::string("true"))); 
-    pl.insert(std::make_pair(std::string("x11_keyboard_grab"), std::string(fullscreen ? "true" : "false"))); 
-    pl.insert(std::make_pair(std::string("XAutoRepeatOn"), std::string("true"))); 
+    pl.insert(std::make_pair(std::string("x11_mouse_grab"), std::string("false")));
+    pl.insert(std::make_pair(std::string("x11_mouse_hide"), std::string("true")));
+    pl.insert(std::make_pair(std::string("x11_keyboard_grab"), std::string(fullscreen ? "true" : "false")));
+    pl.insert(std::make_pair(std::string("XAutoRepeatOn"), std::string("true")));
 #endif
 
     m_inputmgr = new input_manager (pl);
 }
 
 void psychosynth_3d::setup_gui ()
-{   
+{
     m_gui = &CEGUI::System::create (
         CEGUI::OgreRenderer::create (*m_window),
         0, 0, 0, 0, "",
         (get_config_path () / "psynth3d_CEGUI.log").string ());
 
     CEGUI::DefaultResourceProvider* rp =
-        static_cast<CEGUI::DefaultResourceProvider*>(        
+        static_cast<CEGUI::DefaultResourceProvider*>(
             CEGUI::System::getSingleton().getResourceProvider());
     rp->setResourceGroupDirectory("", (get_data_path () / "gui3d/gui").string ());
-    
-    CEGUI::SchemeManager::getSingleton().create("TaharezLook.scheme");
-    m_gui->setDefaultMouseCursor("TaharezLook", "MouseArrow");
-    CEGUI::FontManager::getSingleton().create("DejaVuSans-9.font");
-    m_gui->setDefaultFont("DejaVuSans-9");
-    
+
+    CEGUI::SchemeManager::getSingleton().createFromFile("TaharezLook.scheme");
+    CEGUI::FontManager::getSingleton().createFromFile("DejaVuSans-9.font");
+    m_gui->getDefaultGUIContext()
+        .setDefaultFont("DejaVuSans-9");
+
     CEGUI::WindowManager *win = CEGUI::WindowManager::getSingletonPtr();
-    CEGUI::Window *sheet = win->createWindow("DefaultGUISheet", "root"); // TODO: root?
+    CEGUI::Window *sheet = win->createWindow("DefaultWindow", "root"); // TODO: root?
+    sheet->setMouseCursor("TaharezLook/MouseArrow");
     sheet->setMousePassThroughEnabled(true);
-    m_gui->setGUISheet(sheet);
-    m_gui->setDefaultTooltip("TaharezLook/Tooltip");
-    
-    m_guiinput = new cegui_injecter (); 
+    m_gui->getDefaultGUIContext().setRootWindow(sheet);
+    m_gui->getDefaultGUIContext().setDefaultTooltipType("TaharezLook/Tooltip");
+
+    m_guiinput = new cegui_injecter ();
     m_inputmgr->add_mouse_listener (m_guiinput);
     m_inputmgr->add_key_listener (m_guiinput);
 
-    m_gui->setMultiClickTimeout(0.0f);
+    //m_gui->setMultiClickTimeout(0.0f);
     //m_gui->setMultiClickToleranceAreaSize(CEGUI::Size(0.0f, 0.0f));
 }
 
@@ -361,7 +363,7 @@ void psychosynth_3d::setup_world ()
     //m_scene->setShadowTechnique(SHADOWTYPE_STENCIL_ADDITIVE);
     //m_scene->setShadowTechnique (SHADOWTYPE_TEXTURE_MODULATIVE);
     m_scene->setShadowTechnique (SHADOWTYPE_TEXTURE_ADDITIVE);
-    
+
     m_camera = m_scene->createCamera("camera");
     m_camera->setNearClipDistance(0.1);
     m_camera->setCastShadows(false);
@@ -369,7 +371,7 @@ void psychosynth_3d::setup_world ()
     m_viewport = m_window->addViewport(m_camera);
     m_viewport->setBackgroundColour(Ogre::ColourValue(0,0,0));
     m_camera->setAspectRatio(Ogre::Real(m_window->getWidth())/m_window->getHeight());
-    
+
     Light* light;
     light = m_scene->createLight("light1");
     light->setType(Light::LT_POINT);
@@ -398,14 +400,14 @@ void psychosynth_3d::setup_world ()
     light->setDiffuseColour(1.0, 0.3, 0.3);
     light->setSpecularColour(1.0, 1.0, 0.3);
     light->setAttenuation(100, 2.3, 0, 0);
-    
+
     Entity *ent1 = m_scene->createEntity( "object1", "world.mesh" );
     ent1->setQueryFlags(QFLAG_WORLD);
     SceneNode *node1 = m_scene->getRootSceneNode()->createChildSceneNode();
     //node1->setScale(Vector3(1.5, 1.5, 1.5));
     node1->attachObject(ent1);
     node1->setScale(2, 2, 2);
-    
+
     SceneNode *node = m_scene->getRootSceneNode()->createChildSceneNode();
     /* FIXME: Memory leak. */
     flat_ring* ring0 = new flat_ring ("the_point_0", Degree(0), Degree(360),
@@ -416,7 +418,7 @@ void psychosynth_3d::setup_world ()
 				      ColourValue(0, 0, 0, 0.8));
 
     m_scene->setSkyBox (true, "space_sky_box");
-    
+
     node->attachObject(ring0);
     node->attachObject(ring1);
     node->setPosition(Vector3(0,0.01,0));
@@ -437,11 +439,11 @@ void psychosynth_3d::setup_world ()
 void psychosynth_3d::setup_menus ()
 {
     selector_window* selector = new selector_window (m_elemmgr);
-    
+
     m_populator.populate(selector);
-      
+
     m_windowlist = new window_list ();
-    
+
     m_windowlist->add_window ("SelectorWindowButton.imageset",
 			      "SelectorWindowButton.layout",
 			      "Add objects to the world.",
@@ -504,7 +506,7 @@ void psychosynth_3d::close_gui ()
     delete m_guiinput;
 // TODO
 //	delete m_ceguirender;
-//	delete m_gui; 
+//	delete m_gui;
 }
 
 void psychosynth_3d::close_input ()
@@ -539,8 +541,7 @@ void psychosynth_3d::on_config_change (conf_node& conf)
 void psychosynth_3d::on_fps_change (conf_node& conf)
 {
     int fps;
-    
+
     conf.get(fps);
     m_timer.force_fps(fps);
 }
-

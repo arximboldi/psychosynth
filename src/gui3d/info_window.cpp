@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) Juan Pedro Bolivar Puente 2007                          *
+ *   Copyright (C) Juan Pedro Bolivar Puente 2007, 2016                    *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -104,7 +104,7 @@ static const char* COMPILE_OPTIONS_TEXT =
     "Yes.\n"
 #else
     "No.\n"
-#endif	
+#endif
     "";
 
 static const char* CREDITS_TEXT =
@@ -136,49 +136,49 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.";
 CEGUI::FrameWindow* info_window::create_window ()
 {
     WindowManager& wmgr = WindowManager::getSingleton();
-    
+
     FrameWindow* window = dynamic_cast<FrameWindow*>
 	(wmgr.createWindow("TaharezLook/FrameWindow"));
-    
+
     window->setPosition(UVector2(UDim(0.5, -IW_WIDTH/2), UDim(0.5, -IW_HEIGHT/2)));
-    window->setSize    (UVector2(UDim(0, IW_WIDTH),UDim(0, IW_HEIGHT)));
+    window->setSize    (USize(UDim(0, IW_WIDTH),UDim(0, IW_HEIGHT)));
     window->setText("Info");
-    
-    Imageset* logoimg =
-	&ImagesetManager::getSingleton().create("Logo.imageset");
+
+    auto logos = Sizef(266.0, 68.0);
     Window* logo = wmgr.createWindow("TaharezLook/StaticImage");
-    logo->setProperty("Image", "set:Logo image:the_logo");
-    logo->setPosition(UVector2(UDim(0.5, -logoimg->getImageWidth("the_logo")/2),
+    //logo->setProperty("Image", "Logo/the_logo");
+    logo->setPosition(UVector2(UDim(0.5, -logos.d_width/2),
 			       UDim(0, 30)));
-    logo->setSize(UVector2(UDim(0, logoimg->getImageWidth("the_logo")),
-			   UDim(0, logoimg->getImageHeight("the_logo"))));
+    logo->setSize(USize(UDim(0, logos.d_width),
+                        UDim(0, logos.d_height)));
     logo->setProperty("FrameEnabled", "False");
     logo->setProperty("BackgroundEnabled", "false");
 
     Window* slogan = wmgr.createWindow("TaharezLook/StaticText");
-    slogan->setPosition(UVector2(UDim(0.5, -logoimg->getImageWidth("the_logo")/2),
-				 UDim(0, logoimg->getImageHeight("the_logo") + 26)));
-    slogan->setSize(UVector2(UDim(0, logoimg->getImageWidth("the_logo")), UDim(0, 20)));
+    slogan->setPosition(UVector2(UDim(0.5, -logos.d_width/2),
+				 UDim(0,    logos.d_height + 26)));
+    slogan->setSize(USize(UDim(0, logos.d_width), UDim(0, 20)));
     slogan->setProperty("BackgroundEnabled", "false");
     slogan->setText("Psychosynth "  VERSION);
 
 
     Window* container = wmgr.createWindow("TaharezLook/TabControl");
     container->setPosition(UVector2(UDim(0, 20),
-				    UDim(0, logoimg->getImageHeight("the_logo")+50)));
-    container->setSize(UVector2(UDim(1, -40), UDim(1, -logoimg->getImageHeight("the_logo")-70)));
+				    UDim(0, logos.d_height+50)));
+    container->setSize(USize(UDim(1, -40),
+                             UDim(1, -logos.d_height-70)));
 
     /*
      * About section.
      */
-    Window* about = wmgr.createWindow("DefaultGUISheet");
+    Window* about = wmgr.createWindow("DefaultWindow");
     about->setText("About");
     about->setPosition(UVector2(UDim(0, 0), UDim(0, 0)));
-    about->setSize(UVector2(UDim(1, 0), UDim(1, 0)));
+    about->setSize(USize(UDim(1, 0), UDim(1, 0)));
 
     Window* about_st = wmgr.createWindow("TaharezLook/StaticText");
     about_st->setPosition(UVector2(UDim(0.0, 10), UDim(0.0, 10)));
-    about_st->setSize(UVector2(UDim(1, -20), UDim(0, 140)));
+    about_st->setSize(USize(UDim(1, -20), UDim(0, 140)));
     about_st->setProperty("FrameEnabled", "False");
     about_st->setProperty("BackgroundEnabled", "false");
     about_st->setProperty("HorzFormatting", "WordWrapLeftAligned");
@@ -186,36 +186,36 @@ CEGUI::FrameWindow* info_window::create_window ()
 
     MultiLineEditbox* about_mle = dynamic_cast<MultiLineEditbox*>(wmgr.createWindow("TaharezLook/MultiLineEditbox"));
     about_mle->setPosition(UVector2(UDim(0, 10), UDim(0.0, 150)));
-    about_mle->setSize(UVector2(UDim(1, -20), UDim(1, -160)));
+    about_mle->setSize(USize(UDim(1, -20), UDim(1, -160)));
     about_mle->setReadOnly(true);
     about_mle->setText(COMPILE_OPTIONS_TEXT);
 
     /*
      * Help section.
      */
-    Window* help = wmgr.createWindow("DefaultGUISheet");
+    Window* help = wmgr.createWindow("DefaultWindow");
     help->setText("Help");
     help->setPosition(UVector2(UDim(0, 0), UDim(0, 0)));
-    help->setSize(UVector2(UDim(1, 0), UDim(1, 0)));
+    help->setSize(USize(UDim(1, 0), UDim(1, 0)));
 
     Window* help_mle  = wmgr.createWindow("TaharezLook/StaticText");
     help_mle->setPosition(UVector2(UDim(0, 10), UDim(0, 10)));
-    help_mle->setSize(UVector2(UDim(1, -20), UDim(1, -20)));
+    help_mle->setSize(USize(UDim(1, -20), UDim(1, -20)));
     help_mle->setText(HELP_TEXT);
     help_mle->setProperty("VertScrollbar", "True");
     help_mle->setProperty("HorzFormatting", "WordWrapLeftAligned");
-    
+
     /*
      * Credits section.
      */
-    Window* credits = wmgr.createWindow("DefaultGUISheet");
+    Window* credits = wmgr.createWindow("DefaultWindow");
     credits->setText("Credits");
     credits->setPosition(UVector2(UDim(0, 0), UDim(0, 0)));
-    credits->setSize(UVector2(UDim(1, 0), UDim(1, 0)));
+    credits->setSize(USize(UDim(1, 0), UDim(1, 0)));
 
     Window* credits_st = wmgr.createWindow("TaharezLook/StaticText");
     credits_st->setPosition(UVector2(UDim(0.0, 10), UDim(0.0, 10)));
-    credits_st->setSize(UVector2(UDim(1, -20), UDim(0, 40)));
+    credits_st->setSize(USize(UDim(1, -20), UDim(0, 40)));
     credits_st->setProperty("FrameEnabled", "False");
     credits_st->setProperty("BackgroundEnabled", "false");
     credits_st->setProperty("HorzFormatting", "WordWrapLeftAligned");
@@ -223,7 +223,7 @@ CEGUI::FrameWindow* info_window::create_window ()
 
     Window* credits_mle  = wmgr.createWindow("TaharezLook/StaticText");
     credits_mle->setPosition(UVector2(UDim(0, 10), UDim(0.0, 50)));
-    credits_mle->setSize(UVector2(UDim(1, -20), UDim(1, -60)));
+    credits_mle->setSize(USize(UDim(1, -20), UDim(1, -60)));
     credits_mle->setText(CREDITS_LIST_TEXT);
     credits_mle->setProperty("VertScrollbar", "True");
     credits_mle->setProperty("HorzFormatting", "WordWrapCentred");
@@ -231,36 +231,35 @@ CEGUI::FrameWindow* info_window::create_window ()
     /*
      * License section.
      */
-    Window* license = wmgr.createWindow("DefaultGUISheet");
+    Window* license = wmgr.createWindow("DefaultWindow");
     license->setText("License");
     license->setPosition(UVector2(UDim(0, 0), UDim(0, 0)));
-    license->setSize(UVector2(UDim(1, 0), UDim(1, 0)));
+    license->setSize(USize(UDim(1, 0), UDim(1, 0)));
 
     MultiLineEditbox* license_mle = dynamic_cast<MultiLineEditbox*>(wmgr.createWindow("TaharezLook/MultiLineEditbox"));
     license_mle->setPosition(UVector2(UDim(0, 10), UDim(0.0, 10)));
-    license_mle->setSize(UVector2(UDim(1, -20), UDim(1, -20)));
+    license_mle->setSize(USize(UDim(1, -20), UDim(1, -20)));
     license_mle->setReadOnly(true);
     license_mle->setText(LICENSE_TEXT);
-    
-    about->addChildWindow(about_st);
-    about->addChildWindow(about_mle);
 
-    help->addChildWindow(help_mle);
-    
-    credits->addChildWindow(credits_st);
-    credits->addChildWindow(credits_mle);
+    about->addChild(about_st);
+    about->addChild(about_mle);
 
-    license->addChildWindow(license_mle);
-    
-    container->addChildWindow(about);
-    container->addChildWindow(help);
-    container->addChildWindow(credits);
-    container->addChildWindow(license);
-    
-    window->addChildWindow(container);
-    window->addChildWindow(logo);
-    window->addChildWindow(slogan);
-    
+    help->addChild(help_mle);
+
+    credits->addChild(credits_st);
+    credits->addChild(credits_mle);
+
+    license->addChild(license_mle);
+
+    container->addChild(about);
+    container->addChild(help);
+    container->addChild(credits);
+    container->addChild(license);
+
+    window->addChild(container);
+    window->addChild(logo);
+    window->addChild(slogan);
+
     return window;
 }
-

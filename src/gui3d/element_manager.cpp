@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) 2007 Juan Pedro Bolivar Puente                          *
+ *   Copyright (C) 2007, 2016 Juan Pedro Bolivar Puente                    *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -109,26 +109,26 @@ void element_manager::addElement(int e_type)
     world_node obj;
 
     m_must_own++;
-    
+
     switch(e_type) {
     case ELEM_OSC_SINE:
 	obj = m_world->addObject(NODE_OSCILLATOR);
 	obj.setParam(ObjectOscillator::PARAM_WAVE,
 		     ObjectOscillator::OSC_SINE);
 	break;
-	
+
     case ELEM_OSC_SQUARE:
 	obj = m_world->addObject(NODE_OSCILLATOR);
 	obj.setParam(ObjectOscillator::PARAM_WAVE,
 		     ObjectOscillator::OSC_SQUARE);
 	break;
-	
+
     case ELEM_OSC_TRIANGLE:
 	obj = m_world->addObject(NODE_OSCILLATOR);
 	obj.setParam(ObjectOscillator::PARAM_WAVE,
 		     ObjectOscillator::OSC_TRIANGLE);
 	break;
-	
+
     case ELEM_OSC_SAWTOOTH:
 	obj = m_world->addObject(NODE_OSCILLATOR);
 	obj.setParam(ObjectOscillator::PARAM_WAVE,
@@ -146,7 +146,7 @@ void element_manager::addElement(int e_type)
 	obj.setParam(ObjectOscillator::PARAM_WAVE,
 		     ObjectOscillator::OSC_EXP);
 	break;
-	
+
     case ELEM_LFO_SINE:
 	obj = m_world->addObject(NODE_LFO);
 	obj.setParam(ObjectOscillator::PARAM_WAVE,
@@ -154,7 +154,7 @@ void element_manager::addElement(int e_type)
 	obj.setParam(ObjectOscillator::PARAM_FREQUENCY,
 		     2.0f);
 	break;
-	
+
     case ELEM_LFO_SQUARE:
 	obj = m_world->addObject(NODE_LFO);
 	obj.setParam(ObjectOscillator::PARAM_WAVE,
@@ -162,7 +162,7 @@ void element_manager::addElement(int e_type)
 	obj.setParam(ObjectOscillator::PARAM_FREQUENCY,
 		     2.0f);
 	break;
-	
+
     case ELEM_LFO_TRIANGLE:
 	obj = m_world->addObject(NODE_LFO);
 	obj.setParam(ObjectOscillator::PARAM_WAVE,
@@ -170,7 +170,7 @@ void element_manager::addElement(int e_type)
 	obj.setParam(ObjectOscillator::PARAM_FREQUENCY,
 		     2.0f);
 	break;
-	
+
     case ELEM_LFO_SAWTOOTH:
 	obj = m_world->addObject(NODE_LFO);
 	obj.setParam(ObjectOscillator::PARAM_WAVE,
@@ -186,7 +186,7 @@ void element_manager::addElement(int e_type)
 	obj.setParam(ObjectOscillator::PARAM_FREQUENCY,
 		     2.0f);
 	break;
-	
+
     case ELEM_LFO_EXP:
 	obj = m_world->addObject(NODE_LFO);
 	obj.setParam(ObjectOscillator::PARAM_WAVE,
@@ -194,7 +194,7 @@ void element_manager::addElement(int e_type)
 	obj.setParam(ObjectOscillator::PARAM_FREQUENCY,
 		     2.0f);
 	break;
-	
+
     case ELEM_FILTER_LOWPASS:
 	obj = m_world->addObject(NODE_FILTER);
 	obj.setParam(ObjectFilter::PARAM_TYPE,
@@ -230,7 +230,7 @@ void element_manager::addElement(int e_type)
 	obj.setParam(ObjectFilter::PARAM_TYPE,
 		     ObjectFilter::FILTER_MOOG);
 	break;
-	
+
     case ELEM_MIXER:
 	obj = m_world->addObject(NODE_MIXER);
 	obj.setParam(ObjectMixer::PARAM_MIXOP,
@@ -254,7 +254,7 @@ void element_manager::addElement(int e_type)
 	obj.setParam(ObjectMixer::PARAM_MIXOP,
 		     ObjectMixer::MIX_PRODUCT);
 	break;
-	
+
     default:
 	break;
     }
@@ -265,11 +265,12 @@ void element_manager::addElement(int e_type)
 
 bool element_manager::get_world_pointer (Vector2& res)
 {
-    CEGUI::Point mousepos = CEGUI::MouseCursor::getSingleton().getPosition();	
+    auto mousepos = CEGUI::System::getSingleton()
+        .getDefaultGUIContext().getMouseCursor().getPosition();
     Ray ray =  Ray(m_camera->getCameraToViewportRay(
 		       float(mousepos.d_x)/m_camera->getViewport()->getActualWidth(),
 		       float(mousepos.d_y)/m_camera->getViewport()->getActualHeight()));
-    
+
     pair<bool, Ogre::Real>  inter = ray.intersects(Plane(Vector3(0.0,1.0,0.0),
 							 Ogre::Real(0.0)));
 
@@ -282,14 +283,14 @@ bool element_manager::get_world_pointer (Vector2& res)
 	return true;
     }
 
-    return false; 
+    return false;
 }
 
 bool element_manager::mouseMoved(const OIS::MouseEvent& e)
 {
     Vector2 pos;
     bool ret = false;
-    
+
     if (get_world_pointer (pos)) {
 	for (elem_map_iter it = m_elems.begin(); it != m_elems.end();)
 	    if ((*it++).second->pointer_moved (pos))
@@ -306,7 +307,7 @@ bool element_manager::mousePressed(const OIS::MouseEvent &e, OIS::MouseButtonID 
 
     if (!m_adding.is_null())
 	m_adding = world_node();
-    
+
     if (get_world_pointer (pos)) {
 	for (elem_map_iter it = m_elems.begin(); it != m_elems.end(); ++it)
 	    if ((*it).second->pointer_clicked (pos, id))
@@ -314,12 +315,12 @@ bool element_manager::mousePressed(const OIS::MouseEvent &e, OIS::MouseButtonID 
 
 	if (ret)
 	    return ret;
-	
+
 	for (std::list<connection*>::iterator it = m_cons.begin(); it != m_cons.end(); ++it)
 	    if ((*it)->pointer_clicked (pos, id))
 		return true;//ret = true;
     }
-	
+
     return ret;
 }
 
@@ -327,23 +328,23 @@ bool element_manager::mouseReleased(const OIS::MouseEvent &e, OIS::MouseButtonID
 {
     Vector2 pos;
     bool ret = false;
-    
+
     if (get_world_pointer (pos)) {
 	for (elem_map_iter it = m_elems.begin(); it != m_elems.end();)
 	    if((*it++).second->pointer_released (pos, id))
 		ret = true;
     }
-    
+
     return ret;
 }
 
 bool element_manager::keyPressed(const OIS::KeyEvent &e)
 {
     bool ret = false;
-    
+
     for (elem_map_iter it = m_elems.begin(); it != m_elems.end();)
 	if((*it++).second->key_pressed (e))
-	    ret = true;    
+	    ret = true;
 
     switch(e.key) {
     case OIS::KC_LCONTROL:
@@ -357,21 +358,21 @@ bool element_manager::keyPressed(const OIS::KeyEvent &e)
 	//m_modifier_2++;
 	m_modifier_2 = 1;
 	break;
-	
+
     default:
 	break;
     }
-           
+
     return ret;
 }
 
 bool element_manager::keyReleased(const OIS::KeyEvent &e)
 {
     bool ret = false;
-    
+
     for (elem_map_iter it = m_elems.begin(); it != m_elems.end();)
 	if((*it++).second->key_released (e))
-	    ret = true;    
+	    ret = true;
 
     switch(e.key) {
     case OIS::KC_LCONTROL:
@@ -385,11 +386,11 @@ bool element_manager::keyReleased(const OIS::KeyEvent &e)
 	//m_modifier_2--;
 	m_modifier_2 = 0;
 	break;
-	
+
     default:
 	break;
     }
-    
+
     return ret;
 }
 
@@ -400,10 +401,10 @@ void element_manager::handle_add_node (world_node& obj)
     if (elem != NULL) {
 	elem->set_first_modifier (m_modifier_1);
 	elem->set_second_modifier (m_modifier_2);
-	
+
 	if (m_must_own)
 	    elem->set_owned (true);
-	
+
 	m_elems.insert(pair<int, element*>(obj.get_id(), elem));
 	obj.add_listener(elem);
     }
@@ -425,10 +426,10 @@ void element_manager::update()
 {
     for (elem_iter it = m_clear_elems.begin(); it != m_clear_elems.end(); ++it)
 	delete *it;
-    
+
     for (std::list<connection*>::iterator it = m_cons.begin(); it != m_cons.end(); ++it)
 	(*it)->update();
-    
+
     m_clear_elems.clear();
 }
 

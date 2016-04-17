@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) Juan Pedro Bolivar Puente 2008                          *
+ *   Copyright (C) Juan Pedro Bolivar Puente 2008, 2016                    *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -30,6 +30,7 @@
 class output_conf_window
 {
 public:
+    virtual ~output_conf_window() = default;
     virtual CEGUI::Window* create_window (
 	psynth::base::conf_node& node) = 0;
     virtual void apply() = 0;
@@ -41,11 +42,11 @@ class output_conf_window_simple : public output_conf_window
     std::string m_name;
     CEGUI::Editbox* m_value;
     psynth::base::conf_node* m_node;
-    
+
 public:
     output_conf_window_simple (const std::string& cp,
-			      const std::string& name) :
-	m_conf_path(cp), m_name(name) {}
+                               const std::string& name)
+        : m_conf_path(cp), m_name(name) {}
 
     CEGUI::Window* create_window(psynth::base::conf_node& node);
 
@@ -56,6 +57,7 @@ public:
 
 class output_conf_window_factory {
 public:
+    virtual ~output_conf_window_factory() = default;
     virtual const char* get_name () = 0;
     virtual output_conf_window* create_output_conf_window() = 0;
 };
@@ -67,7 +69,7 @@ public:
     const char* get_name () {
 	return "alsa";
     }
-    
+
     output_conf_window* create_output_conf_window () {
 	return new output_conf_window_simple ("out_device", "Device:");
     }
@@ -81,7 +83,7 @@ public:
     const char* get_name () {
 	return "oss";
     }
-    
+
     output_conf_window* create_output_conf_window () {
 	return new output_conf_window_simple ("out_device", "Device:");
     }
@@ -95,7 +97,7 @@ public:
     const char* get_name () {
 	return "jack";
     }
-    
+
     output_conf_window* create_output_conf_window () {
 	return new output_conf_window_simple ("server", "Name:");
     }
@@ -106,9 +108,9 @@ class path_conf_window : public toggable_window
 {
     CEGUI::ItemListbox* m_listbox;
     CEGUI::Editbox* m_editbox;
-    
+
     psynth::base::conf_node& m_conf;
-    
+
     bool on_generic (const CEGUI::EventArgs &e);
     bool on_delete (const CEGUI::EventArgs &e);
     bool on_add (const CEGUI::EventArgs &e);
@@ -117,35 +119,34 @@ class path_conf_window : public toggable_window
     bool on_selection (const CEGUI::EventArgs &e);
     void populate ();
     CEGUI::FrameWindow* create_window ();
-    
+
 public:
     path_conf_window (psynth::base::conf_node& conf_node) :
 	m_conf (conf_node)
-	{}  
+	{}
 };
 
 class conf_window : public toggable_window
 {
     /* File manager config. */
     path_conf_window m_samples_win;
-    
+
     /* The output thing is boring.*/
     typedef std::map<std::string, output_conf_window_factory*> ocwf_map;
     ocwf_map m_map;
     output_conf_window* m_out_win;
     CEGUI::Window* m_out_cegui_win;
-    
+
     psynth::base::conf_node& m_gui_conf;
     psynth::base::conf_node& m_psynth_conf;
-    
-    
+
     /* Video options */
     CEGUI::Editbox* m_sc_width;
     CEGUI::Editbox* m_sc_height;
-    CEGUI::Checkbox* m_fullscreen;
+    CEGUI::ToggleButton* m_fullscreen;
     CEGUI::Scrollbar* m_fps;
     CEGUI::Window* m_fpslabel;
-    
+
     /* Audio options */
     CEGUI::Editbox* m_srate;
     CEGUI::Editbox* m_bufsize;
@@ -164,19 +165,18 @@ class conf_window : public toggable_window
     bool on_fps_change (const CEGUI::EventArgs &e);
     bool on_window_apply_press (const CEGUI::EventArgs &e);
     bool on_samples_paths_press (const CEGUI::EventArgs &e);
-    
+
     void attach_output_conf_window_factory (output_conf_window_factory* f) {
 	m_map.insert(std::make_pair(std::string(f->get_name()), f));
     }
-    
+
 public:
     conf_window (psynth::base::conf_node& gui_conf,
 		 psynth::base::conf_node& psynth_conf);
 
     ~conf_window ();
-    
+
     CEGUI::FrameWindow* create_window ();
 };
 
 #endif /* CONFWINDOW_H */
-

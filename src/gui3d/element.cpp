@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) 2007 Juan Pedro Bolivar Puente                          *
+ *   Copyright (C) 2007, 2016 Juan Pedro Bolivar Puente                    *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -61,13 +61,13 @@ element::element (world_node& obj, Ogre::SceneManager* scene) :
 			    m_col_ghost);
 
     m_gui_prop.set_active (false);
-    
+
     m_node = scene->getRootSceneNode()->createChildSceneNode();
-    
+
     m_node->attachObject(m_base);
 
     vector_2f v;
-    obj.get_param (psynth::graph::node::PARAM_POSITION, v);
+    obj.get_param (psynth::graph::node0::PARAM_POSITION, v);
     m_pos.x = v.x;
     m_pos.y = v.y;
     m_node->setPosition(Vector3(m_pos.x, Z_POS, m_pos.y));
@@ -80,7 +80,7 @@ element::~element()
 {
     for (elem_component_iter it = m_comp.begin(); it != m_comp.end(); ++it)
 	delete *it;
-    
+
     m_scene->destroySceneNode(m_node->getName());
     delete m_base;
 }
@@ -104,17 +104,17 @@ void element::set_target (const world_node& obj)
 	m_target.delete_listener (this);
 	m_aimpoint = Vector3(0, Z_POS, 0);
     }
-    
+
     m_target = obj;
 
     if (!m_target.is_null()) {
 	m_target.add_listener (this);
 
 	vector_2f v;
-	m_target.get_param (psynth::graph::node::PARAM_POSITION, v);
+	m_target.get_param (psynth::graph::node0::PARAM_POSITION, v);
 	m_aimpoint.x = v.x;
 	m_aimpoint.y = v.y;
-	
+
 	m_aimpoint = Vector3(v.x, Z_POS, v.y);
     }
 
@@ -135,7 +135,7 @@ void element::set_position (const Ogre::Vector2& pos)
     vector_2f dest;
     dest.x = pos.x;
     dest.y = pos.y;
-    m_obj.set_param (psynth::graph::node::PARAM_POSITION, dest);
+    m_obj.set_param (psynth::graph::node0::PARAM_POSITION, dest);
 }
 
 void element::set_ghost (bool ghost)
@@ -143,7 +143,7 @@ void element::set_ghost (bool ghost)
     if (m_ghost != ghost) {
 	m_ghost = ghost;
 	m_base->set_colour (m_ghost ? m_col_ghost : m_col_normal);
-	
+
 	for (elem_component_iter it = m_comp.begin(); it != m_comp.end(); ++it)
 	    (*it)->get_scene_node()->setVisible (!m_ghost);
     }
@@ -160,11 +160,11 @@ void element::set_selected (bool selected)
 bool element::pointer_clicked (const Ogre::Vector2& pos, OIS::MouseButtonID id)
 {
     bool ret = false;
-    
+
     for (elem_component_iter it = m_comp.begin(); it != m_comp.end(); ++it)
 	if ((*it)->handle_pointer_click (pos, id))
 	    ret = true;
-    
+
     switch (id) {
     case OIS::MB_Left:
 	if (m_ghost && m_owned) {
@@ -184,7 +184,7 @@ bool element::pointer_clicked (const Ogre::Vector2& pos, OIS::MouseButtonID id)
 	    m_moving = true;
 	    m_click_diff = pos - m_pos;
 	}
-	
+
 	break;
     default:
 	break;
@@ -196,11 +196,11 @@ bool element::pointer_clicked (const Ogre::Vector2& pos, OIS::MouseButtonID id)
 bool element::pointer_moved (const Ogre::Vector2& pos)
 {
     bool ret = false;
-    
+
     for (elem_component_iter it = m_comp.begin(); it != m_comp.end();)
 	if ((*it++)->handle_pointer_move (pos))
 	    ret = true;
-    
+
     if (m_ghost && m_owned)
 	set_position (pos);
     else if (m_moving)
@@ -245,11 +245,11 @@ bool element::key_pressed (const OIS::KeyEvent& e)
 	//m_modifier_2++;
 	m_modifier_2 = 1;
 	break;
-	
+
     default:
 	break;
     }
-       
+
     return false;
 }
 
@@ -267,11 +267,11 @@ bool element::key_released (const OIS::KeyEvent& e)
 	//m_modifier_2--;
 	m_modifier_2 = 0;
 	break;
-	
+
     default:
 	break;
     }
-    
+
     return false;
 }
 
@@ -285,9 +285,9 @@ void element::node_moved (world_node& obj, vector_2f& dest)
 	m_aimpoint.x = dest.x;
 	m_aimpoint.z = dest.y;
     }
-    
+
     m_node->lookAt (m_aimpoint, Node::TS_PARENT);
-    
+
     /*
     for (std::list<Connection*>::iterator it = m_src_con.begin();
 	 it != m_src_con.end(); ++it)
@@ -314,16 +314,16 @@ void element::handle_deactivate_node (world_node& obj)
 void element::handle_set_param_node (world_node& obj, int param_id)
 {
     if (obj == m_obj) {
-	if (param_id == graph::node::PARAM_POSITION) {
+	if (param_id == graph::node0::PARAM_POSITION) {
 	    vector_2f dest;
 	    obj.get_param (param_id, dest);
 	    node_moved (obj, dest);
 	}
-    
+
 	for (elem_component_iter it = m_comp.begin(); it != m_comp.end(); ++it)
 	    (*it)->handle_param_change (obj, param_id);
     } else if (obj == m_target) {
-	if (param_id == graph::node::PARAM_POSITION) {
+	if (param_id == graph::node0::PARAM_POSITION) {
 	    vector_2f dest;
 	    obj.get_param (param_id, dest);
 	    node_moved (obj, dest);

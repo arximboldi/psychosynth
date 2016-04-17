@@ -4,7 +4,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) 2007 Juan Pedro Bolivar Puente                          *
+ *   Copyright (C) 2007, 2016 Juan Pedro Bolivar Puente                    *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -54,7 +54,7 @@ line_rel_pos point_line_position (const Ogre::Vector2& a,
 				  const Ogre::Vector2& p)
 {
     Real s;
-	
+
     /* Calculamos el área del triángulo que forman, según sea positivo o
      * negativo podremos decir si el triángulo iba en sentido horario o
      * antihorario. Si el área es cero no existía triángulo, son colineales,
@@ -63,7 +63,7 @@ line_rel_pos point_line_position (const Ogre::Vector2& a,
     s = (a.x * b.y - a.y * b.x +
 	 b.x * p.y - b.y * p.x +
 	 p.x * a.y - p.y * a.x);
-	
+
     if (s > 0)
 	return LP_RIGHT;
     else if (s < 0)
@@ -84,16 +84,17 @@ line_rel_pos point_line_position (const Ogre::Vector2& a,
 MaterialPtr create_colour_material (const std::string& name,
 				    const ColourValue&  colour)
 {
-    MaterialPtr matptr = 
-	MaterialManager::getSingleton().createOrRetrieve(name, "General").first; 
-	
+    MaterialPtr matptr = MaterialManager::getSingleton()
+        .createOrRetrieve(name, "General")
+        .first.dynamicCast<Material>();
+
     matptr->setReceiveShadows(true);
     Pass* pass = matptr->getTechnique(0)->getPass(0);
     pass->setDiffuse(colour);
     pass->setAmbient(colour);
     pass->setSpecular(colour);
     pass->setSelfIllumination(colour);
-    //pass->setEmissive(ColourValue(0,0,0,colour.a)); 
+    //pass->setEmissive(ColourValue(0,0,0,colour.a));
     pass->setSceneBlending(SBT_TRANSPARENT_ALPHA);
     pass->setDepthWriteEnabled(false);
 

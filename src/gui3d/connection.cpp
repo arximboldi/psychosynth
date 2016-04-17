@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) 2007 Juan Pedro Bolivar Puente                          *
+ *   Copyright (C) 2007, 2016 Juan Pedro Bolivar Puente                    *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -108,7 +108,7 @@ void connection_wave::build (const Ogre::Vector2& src,
 	Vector2 base = src;
 	Vector2 side = (dst - src).perpendicular().normalisedCopy() * WAVE_WIDTH;
 	Vector2 tmp;
-	
+
 	i = n_samples - 1;
 	while(i >= n_samples - real_samples) {
 	    if (i !=  n_samples - 1 || samples[i] >= 0)
@@ -124,7 +124,7 @@ void connection_wave::build (const Ogre::Vector2& src,
 		tmp = base + side * samples[i] * (sin((n_samples - i) * M_PI / real_samples) * 0.7 + 0.3);
 		position(tmp.x, WAVE_Y, tmp.y);
 	    }
-	    
+
 	    position(base.x, WAVE_Y, base.y);
 	    base += run;
 	}
@@ -167,39 +167,39 @@ connection::connection (Ogre::SceneManager* scene,
     m_link(ev)
 {
     vector_2f v;
-    
-    ev.src.get_param (graph::node::PARAM_MUTE, m_is_muted);
-  
-    ev.src.get_param (graph::node::PARAM_POSITION, v);
+
+    ev.src.get_param (graph::node0::PARAM_MUTE, m_is_muted);
+
+    ev.src.get_param (graph::node0::PARAM_POSITION, v);
     m_src.x = v.x;
     m_src.y = v.y;
 
-    ev.dest.get_param (graph::node::PARAM_POSITION, v);
+    ev.dest.get_param (graph::node0::PARAM_POSITION, v);
     m_dest.x = v.x;
     m_dest.y = v.y;
-    
+
     m_node = m_scene->getRootSceneNode()->createChildSceneNode();
     m_line = new connection_line (m_node->getName() + "line",
 				  m_is_muted ?
 				  LINE_MUTE_COLOUR :
 				  LINE_NORMAL_COLOUR,
 				  m_src, m_dest);
-    
+
     m_wave = new connection_wave (m_node->getName() + "wave",
 				  m_is_muted ?
 				  WAVE_MUTE_COLOUR :
-				  ev.socket_type == graph::node::LINK_AUDIO ?
+				  ev.socket_type == graph::node0::LINK_AUDIO ?
 				  WAVE_NORMAL_A_COLOUR :
 				  WAVE_NORMAL_C_COLOUR,
 				  m_src, m_dest);
-    
+
     m_node->attachObject(m_line);
     m_node->attachObject(m_wave);
-    
+
     m_link.src.add_listener (this);
     m_link.dest.add_listener (this);
 
-    if (ev.socket_type == graph::node::LINK_AUDIO)
+    if (ev.socket_type == graph::node0::LINK_AUDIO)
 	m_watch = new graph::watch_view_audio (WAVE_POINTS,
                                                WAVE_A_SECS);
     else
@@ -224,10 +224,10 @@ connection::~connection ()
 
 void connection::handle_set_param_node (world_node& obj, int id)
 {
-    if (id == graph::node::PARAM_POSITION) {
+    if (id == graph::node0::PARAM_POSITION) {
 	vector_2f pos;
 	obj.get_param (id, pos);
-    
+
 	if (obj.get_id() == m_link.src.get_id()) {
 	    m_src.x = pos.x;
 	    m_src.y = pos.y;
@@ -239,20 +239,20 @@ void connection::handle_set_param_node (world_node& obj, int id)
 	m_line->update(m_src, m_dest);
     }
 
-    if (id == graph::node::PARAM_MUTE
+    if (id == graph::node0::PARAM_MUTE
 	&& obj == m_link.src) {
-	
+
 	obj.get_param (id, m_is_muted);
 	if (m_is_muted == true) {
 	    m_line->set_colour (LINE_MUTE_COLOUR);
 	    m_wave->set_colour (WAVE_MUTE_COLOUR);
 	} else {
 	    m_line->set_colour (LINE_NORMAL_COLOUR);
-	    m_wave->set_colour (m_link.socket_type == graph::node::LINK_AUDIO ?
+	    m_wave->set_colour (m_link.socket_type == graph::node0::LINK_AUDIO ?
 				WAVE_NORMAL_A_COLOUR :
 				WAVE_NORMAL_C_COLOUR);
 	}
-	
+
 	m_line->update(m_src, m_dest);
     }
 }
@@ -267,7 +267,7 @@ bool connection::pointer_clicked (const Ogre::Vector2& pos, OIS::MouseButtonID i
 
     if (point_is_in_poly (pos, top_left, top_right, bot_right, bot_left)) {
 	m_is_muted = !m_is_muted;
-	m_link.src.set_param (graph::node::PARAM_MUTE, m_is_muted);
+	m_link.src.set_param (graph::node0::PARAM_MUTE, m_is_muted);
 
 	return true;
     }
@@ -279,7 +279,7 @@ void connection::update ()
 {
     const sample* buf;
 
-    if (m_link.socket_type == graph::node::LINK_AUDIO)
+    if (m_link.socket_type == graph::node0::LINK_AUDIO)
 	buf = (const sample*)
             &const_range (dynamic_cast<graph::watch_view_audio*>(
                               m_watch)->get_buffer()) [0][0];
@@ -287,7 +287,7 @@ void connection::update ()
 	buf = (const sample*)
             &const_range (dynamic_cast<graph::watch_view_control*>(
                               m_watch)->get_buffer()) [0];
-    
+
     //m_line->update(m_src, m_dest);
     m_wave->update(m_src, m_dest, buf, WAVE_POINTS);
 }
@@ -312,4 +312,3 @@ void connection::update ()
   m_line->update(m_src, m_dest);
   }
 */
-

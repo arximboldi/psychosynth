@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) 2007 Juan Pedro Bolivar Puente                          *
+ *   Copyright (C) 2007, 2016 Juan Pedro Bolivar Puente                    *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -43,32 +43,37 @@ class cegui_injecter : public OIS::MouseListener, public OIS::KeyListener
 {
 public:
     bool mouseMoved(const OIS::MouseEvent& e) {
+	auto& ctx = CEGUI::System::getSingleton().getDefaultGUIContext();
 	auto result =
-            CEGUI::System::getSingleton().injectMousePosition(
-                e.state.X.abs, e.state.Y.abs) ||
-            CEGUI::System::getSingleton().injectMouseWheelChange(
-                e.state.Z.rel * .01);
+            ctx.injectMousePosition(e.state.X.abs, e.state.Y.abs) ||
+            ctx.injectMouseWheelChange(e.state.Z.rel * .01);
         return result;
     }
-	
+
     bool mousePressed(const OIS::MouseEvent &e, OIS::MouseButtonID id) {
-	auto result = CEGUI::System::getSingleton().injectMouseButtonDown (convert_button(id));
+	auto result = CEGUI::System::getSingleton()
+            .getDefaultGUIContext()
+            .injectMouseButtonDown (convert_button(id));
         return result;
     }
-	
+
     bool mouseReleased(const OIS::MouseEvent &e, OIS::MouseButtonID id) {
-	return CEGUI::System::getSingleton().injectMouseButtonUp (convert_button (id));
+	return CEGUI::System::getSingleton()
+            .getDefaultGUIContext()
+            .injectMouseButtonUp (convert_button (id));
     }
-	
+
     bool keyPressed(const OIS::KeyEvent &e) {
-	CEGUI::System *sys = CEGUI::System::getSingletonPtr();
-	bool a = sys->injectKeyDown(e.key);
-	bool b = sys->injectChar(e.text);
+	auto& ctx = CEGUI::System::getSingleton().getDefaultGUIContext();
+	bool a = ctx.injectKeyDown((CEGUI::Key::Scan)e.key);
+	bool b = ctx.injectChar(e.text);
 	return a || b;
     }
-	
+
     bool keyReleased(const OIS::KeyEvent &e) {
-	return CEGUI::System::getSingletonPtr()->injectKeyUp(e.key);
+	return CEGUI::System::getSingleton()
+            .getDefaultGUIContext()
+            .injectKeyUp((CEGUI::Key::Scan)e.key);
     }
 };
 
