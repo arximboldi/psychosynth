@@ -7,7 +7,7 @@
  */
 
 /*
- *  Copyright (C) 2011 Juan Pedro Bolívar Puente
+ *  Copyright (C) 2011, 2016 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
  *   

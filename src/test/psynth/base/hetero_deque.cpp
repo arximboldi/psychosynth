@@ -7,7 +7,7 @@
  */
 
 /*
- *  Copyright (C) 2011 Juan Pedro Bolívar Puente
+ *  Copyright (C) 2011, 2016 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
  *   
@@ -199,12 +199,10 @@ BOOST_AUTO_TEST_CASE(hetero_deque_clear)
 BOOST_AUTO_TEST_CASE(hetero_deque_no_tpl)
 {
     test_deque q (1024);
-    
-    int iter = 0;
-    for (auto& x : q)
-        ++iter;
-    BOOST_CHECK_EQUAL (iter, 0);
-    
+
+    auto diff = std::distance(q.begin(), q.end());
+    BOOST_CHECK_EQUAL (diff, 0);
+
     BOOST_CHECK_EQUAL (q.empty (), true);
     BOOST_CHECK_EQUAL (q.push_back (test_count ()), true);
     test_count_dec var1;
