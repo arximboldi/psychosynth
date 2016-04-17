@@ -7,7 +7,7 @@
  */
 
 /*
- *  Copyright (C) 2008, 2009 Juan Pedro Bolívar Puente
+ *  Copyright (C) 2008, 2009, 2016 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
  *   
@@ -298,7 +298,7 @@ public:
     {}
 
     template <class Y>
-    mgr_auto_ptr (std::auto_ptr<Y>& p)
+    mgr_auto_ptr (std::unique_ptr<Y>& p)
 	: m_ptr (p.release ())
 	, m_managed (true)
     {}
@@ -357,7 +357,7 @@ public:
     }
 
     template <class Y>
-    mgr_auto_ptr& operator= (std::auto_ptr<Y>& p)
+    mgr_auto_ptr& operator= (std::unique_ptr<Y>& p)
     {
 	clean ();
 	m_ptr = p.release ();
