@@ -20,6 +20,20 @@ Makefile.in
 stamp-h1
 test-driver
 
+*.o
+*.lo
+*.la
+.dirstamp
+.libs
+src/psynth-cli
+src/psynth3d
+src/test/psynth_unit_test
+src/test/example_graph_output
+src/test/example_graph_patch
+src/test/example_graph_perf
+src/test/example_graph_scale
+src/test/example_graph_soft
+
 Doxyfile
 libpsynth.pc
 data/gui3d/plugins.cfg
