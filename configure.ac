@@ -33,6 +33,9 @@ AC_LANG(C++)
 AC_PROG_CXX
 AM_PROG_LIBTOOL
 
+# Enable silent rules by default.
+AM_SILENT_RULES([yes])
+
 psynth_config_ok="yes"
 
 dnl  Options
