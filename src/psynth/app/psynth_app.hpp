@@ -30,7 +30,10 @@
 #ifndef PSYNTH_PSYCHOSYNTHAPP_H
 #define PSYNTH_PSYCHOSYNTHAPP_H
 
+#include <psynth/warnings.hpp>
+PSYNTH_DISABLE_WARNINGS
 #include <boost/filesystem.hpp>
+PSYNTH_RESTORE_WARNINGS
 #include <psynth/app/director.hpp>
 
 namespace psynth
