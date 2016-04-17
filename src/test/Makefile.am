@@ -1,14 +1,14 @@
 #
 #   PSYCHOSYNTH
 #   ===========
-#              
-#   Copyright (C) 2007, 2008, 2010 by Juan Pedro Bolivar Puente
-#                                                        
+#
+#   Copyright (C) 2007, 2008, 2010, 2016 by Juan Pedro Bolivar Puente
+#
 #   This program is free software: you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
 #   the Free Software Foundation, either version 3 of the License, or
 #   (at your option) any later version.
-#                                      
+#
 #   This program is distributed in the hope that it will be useful,
 #   but WITHOUT ANY WARRANTY; without even the implied warranty of
 #   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -40,8 +40,8 @@ examples_cxxflags = \
 examples_ldadd = \
 	$(BOOST_FILESYSTEM_LIB) \
 	$(BOOST_SIGNALS_LIB) \
-	-lboost_system-mt \
-	../psynth/libpsynth.la	
+	$(BOOST_SYSTEM_LIB) \
+	../psynth/libpsynth.la
 
 example_graph_scale_SOURCES = examples/graph_scale.cpp
 example_graph_scale_CXXFLAGS = $(examples_cxxflags)
@@ -101,7 +101,8 @@ psynth_unit_test_LDADD = \
 	$(BOOST_UNIT_TEST_FRAMEWORK_LIB) \
 	$(BOOST_FILESYSTEM_LIB) \
 	$(BOOST_SIGNALS_LIB) \
-	-lboost_system-mt \
+	$(BOOST_SYSTEM_LIB) \
+	-lpthread \
 	../psynth/libpsynth.la
 
 

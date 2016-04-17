@@ -1,14 +1,14 @@
 #
 #   PSYCHOSYNTH
 #   ===========
-#              
-#   Copyright (C) 2007, 2008, 2010 by Juan Pedro Bolivar Puente
-#                                                        
+#
+#   Copyright (C) 2007, 2008, 2010, 2016 by Juan Pedro Bolivar Puente
+#
 #   This program is free software: you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
 #   the Free Software Foundation, either version 3 of the License, or
 #   (at your option) any later version.
-#                                      
+#
 #   This program is distributed in the hope that it will be useful,
 #   but WITHOUT ANY WARRANTY; without even the implied warranty of
 #   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -36,11 +36,11 @@ libpsynth_la_CXXFLAGS = $(SIGC_CFLAGS) \
 	-I$(top_srcdir)/src \
 	-I$(top_builddir)/src \
 	-DPSYNTH_DATA_DIR=\"$(PACKAGE_DATA_DIR)\"
-libpsynth_la_LDFLAGS =  
+libpsynth_la_LDFLAGS =
 libpsynth_la_LIBADD = \
 	$(BOOST_FILESYSTEM_LIB) \
 	$(BOOST_SIGNALS_LIB) \
-	-lboost_system-mt
+	$(BOOST_SYSTEM_LIB)
 
 libpsynthincdir = $(PACKAGE_INCLUDE_DIR)
 

@@ -29,7 +29,7 @@
 #   and this notice are preserved. This file is offered as-is, without any
 #   warranty.
 
-#serial 9
+#serial 19
 
 AC_DEFUN([AX_BOOST_UNIT_TEST_FRAMEWORK],
 [
@@ -45,7 +45,7 @@ AC_DEFUN([AX_BOOST_UNIT_TEST_FRAMEWORK],
             ax_boost_user_unit_test_framework_lib=""
         else
 		    want_boost="yes"
-        	ax_boost_user_unit_test_framework_lib="$withval"
+		ax_boost_user_unit_test_framework_lib="$withval"
 		fi
         ],
         [want_boost="yes"]
@@ -64,9 +64,9 @@ AC_DEFUN([AX_BOOST_UNIT_TEST_FRAMEWORK],
         AC_CACHE_CHECK(whether the Boost::Unit_Test_Framework library is available,
 					   ax_cv_boost_unit_test_framework,
         [AC_LANG_PUSH([C++])
-			 AC_COMPILE_IFELSE(AC_LANG_PROGRAM([[@%:@include <boost/test/unit_test.hpp>]],
+			 AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[@%:@include <boost/test/unit_test.hpp>]],
                                     [[using boost::unit_test::test_suite;
-					                 test_suite* test= BOOST_TEST_SUITE( "Unit test example 1" ); return 0;]]),
+							 test_suite* test= BOOST_TEST_SUITE( "Unit test example 1" ); return 0;]])],
                    ax_cv_boost_unit_test_framework=yes, ax_cv_boost_unit_test_framework=no)
          AC_LANG_POP([C++])
 		])
@@ -75,38 +75,38 @@ AC_DEFUN([AX_BOOST_UNIT_TEST_FRAMEWORK],
             BOOSTLIBDIR=`echo $BOOST_LDFLAGS | sed -e 's/@<:@^\/@:>@*//'`
 
             if test "x$ax_boost_user_unit_test_framework_lib" = "x"; then
-         		saved_ldflags="${LDFLAGS}"
-                for monitor_library in `ls $BOOSTLIBDIR/libboost_unit_test_framework*.{so,a}* 2>/dev/null` ; do
+			saved_ldflags="${LDFLAGS}"
+                for monitor_library in `ls $BOOSTLIBDIR/libboost_unit_test_framework*.so* $BOOSTLIBDIR/libboost_unit_test_framework*.dylib* $BOOSTLIBDIR/libboost_unit_test_framework*.a* 2>/dev/null` ; do
                     if test -r $monitor_library ; then
-                       libextension=`echo $monitor_library | sed 's,.*/,,' | sed -e 's;^lib\(boost_unit_test_framework.*\)\.so.*$;\1;' -e 's;^lib\(boost_unit_test_framework.*\)\.a*$;\1;'`
+                       libextension=`echo $monitor_library | sed 's,.*/,,' | sed -e 's;^lib\(boost_unit_test_framework.*\)\.so.*$;\1;' -e 's;^lib\(boost_unit_test_framework.*\)\.dylib.*$;\1;' -e 's;^lib\(boost_unit_test_framework.*\)\.a.*$;\1;'`
                        ax_lib=${libextension}
                        link_unit_test_framework="yes"
                     else
                        link_unit_test_framework="no"
                     fi
 
-        		    if test "x$link_unit_test_framework" = "xyes"; then
+			    if test "x$link_unit_test_framework" = "xyes"; then
                       BOOST_UNIT_TEST_FRAMEWORK_LIB="-l$ax_lib"
                       AC_SUBST(BOOST_UNIT_TEST_FRAMEWORK_LIB)
 					  break
 				    fi
                 done
                 if test "x$link_unit_test_framework" != "xyes"; then
-                for libextension in `ls $BOOSTLIBDIR/boost_unit_test_framework*.{dll,a}* 2>/dev/null  | sed 's,.*/,,' | sed -e 's;^\(boost_unit_test_framework.*\)\.dll.*$;\1;' -e 's;^\(boost_unit_test_framework.*\)\.a*$;\1;'` ; do
+                for libextension in `ls $BOOSTLIBDIR/boost_unit_test_framework*.dll* $BOOSTLIBDIR/boost_unit_test_framework*.a* 2>/dev/null  | sed 's,.*/,,' | sed -e 's;^\(boost_unit_test_framework.*\)\.dll.*$;\1;' -e 's;^\(boost_unit_test_framework.*\)\.a.*$;\1;'` ; do
                      ax_lib=${libextension}
 				    AC_CHECK_LIB($ax_lib, exit,
                                  [BOOST_UNIT_TEST_FRAMEWORK_LIB="-l$ax_lib"; AC_SUBST(BOOST_UNIT_TEST_FRAMEWORK_LIB) link_unit_test_framework="yes"; break],
                                  [link_unit_test_framework="no"])
-  				done
+				done
                 fi
             else
                 link_unit_test_framework="no"
-         		saved_ldflags="${LDFLAGS}"
+			saved_ldflags="${LDFLAGS}"
                 for ax_lib in boost_unit_test_framework-$ax_boost_user_unit_test_framework_lib $ax_boost_user_unit_test_framework_lib ; do
                    if test "x$link_unit_test_framework" = "xyes"; then
                       break;
                    fi
-                   for unittest_library in `ls $BOOSTLIBDIR/lib${ax_lib}.{so,a}* 2>/dev/null` ; do
+                   for unittest_library in `ls $BOOSTLIBDIR/lib${ax_lib}.so* $BOOSTLIBDIR/lib${ax_lib}.a* 2>/dev/null` ; do
                    if test -r $unittest_library ; then
                        libextension=`echo $unittest_library | sed 's,.*/,,' | sed -e 's;^lib\(boost_unit_test_framework.*\)\.so.*$;\1;' -e 's;^lib\(boost_unit_test_framework.*\)\.a*$;\1;'`
                        ax_lib=${libextension}
@@ -115,7 +115,7 @@ AC_DEFUN([AX_BOOST_UNIT_TEST_FRAMEWORK],
                        link_unit_test_framework="no"
                     fi
 
-			        if test "x$link_unit_test_framework" = "xyes"; then
+				if test "x$link_unit_test_framework" = "xyes"; then
                         BOOST_UNIT_TEST_FRAMEWORK_LIB="-l$ax_lib"
                         AC_SUBST(BOOST_UNIT_TEST_FRAMEWORK_LIB)
 					    break
@@ -123,12 +123,15 @@ AC_DEFUN([AX_BOOST_UNIT_TEST_FRAMEWORK],
                   done
                done
             fi
+            if test "x$ax_lib" = "x"; then
+                AC_MSG_ERROR(Could not find a version of the library!)
+            fi
 			if test "x$link_unit_test_framework" != "xyes"; then
 				AC_MSG_ERROR(Could not link against $ax_lib !)
 			fi
 		fi
 
 		CPPFLAGS="$CPPFLAGS_SAVED"
-    	LDFLAGS="$LDFLAGS_SAVED"
+	LDFLAGS="$LDFLAGS_SAVED"
 	fi
 ])

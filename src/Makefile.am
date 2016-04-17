@@ -1,14 +1,14 @@
 #
 #   PSYCHOSYNTH
 #   ===========
-#              
-#   Copyright (C) 2007, 2008 by Juan Pedro Bolivar Puente
-#                                                        
+#
+#   Copyright (C) 2007, 2008, 2016 by Juan Pedro Bolivar Puente
+#
 #   This program is free software: you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
 #   the Free Software Foundation, either version 3 of the License, or
 #   (at your option) any later version.
-#                                      
+#
 #   This program is distributed in the hope that it will be useful,
 #   but WITHOUT ANY WARRANTY; without even the implied warranty of
 #   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -54,13 +54,13 @@ endif
 # ======================================================================
 
 psynth_cli_CXXFLAGS = $(SIGC_CFLAGS)
-psynth_cli_LDFLAGS = 
+psynth_cli_LDFLAGS =
 psynth_cli_LDADD = \
 	$(SIGC_LIBS) \
 	$(LIBLO_LIBS) \
 	$(BOOST_FILESYSTEM_LIB) \
 	$(BOOST_SIGNALS_LIB) \
-	-lboost_system-mt \
+	$(BOOST_SYSTEM_LIB) \
 	./psynth/libpsynth.la
 
 psynth_cli_SOURCES = \
@@ -80,11 +80,11 @@ psynth3d_CXXFLAGS = \
 
 
 # libboost_system is a hack
-psynth3d_LDFLAGS = 
+psynth3d_LDFLAGS =
 psynth3d_LDADD = \
 	$(BOOST_SIGNALS_LIB) \
 	$(BOOST_FILESYSTEM_LIB) \
-	-lboost_system-mt \
+	$(BOOST_SYSTEM_LIB) \
 	$(SIGC_LIBS) \
 	$(OGRE_LIBS) \
 	$(CEGUI_LIBS) \

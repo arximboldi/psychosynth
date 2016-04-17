@@ -1,14 +1,14 @@
 dnl
 dnl   PSYCHOSYNTH
 dnl   ===========
-dnl              
-dnl   Copyright (C) 2007, 2008 by Juan Pedro Bolivar Puente
-dnl                                                        
+dnl
+dnl   Copyright (C) 2007, 2008, 2016 by Juan Pedro Bolivar Puente
+dnl
 dnl   This program is free software: you can redistribute it and/or modify
 dnl   it under the terms of the GNU General Public License as published by
 dnl   the Free Software Foundation, either version 3 of the License, or
 dnl   (at your option) any later version.
-dnl                                      
+dnl
 dnl   This program is distributed in the hope that it will be useful,
 dnl   but WITHOUT ANY WARRANTY; without even the implied warranty of
 dnl   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -21,7 +21,7 @@ dnl
 dnl  Global config
 dnl ======================================================================
 
-AC_PREREQ(2.61)
+AC_PREREQ(2.68)
 AC_INIT([psychosynth], [0.3.0], [raskolnikov@es.gnu.org])
 AC_CONFIG_MACRO_DIR([m4])
 
@@ -58,7 +58,8 @@ dnl ======================================================================
 dnl  BOOST
 dnl ----------------------------------------------------------------------
 
-AX_BOOST_BASE([1.42])
+AX_BOOST_BASE([1.56])
+AX_BOOST_SYSTEM
 AX_BOOST_FILESYSTEM
 AX_BOOST_SIGNALS
 AX_BOOST_UNIT_TEST_FRAMEWORK
