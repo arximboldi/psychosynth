@@ -10,10 +10,10 @@
  */
 
 /*
- *  Copyright (C) 2009 Juan Pedro Bolívar Puente
+ *  Copyright (C) 2009, 2016 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -33,8 +33,8 @@
 #define PSYNTH_OBSERVER_H_
 
 #include <boost/bind.hpp>
-#include <boost/signal.hpp>
-#include <boost/signals/trackable.hpp>
+#include <boost/signals2/signal.hpp>
+#include <boost/signals2/trackable.hpp>
 
 namespace psynth
 {
@@ -58,7 +58,7 @@ class signal : public sigc::signal <Types...> { };
  *      from your signal/subjects before destruction.
  *    - A method to manually disconnect form all callbacks.
  */
-class listener_base : public boost::signals::trackable
+class listener_base : public boost::signals2::trackable
 {
 public:
     /** Virtual destructor. */
@@ -77,7 +77,7 @@ public:
     void disconnect_all ()
     {
         listener_base empty;
-        boost::signals::trackable::operator= (empty);
+        boost::signals2::trackable::operator= (empty);
     }
 
 protected:

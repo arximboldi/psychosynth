@@ -32,8 +32,8 @@ namespace psynth
 
 class output_director_jack : public output_director
 {
-    boost::signals::connection m_on_server_change_slot;
-       
+    boost::signals2::connection m_on_server_change_slot;
+
     ~output_director_jack()
     {
 	if (m_output)

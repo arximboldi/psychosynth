@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) Juan Pedro Bolivar Puente 2008                          *
+ *   Copyright (C) Juan Pedro Bolivar Puente 2008, 2016                    *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -33,8 +33,8 @@ class file_manager_director
 {
     base::conf_node* m_conf;
     boost::filesystem::path m_home_path;
-    boost::signals::connection m_on_conf_nudge_slot;
-    
+    boost::signals2::connection m_on_conf_nudge_slot;
+
     void on_conf_nudge (base::conf_node& node);
     void register_config ();
     void unregister_config ();

@@ -7,10 +7,10 @@
  */
 
 /*
- *  Copyright (C) 2007, 2008, 2009 Juan Pedro Bolívar Puente
+ *  Copyright (C) 2007, 2008, 2009, 2016 Juan Pedro Bolívar Puente
  *
  *  This file is part of Psychosynth.
- *   
+ *
  *  Psychosynth is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -59,7 +59,7 @@ class director : private boost::noncopyable
     void start_output();
     void stop_output();
 
-    boost::signals::connection m_on_output_change_slot;
+    boost::signals2::connection m_on_output_change_slot;
 
 public:
     director()

@@ -8,8 +8,8 @@
  */
 
 /*
- *  Copyright (C) 2007, 2009 Juan Pedro Bolívar Puente
- *  
+ *  Copyright (C) 2007, 2009, 2016 Juan Pedro Bolívar Puente
+ *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -92,7 +92,7 @@ public:
 class conf_subject : public subject_base <conf_listener>
 {
 public:
-    typedef boost::signal <void (conf_node&)> signal;
+    typedef boost::signals2::signal <void (conf_node&)> signal;
     //typedef psynth::base::signal <void, conf_node&> signal;
     
     /** Event emitted whenever the node value is changed. */

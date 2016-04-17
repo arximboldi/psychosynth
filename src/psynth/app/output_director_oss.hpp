@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) Juan Pedro Bolivar Puente 2007, 2008                    *
+ *   Copyright (C) Juan Pedro Bolivar Puente 2007, 2008, 2016              *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -32,9 +32,9 @@ namespace psynth
 {
 
 class output_director_oss : public output_director
-{    
-    boost::signals::connection m_on_device_change_slot;
-    
+{
+    boost::signals2::connection m_on_device_change_slot;
+
     ~output_director_oss()
     {
 	if (m_output)
