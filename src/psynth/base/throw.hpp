@@ -130,8 +130,8 @@ public:
     {
         other._owner = false;
     }
-    
-    ~throw_with ()
+
+    ~throw_with () noexcept(false)
     {
         if (_owner)
             throw _exception;
