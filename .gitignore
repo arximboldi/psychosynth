@@ -38,3 +38,5 @@ Doxyfile
 libpsynth.pc
 data/gui3d/plugins.cfg
 src/psynth/version.hpp
+
+build/
