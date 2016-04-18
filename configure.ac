@@ -184,26 +184,6 @@ else
     HAVE_SOUNDTOUCH=disabled
 fi
 
-dnl  Samplerate
-dnl ----------------------------------------------------------------------
-
-dnl AC_ARG_ENABLE([samplerate],
-dnl    AC_HELP_STRING([--disable-samplerate], [Disable optional Samplerate support]),
-dnl        [samplerate=$enableval], [samplerate=auto])
-dnl
-dnl if test "x${samplerate}" != xno ; then
-dnl    PKG_CHECK_MODULES(SAMPLERATE, [ samplerate ],
-dnl        [
-dnl            HAVE_SAMPLERATE=yes
-dnl            AC_DEFINE([HAVE_SAMPLERATE], 1, [Have Samplerate?])
-dnl        ],
-dnl        [
-dnl            HAVE_SAMPLERATE=no
-dnl        ])
-dnl else
-dnl    HAVE_SAMPLERATE=disabled
-dnl fi
-
 dnl  OGG Vorbis
 dnl ----------------------------------------------------------------------
 
@@ -396,7 +376,6 @@ AM_CONDITIONAL([HAVE_LIBXML], [test "x$HAVE_LIBXML" = xyes])
 AM_CONDITIONAL([HAVE_VORBIS], [test "x$HAVE_VORBIS" = xyes])
 AM_CONDITIONAL([HAVE_SNDFILE], [test "x$HAVE_SNDFILE" = xyes])
 AM_CONDITIONAL([HAVE_SOUNDTOUCH], [test "x$HAVE_SOUNDTOUCH" = xyes])
-AM_CONDITIONAL([HAVE_SAMPLERATE], [test "x$HAVE_SAMPLERATE" = xyes])
 AM_CONDITIONAL([HAVE_OSS], [test "x$HAVE_OSS" = xyes])
 AM_CONDITIONAL([HAVE_ALSA], [test "x$HAVE_ALSA" = xyes])
 AM_CONDITIONAL([HAVE_JACK], [test "x$HAVE_JACK" = xyes])
