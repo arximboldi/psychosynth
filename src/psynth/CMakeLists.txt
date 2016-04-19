@@ -362,7 +362,9 @@ if (HAVE_WAV)
     io/file_output.tpp)
 endif()
 
-add_library(psynth ${psynth_sources})
+# SHARED because when it is static, the factory initializers may be
+# optimized away if not referenced anywhere
+add_library(psynth SHARED ${psynth_sources})
 target_include_directories(psynth PUBLIC ${psynth_include_directories})
 target_compile_options(psynth PUBLIC ${psynth_compile_options})
 target_link_libraries(psynth PUBLIC ${psynth_link_libraries})
