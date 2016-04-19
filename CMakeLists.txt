@@ -150,6 +150,9 @@ set_yes_no(HAVE_OSS OSS_FOUND)
 set_yes_no(HAVE_ALSA ALSA_FOUND)
 set_yes_no(HAVE_JACK JACK_FOUND)
 
+enable_testing()
+add_custom_target(check DEPENDS test)
+
 add_subdirectory(src)
 add_subdirectory(doc)
 add_subdirectory(data)
