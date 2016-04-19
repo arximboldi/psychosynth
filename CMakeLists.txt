@@ -34,6 +34,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-unused-local-typedefs")
 set(WITH_LOCAL_DATA off CACHE bool "use local data")
 
 set(WITH_CCACHE auto CACHE string "enable ccache")
+set(WITH_DOC auto CACHE string "add target to generate docs")
 
 set(WITH_PSYNTH auto CACHE string "build cli client")
 set(WITH_PSYNTH3D auto CACHE string "build 3d gui client")
@@ -48,6 +49,7 @@ set(WITH_WAV auto CACHE string "enable other samples")
 set(WITH_ALSA auto CACHE string "enable ALSA sound system")
 set(WITH_OSS auto CACHE string "enable OSS sound system")
 set(WITH_JACK auto CACHE string "enable Jack sound system")
+
 
 #  Required libraries
 #  =====================================================================
@@ -86,6 +88,16 @@ pkg_check_modules(SOUNDTOUCH soundtouch REQUIRED)
 
 #  Optional libraries
 #  =====================================================================
+
+function(optional_find_package cond tag package)
+  if (${cond})
+    if (NOT (${cond} STREQUAL auto))
+      set(is_required REQUIRED)
+    endif()
+    find_package(${package} ${is_required})
+    set(${tag}_FOUND ${${tag}_FOUND} PARENT_SCOPE)
+  endif()
+endfunction(optional_find_package)
 
 function(optional_pkg_check_modules cond name expr)
   if (${cond})
@@ -140,6 +152,7 @@ optional_pkg_check_modules(WITH_PSYNTH3D CEGUIOGRE CEGUI-0-OGRE>=0.7)
 optional_pkg_check_modules(WITH_PSYNTH3D OIS OIS>=1.0)
 
 optional_find_program(WITH_CCACHE CCACHE ccache)
+optional_find_package(WITH_DOC DOXYGEN Doxygen)
 
 #  Define targets
 #  =====================================================================
@@ -172,6 +185,7 @@ set_yes_no(HAVE_ALSA ALSA_FOUND)
 set_yes_no(HAVE_JACK JACK_FOUND)
 
 set_yes_no(HAVE_CCACHE CCACHE_FOUND)
+set_yes_no(HAVE_DOC DOXYGEN_FOUND)
 
 if(HAVE_CCACHE)
   set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE ${CCACHE})
@@ -255,6 +269,10 @@ endif()
 
 message("")
 
+message("       Reference docs: .......... ${HAVE_DOC}")
+if (WITH_DOC AND NOT DOXYGEN_FOUND)
+  message("           > doxygen not installed")
+endif()
 message("       Use ccache: .............. ${HAVE_CCACHE}")
 if (WITH_CCACHE AND NOT CCACHE_FOUND)
   message("           > ccache not installed")
