@@ -23,9 +23,7 @@ configure_file(
   "${CMAKE_CURRENT_SOURCE_DIR}/version.hpp")
 
 set(psynth_compile_options
-  -DPSYNTH_DATA_DIR=""
-  -Wall
-  -Wno-unused-local-typedefs)
+  -DPSYNTH_DATA_DIR="")
 
 set(psynth_link_libraries
   ${Boost_LIBRARIES})
