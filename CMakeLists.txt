@@ -33,6 +33,8 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-unused-local-typedefs")
 
 set(WITH_LOCAL_DATA off CACHE bool "use local data")
 
+set(WITH_CCACHE auto CACHE string "enable ccache")
+
 set(WITH_PSYNTH auto CACHE string "build cli client")
 set(WITH_PSYNTH3D auto CACHE string "build 3d gui client")
 set(WITH_TESTS auto CACHE string "build unit tests")
@@ -106,6 +108,23 @@ function(optional_check_include_files cond name expr)
   endif()
 endfunction(optional_check_include_files)
 
+function(optional_find_program cond name expr)
+  if (${cond})
+    find_program(${name} ${expr})
+    if (${name})
+      set(${name}_FOUND 1 PARENT_SCOPE)
+    else()
+      set(${name}_FOUND 0 PARENT_SCOPE)
+    endif()
+    if (NOT (${cond} STREQUAL auto) AND
+        NOT ${name}_FOUND)
+      message(SEND_ERROR
+        "Did not find program ${expr} "
+        "as required by ${cond}" )
+    endif()
+  endif()
+endfunction(optional_find_program)
+
 optional_pkg_check_modules(WITH_XML LIBXML libxml-2.0>=2.6)
 optional_pkg_check_modules(WITH_OSC LIBLO liblo>=0.23)
 optional_pkg_check_modules(WITH_WAV SNDFILE sndfile>=1.0.18)
@@ -119,6 +138,8 @@ optional_pkg_check_modules(WITH_PSYNTH3D OGRE OGRE>=1.6)
 optional_pkg_check_modules(WITH_PSYNTH3D CEGUI CEGUI-0>=0.7)
 optional_pkg_check_modules(WITH_PSYNTH3D CEGUIOGRE CEGUI-0-OGRE>=0.7)
 optional_pkg_check_modules(WITH_PSYNTH3D OIS OIS>=1.0)
+
+optional_find_program(WITH_CCACHE CCACHE ccache)
 
 #  Define targets
 #  =====================================================================
@@ -149,6 +170,13 @@ set_yes_no(HAVE_SOUNDTOUCH SOUNDTOUCH_FOUND)
 set_yes_no(HAVE_OSS OSS_FOUND)
 set_yes_no(HAVE_ALSA ALSA_FOUND)
 set_yes_no(HAVE_JACK JACK_FOUND)
+
+set_yes_no(HAVE_CCACHE CCACHE_FOUND)
+
+if(HAVE_CCACHE)
+  set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE ${CCACHE})
+  set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK ${CCACHE})
+endif()
 
 enable_testing()
 add_custom_target(check DEPENDS test)
@@ -227,9 +255,13 @@ endif()
 
 message("")
 
+message("       Use ccache: .............. ${HAVE_CCACHE}")
+if (WITH_CCACHE AND NOT CCACHE_FOUND)
+  message("           > ccache not installed")
+endif()
 message("       Unit tests: .............. ${BUILD_TESTS}")
 if (WITH_TESTS AND NOT BOOST_TEST_FOUND)
-  message("           > ALSA >= 1.0 not installed")
+  message("           > Boost.UTF not installed")
 endif()
 
 message("
