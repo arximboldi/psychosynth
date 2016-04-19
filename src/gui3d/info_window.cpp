@@ -25,8 +25,6 @@
 #include <psynth/version.hpp>
 
 #include "gui3d/info_window.hpp"
-#include "config.h"
-
 
 using namespace CEGUI;
 using namespace std;
@@ -159,7 +157,7 @@ CEGUI::FrameWindow* info_window::create_window ()
 				 UDim(0,    logos.d_height + 26)));
     slogan->setSize(USize(UDim(0, logos.d_width), UDim(0, 20)));
     slogan->setProperty("BackgroundEnabled", "false");
-    slogan->setText("Psychosynth "  VERSION);
+    slogan->setText("Psychosynth "  PSYNTH_VERSION);
 
 
     Window* container = wmgr.createWindow("TaharezLook/TabControl");
