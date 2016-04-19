@@ -3,7 +3,7 @@
  *   PSYCHOSYNTH                                                           *
  *   ===========                                                           *
  *                                                                         *
- *   Copyright (C) Juan Pedro Bolivar Puente 2008                          *
+ *   Copyright (C) Juan Pedro Bolivar Puente 2008, 2016                          *
  *                                                                         *
  *   This program is free software: you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -21,7 +21,6 @@
  ***************************************************************************/
 
 #include <algorithm>
-#include <config.h>
 
 #include <boost/optional.hpp>
 
@@ -32,6 +31,7 @@
 #include <psynth/net/osc_server_logger.hpp>
 #include <psynth/base/timer.hpp>
 #include <psynth/base/arg_parser.hpp>
+#include <psynth/version.hpp>
 
 #include "cli/psychosynth_cli.hpp"
 
@@ -61,7 +61,7 @@ void psychosynth_cli::print_help()
 
 void psychosynth_cli::print_version()
 {
-  cout << "GNU psynth " << VERSION << endl <<
+  cout << "GNU psynth " << PSYNTH_VERSION << endl <<
     "Copyright (C) 2007-2009 Juan Pedro Bolivar Puente\n"
     "This is free software; see the source for copying conditions.  There is NO\n"
     "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n"
