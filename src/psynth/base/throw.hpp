@@ -64,7 +64,7 @@ public:
     { return _where; }
 
     const char* what () const noexcept
-    { return _stream.message ().c_str (); }
+    { return _what.c_str (); }
 
     int level () const noexcept
     { return _stream.level (); }
@@ -72,9 +72,16 @@ public:
     log_stream_adapter& stream ()
     { return _stream; }
 
+    void throw_()
+    {
+        _what = _stream.message();
+        throw *this;
+    }
+
 private:
     const char*        _where;
     log_stream_adapter _stream;
+    std::string        _what;
 };
 
 template <class Base>
@@ -97,7 +104,7 @@ public:
     ~exception_wrapper () noexcept {}
 
     const char* what () const noexcept
-    { return _stream.message ().c_str (); }
+    { return _what.c_str (); }
 
     const char* where () const noexcept
     { return _where; }
@@ -108,9 +115,16 @@ public:
     log_stream_adapter& stream ()
     { return _stream; }
 
+    void throw_()
+    {
+        _what = _stream.message();
+        throw *this;
+    }
+
 private:
     const char*        _where;
     log_stream_adapter _stream;
+    std::string        _what;
 };
 
 } /* namespace detail */
@@ -121,7 +135,7 @@ class throw_with : public boost::noncopyable
 public:
     explicit throw_with (const char* where = "")
         : _exception (where)
-        , _owner (false)
+        , _owner (true)
     {}
 
     throw_with (throw_with&& other)
@@ -134,7 +148,7 @@ public:
     ~throw_with () noexcept(false)
     {
         if (_owner)
-            throw _exception;
+            _exception.throw_();
     }
 
 private:
