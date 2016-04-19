@@ -24,6 +24,9 @@ cmake_policy(SET CMP0056 NEW) # honor link flags in try_compile()
 project(psychosynth VERSION 0.4.0)
 cmake_minimum_required(VERSION 3.5.1)
 
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED on)
+
 #  Options
 #  =====================================================================
 
@@ -116,18 +119,16 @@ optional_pkg_check_modules(WITH_PSYNTH3D CEGUI CEGUI-0>=0.7)
 optional_pkg_check_modules(WITH_PSYNTH3D CEGUIOGRE CEGUI-0-OGRE>=0.7)
 optional_pkg_check_modules(WITH_PSYNTH3D OIS OIS>=1.0)
 
-#  Summary
+#  Define targets
 #  =====================================================================
-
-add_subdirectory(src)
-add_subdirectory(doc)
-add_subdirectory(data)
 
 function (set_yes_no variable)
   if (${ARGN})
     set(${variable} yes PARENT_SCOPE)
+    set(${variable}_P 1 PARENT_SCOPE)
   else()
     set(${variable} no PARENT_SCOPE)
+    set(${variable}_P 0 PARENT_SCOPE)
   endif()
 endfunction(set_yes_no)
 
@@ -147,6 +148,13 @@ set_yes_no(HAVE_SOUNDTOUCH SOUNDTOUCH_FOUND)
 set_yes_no(HAVE_OSS OSS_FOUND)
 set_yes_no(HAVE_ALSA ALSA_FOUND)
 set_yes_no(HAVE_JACK JACK_FOUND)
+
+add_subdirectory(src)
+add_subdirectory(doc)
+add_subdirectory(data)
+
+#  Summary
+#  =====================================================================
 
 message("
 
