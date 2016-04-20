@@ -22,7 +22,6 @@
 
 #include <cstring>
 #include <cstdlib>
-#include <config.h>
 
 #include <psynth/version.hpp>
 #include <psynth/base/logger.hpp>
@@ -94,7 +93,7 @@ void psychosynth_3d::print_help ()
 
 void psychosynth_3d::print_version ()
 {
-    cout << "GNU psynth3d " << VERSION << endl <<
+    cout << "GNU psynth3d " << PSYNTH_VERSION << endl <<
 	"Copyright (C) 2007-2009 Juan Pedro Bolivar Puente\n"
 	"This is free software; see the source for copying conditions.  There is NO\n"
 	"warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n"
