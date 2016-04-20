@@ -57,46 +57,37 @@ following command. Anyways, I suggest installing `liblo` from the
 original sources because the version in the repositories is outdated
 and contains a bug:
 
-> ```
-> apt-get install automake libtool libogre-dev libceguiogre-dev libois-dev \
->                 libcegui-mk2-dev libasound2-dev libjack-dev liblo0-dev \
->                 libsndfile-dev libxml2-dev libsoundtouch1-dev libvorbis-dev \
->                 libboost-serialization1.35-dev libboost1.35-dev libsigc++-2.0-dev
-> ```
+```
+  sudo apt install cmake libogre-1.9-dev libois-dev \
+                   libcegui-mk2-dev libasound2-dev libjack-dev \
+                   liblo-dev libsndfile-dev libxml2-dev \
+                   libsoundtouch-dev libvorbis-dev libboost-dev
+```
 
 Installing
 ----------
 
-If you downloaded the program from Git you will first need to generate the compilation scripts:
+This project uses the [CMake](http://cmake.org/) build system generator.
+To compile from sources, do:
 
-> ```
-> autoreconf
-> ```
+```
+  mkdir build && cd build
+  cmake .. -DCMAKE_BUILD_TYPE=Release
+  cmake --build .
+```
 
-Now you will need to run the configuration script to detect the the libraries and set up the compilation settings.
+You can then **install** the software by doing
 
-> ```
-> ./configure
-> ```
+```
+  sudo cmake --build . -t install
+```
 
-Check that everything has been detected correctly and then compile the program:
-
-> ```
-> make
-> ```
-
-At last we must run these commands with superuser privileges to install:
-
-> ```
-> make install
-> ldconfig
-> ```
-
-We can now run the 3D simulator:
-
-> ```
-> psynth3d
-> ```
+You may customize the installation folder by passing
+`-DCMAKE_INSTALL_PREFIX=<destination-folder>` to the `cmake ..`
+command.  There are other settings you can pass with
+`-D<setting>=value`, you may list all of them with `cmake .. -LH`.
+Also, there are other things you can do besides building or
+installing, see `cmake --build -t help` to list all possible targets.
 
 License
 -------
