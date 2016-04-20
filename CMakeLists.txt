@@ -234,6 +234,20 @@ add_custom_target(uninstall
   COMMAND ${CMAKE_COMMAND}
   -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
 
+#  dist target
+#  =====================================================================
+
+find_package(Git)
+
+if (GIT_FOUND)
+  set(PSYNTH_ARCHIVE_NAME ${CMAKE_PROJECT_NAME}-${PROJECT_VERSION})
+  add_custom_target(dist
+    COMMAND ${GIT_EXECUTABLE} archive
+      --prefix=${PSYNTH_ARCHIVE_NAME}/ HEAD
+      -o ${CMAKE_BINARY_DIR}/${PSYNTH_ARCHIVE_NAME}.tar.bz2
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
+endif()
+
 #  Summary
 #  =====================================================================
 
