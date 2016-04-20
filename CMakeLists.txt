@@ -151,6 +151,11 @@ optional_pkg_check_modules(WITH_PSYNTH3D OGRE OGRE>=1.6)
 optional_pkg_check_modules(WITH_PSYNTH3D CEGUI CEGUI-0>=0.7)
 optional_pkg_check_modules(WITH_PSYNTH3D CEGUIOGRE CEGUI-0-OGRE>=0.7)
 optional_pkg_check_modules(WITH_PSYNTH3D OIS OIS>=1.0)
+if (OGRE_FOUND)
+  execute_process(
+    COMMAND ${PKG_CONFIG_EXECUTABLE} --variable=plugindir OGRE
+    OUTPUT_VARIABLE OGRE_PLUGIN_DIR)
+endif()
 
 optional_find_program(WITH_CCACHE CCACHE ccache)
 optional_find_package(WITH_DOC DOXYGEN Doxygen)
