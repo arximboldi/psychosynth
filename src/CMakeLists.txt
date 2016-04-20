@@ -27,6 +27,7 @@ if (BUILD_PSYNTH)
     cli/psychosynth_cli.hpp
     psynth.cpp)
   target_link_libraries(psynth-cli PUBLIC psynth)
+  install(TARGETS psynth-cli RUNTIME DESTINATION "${PSYNTH_BINDIR}")
 endif()
 
 if (BUILD_PSYNTH3D)
@@ -105,4 +106,5 @@ if (BUILD_PSYNTH3D)
     ${OIS_LDFLAGS}
     ${CEGUI_LDFLAGS}
     ${CEGUIOGRE_LDFLAGS})
+  install(TARGETS psynth3d RUNTIME DESTINATION "${PSYNTH_BINDIR}")
 endif()

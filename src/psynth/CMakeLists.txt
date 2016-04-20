@@ -366,3 +366,6 @@ add_library(psynth SHARED ${psynth_sources})
 target_include_directories(psynth PUBLIC ${psynth_include_directories})
 target_compile_options(psynth PUBLIC ${psynth_compile_options})
 target_link_libraries(psynth PUBLIC ${psynth_link_libraries})
+
+install(TARGETS psynth LIBRARY DESTINATION "${PSYNTH_LIBDIR}")
+install(FILES ${psynth_headers} DESTINATION "${PSYNTH_INCLUDEDIR}/psynth")

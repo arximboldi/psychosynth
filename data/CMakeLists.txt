@@ -21,3 +21,34 @@
 configure_file(
   "${CMAKE_CURRENT_SOURCE_DIR}/gui3d/plugins.cfg.in"
   "${CMAKE_CURRENT_SOURCE_DIR}/gui3d/plugins.cfg")
+
+install(FILES
+  "${CMAKE_CURRENT_SOURCE_DIR}/desktop/psynth3d.desktop"
+  DESTINATION "${PSYNTH_DATAROOTDIR}/applications")
+
+install(FILES
+  "${CMAKE_CURRENT_SOURCE_DIR}/desktop/psychosynth.png"
+  "${CMAKE_CURRENT_SOURCE_DIR}/desktop/psychosynth.xpm"
+  DESTINATION "${PSYNTH_DATAROOTDIR}/pixmaps")
+
+install(DIRECTORY gui3d DESTINATION "${PSYNTH_DATADIR}"
+  FILES_MATCHING
+  PATTERN "*.cfg"
+  PATTERN "*.cg"
+  PATTERN "*.font"
+  PATTERN "*.imageset"
+  PATTERN "*.jpg"
+  PATTERN "*.layout"
+  PATTERN "*.looknfeel"
+  PATTERN "*.material"
+  PATTERN "*.mesh"
+  PATTERN "*.png"
+  PATTERN "*.scheme"
+  PATTERN "*.tga"
+  PATTERN "*.ttf"
+  PATTERN "*.xsd")
+
+install(DIRECTORY samples DESTINATION "${PSYNTH_DATADIR}"
+  FILES_MATCHING
+  PATTERN "*.wav"
+  PATTERN "*.ogg")

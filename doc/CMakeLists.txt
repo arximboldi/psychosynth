@@ -18,6 +18,11 @@
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+install(FILES
+  man/psynth-cli.1
+  man/psynth3d.1
+  DESTINATION ${CMAKE_INSTALL_FULL_MANDIR})
+
 configure_file(
   "${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in"
   "${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile")
