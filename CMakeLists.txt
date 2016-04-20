@@ -161,6 +161,21 @@ optional_find_program(WITH_CCACHE CCACHE ccache)
 optional_find_package(WITH_DOC DOXYGEN Doxygen)
 optional_find_program(WITH_MAN HELP2MAN help2man)
 
+#  Configure paths
+#  ===============
+
+include(GNUInstallDirs)
+
+set(PSYNTH_BINDIR "${CMAKE_INSTALL_FULL_BINDIR}")
+set(PSYNTH_LIBDIR "${CMAKE_INSTALL_FULL_LIBDIR}")
+set(PSYNTH_INCLUDEDIR "${CMAKE_INSTALL_FULL_INCLUDEDIR}")
+set(PSYNTH_DATAROOTDIR "${CMAKE_INSTALL_FULL_DATAROOTDIR}")
+set(PSYNTH_DATADIR "${CMAKE_INSTALL_FULL_DATADIR}/psychosynth")
+
+if (WITH_LOCAL_DATA)
+  set(PSYNTH_DATADIR "${CMAKE_CURRENT_SOURCE_DIR}/data")
+endif()
+
 #  Define targets
 #  =====================================================================
 
@@ -293,6 +308,18 @@ message("       Unit tests: .............. ${BUILD_TESTS}")
 if (WITH_TESTS AND NOT BOOST_TEST_FOUND)
   message("           > Boost.UTF not installed")
 endif()
+
+message("
+    Installation directories
+
+       Prefix: .......... ${CMAKE_INSTALL_PREFIX}
+
+       Programs: ........ ${PSYNTH_BINDIR}
+       Libraries: ....... ${PSYNTH_LIBDIR}
+       Headers: ......... ${PSYNTH_INCLUDEDIR}
+       Data: ............ ${PSYNTH_DATAROOTDIR}
+       Custom data: ..... ${PSYNTH_DATADIR}
+")
 
 message("
 ")
