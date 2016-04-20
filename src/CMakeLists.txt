@@ -21,6 +21,14 @@
 add_subdirectory(psynth)
 add_subdirectory(test)
 
+configure_file(
+  "${CMAKE_CURRENT_SOURCE_DIR}/libpsynth.pc.in"
+  "${CMAKE_CURRENT_SOURCE_DIR}/libpsynth.pc"
+  @ONLY)
+
+install(FILES "libpsynth.pc"
+  DESTINATION "${PSYNTH_DATAROOTDIR}/pkgconfig")
+
 if (BUILD_PSYNTH)
   add_executable(psynth-cli
     cli/psychosynth_cli.cpp

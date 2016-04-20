@@ -1,0 +1,10 @@
+prefix=@CMAKE_INSTALL_PREFIX@
+exec_prefix=@CMAKE_INSTALL_PREFIX@
+libdir=@PSYNTH_LIBDIR@
+includedir=@PSYNTH_INCLUDEDIR@
+
+Name: libpsynth
+Description: A free library for interactive modular sound synthesizers.
+Version: @PROJECT_VERSION@
+Libs: -L${libdir} -llibpsynth
+Cflags: -I${includedir}
