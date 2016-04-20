@@ -24,8 +24,30 @@ configure_file(
 
 if (HAVE_DOC)
   add_custom_target(doc
-    ${DOXYGEN_EXECUTABLE}
-    "${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile"
+    DEPENDS psynth
+    COMMAND ${DOXYGEN_EXECUTABLE} "${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile"
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-    COMMENT "Generating API documentation with Doxygen" VERBATIM)
+    COMMENT "Generating API documentation with Doxygen"
+    VERBATIM)
+endif()
+
+if (HAVE_MAN)
+  add_custom_target(man-psynth3d
+    DEPENDS psynth3d
+    COMMAND ${HELP2MAN}
+    -o "${CMAKE_CURRENT_SOURCE_DIR}/man/psynth3d.1"
+    "${CMAKE_BINARY_DIR}/src/psynth3d"
+    COMMENT "Updating manpage for psynth3d")
+
+  add_custom_target(man-psynth-cli
+    DEPENDS psynth-cli
+    COMMAND ${HELP2MAN}
+    -o "${CMAKE_CURRENT_SOURCE_DIR}/man/psynth-cli.1"
+    "${CMAKE_BINARY_DIR}/src/psynth-cli"
+    COMMENT "Updating manpage for psynth-cli"
+    VERBATIM)
+
+  add_custom_target(man DEPENDS
+    man-psynth3d
+    man-psynth-cli)
 endif()

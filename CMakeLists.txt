@@ -35,6 +35,7 @@ set(WITH_LOCAL_DATA off CACHE bool "use local data")
 
 set(WITH_CCACHE auto CACHE string "enable ccache")
 set(WITH_DOC auto CACHE string "add target to generate docs")
+set(WITH_MAN auto CACHE string "add target to update man page")
 
 set(WITH_PSYNTH auto CACHE string "build cli client")
 set(WITH_PSYNTH3D auto CACHE string "build 3d gui client")
@@ -153,6 +154,7 @@ optional_pkg_check_modules(WITH_PSYNTH3D OIS OIS>=1.0)
 
 optional_find_program(WITH_CCACHE CCACHE ccache)
 optional_find_package(WITH_DOC DOXYGEN Doxygen)
+optional_find_program(WITH_MAN HELP2MAN help2man)
 
 #  Define targets
 #  =====================================================================
@@ -186,6 +188,7 @@ set_yes_no(HAVE_JACK JACK_FOUND)
 
 set_yes_no(HAVE_CCACHE CCACHE_FOUND)
 set_yes_no(HAVE_DOC DOXYGEN_FOUND)
+set_yes_no(HAVE_MAN HELP2MAN_FOUND)
 
 if(HAVE_CCACHE)
   set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE ${CCACHE})
@@ -269,6 +272,10 @@ endif()
 
 message("")
 
+message("       Update man: .............. ${HAVE_DOC}")
+if (WITH_MAN AND NOT HELP2MAN_FOUND)
+  message("           > help2man not installed")
+endif()
 message("       Reference docs: .......... ${HAVE_DOC}")
 if (WITH_DOC AND NOT DOXYGEN_FOUND)
   message("           > doxygen not installed")
