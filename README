@@ -21,7 +21,7 @@ This package provides
   * **libpsynth**: This is a powerful modern C++ library for the
     building of synthesis software. Type-safe audio buffer and I/O
     abstractions, inspired by
-    [Boost.GIL](http://www.boost.org/doc/libs/1_58_0/libs/gil/doc/index.html),
+    [Boost.GIL](https://boost.org/libs/gil),
     a generic system modular synthesis engine, classes for the
     synchronization of synths over the network using OSC, a framework
     for easy application creation, among other stug....
