@@ -64,8 +64,7 @@ include(CheckIncludeFiles)
 
 set(BOOST_COMPONENTS
   system
-  filesystem
-  signals)
+  filesystem)
 
 if(WITH_TESTS)
   if(WITH_TESTS STREQUAL auto)
