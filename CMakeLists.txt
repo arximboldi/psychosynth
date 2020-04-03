@@ -36,6 +36,7 @@ set(WITH_LOCAL_DATA off CACHE bool "use local data")
 set(WITH_CCACHE auto CACHE string "enable ccache")
 set(WITH_DOC auto CACHE string "add target to generate docs")
 set(WITH_MAN auto CACHE string "add target to update man page")
+set(WITH_ASAN off CACHE BOOL "enable address sanitizer")
 
 set(WITH_PSYNTH auto CACHE string "build cli client")
 set(WITH_PSYNTH3D auto CACHE string "build 3d gui client")

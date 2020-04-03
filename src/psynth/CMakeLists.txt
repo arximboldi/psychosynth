@@ -28,6 +28,14 @@ set(psynth_compile_options
 set(psynth_link_libraries
   ${Boost_LIBRARIES})
 
+if (WITH_ASAN)
+  set(psynth_compile_options ${psynth_compile_options}
+    "-fno-omit-frame-pointer"
+    "-fsanitize=address")
+  set(psynth_link_libraries ${psynth_link_libraries}
+    "-fsanitize=address")
+endif()
+
 set(psynth_include_directories
   "${PROJECT_SOURCE_DIR}/src"
   "${PROJECT_SOURCE_DIR}/src/psynth"
