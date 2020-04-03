@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-25 23:01:44 raskolnikov>
+ *  Time-stamp:  <2020-04-03 12:38:33 raskolnikov>
  *
  *  @file        caching_file_reader.tpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -209,7 +209,7 @@ void caching_file_input_impl<R, I>::run ()
                     _new_read_pos = 0;
 
                 assert (_new_read_pos >= 0);
-                assert (_new_read_pos <= _input->length ());
+                assert (_new_read_pos <= (std::ptrdiff_t) _input->length ());
 
                 /* Do we have to seek */
                 if (_new_read_pos != _read_pos)

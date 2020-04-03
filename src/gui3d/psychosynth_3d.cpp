@@ -254,6 +254,8 @@ void psychosynth_3d::setup_ogre (conf_node& conf)
 	((get_config_path() / "gui3d/psynth3d_Ogre.log").string (),
 	 false, false, false);
 
+    logger::self () ("gui", log::info, "data path: " + get_data_path().string());
+
     m_ogre = new Root ((get_data_path() / "gui3d/plugins.cfg").string (),
 		       (get_data_path() / "gui3d/ogre.cfg").string ());
 

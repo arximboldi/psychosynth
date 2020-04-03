@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-15 16:50:56 raskolnikov>
+ *  Time-stamp:  <2020-04-03 12:19:40 raskolnikov>
  *
  *  @file        ring_buffer.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -357,7 +357,7 @@ public:
     /**
      * Checks a iterator for error states.
      */
-    int check_position (const position& reader) const
+    ring_buffer_error check_position (const position& reader) const
     {
 	if (reader._count < _writepos._count - size ())
 	    return ring_buffer_error::underrun;

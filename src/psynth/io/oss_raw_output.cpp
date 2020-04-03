@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2012-02-01 23:09:50 raskolnikov>
+ *  Time-stamp:  <2020-04-03 12:21:17 raskolnikov>
  *
  *  @file        oss_raw_output.cpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -31,6 +31,7 @@
 #define PSYNTH_MODULE_NAME "psynth.io.oss"
 
 #include <cassert>
+#include <cmath>
 
 #include <fcntl.h>
 #include <sys/soundcard.h>

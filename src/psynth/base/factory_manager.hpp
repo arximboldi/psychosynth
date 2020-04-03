@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-09 21:16:59 raskolnikov>
+ *  Time-stamp:  <2020-04-03 12:16:12 raskolnikov>
  *
  *  @file        factory_manager.hpp
  *  @author      Juan Pedro Bolívar Puente <raskolnikov@es.gnu.org>
@@ -57,10 +57,10 @@ struct factory_access
 
     template <class Concrete>
     static void add (FactoryManager& self, const key_type& k)
-    { self.add <Concrete> (k); }
+    { self.template add <Concrete> (k); }
 
     static void add (FactoryManager& self, const key_type& k, factory_method fn)
-    { self.add (k, fn); }
+    { self.template add (k, fn); }
 
     static void del (FactoryManager& self, const key_type& k)
     { self.del (k); }

@@ -1,5 +1,5 @@
 /**
- *  Time-stamp:  <2011-06-18 20:15:44 raskolnikov>
+ *  Time-stamp:  <2020-04-03 12:17:13 raskolnikov>
  *
  *  @file        sample_algorithm.hpp
  *  @author      Juan Pedro Bolivar Puente <raskolnikov@es.gnu.org>
@@ -83,7 +83,8 @@ struct sample_converter_unsigned_integral_nondivisible;
 
 template <typename UnsignedIntegralSample>
 struct unsigned_integral_max_value :
-	public boost::mpl::integral_c<UnsignedIntegralSample, -1> {};
+	public boost::mpl::integral_c<UnsignedIntegralSample,
+                                      static_cast<UnsignedIntegralSample>(-1)> {};
 
 template <>
 struct unsigned_integral_max_value<uint8_t> :

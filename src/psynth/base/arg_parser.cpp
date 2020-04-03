@@ -111,7 +111,7 @@ void arg_parser::parse (int argc, const char *argv[])
 	    }
 	}
     }
-    catch (parse_error)
+    catch (const parse_error&)
     {
 	throw parse_option_error (std::string ("Error while parsing option: ")
 				  + *argv);
