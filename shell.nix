@@ -8,15 +8,43 @@
 with import nixpkgs {};
 
 let
-  cegui = stdenv.mkDerivation rec {
+  ogre1_8 = stdenv.mkDerivation {
+    name = "ogre-1.8.1";
+    src = fetchurl {
+      url = "mirror://sourceforge/ogre/1.8.1/ogre_src_v1-8-1.tar.bz2";
+      sha256 = "1avadx87sdfdk8165wlffnd5dzks694dcdnkg3ijap966k4qm46s";
+    };
+    cmakeFlags = [ "-DOGRE_INSTALL_SAMPLES=yes" ]
+                 ++ (map (x: "-DOGRE_BUILD_PLUGIN_${x}=on")
+                 [ "BSP" "CG" "OCTREE" "PCZ" "PFX" ])
+                 ++ (map (x: "-DOGRE_BUILD_RENDERSYSTEM_${x}=on") [ "GL" ]);
+    buildInputs = [ cmake pkgconfig mesa
+                    freetype freeimage zziplib
+                    xorg.xorgproto xorg.libXrandr xorg.libXaw
+                    xorg.libXmu xorg.libSM xorg.libXxf86vm
+                    xorg.libICE xorg.libXrender xorg.libX11
+                    xorg.libXxf86vm xorg.libXt
+                    freeglut libpng boost ois
+                    nvidia_cg_toolkit ];
+    meta = {
+      description = "A 3D engine";
+      homepage = http://www.ogre3d.org3/;
+      maintainers = [ stdenv.lib.maintainers.raskin ];
+      platforms = stdenv.lib.platforms.linux;
+      license = "MIT";
+    };
+  };
+
+  cegui_7 = stdenv.mkDerivation rec {
       pname = "cegui";
-      version = "0.8.7";
+      version = "0.7.5";
       src = fetchurl {
-        url = "mirror://sourceforge/crayzedsgui/${pname}-${version}.tar.bz2";
-        sha256 = "067562s71kfsnbp2zb2bmq8zj3jk96g5a4rcc5qc3n8nfyayhldk";
+        url = "https://master.dl.sourceforge.net/project/crayzedsgui/CEGUI%20Mk-2/${version}/CEGUI-${version}.tar.gz";
+        sha256 = "1cjccap7y25mnlxn1kky4hsfhbbddrsp2wlwf83lik9zl0qrw111";
       };
-      buildInputs = [ cmake ogre1_9 freetype boost expat
-                      freeimage pkgconfig pcre fribidi ois ];
+      buildInputs = [ ogre1_8 freetype boost expat
+                      freeimage pkgconfig pcre fribidi ois
+                      python2 ];
       meta = with stdenv.lib; {
         homepage = http://cegui.org.uk/;
         description = "C++ Library for creating GUIs";
@@ -26,7 +54,6 @@ let
   };
 
 in
-
 stdenv.mkDerivation rec {
   name = "psynth-dev";
   buildInputs = [
@@ -34,8 +61,8 @@ stdenv.mkDerivation rec {
     pkgconfig
     ccache
     boost
-    ogre1_9
-    cegui
+    ogre1_8
+    cegui_7
     ois
     liblo
     libxml2
