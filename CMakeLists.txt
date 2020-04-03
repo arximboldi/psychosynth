@@ -31,26 +31,27 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-unused-local-typedefs")
 #  Options
 #  =====================================================================
 
-set(WITH_LOCAL_DATA off CACHE bool "use local data")
+set(WITH_LOCAL_DATA off CACHE BOOL "use local data")
 
-set(WITH_CCACHE auto CACHE string "enable ccache")
-set(WITH_DOC auto CACHE string "add target to generate docs")
-set(WITH_MAN auto CACHE string "add target to update man page")
 set(WITH_ASAN off CACHE BOOL "enable address sanitizer")
+set(WITH_CCACHE auto CACHE STRING "enable ccache")
+set(WITH_DOC auto CACHE STRING "add target to generate docs")
+set(WITH_MAN auto CACHE STRING "add target to update man page")
 
-set(WITH_PSYNTH auto CACHE string "build cli client")
-set(WITH_PSYNTH3D auto CACHE string "build 3d gui client")
-set(WITH_TESTS auto CACHE string "build unit tests")
+set(WITH_PSYNTH auto CACHE STRING "build cli client")
+set(WITH_PSYNTH3D auto CACHE STRING "build 3d gui client")
+set(WITH_TESTS auto CACHE STRING "build unit tests")
 
-set(WITH_OSC auto CACHE string "enable OSC")
-set(WITH_XML auto CACHE string "enable XML config")
+set(WITH_OSC auto CACHE STRING "enable OSC")
+set(WITH_XML auto CACHE STRING "enable XML config")
 
-set(WITH_OGG auto CACHE string "enable ogg")
-set(WITH_WAV auto CACHE string "enable other samples")
+set(WITH_OGG auto CACHE STRING "enable ogg")
+set(WITH_WAV auto CACHE STRING "enable other samples")
 
-set(WITH_ALSA auto CACHE string "enable ALSA sound system")
-set(WITH_OSS auto CACHE string "enable OSS sound system")
-set(WITH_JACK auto CACHE string "enable Jack sound system")
+set(WITH_ALSA auto CACHE STRING "enable ALSA sound system")
+set(WITH_OSS auto CACHE STRING "enable OSS sound system")
+set(WITH_JACK auto CACHE STRING "enable Jack sound system")
+
 
 
 #  Required libraries
